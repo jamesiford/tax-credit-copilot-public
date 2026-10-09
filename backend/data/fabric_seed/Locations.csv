@@ -1,0 +1,22 @@
+EmployerLocationID,FEIN,SEIN,EntityName,InternalLocationName,ExternalLocationName,LocationType,DateOpened,DateClosed,Street,City,State,PostalCode,CountryCode
+MC0001,58-2233445,,"MeridianCore Distribution GA, Inc.",Savannah Distribution Center,MeridianCore,Distribution,,,,Savannah,GA,,US
+MC0002,58-1234567,,MeridianCore Logistics LLC,Macon Operations,MeridianCore,Distribution,,,,Macon,GA,,US
+MC0003,58-1234567,,MeridianCore Logistics LLC,Cumberland Center,MeridianCore,Distribution,,,,Cumberland,GA,,US
+MC0004,58-1234567,,MeridianCore Logistics LLC,Atlanta HQ,MeridianCore,Distribution,,,,Atlanta,GA,,US
+MC0005,13-7654321,,MeridianCore Logistics LLC,Manhattan Office,MeridianCore,Distribution,,,,New York,NY,,US
+MC0006,13-7654321,,MeridianCore Logistics LLC,Brooklyn Hub,MeridianCore,Distribution,,,,Brooklyn,NY,,US
+MC0007,57-2345678,,MeridianCore Logistics LLC,Greenville Facility,MeridianCore,Distribution,,,,Greenville,SC,,US
+MC0008,57-2345678,,MeridianCore Logistics LLC,Charleston Port Ops,MeridianCore,Distribution,,,,Charleston,SC,,US
+MC0009,75-3456789,,MeridianCore Logistics LLC,DAL_GW,MeridianCore,Distribution,,,,,TX,,US
+MC0010,75-3456789,,MeridianCore Logistics LLC,Houston Distribution Hub,MeridianCore,Distribution,,,,Houston,TX,,US
+MC0011,75-3456789,,MeridianCore Logistics LLC,Austin Tech Hub,MeridianCore,Distribution,,,,Austin,TX,,US
+MC0012,62-5678901,,MeridianCore Logistics LLC,Nashville Distribution Center,MeridianCore,Distribution,,,,Nashville,TN,,US
+MC0013,62-5678901,,MeridianCore Logistics LLC,Memphis Fulfillment Center,MeridianCore,Distribution,,,,Memphis,TN,,US
+MC0014,54-9012345,,MeridianCore Logistics LLC,Northern Virginia Hub,MeridianCore,Distribution,,,,Tysons Corner,VA,,US
+MC0015,59-6789012,,MeridianCore Logistics LLC,MIA_REG,MeridianCore,Distribution,,,,,FL,,US
+MC0016,59-6789012,,MeridianCore Logistics LLC,JAX_C2C,MeridianCore,Distribution,,,,,FL,,US
+MC0017,56-4567890,,MeridianCore Logistics LLC,Charlotte Distribution Center,MeridianCore,Distribution,,,,Charlotte,NC,,US
+MC0018,56-4567890,,MeridianCore Logistics LLC,Raleigh-Durham Office,MeridianCore,Distribution,,,,Raleigh,NC,,US
+MC0019,31-7890123,,MeridianCore Logistics LLC,CIN_HUB,MeridianCore,Distribution,,,,,OH,,US
+MC0020,31-7890123,,MeridianCore Logistics LLC,CMH_PORT,MeridianCore,Distribution,,,,,OH,,US
+MC0021,84-8901234,,MeridianCore Logistics LLC,Denver Regional Office,MeridianCore,Distribution,,,,Denver,CO,,US

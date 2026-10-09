@@ -1,0 +1,44 @@
+# Root-level docker build context exclusions. azd builds with the repo root
+# as context (per azure.yaml `docker.context: .`), so only THIS .dockerignore
+# is honored. Per-folder .dockerignore files are documentation only.
+
+# Python
+**/__pycache__/
+**/*.pyc
+**/.pytest_cache/
+**/.venv/
+**/venv/
+**/.coverage
+**/htmlcov/
+**/.mypy_cache/
+**/.ruff_cache/
+
+# Node
+**/node_modules/
+**/dist/
+**/.vite/
+**/coverage/
+
+# VCS / IDE
+.git/
+.github/
+.vscode/
+
+# Documentation that doesn't ship in the runtime image
+stakeholder-docs/
+*.md
+**/*.md
+
+# Local env (never bake into images)
+**/.env
+**/.env.local
+
+# Tests are excluded from the runtime images
+backend/tests/
+frontend/src/**/*.test.js
+frontend/src/**/*.test.jsx
+
+# Misc
+**/*.log
+.DS_Store
+**/.DS_Store

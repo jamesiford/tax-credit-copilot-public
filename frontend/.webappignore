@@ -1,0 +1,10 @@
+# azd App Service package exclusions (gitignore syntax). App Service runs
+# `npm install` and `npm run build` itself (SCM_DO_BUILD_DURING_DEPLOYMENT).
+node_modules/
+.env
+.env.*
+coverage/
+tools/
+Dockerfile
+nginx.conf
+.dockerignore

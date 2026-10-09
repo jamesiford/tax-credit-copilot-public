@@ -1,0 +1,213 @@
+name: Deploy to Azure
+
+# Terraform apply, schema migrations and zip deploy of both App Services.
+#
+# - Trigger: manual dispatch ONLY (D23). There is no push trigger and there
+#   must not be one: push-to-deploy is a later, human decision.
+# - Auth: OIDC (azure/login). AZURE_CLIENT_ID, AZURE_TENANT_ID and
+#   AZURE_SUBSCRIPTION_ID are repository or environment VARIABLES, not secrets:
+#   there is no stored credential (HOST-6). See docs/architecture/OIDC-SETUP.md.
+# - State: remote, from the TF_BACKEND_* variables. The run fails fast without
+#   them rather than applying against a throwaway local state.
+# - Target: the subscription and resource group are asserted before apply.
+
+on:
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: Deployment profile (D25)
+        type: choice
+        options: [enterprise, public]
+        default: enterprise
+      environment:
+        description: GitHub environment holding this deployment's variables (and its approval rules)
+        type: string
+        required: true
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: deploy-${{ inputs.environment }}
+  cancel-in-progress: false
+
+jobs:
+  test:
+    name: Test (gate)
+    uses: ./.github/workflows/ci.yml
+
+  deploy:
+    name: Terraform + migrations + zip deploy
+    needs: test
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    env:
+      ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+      ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      ARM_USE_OIDC: 'true'
+      FABRIC_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+      FABRIC_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+      FABRIC_USE_OIDC: 'true'
+      TF_IN_AUTOMATION: 'true'
+      TF_INPUT: '0'
+      TF_VAR_profile: ${{ inputs.profile }}
+      TF_VAR_environment_name: ${{ vars.AZURE_ENV_NAME }}
+      TF_VAR_location: ${{ vars.AZURE_LOCATION }}
+      TF_VAR_resource_group_name: ${{ vars.AZURE_RESOURCE_GROUP }}
+      TF_VAR_subscription_id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      TF_VAR_git_commit: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Require remote state and a named target
+        env:
+          TF_BACKEND_RESOURCE_GROUP: ${{ vars.TF_BACKEND_RESOURCE_GROUP }}
+          TF_BACKEND_STORAGE_ACCOUNT: ${{ vars.TF_BACKEND_STORAGE_ACCOUNT }}
+          TF_BACKEND_CONTAINER: ${{ vars.TF_BACKEND_CONTAINER }}
+          AZURE_RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
+          AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+          AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+          AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+          AZURE_ENV_NAME: ${{ vars.AZURE_ENV_NAME }}
+        run: |
+          missing=""
+          for name in TF_BACKEND_RESOURCE_GROUP TF_BACKEND_STORAGE_ACCOUNT TF_BACKEND_CONTAINER \
+                      AZURE_RESOURCE_GROUP AZURE_SUBSCRIPTION_ID AZURE_CLIENT_ID AZURE_TENANT_ID AZURE_ENV_NAME; do
+            if [ -z "${!name}" ]; then missing="$missing $name"; fi
+          done
+          if [ -n "$missing" ]; then
+            echo "::error::missing repository/environment variables:$missing (see docs/architecture/OIDC-SETUP.md)"
+            exit 1
+          fi
+
+      - name: Azure login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Assert the target subscription and resource group
+        env:
+          EXPECTED_SUBSCRIPTION: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+          RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
+          AZURE_ENV_NAME: ${{ vars.AZURE_ENV_NAME }}
+        run: |
+          actual=$(az account show --query id -o tsv)
+          if [ "$actual" != "$EXPECTED_SUBSCRIPTION" ]; then
+            echo "::error::logged into subscription $actual, expected $EXPECTED_SUBSCRIPTION"; exit 1
+          fi
+          if az group show -n "$RESOURCE_GROUP" -o none 2>/dev/null; then
+            tag=$(az group show -n "$RESOURCE_GROUP" --query "tags.\"azd-env-name\"" -o tsv)
+            if [ -n "$tag" ] && [ "$tag" != "$AZURE_ENV_NAME" ]; then
+              echo "::error::resource group $RESOURCE_GROUP belongs to environment '$tag', not '$AZURE_ENV_NAME'"; exit 1
+            fi
+          fi
+          echo "target: subscription $actual, resource group $RESOURCE_GROUP"
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.16.5
+          terraform_wrapper: false
+
+      - name: Terraform init (remote state)
+        working-directory: infra
+        env:
+          TF_BACKEND_RESOURCE_GROUP: ${{ vars.TF_BACKEND_RESOURCE_GROUP }}
+          TF_BACKEND_STORAGE_ACCOUNT: ${{ vars.TF_BACKEND_STORAGE_ACCOUNT }}
+          TF_BACKEND_CONTAINER: ${{ vars.TF_BACKEND_CONTAINER }}
+          AZURE_ENV_NAME: ${{ vars.AZURE_ENV_NAME }}
+        run: |
+          cat > backend_override.tf <<'EOF'
+          terraform {
+            backend "azurerm" {}
+          }
+          EOF
+          terraform init \
+            -backend-config="resource_group_name=$TF_BACKEND_RESOURCE_GROUP" \
+            -backend-config="storage_account_name=$TF_BACKEND_STORAGE_ACCOUNT" \
+            -backend-config="container_name=$TF_BACKEND_CONTAINER" \
+            -backend-config="key=tax-credit-copilot/$AZURE_ENV_NAME.tfstate" \
+            -backend-config="use_azuread_auth=true" \
+            -backend-config="use_oidc=true"
+
+      - name: Profile values (enterprise BYO inputs)
+        working-directory: infra
+        env:
+          TF_VARS_JSON: ${{ vars.TF_VARS_JSON }}
+        run: |
+          # Subnet ids, DNS zone ids, Fabric ids and app registrations for the
+          # enterprise profile come from one JSON variable (no secrets in it).
+          if [ -n "$TF_VARS_JSON" ]; then printf '%s' "$TF_VARS_JSON" > deploy.auto.tfvars.json; fi
+
+      - name: Terraform plan
+        working-directory: infra
+        run: terraform plan -out=tfplan
+
+      - name: Terraform apply
+        working-directory: infra
+        run: terraform apply tfplan
+
+      - name: Read outputs
+        id: tf
+        working-directory: infra
+        run: |
+          terraform output -json > "$RUNNER_TEMP/outputs.json"
+          for key in API_APP_NAME WEB_APP_NAME AZURE_RESOURCE_GROUP WAREHOUSE_SERVER WAREHOUSE_DATABASE \
+                     FABRIC_WORKSPACE_ID FABRIC_WAREHOUSE_ID TCC_FABRIC_CREATED API_IDENTITY_NAME \
+                     FABRIC_WORKSPACE FABRIC_LAKEHOUSE SOURCE_SCHEMA TCC_PROFILE; do
+            echo "$key=$(jq -r ".${key}.value" "$RUNNER_TEMP/outputs.json")" >> "$GITHUB_ENV"
+          done
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install the ODBC driver and backend dependencies
+        run: |
+          curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | sudo gpg --dearmor -o /usr/share/keyrings/microsoft-prod.gpg
+          curl -fsSL "https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/prod.list" | sudo tee /etc/apt/sources.list.d/mssql-release.list
+          sudo apt-get update
+          sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+
+      - name: Apply schema migrations (bootstrap only on a Warehouse this run created)
+        run: |
+          if [ "$TCC_FABRIC_CREATED" = "true" ]; then
+            python scripts/apply-migrations.py --target deployed --bootstrap
+          else
+            python scripts/apply-migrations.py --target deployed
+          fi
+
+      - name: Grant the API identity on tcc_gold / tcc_ops
+        run: python scripts/grant-warehouse-sql.py --target deployed
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Build packages
+        run: |
+          (cd frontend && npm ci --legacy-peer-deps --no-audit && npm run build)
+          python scripts/package-app.py backend "$RUNNER_TEMP/api.zip"
+          python scripts/package-app.py frontend "$RUNNER_TEMP/web.zip"
+
+      - name: Zip deploy both apps
+        run: |
+          az webapp deploy -g "$AZURE_RESOURCE_GROUP" -n "$API_APP_NAME" --src-path "$RUNNER_TEMP/api.zip" --type zip --async false
+          az webapp deploy -g "$AZURE_RESOURCE_GROUP" -n "$WEB_APP_NAME" --src-path "$RUNNER_TEMP/web.zip" --type zip --async false
+
+      - name: Smoke test through the web app (public profile)
+        if: inputs.profile == 'public'
+        run: |
+          host=$(az webapp show -g "$AZURE_RESOURCE_GROUP" -n "$WEB_APP_NAME" --query defaultHostName -o tsv)
+          for _ in $(seq 1 30); do
+            if curl -fsS --max-time 15 "https://$host/healthz"; then echo; echo "web healthy"; exit 0; fi
+            sleep 20
+          done
+          echo "::error::web app did not become healthy"; exit 1

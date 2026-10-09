@@ -1,0 +1,130 @@
+{
+  "_prototype_verification": "PROTOTYPE rule pack. Tier 1 county parameters reflect publicly documented Georgia Jobs Tax Credit values; verify all numbers (per-job amount, thresholds, county designations, benefit period, carryforward) against current Georgia Department of Revenue guidance before any real client use.",
+  "rule_pack_version": "0.1.0+ty2023",
+  "jurisdiction": {
+    "level": "state",
+    "code": "GA",
+    "name": "Georgia"
+  },
+  "credit": {
+    "code": "GA_JTC",
+    "name": "Georgia Jobs Tax Credit",
+    "statutory_citation": "OCGA \u00a7 48-7-40",
+    "designation": "T1B40_MZ_OZ",
+    "summary": "Statutory credit for net new full-time jobs. This pack prices the $3,500 / 2-job designation band — Tier 1 Bottom-40 county, Military Zone or Opportunity Zone — which is open to ANY lawful business. Standard Tier 1-4 ($4,000/$3,000/$1,750/$1,250, 2/10/15/25 jobs) is restricted to Eligible Business Enterprises and is NOT modelled here. Source: the partner's methodology team, 10 Sep 2026."
+  },
+  "tax_year_convention": {
+    "label": "begins",
+    "regulation": "110-9-1-.02(1)(a)",
+    "_prototype_verify": true,
+    "_disc_ref": "PILOT-07",
+    "_note": "Georgia labels a tax year by the year it BEGINS: a fiscal year opening in April 2024 is Tax Year 2024. The common business convention labels a fiscal year by the year it ENDS. The two agree only for calendar-year filers. READ FROM THE REGULATION, NOT YET CONFIRMED BY THE PARTNER - see PILOT-07. The certified reference run is consistent with this reading: its window opens 2023-07-28 and the whole project calls it TY2023."
+  },
+  "filing": {
+    "window": "With Georgia Form IT-CA at return filing",
+    "cycle": "annual",
+    "_prototype_verify": true,
+    "_disc_ref": "PILOT-06",
+    "form": "IT-CA (Georgia Job Tax Credit)",
+    "attach_to_return": "Georgia Form 600 (C-corp) / 600S (S-corp) / 700 (partnership)",
+    "filing_channel": "Georgia Tax Center (GTC) e-file or with the paper return",
+    "deadline_note": "File with the original Georgia income-tax return for the tax year (including extensions).",
+    "carryforward_years": 10,
+    "required_attachments": [
+      "Form IT-CA with per-county net-new job counts",
+      "Average Monthly Headcount schedule (base year vs credit year)",
+      "Payroll register / evidence pack supporting the One/Zero calculation",
+      "County tier designation reference for the credit year"
+    ],
+    "_note": "Prototype filing guidance for demonstration. Confirm the exact GA DOR form edition, e-file path, and attachment list with the partner (PILOT-06) before any real filing."
+  },
+  "thresholds": {
+    "minimum_new_jobs": 2,
+    "minimum_hours_per_week_full_time": 35
+  },
+  "benefit": {
+    "amount_per_qualifying_job_usd": 3500,
+    "benefit_period_years": 5,
+    "carryforward_years": 10,
+    "currency": "USD"
+  },
+  "eligibility": {
+    "qualifying_employment_type": "full_time",
+    "include_replacement_hires": false,
+    "include_seasonal": true,
+    "seasonal_conditions": {
+      "must_meet_full_time_and_all_other_program_requirements": true,
+      "_doc_source": "the product's documented One/Zero methodology",
+      "_note": "The workbook states that a full-time job filled by a seasonal employee is eligible when the job otherwise meets program requirements. The Reference source has no employment-type field, so this condition is metadata only until supplied."
+    },
+    "staffing_entity_conditions": {
+      "eligible": true,
+      "employee_must_work_full_time_at_client_in_eligible_industry": true,
+      "staffing_entity_internal_employees_excluded": true,
+      "_doc_source": "the product's documented One/Zero methodology",
+      "_note": "The Reference source lacks staffing/client-industry fields; do not infer this classification."
+    },
+    "geographic_scope": {
+      "level": "county",
+      "tier_1_counties_only": true,
+      "_note": "GA eligibility is decided at the LOCATION, not by the company NAICS code (confirmed with the partner's team, 10 Sep 2026). Eight designations exist: T1/T2/T3/T4 at $4,000/$3,000/$1,750/$1,250 for Eligible Business Enterprises only, plus T1B40/MZ/OZ at $3,500 and LDCT at $3,500 (5 jobs). This prototype prices every GA worksite in the $3,500 / 2-job band, which is the one open to any lawful business — including the retail and food-service clients in the demo set, which cannot access standard Tier 1. Production must load the annual DOR designation list AND a per-worksite Eligible Business Enterprise flag."
+    }
+  },
+  "headcount_formula": {
+    "type": "avg_monthly_fte",
+    "fte_basis_hours_per_week": 40,
+    "compare_to_prior_period_months": 12,
+    "partial_month_handling": "prorate_by_active_days",
+    "_note": "Average monthly FTE is computed as sum(hours_in_month) / (4.33 * fte_basis_hours_per_week) per employee, then summed across qualifying employees. This is the PROTOTYPE quick-estimate metric; the statutory engine is the one_zero block below."
+  },
+  "one_zero": {
+    "_doc_source": "the product's documented One/Zero methodology (Pay Period Method, Min Max Method, and the BCS business-framing overview, 2024)",
+    "min_weekly_hours": 35.0,
+    "min_weekly_wages": 636.0,
+    "wage_basis": "all_remuneration",
+    "geographic_granularity": "unit",
+    "pt_aggregation": false,
+    "headcount_unit_field": "Worksite_ID",
+    "measuring_date": "last_day",
+    "entity_combination": "permitted",
+    "pay_code_policy": {
+      "_disc_ref": "DISC-14",
+      "_prototype_verify": true,
+      "_note": "CALC-11: Georgia uses ALL REMUNERATION for the weekly-wage test (Regular + Overtime + Bonus + Commission). Non-wage pay codes (mileage / expense reimbursements) are suppressed. Base-pay-only states would exclude Overtime/Bonus. The synthetic dataset is Regular-only, so suppression is a no-op on the demo numbers; proven on a dedicated fixture. Confirm the GA eligible-code list with the partner (PILOT-05).",
+      "included_pay_codes": [
+        "Regular",
+        "Overtime",
+        "Bonus",
+        "Commission"
+      ],
+      "excluded_pay_codes": [
+        "Mileage",
+        "Expense_Reimbursement",
+        "Relocation"
+      ]
+    },
+    "_note": "GA JTC Base Calculation: per-employee weekly avg hours >= 35 AND weekly avg wages >= the resolved annual floor. Headcount is tested at unit/worksite grain and averaged over monthly counts. Historical table: 2024=$686; 2025=$680.",
+    "wage_floor_basis": {
+      "wage_table_year_basis": "source_tax_year",
+      "regulation": "110-9-1-.02(1)(a) and 110-9-1-.03(3)(b)1",
+      "source_tax_year": 2023,
+      "dol_report_year": 2022,
+      "lowest_wage_county": "Glascock",
+      "annualized_wage_usd": 33072.0
+    }
+  },
+  "calculation": {
+    "qualifying_jobs_expression": "max(0, current_period_qualifying_fte - prior_period_qualifying_fte - threshold_offset)",
+    "annual_credit_expression": "qualifying_jobs * amount_per_qualifying_job_usd",
+    "lifetime_credit_expression": "annual_credit * benefit_period_years",
+    "threshold_offset_note": "Per OCGA \u00a7 48-7-40 the first 2 net new jobs (Tier 1) do not qualify; we subtract that threshold from qualifying FTE before applying the per-job amount."
+  },
+  "tax_year": 2023,
+  "_year_provenance": {
+    "source": "published_wage_table",
+    "note": "Georgia published table: DOL report year 2022, Glascock County, $33,072 / 52 = $636 per week. Source: the product's historical wage table, July 2025 (SHA-256 21A8D16683196F982CBF3040980BEC9C8A3A4F2BD1AC686E57647D03185D8208), Georgia DOL Employment & Wages Averages, lowest-wage county.",
+    "materialised_from": "rules/ga_jtc.json",
+    "materialised_on": "2026-08-26",
+    "adr": "ADR-005"
+  }
+}

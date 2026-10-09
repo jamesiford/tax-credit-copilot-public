@@ -1,0 +1,88 @@
+{
+  "_artifact": "Rules-ingestion agent output for Tennessee. DO NOT hand-edit thresholds here — this is the cited config the calc engine reads for TN. Core values are grounded in T.C.A. § 67-4-2109 (statute text retrieved + verified 2026-07-15). The eligibility floors are deliberately set to MATCH the static tn_jtc.json pack so enabling this cited config changes NO computed number. The weekly-WAGE floor and wage basis are PROTOTYPE placeholders (the statute has no weekly-wage $ floor — it requires 37.5 hrs + minimum health care) pending the partner's wage-base policy (GOV-01 human checkpoint).",
+  "program": "TN_JTC",
+  "jurisdiction": "TN",
+  "credit_name": "Tennessee Job Tax Credit",
+  "in_scope": false,
+  "ingestion": {
+    "produced_by": "RulesIngestionAgent",
+    "method": "web_iq_browse",
+    "captured_at": "2026-07-15",
+    "live_refresh_supported": true,
+    "web_iq": {
+      "status": "WIRED",
+      "transport": "REST v3 (api.microsoft.ai) via tools/webiq.py; key from env WEBIQ_API_KEY",
+      "_note": "The base $4,500/job, $500,000 required capital investment, 25-job minimum (20 tier 3 / 10 tier 4), 37.5 hr/wk qualified-job definition, and 15-year carryforward were VERIFIED by direct retrieval of the T.C.A. § 67-4-2109 statute text (Justia, 2026-07-15 — see parameter sources). Live source reachability/drift refresh IS wired for TN (GET /api/rules/ingested/TN/refresh?live=true browses the statute + TNECD via Web IQ, verifying each source + capturing crawl timestamps); the annual-memo proposals/apply extraction stays GA-only. The weekly-WAGE floor is NOT statutory and stays _prototype_verify pending the partner.",
+      "needs": [
+        "The partner's confirmation of the applicable weekly-wage floor + wage base for TN (statute uses 37.5 hrs + minimum health care, no wage $ floor)"
+      ]
+    }
+  },
+  "parameters": {
+    "min_weekly_hours": {
+      "value": 37.5,
+      "unit": "hours_per_week",
+      "confidence": "high",
+      "source": {
+        "authority": "T.C.A. § 67-4-2109(a)(6)(A)(i)",
+        "title": "Tennessee Job Tax Credit — a qualified job is a permanent position of at least 37.5 hrs/wk for 12 consecutive months",
+        "url": "https://law.justia.com/codes/tennessee/title-67/chapter-4/part-21/section-67-4-2109/",
+        "retrieved_at": "2026-07-15"
+      },
+      "_note": "Statutory, verified against the 2024 TN Code (Justia). A post-7/1/2025 version of the section exists; confirm the current text before client use."
+    },
+    "min_weekly_wages": {
+      "value": 600.0,
+      "unit": "usd_per_week",
+      "confidence": "low",
+      "_prototype_verify": true,
+      "_disc_ref": "TN-1",
+      "source": {
+        "authority": "PROTOTYPE placeholder (NOT statutory)",
+        "title": "TN JTC has no weekly-wage $ floor in statute (it requires 37.5 hrs + minimum health care). $600 is a prototype placeholder matching the static pack.",
+        "url": "https://law.justia.com/codes/tennessee/title-67/chapter-4/part-21/section-67-4-2109/",
+        "retrieved_at": "2026-07-15"
+      },
+      "_note": "Not a statutory value. Kept at 600 to match the static pack so the cited config changes no computed number; pending the partner's wage-base policy."
+    },
+    "wage_basis": {
+      "value": "regular",
+      "confidence": "low",
+      "_prototype_verify": true,
+      "included_pay_codes": null,
+      "excluded_pay_codes": null,
+      "source": {
+        "authority": "PROTOTYPE placeholder",
+        "title": "Wage basis pending the partner's pay-code policy for TN",
+        "url": "https://tnecd.com/incentives/",
+        "retrieved_at": "2026-07-15"
+      }
+    },
+    "measuring_date": {
+      "value": "last_day",
+      "confidence": "medium",
+      "source": {
+        "authority": "Engine default (monthly last-calendar-day measuring date)",
+        "title": "Measuring date — last calendar day of the month",
+        "url": "https://law.justia.com/codes/tennessee/title-67/chapter-4/part-21/section-67-4-2109/",
+        "retrieved_at": "2026-07-15"
+      }
+    }
+  },
+  "benefit_reference": {
+    "base_usd_per_job": 4500,
+    "required_capital_investment_usd": 500000,
+    "minimum_new_jobs": 25,
+    "tier3_minimum_new_jobs": 20,
+    "tier4_minimum_new_jobs": 10,
+    "carryforward_years": 15,
+    "eligibility_scope": "statewide",
+    "source": {
+      "authority": "T.C.A. § 67-4-2109(b)(1)",
+      "title": "Base Job Tax Credit = $4,500/qualified job statewide for $500,000 investment + 25 jobs (20 tier 3 / 10 tier 4); 15-yr carryforward",
+      "url": "https://law.justia.com/codes/tennessee/title-67/chapter-4/part-21/section-67-4-2109/",
+      "retrieved_at": "2026-07-15"
+    },
+    "_note": "Benefit parameters VERIFIED against the statute (2026-07-15). Reference only — the engine reads eligibility floors from `parameters` above; benefit math reads the static rules/tn_jtc.json pack."
+  }
+}

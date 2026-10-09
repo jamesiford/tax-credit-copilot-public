@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "assumption_set_id": "GDS-ONEZERO-2026-07-29-v1",
+  "status": "proposed_for_v1_implementation_review",
+  "created_at": "2026-07-29",
+  "scope": "JOHN_REFERENCE_FY2024",
+  "purpose": "Explicit interpretations needed to implement Min-Max and Pay Period One/Zero v1 from John's original source documents.",
+  "source_basis": [
+    "One Zero Pay Periods.docx Steps 6-7",
+    "One Zero Min Max.docx Steps 5-6",
+    "July 23 working-session transcript",
+    "GDS-STEP1-2026-07-29-v1"
+  ],
+  "assumptions": {
+    "OZ-01": {
+      "status": "derived_from_approved_step1_config",
+      "decision": "Generate the twelve One/Zero month targets from the approved benchmark fiscal window, August 2023 through July 2024, rather than the example years printed in the source documents.",
+      "falsified_by": "John's Access run uses another twelve-month matrix window."
+    },
+    "OZ-02": {
+      "status": "proposed",
+      "decision": "Min-Max coverage uses earliest included PPS through latest included PPE per employee, unit, and FEIN; source-document references to first/last paycheck date are treated as imprecise labels for the period range.",
+      "falsified_by": "John's diagram or Access matrix uses paycheck dates rather than PPS/PPE boundaries."
+    },
+    "OZ-03": {
+      "status": "proposed",
+      "decision": "Pay Period coverage uses PPS <= month target <= PPE. The source condition PaycheckDate <= target AND PaycheckDate >= target is treated as a wording defect because it reduces to equality and conflicts with the period-range examples.",
+      "falsified_by": "John confirms equality-to-paycheck-date or another coverage rule."
+    },
+    "OZ-04": {
+      "status": "source_confirmed",
+      "decision": "For Month 12, when the employee's last PPE is in Month 12 and day > 15, use that PPE as the target; otherwise use month end.",
+      "falsified_by": "A later John-authored flow supersedes the original Month-12 rule."
+    },
+    "OZ-05": {
+      "status": "proposed",
+      "decision": "Pay Period One/Zero consumes only periods classified as major within source cadence. Until John supplies the exact classifier, use the current median-employee-count/2 cadence heuristic and expose every classification and missing-period flag.",
+      "falsified_by": "John supplies a different major-period classifier or Access period list."
+    },
+    "OZ-06": {
+      "status": "proposed",
+      "decision": "No employee may contribute more than one count in a month. Flag every overlap before correction; v1 assigns the count to the covering row with the latest PPS, then latest PPE, then stable source order, and records before/after disposition.",
+      "falsified_by": "John supplies another test-of-twos allocation rule or a manual disposition."
+    },
+    "OZ-07": {
+      "status": "proposed",
+      "decision": "For this full-year benchmark, divide unit total by 12. Preserve the unrounded audit average, expose the source-document nearest-whole half-up view, and keep the application's two-decimal value as a distinct field.",
+      "falsified_by": "John uses a partial-year month denominator, another rounding sequence, or only one output precision."
+    },
+    "OZ-08": {
+      "status": "transcript_confirmed_extension",
+      "decision": "Eligibility remains customer-wide; One/Zero matrix grain includes employee, unit, and FEIN. Unit determines legal entity for this source unless an exception is flagged.",
+      "falsified_by": "John's Access output uses another legal-entity allocation grain."
+    },
+    "OZ-09": {
+      "status": "source_confirmed",
+      "decision": "Min-Max emits one row per eligible employee-unit-FEIN span; Pay Period emits one row per eligible employee-major-period-unit-FEIN.",
+      "falsified_by": "John's follow-up changes the documented matrix grain."
+    }
+  },
+  "change_control": {
+    "approval_required_before_parity_signoff": true,
+    "supersession_rule": "Create a new versioned file when John clarifies an ambiguity; retain this v1 with all runs that used it.",
+    "run_metadata": [
+      "step1_assumption_set_id_and_sha256",
+      "onezero_assumption_set_id_and_sha256",
+      "source_manifest_sha256",
+      "code_commit",
+      "run_timestamp"
+    ]
+  }
+}

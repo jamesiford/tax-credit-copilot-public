@@ -1,0 +1,45 @@
+{
+  "_synthetic": true,
+  "_roadmap_ref": "P1 / PILOT-04 / DISC-16",
+  "_note": "SYNTHETIC benchmark standing in for the partner's Access/Copilot calc output. Regenerated from the engine on 2026-08-24 after the v7 methodology convergence, so it demonstrates the reconciliation MACHINERY only and cannot detect a calculation error. The real correctness gate is backend/tests/test_engine_parity_reference.py, which runs the partner's reference dataset through the production engine and asserts the certified figures. Swap this file for the partner's per-location head counts to surface genuine discrepancies; the real run happens INSIDE the partner's environment (payroll never leaves the partner).",
+  "tax_year": 2025,
+  "tolerance": 0.5,
+  "rows": [
+    {
+      "key": "GA",
+      "average_headcount": 61.0
+    },
+    {
+      "key": "NC",
+      "average_headcount": 24.08
+    },
+    {
+      "key": "CO",
+      "average_headcount": 11.33
+    },
+    {
+      "key": "NY",
+      "average_headcount": 10.67
+    },
+    {
+      "key": "SC",
+      "average_headcount": 5.12
+    },
+    {
+      "key": "VA",
+      "average_headcount": 3.92
+    },
+    {
+      "key": "OH",
+      "average_headcount": 3.34
+    },
+    {
+      "key": "FL",
+      "average_headcount": 2.58
+    },
+    {
+      "key": "TN",
+      "average_headcount": 0.83
+    }
+  ]
+}

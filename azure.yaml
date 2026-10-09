@@ -1,0 +1,48 @@
+name: tax-credit-copilot
+metadata:
+  template: tax-credit-copilot@2.0.0
+
+# Terraform (TF-4). The profile comes from `azd env set TCC_PROFILE
+# public|enterprise`; infra/main.tfvars.json maps azd environment values into
+# Terraform variables. Every azd command here runs with --no-prompt.
+infra:
+  provider: terraform
+  path: infra
+
+hooks:
+  # After every provision, in order (D22):
+  #   1. apply-migrations  - bootstraps DDL v2.0 ONLY on a Warehouse this
+  #                          deployment just created; otherwise applies pending
+  #                          migrations (a re-run applies nothing)
+  #   2. load-synthetic    - public profile only: the synthetic source dataset
+  #   3. grant-warehouse-sql - T-SQL grants on tcc_gold / tcc_ops to the API identity
+  #   4. seed-operational-store - idempotent onboarding assertions
+  postprovision:
+    windows:
+      shell: pwsh
+      run: ./scripts/postprovision.ps1
+      continueOnError: false
+    posix:
+      shell: sh
+      run: pwsh ./scripts/postprovision.ps1
+      continueOnError: false
+
+services:
+  api:
+    project: ./backend
+    language: python
+    host: appservice
+  web:
+    project: ./frontend
+    language: js
+    host: appservice
+    hooks:
+      # App Service builds too (SCM_DO_BUILD_DURING_DEPLOYMENT); building here
+      # first fails fast on a broken bundle before anything is uploaded.
+      prepackage:
+        windows:
+          shell: pwsh
+          run: npm ci --legacy-peer-deps --no-audit ; npm run build
+        posix:
+          shell: sh
+          run: npm ci --legacy-peer-deps --no-audit && npm run build

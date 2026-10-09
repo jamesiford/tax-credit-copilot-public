@@ -1,0 +1,12 @@
+# Local Terraform state and working files never enter git.
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+# Providers are pinned exactly in providers.tf; the lock file stays local.
+.terraform.lock.hcl
+# Real values belong in an overlay, never in the repo.
+*.auto.tfvars
+profiles/*.tfvars
+

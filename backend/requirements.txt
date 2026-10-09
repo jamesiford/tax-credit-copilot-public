@@ -1,0 +1,49 @@
+# --- web framework ---
+fastapi==0.136.3
+uvicorn[standard]==0.48.0
+gunicorn==23.0.0                    # App Service process manager (backend/startup.sh)
+python-multipart==0.0.29           # multipart file uploads
+
+# --- microsoft agent framework (GA) ---
+# `agent-framework-foundry` is the canonical Foundry integration package.
+# It transitively pins agent-framework-core, agent-framework-openai,
+# azure-ai-projects (>=2.1.0,<3.0), and azure-ai-inference.
+agent-framework-foundry==1.7.0
+
+# --- azure identity (DefaultAzureCredential — uses `az login` locally) ---
+azure-identity==1.25.3
+# Artifact bytes (ARTIFACT_STORE=blob): claim packages and rule sources, via the API only.
+azure-storage-blob==12.29.0
+
+# --- foundry v2 SDK. 2.1.0 is current GA on PyPI; 2.2.0 changelog dated
+#     2026-05-29 but not yet published. Both expose .agents.create_version. ---
+azure-ai-projects==2.1.0
+
+# --- async transport used by azure.ai.projects.aio (required by FoundryAgent runtime) ---
+aiohttp>=3.10,<4
+
+# --- telemetry: app insights via the unified opentelemetry distro (optional) ---
+azure-monitor-opentelemetry==1.8.8
+
+# --- misc ---
+python-dotenv==1.0.1
+openpyxl==3.1.5                    # private Reference Dataset Access XLSX imports
+# Reads the Fabric Lakehouse `employees` Delta table directly from OneLake when
+# DATA_SOURCE=fabric (tools/fabric_source.FabricOneLakeAdapter). The pyarrow
+# extra is required by DeltaTable.to_pyarrow_table(); no ODBC driver is needed.
+deltalake[pyarrow]>=1.0,<2.0
+
+# Fabric Warehouse (SQL endpoint) for tcc_gold / tcc_ops, via
+# infrastructure/persistence/fabric_warehouse.py. Unlike the OneLake reader
+# above this DOES need an ODBC driver — "ODBC Driver 18 for SQL Server" must be
+# present in the image, not just the wheel. RUN_MANIFEST_STORE=memory does not
+# import it, so CI stays driverless.
+pyodbc==5.3.0
+
+# --- testing (dev-only; safe to install in prod environments, just unused) ---
+pytest==9.0.3
+httpx==0.28.1                       # FastAPI TestClient async transport
+pytest-cov==7.0.0                   # `pytest --cov=tools --cov=api --cov=data`
+
+# --- authentication (AUTH_MODE=entra): JWT validation against Entra's JWKS ---
+PyJWT[crypto]>=2.8,<3

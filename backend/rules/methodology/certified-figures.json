@@ -1,0 +1,24 @@
+{
+  "certified_figures_id": "GDS-CERTIFIED-2026-08-24",
+  "program_code": "GA_JTC",
+  "tax_year": 2023,
+  "assumption_set_id": "GDS-STEP1-2026-08-25-v8",
+  "onezero_assumption_set_id": "GDS-ONEZERO-2026-08-24-v7",
+  "reconciled_with": "Experian (John Skowronski), 30 July - 24 August 2026",
+  "why_this_file_exists": [
+    "The certified figures are asserted from two places that must not share a definition.",
+    "`backend/tests/certified.py` holds them as literals so a rule-pack edit cannot move",
+    "the gate along with the engine. This file is the PRODUCTION-readable copy, needed",
+    "because the runtime equivalence gate refuses to serve a lakehouse-sourced run that",
+    "does not reproduce them - and production code may not import from tests/.",
+    "",
+    "Two copies would normally be a defect. `tests/test_certified_figures_contract.py`",
+    "asserts they agree, so a drift fails loudly rather than silently."
+  ],
+  "figures": {
+    "employees_evaluated": 10236,
+    "min_max_eligible": 539,
+    "pay_period_eligible": 656
+  },
+  "never_edit": "A change that moves these is either a real improvement needing re-reconciliation with Experian, or a bug. It is never a value that needs updating to make something pass."
+}

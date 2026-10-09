@@ -1,0 +1,45 @@
+# Example customer overlay — Terraform variables (WL-8).
+#
+# PLACEHOLDERS ONLY. This mirrors infra/profiles/enterprise.tfvars.example,
+# which is the canonical, current list of enterprise-profile variables —
+# start there if the two drift, and treat this file as "the enterprise
+# profile, filled in for one customer and relocated into their overlay".
+#
+# Copy this directory to overlays/<name>/ (dropping the .example suffix),
+# replace every <...> value, and run:
+#   terraform plan -var-file=../overlays/<name>/infra.tfvars
+# from infra/.
+
+profile          = "enterprise"
+environment_name = "tcc-prod"
+location         = "eastus2"
+tenant_id        = "00000000-0000-0000-0000-000000000000"
+
+# App registrations, created by the customer (D12, AUTH-1).
+web_client_id = "00000000-0000-0000-0000-000000000001"
+api_client_id = "00000000-0000-0000-0000-000000000002"
+
+# Network: existing subnets and centrally owned private DNS zones (NET-1, NET-3).
+app_integration_subnet_id  = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-network/providers/Microsoft.Network/virtualNetworks/vnet-spoke/subnets/snet-app"
+private_endpoint_subnet_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-network/providers/Microsoft.Network/virtualNetworks/vnet-spoke/subnets/snet-pe"
+private_dns_zone_ids = {
+  blob              = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-dns/providers/Microsoft.Network/privateDnsZones/privatelink.blob.core.windows.net"
+  cognitiveservices = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-dns/providers/Microsoft.Network/privateDnsZones/privatelink.cognitiveservices.azure.com"
+  openai            = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-dns/providers/Microsoft.Network/privateDnsZones/privatelink.openai.azure.com"
+  aiservices        = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-dns/providers/Microsoft.Network/privateDnsZones/privatelink.services.ai.azure.com"
+  sites             = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-dns/providers/Microsoft.Network/privateDnsZones/privatelink.azurewebsites.net"
+}
+
+# Fabric: the customer's existing workspace (D13). Grants are made by the
+# customer's Fabric admin plus scripts/grant-warehouse-sql.py.
+fabric_workspace_id   = "00000000-0000-0000-0000-000000000003"
+fabric_workspace_name = "<workspace display name>"
+fabric_lakehouse_name = "<lakehouse display name>"
+fabric_warehouse_id   = "00000000-0000-0000-0000-000000000004"
+warehouse_server      = "<id>.datawarehouse.fabric.microsoft.com"
+warehouse_database    = "<warehouse display name>"
+
+# The schema holding this customer's own historical source payroll in their
+# lakehouse (D14). The public default is tcc_source; a real customer's own
+# schema is typically named for their own ingestion history, not ours.
+source_schema = "<customer source schema>"

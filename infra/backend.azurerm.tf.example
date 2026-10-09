@@ -1,0 +1,16 @@
+# Remote state for shared environments (D7). Copy to backend.azurerm.tf, fill
+# in, and run `terraform init -migrate-state`. deploy.yml requires this (D23)
+# and reads the values from the TF_BACKEND_* repository variables.
+#
+# The storage account holding state is NOT this deployment's artifact account:
+# it is created once, out of band, with Entra auth and versioning on.
+
+terraform {
+  backend "azurerm" {
+    resource_group_name  = "<state resource group>"
+    storage_account_name = "<state storage account>"
+    container_name       = "tfstate"
+    key                  = "tax-credit-copilot/<environment>.tfstate"
+    use_azuread_auth     = true
+  }
+}

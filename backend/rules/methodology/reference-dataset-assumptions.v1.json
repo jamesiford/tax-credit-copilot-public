@@ -1,0 +1,147 @@
+{
+  "schema_version": 1,
+  "assumption_set_id": "GDS-STEP1-2026-07-29-v1",
+  "status": "approved_for_implementation_not_access_verified",
+  "approved_at": "2026-07-29",
+  "scope": "JOHN_REFERENCE_FY2024",
+  "purpose": "Reproducible Step 1 Min-Max and Pay Period eligibility benchmark configuration.",
+  "source_basis": [
+    "Four private TCC payroll chunks",
+    "July 23 working-session transcript",
+    "Georgia JTC Step 1 Avg Wages and Hours Narrative",
+    "Georgia JTC Step 1 Avg Wages and Hours Diagram"
+  ],
+  "assumptions": {
+    "BA-01": {
+      "status": "approved",
+      "decision": "FY2024 uses an inclusive 2023-08-01 through 2024-07-31 window.",
+      "config": {
+        "fiscal_year_label": 2024,
+        "fiscal_year_begin": "2023-08-01",
+        "fiscal_year_end": "2024-07-31"
+      },
+      "falsified_by": "John's Access run settings use different fiscal dates."
+    },
+    "BA-02": {
+      "status": "approved",
+      "decision": "Paychecks after the fiscal-year end are excluded even when PPE is on or before the fiscal-year end.",
+      "config": {
+        "pay_date_must_be_within_fiscal_year": true,
+        "pay_period_end_must_not_exceed_fiscal_year_end": true,
+        "allow_first_pay_period_start_before_fiscal_year": true,
+        "post_fiscal_year_paycheck_grace_days": 0
+      },
+      "falsified_by": "John's Access controls or outputs include the July-PPE/August-paycheck rows."
+    },
+    "BA-03": {
+      "status": "approved",
+      "decision": "Source PayFrequency is a weeks-per-period code: 1 weekly, 2 biweekly, 4 monthly; semimonthly is absent.",
+      "config": {
+        "pay_frequency_weeks": {
+          "1": 1.0,
+          "2": 2.0,
+          "4": 4.333
+        },
+        "use_major_period_heuristic": false,
+        "off_cycle_period_treatment": "use_source_frequency"
+      },
+      "falsified_by": "John's Access denominator uses different source-code mappings or excludes off-cycle periods."
+    },
+    "BA-04": {
+      "status": "approved",
+      "decision": "Collapse exact duplicate payroll facts with an audit-preserving dimensional key and sum signed hours/wages.",
+      "config": {
+        "collapse_key": [
+          "TCCEmployeeId",
+          "TCCUnitId",
+          "FEIN",
+          "PayPeriodStart",
+          "PayPeriodEnd",
+          "PaycheckDate",
+          "PayFrequency"
+        ],
+        "summed_fields": [
+          "Hours",
+          "Wages"
+        ],
+        "job_title_is_key": false
+      },
+      "falsified_by": "Access employee totals prove another key or aggregation order."
+    },
+    "BA-05": {
+      "status": "approved",
+      "decision": "Preserve signed corrections; include zero-hour wages in totals; do not count zero-hour-only lines as worked periods; flag stragglers rather than auto-excluding them.",
+      "config": {
+        "preserve_negative_hours": true,
+        "preserve_negative_wages": true,
+        "include_zero_hour_wages_in_totals": true,
+        "count_zero_hour_only_line_as_worked_period": false,
+        "hours_are_actual_not_overtime_weighted": true,
+        "straggler_treatment": "flag_only"
+      },
+      "falsified_by": "John's Access controls show automatic exclusion, reassignment, or different overtime normalization."
+    },
+    "BA-06": {
+      "status": "approved",
+      "decision": "The fiscal-year begin year selects the wage table; use the 2023 $636 floor and test two-decimal average values.",
+      "config": {
+        "wage_table_year_basis": "fiscal_year_begin_year",
+        "wage_table_year": 2023,
+        "minimum_average_weekly_hours": 35.0,
+        "minimum_average_weekly_wages_usd": 636.0,
+        "totals_precision": "full",
+        "denominator_precision": "full",
+        "average_display_and_test_decimals": 2,
+        "rounding_mode": "to_be_confirmed"
+      },
+      "falsified_by": "John's run uses another wage-table year, tests unrounded averages, or specifies another rounding mode."
+    },
+    "BA-07": {
+      "status": "approved_dependency",
+      "decision": "Import John's Step 1 CSV/XLSX outputs using unchanged employee IDs; authoritative parity waits for those outputs.",
+      "config": {
+        "accepted_formats": [
+          "csv",
+          "xlsx"
+        ],
+        "employee_join_key": "TCCEmployeeId",
+        "required_output_groups": [
+          "common_employee_totals",
+          "min_max_denominator_averages_flags_eligible_list",
+          "pay_period_denominator_averages_flags_eligible_list",
+          "run_settings_and_exclusions"
+        ]
+      },
+      "falsified_by": "John provides another format, key, or result-table shape."
+    },
+    "BA-08": {
+      "status": "approved",
+      "decision": "Treat One through Four as one complete ordered logical export without cross-file dedupe.",
+      "config": {
+        "ordered_files": [
+          "One.csv",
+          "Two.csv",
+          "Three.csv",
+          "Four.csv"
+        ],
+        "remove_fully_blank_padding_rows": true,
+        "cross_file_deduplication": false,
+        "preserve_source_file_and_row": true,
+        "authoritative_consolidated_csv": false
+      },
+      "falsified_by": "John identifies missing/reordered chunks or Access source controls do not match the logical union."
+    }
+  },
+  "change_control": {
+    "immutable_after_use": true,
+    "supersession_rule": "Create a new versioned assumption-set file; never rewrite a set already used for a recorded benchmark run.",
+    "run_metadata": [
+      "assumption_set_id",
+      "assumption_set_sha256",
+      "source_manifest_sha256",
+      "code_commit",
+      "run_timestamp"
+    ],
+    "difference_policy": "Classify a mismatch against Access before changing an assumption. Record the old and new set IDs and the first divergent stage."
+  }
+}

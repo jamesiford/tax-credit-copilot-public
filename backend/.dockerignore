@@ -1,0 +1,22 @@
+# Backend image hygiene — keep the build context small
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+env/
+*.egg-info/
+.mypy_cache/
+.ruff_cache/
+
+# Tests are not needed in the runtime image
+tests/
+
+# Local-only files
+.env
+*.log
+.DS_Store

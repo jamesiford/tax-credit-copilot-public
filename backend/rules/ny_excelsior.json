@@ -1,0 +1,55 @@
+{
+  "_prototype_verification": "PROTOTYPE stub. Numbers reflect publicly summarized New York Excelsior Jobs Program parameters as of late 2025; verify against current NY Empire State Development guidance and the applicant's Excelsior credit certificate before any client use.",
+  "rule_pack_version": "0.1.0",
+  "jurisdiction": {
+    "level": "state",
+    "code": "NY",
+    "name": "New York"
+  },
+  "credit": {
+    "code": "NY_EXCELSIOR",
+    "name": "New York Excelsior Jobs Program — Jobs Credit",
+    "statutory_citation": "NY Tax Law § 31",
+    "summary": "Refundable credit for net new jobs created in targeted industries in New York State; this stub reflects the 'Jobs Credit' component only."
+  },
+  "filing": {
+    "window": "FY annual filing via NY ESD certificate",
+    "cycle": "annual"
+  },
+  "thresholds": {
+    "minimum_new_jobs": 2,
+    "minimum_hours_per_week_full_time": 35
+  },
+  "benefit": {
+    "amount_per_qualifying_job_pct_of_wages": 0.065,
+    "benefit_period_years": 10,
+    "currency": "USD",
+    "_note": "6.5% of gross wages per net new job per year, capped per program guidance."
+  },
+  "eligibility": {
+    "qualifying_employment_type": "full_time",
+    "include_replacement_hires": false,
+    "geographic_scope": {
+      "level": "state",
+      "all_counties": true
+    }
+  },
+  "headcount_formula": {
+    "type": "avg_monthly_fte",
+    "fte_basis_hours_per_week": 40,
+    "compare_to_prior_period_months": 12
+  },
+  "one_zero": {
+    "_doc_source": "Approximation patched in via rules/_patch_one_zero.py; verify against state DOR before client use.",
+    "_prototype_verify": true,
+    "pt_aggregation": false,
+    "headcount_unit_field": "Worksite_ID",
+    "min_weekly_hours": 35.0,
+    "min_weekly_wages": 770.0,
+    "wage_basis": "all_remuneration",
+    "geographic_granularity": "statewide",
+    "entity_combination": "permitted",
+    "_disc_ref_entity_combination": "DISC-4",
+    "_note": "NY Excelsior: pct-of-wages credit; uses statutory FT threshold plus regional wage standard. entity_combination pending DISC-4 confirmation."
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "_prototype_verification": "PROTOTYPE stub. Numbers reflect a simplified subset of the federal Work Opportunity Tax Credit ('WOTC-lite'); the real WOTC has per-target-group caps and certification workflow this stub omits. Verify against IRS Form 5884 + DOL ETA guidance before any client use.",
+  "rule_pack_version": "0.1.0",
+  "jurisdiction": {
+    "level": "federal",
+    "code": "US",
+    "name": "United States"
+  },
+  "credit": {
+    "code": "FED_WOTC",
+    "name": "Federal Work Opportunity Tax Credit (lite)",
+    "statutory_citation": "IRC § 51",
+    "summary": "Per-employee federal credit for hires from targeted groups (veterans, long-term unemployed, SNAP recipients, etc.). This stub estimates a flat per-new-hire amount; production must layer target-group rates and hour thresholds."
+  },
+  "filing": {
+    "window": "DOL ETA Form 9061/9062 within 28 days of hire",
+    "cycle": "per-hire"
+  },
+  "thresholds": {
+    "minimum_new_jobs": 1,
+    "minimum_hours_first_year": 120
+  },
+  "benefit": {
+    "amount_per_qualifying_job_usd": 2400,
+    "benefit_period_years": 1,
+    "currency": "USD",
+    "wotc_target_group_qualification_rate": 0.22,
+    "_target_group_rate_note": "ILLUSTRATIVE modeling assumption. WOTC applies only to hires certified in a target group (qualified veterans, SNAP recipients, long-term unemployed, designated-community residents, ex-felons, etc.). National certification rates run ~15-25% of new hires; logistics/warehouse skews higher. Production MUST screen each hire via DOL ETA Form 9061/9062 within 28 days — this rate is a portfolio-level estimate, not a per-employee determination.",
+    "_note": "Conservative flat estimate; real WOTC ranges $1,200-$9,600 by target group + hours."
+  },
+  "eligibility": {
+    "qualifying_employment_type": "any",
+    "include_replacement_hires": false,
+    "geographic_scope": {
+      "level": "federal",
+      "all_states": true
+    }
+  },
+  "headcount_formula": {
+    "type": "new_hires_in_window",
+    "compare_to_prior_period_months": 12
+  },
+  "one_zero": {
+    "_doc_source": "Approximation patched in via rules/_patch_one_zero.py; verify against state DOR before client use.",
+    "_prototype_verify": true,
+    "pt_aggregation": false,
+    "headcount_unit_field": "Worksite_ID",
+    "min_weekly_hours": 32.0,
+    "min_weekly_wages": 0.0,
+    "wage_basis": "regular",
+    "geographic_granularity": "statewide",
+    "entity_combination": "prohibited",
+    "_disc_ref_entity_combination": "DISC-4",
+    "_note": "Federal WOTC (simplified): per-hire amount once 400-hour threshold cleared; this prototype uses a weekly-floor proxy. Each employer (FEIN) files its own WOTC, so entity_combination is 'prohibited'. Production needs DOL ETA 9061/9062 pre-screening, out of scope."
+  }
+}

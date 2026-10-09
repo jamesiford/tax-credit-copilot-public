@@ -1,0 +1,62 @@
+{
+  "_prototype_verification": "PROTOTYPE rule pack. Numbers reflect publicly documented Virginia Major Business Facility Job Tax Credit parameters as of late 2025; verify all values (per-job credit amount, threshold, facility qualification) against current Virginia Department of Taxation guidance and Va. Code § 58.1-439 before any real client use.",
+  "rule_pack_version": "0.1.0",
+  "jurisdiction": {
+    "level": "state",
+    "code": "VA",
+    "name": "Virginia"
+  },
+  "credit": {
+    "code": "VA_MBJF",
+    "name": "Virginia Major Business Facility Job Tax Credit",
+    "statutory_citation": "Va. Code § 58.1-439",
+    "summary": "State income tax credit for companies establishing or expanding a major business facility in Virginia and creating 25+ qualifying full-time jobs. Applied against Virginia corporate income tax liability."
+  },
+  "filing": {
+    "window": "Va. Form 500 attachment",
+    "cycle": "annual"
+  },
+  "thresholds": {
+    "minimum_new_jobs": 25,
+    "minimum_hours_per_week_full_time": 35,
+    "_note": "The 25-job threshold applies to facility expansions. New major facility establishments (greenfield) may qualify at 50+ jobs. Prototype uses the 25-job expansion threshold."
+  },
+  "benefit": {
+    "amount_per_qualifying_job_usd": 1000,
+    "benefit_period_years": 5,
+    "carryforward_years": 10,
+    "currency": "USD",
+    "_note": "$1,000 per qualifying net new job, applied in the year the jobs are created. Carryforward of 10 years for unused credit."
+  },
+  "eligibility": {
+    "qualifying_employment_type": "full_time",
+    "include_replacement_hires": false,
+    "geographic_scope": {
+      "level": "state",
+      "all_counties": true
+    }
+  },
+  "headcount_formula": {
+    "type": "avg_monthly_fte",
+    "fte_basis_hours_per_week": 40,
+    "compare_to_prior_period_months": 12
+  },
+  "one_zero": {
+    "_doc_source": "Approximation patched in via rules/_patch_one_zero.py; verify against state DOR before client use.",
+    "_prototype_verify": true,
+    "pt_aggregation": false,
+    "headcount_unit_field": "Worksite_ID",
+    "min_weekly_hours": 35.0,
+    "min_weekly_wages": 820.0,
+    "wage_basis": "regular",
+    "geographic_granularity": "statewide",
+    "entity_combination": "permitted",
+    "_disc_ref_entity_combination": "DISC-4",
+    "_note": "VA MBJF: 25-job statutory minimum; statewide avg wage standard. entity_combination pending DISC-4 confirmation."
+  },
+  "calculation": {
+    "qualifying_jobs_expression": "max(0, current_period_qualifying_fte - prior_period_qualifying_fte - threshold_offset)",
+    "annual_credit_expression": "qualifying_jobs * amount_per_qualifying_job_usd",
+    "lifetime_credit_expression": "annual_credit * benefit_period_years"
+  }
+}

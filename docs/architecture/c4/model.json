@@ -1,0 +1,1508 @@
+{
+ "title": "Tax Credit Copilot · Platform v2",
+ "subtitle": "Target (\"after\") architecture · App Service ×2 on Linux · Fabric Warehouse as the only operational store · Terraform",
+ "asOf": "9 October 2026 · Platform v2.0.0 (after both live smoke deployments)",
+ "summary": "Two Linux App Services have separate managed identities. The API identity reaches OneLake, the Fabric Warehouse, Blob and Foundry; the web identity has telemetry/Easy Auth only. Cosmos DB, the container registry and Container Apps are gone.",
+ "hopNote": "the signed-in analyst's identity, in order",
+ "statusHeading": "Implementation status",
+ "statuses": {
+  "verified": "Deployed and checked in two public-profile smoke runs",
+  "built": "Built and tested; enterprise path not live-deployed",
+  "gated": "Built; waiting on customer configuration",
+  "off": "Optional, deferred, or removed in v2 (see detail)",
+  "blocked": "Waiting on customer input"
+ },
+ "views": {
+  "context": {
+   "title": "Level 1 · System context",
+   "nodes": [
+    {
+     "id": "x-analyst",
+     "title": "Tax credit analysts",
+     "sub": "internal consultants",
+     "icon": "users",
+     "status": "built",
+     "detail": {
+      "what": "Internal users who review eligibility, run calculations per client, record claim decisions and download claim packages. No external (client) access in v2."
+     },
+     "x": 40,
+     "y": 130,
+     "w": 240,
+     "h": 100
+    },
+    {
+     "id": "x-ops",
+     "title": "Platform engineering",
+     "sub": "customer infra and support",
+     "icon": "users",
+     "status": "built",
+     "detail": {
+      "what": "Provision with Terraform, grant Fabric access, monitor and troubleshoot through Application Insights and Log Analytics.",
+      "notes": "Support runbook: docs/architecture/RUNBOOK.md."
+     },
+     "x": 40,
+     "y": 420,
+     "w": 240,
+     "h": 100
+    },
+    {
+     "id": "x-sys",
+     "title": "Tax Credit Copilot",
+     "sub": "continuous eligibility and audit-defensible credit calculation from payroll",
+     "icon": "azure/app-services/app-services",
+     "status": "verified",
+     "w": 380,
+     "h": 120,
+     "detail": {
+      "what": "Reads payroll, applies year-frozen statute rules with deterministic code, stores every figure with its derivation, and lets agents narrate (never compute) the result.",
+      "notes": "Verified in two live public-profile smoke deployments: deployed by azd up; checks a-f passed; torn down clean."
+     },
+     "x": 420,
+     "y": 260
+    },
+    {
+     "id": "x-entra",
+     "title": "Microsoft Entra ID",
+     "sub": "users, app registrations, managed identities",
+     "icon": "entra-id",
+     "status": "blocked",
+     "detail": {
+      "what": "Sign-in for analysts and identity for every service hop. The app registrations are created by the customer; name and client ID are pending."
+     },
+     "x": 1080,
+     "y": 40,
+     "w": 260,
+     "h": 100
+    },
+    {
+     "id": "x-fabric",
+     "title": "Microsoft Fabric",
+     "sub": "customer workspace: Lakehouse + Warehouse",
+     "icon": "fabric",
+     "status": "verified",
+     "detail": {
+      "what": "The customer's data platform. Source payroll is read from the Lakehouse; every application write lands in the Warehouse."
+     },
+     "x": 1080,
+     "y": 260,
+     "w": 260,
+     "h": 100
+    },
+    {
+     "id": "x-foundry",
+     "title": "Microsoft Foundry",
+     "sub": "agents and model deployment",
+     "icon": "foundry",
+     "status": "verified",
+     "detail": {
+      "what": "Hosts the prompt agents that narrate aggregate briefs. Optionally fronted by the customer's AI gateway."
+     },
+     "x": 1080,
+     "y": 480,
+     "w": 260,
+     "h": 100
+    },
+    {
+     "id": "x-pipeline",
+     "title": "Customer payroll pipeline",
+     "sub": "existing, customer-owned",
+     "icon": "azure/analytics/data-factories",
+     "status": "verified",
+     "detail": {
+      "what": "Lands client payroll in the Lakehouse in the customer's source schema. Not part of this system."
+     },
+     "x": 1440,
+     "y": 260,
+     "w": 240,
+     "h": 100
+    },
+    {
+     "id": "x-github",
+     "title": "GitHub",
+     "sub": "source, CI, deploy",
+     "icon": "github",
+     "status": "built",
+     "detail": {
+      "what": "Runs the tests (including the parity gate), Terraform, and zip deploys through workload identity federation.",
+      "notes": "CI green (tests, terraform fmt/validate/tflint/test, gitleaks, actionlint). deploy.yml is dispatch-only and has not been run."
+     },
+     "x": 460,
+     "y": 520,
+     "w": 260,
+     "h": 100
+    }
+   ],
+   "edges": [
+    {
+     "from": "x-analyst",
+     "to": "x-sys",
+     "layer": "user",
+     "label": "Signs in and works",
+     "hop": 1
+    },
+    {
+     "from": "x-sys",
+     "to": "x-entra",
+     "layer": "service",
+     "label": "Token validation · managed identities"
+    },
+    {
+     "from": "x-sys",
+     "to": "x-fabric",
+     "layer": "service",
+     "label": "OneLake read · Warehouse read/write"
+    },
+    {
+     "from": "x-sys",
+     "to": "x-foundry",
+     "layer": "service",
+     "label": "Aggregate briefs in, narration out"
+    },
+    {
+     "from": "x-pipeline",
+     "to": "x-fabric",
+     "layer": "flow",
+     "label": "Loads payroll"
+    },
+    {
+     "from": "x-github",
+     "to": "x-sys",
+     "layer": "ci",
+     "label": "terraform apply · zip deploy (OIDC)"
+    },
+    {
+     "from": "x-ops",
+     "to": "x-sys",
+     "layer": "gov",
+     "label": "Provision, grant, monitor"
+    }
+   ],
+   "w": 1720,
+   "h": 700
+  },
+  "containers": {
+   "title": "Level 2 · Containers",
+   "nodes": [
+    {
+     "id": "c-entra",
+     "title": "Microsoft Entra ID",
+     "sub": "two app registrations (customer-created) · two user-assigned managed identities · GitHub federation",
+     "icon": "entra-id",
+     "status": "blocked",
+     "w": 900,
+     "h": 70,
+     "detail": {
+      "what": "Identity for people, apps and services.",
+      "spikes": "App registration names and client IDs are pending from the customer."
+     },
+     "x": 40,
+     "y": 20
+    },
+    {
+     "id": "c-people",
+     "title": "Analysts",
+     "sub": "internal persona",
+     "icon": "users",
+     "status": "built",
+     "detail": {
+      "what": "Internal users only in v2."
+     },
+     "x": 40,
+     "y": 290,
+     "w": 230,
+     "h": 90
+    },
+    {
+     "id": "c-github",
+     "title": "GitHub Actions",
+     "sub": "test · terraform · zip deploy",
+     "icon": "github",
+     "status": "built",
+     "detail": {
+      "what": "OIDC to Azure; no stored secret.",
+      "notes": "CI green (tests, terraform fmt/validate/tflint/test, gitleaks, actionlint). deploy.yml is dispatch-only and has not been run."
+     },
+     "x": 40,
+     "y": 560,
+     "w": 230,
+     "h": 90
+    },
+    {
+     "id": "c-web",
+     "title": "Web app · frontend",
+     "sub": "App Service Linux · Node 24 LTS · Easy Auth",
+     "icon": "azure/app-services/app-services",
+     "status": "verified",
+     "detail": {
+      "what": "Serves the React build and proxies /api to the API with the user's token. Replaces the nginx container.",
+      "notes": "Verified in two live public-profile smoke deployments: web / 200; /api/health and /api/ready via the web app 200."
+     },
+     "x": 330,
+     "y": 290,
+     "w": 230,
+     "h": 90
+    },
+    {
+     "id": "c-api",
+     "title": "Web app · API",
+     "sub": "App Service Linux · Python 3.12 · FastAPI",
+     "icon": "azure/app-services/app-services",
+     "status": "verified",
+     "w": 270,
+     "detail": {
+      "what": "The deterministic calculation engine, the read/write API, and agent orchestration. Replaces the API container.",
+      "notes": "Verified in two live public-profile smoke deployments: health 200, ready true; direct hostname 403 (inbound limited to the web subnet); calculation run succeeded."
+     },
+     "x": 650,
+     "y": 290,
+     "h": 90
+    },
+    {
+     "id": "c-foundry",
+     "title": "Foundry project",
+     "sub": "model deployment · prompt agents",
+     "icon": "foundry",
+     "status": "verified",
+     "detail": {
+      "what": "Narration only. No payroll rows reach it."
+     },
+     "x": 650,
+     "y": 140,
+     "w": 230,
+     "h": 90
+    },
+    {
+     "id": "c-st",
+     "title": "Storage account",
+     "sub": "Blob: artifacts · outputs",
+     "icon": "azure/storage/storage-accounts",
+     "status": "verified",
+     "detail": {
+      "what": "Source rule documents and generated claim packages. Reachable only through the API.",
+      "notes": "Verified in two live public-profile smoke deployments: claim package written and downloaded through the artifact service; sha256 matched."
+     },
+     "x": 650,
+     "y": 560,
+     "w": 230,
+     "h": 90
+    },
+    {
+     "id": "c-mon",
+     "title": "Monitoring",
+     "sub": "Application Insights · Log Analytics",
+     "icon": "azure/monitor/application-insights",
+     "status": "verified",
+     "detail": {
+      "what": "Telemetry from both apps and diagnostics from every resource."
+     },
+     "x": 330,
+     "y": 560,
+     "w": 230,
+     "h": 90
+    },
+    {
+     "id": "c-net",
+     "title": "Network",
+     "sub": "VNet integration · private endpoints · private DNS",
+     "icon": "vnet",
+     "status": "verified",
+     "detail": {
+      "what": "Customer-owned VNet (bring your own). Outbound from both apps; private endpoints for Storage, Foundry and Key Vault.",
+      "notes": "Verified in two live public-profile smoke deployments: public profile created VNet, private endpoints and DNS; Blob reached over its private endpoint."
+     },
+     "x": 960,
+     "y": 560,
+     "w": 230,
+     "h": 90
+    },
+    {
+     "id": "c-kv",
+     "title": "Key Vault",
+     "sub": "only if a secret is required",
+     "icon": "key-vault",
+     "status": "off",
+     "detail": {
+      "what": "Not needed while every hop is managed identity. Provisioned only if the customer mandates a Fabric service principal."
+     },
+     "x": 1330,
+     "y": 140,
+     "w": 230,
+     "h": 90
+    },
+    {
+     "id": "c-lh",
+     "title": "Fabric Lakehouse",
+     "sub": "source payroll · read-only to the app",
+     "icon": "fabric/lakehouse",
+     "status": "verified",
+     "detail": {
+      "what": "The customer's source schema, read through OneLake."
+     },
+     "x": 1010,
+     "y": 420,
+     "w": 230,
+     "h": 90
+    },
+    {
+     "id": "c-wh",
+     "title": "Fabric Warehouse",
+     "sub": "tcc_gold · tcc_ops · 24 tables",
+     "icon": "fabric/data-warehouse",
+     "status": "verified",
+     "w": 270,
+     "detail": {
+      "what": "Every figure a screen shows and every decision a user makes. Absorbs the three Cosmos containers that were in use.",
+      "notes": "Verified in two live public-profile smoke deployments: DDL v2.0 (24 tables) applied; re-run 0 pending; section 9 validation 25/25 empty; artifact_access row written."
+     },
+     "x": 1010,
+     "y": 290,
+     "h": 90
+    },
+    {
+     "id": "c-pipe",
+     "title": "Customer payroll pipeline",
+     "sub": "existing",
+     "icon": "azure/analytics/data-factories",
+     "status": "verified",
+     "detail": {
+      "what": "Loads the Lakehouse. Out of scope."
+     },
+     "x": 1330,
+     "y": 420,
+     "w": 230,
+     "h": 90
+    },
+    {
+     "id": "c-gw",
+     "title": "AI gateway",
+     "sub": "optional · customer-owned",
+     "icon": "azure/integration/api-management-services",
+     "status": "off",
+     "detail": {
+      "what": "Optional route for model traffic. Must speak the Foundry Agents protocol, not only chat completions."
+     },
+     "x": 960,
+     "y": 140,
+     "w": 230,
+     "h": 90
+    },
+    {
+     "id": "c-gone",
+     "title": "Removed in v2",
+     "sub": "Cosmos DB · Container Registry · Container Apps",
+     "icon": "azure/databases/azure-cosmos-db",
+     "status": "off",
+     "detail": {
+      "what": "Cosmos DB is replaced by tcc_ops in the Warehouse; ACR and the Container Apps environment are replaced by App Service code deploy."
+     },
+     "x": 1330,
+     "y": 580,
+     "w": 230,
+     "h": 90
+    }
+   ],
+   "edges": [
+    {
+     "from": "c-people",
+     "to": "c-entra",
+     "layer": "user",
+     "label": "Sign in",
+     "hop": 1
+    },
+    {
+     "from": "c-people",
+     "to": "c-web",
+     "layer": "user",
+     "label": "HTTPS, Easy Auth session",
+     "hop": 2
+    },
+    {
+     "from": "c-web",
+     "to": "c-api",
+     "layer": "user",
+     "label": "Bearer token, aud = API",
+     "hop": 3
+    },
+    {
+     "from": "c-api",
+     "to": "c-lh",
+     "layer": "service",
+     "label": "OneLake read (managed identity)"
+    },
+    {
+     "from": "c-api",
+     "to": "c-wh",
+     "layer": "service",
+     "label": "TDS read/write (managed identity)"
+    },
+    {
+     "from": "c-api",
+     "to": "c-st",
+     "layer": "service",
+     "label": "Blob Data Contributor"
+    },
+    {
+     "from": "c-api",
+     "to": "c-foundry",
+     "layer": "service",
+     "label": "Foundry User"
+    },
+    {
+     "from": "c-api",
+     "to": "c-gw",
+     "layer": "service",
+     "label": "Optional gateway route",
+     "status": "off"
+    },
+    {
+     "from": "c-gw",
+     "to": "c-foundry",
+     "layer": "service",
+     "label": "Forwards agent calls",
+     "status": "off"
+    },
+    {
+     "from": "c-api",
+     "to": "c-kv",
+     "layer": "service",
+     "label": "Secrets User, only if used",
+     "status": "off"
+    },
+    {
+     "from": "c-web",
+     "to": "c-mon",
+     "layer": "flow",
+     "label": "Telemetry"
+    },
+    {
+     "from": "c-api",
+     "to": "c-mon",
+     "layer": "flow",
+     "label": "Telemetry"
+    },
+    {
+     "from": "c-net",
+     "to": "c-api",
+     "layer": "flow",
+     "label": "Outbound via VNet integration"
+    },
+    {
+     "from": "c-pipe",
+     "to": "c-lh",
+     "layer": "flow",
+     "label": "Loads payroll"
+    },
+    {
+     "from": "c-github",
+     "to": "c-api",
+     "layer": "ci",
+     "label": "terraform apply · zip deploy"
+    },
+    {
+     "from": "c-github",
+     "to": "c-web",
+     "layer": "ci",
+     "label": "zip deploy"
+    }
+   ],
+   "w": 1600,
+   "h": 720
+  },
+  "components": {
+   "title": "Level 3 · Components and identities",
+   "boxes": [
+    {
+     "id": "b-entra",
+     "label": "Microsoft Entra ID · customer tenant",
+     "icon": "entra-id",
+     "tone": "entra",
+     "cols": 6,
+     "x": 290,
+     "y": 20,
+     "w": 2090,
+     "h": 135
+    },
+    {
+     "id": "b-people",
+     "label": "People",
+     "icon": "users",
+     "tone": "people",
+     "cols": 1,
+     "x": 20,
+     "y": 180,
+     "w": 250,
+     "h": 420
+    },
+    {
+     "id": "b-github",
+     "label": "GitHub",
+     "icon": "github",
+     "tone": "external",
+     "cols": 1,
+     "x": 20,
+     "y": 20,
+     "w": 250,
+     "h": 135
+    },
+    {
+     "id": "b-rg",
+     "label": "Azure · rg-tcc-<env> · one region",
+     "icon": "resource-group",
+     "tone": "azure",
+     "cols": 2,
+     "x": 290,
+     "y": 180,
+     "w": 1120,
+     "h": 740
+    },
+    {
+     "id": "b-vnet",
+     "parent": "b-rg",
+     "label": "Customer VNet (bring your own) · outbound integration + private endpoints",
+     "icon": "vnet",
+     "tone": "vnet",
+     "cols": 2,
+     "x": 310,
+     "y": 220,
+     "w": 1080,
+     "h": 470
+    },
+    {
+     "id": "b-asp",
+     "parent": "b-vnet",
+     "label": "App Service Plan · Linux · P1v3 (proposed)",
+     "icon": "azure/app-services/app-service-plans",
+     "tone": "inner",
+     "cols": 2,
+     "x": 330,
+     "y": 262,
+     "w": 1040,
+     "h": 175
+    },
+    {
+     "id": "b-data",
+     "parent": "b-vnet",
+     "label": "Private endpoints · public access off",
+     "icon": "private-endpoint",
+     "tone": "inner",
+     "cols": 3,
+     "x": 860,
+     "y": 465,
+     "w": 510,
+     "h": 205
+    },
+    {
+     "id": "b-foundry",
+     "parent": "b-rg",
+     "label": "Microsoft Foundry · account and project",
+     "icon": "foundry",
+     "tone": "foundry",
+     "cols": 2,
+     "x": 310,
+     "y": 710,
+     "w": 450,
+     "h": 190
+    },
+    {
+     "id": "b-mon",
+     "parent": "b-rg",
+     "label": "Monitoring",
+     "icon": "log-analytics",
+     "tone": "inner",
+     "cols": 2,
+     "x": 780,
+     "y": 710,
+     "w": 610,
+     "h": 190
+    },
+    {
+     "id": "b-fabric",
+     "label": "Microsoft Fabric · the customer's workspace",
+     "icon": "fabric",
+     "tone": "fabric",
+     "cols": 1,
+     "x": 1430,
+     "y": 180,
+     "w": 560,
+     "h": 620
+    },
+    {
+     "id": "b-ext",
+     "label": "Customer-owned source",
+     "tone": "external",
+     "cols": 1,
+     "x": 2010,
+     "y": 180,
+     "w": 370,
+     "h": 620
+    },
+    {
+     "id": "b-gone",
+     "label": "Removed in v2",
+     "tone": "external",
+     "cols": 1,
+     "x": 780,
+     "y": 940,
+     "w": 630,
+     "h": 150
+    },
+    {
+     "id": "b-gw",
+     "label": "Customer-owned, optional",
+     "tone": "external",
+     "cols": 1,
+     "x": 290,
+     "y": 940,
+     "w": 470,
+     "h": 150
+    }
+   ],
+   "nodes": [
+    {
+     "id": "e-users",
+     "box": "b-entra",
+     "title": "Analyst group",
+     "sub": "assigned to the web app",
+     "icon": "groups",
+     "status": "blocked",
+     "detail": {
+      "what": "The Entra group whose members may use the application.",
+      "access": "Assigned to the web app's enterprise application with 'Assignment required' on, so an unassigned user is refused at sign-in.",
+      "managed": "Customer, in Entra. Not in Terraform.",
+      "learn": "https://learn.microsoft.com/en-us/entra/identity-platform/howto-restrict-your-app-to-a-set-of-users"
+     },
+     "x": 790,
+     "y": 60,
+     "w": 220,
+     "h": 76
+    },
+    {
+     "id": "e-reg-web",
+     "box": "b-entra",
+     "title": "App registration · web",
+     "sub": "Easy Auth client",
+     "icon": "app-registrations",
+     "status": "blocked",
+     "detail": {
+      "what": "The sign-in client for the frontend. Redirect URI /.auth/login/aad/callback.",
+      "identity": "Requests a token for the API scope at sign-in, so the frontend can forward it.",
+      "managed": "Created by the customer; Terraform takes its client ID as a variable. Use a managed-identity federated credential rather than a client secret.",
+      "spikes": "Name and client ID pending from the customer.",
+      "learn": "https://learn.microsoft.com/en-us/azure/app-service/configure-authentication-provider-aad"
+     },
+     "x": 550,
+     "y": 60,
+     "w": 220,
+     "h": 76
+    },
+    {
+     "id": "e-reg-api",
+     "box": "b-entra",
+     "title": "App registration · API",
+     "sub": "user_impersonation + app role TCC.User",
+     "icon": "app-registrations",
+     "status": "blocked",
+     "detail": {
+      "what": "The resource the API's bearer tokens are issued for (aud = api://<api-client-id>).",
+      "access": "Exposes one delegated scope. App roles (reviewer, operator) are a v2 option.",
+      "managed": "Created by the customer.",
+      "spikes": "Name and client ID pending from the customer. One registration or two is a customer choice; two keeps client and resource separate.",
+      "learn": "https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-configure-app-expose-web-apis"
+     },
+     "x": 1270,
+     "y": 60,
+     "w": 220,
+     "h": 76
+    },
+    {
+     "id": "e-mi-api",
+     "box": "b-entra",
+     "title": "Managed identity · API",
+     "sub": "user-assigned",
+     "icon": "managed-identities",
+     "status": "verified",
+     "detail": {
+      "what": "The one identity the API uses for every Azure and Fabric call.",
+      "identity": "Pinned with AZURE_CLIENT_ID so DefaultAzureCredential cannot silently fall back to a service principal.",
+      "access": "OneLake read, Warehouse read/write, Blob Data Contributor, Foundry User, Monitoring Metrics Publisher.",
+      "managed": "Terraform (identity module). Today one identity is shared by both apps; v2 splits it.",
+      "learn": "https://learn.microsoft.com/en-us/entra/identity/managed-identities-azure-resources/overview",
+      "notes": "Verified in two live public-profile smoke deployments: the API identity read OneLake, wrote the Warehouse and Blob, and sent telemetry."
+     },
+     "x": 1510,
+     "y": 60,
+     "w": 220,
+     "h": 76
+    },
+    {
+     "id": "e-mi-web",
+     "box": "b-entra",
+     "title": "Managed identity · web",
+     "sub": "user-assigned",
+     "icon": "managed-identities",
+     "status": "built",
+     "detail": {
+      "what": "The frontend's own identity: telemetry and the Easy Auth federated credential only.",
+      "access": "Monitoring Metrics Publisher. No data access of any kind.",
+      "managed": "Terraform (identity module).",
+      "notes": "Created by Terraform; telemetry from the web app was not checked by the smoke test."
+     },
+     "x": 1030,
+     "y": 60,
+     "w": 220,
+     "h": 76
+    },
+    {
+     "id": "e-oidc",
+     "box": "b-entra",
+     "title": "Deploy identity",
+     "sub": "GitHub OIDC federation",
+     "icon": "entra-workload-id",
+     "status": "blocked",
+     "detail": {
+      "what": "The pipeline's identity. Federated to the repository and environment; no stored secret.",
+      "access": "Contributor and Role Based Access Control Administrator (constrained to the roles above) on the resource group.",
+      "managed": "Customer creates the app and federated credential; Terraform does not.",
+      "learn": "https://learn.microsoft.com/en-us/azure/developer/github/connect-from-azure-openid-connect",
+      "notes": "Workflow side built (docs/architecture/OIDC-SETUP.md); the federated app registration is created by the customer."
+     },
+     "x": 310,
+     "y": 60,
+     "w": 220,
+     "h": 76
+    },
+    {
+     "id": "p-analyst",
+     "box": "b-people",
+     "title": "Analyst",
+     "sub": "internal consultant",
+     "icon": "users",
+     "status": "built",
+     "detail": {
+      "what": "Reviews eligibility, triggers a calculation run per client, records claim and finding decisions, downloads claim packages.",
+      "identity": "Their Entra token; their UPN is written to every decision row (decided_by, created_by, user_upn) instead of today's hard-coded reviewer string."
+     },
+     "x": 40,
+     "y": 240,
+     "w": 220,
+     "h": 76
+    },
+    {
+     "id": "p-ops",
+     "box": "b-people",
+     "title": "Platform engineer",
+     "sub": "customer infra and support",
+     "icon": "users",
+     "status": "built",
+     "detail": {
+      "what": "Applies Terraform, runs the Fabric grant script, watches health and logs.",
+      "access": "Log Analytics Reader and App Service Website Contributor for operations; no data-plane access to the application stores.",
+      "notes": "Support runbook: docs/architecture/RUNBOOK.md."
+     },
+     "x": 40,
+     "y": 470,
+     "w": 220,
+     "h": 76
+    },
+    {
+     "id": "gh-actions",
+     "box": "b-github",
+     "title": "GitHub Actions",
+     "sub": "test · terraform · zip deploy",
+     "icon": "github",
+     "status": "built",
+     "detail": {
+      "what": "CI runs the backend and frontend suites with the parity gate required; CD runs terraform plan/apply, then zip-deploys both apps.",
+      "identity": "Deploy identity via OIDC.",
+      "managed": ".github/workflows (replaces the azd/container deploy). azd up with the Terraform provider stays as the one-command path.",
+      "learn": "https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/use-terraform-for-azd",
+      "notes": "CI green (tests, terraform fmt/validate/tflint/test, gitleaks, actionlint). deploy.yml is dispatch-only and has not been run."
+     },
+     "x": 40,
+     "y": 60,
+     "w": 220,
+     "h": 76
+    },
+    {
+     "id": "web",
+     "box": "b-asp",
+     "title": "Web app · frontend",
+     "sub": "Linux · Node 24 LTS · Easy Auth",
+     "icon": "azure/app-services/app-services",
+     "status": "verified",
+     "detail": {
+      "what": "Serves the static React build and proxies /api/* to the API, preserving today's same-origin contract. Replaces the nginx container.",
+      "identity": "Easy Auth signs the user in and holds their API token; the proxy forwards it as the Authorization header.",
+      "access": "Public network access off; inbound by private endpoint or access restriction (customer choice). Unauthenticated requests redirect to sign-in.",
+      "managed": "Terraform (app_service module); code by zip deploy.",
+      "spikes": "D3 runtime (Node proxy recommended) and D6 inbound model.",
+      "learn": "https://learn.microsoft.com/en-us/azure/app-service/overview-authentication-authorization",
+      "notes": "Verified in two live public-profile smoke deployments: web / 200; /api/health and /api/ready via the web app 200."
+     },
+     "x": 370,
+     "y": 320,
+     "w": 240,
+     "h": 90
+    },
+    {
+     "id": "api",
+     "box": "b-asp",
+     "title": "Web app · API",
+     "sub": "Linux · Python 3.12 · FastAPI on gunicorn/uvicorn",
+     "icon": "azure/app-services/app-services",
+     "status": "verified",
+     "w": 320,
+     "detail": {
+      "what": "Deterministic calculation engine, the read/write API, artifact service and agent orchestration. Agents narrate; tools calculate.",
+      "identity": "Validates the user's bearer token (aud = API) and authorizes the client; then calls every store as the API managed identity.",
+      "access": "Inbound only from the web app's subnet. A request with no valid token gets 401.",
+      "managed": "Terraform (app_service module); code by zip deploy. Always On, health check, startup timeout sized for a 60-90 s cold build.",
+      "notes": "Cold Fabric read is about 55 s per tenant; warm responses about 0.1 s. Verified in two live public-profile smoke deployments: health 200, ready true; direct hostname 403 (inbound limited to the web subnet); calculation run succeeded.",
+      "learn": "https://learn.microsoft.com/en-us/azure/app-service/configure-language-python"
+     },
+     "x": 760,
+     "y": 310,
+     "h": 100
+    },
+    {
+     "id": "st",
+     "box": "b-data",
+     "title": "Storage account",
+     "sub": "Blob: artifacts · outputs",
+     "icon": "azure/storage/storage-accounts",
+     "status": "verified",
+     "detail": {
+      "what": "artifacts: source documents rule packs were authored from. outputs: generated claim packages at {client_id}/{run_id}/{file}.",
+      "access": "Public network access off, shared-key access off, anonymous access off, TLS 1.2. Only the API identity holds Blob Data Contributor. No SAS reaches a browser; downloads stream through the API.",
+      "managed": "Terraform (storage module), versioning on, lifecycle policy on outputs (retention: customer decision). Private endpoint (blob) in the customer VNet; private DNS zone linking is usually central and the customer's call. Private endpoint (blob) in the customer VNet; private DNS zone linking is usually central and the customer's call.",
+      "notes": "Every blob has a row in tcc_ops.artifact; a blob with no row cannot be downloaded. Verified in two live public-profile smoke deployments: claim package written and downloaded through the artifact service; sha256 matched.",
+      "learn": "https://learn.microsoft.com/en-us/azure/storage/common/shared-key-authorization-prevent"
+     },
+     "x": 880,
+     "y": 525,
+     "w": 235,
+     "h": 100
+    },
+    {
+     "id": "kv",
+     "box": "b-data",
+     "title": "Key Vault",
+     "sub": "only if a secret is required",
+     "icon": "key-vault",
+     "status": "off",
+     "detail": {
+      "what": "Not provisioned by default: every hop is a managed identity. Enabled by a Terraform flag if the customer mandates a Fabric service principal.",
+      "access": "RBAC mode; API identity Key Vault Secrets User; secrets surface as App Service Key Vault references.",
+      "learn": "https://learn.microsoft.com/en-us/azure/key-vault/general/rbac-guide"
+     },
+     "x": 1125,
+     "y": 525,
+     "w": 230,
+     "h": 100
+    },
+    {
+     "id": "f-proj",
+     "box": "b-foundry",
+     "title": "Foundry project",
+     "sub": "prompt agents",
+     "icon": "foundry-project",
+     "status": "verified",
+     "detail": {
+      "what": "Hosts the narration agents (orchestrator, client situation, credit discovery, exception report, page summary and others). They receive an aggregate brief and return prose.",
+      "access": "API identity holds Foundry User. Local (key) auth disabled.",
+      "notes": "Prompt data boundary: aggregates only; no payroll rows, names, IDs, or per-person wages or hours. Verified in two live public-profile smoke deployments: agents registered at startup (health: agents_registered true).",
+      "managed": "Terraform (azapi for the project). Agents are registered by the API at startup.",
+      "learn": "https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/rbac-azure-ai-foundry"
+     },
+     "x": 325,
+     "y": 770,
+     "w": 205,
+     "h": 90
+    },
+    {
+     "id": "f-model",
+     "box": "b-foundry",
+     "title": "Model deployment",
+     "sub": "GlobalStandard · model is a variable",
+     "icon": "foundry-models",
+     "status": "verified",
+     "detail": {
+      "what": "One deployment; GPT-4.1 or the current default, set by variable. GlobalStandard routes across regions, which meets the availability ask with no code change.",
+      "notes": "Verified in two live public-profile smoke deployments: deployment created (default gpt-4.1-mini, GlobalStandard)."
+     },
+     "x": 545,
+     "y": 770,
+     "w": 200,
+     "h": 90
+    },
+    {
+     "id": "appi",
+     "box": "b-mon",
+     "title": "Application Insights",
+     "sub": "workspace-based",
+     "icon": "azure/monitor/application-insights",
+     "status": "verified",
+     "detail": {
+      "what": "Requests, dependencies (Fabric, Foundry, Blob) and exceptions from both apps.",
+      "access": "Entra-authenticated ingestion; both identities hold Monitoring Metrics Publisher.",
+      "learn": "https://learn.microsoft.com/en-us/azure/azure-monitor/app/azure-ad-authentication",
+      "notes": "Verified in two live public-profile smoke deployments: AppRequests, AppTraces and AppDependencies populated from the API."
+     },
+     "x": 800,
+     "y": 770,
+     "w": 260,
+     "h": 90
+    },
+    {
+     "id": "law",
+     "box": "b-mon",
+     "title": "Log Analytics",
+     "sub": "diagnostics from every resource",
+     "icon": "log-analytics",
+     "status": "verified",
+     "detail": {
+      "what": "App Service console and HTTP logs, platform logs, and the App Insights tables. The support runbook's queries run here.",
+      "notes": "Verified in two live public-profile smoke deployments: diagnostic settings delivered; queried with KQL."
+     },
+     "x": 1110,
+     "y": 770,
+     "w": 260,
+     "h": 90
+    },
+    {
+     "id": "lh",
+     "box": "b-fabric",
+     "title": "Lakehouse",
+     "sub": "source payroll · customer schema · read-only",
+     "icon": "fabric/lakehouse",
+     "status": "verified",
+     "detail": {
+      "what": "Account, Entity, Location, Employment, Payroll and lookups in the customer's source schema (SOURCE_SCHEMA).",
+      "access": "API identity reads Delta over OneLake (audience https://storage.azure.com/). Nothing in the application writes here.",
+      "managed": "Customer-owned. The app's access is granted in Fabric, not Azure.",
+      "learn": "https://learn.microsoft.com/en-us/fabric/onelake/onelake-overview"
+     },
+     "x": 1450,
+     "y": 430,
+     "w": 300,
+     "h": 100
+    },
+    {
+     "id": "wh",
+     "box": "b-fabric",
+     "title": "Warehouse",
+     "sub": "tcc_gold · tcc_ops · 24 tables",
+     "icon": "fabric/data-warehouse",
+     "status": "verified",
+     "w": 300,
+     "detail": {
+      "what": "The only operational store. tcc_gold: every figure a screen shows. tcc_ops: run provenance, overrides, rule versions, agent audit, claims, engagements, finding decisions, artifacts and downloads.",
+      "identity": "API identity over TDS 1433 (audience https://database.windows.net/).",
+      "access": "Read/write on tcc_gold and tcc_ops only. Snapshot isolation; a write-write conflict is retried by the adapter.",
+      "managed": "DDL tcc-schema.fabric.sql v2.0 (SQL Server variant generated).",
+      "notes": "The Warehouse is the only operational store: Gold, runs, overrides, claims, engagements, findings and artifacts all live here. Verified in two live public-profile smoke deployments: DDL v2.0 (24 tables) applied; re-run 0 pending; section 9 validation 25/25 empty; artifact_access row written.",
+      "learn": "https://learn.microsoft.com/en-us/fabric/data-warehouse/transactions"
+     },
+     "x": 1450,
+     "y": 240,
+     "h": 100
+    },
+    {
+     "id": "fab-roles",
+     "box": "b-fabric",
+     "title": "Workspace access",
+     "sub": "workspace role in Terraform · SQL grants in T-SQL",
+     "icon": "roles",
+     "status": "verified",
+     "detail": {
+      "what": "The API identity's Fabric permissions: a workspace role (Viewer for OneLake reads, or Contributor) plus schema-level read/write on tcc_gold and tcc_ops in the Warehouse.",
+      "managed": "Workspace role: Terraform, microsoft/fabric provider (fabric_workspace_role_assignment), optional because the customer may own Fabric access. Schema grants: a post-deploy T-SQL script. The Fabric tenant setting must allow service principals to use Fabric APIs.",
+      "notes": "Under Bicep both were manual. Terraform removes one of the two out-of-band steps. Verified in two live public-profile smoke deployments: workspace role from Terraform and schema grants from scripts/grant-warehouse-sql.py; API identity read and wrote.",
+      "learn": "https://learn.microsoft.com/en-us/fabric/fundamentals/roles-workspaces"
+     },
+     "x": 1775,
+     "y": 335,
+     "w": 200,
+     "h": 100
+    },
+    {
+     "id": "pipe",
+     "box": "b-ext",
+     "title": "Payroll pipeline",
+     "sub": "loads the Lakehouse",
+     "icon": "azure/analytics/data-factories",
+     "status": "verified",
+     "detail": {
+      "what": "The customer's existing pipeline. Out of scope for v2."
+     },
+     "x": 2040,
+     "y": 430,
+     "w": 310,
+     "h": 100
+    },
+    {
+     "id": "gw",
+     "box": "b-gw",
+     "title": "AI gateway",
+     "sub": "optional",
+     "icon": "azure/integration/api-management-services",
+     "status": "off",
+     "detail": {
+      "what": "If model traffic must route through the customer's gateway, it has to pass the Foundry Agents protocol, not only chat completions. Default is direct to Foundry.",
+      "spikes": "Contract and auth to agree with the gateway owner."
+     },
+     "x": 325,
+     "y": 985,
+     "w": 400,
+     "h": 80
+    },
+    {
+     "id": "gone-cosmos",
+     "box": "b-gone",
+     "title": "Cosmos DB",
+     "sub": "replaced by tcc_ops",
+     "icon": "azure/databases/azure-cosmos-db",
+     "status": "off",
+     "detail": {
+      "what": "Ten containers were declared; three were used (programClaims, engagements, findings). All three map to existing tcc_ops tables."
+     },
+     "x": 800,
+     "y": 985,
+     "w": 290,
+     "h": 80
+    },
+    {
+     "id": "gone-aca",
+     "box": "b-gone",
+     "title": "Container Apps + ACR",
+     "sub": "replaced by App Service code deploy",
+     "icon": "azure/containers/container-registries",
+     "status": "off",
+     "detail": {
+      "what": "No images to build, store or pull. Dockerfiles remain optional for local use only."
+     },
+     "x": 1105,
+     "y": 985,
+     "w": 290,
+     "h": 80
+    }
+   ],
+   "edges": [
+    {
+     "id": "u1",
+     "from": "p-analyst",
+     "to": "e-reg-web",
+     "layer": "user",
+     "label": "Sign in (OIDC); group assignment required",
+     "hop": 1
+    },
+    {
+     "id": "u2",
+     "from": "p-analyst",
+     "to": "web",
+     "layer": "user",
+     "label": "HTTPS · Easy Auth session",
+     "hop": 2
+    },
+    {
+     "id": "u3",
+     "from": "web",
+     "to": "api",
+     "layer": "user",
+     "label": "Bearer, aud = API, scope user_impersonation",
+     "hop": 3
+    },
+    {
+     "id": "u4",
+     "from": "api",
+     "to": "e-reg-api",
+     "layer": "user",
+     "label": "Validates issuer, audience, scope",
+     "hop": 4
+    },
+    {
+     "id": "s1",
+     "from": "api",
+     "to": "lh",
+     "layer": "service",
+     "label": "MI · OneLake read (ReadAll)"
+    },
+    {
+     "id": "s2",
+     "from": "api",
+     "to": "wh",
+     "layer": "service",
+     "label": "MI · TDS read/write tcc_gold, tcc_ops"
+    },
+    {
+     "id": "s3",
+     "from": "api",
+     "to": "st",
+     "layer": "service",
+     "label": "MI · Storage Blob Data Contributor"
+    },
+    {
+     "id": "s4",
+     "from": "api",
+     "to": "f-proj",
+     "layer": "service",
+     "label": "MI · Foundry User"
+    },
+    {
+     "id": "s5",
+     "from": "api",
+     "to": "kv",
+     "layer": "service",
+     "label": "MI · Key Vault Secrets User (if used)",
+     "status": "off"
+    },
+    {
+     "id": "s6",
+     "from": "api",
+     "to": "appi",
+     "layer": "service",
+     "label": "MI · Monitoring Metrics Publisher"
+    },
+    {
+     "id": "s7",
+     "from": "web",
+     "to": "appi",
+     "layer": "service",
+     "label": "MI · Monitoring Metrics Publisher"
+    },
+    {
+     "id": "s9",
+     "from": "f-proj",
+     "to": "f-model",
+     "layer": "flow",
+     "label": "Agent runs on the deployment"
+    },
+    {
+     "id": "g1",
+     "from": "e-mi-api",
+     "to": "api",
+     "layer": "gov",
+     "label": "User-assigned identity"
+    },
+    {
+     "id": "g2",
+     "from": "e-mi-web",
+     "to": "web",
+     "layer": "gov",
+     "label": "User-assigned identity"
+    },
+    {
+     "id": "g3",
+     "from": "fab-roles",
+     "to": "wh",
+     "layer": "gov",
+     "label": "Grants API identity read/write on two schemas"
+    },
+    {
+     "id": "g4",
+     "from": "fab-roles",
+     "to": "lh",
+     "layer": "gov",
+     "label": "Grants API identity ReadAll"
+    },
+    {
+     "id": "g5",
+     "from": "e-users",
+     "to": "e-reg-web",
+     "layer": "gov",
+     "label": "Assignment required"
+    },
+    {
+     "id": "f1",
+     "from": "pipe",
+     "to": "lh",
+     "layer": "flow",
+     "label": "Loads client payroll"
+    },
+    {
+     "id": "f3",
+     "from": "appi",
+     "to": "law",
+     "layer": "flow",
+     "label": "Workspace-based"
+    },
+    {
+     "id": "c1",
+     "from": "gh-actions",
+     "to": "e-oidc",
+     "layer": "ci",
+     "label": "Federated token"
+    },
+    {
+     "id": "c2",
+     "from": "gh-actions",
+     "to": "api",
+     "layer": "ci",
+     "label": "terraform apply · zip deploy"
+    },
+    {
+     "id": "c3",
+     "from": "gh-actions",
+     "to": "web",
+     "layer": "ci",
+     "label": "zip deploy"
+    },
+    {
+     "id": "s8",
+     "from": "gw",
+     "to": "f-proj",
+     "layer": "service",
+     "label": "Optional: agent traffic via customer gateway",
+     "status": "off"
+    }
+   ],
+   "scenarios": [
+    {
+     "id": "read",
+     "title": "An analyst opens the portfolio",
+     "steps": [
+      {
+       "t": "Sign in",
+       "x": "The analyst signs in through Easy Auth. Only members of the assigned group get a session; the token requested at sign-in is for the API's scope.",
+       "n": [
+        "p-analyst",
+        "e-reg-web",
+        "e-users",
+        "web"
+       ],
+       "e": [
+        "u1",
+        "u2",
+        "g5"
+       ]
+      },
+      {
+       "t": "Call the API as the analyst",
+       "x": "The frontend's proxy forwards /api with the analyst's bearer token. The API checks issuer, audience and scope, then which clients this user may see. No token: 401.",
+       "n": [
+        "web",
+        "api",
+        "e-reg-api"
+       ],
+       "e": [
+        "u3",
+        "u4"
+       ]
+      },
+      {
+       "t": "Read gold and ops",
+       "x": "Screens read tcc_gold (figures) and tcc_ops (claims and engagements) from the Warehouse as the API's managed identity. No calculation runs on a page load.",
+       "n": [
+        "api",
+        "wh",
+        "e-mi-api"
+       ],
+       "e": [
+        "s2",
+        "g1"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "run",
+     "title": "A calculation run for one client",
+     "steps": [
+      {
+       "t": "Read payroll",
+       "x": "The API reads that client's Delta tables from the Lakehouse over OneLake. Payroll stays in memory; nothing copies it into the Warehouse.",
+       "n": [
+        "api",
+        "lh"
+       ],
+       "e": [
+        "s1"
+       ]
+      },
+      {
+       "t": "Compute deterministically",
+       "x": "The engine applies the rule pack frozen for each tax year and records every step with its inputs, formula, citation and a SHA-256 over the trail."
+      },
+      {
+       "t": "Write in one transaction",
+       "x": "Gold rows and the run manifest are written together; the prior run's rows are marked not current, never overwritten. A write-write conflict is retried.",
+       "n": [
+        "api",
+        "wh"
+       ],
+       "e": [
+        "s2"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "ask",
+     "title": "Ask Copilot",
+     "steps": [
+      {
+       "t": "Compute first",
+       "x": "The API answers the question with deterministic code before any model is involved.",
+       "n": [
+        "api"
+       ]
+      },
+      {
+       "t": "Narrate an aggregate",
+       "x": "An aggregate brief (no payroll rows, names or per-person figures) goes to a Foundry agent, which writes the explanation. If Foundry is unreachable, every screen still works.",
+       "n": [
+        "api",
+        "f-proj",
+        "f-model"
+       ],
+       "e": [
+        "s4",
+        "s9"
+       ]
+      },
+      {
+       "t": "Optional gateway",
+       "x": "If the customer requires it, agent traffic routes through their AI gateway. It must carry the Foundry Agents protocol.",
+       "n": [
+        "gw",
+        "f-proj"
+       ],
+       "e": [
+        "s8"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "files",
+     "title": "A claim package, generated and downloaded",
+     "steps": [
+      {
+       "t": "Generate",
+       "x": "The API renders the package and writes it to outputs/{client_id}/{run_id}/ through the blob private endpoint, then records it in tcc_ops.artifact with its SHA-256.",
+       "n": [
+        "api",
+        "st",
+        "wh"
+       ],
+       "e": [
+        "s3",
+        "s2"
+       ]
+      },
+      {
+       "t": "Request a download",
+       "x": "The analyst asks for the file through the app. The API checks the user may see that client and that the artifact row exists.",
+       "n": [
+        "p-analyst",
+        "web",
+        "api"
+       ],
+       "e": [
+        "u2",
+        "u3"
+       ]
+      },
+      {
+       "t": "Stream and record",
+       "x": "The API streams the blob and writes tcc_ops.artifact_access (served, denied or missing). The storage account itself is unreachable from outside: no public access, no shared key, no SAS.",
+       "n": [
+        "api",
+        "st",
+        "wh"
+       ],
+       "e": [
+        "s3",
+        "s2"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "grants",
+     "title": "Who grants what",
+     "steps": [
+      {
+       "t": "Terraform: Azure RBAC",
+       "x": "Terraform creates both managed identities and assigns their Azure roles: Blob Data Contributor, Foundry User, Monitoring Metrics Publisher.",
+       "n": [
+        "e-mi-api",
+        "e-mi-web",
+        "api",
+        "web"
+       ],
+       "e": [
+        "g1",
+        "g2"
+       ]
+      },
+      {
+       "t": "Fabric: workspace access",
+       "x": "The workspace role for the API identity can be assigned by Terraform's Fabric provider, or by the customer if they own Fabric access. Schema-level read/write on tcc_gold and tcc_ops is a T-SQL grant run after deploy.",
+       "n": [
+        "fab-roles",
+        "lh",
+        "wh"
+       ],
+       "e": [
+        "g3",
+        "g4"
+       ]
+      },
+      {
+       "t": "Entra: registrations and assignment",
+       "x": "The customer creates the app registrations and assigns the analyst group. Terraform only takes their client IDs.",
+       "n": [
+        "e-reg-web",
+        "e-reg-api",
+        "e-users"
+       ],
+       "e": [
+        "g5"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "ship",
+     "title": "Delivery",
+     "steps": [
+      {
+       "t": "Test",
+       "x": "Every pull request runs both suites with the parity gate required: 10,236 evaluated, 539 Min-Max, 656 Pay Period.",
+       "n": [
+        "gh-actions"
+       ]
+      },
+      {
+       "t": "Federate",
+       "x": "The workflow exchanges its GitHub token for an Entra token. No secret is stored anywhere.",
+       "n": [
+        "gh-actions",
+        "e-oidc"
+       ],
+       "e": [
+        "c1"
+       ]
+      },
+      {
+       "t": "Provision and deploy",
+       "x": "terraform apply, then zip deploy of the API and the built frontend. Re-running is a no-op.",
+       "n": [
+        "gh-actions",
+        "api",
+        "web"
+       ],
+       "e": [
+        "c2",
+        "c3"
+       ]
+      }
+     ]
+    }
+   ],
+   "w": 2400,
+   "h": 1110
+  }
+ }
+}

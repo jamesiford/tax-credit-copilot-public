@@ -1,0 +1,172 @@
+{
+  "_artifact": "Rules-ingestion agent output. DO NOT hand-edit thresholds here — this file is the config the calc engine reads. It is INTENDED to be (re)produced by the RulesIngestionAgent from trusted primary GA sources. Briefing figures are a sanity check, not the source of truth (GOV-01).",
+  "program": "GA_JTC",
+  "jurisdiction": "GA",
+  "credit_name": "Georgia Jobs Tax Credit",
+  "in_scope": true,
+  "ingestion": {
+    "produced_by": "RulesIngestionAgent",
+    "method": "web_iq_browse",
+    "captured_at": "2026-06-30",
+    "live_refresh_supported": true,
+    "web_iq": {
+      "status": "WIRED",
+      "transport": "REST v3 (api.microsoft.ai) via tools/webiq.py; key from env WEBIQ_API_KEY",
+      "_note": "Retrieval is LIVE: ingest_ga_jtc(live=True) browses each source URL via Web IQ (real grounding + crawl timestamps). Source URLs below were discovered + verified retrievable via Web IQ web search (dca.georgia.gov Job Tax Credit Annual Ranking Memo + DOR employers page + O.C.G.A. 48-7-40). REMAINING (GOV-01 human checkpoint): extract the exact numeric values from the retrieved memo/statute text and confirm with the partner before client use — values still carry _prototype_verify and are NOT auto-overwritten by retrieval.",
+      "needs": [
+        "Human extraction + sign-off of the exact county wage figure from the retrieved DCA ranking memo (PILOT-02)",
+        "The partner's confirmation these DCA/DOR pages are the canonical sources (ACT-05 / OQ-04)"
+      ]
+    },
+    "_note": "captured_at is the date these cited values + source URLs were assembled by hand from public GA references as a stand-in. live=False (default, used by tests + demo) returns this snapshot verbatim so the calc is reproducible. live=True currently only PROBES source-URL reachability (a plain HTTP HEAD) — it does NOT parse or re-serialise values. Wiring real retrieval is blocked on the two inputs in `web_iq.needs`."
+  },
+  "parameters": {
+    "min_weekly_hours": {
+      "value": 35.0,
+      "unit": "hours_per_week",
+      "confidence": "high",
+      "_prototype_verify": true,
+      "_disc_ref": "PILOT-02",
+      "source": {
+        "authority": "O.C.G.A. § 48-7-40 / GA DOR",
+        "title": "Georgia Jobs Tax Credit — full-time job definition (30-40 hrs; program uses 35 hr/wk average bar)",
+        "url": "https://law.justia.com/codes/georgia/title-48/chapter-7/article-2/section-48-7-40/",
+        "retrieved_at": "2026-06-30"
+      }
+    },
+    "min_weekly_wages": {
+      "value": 680.0,
+      "unit": "usd_per_week",
+      "confidence": "medium",
+      "_prototype_verify": true,
+      "_disc_ref": "PILOT-02",
+      "basis": "average_weekly_wage_of_georgia_lowest_county",
+      "briefing_sanity_check_2024": 686.0,
+      "workbook_2024_value": 686.0,
+      "workbook_source": "the product's documented One/Zero methodology workbook, cells P2:P3",
+      "published_annually": true,
+      "fixed_once_released": true,
+      "source": {
+        "authority": "Georgia Department of Community Affairs (DCA)",
+        "title": "Job Tax Credit Annual Ranking Memo — annual county tiers + wage tables (avg weekly wage of the lowest-wage county)",
+        "url": "https://dca.georgia.gov/document/document/2025-job-tax-credit-annual-ranking-memo/download",
+        "retrieved_at": "2026-06-30"
+      },
+      "_note": "The historical wage PDF resolves Tax Year 2024=$686/wk and Tax Year 2025=$680/wk. The flat $680 value remains the unconfigured-year fallback."
+    },
+    "wage_basis": {
+      "value": "all_remuneration",
+      "confidence": "high",
+      "_prototype_verify": true,
+      "_disc_ref": "DISC-14",
+      "included_pay_codes": ["Regular", "Overtime", "Bonus", "Commission", "Holiday", "Incentive"],
+      "excluded_pay_codes": ["Mileage", "Expense_Reimbursement", "Relocation"],
+      "source": {
+        "authority": "GA DOR guidance / briefing § Pay codes",
+        "title": "GA JTC includes ALL remuneration (bonuses, overtime, incentive, holiday); non-taxable codes stripped",
+        "url": "https://dor.georgia.gov/employers-jobs-tax-credit",
+        "retrieved_at": "2026-06-30"
+      }
+    },
+    "measuring_date": {
+      "value": "last_day",
+      "confidence": "medium",
+      "_prototype_verify": true,
+      "_disc_ref": "PILOT-03",
+      "source": {
+        "authority": "O.C.G.A. § 48-7-40 / GA DOR IT-CA instructions",
+        "title": "Monthly employment level measured on the statute's 'magical pay date'; GA measures month-end",
+        "url": "https://dor.georgia.gov/employers-jobs-tax-credit",
+        "retrieved_at": "2026-06-30"
+      }
+    },
+    "minimum_new_jobs": {
+      "value": 2,
+      "confidence": "high",
+      "_prototype_verify": true,
+      "_disc_ref": "GEO-03",
+      "depends_on": "county_tier_designation",
+      "source": {
+        "authority": "Georgia DCA — Job Tax Credit tiers",
+        "title": "Tier 1 counties require 2 net-new jobs (Tier 2=10, Tier 3=15, Tier 4=25)",
+        "url": "https://dca.georgia.gov/financing-tools/incentives/job-tax-credits/job-tax-credits-documents-downloads",
+        "retrieved_at": "2026-06-30"
+      }
+    },
+    "amount_per_qualifying_job_usd": {
+      "value": 3500,
+      "confidence": "medium",
+      "_prototype_verify": true,
+      "_disc_ref": "GEO-03",
+      "depends_on": "county_tier_designation",
+      "source": {
+        "authority": "Georgia DCA — Job Tax Credit tiers",
+        "title": "Tier 1 credit value per net-new job per year (varies by tier / zone: MZ/OZ, LDCT)",
+        "url": "https://dca.georgia.gov/financing-tools/incentives/job-tax-credits/job-tax-credits-documents-downloads",
+        "retrieved_at": "2026-06-30"
+      }
+    },
+    "benefit_period_years": {
+      "value": 5,
+      "confidence": "high",
+      "_prototype_verify": true,
+      "source": {
+        "authority": "O.C.G.A. § 48-7-40",
+        "title": "Each net-new-job layer earns the credit for 5 years if the jobs are maintained",
+        "url": "https://law.justia.com/codes/georgia/title-48/chapter-7/article-2/section-48-7-40/",
+        "retrieved_at": "2026-06-30"
+      }
+    },
+    "carryforward_years": {
+      "value": 10,
+      "confidence": "high",
+      "_prototype_verify": true,
+      "source": {
+        "authority": "O.C.G.A. § 48-7-40",
+        "title": "Unused GA JTC carries forward up to 10 years; GA does not recapture earned credit",
+        "url": "https://law.justia.com/codes/georgia/title-48/chapter-7/article-2/section-48-7-40/",
+        "retrieved_at": "2026-06-30"
+      }
+    },
+    "industry_zone_eligibility": {
+      "value": "tier1_or_zone",
+      "confidence": "medium",
+      "_prototype_verify": true,
+      "_disc_ref": "GEO-01",
+      "retail_eligible_when": ["tier_1_bottom_40", "military_zone", "opportunity_zone", "less_developed_census_tract"],
+      "source": {
+        "authority": "Georgia DCA — designation program",
+        "title": "Tier 1 needs an eligible industry (mfg/warehousing) UNLESS tier-1-bottom-40 / MZ / OZ / LDCT where retail qualifies too",
+        "url": "https://dca.georgia.gov/financing-tools/incentives/job-tax-credits/job-tax-credits-documents-downloads",
+        "retrieved_at": "2026-06-30"
+      }
+    }
+  },
+  "thresholds_by_year": {
+    "2024": {
+      "min_weekly_hours": 35.0,
+      "min_weekly_wages": 686.0,
+      "confidence": "medium",
+      "_prototype_verify": true,
+      "_disc_ref": "GDS-51",
+      "source": {
+        "authority": "the partner's stakeholder methodology",
+        "title": "the product's documented One/Zero methodology workbook, cells P2:P3",
+        "artifact_sha256": "C2F8CF527AF8423F88105D3EE77B30F938D7CFCE4E5D532A6C851F60701D310A",
+        "retrieved_at": "2026-07-29"
+      }
+    },
+    "2025": {
+      "min_weekly_wages": 680.0,
+      "confidence": "high",
+      "_prototype_verify": true,
+      "_disc_ref": "GDS-51",
+      "source": {
+        "authority": "Georgia JTC historical wage table",
+        "title": "JTCHistoricalWages_Jul 2025.pdf — Tax Year 2025 row",
+        "artifact_sha256": "21A8D16683196F982CBF3040980BEC9C8A3A4F2BD1AC686E57647D03185D8208",
+        "retrieved_at": "2026-07-29"
+      }
+    }
+  }
+}

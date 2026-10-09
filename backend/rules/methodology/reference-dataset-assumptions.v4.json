@@ -1,0 +1,150 @@
+{
+  "schema_version": 4,
+  "assumption_set_id": "GDS-STEP1-2026-07-30-v4",
+  "status": "approved_for_implementation_not_access_verified",
+  "approved_at": "2026-07-30",
+  "supersedes": "GDS-STEP1-2026-07-29-v3",
+  "scope": "JOHN_REFERENCE_FY2024",
+  "purpose": "Step 1 benchmark configuration with cash-basis leading-boundary selection, explicit source lookback controls, workbook period rules, and the Tax Year 2024 wage floor.",
+  "source_basis": [
+    "Four private TCC payroll chunks",
+    "Georgia JTC Step 1 Avg Wages and Hours Narrative",
+    "Georgia JTC Step 1 Avg Wages and Hours Diagram",
+    "GA JTC One Zero Methodology Overview.xlsx (SHA-256 C2F8CF527AF8423F88105D3EE77B30F938D7CFCE4E5D532A6C851F60701D310A)",
+    "JTCHistoricalWages_Jul 2025.pdf (SHA-256 21A8D16683196F982CBF3040980BEC9C8A3A4F2BD1AC686E57647D03185D8208)"
+  ],
+  "assumptions": {
+    "BA-01": {
+      "status": "approved",
+      "decision": "FY2024 uses an inclusive 2023-08-01 through 2024-07-31 payroll-analysis window.",
+      "config": {
+        "fiscal_year_label": 2024,
+        "fiscal_year_begin": "2023-08-01",
+        "fiscal_year_end": "2024-07-31"
+      },
+      "falsified_by": "John's Access run settings use different fiscal dates."
+    },
+    "BA-02": {
+      "status": "approved_cash_basis_with_boundary_controls",
+      "decision": "Include payroll records paid during the fiscal year even when PPE is before fiscal-year start; include the first PPE in FY when PPS precedes start; exclude pay dates after FY end and PPE after/transcending FY end.",
+      "config": {
+        "pay_date_must_be_within_fiscal_year": true,
+        "include_prior_fy_ppe_paid_in_fiscal_year": true,
+        "include_first_ppe_in_fiscal_year_when_pps_precedes_start": true,
+        "pay_period_end_must_not_exceed_fiscal_year_end": true,
+        "post_fiscal_year_paycheck_grace_days": 0
+      },
+      "falsified_by": "John's Access source controls apply a different leading/trailing boundary rule."
+    },
+    "BA-03": {
+      "status": "approved_with_cycle_evidence_gate",
+      "decision": "Source PayFrequency maps 1/2/4 to weekly/biweekly/monthly. Collapse each employee's records sharing PPS/PPE into one denominator period, retain every source row as lineage, and reject conflicting cadence codes.",
+      "config": {
+        "pay_frequency_weeks": {"1": 1.0, "2": 2.0, "4": 4.333},
+        "denominator_period_key": ["TCCEmployeeId", "PayPeriodStart", "PayPeriodEnd"],
+        "lineage_fields": ["PaycheckDate", "TCCUnitId", "FEIN", "PayFrequency", "SourceFile", "SourceRow"],
+        "conflicting_frequency_treatment": "exception",
+        "use_major_period_heuristic": false,
+        "major_cycle_evidence_required_for_signoff": true,
+        "off_cycle_period_treatment": "retain_and_flag_until_cycle_evidence"
+      },
+      "falsified_by": "Access denominator output uses another period identity or cadence mapping."
+    },
+    "BA-04": {
+      "status": "approved",
+      "decision": "Collapse exact duplicate payroll facts for common totals using the audit-preserving dimensional key and sum signed hours/wages. Denominator identity is separately controlled by BA-03.",
+      "config": {
+        "collapse_key": ["TCCEmployeeId", "TCCUnitId", "FEIN", "PayPeriodStart", "PayPeriodEnd", "PaycheckDate", "PayFrequency"],
+        "summed_fields": ["Hours", "Wages"],
+        "job_title_is_key": false
+      },
+      "falsified_by": "Access employee totals prove another source-fact key or aggregation order."
+    },
+    "BA-05": {
+      "status": "approved_workbook_corroborated",
+      "decision": "Preserve signed corrections; include zero-hour wages in totals; do not count a net-zero-hour PPS/PPE period in the denominator; flag stragglers rather than auto-excluding them.",
+      "config": {
+        "preserve_negative_hours": true,
+        "preserve_negative_wages": true,
+        "include_zero_hour_wages_in_totals": true,
+        "count_zero_hour_only_period_as_worked_period": false,
+        "hours_are_actual_not_overtime_weighted": true,
+        "straggler_treatment": "flag_only"
+      },
+      "falsified_by": "John's Access controls show different correction, overtime, or bonus normalization."
+    },
+    "BA-06": {
+      "status": "source_confirmed_historical_wage_table",
+      "decision": "Use the wage table Tax Year column. Reference Tax Year 2024 uses DOL Report Year 2023, Taliaferro County, and a $686 minimum average weekly wage; test two-decimal averages against 35 hours and $686.",
+      "config": {
+        "wage_table_year_basis": "source_tax_year",
+        "source_tax_year": 2024,
+        "dol_report_year": 2023,
+        "lowest_wage_county": "Taliaferro",
+        "minimum_average_weekly_hours": 35.0,
+        "minimum_average_weekly_wages_usd": 686.0,
+        "annualized_wage_usd": 35672.0,
+        "regulation": "110-9-1-.02(1)(a) and 110-9-1-.03(3)(b)1",
+        "totals_precision": "full",
+        "denominator_precision": "full",
+        "average_display_and_test_decimals": 2,
+        "rounding_mode": "to_be_confirmed"
+      },
+      "falsified_by": "John's Access run uses another Tax Year row or rounding mode."
+    },
+    "BA-07": {
+      "status": "approved_dependency",
+      "decision": "Import John's Step 1 CSV/XLSX outputs using unchanged employee IDs; authoritative parity waits for those outputs.",
+      "config": {
+        "accepted_formats": ["csv", "xlsx"],
+        "employee_join_key": "TCCEmployeeId",
+        "required_output_groups": ["common_employee_totals", "min_max_denominator_averages_flags_eligible_list", "pay_period_denominator_averages_flags_eligible_list", "run_settings_exclusions_cycle_groups_and_boundary_controls"]
+      },
+      "falsified_by": "John provides another format, key, or result-table shape."
+    },
+    "BA-08": {
+      "status": "approved",
+      "decision": "Treat One through Four as one complete ordered logical export without cross-file dedupe.",
+      "config": {
+        "ordered_files": ["One.csv", "Two.csv", "Three.csv", "Four.csv"],
+        "remove_fully_blank_padding_rows": true,
+        "cross_file_deduplication": false,
+        "preserve_source_file_and_row": true,
+        "authoritative_consolidated_csv": false
+      },
+      "falsified_by": "John identifies missing/reordered chunks or Access source controls do not match the logical union."
+    },
+    "BA-09": {
+      "status": "source_confirmed_review_control",
+      "decision": "Pay Period weeks must not exceed Min-Max weeks and must not exceed 52 without review. Report every violation and never cap or auto-repair a sealed run.",
+      "config": {
+        "report_any_pay_period_gt_min_max": true,
+        "review_tolerance_weeks": 1.5,
+        "maximum_pay_period_weeks_without_review": 52.0,
+        "repair_policy": "none",
+        "signoff_requires_reviewed_cycle_evidence": true
+      },
+      "falsified_by": "John supplies a different invariant, tolerance, maximum-weeks policy, or approved repair."
+    },
+    "BA-10": {
+      "status": "source_gap_control",
+      "decision": "The source must contain pre-FY lookback sufficient to include prior-PPE paychecks paid in FY and the first period crossing FY start. Report boundary completeness; never synthesize missing rows or force 52 weeks.",
+      "config": {
+        "require_valid_pps_before_fiscal_begin": true,
+        "report_prior_ppe_paid_in_fy": true,
+        "report_crossing_start_periods": true,
+        "report_current_ppe_paid_after_fy": true,
+        "missing_lookback_status": "MISSING_LEADING_LOOKBACK",
+        "synthetic_boundary_rows_allowed": false,
+        "force_52_weeks": false
+      },
+      "falsified_by": "A complete source manifest proves no lookback is required or Access supplies another completeness control."
+    }
+  },
+  "change_control": {
+    "immutable_after_use": true,
+    "supersession_rule": "Create a new versioned assumption-set file; never rewrite a set already used for a recorded run.",
+    "run_metadata": ["assumption_set_id", "assumption_set_sha256", "source_manifest_sha256", "methodology_workbook_sha256", "historical_wages_pdf_sha256", "code_commit", "run_timestamp"],
+    "difference_policy": "Classify a mismatch before changing an assumption; record old/new IDs and first divergent stage."
+  }
+}

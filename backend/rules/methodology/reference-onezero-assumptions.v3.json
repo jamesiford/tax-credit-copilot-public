@@ -1,0 +1,78 @@
+{
+  "schema_version": 3,
+  "assumption_set_id": "GDS-ONEZERO-2026-07-29-v3",
+  "status": "approved_for_v3_implementation_not_access_verified",
+  "created_at": "2026-07-29",
+  "supersedes": "GDS-ONEZERO-2026-07-29-v2",
+  "scope": "JOHN_REFERENCE_FY2024",
+  "purpose": "One/Zero interpretations bound to the corrected Tax Year 2024 eligibility floor while preserving workbook evidence gates.",
+  "source_basis": [
+    "One Zero Pay Periods.docx Steps 6-7",
+    "One Zero Min Max.docx Steps 5-6",
+    "Georgia JTC Step 1 Avg Wages and Hours Narrative",
+    "Georgia JTC Step 1 Avg Wages and Hours Diagram",
+    "GA JTC One Zero Methodology Overview.xlsx (SHA-256 C2F8CF527AF8423F88105D3EE77B30F938D7CFCE4E5D532A6C851F60701D310A)",
+    "JTCHistoricalWages_Jul 2025.pdf (SHA-256 21A8D16683196F982CBF3040980BEC9C8A3A4F2BD1AC686E57647D03185D8208)",
+    "GDS-STEP1-2026-07-29-v3"
+  ],
+  "assumptions": {
+    "OZ-01": {
+      "status": "derived_from_approved_step1_config",
+      "decision": "Generate twelve One/Zero month targets from the approved Reference fiscal window, August 2023 through July 2024. Do not use the workbook's malformed hard-coded cutoff dates as expected values.",
+      "falsified_by": "John's Access run uses another twelve-month matrix window."
+    },
+    "OZ-02": {
+      "status": "source_confirmed_workbook_corroborated",
+      "decision": "Min-Max coverage uses earliest included PPS through latest included PPE per employee, unit, and FEIN; assign 1 when Min PPS <= monthly cutoff <= Max PPE.",
+      "falsified_by": "John's Access matrix uses paycheck dates or another coverage range."
+    },
+    "OZ-03": {
+      "status": "proposed",
+      "decision": "Pay Period coverage uses PPS <= month target <= PPE. The original equality-to-paycheck-date wording remains treated as a defect because the workbook does not resolve that conflict.",
+      "falsified_by": "John confirms equality-to-paycheck-date or another coverage rule."
+    },
+    "OZ-04": {
+      "status": "source_confirmed_workbook_corroborated",
+      "decision": "For Month 12, when the employee's last PPE is in Month 12 and day > 15, use that PPE as the target; otherwise use month end. The workbook's December 27 cutoff supports this special case but is not a universal date.",
+      "falsified_by": "A later John-authored flow supersedes the Month-12 rule."
+    },
+    "OZ-05": {
+      "status": "blocked_on_reviewed_cycle_evidence",
+      "decision": "Pay Period One/Zero uses reviewed company pay-cycle groups or practitioner-identified material payroll dates. The median-employee-participation heuristic may be shown as a diagnostic proposal but cannot support parity or sign-off.",
+      "falsified_by": "John supplies a deterministic classifier that is validated against Access period output."
+    },
+    "OZ-06": {
+      "status": "manual_review_required",
+      "decision": "No employee may contribute more than one count in a month. Flag every overlap before correction. V3 retains the latest-PPS/latest-PPE/stable-order disposition only as a reproducible provisional view; sign-off requires a reviewed disposition because the workbook does not define the winning unit.",
+      "falsified_by": "John supplies an authoritative automatic allocation rule or reviewed manual dispositions."
+    },
+    "OZ-07": {
+      "status": "proposed",
+      "decision": "For this full-year benchmark, divide unit total by 12. Preserve unrounded, source-nearest-whole half-up, and application two-decimal views separately.",
+      "falsified_by": "John uses a partial-year denominator, another rounding sequence, or only one output precision."
+    },
+    "OZ-08": {
+      "status": "stakeholder_confirmed_extension",
+      "decision": "Eligibility remains customer-wide; One/Zero matrix grain includes employee, unit, and FEIN. Unit determines legal entity for this source unless an exception is flagged.",
+      "falsified_by": "John's Access output uses another legal-entity allocation grain."
+    },
+    "OZ-09": {
+      "status": "source_confirmed_workbook_corroborated",
+      "decision": "Min-Max emits one row per eligible employee-unit-FEIN span. Pay Period first collapses pay lines sharing employee/unit/FEIN/PPS/PPE, then emits one row per reviewed major period.",
+      "falsified_by": "John's Access matrix uses another row grain."
+    }
+  },
+  "change_control": {
+    "approval_required_before_parity_signoff": true,
+    "supersession_rule": "Create a new versioned file when John or Access evidence resolves an ambiguity; retain this v3 with all runs that used it.",
+    "run_metadata": [
+      "step1_assumption_set_id_and_sha256",
+      "onezero_assumption_set_id_and_sha256",
+      "source_manifest_sha256",
+      "methodology_workbook_sha256",
+      "historical_wages_pdf_sha256",
+      "code_commit",
+      "run_timestamp"
+    ]
+  }
+}

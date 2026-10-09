@@ -1,0 +1,63 @@
+{
+  "_prototype_verification": "PROTOTYPE rule pack. Numbers reflect publicly documented North Carolina Job Opportunity Tax Credit parameters for Tier 2 counties; verify all values (per-job amount, tier designations, thresholds, benefit period) against current NC Department of Commerce and NC DOR guidance before any real client use.",
+  "rule_pack_version": "0.1.0",
+  "jurisdiction": {
+    "level": "state",
+    "code": "NC",
+    "name": "North Carolina"
+  },
+  "credit": {
+    "code": "NC_JTEC",
+    "name": "North Carolina Job Expansion Tax Credit",
+    "statutory_citation": "N.C.G.S. § 105-129.87",
+    "tier": 2,
+    "summary": "Statutory credit per net new full-time job created in Tier 2 NC counties; the per-job amount scales with county tier designation (Tier 1 distressed counties receive higher amounts)."
+  },
+  "filing": {
+    "window": "Annual NC-478 attached to return",
+    "cycle": "annual"
+  },
+  "thresholds": {
+    "minimum_new_jobs": 10,
+    "minimum_hours_per_week_full_time": 35
+  },
+  "benefit": {
+    "amount_per_qualifying_job_usd": 750,
+    "benefit_period_years": 5,
+    "carryforward_years": 5,
+    "currency": "USD",
+    "_note": "Tier 2 county per-job amount. Tier 1 (most distressed) counties may qualify for up to $1,500/job. This stub uses Charlotte/Raleigh-MSA metro rates."
+  },
+  "eligibility": {
+    "qualifying_employment_type": "full_time",
+    "include_replacement_hires": false,
+    "geographic_scope": {
+      "level": "county",
+      "all_counties": true,
+      "_note": "County tier designations are updated annually by NC Dept. of Commerce. Prototype treats all NC counties as Tier 2."
+    }
+  },
+  "headcount_formula": {
+    "type": "avg_monthly_fte",
+    "fte_basis_hours_per_week": 40,
+    "compare_to_prior_period_months": 12
+  },
+  "one_zero": {
+    "_doc_source": "Approximation patched in via rules/_patch_one_zero.py; verify against state DOR before client use.",
+    "_prototype_verify": true,
+    "pt_aggregation": false,
+    "headcount_unit_field": "Worksite_ID",
+    "min_weekly_hours": 35.0,
+    "min_weekly_wages": 700.0,
+    "wage_basis": "regular",
+    "geographic_granularity": "county",
+    "entity_combination": "permitted",
+    "_disc_ref_entity_combination": "DISC-4",
+    "_note": "NC JTEC: avg county wage standard. entity_combination pending DISC-4 confirmation."
+  },
+  "calculation": {
+    "qualifying_jobs_expression": "max(0, current_period_qualifying_fte - prior_period_qualifying_fte - threshold_offset)",
+    "annual_credit_expression": "qualifying_jobs * amount_per_qualifying_job_usd",
+    "lifetime_credit_expression": "annual_credit * benefit_period_years"
+  }
+}

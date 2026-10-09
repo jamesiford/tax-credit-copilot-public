@@ -1,0 +1,36 @@
+# White-label allow-list for scripts/check-whitelabel.ps1 and
+# scripts/audit-export.py. [WL-12]
+#
+# Format: <path>|<term>|<one-line justification>
+# - <path> is repo-relative, or '*' to apply to every file.
+# - <term> is one of the WL-12 deny-list terms (check-whitelabel.ps1), or one
+#   of audit-export.py's finding kinds: pdf-unscanned, synthetic-data.
+# - Comments (#) and blank lines are ignored.
+#
+# This file starts EMPTY. Every entry needs its own justification; do not add
+# one to silence a finding without reading it first.
+
+# --- Frozen parity pins (AGENTS.md: "Never: ... edit the parity pins") ---
+# These two files are never edited, for any reason, including this one. The
+# hits are attribution prose ("reconciled with Experian...", a citation to a
+# named reviewer), not a figure.
+backend/tests/certified.py|experian|frozen parity pin (AGENTS.md); reconciliation-date attribution prose, not a figure
+backend/rules/methodology/certified-figures.json|experian|frozen parity pin (AGENTS.md); reconciliation attribution ("reconciled_with", "never_edit" prose), not a figure
+backend/rules/methodology/certified-figures.json|skowronski|frozen parity pin (AGENTS.md); reconciliation attribution, not a figure
+
+# --- Immutable published methodology sets (house rule: never edit a
+# published set; create the next one) ---
+# Each hit is a citation/attribution string inside an evidence field (who
+# confirmed a decision, and when) — part of the evidentiary record a published
+# set exists to freeze, not a figure.
+backend/rules/methodology/reference-dataset-assumptions.v5.json|skowronski|immutable published methodology set; evidentiary attribution, not a figure
+backend/rules/methodology/reference-dataset-assumptions.v6.json|experian|immutable published methodology set; evidentiary attribution, not a figure
+backend/rules/methodology/reference-dataset-assumptions.v6.json|skowronski|immutable published methodology set; evidentiary attribution, not a figure
+backend/rules/methodology/reference-dataset-assumptions.v7.json|skowronski|immutable published methodology set; evidentiary attribution, not a figure
+backend/rules/methodology/reference-dataset-assumptions.v8.json|skowronski|immutable published methodology set; evidentiary attribution, not a figure
+backend/rules/methodology/reference-onezero-assumptions.v5.json|experian|immutable published methodology set; evidentiary attribution, not a figure
+backend/rules/methodology/reference-onezero-assumptions.v5.json|skowronski|immutable published methodology set; evidentiary attribution, not a figure
+backend/rules/methodology/reference-onezero-assumptions.v6.json|experian|immutable published methodology set; evidentiary attribution, not a figure
+backend/rules/methodology/reference-onezero-assumptions.v6.json|skowronski|immutable published methodology set; evidentiary attribution, not a figure
+backend/rules/methodology/reference-onezero-assumptions.v7.json|experian|immutable published methodology set; evidentiary attribution, not a figure
+backend/rules/methodology/reference-onezero-assumptions.v7.json|skowronski|immutable published methodology set; evidentiary attribution, not a figure

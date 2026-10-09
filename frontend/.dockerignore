@@ -1,0 +1,19 @@
+# Frontend image hygiene.
+#
+# `dist/` is INTENTIONALLY KEPT — the azd prepackage hook builds it on the
+# host and the Dockerfile copies it straight into nginx. (esbuild crashes
+# under Docker Desktop x86_64 emulation on Windows ARM, so we don't build
+# inside the container.)
+node_modules/
+.vite/
+coverage/
+
+# Test files are not needed in the runtime image
+src/**/*.test.js
+src/**/*.test.jsx
+
+# Local-only
+.env
+.env.local
+*.log
+.DS_Store

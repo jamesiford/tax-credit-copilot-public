@@ -1,0 +1,69 @@
+{
+  "_prototype_verification": "PROTOTYPE stub. Numbers reflect publicly summarized South Carolina Jobs Tax Credit parameters as of late 2025; verify against current SC Department of Revenue Form TC-4 guidance before any client use.",
+  "rule_pack_version": "0.1.0",
+  "jurisdiction": {
+    "level": "state",
+    "code": "SC",
+    "name": "South Carolina"
+  },
+  "credit": {
+    "code": "SC_JTC",
+    "name": "South Carolina Jobs Tax Credit",
+    "statutory_citation": "S.C. Code § 12-6-3360",
+    "tier": "Tier III (Developed)",
+    "summary": "Annual statutory credit per net new full-time job, varying by county designation tier."
+  },
+  "filing": {
+    "window": "Form SCH TC-4 with return",
+    "cycle": "annual"
+  },
+  "thresholds": {
+    "minimum_new_jobs": 5,
+    "minimum_hours_per_week_full_time": 35
+  },
+  "benefit": {
+    "amount_per_qualifying_job_usd": 1500,
+    "benefit_period_years": 5,
+    "carryforward_years": 15,
+    "currency": "USD",
+    "_note": "Tier III county per-job amount. Lower-tier (more distressed) counties qualify for higher amounts; this stub uses Charleston/Greenville-style metro pricing."
+  },
+  "eligibility": {
+    "qualifying_employment_type": "full_time",
+    "include_replacement_hires": false,
+    "geographic_scope": {
+      "level": "county",
+      "all_counties": true
+    }
+  },
+  "headcount_formula": {
+    "type": "avg_monthly_fte",
+    "fte_basis_hours_per_week": 40,
+    "compare_to_prior_period_months": 12
+  },
+  "one_zero": {
+    "_doc_source": "June 4 user story CALC-03 (SC rule) + One Zero docs. Verify against SC DOR Form TC-4 before client use.",
+    "_prototype_verify": true,
+    "_disc_ref": "DISC-2",
+    "pt_aggregation": false,
+    "headcount_unit_field": "Worksite_ID",
+    "min_weekly_hours": 32.0,
+    "min_weekly_wages": 0.0,
+    "wage_basis": "regular",
+    "geographic_granularity": "county",
+    "measuring_date": "last_day",
+    "entity_combination": "permitted",
+    "thresholds_by_year": {
+      "2025": {
+        "min_weekly_hours": 32.0,
+        "min_weekly_wages": 0.0,
+        "pt_band_hours": [20.0, 32.0],
+        "pt_weight": 0.5,
+        "_prototype_verify": true,
+        "_disc_ref": "DISC-2",
+        "_note": "June 4 CALC-03: SC = NO wage test, 32-hour threshold, part-time tier 20-32 hrs counted as 0.5. Replaces the prior (incorrect) 35-hr/$580 stub. Confirm with the partner (PILOT-02)."
+      }
+    },
+    "_note": "SC JTC Base Calculation per CALC-03: no weekly-wage test (min_weekly_wages = 0), 32-hr full-time threshold, and a 20-32 hr part-time band counted as 0.5 of a head. Headcount tested at county granularity."
+  }
+}

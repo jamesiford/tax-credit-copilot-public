@@ -1,0 +1,16 @@
+# gitleaks configuration: the default rules plus one narrow allowance.
+#
+# `record_token` is an opaque SHA-256-derived handle for an employee row (see
+# backend/tools/tokens.py). Test fixtures pass literal hex values for it, which
+# the generic-api-key rule reads as a credential. It is not one: it grants
+# nothing and resolves only inside a run the caller can already read.
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "record_token fixtures in frontend tests are opaque row handles, not credentials"
+condition = "AND"
+paths = ['''^frontend/src/.*\.test\.jsx?$''']
+regexTarget = "line"
+regexes = ['''(?i)record_?token''']

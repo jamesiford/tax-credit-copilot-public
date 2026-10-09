@@ -1,0 +1,12 @@
+
+# Scratch extraction (one-shot)
+_extract.py
+_extracted.txt
+
+
+# Scratch files
+backend/_smoke.py
+_extract.py
+_extracted.txt
+# Local artifact store (ARTIFACT_STORE=local)
+data/artifacts/

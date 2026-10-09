@@ -1,0 +1,69 @@
+{
+  "_prototype_verification": "PROTOTYPE rule pack. Numbers reflect publicly documented Colorado Enterprise Zone Investment Tax Credit parameters as of late 2025; verify all values (credit amount, enterprise zone designations, thresholds) against current Colorado Office of Economic Development and International Trade guidance and C.R.S. § 39-30-105 before any real client use.",
+  "rule_pack_version": "0.1.0",
+  "jurisdiction": {
+    "level": "state",
+    "code": "CO",
+    "name": "Colorado"
+  },
+  "credit": {
+    "code": "CO_EZ",
+    "name": "Colorado Enterprise Zone Job Credit",
+    "statutory_citation": "C.R.S. § 39-30-105",
+    "summary": "State income tax credit for net new employees in a designated Colorado Enterprise Zone; $500 per qualifying new employee. Denver metro has several EZ-designated census tracts."
+  },
+  "filing": {
+    "window": "Form DR 0074 with state return",
+    "cycle": "annual"
+  },
+  "thresholds": {
+    "minimum_new_jobs": 5,
+    "minimum_hours_per_week_full_time": 35,
+    "_note": "No statutory minimum job count for the basic credit; this stub uses 5 as a minimum to filter immaterial credits. Enterprise Zone designation is required."
+  },
+  "benefit": {
+    "amount_per_qualifying_job_usd": 500,
+    "benefit_period_years": 3,
+    "carryforward_years": 7,
+    "currency": "USD",
+    "_note": "$500 per qualifying new employee per year, for up to 3 years. Carryforward of 7 years for unused credit."
+  },
+  "eligibility": {
+    "qualifying_employment_type": "full_time",
+    "include_replacement_hires": false,
+    "geographic_scope": {
+      "level": "county",
+      "qualifying_counties": [
+        "Denver",
+        "Adams",
+        "Arapahoe",
+        "Jefferson",
+        "Weld"
+      ],
+      "_note": "Enterprise Zones include portions of Denver metro and many rural counties. Prototype treats Denver as the qualifying geography."
+    }
+  },
+  "headcount_formula": {
+    "type": "avg_monthly_fte",
+    "fte_basis_hours_per_week": 40,
+    "compare_to_prior_period_months": 12
+  },
+  "one_zero": {
+    "_doc_source": "Approximation patched in via rules/_patch_one_zero.py; verify against state DOR before client use.",
+    "_prototype_verify": true,
+    "pt_aggregation": false,
+    "headcount_unit_field": "Worksite_ID",
+    "min_weekly_hours": 35.0,
+    "min_weekly_wages": 620.0,
+    "wage_basis": "regular",
+    "geographic_granularity": "unit",
+    "entity_combination": "permitted",
+    "_disc_ref_entity_combination": "DISC-4",
+    "_note": "CO Enterprise Zone: per-employee per-site eligibility within designated EZ boundary. entity_combination pending DISC-4 confirmation."
+  },
+  "calculation": {
+    "qualifying_jobs_expression": "max(0, current_period_qualifying_fte - prior_period_qualifying_fte - threshold_offset)",
+    "annual_credit_expression": "qualifying_jobs * amount_per_qualifying_job_usd",
+    "lifetime_credit_expression": "annual_credit * benefit_period_years"
+  }
+}

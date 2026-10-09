@@ -1,0 +1,21 @@
+# azd App Service package exclusions (gitignore syntax). Without this file azd
+# zips the whole folder, including gitignored local files.
+#
+# NEVER deploy: confidential reference payroll, local environment files,
+# local operational stores.
+.env
+.env.*
+data/payroll/
+data/reference_output/
+data/operational.db
+data/artifacts/
+data/evidence_cache.json
+# Not needed at runtime.
+tests/
+.pytest_cache/
+__pycache__/
+*.pyc
+.venv/
+venv/
+Dockerfile
+.dockerignore

@@ -1,0 +1,63 @@
+{
+  "_prototype_verification": "PROTOTYPE rule pack. Numbers reflect publicly documented Ohio Job Creation Tax Credit parameters as of late 2025; verify all values (credit rate, term, thresholds, average wage requirement) against current Ohio Development Services Agency guidance and ORC § 122.17 before any real client use.",
+  "rule_pack_version": "0.1.0",
+  "jurisdiction": {
+    "level": "state",
+    "code": "OH",
+    "name": "Ohio"
+  },
+  "credit": {
+    "code": "OH_JCTC",
+    "name": "Ohio Job Creation Tax Credit",
+    "statutory_citation": "ORC § 122.17",
+    "summary": "Refundable tax credit awarded as a percentage of employee Ohio income tax withholding for net new jobs; amount and term set by negotiated agreement with Ohio Tax Credit Authority. This stub uses a representative per-job-equivalent amount for the demo."
+  },
+  "filing": {
+    "window": "Quarterly performance reports to JobsOhio",
+    "cycle": "quarterly"
+  },
+  "thresholds": {
+    "minimum_new_jobs": 10,
+    "minimum_hours_per_week_full_time": 35,
+    "minimum_annual_payroll_per_job_usd": 35000,
+    "_note": "Ohio JCTC requires minimum 10 qualifying jobs at average wage ≥ $35,000/yr. Credits are negotiated individually; this stub represents a typical Columbus/Cincinnati-area award."
+  },
+  "benefit": {
+    "amount_per_qualifying_job_usd": 2000,
+    "benefit_period_years": 6,
+    "carryforward_years": 0,
+    "currency": "USD",
+    "_note": "Simplified per-job equivalent. Actual JCTC is a % of withholding (up to 75%) for a negotiated term (up to 15 years). This stub converts a typical award to a per-job-year amount for comparability."
+  },
+  "eligibility": {
+    "qualifying_employment_type": "full_time",
+    "include_replacement_hires": false,
+    "geographic_scope": {
+      "level": "state",
+      "all_counties": true
+    }
+  },
+  "headcount_formula": {
+    "type": "avg_monthly_fte",
+    "fte_basis_hours_per_week": 40,
+    "compare_to_prior_period_months": 12
+  },
+  "one_zero": {
+    "_doc_source": "Approximation patched in via rules/_patch_one_zero.py; verify against state DOR before client use.",
+    "_prototype_verify": true,
+    "pt_aggregation": false,
+    "headcount_unit_field": "Worksite_ID",
+    "min_weekly_hours": 35.0,
+    "min_weekly_wages": 750.0,
+    "wage_basis": "regular",
+    "geographic_granularity": "statewide",
+    "entity_combination": "permitted",
+    "_disc_ref_entity_combination": "DISC-4",
+    "_note": "OH JCTC: performance-based refundable; wage threshold per project agreement. entity_combination pending DISC-4 confirmation."
+  },
+  "calculation": {
+    "qualifying_jobs_expression": "max(0, current_period_qualifying_fte - prior_period_qualifying_fte - threshold_offset)",
+    "annual_credit_expression": "qualifying_jobs * amount_per_qualifying_job_usd",
+    "lifetime_credit_expression": "annual_credit * benefit_period_years"
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "_prototype_verification": "PROTOTYPE rule pack. Numbers reflect publicly documented Florida Qualified Target Industry Tax Refund parameters as of late 2025; verify all values (per-job refund amount, thresholds, target industry qualification, local match requirement) against current Florida Commerce guidance and F.S. § 288.106 before any real client use.",
+  "rule_pack_version": "0.1.0",
+  "jurisdiction": {
+    "level": "state",
+    "code": "FL",
+    "name": "Florida"
+  },
+  "credit": {
+    "code": "FL_QTI",
+    "name": "Florida Qualified Target Industry Tax Refund",
+    "statutory_citation": "F.S. § 288.106",
+    "summary": "Performance-based tax refund for qualified target industries (logistics, transportation, distribution) creating 10+ net new jobs paying at least 115% of the average private-sector wage. Local government must provide a 20% cash match."
+  },
+  "filing": {
+    "window": "Pre-application required before hiring",
+    "cycle": "pre-application"
+  },
+  "thresholds": {
+    "minimum_new_jobs": 10,
+    "minimum_hours_per_week_full_time": 35,
+    "minimum_wage_pct_of_local_average": 1.15,
+    "_note": "Wage threshold of 115% of average private-sector wage in the county. Logistics and distribution qualify as target industries under F.S. § 288.106(2)(q)."
+  },
+  "benefit": {
+    "amount_per_qualifying_job_usd": 3000,
+    "benefit_period_years": 7,
+    "carryforward_years": 0,
+    "currency": "USD",
+    "_note": "$3,000 per net new job for non-rural areas (Jacksonville, Miami). Rural areas qualify for $6,000/job. Refund is paid over multiple years as job milestones are met."
+  },
+  "eligibility": {
+    "qualifying_employment_type": "full_time",
+    "include_replacement_hires": false,
+    "geographic_scope": {
+      "level": "state",
+      "all_counties": true
+    }
+  },
+  "headcount_formula": {
+    "type": "avg_monthly_fte",
+    "fte_basis_hours_per_week": 40,
+    "compare_to_prior_period_months": 12
+  },
+  "one_zero": {
+    "_doc_source": "Approximation patched in via rules/_patch_one_zero.py; verify against state DOR before client use.",
+    "_prototype_verify": true,
+    "pt_aggregation": false,
+    "headcount_unit_field": "Worksite_ID",
+    "min_weekly_hours": 35.0,
+    "min_weekly_wages": 880.0,
+    "wage_basis": "regular",
+    "geographic_granularity": "statewide",
+    "entity_combination": "permitted",
+    "_disc_ref_entity_combination": "DISC-4",
+    "_note": "FL QTI: avg wage >= 115% of statewide avg; pre-application required. entity_combination pending DISC-4 confirmation."
+  },
+  "calculation": {
+    "qualifying_jobs_expression": "max(0, current_period_qualifying_fte - prior_period_qualifying_fte - threshold_offset)",
+    "annual_credit_expression": "qualifying_jobs * amount_per_qualifying_job_usd",
+    "lifetime_credit_expression": "annual_credit * benefit_period_years"
+  }
+}

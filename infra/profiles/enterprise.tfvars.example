@@ -1,0 +1,33 @@
+# Enterprise profile (D25): bring-your-own network and Fabric, Entra sign-in.
+# PLACEHOLDERS ONLY. Copy to profiles/enterprise.tfvars (gitignored) or into a
+# customer overlay, and replace every <...> value.
+
+profile          = "enterprise"
+environment_name = "tcc-prod"
+location         = "eastus2"
+tenant_id        = "00000000-0000-0000-0000-000000000000"
+
+# App registrations, created by the customer (D12, AUTH-1).
+web_client_id = "00000000-0000-0000-0000-000000000001"
+api_client_id = "00000000-0000-0000-0000-000000000002"
+
+# Network: existing subnets and centrally owned private DNS zones (NET-1, NET-3).
+app_integration_subnet_id  = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-network/providers/Microsoft.Network/virtualNetworks/vnet-spoke/subnets/snet-app"
+private_endpoint_subnet_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-network/providers/Microsoft.Network/virtualNetworks/vnet-spoke/subnets/snet-pe"
+private_dns_zone_ids = {
+  blob              = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-dns/providers/Microsoft.Network/privateDnsZones/privatelink.blob.core.windows.net"
+  cognitiveservices = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-dns/providers/Microsoft.Network/privateDnsZones/privatelink.cognitiveservices.azure.com"
+  openai            = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-dns/providers/Microsoft.Network/privateDnsZones/privatelink.openai.azure.com"
+  aiservices        = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-dns/providers/Microsoft.Network/privateDnsZones/privatelink.services.ai.azure.com"
+  sites             = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-dns/providers/Microsoft.Network/privateDnsZones/privatelink.azurewebsites.net"
+}
+
+# Fabric: the customer's existing workspace (D13). Grants are made by the
+# customer's Fabric admin plus scripts/grant-warehouse-sql.py.
+fabric_workspace_id   = "00000000-0000-0000-0000-000000000003"
+fabric_workspace_name = "<workspace display name>"
+fabric_lakehouse_name = "<lakehouse display name>"
+fabric_warehouse_id   = "00000000-0000-0000-0000-000000000004"
+warehouse_server      = "<id>.datawarehouse.fabric.microsoft.com"
+warehouse_database    = "<warehouse display name>"
+source_schema         = "<source schema>"

@@ -1,0 +1,178 @@
+{
+  "schema_version": 5,
+  "assumption_set_id": "GDS-STEP1-2026-08-05-v5",
+  "status": "stakeholder_confirmed_source_reconciled",
+  "approved_at": "2026-08-05",
+  "supersedes": "GDS-STEP1-2026-07-30-v4",
+  "scope": "JOHN_REFERENCE_FY2023",
+  "purpose": "Step 1 benchmark configuration reconciled to John Skowronski's 2026-07-30 Access run: Tax Year 2023 wage floor, paycheck-date-only fiscal trim, actual-span pay period denominator, and exclusive-day Min-Max span.",
+  "source_basis": [
+    "Four private TCC payroll chunks",
+    "John Skowronski email 2026-07-30 with Min-Max and Pay Period 1/0 Summary Tables",
+    "One Zero Min Max.docx Steps 1-6",
+    "One Zero Pay Periods.docx Steps 1-7",
+    "Georgia JTC Step 1 Avg Wages and Hours Narrative",
+    "Georgia JTC Step 1 Avg Wages and Hours Diagram",
+    "GA JTC One Zero Methodology Overview.xlsx (SHA-256 C2F8CF527AF8423F88105D3EE77B30F938D7CFCE4E5D532A6C851F60701D310A)",
+    "JTCHistoricalWages_Jul 2025.pdf (SHA-256 21A8D16683196F982CBF3040980BEC9C8A3A4F2BD1AC686E57647D03185D8208)"
+  ],
+  "assumptions": {
+    "BA-01": {
+      "status": "stakeholder_confirmed",
+      "decision": "Tax Year 2023 uses an inclusive 2023-07-28 through 2024-08-02 payroll-analysis window, confirmed by James Ford on 2026-08-05 against John's reported control totals.",
+      "config": {
+        "fiscal_year_label": 2023,
+        "fiscal_year_begin": "2023-07-28",
+        "fiscal_year_end": "2024-08-02"
+      },
+      "falsified_by": "John's Access run settings use different fiscal dates."
+    },
+    "BA-02": {
+      "status": "stakeholder_confirmed_paycheck_date_trim",
+      "decision": "Trim on paycheck date only. Include every record whose paycheck date falls within the fiscal window regardless of where its pay period ends. The v4 rule that also excluded PPE beyond fiscal-year end removed 7769 rows and 94 employees and is superseded.",
+      "config": {
+        "pay_date_must_be_within_fiscal_year": true,
+        "include_prior_fy_ppe_paid_in_fiscal_year": true,
+        "include_first_ppe_in_fiscal_year_when_pps_precedes_start": true,
+        "pay_period_end_must_not_exceed_fiscal_year_end": false,
+        "post_fiscal_year_paycheck_grace_days": 0
+      },
+      "verification": "Reproduces John's post-trim controls exactly: 384418 records, 4950777.43 hours, $82533629.87 wages, 10236 employees.",
+      "falsified_by": "John's Access source controls apply a different leading/trailing boundary rule."
+    },
+    "BA-03": {
+      "status": "stakeholder_confirmed_span_denominator",
+      "decision": "Pay Period weeks are the sum of each included period's actual inclusive span, (PayPeriodEnd - PayPeriodStart + 1) / 7. The source PayFrequency code is retained as lineage but is NOT used as a week multiplier. Collapse each employee's records sharing PPS/PPE into one denominator period.",
+      "config": {
+        "pay_period_denominator_mode": "actual_span_inclusive",
+        "pay_frequency_weeks_used_as_multiplier": false,
+        "pay_frequency_weeks_reference_only": {"1": 1.0, "2": 2.0, "4": 4.0},
+        "denominator_period_key": ["TCCEmployeeId", "PayPeriodStart", "PayPeriodEnd"],
+        "lineage_fields": ["PaycheckDate", "TCCUnitId", "FEIN", "PayFrequency", "SourceFile", "SourceRow"],
+        "conflicting_frequency_treatment": "lineage_only_no_exclusion",
+        "use_major_period_heuristic": false,
+        "major_cycle_evidence_required_for_signoff": true,
+        "off_cycle_period_treatment": "retain_and_flag_until_cycle_evidence"
+      },
+      "evidence": "PayFrequency code 4 is not a four-week cadence: all 1364 code-4 periods run the 16th through the 31st (16 days) and code-2 periods are predominantly the 1st through the 15th (15 days). Employees touching codes 2 or 4 have a median of 26 periods per year, i.e. semi-monthly. Applying the literal 1/2/4 constants yields 447 eligible against John's reported 659, so his run cannot be using them.",
+      "falsified_by": "John confirms an explicit weeks-per-period multiplier that reproduces his eligible count."
+    },
+    "BA-04": {
+      "status": "approved",
+      "decision": "Collapse exact duplicate payroll facts for common totals using the audit-preserving dimensional key and sum signed hours/wages. Denominator identity is separately controlled by BA-03.",
+      "config": {
+        "collapse_key": ["TCCEmployeeId", "TCCUnitId", "FEIN", "PayPeriodStart", "PayPeriodEnd", "PaycheckDate", "PayFrequency"],
+        "summed_fields": ["Hours", "Wages"],
+        "job_title_is_key": false
+      },
+      "falsified_by": "Access employee totals prove another source-fact key or aggregation order."
+    },
+    "BA-05": {
+      "status": "stakeholder_confirmed_retain_zero_hour_periods",
+      "decision": "Preserve signed corrections and include zero-hour wages in totals. Zero-hour PPS/PPE periods are RETAINED in the Pay Period denominator, superseding the v4 exclusion, because James selected the retain-zero-hour reconciliation on 2026-08-05.",
+      "config": {
+        "preserve_negative_hours": true,
+        "preserve_negative_wages": true,
+        "include_zero_hour_wages_in_totals": true,
+        "count_zero_hour_only_period_as_worked_period": true,
+        "hours_are_actual_not_overtime_weighted": true,
+        "straggler_treatment": "flag_only"
+      },
+      "falsified_by": "John's Access controls show different correction, overtime, or bonus normalization."
+    },
+    "BA-06": {
+      "status": "source_confirmed_historical_wage_table",
+      "decision": "Use the wage table Tax Year column. Reference Tax Year 2023 uses DOL Report Year 2022, Glascock County, and a $636 minimum average weekly wage; test two-decimal averages against 35 hours and $636. John's quoted $635.99 is a rounding artifact of his query, not the statutory figure.",
+      "config": {
+        "wage_table_year_basis": "source_tax_year",
+        "source_tax_year": 2023,
+        "dol_report_year": 2022,
+        "lowest_wage_county": "Glascock",
+        "minimum_average_weekly_hours": 35.0,
+        "minimum_average_weekly_wages_usd": 636.0,
+        "annualized_wage_usd": 33072.0,
+        "regulation": "110-9-1-.02(1)(a) and 110-9-1-.03(3)(b)1",
+        "totals_precision": "full",
+        "denominator_precision": "full",
+        "average_display_and_test_decimals": 2,
+        "rounding_mode": "half_up"
+      },
+      "falsified_by": "John's Access run uses another Tax Year row or rounding mode."
+    },
+    "BA-07": {
+      "status": "approved_dependency",
+      "decision": "Import John's Step 1 CSV/XLSX outputs using unchanged employee IDs; authoritative parity waits for those outputs.",
+      "config": {
+        "accepted_formats": ["csv", "xlsx"],
+        "employee_join_key": "TCCEmployeeId",
+        "required_output_groups": [
+          "common_employee_totals",
+          "min_max_denominator_averages_flags_eligible_list",
+          "pay_period_denominator_averages_flags_eligible_list",
+          "run_settings_exclusions_cycle_groups_and_boundary_controls"
+        ]
+      },
+      "falsified_by": "John provides another format, key, or result-table shape."
+    },
+    "BA-08": {
+      "status": "approved",
+      "decision": "Treat One through Four as one complete ordered logical export without cross-file dedupe.",
+      "config": {
+        "ordered_files": ["One.csv", "Two.csv", "Three.csv", "Four.csv"],
+        "remove_fully_blank_padding_rows": true,
+        "cross_file_deduplication": false,
+        "preserve_source_file_and_row": true,
+        "authoritative_consolidated_csv": false
+      },
+      "falsified_by": "John identifies missing/reordered chunks or Access source controls do not match the logical union."
+    },
+    "BA-09": {
+      "status": "source_confirmed_review_control",
+      "decision": "Pay Period weeks must not exceed Min-Max weeks and must not exceed 53 without review. Report every violation and never cap or auto-repair a sealed run. The 53-week ceiling follows One Zero Pay Periods.docx Step 3.",
+      "config": {
+        "report_any_pay_period_gt_min_max": true,
+        "review_tolerance_weeks": 1.5,
+        "maximum_pay_period_weeks_without_review": 53.0,
+        "repair_policy": "none",
+        "signoff_requires_reviewed_cycle_evidence": true
+      },
+      "falsified_by": "John supplies a different invariant, tolerance, maximum-weeks policy, or approved repair."
+    },
+    "BA-10": {
+      "status": "source_gap_control",
+      "decision": "Report boundary completeness; never synthesize missing rows or force 52 weeks. Under the BA-02 paycheck-date-only trim the leading lookback requirement is relaxed because prior-period paychecks landing in the window are now retained.",
+      "config": {
+        "require_valid_pps_before_fiscal_begin": false,
+        "report_prior_ppe_paid_in_fy": true,
+        "report_crossing_start_periods": true,
+        "report_current_ppe_paid_after_fy": true,
+        "missing_lookback_status": "MISSING_LEADING_LOOKBACK",
+        "synthetic_boundary_rows_allowed": false,
+        "force_52_weeks": false
+      },
+      "falsified_by": "A complete source manifest proves no lookback is required or Access supplies another completeness control."
+    },
+    "BA-11": {
+      "status": "source_confirmed_min_max_span",
+      "decision": "Min-Max weeks are (LastEnd - FirstStart) / 7 with NO inclusive-day adjustment, computed across all of an employee's periods including zero-hour periods. One Zero Min Max.docx Step 2 states: 'Using the earliest PayPeriodStart date for each employee and the latest PayPeriodEnd date for each employee, count the number of days between the two and divide by 7.'",
+      "config": {
+        "min_max_span_mode": "exclusive_days",
+        "min_max_excludes_zero_hour_rows": false,
+        "onezero_segment_excludes_zero_hour_rows": true
+      },
+      "evidence": "Exclusive days over all rows yields 525 eligible against John's reported 511; the v4 inclusive-day, positive-hours-only variant yielded 462. Note the deliberate asymmetry: the eligibility span includes zero-hour periods (One Zero Min Max.docx Step 2 counts days between first PayPeriodStart and last PayPeriodEnd with no hours filter), while the One/Zero segment span excludes them (Step 5 says 'one line per unit that the employee worked at'). This asymmetry affects 11 of 811 segments and 6 One/Zero counts before test-of-twos disposition; it is surfaced for John's confirmation rather than silently reconciled.",
+      "falsified_by": "John's Access Weeks Worked table shows an inclusive day count or a positive-hours-only span."
+    }
+  },
+  "change_control": {
+    "immutable_after_use": true,
+    "supersession_rule": "Create a new versioned assumption-set file; never rewrite a set already used for a recorded run.",
+    "run_metadata": [
+      "assumption_set_id",
+      "assumption_set_sha256",
+      "source_manifest_sha256",
+      "code_commit",
+      "run_timestamp"
+    ]
+  }
+}
