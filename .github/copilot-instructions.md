@@ -95,8 +95,13 @@ the orchestrator captures the result and hands the agent a JSON brief. Agents
 hold no tools. [ADR-004]
 
 **The honest limit:** this prevents an agent *computing* a number, not
-*misstating* one — prose streams unvalidated. Anything shown to a customer must
-render from canonical values.
+*misstating* one. The Microsoft 365 channel path now validates narration: a
+narrator writes only `{{facts.…}}` placeholders, the composer substitutes the
+engine's rendering, and a numeric guard rejects any reply containing a figure that
+is not a supplied fact [ADR-008]. **The portal chat path does not** — its prose
+still streams unvalidated, so there it remains true that a model can misstate a
+figure it was handed. Anything shown to a customer must render from canonical
+values.
 
 ### Statute is versioned by tax year
 

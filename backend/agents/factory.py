@@ -161,6 +161,7 @@ def list_agent_modules():
         rules_ingestion,
         exception_report,
         legislative_monitor,
+        channel_narrator,
     )
     return [
         orchestrator,
@@ -174,6 +175,7 @@ def list_agent_modules():
         rules_ingestion,
         exception_report,
         legislative_monitor,
+        channel_narrator,
     ]
 
 
