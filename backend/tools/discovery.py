@@ -13,18 +13,27 @@ from typing import Any
 from domain.calculation.trail import current_recorder
 
 
-def discover_credits(exclude_codes: list[str] | None = None) -> dict[str, Any]:
+def discover_credits(
+    exclude_codes: list[str] | None = None,
+    *,
+    account_id: int | None = None,
+    tax_year: int | None = None,
+) -> dict[str, Any]:
     """Return every jurisdiction with a positive statutory credit, minus any
     codes the caller is already tracking.
 
     `exclude_codes` lets the caller suppress credits the client is already
     claiming (e.g. ['GA_JTC'] when answering 'what *other* credits').
+
+    `account_id` and `tax_year` scope the scan to one client-year. Left as None
+    the scan reads the configured default tenant's latest year, which is what
+    the portal chat has always done.
     """
     from .portfolio import build_portfolio, latest_tax_year
 
     exclude = set(exclude_codes or [])
-    tax_year = latest_tax_year()
-    tiles = build_portfolio(tax_year)
+    tax_year = tax_year if tax_year is not None else latest_tax_year(account_id=account_id)
+    tiles = build_portfolio(tax_year, account_id=account_id)
 
     considered = [t["code"] for t in tiles]
     hits: list[dict[str, Any]] = []

@@ -54,6 +54,7 @@ from application.queries.get_client_situation import (
     handle_get_client_situation,
 )
 from application.queries.get_proximity import GetProximityQuery, handle_get_proximity
+from application.queries.list_findings import ListFindingsQuery, handle_list_findings
 from application.queries.get_unit_trend import GetUnitTrendQuery, handle_get_unit_trend
 from application.queries.simulate_portfolio import (
     SimulatePortfolioQuery,
@@ -387,6 +388,7 @@ def build_mediator() -> Mediator:
     mediator.register(RebaseUnitQuery, handle_rebase_unit)
     mediator.register(GetInYearProgressQuery, handle_get_in_year_progress)
     mediator.register(GetClientSituationQuery, handle_get_client_situation)
+    mediator.register(ListFindingsQuery, handle_list_findings)
 
     # --- Commands: change what the business believes ---
     mediator.register(AssessClientCommand, handle_assess_client)
