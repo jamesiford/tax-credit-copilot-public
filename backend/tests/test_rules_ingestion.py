@@ -202,8 +202,9 @@ def test_three_new_agents_registered():
     assert "LegislativeMonitorAgent" in names
     # The roster is a decided set, for the same reason the route inventory is.
     # Every agent is a Foundry registration that mints a version on each prompt
-    # change, so one arriving unnoticed is a cost nobody chose.
-    assert len(list_agent_modules()) == 11
+    # change, so one arriving unnoticed is a cost nobody chose. The twelfth is
+    # ChannelNarratorAgent (CH-02), the narrator for the Microsoft 365 channel.
+    assert len(list_agent_modules()) == 12
 
 
 def test_new_agents_have_profiles():
