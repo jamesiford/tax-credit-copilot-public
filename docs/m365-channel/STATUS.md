@@ -11,7 +11,7 @@ runs in a worktree, so `feat/m365-channel` is held by the main checkout).
 | WP | Title | Status | Branch | Merge SHA |
 | --- | --- | --- | --- | --- |
 | CH-01 | Capability layer (`application/capabilities/`) | done | `wp/CH-01-capabilities` | `0c8a4d8` |
-| CH-02 | Numeric guard, composer, narrator agent, ADR-008 | in_progress | `wp/CH-02-numeric-guard` | — |
+| CH-02 | Numeric guard, composer, narrator agent, ADR-008 | done | `wp/CH-02-numeric-guard` | `f1c7815` |
 
 ## Evidence
 
@@ -56,6 +56,29 @@ the catalog with `implemented: false`.
 Behaviour deliberately preserved rather than fixed (see D-05, D-06): the chat's
 eligibility brief reads the pay-period average whatever method the scope selects,
 and its `discovery` / `multi_state` scans read the configured default tenant.
+
+### CH-02 (merged `f1c7815`)
+
+- Full backend suite: **1565 passed, 122 skipped, 1 xfailed** (CH-01 baseline:
+  1407 passed). No new skip; synthetic parity gate green; pins untouched.
+- New: `test_numeric_guard.py` (extraction shapes, every formatter spelling, wrong
+  figures, non-ASCII and space-split digits, the flipped-digit mutation loop and
+  its meta-test that fails when the guard is replaced by an always-pass one),
+  `test_composer.py` (placeholders, narrator-typed figures, formatter-bug defence
+  in depth, blocks-only fallback, guard-is-consulted), `test_channel_narrator.py`.
+  `test_capabilities_envelope.py` now runs the flipped-digit loop over the blocks
+  of every capability (more than a hundred corruptions, all refused).
+- Existing test edited: `test_rules_ingestion.py` roster pin eleven -> twelve
+  (D-18). `test_architecture.py` gained `envelope.py` in the stdlib-only rule.
+- `ChannelNarratorAgent` registered in `agents/factory.list_agent_modules()`;
+  its profile is checked by the existing agent-module contract tests. There is
+  no `/api/agents` route in this repository (D-18).
+- Standard gate: `check-whitelabel.ps1 -Enforce` 0 enforced; `audit-export.py
+  --enforce` 0 findings; `gitleaks` no leaks; route inventory unchanged;
+  `infra/` untouched.
+- Docs: ADR-008 written and linked from `docs/README.md`; ADR-004 carries a
+  status note; the "honest limit" paragraph in `.github/copilot-instructions.md`
+  now says the portal chat path still streams unvalidated prose.
 
 ## Blockers
 
