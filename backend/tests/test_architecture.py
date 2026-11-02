@@ -384,6 +384,90 @@ def test_commands_live_in_commands_and_queries_in_queries():
     assert not misplaced, "requests in the wrong package:\n  " + "\n  ".join(misplaced)
 
 
+# --- The capability layer is transport-neutral [CH-01] ---------------------
+#
+# A capability is driven by the portal chat, the channel gateway and (later) a
+# notebook, so it may not know which. These rules are what keep "plain function"
+# true: the first import that points at a router, a framework or an agent is
+# invisible until a gateway cannot start.
+
+_CAPABILITY_FORBIDDEN = (
+    "fastapi", "starlette", "api", "agents", "agent_framework", "azure.ai",
+)
+
+
+def _import_modules(source: str) -> set[str]:
+    """Every absolute module a source file imports, as its full dotted name."""
+    found: set[str] = set()
+    for node in ast.walk(ast.parse(source)):
+        if isinstance(node, ast.Import):
+            found.update(alias.name for alias in node.names)
+        elif isinstance(node, ast.ImportFrom) and node.module and node.level == 0:
+            found.add(node.module)
+    return found
+
+
+def _is_forbidden(module: str, forbidden: tuple[str, ...]) -> bool:
+    return any(module == name or module.startswith(f"{name}.") or module.startswith(f"{name}_")
+               for name in forbidden)
+
+
+def _forbidden_imports(source: str, forbidden: tuple[str, ...]) -> list[str]:
+    return sorted(m for m in _import_modules(source) if _is_forbidden(m, forbidden))
+
+
+def _non_stdlib_imports(source: str) -> list[str]:
+    import sys
+
+    stdlib = set(sys.stdlib_module_names) | {"__future__"}
+    return sorted(m for m in _import_modules(source) if m.split(".")[0] not in stdlib)
+
+
+def test_capabilities_import_no_framework_router_or_agent():
+    violations = []
+    for path in _python_files("application/capabilities"):
+        bad = _forbidden_imports(path.read_text(encoding="utf-8"), _CAPABILITY_FORBIDDEN)
+        if bad:
+            violations.append(f"{path.relative_to(BACKEND).as_posix()} -> {bad}")
+    assert not violations, (
+        "application/capabilities/ imports outward:\n  " + "\n  ".join(violations)
+        + "\n\nA capability must be callable from a gateway that has no web framework, "
+        "no router and no Foundry client."
+    )
+
+
+@pytest.mark.parametrize("relative", [
+    "application/capabilities/catalog.py",
+    "application/capabilities/format.py",
+])
+def test_vendored_capability_modules_import_only_the_standard_library(relative):
+    """These two are copied into the orchestrator container unchanged."""
+    bad = _non_stdlib_imports((BACKEND / relative).read_text(encoding="utf-8"))
+    assert not bad, f"{relative} imports {bad}; it is vendored and may use the stdlib only"
+
+
+def test_chat_pipelines_call_capabilities_not_tools():
+    """The chat's compute lives in `application/capabilities/`.
+
+    `api/chat.py` interleaved computing, prompting and SSE framing; a gateway
+    cannot reuse that. The pipelines now ask a capability for their brief, so a
+    call into `tools.*` from this module is compute that has crept back.
+    """
+    source = (BACKEND / "api" / "chat.py").read_text(encoding="utf-8")
+    assert _forbidden_imports(source, ("tools",)) == []
+
+
+def test_the_capability_rules_catch_a_crafted_violation():
+    """A rule nobody has seen fail is a rule nobody knows works."""
+    assert _forbidden_imports("from api.claims import portfolio_v2", _CAPABILITY_FORBIDDEN) == ["api.claims"]
+    assert _forbidden_imports("import agent_framework_foundry", _CAPABILITY_FORBIDDEN) == ["agent_framework_foundry"]
+    assert _forbidden_imports("from azure.ai.projects import AIProjectClient", _CAPABILITY_FORBIDDEN)
+    assert _forbidden_imports("from application import wiring", _CAPABILITY_FORBIDDEN) == []
+    assert _non_stdlib_imports("import re\nfrom decimal import Decimal") == []
+    assert _non_stdlib_imports("from application.capabilities import format") == ["application.capabilities"]
+    assert _forbidden_imports("def f():\n    from tools.portfolio import chat_state_credit", ("tools",)) == ["tools.portfolio"]
+
+
 # --- 3. One definition of a statutory quantity -----------------------------
 
 
