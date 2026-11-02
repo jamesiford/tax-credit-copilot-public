@@ -24,6 +24,7 @@ precisely rather than in general.
 | [ADR-004](architecture/ADR-004-agentic-workflows.md) | Where agents are allowed to act, and where they may only narrate |
 | [ADR-005](architecture/ADR-005-year-versioned-rules.md) | Statute frozen per tax year, so a historical run replays exactly. This is what makes a retroactive audit defensible |
 | [ADR-007](architecture/ADR-007-warehouse-operational-store.md) | The Fabric Warehouse is the only operational store; the document store is retired. Every statement is tenant-bound on `client_id` |
+| [ADR-008](architecture/ADR-008-channel-numeric-integrity.md) | Numeric integrity for the Microsoft 365 channel: facts, placeholders and a zero-tolerance guard. **Partially implements** ADR-004 §3 — the portal chat path is unchanged |
 | [CALCULATION-PROVENANCE.md](architecture/CALCULATION-PROVENANCE.md) | How every figure traces back to its inputs, formula and citation |
 | [DEPLOYMENT-HANDOVER.md](architecture/DEPLOYMENT-HANDOVER.md) | How to deploy: prerequisites, the two profiles, `azd up`, the CI path, verification and teardown |
 | [ENGINE-CONVERGENCE.md](architecture/ENGINE-CONVERGENCE.md) | How two independent implementations were reconciled to the same figures |

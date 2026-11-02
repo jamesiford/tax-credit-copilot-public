@@ -136,3 +136,68 @@ One short entry per decision: context, choice, why.
 - **Choice.** The move kept every reachable line and dropped the unreachable one.
 - **Why.** Pure move; behaviour identical, and the equivalence test compares the
   endpoint to the capability on the synthetic payroll.
+
+## D-14 The guard imports the formatter; both are stdlib-only
+
+- **Context.** CH-02 allows either a fully self-contained guard or one that
+  imports `format.py`.
+- **Choice.** `numeric_guard.py` imports `application.capabilities.format` (itself
+  stdlib-only); `composer.py` imports the guard, the formatter and
+  `capabilities/envelope.py` (also stdlib-only). Tests assert each file's imports,
+  and the architecture test now also holds `envelope.py` to stdlib-only.
+- **Why.** The guard must accept exactly the spellings the formatter emits; one
+  source for both cannot drift. All five files are vendored together.
+
+## D-15 Guard and composer are functions, not `ChatMiddleware`
+
+- **Context.** ADR-004 §3 names a `NumericIntegrityMiddleware`; MAF workflows are
+  not built.
+- **Choice.** `check` / `check_raw` and `compose` are plain functions the hosted
+  orchestrator calls in code. ADR-008 records this.
+- **Why.** Middleware needs the MAF runtime this work package does not build.
+  Wrapping them later changes the call site, not the check.
+
+## D-16 Strictness choices in the guard
+
+- **Non-ASCII digits** (full-width, Arabic-Indic, vulgar fractions) and a figure
+  split by a thin or no-break space are **rejected**, not normalised.
+- **A narrator's raw digit is rejected even when it equals a fact.** Only the
+  reader's own numerals and structural digits pass the pre-substitution gate.
+- **Structural allow-list** is narrow: a list marker (up to 99) at the start of a
+  line, `step N` (up to 20), and ordinals up to the tenth.
+- **Percentages** are accepted only for a fact a placeholder has declared a ratio
+  or percentage (`|percent`, `|percent_points`, or a `_pct` name).
+- **Digits inside a string fact** (a citation, a date, an engine note) are the
+  engine's own words and are accepted in the final text; the raw gate is what stops
+  a model using that door.
+- **Why.** Each is the strict direction ADR-004 asks for: a rejected sentence is an
+  inconvenience, a wrong figure on a return is not.
+
+## D-17 `compose` degrades; `substitute` raises
+
+- **Context.** CH-02 says an unknown placeholder or formatter raises
+  `PlaceholderError`, and that a failed check returns the blocks alone.
+- **Choice.** `substitute` raises. `compose` catches it, records a `placeholder`
+  violation and returns the blocks alone (`guard.status == "rejected"`).
+- **Why.** A channel reply must still be produced when a model invents a path.
+  Placeholders inside a fenced code block are refused for the same reason: the
+  formatting of a figure cannot be trusted there.
+
+## D-18 The roster test is updated; the Workbench route does not exist
+
+- **Context.** `test_rules_ingestion.py` pins the agent roster at eleven.
+  CH-02 asks that `/api/agents` still return a valid profile.
+- **Choice.** The pinned count became twelve, with a comment naming
+  `ChannelNarratorAgent` (the only existing test edit in CH-02). There is no
+  `/api/agents` route in this repository (it was removed; `test_api_ga_pass.py`
+  says so), so the profile is validated by the existing agent-module contract tests
+  plus `test_channel_narrator.py`, which also checks it serialises to JSON.
+- **Why.** The count is a deliberate gate; adding an agent is meant to need this
+  edit. Creating a route to satisfy a sentence would add to the pinned API surface.
+
+## D-19 The narrator is never shown a value
+
+- **Choice.** `composer.narrator_brief` lists fact paths with a format hint and no
+  values; the narrator's instructions contain no digit.
+- **Why.** A model that has not seen a figure cannot copy it as a digit, so the
+  guarantee does not rest on the model obeying an instruction.
