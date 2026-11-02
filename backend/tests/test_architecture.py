@@ -439,9 +439,10 @@ def test_capabilities_import_no_framework_router_or_agent():
 @pytest.mark.parametrize("relative", [
     "application/capabilities/catalog.py",
     "application/capabilities/format.py",
+    "application/capabilities/envelope.py",
 ])
 def test_vendored_capability_modules_import_only_the_standard_library(relative):
-    """These two are copied into the orchestrator container unchanged."""
+    """These are copied into the orchestrator container unchanged."""
     bad = _non_stdlib_imports((BACKEND / relative).read_text(encoding="utf-8"))
     assert not bad, f"{relative} imports {bad}; it is vendored and may use the stdlib only"
 

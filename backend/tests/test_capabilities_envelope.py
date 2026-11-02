@@ -159,6 +159,28 @@ def test_the_scan_can_fail(every_result):
     assert unexplained_numerals(forged, scope), "a changed digit must not look derivable"
 
 
+def test_every_capability_reply_passes_the_real_guard_and_no_flipped_digit_does(every_result):
+    """CH-01's blocks, held to CH-02's guard (ADR-008): the platform's own text
+    must be acceptable, and one corrupted digit anywhere in it must not be."""
+    from application import composer, numeric_guard
+    from application.numeric_guard import AllowedContext, FactIndex
+    from test_numeric_guard import _mutations
+
+    flipped = 0
+    for result, scope in every_result:
+        context = AllowedContext.build(years=[n for n in scope if 1900 <= n <= 2100], numbers=sorted(scope))
+        index = FactIndex.from_facts(result.facts)
+        reply = composer.compose(result.blocks, None, index, context)
+        assert reply.guard.passed and reply.blocks_verified, (result.tool, reply.guard.to_dict())
+
+        accept = {"values": set(index.values) | set(context.values), "dates": set(index.dates)}
+        for numeral, mutated in _mutations(reply.text, accept):
+            flipped += 1
+            verdict = numeric_guard.check(mutated, facts=index, allowed_context=context)
+            assert verdict.status == numeric_guard.REJECTED, (result.tool, numeral.text, mutated)
+    assert flipped > 100, "the corruption loop barely ran"
+
+
 def test_provenance_is_never_invented(every_result):
     by_tool = {r.tool: r for r, _ in every_result}
     assert by_tool["book_rank"].provenance.run_id is None
