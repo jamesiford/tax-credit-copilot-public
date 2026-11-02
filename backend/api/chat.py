@@ -31,14 +31,18 @@ from fastapi import APIRouter, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
-from tools.discovery import discover_credits
-from tools.portfolio import (
-    chat_client_context,
-    chat_client_trend,
-    chat_jobs_at_risk,
-    chat_state_credit,
+from application.capabilities.catalog import CAPABILITIES, NEEDS_CLIENT as _NEEDS_CLIENT
+from application.capabilities.book import book_rank
+from application.capabilities.client import (
+    client_at_risk,
+    client_discovery,
+    client_eligibility,
+    client_situation,
+    client_trend,
 )
-from tools.simulation import simulate_hiring
+from application.capabilities.errors import YearNotAuthored
+from application.capabilities.simulate import simulate_headcount
+from application.capabilities.walkthrough import calc_walkthrough
 from domain.calculation.trail import TrailRecorder, reset_recorder, set_recorder
 
 log = logging.getLogger(__name__)
@@ -101,11 +105,11 @@ def _request_scope(req: ChatRequest) -> dict[str, Any]:
 
 def _chat_clients() -> list[Any]:
     """The book, as the resolver needs it. Empty rather than failing the turn."""
-    from api.scope import _clients
+    from application import client_book
     from application.chat_scope import ClientName
 
     try:
-        return [ClientName(int(c["account_id"]), str(c["name"])) for c in _clients()]
+        return [ClientName(int(c["account_id"]), str(c["name"])) for c in client_book.clients()]
     except Exception:  # noqa: BLE001 — no client list means no names to match
         log.warning("chat: client list unavailable; clarification disabled", exc_info=True)
         return []
@@ -285,45 +289,11 @@ def _detect_state(message: str) -> str:
     return "GA"
 
 
-#: Everything the chat can actually answer, and what each one costs.
-#:
-#: A plan is validated against these names. The router is a language model and
-#: will happily invent `trend_analysis` or `client_deep_dive`; an unrecognised
-#: intent is DROPPED rather than dispatched, because a made-up intent that
-#: silently runs the default pipeline answers a question nobody asked.
-CAPABILITIES: dict[str, str] = {
-    "book": (
-        "who to call ACROSS EVERY CLIENT, ranked by why — the portfolio question. "
-        "Needs no client selected; naming one would be the opposite of what was asked."
-    ),
-    "situation": "why this client is worth calling — bands, programmes, years. Claims only.",
-    "eligibility": "the credit figure and headcount for the selected client-year.",
-    "at_risk": (
-        "which employees ALREADY counted toward the credit sit close enough to a "
-        "statutory floor that they could fall out of it — jobs the client could lose."
-    ),
-    "trend": "how a client has moved across years, and whether they have been eligible since their base year.",
-    "multi_state": (
-        "which PROGRAMMES across every state one client may qualify for — a rule-pack "
-        "scan for the selected client, NOT a view across clients."
-    ),
-    "discovery": "other programmes the client may qualify for, excluding the one in scope.",
-    "simulate": "what-if: hiring, losing, hours or wages against the statutory engine.",
-    "explain": "re-narrate the cached calculation trail, step by step.",
-}
-
-#: Which capabilities are about ONE client, and therefore cannot be answered
-#: without one selected.
-#:
-#: The chat used to refuse every question without a client, which made the
-#: portfolio question — "who should we reach out to?" — unanswerable from the
-#: title bar, where no client is selected BY DESIGN. The refusal itself is
-#: right and stays: it exists so nothing silently answers against the default
-#: tenant. It just belongs per capability rather than across the whole door.
-_NEEDS_CLIENT: frozenset[str] = frozenset({
-    "situation", "eligibility", "at_risk", "trend", "multi_state",
-    "discovery", "simulate", "explain",
-})
+#: Everything the chat can actually answer, and what each one costs, lives in
+#: `application/capabilities/catalog.py` — `CAPABILITIES` and `_NEEDS_CLIENT`
+#: are imported at the top of this module so there is one list. A plan is
+#: validated against those names: the router is a language model and will invent
+#: `trend_analysis`, and an unrecognised intent is DROPPED, never dispatched.
 
 #: Keyword routing, kept as the FALLBACK rather than the primary path. It is
 #: what answers when the router is unavailable or returns nothing usable, and
@@ -549,36 +519,19 @@ async def _pipeline_eligibility(app, registry, message: str, *, scope: dict[str,
         #
         # No unscoped branch: `chat()` refuses a request without a client and a
         # tax year before dispatching, so both are always present here.
-        context = chat_client_context(account_id=account_id, tax_year=tax_year)
-        window = scope.get("window")
-        snapshot = {
-            "source": "tcc_gold — read from the run that computed it",
-            "selected_client_id": account_id,
-            "selected_tax_year": tax_year,
-            "state": state,
-            "calculated": context.get("calculated", False),
-            "average_headcount": context.get("current_average"),
-            "prior_year_average_headcount": context.get("prior_average"),
-            "run_id": context.get("run_id"),
-            "fiscal_window": {
-                "begin": window.begin.isoformat() if window is not None else None,
-                "end": window.end.isoformat() if window is not None else None,
-            },
-        }
-        if not context.get("calculated"):
-            snapshot["note"] = (
-                f"No calculated run holds TY{tax_year} for this client. That is "
-                f"not a zero — say so rather than reporting a figure."
-            )
+        #
+        # `method="pay_period"` is what this brief has always read. The scope's
+        # method selector never reached it, and the capability's default is the
+        # channel's, so the portal says so explicitly (DECISIONS D-05).
+        eligibility = client_eligibility(
+            account_id, tax_year, state, method="pay_period", window=scope.get("window"),
+        ).facts
+        snapshot = eligibility["snapshot"]
+        credit = eligibility["credit"]
         async for f in _stream_agent("PayrollIngestAgent", registry["PayrollIngestAgent"].agent,
                                      _brief(f"Confirm the payroll snapshot in scope for state={state}.", snapshot)):
             yield f
 
-        credit = chat_state_credit(
-            state, tax_year=tax_year, account_id=account_id,
-            current_average=context.get("current_average"),
-            prior_average=context.get("prior_average"),
-        )
         if not credit.get("no_state_pack"):
             async for f in _stream_agent("HeadcountAgent", registry["HeadcountAgent"].agent,
                                          _brief(f"Report the statutory headcount picture for {state} in one sentence.", {
@@ -649,7 +602,7 @@ async def _pipeline_portfolio(app, registry, message: str) -> AsyncIterator[str]
                                      f"User question: {message}\nIntent: full multi-state portfolio across every rule pack."):
             yield f
 
-        result = discover_credits()  # no exclusions — include GA + every other pack
+        result = client_discovery(exclude_codes=[]).facts  # no exclusions — include GA + every other pack
         async for f in _stream_agent("CreditDiscoveryAgent", registry["CreditDiscoveryAgent"].agent,
                                      _brief(
                                          "List EVERY hit as a short bullet (jurisdiction, credit name, lifetime credit, citation). "
@@ -693,7 +646,7 @@ async def _pipeline_discovery(app, registry, message: str) -> AsyncIterator[str]
             yield f
 
         # Exclude GA_JTC since the user's asking what *other* credits apply.
-        result = discover_credits(exclude_codes=["GA_JTC"])
+        result = client_discovery(exclude_codes=["GA_JTC"]).facts
         async for f in _stream_agent("CreditDiscoveryAgent", registry["CreditDiscoveryAgent"].agent,
                                      _brief(
                                          "List each hit as a short bullet (jurisdiction, credit name, "
@@ -728,8 +681,6 @@ async def _pipeline_situation(app, registry, message: str, *, scope: dict[str, A
     single deterministic brief there is no routing to acknowledge, and a second
     agent restating the scope would be narration for its own sake.
     """
-    from application.queries.get_client_situation import GetClientSituationQuery
-
     request_id = str(uuid.uuid4())
     ctx_token = _TELEMETRY_CONTEXT.set({"app": app, "request_id": request_id, "intent": "situation"})
     try:
@@ -740,11 +691,12 @@ async def _pipeline_situation(app, registry, message: str, *, scope: dict[str, A
             "client_id": account_id, "tax_year": tax_year,
         })
 
-        from application.wiring import get_mediator
-
-        brief = get_mediator().send(
-            GetClientSituationQuery(client_id=account_id, tax_year=tax_year)
-        )
+        # The narrator was never handed the display name, and must not be now:
+        # its prompt is byte-for-byte what it was before the extraction.
+        brief = {
+            key: value for key, value in client_situation(account_id, tax_year).facts.items()
+            if key != "client_name"
+        }
         async for f in _stream_agent("ClientSituationAgent", registry["ClientSituationAgent"].agent,
                                      _brief(f"User question: {message}", brief)):
             yield f
@@ -769,11 +721,12 @@ async def _pipeline_explain(app, registry, message: str) -> AsyncIterator[str]:
             yield _sse("done", {})
             return
 
+        brief = calc_walkthrough(trail=cached).facts
         async for f in _stream_agent("ReportingAgent", registry["ReportingAgent"].agent,
                                      _brief(
                                          "Walk an exec through this calculation step by step in 3-5 sentences. "
                                          "Cite the statute. End by reminding them every number above is sourced from a JSON rule pack, not from the model.",
-                                         cached,
+                                         brief,
                                      )):
             yield f
 
@@ -801,7 +754,7 @@ async def _pipeline_simulate(app, registry, message: str) -> AsyncIterator[str]:
         async for f in _stream_agent("OrchestratorAgent", registry["OrchestratorAgent"].agent, ack):
             yield f
 
-        sim = simulate_hiring(location=city, new_hires=new_hires)
+        sim = simulate_headcount(city, new_hires).facts
 
         async for f in _stream_agent("HeadcountAgent", registry["HeadcountAgent"].agent,
                                      _brief(
@@ -842,72 +795,15 @@ async def _pipeline_simulate(app, registry, message: str) -> AsyncIterator[str]:
         _TELEMETRY_CONTEXT.reset(ctx_token)
 
 
-#: How the page says each band. The chat reads it aloud beside the page, so it
-#: must use the page's words — `lib/priority.js` — not the enum ids, which are
-#: storage vocabulary ("unclaimed_at_scale" is labelled "Identified" on screen
-#: precisely because no filing is held).
-_BAND_LABEL = {
-    "exposed": "Exposed",
-    "on_the_line": "On the line",
-    "declining": "Declining",
-    "unclaimed_at_scale": "Identified",
-    "not_assessed": "Not assessed",
-    "settled": "Nothing found",
-}
-
-
 def _book_brief(limit: int = 8) -> dict[str, Any]:
     """The book exactly as the page ranks it, read from the page's own endpoint.
 
-    It used to come from a second ranking over claim cells, filtered by the
-    shell's year. The book has no year, and that ranking had no `declining`
-    overlay — so the headline question answered "Northwind first" while the
-    page behind the chat said Ironbridge. One ranking, one read.
+    The ranking lives in `book_rank`; this passes the router's read in as its
+    page source so the chat and the page are literally the same call.
     """
     from api.claims import portfolio_v2
 
-    page = portfolio_v2(
-        year=None, program=None, outcome=None, scope=None, near=None, status=None,
-        sort="priority", order="asc", limit=limit, offset=0,
-    )
-    items = page.get("items") or []
-    if not items:
-        return {
-            "calculated": False,
-            "message": (
-                "No client has been assessed yet. There is nothing to rank — "
-                "that is not the same as nobody being worth calling."
-            ),
-        }
-    clients = []
-    for position, row in enumerate(items, start=1):
-        band = row.get("priority_band")
-        trend = row.get("trend") or {}
-        clients.append({
-            "position": position,
-            "client_name": row.get("client_name") or f"Account {row.get('client_id')}",
-            "reason": _BAND_LABEL.get(band, band),
-            "program_code": row.get("program_code"),
-            "tax_year": row.get("tax_year"),
-            "identified_usd": row.get("identified_usd"),
-            "jobs_margin": row.get("jobs_margin"),
-            "credit_earned_on_trend_usd": trend.get("credit_earned_usd") if band == "declining" else None,
-            "provenance_verified": row.get("provenance_verified"),
-        })
-    return {
-        "calculated": True,
-        "total_clients": page.get("total_clients"),
-        "assessed_clients": page.get("assessed_clients"),
-        "clients": clients,
-        "ranking_note": (
-            "Ordered by what inaction costs, not by size, and in the same order "
-            "as the page. 'On the line' outranks 'Identified' because a threshold "
-            "missed at year end is gone, while an unclaimed credit is recoverable "
-            "retroactively. 'Declining' is a forecast about a year nobody has "
-            "filed, not a finding against a filed return."
-        ),
-        "claimed_is_unverified": any(not c.get("provenance_verified", True) for c in clients),
-    }
+    return book_rank(limit, page_reader=portfolio_v2).facts
 
 
 async def _pipeline_book(app, registry, message: str, *, scope: dict[str, Any]) -> AsyncIterator[str]:
@@ -948,16 +844,16 @@ async def _pipeline_at_risk(app, registry, message: str, *, scope: dict[str, Any
         tax_year = scope.get("tax_year")
         state = scope.get("state")
         method = scope.get("method") or "min_max"
-        if method == "both":
-            method = "min_max"
         yield _sse("status", {
             "phase": 3, "intent": "at_risk",
             "client_id": account_id, "tax_year": tax_year,
         })
 
-        brief = chat_jobs_at_risk(
-            account_id=account_id, state=state, tax_year=tax_year, method=method,
-        )
+        try:
+            brief = client_at_risk(account_id, tax_year, state, method).facts
+        except YearNotAuthored as exc:
+            # The narrator is told the year is declined, by name, and says so.
+            brief = {"calculated": False, "declined": str(exc)}
         async for f in _stream_agent("ClientSituationAgent", registry["ClientSituationAgent"].agent,
                                      _brief(
                                          "Say how many of the jobs already counted toward this "
@@ -982,7 +878,7 @@ async def _pipeline_trend(app, registry, message: str, *, scope: dict[str, Any])
         account_id = scope.get("account_id")
         yield _sse("status", {"phase": 3, "intent": "trend", "client_id": account_id})
 
-        brief = chat_client_trend(account_id=account_id)
+        brief = client_trend(account_id).facts
         async for f in _stream_agent("ClientSituationAgent", registry["ClientSituationAgent"].agent,
                                      _brief(
                                          "Describe how this client has moved across tax years, and say "
