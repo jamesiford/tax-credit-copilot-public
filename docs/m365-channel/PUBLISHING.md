@@ -40,10 +40,11 @@ pwsh scripts/publish-m365.ps1 <the same arguments, without -WhatIf>
 | `-PublishScope` | `Shared` | `Shared` or `Tenant` (below) |
 | `-ConfirmTenantPublish` | off | Required with `Tenant` |
 | `-EnablePrivateNetworkRoute` | `$true` | `-EnablePrivateNetworkRoute:$false` for a project with public network access (the colon form is needed under `pwsh -File`) |
-| `-AppVersion` | `1.0.0` | Semantic version. If it is already published the script tries the next patch version, repeatedly |
+| `-AppVersion` | `1.0.0` | Semantic version. If it is already published the script tries the next patch version, repeatedly. Pass the next unused one (the next publish after 1.0.2 is `-AppVersion 1.0.3`) rather than relying on the retries |
+| `-ColorIconPath`, `-OutlineIconPath` | `dist/branding/color-192.png`, `dist/branding/outline-32.png` when they exist | The agent icon, sent as `colorIconBase64` (192x192 PNG) and `outlineIconBase64` (32x32 RGBA PNG) in the publish body and the package request. Render them with `python scripts/render-icons.py`. The PNG signature and size are checked before anything is sent; an explicit path that is wrong is an error; `''` means none. The base64 is never printed (`-WhatIf` shows only its length) |
 | `-OutputDir` | `./publish-output` | Where `appPackage.zip` and its extracted manifest are saved |
 | `-SubscriptionId` | the current subscription | |
-| `-DeveloperName`, `-DeveloperWebsiteUrl`, `-PrivacyUrl`, `-TermsOfUseUrl` | placeholders pointing at this repository's `SECURITY.md` and `DISCLAIMER.md` | Shown to users. HTTPS only. No secrets, no customer names |
+| `-DeveloperName`, `-DeveloperWebsiteUrl`, `-PrivacyUrl`, `-TermsOfUseUrl` | `Tax Credit Copilot (PoC)`, then placeholders pointing at this repository's `SECURITY.md` and `DISCLAIMER.md` | Shown to users. HTTPS only. No secrets, no customer names. The developer name is limited to 32 characters (the platform rejects longer; the script refuses it up front) |
 
 ## What it does
 

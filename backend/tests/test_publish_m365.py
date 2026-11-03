@@ -24,10 +24,12 @@ SCRIPT = REPO / "scripts" / "publish-m365.ps1"
 pytestmark = pytest.mark.skipif(shim.PWSH is None, reason="PowerShell 7 (pwsh) is not installed")
 
 
-def run(tmp_path, *extra, scenario=None, whatif=False):
+def run(tmp_path, *extra, scenario=None, whatif=False, icons=False):
+    """Run the script; icons are switched off unless asked for, so a rendered dist/branding cannot change a test."""
     fake = shim.install(tmp_path, scenario)
+    no_icons = [] if icons else ["-ColorIconPath", "", "-OutlineIconPath", ""]
     arguments = [shim.PWSH, "-NoProfile", "-NonInteractive", "-File", str(SCRIPT), *shim.required_arguments(),
-                 "-OutputDir", str(tmp_path / "out"), *extra, *(["-WhatIf"] if whatif else [])]
+                 "-OutputDir", str(tmp_path / "out"), *no_icons, *extra, *(["-WhatIf"] if whatif else [])]
     done = subprocess.run(arguments, capture_output=True, text=True, env=fake.environment(), timeout=180)
     return fake, done
 
