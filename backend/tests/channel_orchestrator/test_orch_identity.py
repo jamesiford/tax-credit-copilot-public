@@ -106,3 +106,9 @@ def test_the_shape_report_shows_an_object_id_and_hides_an_opaque_key():
     opaque = describe_signals({"x-agent-user-id": "k" * 40})["agent_user_id"]
     assert opaque == {"kind": "opaque", "length": 40, "equals_an_oid_signal": False}
     assert describe_signals({})["agent_user_id"] is None
+
+
+def test_by_default_the_platforms_agent_user_id_is_a_source_after_the_two_platform_signals():
+    """Live (CH-14): for a caller's own token the platform's x-agent-user-id equalled that caller's object id."""
+    rig = build_rig([], env={})
+    assert rig.settings.identity_sources == ("original-subject", "platform", "agent-user-id")

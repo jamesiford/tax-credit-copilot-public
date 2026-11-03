@@ -34,7 +34,7 @@ services:
       CHANNEL_NAME: ${CHANNEL_NAME=teams}
       CHANNEL_DEBUG_WHOAMI: ${CHANNEL_DEBUG_WHOAMI=false}
       LOG_LEVEL: ${LOG_LEVEL=INFO}
-      CHANNEL_IDENTITY_SOURCES: ${CHANNEL_IDENTITY_SOURCES=original-subject,platform}
+      CHANNEL_IDENTITY_SOURCES: ${CHANNEL_IDENTITY_SOURCES=original-subject,platform,agent-user-id}
       FOUNDRY_MODEL: ${FOUNDRY_MODEL=gpt-4.1-mini}
       AI_PROVIDER_CHAIN: ${AI_PROVIDER_CHAIN=foundry}
     agentEndpoint:
