@@ -46,7 +46,30 @@ def _foundry(chunks=("Hello ", "world"), error=None, closed=None):
     return foundry_runtime_over(Agent())
 
 
-ADAPTERS = {"foundry_prompt_agent": _foundry}
+def _gateway(chunks=("Hello ", "world"), error=None, closed=None):
+    """The OpenAI-compatible adapter, against the in-process mock gateway."""
+    from application.ai.settings import AiSettings
+    from infrastructure.ai.chat_model_runtime import ChatModelAgentRuntime
+    from infrastructure.ai.openai_compatible import OpenAICompatibleChatModel
+    from tests.mock_gateway import gateway, settings
+
+    state, client, _ = gateway(closed=closed)
+    if error is not None and not chunks:
+        code = getattr(error, "status_code", 503)
+        fault = {"kind": "status", "code": code}
+        retry_after = getattr(getattr(error, "response", None), "headers", {}).get("retry-after")
+        if retry_after:
+            fault["retry_after"] = retry_after
+        state.faults.append(fault)
+    else:
+        state.responses.append({"text": "".join(chunks)})
+    gw = settings()
+    return ChatModelAgentRuntime(OpenAICompatibleChatModel(gw, client=client), AiSettings(
+        models={"narrator__gateway": "mock-model", "analysis__gateway": "mock-model", "router__gateway": "mock-model"},
+    ))
+
+
+ADAPTERS = {"foundry_prompt_agent": _foundry, "openai_compatible_gateway": _gateway}
 
 
 @pytest.fixture(params=sorted(ADAPTERS))
