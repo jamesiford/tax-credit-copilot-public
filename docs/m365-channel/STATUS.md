@@ -18,8 +18,8 @@ runs in a worktree, so `feat/m365-channel` is held by the main checkout).
 | AI-01 | Latest stable SDKs | done | `wp/AI-01-sdk-upgrade` | merge `6b36f0f` |
 | AI-02 | Ports, adapters, streaming mediator | done | `wp/AI-02-ports-adapters` | merge `2bab7a2` |
 | AI-03 | External model gateway | done | `wp/AI-03-model-gateway` | merge `e7de7fc`; gateway adapter, auth, egress, mock gateway, Terraform (terraform test 30/30) |
-| AI-04 | Resilience | in_progress | `wp/AI-04-resilience` | — |
-| AI-06 | Observability, prompt versioning, evals | todo | — | — |
+| AI-04 | Resilience | done | `wp/AI-04-resilience` | merge `045aaef`; stack, budget, degraded narration (1975 passed) |
+| AI-06 | Observability, prompt versioning, evals | in_progress | `wp/AI-06-observability` | — |
 | AI-07 | Safety | todo | — | — |
 | AI-08 | Coding-standards ratchet | todo | — | — |
 | AI-05 | Conversation continuity (stretch, last) | todo | — | — |

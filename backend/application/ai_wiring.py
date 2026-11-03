@@ -89,11 +89,12 @@ def _register_builtin_providers(registry: ProviderRegistry) -> None:
 
 
 def get_ai_telemetry() -> Any:
+    """OpenTelemetry spans and metrics. A no-op until an SDK is configured (main.py does)."""
     global _telemetry
     if _telemetry is None:
-        from application.ai.telemetry_null import NullTelemetry
+        from infrastructure.ai.otel_telemetry import OtelTelemetry
 
-        _telemetry = NullTelemetry()
+        _telemetry = OtelTelemetry()
     return _telemetry
 
 
@@ -122,18 +123,21 @@ def set_ai_clock(clock: Any) -> None:
 def _decorate(runtime: Any, _provider: str) -> Any:
     """Layer the guards over a provider, outermost first.
 
-    egress → budget → bulkhead → breaker → retry → timeout → the call. Every provider
-    gets the same stack from here, so a new one is resilient without writing any.
+    observe → egress → budget → bulkhead → breaker → retry → timeout → the call.
+    Every provider gets the same stack from here, so a new one is resilient and
+    observed without writing any.
     """
     from application.ai.egress import build_egress_policy
     from application.ai.guarded import GuardedRuntime
+    from application.ai.observed import ObservedRuntime
     from infrastructure.ai.resilience import build_resilient_runtime
 
     settings, telemetry = get_ai_settings(), get_ai_telemetry()
     resilient = build_resilient_runtime(runtime, settings.resilience, clock=_clock, telemetry=telemetry)
-    return GuardedRuntime(
+    guarded = GuardedRuntime(
         resilient, build_egress_policy(settings.egress_policy), get_token_budget(), telemetry,
     )
+    return ObservedRuntime(guarded, telemetry)
 
 
 def get_provider_registry() -> ProviderRegistry:

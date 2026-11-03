@@ -12,8 +12,8 @@ gateway, on its own cloud — and the product must work that way **without chang
 a pipeline**. The gateway path exists for that: the customer's approved models and
 existing AI governance.
 
-It does not replace the Foundry path and is not meant to. (A write-up of what is
-available only, or best, on Foundry follows in the AI operations documentation.)
+It does not replace the Foundry path and is not meant to. See
+[AI-PLATFORM-VALUE.md](AI-PLATFORM-VALUE.md) for what is available only, or best, on Foundry.
 
 ```mermaid
 flowchart LR

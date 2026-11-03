@@ -1,0 +1,65 @@
+{
+  "format": 1,
+  "prompts": {
+    "channel_narrator": {
+      "versions": {
+        "1": "2f90a56fa35f616a533a920bcaccf1a09d8da2f61ab39f77d1209b4a08afee71"
+      }
+    },
+    "client_situation": {
+      "versions": {
+        "1": "911b65b6d2715d08376d9ee1e30b7f88ebbf7f4a162b703f14452e9bf6a171a9"
+      }
+    },
+    "credit_discovery": {
+      "versions": {
+        "1": "12020f37b3e1cfe5edf4f3d191339cbebf05f60d8a0d52113e92dfa545dadbfd"
+      }
+    },
+    "credit_rules": {
+      "versions": {
+        "1": "3082d9d944d6b720612d4d5939dc3a32c7ccd16ea82154762e54ba4934053017"
+      }
+    },
+    "exception_report": {
+      "versions": {
+        "1": "66d8e1fe18c7984e2c77a0049cb20d3fc778eed5600cea6a7abc0b4b7fcbbda7"
+      }
+    },
+    "headcount": {
+      "versions": {
+        "1": "d1afada16d0acc0c8d300d652691b9f21c5245533903bde43a67fe784281e96c"
+      }
+    },
+    "legislative_monitor": {
+      "versions": {
+        "1": "ecae917ba8fbf4182a1833b9c36e773dbbed43e5fec036a53327bc355afc656b"
+      }
+    },
+    "orchestrator": {
+      "versions": {
+        "1": "112c8b03130c3ae35c1c1f6236d55b2e0b50772d35031783116bd3e7ddc59a68"
+      }
+    },
+    "page_summary": {
+      "versions": {
+        "1": "0eab358f660bc677e339be09f88343a28b86faf6941bca9ea4cda031006be1be"
+      }
+    },
+    "payroll_ingest": {
+      "versions": {
+        "1": "cfe97ba1377ffc3d86f336904368ccedc8cead06751907a264da95ac293ead8b"
+      }
+    },
+    "reporting": {
+      "versions": {
+        "1": "af874e7eacc2bc29e83081534bbaaafc2877e7944157e1fe5d1e48d910319344"
+      }
+    },
+    "rules_ingestion": {
+      "versions": {
+        "1": "f3544e6dde65b0be80f93aa38df1d446bf37587724d691d8d1a6ff7c3d725e2d"
+      }
+    }
+  }
+}
