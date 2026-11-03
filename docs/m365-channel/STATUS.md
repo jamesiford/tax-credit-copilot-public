@@ -25,7 +25,7 @@ runs in a worktree, so `feat/m365-channel` is held by the main checkout).
 | AI-05 | Conversation continuity (stretch, last) | deferred | — | see D-60: needs a migration, two store adapters, a deployed-store check and Terraform; not started |
 | CH-06a | `POST /api/capabilities/{tool}`, `GET /api/capabilities`, claim package create/link | done | `wp/CH-06a-capabilities-api` | merge `cbaad1a` |
 | CH-06b | Channel gateway (`backend/channel`), MCP facade, `verify_figures`, ticketed downloads | done | `wp/CH-06b-gateway` | merge `f9a4711` |
-| CH-07 | Terraform `channel` module, packaging, grants, docs | in_progress | `wp/CH-07-channel-infra` | — |
+| CH-07 | Terraform `channel` module, packaging, grants, docs | done | `wp/CH-07-channel-infra` | merge `ed36927` |
 
 ## Evidence
 
@@ -192,6 +192,27 @@ and its `discovery` / `multi_state` scans read the configured default tenant.
 - Gateway routes: `GET /channel/health`, `GET /channel/ready`, `GET /channel/v1/tools`,
   `POST /channel/v1/tools/{tool}`, `GET /channel/v1/downloads/{ticket}`, `POST|GET|DELETE
   /mcp`.
+
+### CH-07 (merged `ed36927`)
+
+- Full backend suite: **2385 passed, 136 skipped, 1 xfailed** (CH-06b: 2360 passed). New:
+  `tests/test_channel_infra.py` (26). No skip or xfail added; pins untouched.
+- Terraform (`infra/`): `terraform fmt -check -recursive` clean, `terraform init
+  -backend=false` and `validate` clean, `tflint --recursive` exit 0, `terraform test`
+  **43 passed, 0 failed** (baseline 30; 13 new in `tests/channel.tftest.hcl`, no existing
+  test edited).
+- Plan summary (mock providers, `public` profile): toggle **off** — channel module creates
+  **0** resources, outputs empty, API restriction `Deny` + `web-app-subnet` only. Toggle
+  **on** — exactly **4** resources added (`azurerm_user_assigned_identity`,
+  `azurerm_linux_web_app`, `azurerm_role_assignment` for Monitoring Metrics Publisher,
+  `azurerm_monitor_diagnostic_setting`); API restriction identical. `enterprise` with the
+  toggle off: unchanged; with it on: refused. A real `terraform plan` against Azure was
+  **not** run (D-70).
+- Docs: CONNECTIVITY-MATRIX §1a (CH1-CH9 plus an identity/role table), component spec §4.7a,
+  ENV-VARS §9a, SECURITY posture rows, RUNBOOK §13, DEPLOYMENT-HANDOVER values, C4 model
+  (`c4arch.py validate`: 0 errors, 0 warnings; `build` regenerated the HTML, no raster images).
+  `scripts/check-links.py` 0 broken.
+- Standard gate: whitelabel 0 enforced; audit-export 0 findings; gitleaks clean.
 
 ## Blockers
 
