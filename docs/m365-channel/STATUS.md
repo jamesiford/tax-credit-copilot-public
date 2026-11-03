@@ -23,6 +23,9 @@ runs in a worktree, so `feat/m365-channel` is held by the main checkout).
 | AI-07 | Safety | done | `wp/AI-07-safety` | merge `83fa319`; injection screen, output policy, stream gate (2104 passed) |
 | AI-08 | Coding-standards ratchet | done | `wp/AI-08-standards` | merge `3a782d6`; ratchet baseline 540 → 483, five channel modules split (2128 passed) |
 | AI-05 | Conversation continuity (stretch, last) | deferred | — | see D-60: needs a migration, two store adapters, a deployed-store check and Terraform; not started |
+| CH-06a | `POST /api/capabilities/{tool}`, `GET /api/capabilities`, claim package create/link | done | `wp/CH-06a-capabilities-api` | merge `cbaad1a` |
+| CH-06b | Channel gateway (`backend/channel`), MCP facade, `verify_figures`, ticketed downloads | done | `wp/CH-06b-gateway` | merge `f9a4711` |
+| CH-07 | Terraform `channel` module, packaging, grants, docs | in_progress | `wp/CH-07-channel-infra` | — |
 
 ## Evidence
 
@@ -166,6 +169,29 @@ and its `discovery` / `multi_state` scans read the configured default tenant.
 - Not verified against live Azure: `scripts/create-model-connection.ps1` (Bicep
   parameter names are a guess); the mock gateway's code deployment is a manual step;
   no `az`/`azd` was run.
+
+### CH-06a (merged `cbaad1a`) and CH-06b (merged `f9a4711`)
+
+- Integration branch is `feat/m365-channel` itself (D-61). Python 3.14 venv (D-62).
+- Full backend suite after CH-06b: **2360 passed, 136 skipped, 1 xfailed** (Prompt 2B
+  baseline: 2128 passed). No skip or xfail added; the synthetic parity gate (81/51/49) is
+  green and the three pinned files are untouched. New: `tests/test_capabilities_api.py`
+  (43) and `tests/channel/` (189: auth matrix, pipeline, ledger and `verify_figures`,
+  MCP, config, ping, architecture, and 14 against the REAL API in-process).
+- Standard gate: `check-whitelabel.ps1 -Enforce` 0 enforced (29 allow-listed);
+  `audit-export.py --enforce` 0 findings; `gitleaks git` no leaks (two rounds of
+  false positives on `idempotency_key="..."` literals in tests were rewritten, not
+  allow-listed). The standards ratchet was TIGHTENED (483 baseline violations;
+  `application/wiring.py` 605 -> 471).
+- Routes: `tests/route_inventory.json` +2 (`GET /api/capabilities`,
+  `POST /api/capabilities/{tool}`); new `tests/channel_route_inventory.json` pins the
+  gateway's eight routes. `infra/` untouched in these two WPs.
+- Existing tests edited (D-64): three that pinned `claim_package_create` and
+  `verify_figures` as unbuilt.
+- New runtime pin: `jsonschema==4.26.0`. The `mcp` SDK is deliberately not used (D-65).
+- Gateway routes: `GET /channel/health`, `GET /channel/ready`, `GET /channel/v1/tools`,
+  `POST /channel/v1/tools/{tool}`, `GET /channel/v1/downloads/{ticket}`, `POST|GET|DELETE
+  /mcp`.
 
 ## Blockers
 
