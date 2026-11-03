@@ -14,7 +14,7 @@ runs in a worktree, so `feat/m365-channel` is held by the main checkout).
 | CH-02 | Numeric guard, composer, narrator agent, ADR-008 | done | `wp/CH-02-numeric-guard` | `f1c7815` |
 | CH-03 | Channel audit trail | done | `wp/CH-03-channel-audit` | `087847f` |
 | CH-04 | Identity, authorization, writer entitlement | done | `wp/CH-04-identity-authz` | `603418e` |
-| CH-05 | Prepare/commit safe writes | not started | `wp/CH-05-safe-writes` | — |
+| CH-05 | Prepare/commit safe writes | done | `wp/CH-05-safe-writes` | `e5634c3` |
 
 ## Evidence
 
@@ -117,6 +117,22 @@ and its `discovery` / `multi_state` scans read the configured default tenant.
   mediator docstring, SECURITY.md, ENV-VARS (four new variables).
 - Standard gate clean; `infra/` untouched. Owner actions: assign `TCC.Agent` to the
   gateway's service principal; for `entra_group`, grant Graph `GroupMember.Read.All`.
+
+### CH-05 (merged `e5634c3`)
+
+- Full backend suite: **1735 passed, 135 skipped, 1 xfailed** (CH-04: 1706 passed).
+  No skip/xfail added; pins and `infra/` untouched; standard gate clean.
+- New: `application/confirmations.py`, `capabilities/writes.py` (six prepare/commit
+  pairs), `capabilities/write_specs.py`, commands `record_claim`, `transition_claim`,
+  `set_engagement`, `tests/test_channel_writes.py` (28 tests). `plan_base_year`
+  extracted from the base-year handler. Decisions D-31..D-35.
+- Built: `finding_resolve`, `finding_reopen`, `claim_transition`, `claim_record`,
+  `engagement_set`, `base_year_set`. Unbuilt: `claim_package_create` (Prompt 3) and
+  `verify_figures`.
+- Existing tests edited (D-35): the two unbuilt-write assertions in
+  `test_capabilities_envelope.py` and `test_capabilities_equivalence.py`.
+- Open for Prompt 3: the channel route that wraps reads in the auditor; the writes
+  audit themselves, so it must not audit write capabilities a second time.
 
 ## Blockers
 
