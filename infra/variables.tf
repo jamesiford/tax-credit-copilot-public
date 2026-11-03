@@ -445,6 +445,60 @@ variable "ai_gateway_oauth_secret_name" {
   }
 }
 
+# --- Microsoft 365 channel gateway (proof of concept) -------------------------------
+
+variable "enable_m365_channel" {
+  description = "Create the channel gateway: a third App Service on the existing plan, its identity and its settings. Off by default; with it off the plan is unchanged. Public profile only (PoC): the gateway is the one new public surface."
+  type        = bool
+  default     = false
+  validation {
+    condition     = !var.enable_m365_channel || var.profile != "enterprise"
+    error_message = "enable_m365_channel is a proof-of-concept feature and is refused in the enterprise profile: the gateway is a public surface."
+  }
+}
+
+variable "channel_gateway_audience" {
+  description = "The gateway's app registration: api://<client id> or the bare client id (GATEWAY_AUDIENCE). Required when enable_m365_channel."
+  type        = string
+  default     = ""
+  validation {
+    condition     = !var.enable_m365_channel || length(trimspace(var.channel_gateway_audience)) > 0
+    error_message = "channel_gateway_audience is required when enable_m365_channel is true."
+  }
+}
+
+variable "channel_allowed_caller_app_ids" {
+  description = "App ids that may call the gateway as the orchestrator without holding the Channel.Invoke role (CHANNEL_ALLOWED_CALLER_APP_IDS). Empty = role only."
+  type        = list(string)
+  default     = []
+}
+
+variable "channel_writer_source" {
+  description = "Who may make changes through the channel (CHANNEL_WRITER_SOURCE): allowlist | entra_group | either."
+  type        = string
+  default     = "allowlist"
+  validation {
+    condition     = contains(["allowlist", "entra_group", "either"], var.channel_writer_source)
+    error_message = "channel_writer_source must be allowlist, entra_group or either."
+  }
+}
+
+variable "channel_writer_group_id" {
+  description = "Object id of the Entra group whose members may write (CHANNEL_WRITER_GROUP_ID). Required unless channel_writer_source is allowlist."
+  type        = string
+  default     = ""
+  validation {
+    condition     = var.channel_writer_source == "allowlist" || length(trimspace(var.channel_writer_group_id)) > 0
+    error_message = "channel_writer_group_id is required when channel_writer_source is entra_group or either."
+  }
+}
+
+variable "channel_allowed_ip_ranges" {
+  description = "CIDR ranges allowed to reach the gateway. Empty (default) allows every address: callers are authenticated in the app by token validation, not by Easy Auth or by network."
+  type        = list(string)
+  default     = []
+}
+
 # --- mock AI gateway (proof of concept only) --------------------------------------
 
 variable "enable_mock_ai_gateway" {

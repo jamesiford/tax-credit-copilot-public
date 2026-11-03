@@ -13,7 +13,10 @@
                              applies nothing.
       2. load-synthetic      public profile only: the synthetic source dataset
                              into the new Lakehouse (data.source.load_fabric).
-      3. grant-warehouse-sql T-SQL grants on tcc_gold / tcc_ops to the API identity.
+      3. grant-warehouse-sql T-SQL grants on tcc_gold / tcc_ops to the API identity; when
+                             the channel is enabled (GATEWAY_IDENTITY_NAME is set), also
+                             INSERT/SELECT on tcc_ops.channel_audit to the gateway
+                             identity, at object level only.
       4. seed-operational-store  idempotent.
 
     Every SQL step addresses the target `deployed`, which the guard resolves
@@ -61,6 +64,16 @@ if ($env:TCC_PROFILE -eq 'public') {
 
 Invoke-Step 'grant-warehouse-sql' {
     & $python (Join-Path $PSScriptRoot 'grant-warehouse-sql.py') --target deployed
+}
+
+# The channel gateway writes the audit trail and nothing else in the Warehouse:
+# object-level INSERT and SELECT on tcc_ops.channel_audit, no schema grant. The
+# output is empty unless Terraform ran with enable_m365_channel. GRANT is
+# idempotent, so a re-run changes nothing.
+if (-not [string]::IsNullOrWhiteSpace($env:GATEWAY_IDENTITY_NAME) -and $env:GATEWAY_IDENTITY_NAME -ne 'null') {
+    Invoke-Step 'grant-warehouse-sql (channel gateway)' {
+        & $python (Join-Path $PSScriptRoot 'grant-warehouse-sql.py') --target deployed --profile gateway --principal $env:GATEWAY_IDENTITY_NAME
+    }
 }
 
 Invoke-Step 'seed-operational-store' {

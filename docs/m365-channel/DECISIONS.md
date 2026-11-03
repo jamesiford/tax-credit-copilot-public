@@ -763,3 +763,52 @@ One short entry per decision: context, choice, why.
   shown and the orchestrator narrates.
 - A delegated caller with no MCP session and no `X-Conversation-Id` is keyed by their
   user id, so one person's calls without a conversation share a ledger entry.
+
+## D-70 CH-07: the channel module, and what "off" means
+
+- **Choice.** `infra/modules/channel` creates, only when `enable_m365_channel`: one
+  user-assigned identity, one Linux web app on the existing plan (Python 3.12, `sh
+  startup-channel.sh`, same integration subnet, HTTPS only, TLS 1.2, FTPS and basic-auth
+  publishing off, `vnet_route_all_enabled`, inbound public, `Allow` unless
+  `channel_allowed_ip_ranges`), the Monitoring Metrics Publisher role and a diagnostic
+  setting. Everything is `count = 0` when off.
+- **Proof of "strict no-op".** A real `terraform plan` needs Azure credentials and a
+  subscription, and the brief forbids cloud changes in this prompt, so it was not run.
+  The proof is structural and tested: the module's resource list is empty (`resource_types`),
+  its outputs are empty, no existing module's inputs changed (the only edit to
+  `app_service` is a new read-only OUTPUT), and the 30 existing Terraform tests pass
+  unedited. The first plan against a real subscription should be reviewed for exactly
+  that: no change with the toggle off.
+- **No new API setting.** The API accepts the gateway because the token carries `TCC.Agent`
+  (`infrastructure/auth/entra.py`); adding a caller list would be a second control.
+  A test asserts the API's settings gain nothing channel-shaped, and that
+  `api_access_restriction` is identical on and off: default deny, `web-app-subnet` only.
+
+## D-71 CH-07: refusals and where they live
+
+- The enterprise profile refuses the toggle (variable validation), as the mock gateway
+  does: the gateway is a public surface and the design says "public profile only for the PoC".
+- The channel needs the API to validate tokens; the public profile defaults to
+  `AUTH_MODE=none`. That check is a `precondition` on the root output `CHANNEL_APP_NAME`
+  rather than on the module's app: `terraform test` can only expect a failure from a
+  variable, output, check or root-addressable resource, and a module resource is none of
+  those. The message says what to set.
+- Lists (`channel_allowed_caller_app_ids`, `channel_allowed_ip_ranges`) are overlay-only:
+  azd's `${NAME=default}` substitution produces strings. The four scalar variables are
+  mapped, and `test_deployment_docs_contract` forced them into the handover.
+
+## D-72 CH-07: azd and CI
+
+- `azure.yaml` lists the `channel` service as the brief asks. **Consequence the owner must
+  know:** azd resolves a service to an app by its `azd-service-name` tag, so with the channel
+  OFF there is no app and a bare `azd deploy` / `azd up` reports "unable to find a resource
+  tagged azd-service-name: channel". The handover and `azure.yaml` say to deploy by name
+  (`azd deploy api`, `azd deploy web`) with the channel off. No azd feature to skip a service
+  was found; if one exists it is a one-line change.
+- `deploy.yml` triggers are untouched (still `workflow_dispatch` only, asserted). Its steps
+  gained: two more outputs read, a gateway grant and a channel zip deploy, each conditional on
+  the output being non-empty, so a deployment without the channel runs exactly the old steps.
+- `scripts/package-app.py` is not service-aware (it zips a folder), so the channel zip is
+  the same `backend/` zip; a test proves it carries `startup-channel.sh` and `channel/`.
+- `startup-channel.sh` is checked out with LF (`.gitattributes` `*.sh text eol=lf`) and a test
+  fails on a carriage return: a CRLF `set -e` fails on App Service.

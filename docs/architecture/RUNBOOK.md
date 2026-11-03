@@ -330,3 +330,68 @@ event from a different table and none alone is enough to reproduce it:
 | Request path and `ResultCode` | `AppRequests.Url`, `AppRequests.ResultCode` |
 | `artifact_id` / `access_id` | `tcc_ops.artifact_access`, for a download issue (§8) |
 | Time window (UTC) and approximate `client_id` | Needed to bound every query above |
+
+## 13. Channel gateway (Microsoft 365)
+
+Only when `enable_m365_channel` is on. The gateway is `app-tcc-channel-<suffix>`
+(`channel.main:app`). Its health is `GET /channel/health` and `/channel/ready`, which
+need no credentials. Every error it returns has the same body,
+`{"error": {"code", "message", "retryable"}, "correlation_id"}`: quote the correlation id.
+
+**One correlation id follows a call.** The gateway puts it in the acting-user header it
+sends the API (and in `X-Correlation-Id`), so the capability's own audit rows carry the
+same id as the gateway's: `tcc_ops.channel_audit` joins on it.
+
+### 13.1 Symptoms
+
+| Symptom | Meaning | Check |
+|---|---|---|
+| **401** `unauthenticated` | No proof of identity: no bearer token, a malformed or expired one, a wrong audience (it must be `GATEWAY_AUDIENCE`, as `api://<id>` or the bare id) or a wrong issuer (a token from another tenant) | The caller's token claims (`aud`, `iss`, `exp`). Never paste a token into a ticket |
+| **403** `caller_not_allowed` | The token is valid but the app holds neither the role `Channel.Invoke` nor an app id on `CHANNEL_ALLOWED_CALLER_APP_IDS` | Assign the role to the orchestrator's agent identity, or (sandbox only) add its app id. `channel_ping` (below) names which rule admitted a caller |
+| **403** `missing_scope` / `mixed_token` / `tenant_mismatch` | A delegated token without `Channel.Access`; a token that mixes app-only and delegated claims; an acting user from another tenant | The registration's exposed scope and consent; the `X-Acting-Tenant` header |
+| **400** `invalid_acting_user` | An agent call must name the user on every request: `X-Acting-User-Oid` (GUID), `X-Acting-User-Name`, `X-Acting-Tenant`, `X-Channel` (`teams` or `m365-copilot`), `X-Conversation-Id` | The headers the orchestrator actually sends (`channel_ping` echoes them as received) |
+| **502** `api_error` | **The API refused the gateway**, not the user: its token lacks the `TCC.Agent` role, or the API's access restriction did not admit the gateway. The user-facing 403 from the API is a different shape (`{"error": ...}`) and is passed through | Is the gateway still in the API's integration subnet (`api_access_restriction`, `terraform output`)? Was `TCC.Agent` assigned to `GATEWAY_IDENTITY_PRINCIPAL_ID`? `channel_ping` reports `api_reachable` |
+| **502** `api_unreachable` / `bad_response`, **504** `timeout` | The API did not answer, or answered with a body over 1 MB, or took longer than `CHANNEL_REQUEST_TIMEOUT_SECONDS` (30; the API's own limit is `CAPABILITY_TIMEOUT_SECONDS`, 25) | API health (§1). A timed-out **commit** may still have landed: retry with the same idempotency key, which replays rather than repeats |
+| **503** `audit_unavailable` | The opening audit event could not be written, so the call was **not made**: an action the platform cannot account for is not performed | The Warehouse grants for the gateway identity (below); Warehouse reachability |
+| **429** `rate_limited` | More than `CHANNEL_RATE_LIMIT_PER_MINUTE` (60) calls a minute for one user. `retry_after_seconds` and `Retry-After` say when. The refusal is itself audited | Raise the setting only knowing the limiter is **per process** |
+| `verify_figures` says every figure is wrong after a restart or a scale-out | **The fact ledger is lost on restart and is per process.** The gateway only remembers what a conversation was told while it was running, in one worker; with `WEB_CONCURRENCY` above 1 a conversation's facts may live in another worker. The strict answer is "no", never "yes" | Keep `WEB_CONCURRENCY=1` (the default). Re-fetch the figures in the conversation, then verify again |
+| A download link says 410 or 404 | A ticket works once, for 15 minutes, for one person. `confirmation_replayed` / `confirmation_expired` mean it was used or timed out; `confirmation_wrong_user` that a different person's token was presented (the owner's link is **not** burned by that) | Mint a new link with `claim_package_link` |
+| Cowork says "unknown session" (404 on `/mcp`) | MCP sessions are in memory and bound to one user: a restart or another user's session id is unknown, and the protocol's answer is to initialise again | None: the client re-initialises |
+
+### 13.2 What the person did: the per-user audit
+
+```pwsh
+python scripts/channel-audit.py --user <entra object id> --since 2026-11-01
+python scripts/channel-audit.py --user "<display name from the writer list>" --tool engagement_set_commit
+```
+
+A request with a `begin` and no `end` is shown `PENDING` (a crash, or one still
+running). To follow one call, query the trail by its correlation id; the gateway and
+the capability inside the API write to the same table with the same id:
+
+```sql
+SELECT occurred_at, phase, tool_name, action_kind, outcome, error, elapsed_ms
+FROM tcc_ops.channel_audit
+WHERE correlation_id = '<correlation id from the error body>'
+ORDER BY occurred_at, event_seq;
+```
+
+Reads are audited by the gateway (a `begin` and an `end`). A write is audited by the
+capability inside the API; the gateway adds one event only for what the capability could
+not see: the rate limit, its own writer check, the API unreachable, a timeout, or a
+request refused before dispatch.
+
+### 13.3 Identity spike diagnostics
+
+Set `CHANNEL_DEBUG_WHOAMI=true` (then redeploy or restart) and call the tool
+`channel_ping`: it returns the gateway version, the caller's shape, **which rule admitted
+it** (`role` or `allow-list`), the acting-user headers exactly as received, and whether
+the API answers. It never returns a token. Turn it off afterwards.
+
+### 13.4 Grants the gateway needs that Terraform does not make
+
+`scripts/grant-warehouse-sql.py --target deployed --profile gateway` (run by
+postprovision when the channel is on) grants the gateway identity `INSERT, SELECT ON
+OBJECT::tcc_ops.channel_audit` and nothing else. A Fabric workspace role to connect, the
+`TCC.Agent` assignment and, for a group-based writer source, Graph `GroupMember.Read.All`
+are operator steps ([CONNECTIVITY-MATRIX.md §1a](CONNECTIVITY-MATRIX.md)).

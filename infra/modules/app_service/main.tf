@@ -317,6 +317,21 @@ output "plan_id" {
   value = azurerm_service_plan.this.id
 }
 
+# The API's inbound posture as the resource holds it. The channel gateway shares
+# the web app's integration subnet, which this already admits, so a test asserts
+# this is the same with the channel on and off: the restriction is never widened.
+output "api_access_restriction" {
+  value = {
+    default_action = azurerm_linux_web_app.api.site_config[0].ip_restriction_default_action
+    allowed = [for r in azurerm_linux_web_app.api.site_config[0].ip_restriction : {
+      name      = r.name
+      priority  = r.priority
+      action    = r.action
+      subnet_id = r.virtual_network_subnet_id
+    }]
+  }
+}
+
 output "easy_auth_enabled" {
   value = length(azurerm_linux_web_app.web.auth_settings_v2) > 0
 }

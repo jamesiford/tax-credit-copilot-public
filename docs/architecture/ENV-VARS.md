@@ -248,6 +248,10 @@ into the settings above. Full guidance is in [DEPLOYMENT-HANDOVER.md](DEPLOYMENT
 | azd value | Terraform variable | Default | Profile | Becomes |
 |---|---|---|---|---|
 | `TCC_PROFILE` | `profile` | `public` | both | Every profile default in `infra/locals.tf`; output `TCC_PROFILE` |
+| `TCC_ENABLE_M365_CHANNEL` | `enable_m365_channel` | `false` | public | The channel gateway app, its identity, telemetry role and diagnostic setting; outputs `CHANNEL_APP_NAME`, `CHANNEL_BASE_URL`, `GATEWAY_IDENTITY_NAME`. Needs `auth_mode = "entra"` and `api_client_id` |
+| `TCC_CHANNEL_GATEWAY_AUDIENCE` | `channel_gateway_audience` | none | public (required with the toggle) | `GATEWAY_AUDIENCE` |
+| `TCC_CHANNEL_WRITER_SOURCE` | `channel_writer_source` | `allowlist` | public | `CHANNEL_WRITER_SOURCE` |
+| `TCC_CHANNEL_WRITER_GROUP_ID` | `channel_writer_group_id` | none | public (required unless `allowlist`) | `CHANNEL_WRITER_GROUP_ID` |
 | `AZURE_ENV_NAME` | `environment_name` | written by azd | both | Resource names, `azd-env-name` tag |
 | `AZURE_LOCATION` | `location` | none | both | Region; output `AZURE_LOCATION` |
 | `AZURE_RESOURCE_GROUP` | `resource_group_name` | `rg-<env>` | both | Output `AZURE_RESOURCE_GROUP` |
@@ -278,6 +282,7 @@ overlay (`*.auto.tfvars`, `infra/profiles/*.tfvars`, or `TF_VARS_JSON` in
 `enable_key_vault`, `api_worker_count`, `vnet_address_space`,
 `private_dns_zone_ids`, `fabric_capacity_sku`, `fabric_workspace_role`,
 `foundry_deployment_sku`, `foundry_capacity`, `ai_gateway_endpoint`,
+`channel_allowed_caller_app_ids`, `channel_allowed_ip_ranges`,
 `outputs_retention_days`, `tags`.
 
 ### v1 azd values that no longer exist
