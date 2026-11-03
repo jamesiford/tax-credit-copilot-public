@@ -34,14 +34,11 @@ CONTACT_DATES = ("29 October", "27 October")
 
 
 def resolve(surface, name: str) -> int:
-    """`client_resolve` as the skills use it: a name, then the confirmed candidate."""
+    """`client_resolve` as the skills use it: one exact name resolves on the first call [CH-15e]."""
     first = surface.call("client_resolve", {"name_or_text": name})
-    assert first.ok and first.facts["clarify"] is True, "with nothing selected the resolver always asks"
-    [candidate] = first.facts["candidates"]
-    assert candidate["name"] == name
-    second = surface.call("client_resolve", {"name_or_text": name, "current_client_id": candidate["client_id"]})
-    assert second.ok and second.facts["clarify"] is False and second.facts["client_name"] == name
-    return second.facts["client_id"]
+    assert first.ok and first.facts["resolved"] is True and first.facts["clarify"] is False
+    assert first.facts["client_name"] == name
+    return first.facts["client_id"]
 
 
 def shape(events):

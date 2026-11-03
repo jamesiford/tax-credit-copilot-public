@@ -90,7 +90,7 @@ class ToolRunner:
         facts = reply.body.get("facts") or {}
         chosen = facts.get("client_id")
         if chosen is None and facts.get("clarify") and len(facts.get("named") or []) == 1:
-            chosen = facts["named"][0]  # Teams has no page selection: one name, in the reader's own words, selects
+            chosen = facts["named"][0]  # a gateway that predates `resolved` still asks about one exact name; the reader's own words select
         if chosen is None:
             self.clarify = Clarification("client", str(facts.get("reason") or ""), tuple(facts.get("candidates") or ()))
             return None

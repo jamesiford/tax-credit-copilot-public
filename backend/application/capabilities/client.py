@@ -10,6 +10,7 @@ of `application.capabilities.client` is unchanged.
 """
 from __future__ import annotations
 
+import re
 from collections.abc import Mapping, Sequence
 from typing import Any
 
@@ -20,7 +21,35 @@ from application.capabilities.client_analysis import client_at_risk, client_disc
 from application.capabilities.client_eligibility import client_eligibility  # noqa: F401
 from application.capabilities.envelope import Provenance, ToolResult
 from application.capabilities.errors import Ambiguous, ClientNotFound
-from application.chat_scope import ClientName, resolve_referent
+from application.chat_scope import ClientName, Referent, clients_named, resolve_referent
+
+
+def _exact_single_name(referent: Referent, text: str, clients: Sequence[ClientName]) -> Referent:
+    """One client named in full or by an exact alias is the answer, whatever is selected.
+
+    The portal asks here because a page selection can contradict the sentence; a channel
+    has no page, so the reader's own words are the whole signal, and a second question
+    about a name they already gave is the friction CH-15e removes. Partial text never
+    reaches this (`clients_named` matches whole words only) and two names still ask.
+
+    A full name beats a first-word alias that other clients share: "Cascade Retail
+    Partners" also contains "cascade", which would name both Cascade clients. So when
+    exactly one FULL name is present, the text left after removing it must name nobody
+    else.
+    """
+    if not (referent.clarify and referent.named):
+        return referent
+    if len(referent.named) == 1:
+        return Referent(referent.named[0], named=referent.named)
+    lowered = text.lower()
+    in_full = [c for c in clients if re.search(rf"\b{re.escape(c.name.strip().lower())}\b", lowered)]
+    if len(in_full) != 1:
+        return referent
+    only = in_full[0]
+    remainder = re.sub(rf"\b{re.escape(only.name.strip().lower())}\b", " ", lowered)
+    if set(clients_named(remainder, clients)) <= {only.client_id}:
+        return Referent(only.client_id, named=(only.client_id,))
+    return referent
 
 
 def client_resolve(
@@ -34,8 +63,10 @@ def client_resolve(
 
     Deterministic and model-free: it decides whose payroll an answer describes,
     so it must give the same response every time the same question is asked
-    [`chat_scope`]. When the client is not unambiguous the result says so and
-    lists candidates; with `strict` it raises `Ambiguous` instead.
+    [`chat_scope`]. `facts.resolved` says whether one client was settled. When it is
+    not unambiguous the result lists candidates; with `strict` (the portal's rule,
+    where the page selection can disagree with the words) it raises `Ambiguous`
+    instead and a single name is not promoted.
     """
     book = client_book.clients_or_empty()
     if not book:
@@ -44,10 +75,13 @@ def client_resolve(
     clients = [ClientName(client_id, name) for client_id, name in names.items()]
 
     referent = resolve_referent(name_or_text, list(history), current_client_id, clients)
+    if not strict:
+        referent = _exact_single_name(referent, name_or_text, clients)
     candidates = [
         {"client_id": cid, "name": names.get(cid, f"Account {cid}")} for cid in referent.candidates
     ]
     facts = {
+        "resolved": referent.client_id is not None,
         "client_id": referent.client_id,
         "client_name": names.get(referent.client_id) if referent.client_id is not None else None,
         "clarify": referent.clarify,
