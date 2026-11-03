@@ -38,3 +38,18 @@
   align-items: flex-start;
   gap: var(--space-6);
 }
+
+/* A shell fixture: the bar and trails stack, full width, as they do in the app. */
+.sg-shell {
+  flex: 1 1 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+}
+
+.sg-row > .ui-hero,
+.sg-row > .start-here {
+  flex: 1 1 100%;
+}

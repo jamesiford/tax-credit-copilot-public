@@ -1,12 +1,17 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import InsightBar from '../components/InsightBar.jsx';
 import BookGrid from '../components/BookGrid.jsx';
-import PageHeader from '../components/PageHeader.jsx';
+import StartHereCards from '../components/StartHereCards.jsx';
+import HeroBand from '../components/ui/HeroBand.jsx';
+import SectionHeading from '../components/ui/SectionHeading.jsx';
 import { fetchPortfolioV2 } from '../api.js';
 import { portfolioAnswer } from '../lib/answers.js';
 import { formatFilters, parseFilters } from '../lib/gridFilter.js';
 import { bookSortQuery, formatBookSort, parseBookSort, toggleBookSort } from '../lib/bookSort.js';
+import { greeting } from '../lib/identity.js';
+import { loadStartHere, storeStartHere } from '../lib/startHere.js';
 
 /**
  * The book. Every client, ranked by why you would call them.
@@ -31,10 +36,28 @@ const FILTER_KEYS = {
   client: 1, band: 1, program: 1, year: 1, identified: 1, margin: 1, state: 1,
 };
 
-export default function PortfolioPage({ onPickClient, onAskCopilot, scopeOptions }) {
+export default function PortfolioPage({
+  onPickClient, onAskCopilot, scopeOptions, identity = null,
+}) {
   const [summary, setSummary] = useState(null);
   const [error, setError] = useState(null);
   const [search, setSearch] = useSearchParams();
+  const navigate = useNavigate();
+  const headingRef = useRef(null);
+
+  // "Start here" is a view preference: open for somebody who has never seen the
+  // page, and closed once they have put it away.
+  const [startOpen, setStartOpen] = useState(() => loadStartHere());
+  const toggleStart = useCallback(() => {
+    setStartOpen((open) => { storeStartHere(!open); return !open; });
+  }, []);
+
+  const showBook = useCallback(() => {
+    const node = headingRef.current;
+    if (!node) return;
+    node.focus({ preventScroll: true });
+    if (typeof node.scrollIntoView === 'function') node.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  }, []);
 
   // NO YEAR. The book asks which client to call, and that is a question about a
   // client across every year they hold — an unclaimed year from four years ago
@@ -99,12 +122,34 @@ export default function PortfolioPage({ onPickClient, onAskCopilot, scopeOptions
   }, [onAskCopilot]);
 
   const header = (
-    <PageHeader
-      eyebrow="Portfolio"
-      title="Targeting"
-      sub="Who to target — new clients and existing ones — ranked by the reason to act, not by dollar value."
-    />
+    <HeroBand
+      compact
+      title={greeting(identity)}
+      aside={(
+        <button
+          type="button"
+          className="start-here-toggle"
+          aria-expanded={startOpen}
+          aria-controls="start-here"
+          onClick={toggleStart}
+        >
+          {startOpen ? <ChevronUp size={16} aria-hidden="true" /> : <ChevronDown size={16} aria-hidden="true" />}
+          Start here
+        </button>
+      )}
+    >
+      Who to target — new clients and existing ones — ranked by the reason to act, not by dollar value.
+    </HeroBand>
   );
+
+  const cards = startOpen ? (
+    <StartHereCards
+      id="start-here"
+      firstClientId={rows[0]?.client_id ?? null}
+      onNavigate={(href) => navigate(href)}
+      onShowBook={showBook}
+    />
+  ) : null;
 
   if (error) {
     return <div>{header}<div className="callout warn">The book could not be read: {error}</div></div>;
@@ -113,6 +158,10 @@ export default function PortfolioPage({ onPickClient, onAskCopilot, scopeOptions
   return (
     <div>
       {header}
+      {cards}
+      <SectionHeading className="book-heading">
+        <span id="targeting" ref={headingRef} tabIndex={-1}>Targeting</span>
+      </SectionHeading>
       {answer ? (
         <InsightBar
           caption={answer.replace(/\.$/, '')}

@@ -5,6 +5,23 @@ import {
   MetaLine, Pill, SectionHeading, Skeleton, Stepper, Tabs, TaskCard,
 } from '../components/ui/index.js';
 import './Styleguide.css';
+import DrillTrail from '../components/shell/DrillTrail.jsx';
+import TopBar from '../components/shell/TopBar.jsx';
+import StartHereCards from '../components/StartHereCards.jsx';
+
+const NOOP = {
+  onOpenPortfolio: () => {}, onOpenClient: () => {}, onOpenUnit: () => {}, onSelectView: () => {},
+};
+const SHELL_GROUPS = [
+  { section: 'What is it worth', items: [
+    { id: 'eligibility', label: 'Eligibility', disabled: true, reason: 'Pick a client first' },
+    { id: 'onezero', label: 'Monthly employment' },
+  ] },
+  { section: 'What needs a decision', items: [
+    { id: 'ingestion', label: 'Payroll data' }, { id: 'agents', label: 'Agents' },
+  ] },
+  { section: 'Prove it', items: [{ id: 'evidence', label: 'Audit trail' }, { id: 'rules', label: 'Programs' }] },
+];
 
 /**
  * The owner's visual review surface: every `ui/` component in every variant,
@@ -141,6 +158,25 @@ export default function Styleguide() {
       <Section title="TaskCard">
         <TaskCard href="#who" title="Who to call" description="Clients ranked by the reason to act." category="Targeting" />
         <TaskCard href="#rules" title="Programs and rules" description="What statute is authored, by year." category="Reference" />
+      </Section>
+
+      <Section title="Shell: top bar and drill trail">
+        <div className="sg-shell">
+          <TopBar groups={SHELL_GROUPS} activeId="onezero" onSelect={() => {}} onHome={() => {}} />
+          <DrillTrail clientId="portfolio" view="trend" {...NOOP} />
+          <DrillTrail clientId={2001} clientName="Cascade Retail Partners" view="trend" {...NOOP} />
+          <DrillTrail clientId={2001} clientName="Cascade Retail Partners" unitId="GA_GA-001" view="trend" {...NOOP} />
+          <DrillTrail
+            clientId={2001} clientName="Cascade Retail Partners" unitId="GA_GA-001" token="t" view="trend" {...NOOP}
+          />
+        </div>
+      </Section>
+
+      <Section title="Home: hero and task cards">
+        <HeroBand compact title="Hi, Jane" aside={<Pill variant="category">Start here</Pill>}>
+          Who to target, ranked by the reason to act, not by dollar value.
+        </HeroBand>
+        <StartHereCards id="sg-start" firstClientId={2001} onNavigate={() => {}} onShowBook={() => {}} />
       </Section>
 
       <Section title="EmptyState / Skeleton">
