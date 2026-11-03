@@ -5,7 +5,7 @@
 #
 # Terraform creates the app and its settings and NOTHING ELSE. The code is
 # scripts/mock-ai-gateway.py, deployed by hand as a separate PoC step (copy it
-# as mock_ai_gateway.py next to a requirements.txt naming fastapi and uvicorn,
+# as mock_ai_gateway.py next to scripts/mock-ai-gateway.requirements.txt as requirements.txt,
 # then `az webapp deploy`); the startup command below imports it by that name.
 #
 # Inbound is restricted to the integration subnet, exactly as the API is (NET-2),

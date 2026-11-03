@@ -132,7 +132,23 @@ all four auth modes and fault injection (latency, 429 + `Retry-After`, 5xx, hang
 cut mid-way, malformed SSE). Tests drive it in-process; the same script can run as a
 PoC App Service (`enable_mock_ai_gateway`, default off, public profile only — a Terraform
 validation fails the plan in the enterprise profile). Deploying its code is a manual PoC
-step (`az webapp deploy` of the script); Terraform creates only the empty app.
+step: zip `scripts/mock-ai-gateway.py` as `mock_ai_gateway.py` with
+`scripts/mock-ai-gateway.requirements.txt` as `requirements.txt` and `az webapp deploy` it
+(`python-multipart` is required: without it `POST /oauth/token` answers 500). Terraform creates
+only the empty app.
+
+**The mock is reachable only from the integration subnet**, so it can be called by the API
+app and the gateway, not by a workstation and **not by the hosted orchestrator**, whose
+runtime is outside that network. *The hosted orchestrator can use a customer gateway only if
+that gateway is reachable from the hosted runtime's network.* A real gateway on a public or
+private-linked address the runtime can resolve and route to is fine; one that exists only
+inside the customer's VNet is not, until the hosted-runtime network path (HARDENING-PLAN) is built.
+The orchestrator's default chain is therefore `foundry` alone.
+
+**Live check (CH-14).** `scripts/live-ai-checks.py` drives the real narration chain from inside
+the network (the API app's Kudu console) against the deployed mock in each auth mode, with a
+queued 429 + `Retry-After`, with queued failures to force a hop, and with an identifier-shaped
+prompt. Results: `docs/m365-channel/evidence/live-smoke-2026-11-03.md`.
 
 ## Questions for the gateway team
 

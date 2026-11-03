@@ -1,0 +1,7 @@
+# The proof-of-concept mock model gateway's own dependencies (scripts/mock-ai-gateway.py). [CH-14]
+# Deployed by hand next to the script, copied as mock_ai_gateway.py (see docs/architecture/AI-GATEWAY.md).
+# python-multipart is needed by `POST /oauth/token` (a form body): without it that endpoint answers 500, which
+# the live run showed as "the gateway token endpoint answered 500" in oauth_client_credentials mode.
+fastapi==0.136.3
+uvicorn==0.48.0
+python-multipart==0.0.29
