@@ -14,8 +14,14 @@ from jsonschema import Draft202012Validator
 from application.capabilities import catalog
 
 _YEAR = re.compile(r"\b(?:ty\s?)?((?:19|20)\d\d)\b", re.IGNORECASE)
+_NUMBER = re.compile(r"(?<![\w.\-])\d+(?:\.\d+)?(?![\w])")
+_WORDS = {"one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10,
+          "eleven": 11, "twelve": 12}
 _NOT_FOR_MODELS = frozenset({"client_resolve", "employee_drill"})
 CLIENT_PLACEHOLDER = "client_id"
+YEAR_KEYS = ("tax_year", "year", "base_year")
+#: A what-if's inputs: the reader's to give. A value the model chose is dropped, never run.
+SCENARIO_NUMBERS = ("magnitude", "hire_weekly_hours", "hire_hourly_rate")
 
 
 def model_tools() -> dict[str, catalog.CapabilitySpec]:
@@ -37,6 +43,13 @@ def years_in(text: str) -> list[int]:
     return found
 
 
+def numbers_in(text: str) -> set[float]:
+    """The numbers the reader wrote, as digits or as the words one to twelve."""
+    found = {float(m.group(0)) for m in _NUMBER.finditer(text or "")}
+    found |= {float(n) for word, n in _WORDS.items() if re.search(rf"\b{word}\b", (text or "").lower())}
+    return found
+
+
 def offered_schema(spec: catalog.CapabilitySpec) -> dict[str, Any]:
     """The schema a model is shown: the client and the year are not the model's to supply.
 
@@ -47,7 +60,7 @@ def offered_schema(spec: catalog.CapabilitySpec) -> dict[str, Any]:
     reaches the one place that overwrites it.
     """
     schema = {**spec.schema, "properties": {k: v for k, v in spec.schema["properties"].items() if k != CLIENT_PLACEHOLDER}}
-    schema["required"] = [name for name in spec.schema.get("required", []) if name not in (CLIENT_PLACEHOLDER, "tax_year", "year")]
+    schema["required"] = [name for name in spec.schema.get("required", []) if name not in (CLIENT_PLACEHOLDER, *YEAR_KEYS, "magnitude")]
     schema["additionalProperties"] = True
     return schema
 

@@ -9,6 +9,7 @@ the shipped code.
 """
 from __future__ import annotations
 
+import asyncio
 import copy
 import json
 from collections.abc import Callable
@@ -82,6 +83,8 @@ class ScriptedChat:
         if not self.script:
             raise ModelUnavailable("script exhausted")
         step = self.script.pop(0)
+        if step.get("delay"):
+            await asyncio.sleep(step["delay"])
         if step.get("error"):
             raise ModelUnavailable(step["error"])
         for n, call in enumerate(step.get("tools", [])):
@@ -161,6 +164,7 @@ class FakeGateway:
     writers: set[str] = field(default_factory=lambda: {USER_OID})
     overrides: dict[str, Callable[[dict[str, Any]], tuple[int, dict[str, Any]]]] = field(default_factory=dict)
     narration_status: int = 200
+    delays: dict[str, float] = field(default_factory=dict)
     calls: list[Call] = field(default_factory=list)
     narrations: list[dict[str, Any]] = field(default_factory=list)
     prepared: dict[str, dict[str, Any]] = field(default_factory=dict)
@@ -176,6 +180,7 @@ class FakeGateway:
         async def run(tool: str, request: Request) -> JSONResponse:
             body = await request.json()
             self.calls.append(Call(tool, body.get("args", {}), body, {k.lower(): v for k, v in request.headers.items()}))
+            await asyncio.sleep(self.delays.get(tool, 0))
             status, payload = self._answer(tool, body, request.headers.get("x-acting-user-oid", ""))
             return JSONResponse(status_code=status, content=payload)
 
@@ -260,8 +265,9 @@ class Rig:
     clock: FakeClock
     settings: OrchestratorSettings
 
-    async def say(self, text: str, who: ActingIdentity | None = None) -> TurnReply:
-        return await self.pipeline.handle(text, who if who is not None else identity())
+    async def say(self, text: str, who: ActingIdentity | None | object = "default") -> TurnReply:
+        """Say `text` as `who`: a person, the default test user, or `None` for nobody."""
+        return await self.pipeline.handle(text, identity() if who == "default" else who)
 
 
 def build_rig(

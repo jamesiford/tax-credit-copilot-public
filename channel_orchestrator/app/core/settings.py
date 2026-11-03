@@ -40,6 +40,7 @@ class OrchestratorSettings:
     confirm_ttl_seconds: int = 300
     state_ttl_seconds: int = 3600
     request_timeout_seconds: float = 40.0
+    turn_timeout_seconds: float = 90.0
     debug_whoami: bool = False
     identity_sources: tuple[str, ...] = ("original-subject", "platform")
     agent_name: str = "tcc-channel-orchestrator"
@@ -110,6 +111,7 @@ def load_settings(env: Mapping[str, str]) -> OrchestratorSettings:
         confirm_ttl_seconds=_integer(env, "CHANNEL_CONFIRM_TTL_SECONDS", 300, 30, 3600),
         state_ttl_seconds=_integer(env, "CHANNEL_STATE_TTL_SECONDS", 3600, 60, 86400),
         request_timeout_seconds=float(_integer(env, "CHANNEL_REQUEST_TIMEOUT_SECONDS", 40, 5, 300)),
+        turn_timeout_seconds=float(_integer(env, "CHANNEL_TURN_TIMEOUT_SECONDS", 90, 10, 600)),
         debug_whoami=_flag(env, "CHANNEL_DEBUG_WHOAMI"),
         identity_sources=_identity_sources(env),
         agent_name=_text(env, "FOUNDRY_AGENT_NAME", "tcc-channel-orchestrator"),

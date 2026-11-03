@@ -25,6 +25,7 @@ import time
 import uuid
 from collections.abc import Callable
 from dataclasses import dataclass
+from typing import Any
 
 from app.core import replies
 from app.core.compose import compose_reply, provenance_footer
@@ -46,12 +47,13 @@ def parse_command(text: str) -> str | None:
 
 @dataclass(frozen=True)
 class CommitOutcome:
-    """What the owner is told, and whether the change was recorded."""
+    """What the owner is told, and whether the change was recorded. `runs` are the results shown (the commit, and a package link)."""
 
     text: str
     made: bool
     tool: str = ""
     code: str = "ok"
+    runs: tuple[ToolRun, ...] = ()
 
 
 def commit_tool_for(prepare_tool: str) -> str:
@@ -59,6 +61,15 @@ def commit_tool_for(prepare_tool: str) -> str:
     if not prepare_tool.endswith("_prepare"):
         raise ValueError(f"{prepare_tool} is not a preview")
     return prepare_tool[: -len("_prepare")] + "_commit"
+
+
+async def _package_link(gateway: GatewayClient, who: ActingIdentity, args: dict[str, Any]) -> tuple[ToolRun | None, str]:
+    """After a claim package is built, its link from the gateway (never a storage URL), or why not."""
+    wanted = {k: args[k] for k in ("client_id", "tax_year") if k in args}
+    reply = await gateway.call_tool(who, "claim_package_link", wanted)
+    if reply.ok:
+        return ToolRun("claim_package_link", wanted, reply.body, "claim_package_link"), ""
+    return None, f"The package was built, but I could not get its link: {reply.error_message or reply.error_code}."
 
 
 async def commit_pending(
@@ -78,7 +89,10 @@ async def commit_pending(
     )
     if not reply.ok:
         return CommitOutcome(replies.commit_failure(reply.error_code, reply.error_message), False, tool, reply.error_code)
-    run = ToolRun(tool, pending.args, reply.body, tool)
-    composed = compose_reply("", [run], None)
-    text = "\n\n".join(p for p in (composed.text, provenance_footer([run])) if p)
-    return CommitOutcome(text, True, tool)
+    runs, note = [ToolRun(tool, pending.args, reply.body, tool)], ""
+    if tool == "claim_package_create_commit":
+        link, note = await _package_link(gateway, who, pending.args)
+        runs += [link] if link else []
+    composed = compose_reply("", runs, None)
+    text = "\n\n".join(p for p in (composed.text, provenance_footer(runs), note) if p)
+    return CommitOutcome(text, True, tool, runs=tuple(runs))

@@ -32,8 +32,10 @@ from typing import Any
 from app.core.gateway_client import GatewayClient
 from app.core.identity import ActingIdentity
 from app.core.state import ConversationState, PendingWrite
+from app.core.telemetry import tool_span
 from app.core.toolset import (  # noqa: F401 - re-exported: the names the rest of the orchestrator imports from here
-    CLIENT_PLACEHOLDER, Clarification, Problem, ToolRun, first_schema_problem, model_tools, offered_schema, years_in,
+    CLIENT_PLACEHOLDER, SCENARIO_NUMBERS, YEAR_KEYS, Clarification, Problem, ToolRun, first_schema_problem, model_tools,
+    numbers_in, offered_schema, years_in,
 )
 from application.capabilities import catalog
 from application.composer import narrator_brief
@@ -65,11 +67,20 @@ class ToolRunner:
 
     # ----------------------------------------------------------------- the client
 
+    async def _timed(self, tool: str, kind: str, args: dict[str, Any]):
+        """One gateway call inside a span that carries the tool, its kind and its outcome, and nothing else."""
+        with tool_span(tool, kind, self.who.channel, self.who.correlation_id) as span:
+            reply = await self.gateway.call_tool(self.who, tool, args)
+            span.set_attribute("tcc.outcome", "ok" if reply.ok else "error")
+            if not reply.ok:
+                span.set_attribute("tcc.error_code", reply.error_code)
+        return reply
+
     async def ensure_client(self) -> int | None:
         """The one client this turn is about, or None with `clarify` set."""
         if self.client_id is not None or self.clarify is not None:
             return self.client_id
-        reply = await self.gateway.call_tool(self.who, "client_resolve", {
+        reply = await self._timed("client_resolve", catalog.READ, {
             "name_or_text": self.question, "history": self.state.history, "current_client_id": self.state.client_id,
         })
         if not reply.ok:
@@ -100,6 +111,31 @@ class ToolRunner:
         pay, minmax = bool(_PAY_PERIOD.search(self.question)), bool(_MIN_MAX.search(self.question))
         return "pay_period" if pay and not minmax else "min_max" if minmax and not pay else "both"
 
+    def _years(self, spec: catalog.CapabilitySpec, args: dict[str, Any]) -> bool:
+        """Settle every year argument from the reader's words; False (with `clarify` set) when a needed one is missing."""
+        for key in (k for k in YEAR_KEYS if k in spec.schema["properties"]):
+            explicit_only = spec.kind == catalog.WRITE_PREPARE or key == "base_year"
+            year = self._year(args.get(key), allow_state=not explicit_only)
+            if year is not None:
+                args[key] = year
+            elif key in spec.schema.get("required", []) or spec.needs_year:
+                self.clarify = self.clarify or Clarification("year", "no tax year was named")
+                return False
+            else:
+                args.pop(key, None)
+        return True
+
+    def _scenario(self, spec: catalog.CapabilitySpec, args: dict[str, Any]) -> bool:
+        """A what-if's numbers are the reader's: one the model chose is dropped, and a missing size is asked for."""
+        said = numbers_in(self.question)
+        for key in SCENARIO_NUMBERS:
+            if key in args and not (isinstance(args[key], (int, float)) and float(args[key]) in said):
+                del args[key]
+        if "magnitude" in spec.schema["properties"] and "magnitude" not in args:
+            self.clarify = self.clarify or Clarification("detail", "How many, or by how much?")
+            return False
+        return True
+
     async def _arguments(self, spec: catalog.CapabilitySpec, proposed: dict[str, Any]) -> dict[str, Any] | None:
         args = {k: v for k, v in proposed.items() if v is not None}
         properties = spec.schema["properties"]
@@ -108,17 +144,8 @@ class ToolRunner:
             if client is None:
                 return None
             args[CLIENT_PLACEHOLDER] = client
-        for key in ("tax_year", "year"):
-            if key not in properties:
-                continue
-            year = self._year(args.get(key), allow_state=spec.kind != catalog.WRITE_PREPARE)
-            if year is None:
-                if key in spec.schema.get("required", []) or spec.needs_year:
-                    self.clarify = self.clarify or Clarification("year", "no tax year was named")
-                    return None
-                args.pop(key, None)
-            else:
-                args[key] = year
+        if not self._years(spec, args) or not self._scenario(spec, args):
+            return None
         if "method" in properties:
             method = self._method(spec.name, args.get("method"))
             if method is None:
@@ -141,8 +168,8 @@ class ToolRunner:
         self.calls += 1
         args = await self._arguments(spec, dict(proposed or {}))
         if args is None:
-            what = "year" if self.clarify and self.clarify.kind == "year" else "client"
-            return {"ok": False, "error": "needs_" + what, "message": f"the reader must say which {what}; stop and wait"}
+            what = self.clarify.kind if self.clarify else "client"
+            return {"ok": False, "error": "needs_" + what, "message": f"the reader must say which {what} (or how much); stop and wait"}
         invalid = first_schema_problem(spec, args)
         if invalid:
             self.problems.append(Problem(name, "invalid_arguments", invalid))
@@ -172,7 +199,7 @@ class ToolRunner:
         return label
 
     async def _call(self, spec: catalog.CapabilitySpec, args: dict[str, Any]) -> dict[str, Any]:
-        reply = await self.gateway.call_tool(self.who, spec.name, args)
+        reply = await self._timed(spec.name, spec.kind, args)
         if not reply.ok:
             self.problems.append(Problem(spec.name, reply.error_code, reply.error_message))
             return {"ok": False, "error": reply.error_code, "message": reply.error_message}

@@ -62,7 +62,7 @@
   {
     "name": "what_if_a_hire",
     "turns": [{
-      "say": "What if Cascade hired a few people at site A-1 in 2023?",
+      "say": "What if Cascade hired 2 people at site A-1 in 2023?",
       "model": [{"tools": [{"tool": "simulate", "args": {"worksite_id": "A-1", "action": "add_headcount", "magnitude": 2}}]}, {"text": "The what-if is shown below."}],
       "expect": {"kind": "answer", "gateway": ["client_resolve", "simulate"], "args": {"simulate": {"worksite_id": "A-1", "tax_year": 2023, "client_id": 2001}}}
     }]

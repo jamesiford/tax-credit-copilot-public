@@ -978,3 +978,21 @@ One short entry per decision: context, choice, why.
   AFTER the composer from the envelopes' provenance fields verbatim: identifiers, not figures, no model touches them.
 - No identity, an injection-flagged message, a model outage and a tool outage each have a plain sentence
   (`app/core/replies.py`); none carries a figure.
+
+## D-84 CH-08b: gaps found re-reading the brief
+
+- A re-read of the work package against the brief found items the first pass missed; all are fixed in
+  `wp/CH-08b-spec-gaps`: candidates are numbered `1) Name` (was `1.`); a message that supersedes a pending
+  change says so; a claim-package confirm is followed, in code, by `claim_package_link`; a turn deadline
+  (`CHANNEL_TURN_TIMEOUT_SECONDS`) and plain-word mappings for 401/403/429/timeouts; one span per gateway call
+  (`app/core/telemetry.py`, no payroll in attributes); `/whoami` also names the display name, channel and
+  conversation, and a refused turn shows what was received when `CHANNEL_DEBUG_WHOAMI` is on; the report carries
+  `conversation_id`; the golden prompts now cover every write flow and assert, for every answer, that each
+  numeral is in the facts or the reader's words.
+- **A what-if's size and a base year are the reader's** (found while doing the above): a `magnitude`, hire hours
+  or rate the model chose is dropped, a missing size is asked for ("How many, or by how much?"), and a
+  `base_year` is treated like a write's tax year (explicit only). A free identifier the model supplies (a finding
+  id, a unit) is not checked here: the preview shows what will change and the person confirms it.
+- **Conversation state** is an in-memory dictionary with a TTL. The runtime's session storage (`$HOME`) is a
+  filesystem the platform may discard on idle and is not shared across replicas, and what is held is a
+  convenience and one safety device whose loss costs a repeated question.

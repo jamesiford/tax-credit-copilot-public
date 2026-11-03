@@ -17,10 +17,13 @@ from __future__ import annotations
 
 import asyncio
 import json
+import re
 from pathlib import Path
 
 import pytest
 
+from app.core.compose import allowed_for, facts_of
+from application.numeric_guard import FactIndex, check
 from orch_harness import OTHER_OID, USER_OID, FakeGateway, build_rig, identity
 
 GOLDEN = Path(__file__).parent / "golden"
@@ -54,6 +57,7 @@ async def play(case: dict) -> None:
     for tool, reply in case.get("overrides", {}).items():
         gateway.overrides[tool] = lambda _args, r=reply: (r["status"], {"error": r["error"]} if "error" in r else r["body"])
     gateway.narration_status = case.get("narration_status", 200)
+    said: list[str] = []
     rig = build_rig([], supports_tools=case.get("supports_tools", True), gateway=gateway,
                     env=case.get("env"), configured=case.get("configured", True))
     for number, turn in enumerate(case["turns"], 1):
@@ -85,3 +89,10 @@ async def play(case: dict) -> None:
             assert text in reply.text, f"missing {text!r} — {where}"
         for text in expect.get("absent", []):
             assert text not in reply.text, f"unexpected {text!r} — {where}"
+        said.append(turn["say"])
+        if reply.kind in ("answer", "commit") and reply.runs:
+            verdict = check(
+                re.sub(r"\*\*|\|", " ", "\n".join(l for l in reply.text.splitlines() if not l.startswith("_Source:"))),
+                facts=FactIndex.coerce(facts_of(reply.runs)), allowed_context=allowed_for(" ".join(said), reply.runs),
+            )
+            assert verdict.passed, f"a numeral nobody vouched for: {[v.numeral.text for v in verdict.violations]} — {where}"

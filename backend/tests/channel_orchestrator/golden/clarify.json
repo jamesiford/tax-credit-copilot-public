@@ -4,7 +4,7 @@
     "turns": [{
       "say": "Compare Cascade and Northwind for 2023",
       "model": [{"tools": [{"tool": "client_eligibility", "args": {"tax_year": 2023}}]}, {"text": "I need to know more first."}],
-      "expect": {"kind": "clarify", "gateway": ["client_resolve"], "contains": ["Which client do you mean?", "1. Cascade Retail Partners", "2. Northwind Care Systems", "Reply with the number."]}
+      "expect": {"kind": "clarify", "gateway": ["client_resolve"], "contains": ["Which client do you mean?", "1) Cascade Retail Partners", "2) Northwind Care Systems", "Reply with the number."]}
     }]
   },
   {
@@ -24,7 +24,7 @@
       {"say": "Compare Cascade and Northwind for 2023",
        "model": [{"tools": [{"tool": "client_eligibility", "args": {"tax_year": 2023}}]}, {"text": "I need to know more first."}],
        "expect": {"kind": "clarify"}},
-      {"say": "9", "expect": {"kind": "clarify", "gateway": [], "model_calls": 0, "contains": ["1. Cascade Retail Partners"]}}
+      {"say": "9", "expect": {"kind": "clarify", "gateway": [], "model_calls": 0, "contains": ["1) Cascade Retail Partners"]}}
     ]
   },
   {
@@ -32,7 +32,7 @@
     "turns": [{
       "say": "What is the credit for 2023?",
       "model": [{"tools": [{"tool": "client_eligibility", "args": {"tax_year": 2023}}]}, {"text": "I need to know more first."}],
-      "expect": {"kind": "clarify", "gateway": ["client_resolve"], "contains": ["Which client do you mean?", "1. Cascade Retail Partners"], "absent": ["$"]}
+      "expect": {"kind": "clarify", "gateway": ["client_resolve"], "contains": ["Which client do you mean?", "1) Cascade Retail Partners"], "absent": ["$"]}
     }]
   },
   {
