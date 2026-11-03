@@ -310,7 +310,7 @@ overlay (`*.auto.tfvars`, `infra/profiles/*.tfvars`, or `TF_VARS_JSON` in
 `enable_key_vault`, `api_worker_count`, `vnet_address_space`,
 `private_dns_zone_ids`, `fabric_capacity_sku`, `fabric_workspace_role`,
 `foundry_deployment_sku`, `foundry_capacity`, `ai_gateway_endpoint`,
-`channel_allowed_caller_app_ids`, `channel_allowed_ip_ranges`,
+`channel_allowed_caller_app_ids`, `channel_allowed_ip_ranges`, `channel_debug_whoami`,
 `outputs_retention_days`, `tags`.
 
 ### v1 azd values that no longer exist

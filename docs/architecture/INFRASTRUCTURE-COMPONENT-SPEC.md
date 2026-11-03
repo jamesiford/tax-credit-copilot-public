@@ -342,7 +342,9 @@ it accepts the gateway because the token carries the `TCC.Agent` role.
 
 Variables: `enable_m365_channel`, `channel_gateway_audience`,
 `channel_allowed_caller_app_ids`, `channel_writer_source`, `channel_writer_group_id`,
-`channel_allowed_ip_ranges`. Outputs: `CHANNEL_APP_NAME`, `CHANNEL_BASE_URL`,
+`channel_allowed_ip_ranges`, `channel_debug_whoami` (default `false`: sets
+`CHANNEL_DEBUG_WHOAMI=true`, which offers the `channel_ping` diagnostic for the identity
+spikes). Outputs: `CHANNEL_APP_NAME`, `CHANNEL_BASE_URL`,
 `GATEWAY_IDENTITY_NAME` (the T-SQL grant target), `GATEWAY_IDENTITY_PRINCIPAL_ID` (the
 object id the operator assigns the API's `TCC.Agent` role to), `GATEWAY_IDENTITY_CLIENT_ID`.
 Enabling the channel needs the API to validate tokens: set `auth_mode = "entra"` and

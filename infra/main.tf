@@ -252,6 +252,7 @@ module "channel" {
   writer_source                  = var.channel_writer_source
   writer_group_id                = var.channel_writer_group_id
   allowed_ip_ranges              = var.channel_allowed_ip_ranges
+  debug_whoami                   = var.channel_debug_whoami
   git_commit                     = var.git_commit
   app_insights_id                = module.monitoring.app_insights_id
   app_insights_connection_string = module.monitoring.app_insights_connection_string

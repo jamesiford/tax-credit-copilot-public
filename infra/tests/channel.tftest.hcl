@@ -365,3 +365,35 @@ run "public_entra_without_a_web_registration_is_as_it_was" {
     error_message = "without a web registration there is nothing to sign in against"
   }
 }
+
+# CH-13: the channel_ping diagnostic is off unless asked for.
+run "debug_whoami_is_off_by_default_and_one_variable_turns_it_on" {
+  command = apply
+  variables {
+    enable_m365_channel      = true
+    channel_gateway_audience = "api://00000000-0000-0000-0000-0000000000c1"
+    auth_mode                = "entra"
+    api_client_id            = "00000000-0000-0000-0000-0000000000a1"
+    channel_debug_whoami     = true
+  }
+
+  assert {
+    condition     = lookup(module.channel.settings, "CHANNEL_DEBUG_WHOAMI", "") == "true"
+    error_message = "channel_debug_whoami = true sets CHANNEL_DEBUG_WHOAMI"
+  }
+}
+
+run "debug_whoami_absent_when_not_asked_for" {
+  command = apply
+  variables {
+    enable_m365_channel      = true
+    channel_gateway_audience = "api://00000000-0000-0000-0000-0000000000c1"
+    auth_mode                = "entra"
+    api_client_id            = "00000000-0000-0000-0000-0000000000a1"
+  }
+
+  assert {
+    condition     = !contains(keys(module.channel.settings), "CHANNEL_DEBUG_WHOAMI")
+    error_message = "the diagnostic is not offered by default"
+  }
+}

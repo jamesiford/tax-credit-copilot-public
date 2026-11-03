@@ -250,7 +250,7 @@ CI, `TF_VARS_JSON`): `auth_mode`, `data_classification`, `create_fabric`,
 `vnet_address_space`, `private_dns_zone_ids`, `fabric_capacity_sku`,
 `fabric_workspace_role`, `foundry_deployment_sku`, `foundry_capacity`,
 `ai_gateway_endpoint`, `channel_allowed_caller_app_ids`,
-`channel_allowed_ip_ranges`, `foundry_allow_any_ip`, `outputs_retention_days`, `tags`. See
+`channel_allowed_ip_ranges`, `channel_debug_whoami`, `foundry_allow_any_ip`, `outputs_retention_days`, `tags`. See
 `infra/variables.tf` for each default.
 
 ### 3. Run it

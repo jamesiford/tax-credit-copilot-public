@@ -87,6 +87,12 @@ variable "allowed_ip_ranges" {
   type = list(string)
 }
 
+variable "debug_whoami" {
+  description = "CHANNEL_DEBUG_WHOAMI: offer the channel_ping diagnostic."
+  type        = bool
+  default     = false
+}
+
 variable "warehouse" {
   description = "The Warehouse the audit trail is written to (the same one the API uses)."
   type = object({
@@ -138,6 +144,7 @@ locals {
     length(var.allowed_caller_app_ids) > 0 ? { CHANNEL_ALLOWED_CALLER_APP_IDS = join(",", var.allowed_caller_app_ids) } : {},
     trimspace(var.writer_group_id) != "" ? { CHANNEL_WRITER_GROUP_ID = trimspace(var.writer_group_id) } : {},
     trimspace(var.git_commit) != "" ? { GIT_COMMIT = var.git_commit } : {},
+    var.debug_whoami ? { CHANNEL_DEBUG_WHOAMI = "true" } : {},
   )
 }
 
