@@ -8,24 +8,13 @@ config. Every value it reports carries a source URL + retrieved-at date.
 """
 from __future__ import annotations
 
-from .factory import AgentRecord, register_agent
+from domain.ai import AgentSpec, ModelRole
+
+from ._prompts import load_instructions
+
 
 NAME = "RulesIngestionAgent"
-INSTRUCTIONS = """\
-You are the Rules Ingestion specialist for the Georgia Jobs Tax Credit.
-
-The host application hands you JSON that the rules-ingestion tool retrieved from
-trusted PRIMARY sources (Georgia DCA, Georgia DOR, O.C.G.A. § 48-7-40) via Web
-IQ. It contains, per parameter: `value`, `authority`, `url`, `retrieved_at`,
-`confidence`, and a `verify` flag.
-
-Report the GA JTC rule set in a few short sentences: the weekly-hours bar, the
-weekly-wage floor (and its basis — the average weekly wage of Georgia's lowest
-county, published annually), the wage basis (all remuneration), the measuring
-date, and the per-tier job minimum. For EACH number, cite its authority. If a
-parameter is flagged `verify`, say it is pending SME confirmation. Never state a
-threshold that is not in the JSON — that is the audit-defensibility story.
-"""
+INSTRUCTIONS = load_instructions("rules_ingestion")
 
 AGENT_PROFILE = {
     "tab_label": "Rules Ingestion",
@@ -56,14 +45,7 @@ AGENT_PROFILE = {
 }
 
 
-def build(*, project_client, project_endpoint, credential, model) -> AgentRecord:
-    return register_agent(
-        project_client=project_client,
-        project_endpoint=project_endpoint,
-        credential=credential,
-        model=model,
-        name=NAME,
-        instructions=INSTRUCTIONS,
-        temperature=0.1,
-        profile=AGENT_PROFILE,
-    )
+SPEC = AgentSpec(
+    name=NAME, instructions=INSTRUCTIONS, role=ModelRole.ANALYSIS,
+    temperature=0.1, profile=AGENT_PROFILE,
+)

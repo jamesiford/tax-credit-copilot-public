@@ -1,17 +1,13 @@
 """HeadcountAgent — narrates pre-computed statutory Average Monthly Headcount."""
 from __future__ import annotations
 
-from .factory import AgentRecord, register_agent
+from domain.ai import AgentSpec, ModelRole
+
+from ._prompts import load_instructions
+
 
 NAME = "HeadcountAgent"
-INSTRUCTIONS = """\
-You are the Headcount specialist for the Tax Credit Copilot.
-
-The host application will hand you JSON with `state`, `average_headcount`,
-`prior_period_average_headcount`, and `qualifying_jobs`. In ONE short sentence,
-report the current vs prior-year Average Monthly Headcount and the net-new
-qualifying jobs in plain language. Use the exact numbers; never invent.
-"""
+INSTRUCTIONS = load_instructions("headcount")
 
 AGENT_PROFILE = {
     "tab_label": "Headcount Calc",
@@ -35,14 +31,7 @@ AGENT_PROFILE = {
 }
 
 
-def build(*, project_client, project_endpoint, credential, model) -> AgentRecord:
-    return register_agent(
-        project_client=project_client,
-        project_endpoint=project_endpoint,
-        credential=credential,
-        model=model,
-        name=NAME,
-        instructions=INSTRUCTIONS,
-        temperature=0.2,
-        profile=AGENT_PROFILE,
-    )
+SPEC = AgentSpec(
+    name=NAME, instructions=INSTRUCTIONS, role=ModelRole.NARRATOR,
+    temperature=0.2, profile=AGENT_PROFILE,
+)
