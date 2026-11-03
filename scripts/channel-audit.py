@@ -1,6 +1,6 @@
 """Print one user's channel audit timeline. [CH-03]
 
-    python scripts/channel-audit.py --user <oid|name> [--since 2026-11-01] [--until ...] [--tool <name>] [--limit 200]
+    python scripts/channel-audit.py --user <oid|name> [--since 2026-11-01] [--until ...] [--tool <name>] [--limit 200] [--detail]
 
 Reads whichever store `CHANNEL_STORE` selects (SQLite locally, the Warehouse when
 deployed). `--user` is an Entra object id; a name is resolved against the writer
@@ -55,6 +55,22 @@ def render_timeline(entries: list[dict]) -> str:
     return "\n".join(lines)
 
 
+def render_detail(entries: list) -> str:
+    """The same timeline with what the platform recorded about WHO asked and by what channel."""
+    if not entries:
+        return "(no channel activity)"
+    lines = []
+    for entry in entries:
+        e = entry.last
+        who = f"{e.user_oid} ({e.user_display_name or '(name not provided)'})"
+        lines.append(
+            f"{entry.begun_at.isoformat()}  {entry.outcome:<10} {e.action_kind:<13} {e.tool_name:<22} "
+            f"channel={e.channel} user={who} assurance={e.identity_assurance} guard={e.numeric_guard} "
+            f"correlation={e.correlation_id}"
+        )
+    return "\n".join(lines)
+
+
 def main(argv: list[str] | None = None, *, repository=None, writers=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--user", required=True)
@@ -62,6 +78,7 @@ def main(argv: list[str] | None = None, *, repository=None, writers=None) -> int
     parser.add_argument("--until")
     parser.add_argument("--tool")
     parser.add_argument("--limit", type=int, default=200)
+    parser.add_argument("--detail", action="store_true", help="also show channel, display name, assurance, guard and correlation id")
     args = parser.parse_args(argv)
 
     common.load_env()
@@ -80,7 +97,8 @@ def main(argv: list[str] | None = None, *, repository=None, writers=None) -> int
         return common.EXIT_USAGE
 
     events = repository.for_user(oid, since=since, until=until, tool=args.tool, limit=args.limit)
-    print(render_timeline([e.to_dict() for e in collapse(events)]))
+    entries = collapse(events)
+    print(render_detail(entries) if args.detail else render_timeline([e.to_dict() for e in entries]))
     return common.EXIT_OK
 
 

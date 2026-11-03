@@ -65,7 +65,7 @@ param(
     [string]$OutputDir = (Join-Path (Get-Location) 'publish-output'),
     [switch]$ConfirmTenantPublish,
     [string]$SubscriptionId = '',
-    [string]$DeveloperName = 'Tax Credit Copilot (proof of concept)',
+    [string]$DeveloperName = 'Tax Credit Copilot (PoC)',
     [string]$DeveloperWebsiteUrl = 'https://github.com/jamesiford/tax-credit-copilot-public',
     [string]$PrivacyUrl = 'https://github.com/jamesiford/tax-credit-copilot-public/blob/main/SECURITY.md',
     [string]$TermsOfUseUrl = 'https://github.com/jamesiford/tax-credit-copilot-public/blob/main/DISCLAIMER.md'

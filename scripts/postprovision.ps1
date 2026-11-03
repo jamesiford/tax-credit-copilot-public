@@ -11,8 +11,12 @@
                              still refuses the bootstrap if the Warehouse
                              already has tcc_ops.schema_migration, so a re-run
                              applies nothing.
-      2. load-synthetic      public profile only: the synthetic source dataset
-                             into the new Lakehouse (data.source.load_fabric).
+      2. load-synthetic      public profile only, and only when Terraform created
+                             this Lakehouse (TCC_FABRIC_CREATED=true): the synthetic
+                             source dataset into the new Lakehouse
+                             (data.source.load_fabric). `--synthetic-only` OVERWRITES
+                             every table it writes, so it never runs against a
+                             brought (existing) Lakehouse, whatever the profile.
       3. grant-warehouse-sql T-SQL grants on tcc_gold / tcc_ops to the API identity; when
                              the channel is enabled (GATEWAY_IDENTITY_NAME is set), also
                              INSERT/SELECT on tcc_ops.channel_audit to the gateway
@@ -53,7 +57,7 @@ Invoke-Step 'apply-migrations' {
     }
 }
 
-if ($env:TCC_PROFILE -eq 'public') {
+if ($env:TCC_PROFILE -eq 'public' -and $created) {
     Invoke-Step 'load-synthetic' {
         Push-Location (Join-Path $repoRoot 'backend')
         try {

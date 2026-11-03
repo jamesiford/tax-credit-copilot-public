@@ -350,7 +350,7 @@ run "the_mock_module_is_one_locked_down_poc_app_when_enabled" {
   }
 
   assert {
-    condition     = azurerm_linux_web_app.this[0].app_settings["MOCK_AUTH"] == "api_key" && azurerm_linux_web_app.this[0].app_settings["WEBSITES_PORT"] == "8089"
+    condition     = azurerm_linux_web_app.this[0].app_settings["MOCK_AUTH"] == "api_key" && azurerm_linux_web_app.this[0].app_settings["WEBSITES_PORT"] == "8000"
     error_message = "the mock reads its auth scheme and port from settings"
   }
 

@@ -332,3 +332,68 @@ run "enterprise_with_the_channel_off_is_unchanged" {
     error_message = "the enterprise posture is as it was: Easy Auth on, Entra, an API that admits one subnet"
   }
 }
+
+# CH-13: the public profile with Entra tokens puts Easy Auth on the web app when a web
+# registration is given, and only then.
+run "public_entra_with_a_web_registration_enables_easy_auth" {
+  command = apply
+  variables {
+    enable_m365_channel      = true
+    channel_gateway_audience = "api://00000000-0000-0000-0000-0000000000c1"
+    auth_mode                = "entra"
+    api_client_id            = "00000000-0000-0000-0000-0000000000a1"
+    web_client_id            = "00000000-0000-0000-0000-000000000001"
+  }
+
+  assert {
+    condition     = output.easy_auth_enabled && output.AUTH_MODE == "entra"
+    error_message = "a public deployment with a web registration and Entra tokens signs the user in at the web app"
+  }
+}
+
+run "public_entra_without_a_web_registration_is_as_it_was" {
+  command = apply
+  variables {
+    enable_m365_channel      = true
+    channel_gateway_audience = "api://00000000-0000-0000-0000-0000000000c1"
+    auth_mode                = "entra"
+    api_client_id            = "00000000-0000-0000-0000-0000000000a1"
+  }
+
+  assert {
+    condition     = !output.easy_auth_enabled
+    error_message = "without a web registration there is nothing to sign in against"
+  }
+}
+
+# CH-13: the channel_ping diagnostic is off unless asked for.
+run "debug_whoami_is_off_by_default_and_one_variable_turns_it_on" {
+  command = apply
+  variables {
+    enable_m365_channel      = true
+    channel_gateway_audience = "api://00000000-0000-0000-0000-0000000000c1"
+    auth_mode                = "entra"
+    api_client_id            = "00000000-0000-0000-0000-0000000000a1"
+    channel_debug_whoami     = true
+  }
+
+  assert {
+    condition     = lookup(module.channel.settings, "CHANNEL_DEBUG_WHOAMI", "") == "true"
+    error_message = "channel_debug_whoami = true sets CHANNEL_DEBUG_WHOAMI"
+  }
+}
+
+run "debug_whoami_absent_when_not_asked_for" {
+  command = apply
+  variables {
+    enable_m365_channel      = true
+    channel_gateway_audience = "api://00000000-0000-0000-0000-0000000000c1"
+    auth_mode                = "entra"
+    api_client_id            = "00000000-0000-0000-0000-0000000000a1"
+  }
+
+  assert {
+    condition     = !contains(keys(module.channel.settings), "CHANNEL_DEBUG_WHOAMI")
+    error_message = "the diagnostic is not offered by default"
+  }
+}

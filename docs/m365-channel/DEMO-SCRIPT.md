@@ -25,6 +25,13 @@ off it. If they differ, that is a defect to report, not a rounding to explain.
    a step it is told to run. A wrong figure is *caught if the author checks*.
 3. **Everything here is synthetic data**, and the demo posture leaves the gateway and the Foundry data plane
    reachable from the internet (authenticated). That is acceptable only because there is no real data.
+4. **Data handling in the sandbox.** The PoC reads an existing Fabric workspace that holds the five synthetic named
+   clients and the reference dataset (shown in the app as "Reference Dataset Client", 10,236 employees). The owner's
+   statement is that no personal data is housed there: employee identifiers are pseudonymous tokens, with no names,
+   SSNs, emails or free text. That was checked read-only before the deployment (column names, row counts and the shape
+   of a few values; nothing copied): no personal names, emails or phone numbers exist, and the tax-identifier and address
+   columns hold obvious placeholder business values. The deployment is therefore classified `synthetic`. Do not point it
+   at real payroll without the hardening plan.
 
 ## Before you start
 
@@ -226,3 +233,29 @@ Run it once per surface. Tick, date and initial each line; record a failure with
 
 Anything that fails is recorded in [STATUS.md](STATUS.md) under Blockers with the prompt, the reply and the
 correlation id from the error body ([RUNBOOK §13](../architecture/RUNBOOK.md)).
+
+## Appendix: the live sandbox, what only a person can do
+
+Placeholders only here; the filled-in copy is the private deploy notes. Everything the automation could check
+(gateway REST and MCP, the per-user audit, the writes, the certified figures) is in
+[evidence/live-smoke-2026-11-03.md](evidence/live-smoke-2026-11-03.md). What follows needs a person in Teams or
+Copilot, because nothing can send a message on a person's behalf.
+
+1. **S2 / S1: Teams.** Open `<share link>`, add the agent, send `/whoami`. Expect: your object id (`<operator oid>`),
+   a display name, assurance `channel-asserted`, and the source named. Paste the reply into the private notes. Then run
+   `pwsh scripts/channel-smoke.ps1 -Since '<time just before you typed>'` and confirm the audit row shows the same id.
+   If `/whoami` says it cannot tell who you are, that is the finding (see ORCHESTRATOR.md, `CHANNEL_IDENTITY_SOURCES`).
+   If the share link does not open the agent, sideload the package azd generated (`channel_orchestrator/appPackage.zip`
+   on the deploying machine, ignored by git): Teams, Apps, Manage your apps, Upload a custom app.
+2. **Copilot Chat.** Find the agent under *Your agents*; run the three demo prompts (book, client brief, what-if).
+   Compare the figures with the portal. Replies carry no model commentary in this sandbox: see the limitation about
+   the hosted agent's model path; the figures and the disclaimer are the engine's.
+3. **Write flow.** "Move `<client>` TY`<year>` to proposed", read the preview, reply `confirm`. Check the row in the portal
+   and the preview and commit pair in the audit. Try the same as a non-writer account if you have one.
+4. **Guard.** Run `/whoami` after a few turns and confirm narration-audit rows exist when a model took part (it does not
+   in this sandbox, so expect none). There is no flag that forces a bad narration; skip the blocks-only check.
+5. **Cowork (S5).** Register the OAuth client in the Teams Developer Portal for the gateway scope
+   ([COWORK-SETUP](COWORK-SETUP.md)), put its registration id in `overlays/<name>/cowork.config.json`, rebuild with
+   `python scripts/build-cowork-plugin.py --config overlays/<name>/cowork.config.json --strict`, install through
+   *Shared with me*, run W1 and W2, then show the per-user audit.
+6. Report back anything that differs from these documents.

@@ -4,7 +4,10 @@ Customer-neutral. This file is the only memory a resumed session has; keep it
 truthful. Decisions live in [DECISIONS.md](DECISIONS.md).
 
 Integration branch: `jamesiford-m365-capability-layer` (see D-01 — this session
-runs in a worktree, so `feat/m365-channel` is held by the main checkout).
+runs in a worktree, so `feat/m365-channel` is held by the main checkout). Prompt 6 (CH-13)
+ran on `jamesiford-m365-channel-live-deploy`, fast-forwarded to the tip of `feat/m365-channel` first (D-95).
+
+**Blocked-soft work packages from Prompts 1–5: none.** AI-05 (conversation continuity) remains the deliberate stretch deferral (D-60); nothing deployed depends on it.
 
 ## Work packages
 
@@ -34,6 +37,7 @@ runs in a worktree, so `feat/m365-channel` is held by the main checkout).
 | CH-11 | End-to-end workflow and exactness tests | done | `wp/CH-11-workflow-tests` | merge `f33ffa4` |
 | CH-12 | Documentation, ADR-009, runbook, demo script | done | `wp/CH-12-documentation` | merge `b470494` |
 | CH-12b | Demo network posture toggle and hardening plan | done | `wp/CH-12b-demo-posture` | merge `0bda7b9` |
+| CH-13 | Live deployment, spikes, smoke tests and hand-off (Prompt 6) | done with open items (see Blockers) | `wp/CH-13-live-deploy` | merge: see the CH-13 evidence below |
 
 ## Evidence
 
@@ -267,6 +271,31 @@ and its `discovery` / `multi_state` scans read the configured default tenant.
 
 - Full backend suite: **2765 passed**, 136 skipped, 1 xfailed (no Python changed). `scripts/check-links.py` 80 files, 0 broken; whitelabel 0 enforced; audit-export 0; `gitleaks git` clean.
 - Written: `docs/m365-channel/README.md` (architecture, who can do what, the two data flows as Mermaid, the audit model, orchestrator versus Cowork), `DEMO-SCRIPT.md` (Teams, Copilot Chat, Cowork, the per-user audit, an 18-line manual checklist; synthetic clients only), `KNOWN-LIMITATIONS.md`; `docs/architecture/ADR-009-m365-channel.md`; ADR-008 finalised as built (`verify_figures`, the provenance line, two limits found by CH-11); RUNBOOK §13.6-13.9 (writers, paused capacity, a failed publish, a guard-rejection spike); SECURITY.md Cowork row; TARGET-ARCHITECTURE gap analysis; root README "Channels"; `docs/README.md` links; COWORK-SETUP forward links resolved. Order of CH-12 and CH-12b: D-94.
-## Blockers
+### CH-13 (live deployment, Prompt 6)
 
-_None._
+- Backend suite: **2767 passed**, 136 skipped, 1 xfailed (CH-12: 2765; two new tests in `test_postprovision_guards.py`; one test narrowed, see D-96). No skip or xfail added; parity pins untouched; the synthetic parity gate is green. Terraform: `fmt -check`, `validate`, `tflint` clean, `terraform test` **61 passed** (57 at CH-12b; four new, one assertion updated for the mock's port) with the local overlay moved aside. Whitelabel 0 enforced; audit-export 0; `gitleaks git` no leaks; links 0 broken; a search of tracked files for every real identifier used in this run found none.
+- Deployed to the sandbox (public profile, synthetic classification, channel on, `AUTH_MODE=entra`, existing Fabric workspace reused, not created). `azd up`: 46 resources; migrations 0001 and 0002 applied, **0 pending afterwards**; `terraform plan` (via `azd provision --preview`): **No changes**. Web 302 to sign-in; direct API 403; gateway `/channel/health` 200, `/channel/ready` ready, `/channel/v1/tools` 401 without a token.
+- Certified figures on the deployed Warehouse via `backend/tools/check_certified_live.py`: **10,236 / 539 / 656, reproduce**.
+- Live smoke ([evidence/live-smoke-2026-11-03.md](evidence/live-smoke-2026-11-03.md)): **44 passed, 0 failed** across three runs (41 main + 2 non-writer + 1 limits), plus an honest SKIP each for `finding_resolve` and the 429. Facts from the gateway were identical to the in-process engine over the same Warehouse for every read tool on two clients. Audit: 659 rows, all `cowork`/`delegated`, no payroll content.
+- Entra: web redirect URI and federated credential; `TCC.Agent` to the gateway identity; `Channel.Invoke` to the agent identity; Graph `GroupMember.Read.All` to the gateway and API identities. No admin action is outstanding.
+- Hosted agent: deployed with `azd ai agent` (active version 7, selector `@latest`), published with scope `Shared`; the endpoint reads `activity` and `responses` with a Bot Service scheme. **Nothing was sent from Teams.**
+- Scripts added: `assign-channel-roles.ps1`, `channel-live-smoke.py`, `channel-smoke.ps1`, `poc-pause.ps1`; `channel-audit.py --detail`; `OPERATIONS.md`.
+
+| Spike | Question | Outcome |
+| --- | --- | --- |
+| S1 | What identity signal does a Teams message carry? | **Needs a person** (checklist item 1) |
+| S2 | Does the sender's display name arrive? | **Needs a person** (same message) |
+| S3 | Can the hosted agent reach the gateway, and by which rule? | **Answered**: yes; authorised by the `Channel.Invoke` role; egress is the public internet. A direct call carries no identity (nothing runs), and `x-ms-user-identity` is refused unless delegation is authorised |
+| S4 | Does `azd ai agent` accept the orchestrator project? | **Answered**: after the schema fix (D-99), and it creates the Bot resource too |
+| S5 | Cowork end to end | **Needs a person** (OAuth client registration, install, W1 and W2) |
+| S6 | Can the hosted agent reach the Foundry model endpoint? | **Answered: no** (connect fails); the orchestrator degrades to engine-only answers. The firewall also had to be opened (D-98) |
+
+### CH-13 merge
+
+Merged `--no-ff` into the session integration branch; the merge SHA is the first line of `git log` for this file's commit.
+
+1. **Spikes S1, S2 and S5 need people.** Nothing can send a Teams message or sign into Cowork. The manual checklist is the appendix of [DEMO-SCRIPT](DEMO-SCRIPT.md); `scripts/channel-smoke.ps1 -Since <time>` prints what the platform received.
+2. **The hosted agent cannot reach the Foundry model endpoint** (spike S6, open). Replies are the engine's own, without commentary. See KNOWN-LIMITATIONS, "Found in the live sandbox".
+3. **A group-only writer is refused by the API** until its Graph token cache turns over (about a day after 3 Nov 2026); the operator is on the allow-list as well. Not an admin action: every role this prompt allowed was granted.
+4. **The live external model gateway test is pending the customer's real endpoint.** The mock was deployed and checked from inside the network; the API's narration through it, the forced fallbacks in both orders, the `api_key` and `oauth_client_credentials` modes, and the spans in Application Insights were **not** exercised live (the API is reachable only through the signed-in portal). See CH-13 evidence.
+5. `finding_resolve` was not exercised live (no open finding exists); the 429 rate limit was not reachable live (proven offline).

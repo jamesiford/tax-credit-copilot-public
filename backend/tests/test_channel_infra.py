@@ -131,10 +131,17 @@ def test_every_new_terraform_variable_is_off_or_empty_by_default():
         assert block and re.search(rf"default\s*=\s*{re.escape(default)}", block.group(1)), name
 
 
-def test_the_api_gets_no_new_setting_for_the_channel():
+def test_the_api_gets_only_the_writer_settings_for_the_channel_and_only_with_it_on():
+    """The API enforces the writer entitlement itself, so it reads the gateway's two writer settings. [CH-13]
+
+    Found live: with the gateway on `either` and the API left on its `allowlist` default, a group-only
+    writer passed the gateway and was refused by the API. Nothing else of the channel reaches the API.
+    """
     main = read("infra", "main.tf")
     api_settings = main[main.index("api_app_settings"): main.index("web_app_settings")]
-    assert "CHANNEL" not in api_settings and "TCC.Agent" not in api_settings
+    assert set(re.findall(r"CHANNEL_[A-Z_]+", api_settings)) == {"CHANNEL_WRITER_SOURCE", "CHANNEL_WRITER_GROUP_ID"}
+    assert "TCC.Agent" not in api_settings
+    assert api_settings.index("var.enable_m365_channel") < api_settings.index("CHANNEL_WRITER_SOURCE")
 
 
 # ------------------------------------------------------------------ the docs

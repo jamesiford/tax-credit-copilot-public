@@ -527,6 +527,12 @@ variable "channel_allowed_ip_ranges" {
   default     = []
 }
 
+variable "channel_debug_whoami" {
+  description = "Turn on the gateway's diagnostic tool channel_ping (CHANNEL_DEBUG_WHOAMI). Demo and identity spikes only: it echoes the acting-user headers as received. Never a token."
+  type        = bool
+  default     = false
+}
+
 # --- mock AI gateway (proof of concept only) --------------------------------------
 
 variable "enable_mock_ai_gateway" {

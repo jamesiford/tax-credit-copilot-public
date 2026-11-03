@@ -75,7 +75,7 @@ resource "azurerm_linux_web_app" "this" {
 
   site_config {
     always_on                         = true
-    app_command_line                  = "python -m uvicorn mock_ai_gateway:app --host 0.0.0.0 --port 8089"
+    app_command_line                  = "python -m uvicorn mock_ai_gateway:app --host 0.0.0.0 --port 8000"
     health_check_path                 = "/healthz"
     health_check_eviction_time_in_min = 10
     ftps_state                        = "Disabled"
@@ -100,7 +100,7 @@ resource "azurerm_linux_web_app" "this" {
   app_settings = {
     MOCK_AUTH                      = var.mock_auth
     MOCK_ENTRA_AUDIENCE            = var.entra_audience
-    WEBSITES_PORT                  = "8089"
+    WEBSITES_PORT                  = "8000"
     SCM_DO_BUILD_DURING_DEPLOYMENT = "true"
   }
 }

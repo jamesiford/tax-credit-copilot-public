@@ -1144,3 +1144,64 @@ One short entry per decision: context, choice, why.
 - **Two limits found by the end-to-end tests are documented as limits, not fixed** (D-89 and the value-matching guard): the
   figure guard compares values, and `client_resolve` asks even for one exact name. Both are in KNOWN-LIMITATIONS and the
   demo script tells the presenter what the resolver will do.
+
+## D-95 CH-13: integration branch, Python, resource group
+
+- **Context.** `feat/m365-channel` is checked out in the owner's main checkout, so this prompt ran in a linked worktree
+  on a session branch that started at the initial public commit.
+- **Choice.** The session branch was fast-forwarded to the tip of `feat/m365-channel` (no history rewritten, nothing
+  lost) and treated as the integration branch; `wp/CH-13-live-deploy` is cut from it. The fast-forward of
+  `feat/m365-channel` itself is left to the owner. Python 3.12 is not installed here; the `.venv` uses 3.14 (the
+  backend suite and all scripts ran on it; the deployed apps run 3.12 and the hosted agent 3.13).
+- **The resource group is created by Terraform, tagged through the `tags` variable**, not pre-created with `az`: the
+  provider declares the group and an existing one must be imported first. Tags are `purpose=m365-channel-poc` and
+  `owner=<operator>`.
+
+## D-96 CH-13: three things changed in code because the live run needed them
+
+- **Easy Auth on the public profile (locals.tf).** The public profile with `auth_mode = entra` (which the channel
+  needs) left the web app without Easy Auth, so the BFF forwarded no token and the portal could not call the API. It is now
+  enabled for that combination **only when `web_client_id` is given**; every other combination is unchanged (two tests).
+- **`postprovision` never runs the synthetic load against a brought Lakehouse.** `load_fabric --synthetic-only`
+  overwrites every table it writes and drops the reference client. The step runs only when Terraform created the
+  Lakehouse (`TCC_FABRIC_CREATED=true`). This is a data-loss guard on the owner's workspace, not a convenience.
+- **The API reads `CHANNEL_WRITER_SOURCE` and the group id (main.tf).** It enforces the writer entitlement itself. The
+  existing test that said the API gets no channel setting was narrowed to exactly these two settings, and only with the
+  channel on. Also: `channel_debug_whoami` (default off) so the `channel_ping` diagnostic is a Terraform setting, and the
+  mock model gateway listens on port 8000 (the platform's probe), with its one test updated.
+
+## D-97 CH-13: the Fabric target was reused, and what was and was not touched
+
+- **Reused, not created:** the existing workspace, lakehouse and warehouse (ids verified against the Fabric API before
+  any write; the guard passed). The warehouse already held the v2.0 schema, so only pending migrations 0001 and 0002 ran;
+  the destructive bootstrap never did. The T-SQL grants and the idempotent seed ran; the seed wrote nothing.
+- **Workspace roles added, both for this deployment's own identities:** the API identity (Terraform, `Contributor`) and
+  the gateway identity (`Viewer`, added through the Fabric API: it connects, and its object-level `INSERT, SELECT` on
+  `tcc_ops.channel_audit` is what writes the audit). Nothing else on the workspace was changed. The shared capacity was
+  checked (Active) and not touched.
+- **Data check, read-only:** column names, row counts and the shape of a few values were inspected before any write; no
+  personal names, emails or phone numbers, and the tax-identifier and address columns hold placeholder business values.
+  Nothing was copied into logs or notes. Classification `synthetic` stands.
+
+## D-98 CH-13: the Foundry firewall is open to any address in the demo
+
+- **Context.** The brief asked for the data plane to be reachable from the operator's address and nowhere else. The
+  hosted agent's own runtime calls the project (storage, history) from addresses nobody can list, and with the firewall
+  narrowed to one address those calls were refused (403), so the agent could not answer at all.
+- **Choice.** `TCC_FOUNDRY_ALLOWED_IP_RANGES` was emptied: public, Entra-only, local keys off, synthetic data. This is the
+  setting the repo's own demo toggle provides; nothing new was added. It is documented in KNOWN-LIMITATIONS and must be
+  closed (OPERATIONS.md, "Turning the demo posture off") before any real data.
+- **What it did not fix:** the agent's call to the account's model endpoint still fails at connect. The orchestrator
+  degrades by design to the engine's own answer without commentary. Left open as spike S6.
+
+## D-99 CH-13: how the agent was deployed and published
+
+- `azd ai agent` needed a different `azure.yaml` shape than the one written offline (`entryPoint` is a string; the
+  project, protocols and Bot Service scheme are declared); the file was rewritten from what the tool itself generates.
+  It also created the Azure Bot resource, which `publish-m365.ps1` then reused. The script's default developer name was
+  38 characters; the platform's cap is 32, so the default is now `Tax Credit Copilot (PoC)`.
+- Scope was `Shared`. `Tenant` was never used. The agent's identity holds `Channel.Invoke` on the gateway and the
+  Foundry User role on the account; the client-headers identity source was switched on only to prove the agent reaches the
+  gateway (spike S3) and switched off again before publishing.
+- Files `azd ai agent` generates carry the bot id; they are gitignored and were removed from the one unmerged commit that
+  first included them.
