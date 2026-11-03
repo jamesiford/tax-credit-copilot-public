@@ -32,7 +32,7 @@ runs in a worktree, so `feat/m365-channel` is held by the main checkout).
 | CH-09 | `scripts/publish-m365.ps1` | done | `wp/CH-09-publish-m365` | merge `3285ade` |
 | CH-10 | Cowork plugin (`channels/cowork/`), builder and offline validator | done | `wp/CH-10-cowork-plugin` | merge `e93ed3d` |
 | CH-11 | End-to-end workflow and exactness tests | done | `wp/CH-11-workflow-tests` | merge `f33ffa4` |
-| CH-12 | Documentation, ADR-009, runbook, demo script | done | `wp/CH-12-documentation` | merge `PENDING` |
+| CH-12 | Documentation, ADR-009, runbook, demo script | done | `wp/CH-12-documentation` | merge `b470494` |
 | CH-12b | Demo network posture toggle and hardening plan | done | `wp/CH-12b-demo-posture` | merge `0bda7b9` |
 
 ## Evidence
@@ -248,7 +248,7 @@ and its `discovery` / `multi_state` scans read the configured default tenant.
 ### CH-10 (merged `e93ed3d`)
 
 - Full backend suite: **2686 passed**, 136 skipped, 1 xfailed (CH-09: 2615 passed). New: `tests/channel/test_cowork_package.py` (67) and `tests/channel/test_gw_render.py` (4). No skip or xfail added; parity pins untouched; `infra/` untouched.
-- `python scripts/build-cowork-plugin.py --config channels/cowork/config.example.json`: builds offline, 13 files, reproducible (two builds, same bytes). Placeholder-config SHA-256 `972fd949ccaed5a6fe996f58be4856c3577909bfee9d0c44c5ace816583ef663` (app id from the default seed); `--strict` refuses it with exit 1. The manifest also validates (0 errors) against the published 1.29 JSON schema; `atk package` 1.1.14 builds the tree in a throwaway Agents Toolkit project. `wiqd` was not installed and `atk validate` needs sign-in (D-87).
+- `python scripts/build-cowork-plugin.py --config channels/cowork/config.example.json`: builds offline, 13 files, reproducible (two builds, same bytes). Placeholder-config SHA-256 at merge `972fd949ccaed5a6fe996f58be4856c3577909bfee9d0c44c5ace816583ef663`; after CH-11 reworded two skill steps (the `client_resolve` confirmation) it is `da3a96072bf5464a6971ac4de158da9166de92954ce4fac7e17d611bfdea73e6` (app id from the default seed); `--strict` refuses it with exit 1. The manifest also validates (0 errors) against the published 1.29 JSON schema; `atk package` 1.1.14 builds the tree in a throwaway Agents Toolkit project. `wiqd` was not installed and `atk validate` needs sign-in (D-87).
 - Gateway change (D-88): the MCP text carries a `Provenance:` line so a footer is copied, not invented.
 - Whitelabel 0 enforced; audit-export 0; `gitleaks git` clean; links 0 broken.
 ### CH-11 (merged `f33ffa4`)
@@ -263,6 +263,10 @@ and its `discovery` / `multi_state` scans read the configured default tenant.
 - `foundry_public_network_access` (default `false`), `foundry_allowed_ip_ranges` and `foundry_allow_any_ip`; azd values `TCC_FOUNDRY_PUBLIC_NETWORK_ACCESS` and `TCC_FOUNDRY_ALLOWED_IP_RANGES`. Default: the account body is byte for byte what it was (asserted through the module's `network_settings` output) and the check resource has `count` 0, so the default plan gains nothing. On: only `publicNetworkAccess` and `networkAcls` differ, local auth stays off, the private endpoint stays; output `network_posture` and a plan warning. Refused: enterprise, customer data, a malformed or `/31` range, any `/0` without the second switch, ranges without the toggle (D-93).
 - Docs: `docs/architecture/HARDENING-PLAN.md`, `docs/m365-channel/HARDENING-SPIKE.md` (spike S6, runnable), `SECURITY.md` posture row, CONNECTIVITY-MATRIX §4a, DEPLOYMENT-HANDOVER and ENV-VARS rows, RUNBOOK §13.5, `docs/README.md`. **D-78 is corrected** (D-92) in DECISIONS and ORCHESTRATOR.md: the "standard agent setup" is the classic path; the hosted-agent path is per the documentation, unproven until S6; Cosmos DB is ruled out.
 - Whitelabel 0 enforced; audit-export 0; `gitleaks git` clean. No Azure resource was created or changed.
+### CH-12 (merged `b470494`)
+
+- Full backend suite: **2765 passed**, 136 skipped, 1 xfailed (no Python changed). `scripts/check-links.py` 80 files, 0 broken; whitelabel 0 enforced; audit-export 0; `gitleaks git` clean.
+- Written: `docs/m365-channel/README.md` (architecture, who can do what, the two data flows as Mermaid, the audit model, orchestrator versus Cowork), `DEMO-SCRIPT.md` (Teams, Copilot Chat, Cowork, the per-user audit, an 18-line manual checklist; synthetic clients only), `KNOWN-LIMITATIONS.md`; `docs/architecture/ADR-009-m365-channel.md`; ADR-008 finalised as built (`verify_figures`, the provenance line, two limits found by CH-11); RUNBOOK §13.6-13.9 (writers, paused capacity, a failed publish, a guard-rejection spike); SECURITY.md Cowork row; TARGET-ARCHITECTURE gap analysis; root README "Channels"; `docs/README.md` links; COWORK-SETUP forward links resolved. Order of CH-12 and CH-12b: D-94.
 ## Blockers
 
 _None._
