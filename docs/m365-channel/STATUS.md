@@ -38,7 +38,7 @@ ran on `jamesiford-m365-channel-live-deploy`, fast-forwarded to the tip of `feat
 | CH-12 | Documentation, ADR-009, runbook, demo script | done | `wp/CH-12-documentation` | merge `b470494` |
 | CH-12b | Demo network posture toggle and hardening plan | done | `wp/CH-12b-demo-posture` | merge `0bda7b9` |
 | CH-13 | Live deployment, spikes, smoke tests and hand-off (Prompt 6) | done with open items (see Blockers) | `wp/CH-13-live-deploy` | merge `fec797d` |
-| CH-14 | Hosted-agent model access (M-01), the silent Teams chat, claim_not_found, deploy health wait, live AI checks (Prompt 7) | done with open items (Teams proof is the owner's; see Blockers) | `wp/CH-14-model-access` | merge `PENDING` |
+| CH-14 | Hosted-agent model access (M-01), the silent Teams chat, claim_not_found, deploy health wait, live AI checks (Prompt 7) | done with open items (Teams proof is the owner's; see Blockers) | `wp/CH-14-model-access` | merge `b8ce56e` |
 
 ## Evidence
 
