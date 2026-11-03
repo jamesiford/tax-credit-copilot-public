@@ -3,25 +3,19 @@
 Why this exists at all, given that a router could simply call a function:
 
 **Commands and queries are different, and the difference is worth enforcing.**
-A query computes and returns; a command changes what the business believes.
-Recording that a client claims a credit for a tax year is a decision that lands
-on a filed return, and it needs an actor, a timestamp and the rule versions it
-was made under. A query needs none of those. Separating them at the type level
-means the write path cannot quietly acquire a read's casualness.
+A query computes and returns; a command changes what the business believes, and
+needs an actor, a timestamp and the rule versions it was made under. Separating
+them at the type level means the write path cannot quietly acquire a read's
+casualness.
 
-**Cross-cutting concerns get one home.** Timing, logging, tenant checks and the
-audit trail are the same on every write. Without a pipeline they are copied into
-every handler, which is where they drift and eventually get forgotten in the one
-place it mattered.
-
-**Routers stop being a place where logic hides.** A router that calls
-`mediator.send(...)` and serialises the result cannot accumulate business rules
-by accident, and business rules in routers is how the same statutory quantity
-ended up with three implementations that disagreed.
+**Cross-cutting concerns get one home.** Timing, logging, authorization and the
+audit trail are the same on every write; copied into handlers they drift and get
+forgotten in the one place it mattered. **Routers stop being a place where logic
+hides:** a router that calls `mediator.send(...)` cannot accumulate business
+rules by accident.
 
 Deliberately not a framework. No auto-discovery, no decorators, no container —
-those hide the wiring, and the wiring is what a new engineer needs to read
-first. Registration is explicit and lives in one file.
+registration is explicit and lives in one file (`application/wiring.py`).
 
     result = mediator.send(GetProximityQuery(tax_year=2023, state="GA"))
 
@@ -31,20 +25,15 @@ THE PIPELINE, AND WHAT IS NOT IN IT
 A command runs Authorization -> Validation -> Handler -> Audit, and every
 dispatch is timed.
 
-* **Authorization** is real as of the Microsoft 365 channel (CH-04). A command
-  class may declare `policy = Policy.WRITER`; the stage asks the configured
-  authorizer whether the caller's PERSON — for the channel gateway, the user it
-  acts for — is entitled. A command that declares a policy on a mediator with no
-  authorizer is REFUSED, not waved through: a control that silently does not run
-  is the failure this stage exists to prevent. A refusal is recorded as
-  `refused`, because "somebody tried and was turned away" gets asked about.
-  The caller is the `principal` argument, else the principal the API guard set
-  for the request, so a router that forgets to pass one cannot demote an agent
-  to anonymous.
-* **TenantScope** is still NOT here: there is no employer binding to scope to.
-  It is absent rather than stubbed because a stage that runs and always passes
-  reads as a control, and an auditor would find a name where an enforcement
-  should be. It becomes a stage when that binding exists.
+* **Authorization** (CH-04). A command class may declare `policy = Policy.WRITER`;
+  the stage asks the configured authorizer whether the caller's PERSON — for the
+  channel gateway, the user it acts for — is entitled. A policy on a mediator
+  with no authorizer is REFUSED, not waved through: a control that silently does
+  not run is the failure this stage exists to prevent. A refusal is recorded as
+  `refused`. The caller is the `principal` argument, else the one the API guard
+  set for the request, so a router that forgets it cannot demote an agent.
+* **TenantScope** is still NOT here: there is no employer binding to scope to,
+  and a stage that runs and always passes reads as a control.
 """
 from __future__ import annotations
 
@@ -69,8 +58,7 @@ class Request(Protocol):
 class Authorizer(Protocol):
     """The Authorization stage's port: raise `NotAuthorized` or return."""
 
-    def check(self, request: Any, principal: Principal) -> None:
-        ...
+    def check(self, request: Any, principal: Principal) -> None: ...
 
 
 @dataclass(frozen=True)
@@ -123,12 +111,9 @@ class AuditRecord:
 
 
 class AuditLog:
-    """A bounded in-memory trail.
-
-    IN MEMORY IS NOT THE DESTINATION. It is bounded and dies with the process,
-    so it survives a support question and nothing more; the durable trail is
-    `tcc_ops.agent_action_audit` plus the per-run manifest. This exists so the
-    pipeline stage is real now rather than pending a store.
+    """A bounded in-memory trail: a support aid, not the destination. It dies with
+    the process; the durable trails are `tcc_ops.agent_action_audit`,
+    `tcc_ops.channel_audit` and the per-run manifest.
     """
 
     def __init__(self, limit: int = 2000) -> None:
@@ -180,8 +165,7 @@ class Mediator:
         self._handlers[request_type] = handler
 
     def send(self, request: Any, principal: Principal | None = None) -> Any:
-        """Authorization → Validation → Handler → Audit, timed. See the module
-        docstring for the stage this deliberately does not have."""
+        """Authorization → Validation → Handler → Audit, timed (see the module docstring)."""
         handler = self._handlers.get(type(request))
         if handler is None:
             raise HandlerNotRegistered(
