@@ -979,7 +979,37 @@ One short entry per decision: context, choice, why.
 - No identity, an injection-flagged message, a model outage and a tool outage each have a plain sentence
   (`app/core/replies.py`); none carries a figure.
 
-## D-84 CH-08b: gaps found re-reading the brief
+## D-84 CH-09: `scripts/publish-m365.ps1`
+
+- **Source.** https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/publish-copilot-virtual-network and
+  .../publish-copilot (consulted 2026-11-03). Payload shapes (bot properties, the Teams channel, the PATCH, the publish
+  body, `authorization_schemes` as `[{"type": ...}]`) are the documented ones; none has been run against a live service.
+- **Tokens: `az rest --resource https://ai.azure.com`, not `az account get-access-token`.** The brief names the latter;
+  `az rest` asks az for the same token itself, so the script never reads, holds or prints one (nothing to leak, nothing to
+  redact) and every call stays one `az` invocation a fake can stand in for. Tested: no call carries an Authorization header
+  or a bearer string, and every Foundry call carries the `ai.azure.com` resource.
+- **Merge, never replace.** The PATCH replaces `protocol_configuration` and `authorization_schemes`, so the script reads the
+  agent, carries every existing protocol and scheme, adds `activity.enable_m365_public_endpoint` and the scope's Bot Service
+  scheme, and removes only the other Bot Service scheme. An endpoint with nothing configured gets `responses` + `activity`.
+  It does NOT add `AzureRbac` if absent: that would grant direct-client access nobody asked for.
+- **WhatIf.** Reads (provider state, tenant, the agent) run, because the merge cannot be shown without the agent; every
+  request that changes something is printed with its body and not sent. `Remove-Item`/`Set-Content` on the script's own temp
+  files use `-WhatIf:$false`: a `-WhatIf` that skipped them would leak files and fail.
+- **Version.** A published `appVersion` cannot be republished, so a "version already exists" answer moves to the next patch
+  version (up to 50 tries) and the package download uses the version that published. Each run that reaches publish therefore
+  publishes a new version; the bot, channel and endpoint steps are idempotent.
+- **Guards.** `Tenant` without `-ConfirmTenantPublish` stops before any call; the provider check prints the register command
+  and exits 1 and the script never registers a provider; success is printed only with a `titleId`.
+- **Parameters.** `-EnablePrivateNetworkRoute` is a `[bool]` as specified; under `pwsh -File` it must be passed as
+  `-EnablePrivateNetworkRoute:$false` (a bare second argument is rejected), which the docs and tests use.
+- **Placeholders.** Developer, privacy and terms URLs default to this repository's `SECURITY.md` and `DISCLAIMER.md`.
+- **Not scripted: unpublish.** The reference has no such call; `PUBLISHING.md` says how to remove an agent by hand.
+- **Request bodies go through temp files** (`--body @file`) rather than inline strings, because quoting JSON for a native
+  command differs between PowerShell and cmd and a mangled body is a silent failure; the files are deleted in `finally`.
+- **A second Bicep-free resource:** the bot is one ARM PUT. No Terraform was added: Bot Service is created per
+  publish by the operator who holds the role, not by the platform's infrastructure code.
+
+## D-85 CH-08b: gaps found re-reading the brief
 
 - A re-read of the work package against the brief found items the first pass missed; all are fixed in
   `wp/CH-08b-spec-gaps`: candidates are numbered `1) Name` (was `1.`); a message that supersedes a pending
