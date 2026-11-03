@@ -1128,3 +1128,19 @@ One short entry per decision: context, choice, why.
 - **The warning is a `check`.** A failed `check` is a warning in the plan, so it cannot be missed and does not block the
   demo. The tests expect it. A mutation (the any-address rule made always true) was shown to fail its test.
 - **Not built.** No agent subnet, ops VM, Bastion, private endpoint or registry.
+
+## D-94 CH-12: order of the last two packages, and what the documents are built from
+
+- **Choice.** CH-12b was built and merged **before** CH-12, although the brief lists it after. CH-12's documents link to the
+  hardening plan and the spike, and a link check that fails until a later package exists is a gate that cannot pass in
+  order. Nothing else about the packages changed.
+- **The documents were written against the code, not the plan.** Examples: claim package tickets live in the confirmation
+  store (the Warehouse when deployed), not in memory; an allow-list change takes effect at the next call and a group source
+  caches for 60 seconds; `/channel/ready` does not check the Warehouse. Where the design document and the code differed,
+  the documents say what the code does.
+- **The demo uses only the synthetic clients in `backend/data/source/synth.py`** (Cascade Retail Partners, Northwind Care
+  Systems, Ironbridge Logistics, Halloway Foods). The reference client's codename is not used: its payroll is real,
+  de-identified.
+- **Two limits found by the end-to-end tests are documented as limits, not fixed** (D-89 and the value-matching guard): the
+  figure guard compares values, and `client_resolve` asks even for one exact name. Both are in KNOWN-LIMITATIONS and the
+  demo script tells the presenter what the resolver will do.
