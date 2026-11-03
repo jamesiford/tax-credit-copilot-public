@@ -77,27 +77,34 @@ def client_resolve(
     referent = resolve_referent(name_or_text, list(history), current_client_id, clients)
     if not strict:
         referent = _exact_single_name(referent, name_or_text, clients)
-    candidates = [
-        {"client_id": cid, "name": names.get(cid, f"Account {cid}")} for cid in referent.candidates
-    ]
-    facts = {
-        "resolved": referent.client_id is not None,
-        "client_id": referent.client_id,
-        "client_name": names.get(referent.client_id) if referent.client_id is not None else None,
+    facts = _resolution_facts(referent, names)
+    if referent.clarify and strict:
+        raise Ambiguous(referent.reason or "the question does not name one client", tuple(facts["candidates"]))
+    return s.result(
+        "client_resolve", facts, _resolution_blocks(referent, facts), provenance=Provenance(source="client book"),
+    )
+
+
+def _resolution_facts(referent: Referent, names: Mapping[int, str]) -> dict[str, Any]:
+    """The wire facts of a resolution; `resolved` is the one flag a caller needs."""
+    chosen = referent.client_id
+    return {
+        "resolved": chosen is not None,
+        "client_id": chosen,
+        "client_name": names.get(chosen) if chosen is not None else None,
         "clarify": referent.clarify,
-        "candidates": candidates,
+        "candidates": [{"client_id": cid, "name": names.get(cid, f"Account {cid}")} for cid in referent.candidates],
         "reason": referent.reason,
         "named": list(referent.named),
     }
-    if referent.clarify and strict:
-        raise Ambiguous(referent.reason or "the question does not name one client", tuple(candidates))
 
-    if referent.clarify:
-        asked = "Which client do you mean?" + (f" ({referent.reason})" if referent.reason else "")
-        blocks = [s.paragraph(asked), s.bullets([c["name"] for c in candidates])]
-    else:
-        blocks = [s.paragraph(f"Answering for {facts['client_name']}.")]
-    return s.result("client_resolve", facts, blocks, provenance=Provenance(source="client book"))
+
+def _resolution_blocks(referent: Referent, facts: Mapping[str, Any]) -> list[Any]:
+    """Either the question to ask back with its choices, or the one-line statement of whose answer this is."""
+    if not referent.clarify:
+        return [s.paragraph(f"Answering for {facts['client_name']}.")]
+    asked = "Which client do you mean?" + (f" ({referent.reason})" if referent.reason else "")
+    return [s.paragraph(asked), s.bullets([c["name"] for c in facts["candidates"]])]
 
 
 def _situation_rows(facts: dict[str, Any]) -> list[tuple[str, ...]]:
