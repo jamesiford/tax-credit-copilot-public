@@ -1,5 +1,6 @@
 [
   "GET /api/alerts/monthly/{tax_year}",
+  "GET /api/audit/channel",
   "GET /api/claims/cell/{client_id}/{program_code}/{tax_year}",
   "GET /api/clients/{client_id}/artifacts/{artifact_id}",
   "GET /api/claims/coverage",

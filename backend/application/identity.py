@@ -18,6 +18,33 @@ from dataclasses import dataclass, field
 from typing import Protocol
 
 
+class NotAuthorized(PermissionError):
+    """The caller is who they say and may not do this. Routers map it to 403."""
+
+
+@dataclass(frozen=True)
+class ActingUser:
+    """The person a channel request is made on behalf of.
+
+    Asserted by the channel (Azure Bot Service says who sent the message), not
+    proven by a token of theirs — hence `assurance`, which an audit row carries.
+    """
+
+    oid: str
+    tenant_id: str | None = None
+    display_name: str | None = None
+    upn: str | None = None
+    assurance: str = "channel-asserted"
+    channel: str | None = None
+    conversation_id: str | None = None
+    correlation_id: str | None = None
+
+    @property
+    def actor(self) -> str:
+        """What a write is attributed to: UPN, else object id."""
+        return self.upn or self.oid
+
+
 @dataclass(frozen=True)
 class Principal:
     oid: str | None = None
