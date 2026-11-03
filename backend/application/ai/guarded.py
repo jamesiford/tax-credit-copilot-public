@@ -32,6 +32,8 @@ def _principal_key() -> str:
 
 
 class GuardedRuntime:
+    """An `AgentRuntime` that checks egress and the token budget before delegating, and charges after."""
+
     def __init__(
         self, inner: AgentRuntime, egress: EgressPolicy, budget: TokenBudget | None = None,
         telemetry: Any = None,
@@ -63,6 +65,7 @@ class GuardedRuntime:
         return estimate
 
     async def stream(self, spec: AgentSpec, prompt: str) -> AsyncIterator[ModelEvent]:
+        """Egress check, budget check, then the inner stream; charge the budget when it ends."""
         decision = self._egress.prepare(prompt, role=spec.role, provider=self.name)
         if not decision.allowed:
             raise EgressRefused(f"{self.name}: {decision.reason} (policy {decision.policy})")

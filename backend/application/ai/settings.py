@@ -51,6 +51,8 @@ class ResilienceSettings:
 
 @dataclass(frozen=True)
 class AiSettings:
+    """The validated, frozen AI configuration. Build it with `load_ai_settings`."""
+
     provider_chain: tuple[str, ...] = ("foundry",)
     role_chains: Mapping[ModelRole, tuple[str, ...]] = field(default_factory=dict)
     models: Mapping[str, str] = field(default_factory=dict)

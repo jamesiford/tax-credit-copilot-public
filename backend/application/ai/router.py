@@ -20,6 +20,8 @@ Decorator = Callable[[AgentRuntime, str], AgentRuntime]
 
 
 class ModelRouter:
+    """Builds each provider once, decorates it, and hands out the chain for a role."""
+
     def __init__(
         self, settings: AiSettings, registry: ProviderRegistry, decorate: Decorator | None = None,
     ) -> None:

@@ -32,6 +32,8 @@ _TIMEOUTS = (httpx.TimeoutException,)
 
 
 class OpenAICompatibleChatModel:
+    """A `ChatModel` over an OpenAI-compatible HTTP endpoint: streaming, tool calls, mapped errors."""
+
     name = "gateway"
 
     def __init__(
@@ -58,6 +60,7 @@ class OpenAICompatibleChatModel:
         self, messages: Sequence[ChatMessage], *, model: str, temperature: float | None = None,
         tools: Sequence[ToolSpec] = (),
     ) -> AsyncIterator[ModelEvent]:
+        """Stream one completion; the gateway's dialect and failures are mapped to the model-error taxonomy."""
         s, request_id = self._settings, self._request_id()
         streaming = s.streaming
         headers = build_headers(s, await self._auth.headers(), request_id, streaming)

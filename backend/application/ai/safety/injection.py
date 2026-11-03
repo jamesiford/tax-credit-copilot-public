@@ -83,6 +83,8 @@ _LINE_TURN = re.compile(r"(?m)^[ \t>*#-]*(?:system|assistant|developer)(?: (?:pr
 
 @dataclass(frozen=True)
 class InjectionVerdict:
+    """Which injection rules fired. Names only, never the matched text."""
+
     rules: tuple[str, ...] = ()
 
     @property

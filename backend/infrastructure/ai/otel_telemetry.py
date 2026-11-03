@@ -54,6 +54,7 @@ class OtelCallSpan:
         self, *, outcome: str, usage: ModelUsage | None = None, finish_reason: str | None = None,
         error_type: str | None = None, **attributes: Any,
     ) -> None:
+        """End the span with its outcome, token usage and allow-listed attributes; record the metrics."""
         model = attributes.pop("model", None)
         labels = dict(self._base)
         if model:

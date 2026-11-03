@@ -23,6 +23,8 @@ class BulkheadFull(ModelUnavailable):
 
 
 class BulkheadRuntime(RuntimeDecorator):
+    """At most `limit` concurrent calls; the next is refused at once rather than queued."""
+
     def __init__(self, inner, limit: int, telemetry: Any = None) -> None:
         super().__init__(inner)
         self._limit, self._active, self._telemetry = limit, 0, telemetry

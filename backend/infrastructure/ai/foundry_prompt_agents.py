@@ -43,12 +43,13 @@ class FoundryAgentCatalog:
 
     def __init__(
         self, settings: AiSettings, specs: Iterable[AgentSpec], *, model_for: ModelFor | None = None,
-        name_suffix: str = "", provider: str = "foundry", client_factory: ClientFactory | None = None,
+        variant: tuple[str, str] = ("foundry", ""), client_factory: ClientFactory | None = None,
         sleep: Callable[[float], None] = time.sleep, attempts: int = 5,
     ) -> None:
+        """`variant` is (provider name, suffix appended to each published agent name)."""
         self._settings, self._specs = settings, tuple(specs)
         self._model_for = model_for or (lambda spec: settings.model_for(spec.role, "foundry"))
-        self._suffix, self.provider, self._sleep, self._attempts = name_suffix, provider, sleep, attempts
+        (self.provider, self._suffix), self._sleep, self._attempts = variant, sleep, attempts
         self._client_factory = client_factory or (lambda: _default_client(settings.foundry_endpoint))
         self._entries: dict[str, PublishedAgent] = {}
         self._state, self._detail = ("warming", "") if settings.foundry_endpoint else ("disabled", "FOUNDRY_PROJECT_ENDPOINT is not set")
@@ -165,6 +166,7 @@ class FoundryAgentRuntime:
         return self._catalog.status()
 
     async def stream(self, spec: AgentSpec, prompt: str) -> AsyncIterator[ModelEvent]:
+        """Run the named Foundry agent over `prompt`; Foundry failures are mapped to the model-error taxonomy."""
         entry = self._catalog.entry(spec.name)
         if entry is None:
             raise ModelUnavailable(f"{spec.name} is not published on {self.name}")

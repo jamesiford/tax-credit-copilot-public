@@ -16,6 +16,8 @@ from infrastructure.ai.resilience.clock import Clock, RealClock
 
 
 class TimeoutRuntime(RuntimeDecorator):
+    """Raises `ModelTimeout` when the provider is silent for longer than `seconds` between events."""
+
     def __init__(self, inner, seconds: float, clock: Clock | None = None) -> None:
         super().__init__(inner)
         self._seconds, self._clock = seconds, clock or RealClock()

@@ -56,6 +56,8 @@ DEFAULT_ALLOWED_HOSTS: tuple[str, ...] = ()
 
 @dataclass(frozen=True)
 class PolicyResult:
+    """The rule codes a text broke; empty when it is fine."""
+
     violations: tuple[str, ...] = ()
 
     @property

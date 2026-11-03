@@ -61,7 +61,10 @@ def test_application_ai_imports_no_framework_and_no_adapter():
 
 
 def test_the_ai_domain_types_are_standard_library_only():
-    assert _non_stdlib_imports((BACKEND / "domain" / "ai.py").read_text(encoding="utf-8")) == []
+    """Stdlib plus the domain's own sibling (`ai_errors`, split out for size and re-exported)."""
+    for module in ("ai.py", "ai_errors.py"):
+        imports = _non_stdlib_imports((BACKEND / "domain" / module).read_text(encoding="utf-8"))
+        assert [i for i in imports if i != "domain.ai_errors"] == [], module
 
 
 def test_ports_are_small():

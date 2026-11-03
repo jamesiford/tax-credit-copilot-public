@@ -35,6 +35,8 @@ def _utc_day() -> str:
 
 
 class InMemoryTokenBudget:
+    """The `TokenBudget` port in memory: one lock, one day's counters, reset when the UTC date changes."""
+
     def __init__(
         self, global_daily: int | None, principal_daily: int | None, today: Callable[[], str] = _utc_day,
     ) -> None:

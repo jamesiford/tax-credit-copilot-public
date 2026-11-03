@@ -144,6 +144,15 @@ def decode_chunk(payload: Mapping[str, Any], tools: ToolCallAssembler) -> tuple[
     return events, finish
 
 
+def _whole_tool_calls(message: Mapping[str, Any]) -> list[ToolCall]:
+    """The tool calls a non-streaming message carries, already assembled."""
+    calls = []
+    for call in message.get("tool_calls") or []:
+        function = call.get("function") or {}
+        calls.append(ToolCall(call.get("id", ""), function.get("name", ""), function.get("arguments") or "{}"))
+    return calls
+
+
 def decode_message(payload: Mapping[str, Any]) -> tuple[list[Any], str | None]:
     """Events and finish reason of a non-streaming completion."""
     events: list[Any] = []
@@ -152,9 +161,7 @@ def decode_message(payload: Mapping[str, Any]) -> tuple[list[Any], str | None]:
         message = choice.get("message") or {}
         if message.get("content"):
             events.append(TextDelta(message["content"]))
-        for call in message.get("tool_calls") or []:
-            function = call.get("function") or {}
-            events.append(ToolCall(call.get("id", ""), function.get("name", ""), function.get("arguments") or "{}"))
+        events.extend(_whole_tool_calls(message))
         finish = choice.get("finish_reason") or finish
     if (usage := usage_of(payload)) is not None:
         events.append(usage)

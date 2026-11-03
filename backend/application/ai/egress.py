@@ -75,10 +75,14 @@ class _Base:
 
 
 class AllowAll(_Base):
+    """Send what the caller built; identifiers are still refused (the invariant is policy-independent)."""
+
     name = "allow_all"
 
 
 class AggregatesOnly(_Base):
+    """Refuse a prompt to an external provider unless it is the aggregate brief the engine built."""
+
     name = "aggregates_only"
 
     def _policy(self, prompt: str, provider: str) -> EgressDecision:
@@ -91,6 +95,8 @@ class AggregatesOnly(_Base):
 
 
 class BlockExternal(_Base):
+    """Send nothing to an external provider at all."""
+
     name = "block"
 
     def _policy(self, prompt: str, provider: str) -> EgressDecision:

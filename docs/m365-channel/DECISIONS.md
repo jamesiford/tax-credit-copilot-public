@@ -590,3 +590,35 @@ One short entry per decision: context, choice, why.
   `AI_OUTPUT_ALLOWED_HOSTS`. A value other than on/off is a startup error.
 - **Why.** A control silently off reads as on. `off` is a break-glass for a false
   positive in production while a rule is fixed.
+
+## D-58 AI-08: a ratchet, not a retroactive standard
+
+- **Choice.** `tests/code_standards_baseline.json` records every existing violation
+  (module 250 / class 150 / function 40 / complexity 10 / args 7 / bare except /
+  docstrings / exact duplicate bodies) with its magnitude; `test_code_standards.py`
+  fails on a new or worse violation, and on an improved one until the baseline is
+  tightened (`scripts/code-standards.py --update`, which refuses to loosen). A
+  function that moves file unchanged is recognised as a move. Pure AST
+  (`tools/code_standards/`). Tests, `data/` and `__pycache__` are not measured.
+- **Baseline.** 540 violations at first measurement; 483 after the AI/channel code
+  was brought up to standard. A test holds `application/ai`, `infrastructure/ai`,
+  `domain/ai*`, `api/chat` (bar five moved pipeline functions) and the tooling to
+  zero shape violations.
+- **Why.** A standard nobody can meet on day one is ignored; a ratchet makes the
+  direction of travel the rule.
+
+## D-59 AI-08: splits keep every import path; vendoring is by package
+
+- **Choice.** `numeric_guard` → `numeric_types`/`_extract`/`_context`/`_facts`;
+  `composer` → `composer_placeholders`/`composer_render`; `capabilities/format` →
+  `format_core`/`format_renderers`; `capabilities/client` → `client_eligibility`/
+  `client_analysis`; `capabilities/catalog` → `catalog_types`/`catalog_intents`;
+  `domain/ai` → `ai_errors`. Code moved verbatim (plus small extractions in
+  `composer.compose`, `client_eligibility`, `client_trend`, `_stream_agent`,
+  `decode_message`); the original modules re-export every public and test-used name.
+  Documented in `ORCHESTRATOR.md` as vendored packages.
+- **Existing tests touched, and why.** `test_numeric_guard` and `test_composer`
+  (the import-purity checks now cover the sibling set, not one file),
+  `test_architecture` (vendored-module rule: stdlib plus vendored siblings),
+  `test_architecture_ai` (domain stdlib check includes `ai_errors`). No behavioural
+  test was edited; the mutation tests over the guard pass unchanged.

@@ -428,12 +428,21 @@ def _imports(path: Path) -> set[str]:
 
 
 def test_the_guard_imports_only_the_standard_library_and_the_formatter():
-    """It is vendored into the orchestrator container, which has no repository."""
+    """It is vendored into the orchestrator container, which has no repository.
+
+    The guard was split into `numeric_*` siblings by size; the vendored set is all of
+    them, and each may import only the standard library, the formatter, or a sibling.
+    """
     import sys
 
-    allowed_local = {"application.capabilities.format"}
+    modules = ("numeric_guard", "numeric_types", "numeric_extract", "numeric_context", "numeric_facts")
     stdlib = set(sys.stdlib_module_names) | {"__future__"}
-    path = Path(numeric_guard.__file__)
-    bad = {m for m in _imports(path) if m.split(".")[0] not in stdlib and m not in allowed_local}
-    assert not bad, f"numeric_guard imports {sorted(bad)}"
-    assert allowed_local <= _imports(path)
+    root = Path(numeric_guard.__file__).parent
+    imported: set[str] = set()
+    for name in modules:
+        found = _imports(root / f"{name}.py")
+        imported |= found
+        bad = {m for m in found if m.split(".")[0] not in stdlib
+               and m != "application.capabilities.format" and not m.startswith("application.numeric_")}
+        assert not bad, f"{name} imports {sorted(bad)}"
+    assert "application.capabilities.format" in imported

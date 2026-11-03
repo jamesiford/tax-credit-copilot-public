@@ -17,6 +17,8 @@ T = TypeVar("T")
 
 
 class Clock(Protocol):
+    """Time as a dependency: `now`, `sleep` and a bounded wait, all replaceable in a test."""
+
     def now(self) -> float: ...
 
     async def sleep(self, seconds: float) -> None: ...
