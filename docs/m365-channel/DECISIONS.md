@@ -642,3 +642,51 @@ One short entry per decision: context, choice, why.
   Redact with the same rules as the egress invariant and the output policy; store
   rule codes, never matched text. Follow-up suggestions should be a pure function of
   the intents that ran (deterministic, no model).
+
+## D-61 Prompt 3 runs on `feat/m365-channel` in the main checkout
+
+- **Context.** Prompt 3 was started in the main checkout, on `main`. The previous prompts
+  ran in a worktree on `jamesiford-m365-capability-layer` (D-01) and left
+  `feat/m365-channel` at the same commit (`98462b0`), checked out nowhere.
+- **Choice.** The checkout was clean, so it was switched to `feat/m365-channel` (the
+  branch the brief names) and `wp/CH-06a-*`, `wp/CH-06b-*` and `wp/CH-07-*` are cut from
+  it. D-01 no longer applies to this prompt: the fast-forward is not left to the owner.
+- **Why.** The brief's own rule: be on `feat/m365-channel`, or on a branch containing it.
+
+## D-62 Python 3.14 venv, seeded from the sibling venv
+
+- **Choice.** `.venv` is built with `py -3.14` (D-02; 3.12 is not installed). Its
+  site-packages were copied from the Prompt 2B worktree's venv rather than re-resolved,
+  because installing `deltalake[pyarrow]` from source on 3.14 takes many minutes.
+  `jsonschema==4.26.0` is the one new runtime pin (CH-06a).
+
+## D-63 CH-06a: `verify_figures` and the package tickets
+
+- **`verify_figures` is `implemented` but gateway-local.** The catalog test requires every
+  implemented tool to have a registry function, so `application/capabilities/verify.py`
+  holds the stateless guard call. The tool carries the tag `gateway-local`, and the API
+  answers it `501 gateway_local`: only the gateway knows which results a conversation
+  received, and an API answer with no facts would be a confident "every figure is wrong".
+  `facts` is a keyword the gateway passes, not a schema property, so a caller cannot
+  choose the facts it is checked against.
+- **A ticket is a row in `channel_confirmation`.** `claim_package_link` mints a 256-bit
+  token (hash only stored), bound to the person, valid 15 minutes, spent atomically by the
+  internal tool `claim_package_redeem` (tag `internal`, never listed). The confirmation
+  store was chosen because it is already "a secret handed out once, kept as a hash, spent
+  atomically", is durable, and needs no grant the gateway lacks. The row's `result_json`
+  carries the conversation context so the download can be audited as the right person.
+- **A commit's body.** `args` may be the prepare's own arguments (the token and key beside
+  them, at the top level of the body) or the catalog's full commit shape; the two may not
+  disagree. Top-level token/key on a non-commit tool are ignored.
+- **Timeouts.** A timed-out call returns `504 timeout` (retryable). The worker thread is
+  not killed, so a timed-out COMMIT may still land; the retry carries the same idempotency
+  key and replays instead of repeating.
+
+## D-64 CH-06a: existing tests edited
+
+- `test_capabilities_envelope.py` (the "unbuilt tools" pin is now "nothing is unbuilt"),
+  `test_capabilities_equivalence.py` (an unbuilt tool cannot be called → an unknown name
+  cannot) and `test_channel_writes.py` (seven write specs, not six; the package pair is
+  built). Each asserted precisely the thing this work package changes.
+- `application/wiring.py` is a baselined offender in the standards ratchet (605 lines);
+  the three new lines were paid for by removing three elsewhere in the same file.

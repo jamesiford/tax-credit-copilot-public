@@ -50,3 +50,6 @@ pytest-cov==7.0.0                   # `pytest --cov=tools --cov=api --cov=data`
 
 # --- authentication (AUTH_MODE=entra): JWT validation against Entra's JWKS ---
 PyJWT[crypto]>=2.8,<3
+
+# --- capability endpoint: arguments are validated against the catalog's own JSON-Schema (CH-06) ---
+jsonschema==4.26.0
