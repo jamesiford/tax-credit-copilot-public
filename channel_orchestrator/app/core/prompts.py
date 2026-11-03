@@ -28,7 +28,8 @@ Rules:
   several tools: call them one after another, then stop.
 - When the question names one client, or says "them" about the client already discussed,
   use that client's tools (for a brief or a call, `client_situation`). `book_rank` ranks
-  every client: use it only for a question about the whole book, such as who to call first.
+  every client: use it for a question about the whole book, such as who to call first or which
+  clients are closest to a threshold (its "on the line" reason).
   The platform fills in which client; you never do.
 - The client is resolved for you from the conversation. Never pass a client id and never
   guess one. If a tool answers that the reader must say which client or year, stop calling
