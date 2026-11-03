@@ -356,12 +356,12 @@ describe('the view re-reads when scope changes', () => {
     await userEvent.click(await screen.findByRole('button', { name: 'Open Cascade Retail Partners' }));
 
     await waitFor(() => expect(api.fetchClientScope).toHaveBeenCalledWith(2001));
-    // The client page is tabbed, and only the open section reads. The location
-    // grid opens first; "What was claimed" reads when somebody opens it —
-    // and then for THIS client.
+    // The client page is a flow of steps, and only the open section reads. The
+    // location grid (Trend) opens first; "Position" reads when somebody opens
+    // it — and then for THIS client.
     await waitFor(() => expect(units).toHaveBeenCalledWith(2001, expect.anything()));
     expect(api.fetchClientCoverage).not.toHaveBeenCalledWith(2001, expect.anything());
-    await userEvent.click(await screen.findByRole('tab', { name: 'What was claimed' }));
+    await userEvent.click(await screen.findByRole('link', { name: 'Position' }));
     await waitFor(() => expect(api.fetchClientCoverage).toHaveBeenCalledWith(2001, expect.anything()));
   });
 

@@ -74,14 +74,14 @@ const CEILING = {
   '--exp-blue': 10,
   '--exp-subtle': 4,
   '--exp-ink': 3,
-  '--exp-gold': 6,
+  '--exp-gold': 5,
   '--exp-violet': 0,
   '--accent': 20,
   '--accent-strong': 26,
   '--accent-bg': 3,
   '--accent-2': 1,
   '--accent-2-strong': 41,
-  '--accent-2-bg': 26,
+  '--accent-2-bg': 25,
   '--accent-2-line': 4,
 };
 

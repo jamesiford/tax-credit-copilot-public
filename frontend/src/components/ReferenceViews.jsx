@@ -70,7 +70,7 @@ function Pager({ total, offset, limit, onChange }) {
   return <div className="tcc-pager"><button className="btn btn-secondary" disabled={!offset} onClick={() => onChange(Math.max(0, offset - limit))}>Previous</button><span>{NUM.format(offset + 1)}–{NUM.format(Math.min(offset + limit, total))} of {NUM.format(total)}</span><button className="btn btn-secondary" disabled={offset + limit >= total} onClick={() => onChange(offset + limit)}>Next</button></div>;
 }
 
-export function EligibilityView({ summary, openEmployee, scope }) {
+export function EligibilityView({ summary, openEmployee, scope, header = null }) {
   const [data, setData] = useState(null); const [error, setError] = useState(null);
   const [status, setStatus] = useState('all'); const [proximity, setProximity] = useState('all');
   const [query, setQuery] = useState(''); const [offset, setOffset] = useState(0); const limit = 50;
@@ -110,7 +110,15 @@ export function EligibilityView({ summary, openEmployee, scope }) {
   const calculated = isCalculated(data);
   const uncalculated = data != null && !calculated;
   return <>
-    <PageHeader eyebrow="What is it worth" title="Eligibility" sub="One employee total · two independent denominators · two independently validated eligibility lists" />
+    {header ? (
+      <>
+        {header}
+        <h2 className="panel-title">Eligibility</h2>
+        <p className="page-sub">One employee total · two independent denominators · two independently validated eligibility lists</p>
+      </>
+    ) : (
+      <PageHeader eyebrow="What is it worth" title="Eligibility" sub="One employee total · two independent denominators · two independently validated eligibility lists" />
+    )}
     <div className="callout info"><b>Methods are not expected to agree with each other.</b> Min-Max and Pay Period must each agree with the partner’s implementation of that method.</div>
     <div className="tcc-formula-pair"><div><b>Min-Max denominator</b><code>weeks = (last PPE - first PPS) / 7</code><span>BA-11 · exclusive days · zero-hour rows included in span</span></div><div><b>Pay Period denominator</b><code>weeks = Σ (PPE - PPS + 1) / 7</code><span>BA-03 · actual period span · PayFrequency is lineage only</span></div></div>
     {isPortfolio && <div className="callout info">Eligibility is tested per employee against one client’s fiscal year, so there is no portfolio-wide population to show. Select a client to see theirs.</div>}

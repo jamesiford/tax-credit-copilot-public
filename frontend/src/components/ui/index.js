@@ -18,3 +18,4 @@ export { default as Skeleton } from './Skeleton.jsx';
 export { default as Stepper } from './Stepper.jsx';
 export { default as Tabs } from './Tabs.jsx';
 export { default as TaskCard } from './TaskCard.jsx';
+export { default as VerdictCard } from './VerdictCard.jsx';

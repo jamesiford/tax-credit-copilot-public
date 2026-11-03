@@ -1,13 +1,36 @@
 import { useEffect, useMemo, useState } from 'react';
-import { BookOpenCheck, Loader2, ShieldCheck } from 'lucide-react';
+import { BookOpenCheck, ShieldCheck } from 'lucide-react';
 import { fetchRules } from '../api.js';
 import { authoredYearsLabel } from '../lib/reference.js';
 import { PageHeader } from './ReferenceViews.jsx';
+import EmptyState from './ui/EmptyState.jsx';
 import KpiTile, { KpiRow } from './ui/KpiTile.jsx';
+import Skeleton from './ui/Skeleton.jsx';
+import VerdictCard from './ui/VerdictCard.jsx';
 import SortHeader from './SortHeader.jsx';
 import { FilterBar } from './ColumnFilter.jsx';
 import useTableControls from './useTableControls.js';
 import { ENUM, NUMERIC, TEXT } from '../lib/gridFilter.js';
+import { programVerdict } from '../lib/programVerdict.js';
+
+function ProgramVerdict({ rule, years, known }) {
+  const v = programVerdict(rule, years, known);
+  return (
+    <VerdictCard
+      tone={v.tone}
+      title={rule.name}
+      pills={v.pills}
+      assessmentTitle="Why this reading"
+      assessment={v.assessment}
+    >
+      <p className="tcc-verdict-text">
+        <code>{rule.citation}</code>
+        {rule.threshold != null ? ` · minimum ${rule.threshold} new jobs` : ''}
+        {rule.benefit_period_years != null ? ` · ${rule.benefit_period_years}-year benefit` : ''}
+      </p>
+    </VerdictCard>
+  );
+}
 
 /**
  * Rules — statute and methodology, in one place and clearly separated.
@@ -84,8 +107,13 @@ export default function RuleLibraryView({ onAskCopilot, programs = null }) {
       )}
     />
 
-    {error && <div className="callout warn">{error}</div>}
-    {loading && <div className="callout info"><Loader2 size={15} className="spin" /> Reading rule packs…</div>}
+    {error && (
+      <EmptyState title="The rule packs could not be read" icon={<ShieldCheck size={20} />}>
+        {error}. The statute files are read from the API, so check that it is
+        running, then reload this page.
+      </EmptyState>
+    )}
+    {loading && <Skeleton lines={3} label="Reading rule packs" />}
 
     <div className="callout info">
       <b>Statute is frozen per tax year.</b> Georgia&apos;s minimum weekly wage was
@@ -100,6 +128,12 @@ export default function RuleLibraryView({ onAskCopilot, programs = null }) {
       <KpiTile label="Signed off" value={verified} sub="by a practitioner" tone="above-min" />
       <KpiTile label="Awaiting review" value={rules.length - verified || '—'} />
     </KpiRow>
+
+    {rules.length > 0 && (
+      <div className="tcc-verdict-grid" role="list" aria-label="Programs by readiness">
+        {rules.map((r) => <div role="listitem" key={r.code}><ProgramVerdict rule={r} years={yearsFor(r.code)} known={Boolean(programs)} /></div>)}
+      </div>
+    )}
 
     <section className="panel">
       <h3 className="panel-title">
@@ -193,7 +227,15 @@ export default function RuleLibraryView({ onAskCopilot, programs = null }) {
             );
           })}
           {!rules.length && !loading && (
-            <tr><td colSpan={8} className="muted">No rule packs loaded.</td></tr>
+            <tr>
+              <td colSpan={8}>
+                <EmptyState title="No rule packs are loaded">
+                  The API returned no programs. Statute arrives as authored year
+                  packs under <code>rules/</code>; with none present nothing can
+                  be calculated, by design.
+                </EmptyState>
+              </td>
+            </tr>
           )}
         </tbody>
       </table>

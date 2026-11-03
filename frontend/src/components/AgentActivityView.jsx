@@ -1,9 +1,13 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
-  CheckCircle2, Flag, Loader2, RotateCcw, ShieldQuestion, Undo2,
+  CheckCircle2, Flag, RotateCcw, ShieldQuestion, Undo2,
 } from 'lucide-react';
 import { fetchFindings, fetchMe, reopenFinding, resolveFinding } from '../api.js';
+import PageHeader from './PageHeader.jsx';
+import EmptyState from './ui/EmptyState.jsx';
 import KpiTile, { KpiRow } from './ui/KpiTile.jsx';
+import Skeleton from './ui/Skeleton.jsx';
+import VerdictCard from './ui/VerdictCard.jsx';
 import { PORTFOLIO } from '../lib/scopeDimension.js';
 import { USD } from '../lib/coverage.js';
 
@@ -160,10 +164,10 @@ export default function AgentActivityView({ scope, scopeOptions }) {
   if (isPortfolio) {
     return <>
       <Header />
-      <div className="callout info">
+      <EmptyState title="Pick a client to review findings" icon={<ShieldQuestion size={20} />}>
         Findings are per client-year, because a judgement about one employee&apos;s
         worksites belongs to one client. Select a client to review theirs.
-      </div>
+      </EmptyState>
     </>;
   }
 
@@ -172,10 +176,12 @@ export default function AgentActivityView({ scope, scopeOptions }) {
   return <>
     <Header />
 
-    {error && <div className="callout warn">{error}</div>}
-    {loading && !data && (
-      <div className="callout info"><Loader2 size={15} className="spin" /> Looking…</div>
+    {error && (
+      <EmptyState title="Findings could not be read" icon={<Flag size={20} />}>
+        {error}. Nothing was changed; reload the page to try again.
+      </EmptyState>
     )}
+    {loading && !data && <Skeleton lines={3} label="Looking for findings" />}
 
     {summary && (
       <KpiRow label="Findings summary">
@@ -209,27 +215,31 @@ export default function AgentActivityView({ scope, scopeOptions }) {
     )}
 
     {data && data.findings.length === 0 && (
-      <div className="callout info">
-        <CheckCircle2 size={15} />
-        <b>The agent found nothing for this client-year.</b> That is a result, not
-        an absence — the checks ran and came back clean.
-      </div>
+      <EmptyState title="The agent found nothing for this client-year" icon={<CheckCircle2 size={20} />}>
+        That is a result, not an absence: the checks ran and came back clean.
+      </EmptyState>
     )}
 
     {(data?.findings || []).map((finding) => (
-      <section className={`panel finding ${finding.requires_decision ? 'open' : 'closed'}`} key={finding.finding_id}>
-        <h3 className="panel-title">
-          <span>
-            <ShieldQuestion size={15} /> {finding.title}
-          </span>
-          <span className="right">
-            {finding.grain === 'policy'
+      <VerdictCard
+        key={finding.finding_id}
+        tone={finding.requires_decision ? 'partial' : 'above-min'}
+        title={finding.title}
+        pills={[
+          {
+            variant: 'category',
+            label: finding.grain === 'policy'
               ? `policy · ${finding.population.instances.toLocaleString()} instances`
-              : finding.employee_id}
-          </span>
-        </h3>
-        <p className="small">{finding.why_it_matters}</p>
-
+              : finding.employee_id,
+          },
+          finding.requires_decision
+            ? { variant: 'partial', icon: 'dot', label: 'Needs a decision' }
+            : { variant: 'above-min', icon: 'check', label: 'Decided' },
+        ]}
+        assessmentTitle="Why it matters"
+        assessment={finding.why_it_matters}
+        className="finding-card"
+      >
         {finding.population && (
           <div className="tcc-control-grid finding-evidence">
             <div>
@@ -292,22 +302,17 @@ export default function AgentActivityView({ scope, scopeOptions }) {
         </p>
 
         <Decision finding={finding} onDecide={decide} busy={busy === finding.finding_id} />
-      </section>
+      </VerdictCard>
     ))}
   </>;
 }
 
 function Header() {
   return (
-    <div className="page-header tcc-page-header">
-      <div>
-        <div className="tcc-eyebrow">What needs a decision</div>
-        <h1 className="page-title">Agents</h1>
-        <div className="page-sub">
-          What the agents found, and what you decided about it. Every finding
-          changes a figure if left unanswered — nothing is applied automatically.
-        </div>
-      </div>
-    </div>
+    <PageHeader
+      eyebrow="What needs a decision"
+      title="Agents"
+      sub="What the agents found, and what you decided about it. Every finding changes a figure if left unanswered — nothing is applied automatically."
+    />
   );
 }

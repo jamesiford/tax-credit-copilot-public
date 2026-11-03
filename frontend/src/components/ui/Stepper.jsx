@@ -1,10 +1,13 @@
 /*
  * Why: a guided flow needs a visible "where am I" that is also a way to move.
- * It is route-driven, so any enabled step is activatable.
+ * It is route-driven, so any enabled step is activatable: `to` renders a router
+ * link, `href` a plain anchor, otherwise a button. A disabled step carries a
+ * `reason`, which is announced (and shown as a tooltip) rather than silent.
  *
  * Never: block navigation like a wizard, use the --state-* colours (selection
  * is not a verdict), or make a disabled step focusable.
  */
+import { Link } from 'react-router-dom';
 import './Stepper.css';
 
 const GLYPH = { done: '✓' };
@@ -27,6 +30,13 @@ function StepControl({ step, index, onSelect }) {
   const handler = step.onSelect ?? onSelect;
   const current = step.status === 'current' ? { 'aria-current': 'step' } : {};
 
+  if (enabled && step.to) {
+    return (
+      <Link className="ui-stepper__control" to={step.to} title={step.title} {...current}>
+        {body}
+      </Link>
+    );
+  }
   if (enabled && step.href) {
     return (
       <a
@@ -55,9 +65,11 @@ function StepControl({ step, index, onSelect }) {
     <span
       className="ui-stepper__control"
       aria-disabled={enabled ? undefined : 'true'}
+      title={step.reason}
       {...current}
     >
       {body}
+      {step.reason ? <span className="ui-stepper__sr">Unavailable: {step.reason}</span> : null}
     </span>
   );
 }

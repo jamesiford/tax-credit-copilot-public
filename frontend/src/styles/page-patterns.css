@@ -84,12 +84,31 @@
 }
 
 /* ---- Client review: header, meta line, stepper ---------------------------- */
-.tcc-review-head {
+.tcc-header-compact > div {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-4) var(--space-10);
+  gap: var(--space-2) var(--space-10);
+}
+
+.tcc-header-compact .page-title {
+  margin: 0;
+  font-size: var(--text-title);
+  line-height: var(--leading-heading);
+}
+
+html[data-theme="modern"] .tcc-header.tcc-header-compact {
   margin-bottom: var(--space-4);
+}
+
+/* The client page's own title is the header above it; this one names the
+   section, so it steps down rather than competing. */
+.trend-head .trend-title {
+  font-size: var(--text-subhead);
+}
+
+.tcc-header-compact .ui-meta {
+  margin: 0;
 }
 
 .tcc-review-back {
@@ -110,40 +129,25 @@
   text-decoration: underline;
 }
 
-.tcc-review-title {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-4);
-  margin: 0;
-  color: var(--text-primary);
-  font-size: var(--text-title);
-  font-weight: 600;
-  line-height: var(--leading-heading);
-}
-
-.tcc-review-title svg {
-  flex-shrink: 0;
-  color: var(--text-secondary);
-}
-
-.tcc-review-head .ui-meta {
-  margin: 0;
-}
-
 .tcc-review-flow {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-8);
-  margin-bottom: var(--space-7);
-  padding-bottom: var(--space-4);
+  margin-bottom: var(--space-4);
   border-bottom: 1px solid var(--border-subtle);
 }
 
 .tcc-review-flow .ui-stepper-nav {
   flex: 1 1 auto;
   min-width: 0;
+}
+
+.tcc-review-note {
+  margin: 0 0 var(--space-5);
+  color: var(--text-secondary);
+  font-size: var(--text-caption);
 }
 
 /* ---- Verdict card: border = verdict, then pills, title, assessment ------- */

@@ -473,7 +473,7 @@ function ClientPicker({ clients, onPickClient }) {
 }
 
 export default function TrendGridView({
-  scope, scopeOptions, clientScope, scopeError, onPickClient, onOpenUnit, onWhatIf,
+  scope, scopeOptions, clientScope, scopeError, onPickClient, onOpenUnit, onWhatIf, onContext,
 }) {
   const [loaded, setLoaded] = useState(null);
   const [error, setError] = useState(null);
@@ -515,6 +515,13 @@ export default function TrendGridView({
   // grid captioned with someone else's name.
   const payload = loaded?.key === scopeKey ? loaded.data : null;
   const calculated = isCalculated(payload);
+
+  // The page header states the run and the reading this grid is showing. It
+  // only reads them: they are lifted, not recomputed, so the two cannot differ.
+  const run = payload?.run ?? null;
+  useEffect(() => {
+    onContext?.({ run, method });
+  }, [onContext, run, method]);
   const data = useMemo(
     () => (calculated ? trendFromGold(payload) : null),
     [payload, calculated],
@@ -760,7 +767,7 @@ export default function TrendGridView({
           against 656 on the reference client, and the statute has not chosen.
           A dropdown in the top strip reads as a display preference. */}
       <div className="trend-head">
-        <h1 className="page-title">Position by location</h1>
+        <h2 className="page-title trend-title">Position by location</h2>
         <div className="trend-head-controls">
           {data ? (
             <>

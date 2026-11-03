@@ -105,6 +105,25 @@ describe('a finding explains itself', () => {
 
     expect(await screen.findByText(/Nothing is applied until you decide/)).toBeInTheDocument();
   });
+
+  it('is a verdict card: amber while it needs a decision, green once answered', async () => {
+    const { unmount } = render(<AgentActivityView scope={scope()} scopeOptions={SCOPE_OPTIONS} />);
+    const open = await screen.findByRole('article', { name: /counted at two worksites/ });
+    expect(open).toHaveClass('ui-card-verdict-partial');
+    expect(open).toHaveTextContent('Needs a decision');
+    // The derivation sits in the inset callout, in the product's own words.
+    expect(within(open).getByRole('complementary')).toHaveTextContent(/counted twice/);
+    unmount();
+
+    api.fetchFindings.mockResolvedValue(payload([finding({
+      requires_decision: false,
+      resolution: { resolution: 'assign', decided_by: 'analyst', detail: {} },
+    })]));
+    render(<AgentActivityView scope={scope()} scopeOptions={SCOPE_OPTIONS} />);
+    const done = await screen.findByRole('article', { name: /counted at two worksites/ });
+    expect(done).toHaveClass('ui-card-verdict-above-min');
+    expect(done).toHaveTextContent('Decided');
+  });
 });
 
 // ------------------------------------------------------------ the grain

@@ -1842,9 +1842,6 @@ button.pill-action.pill-forecast-ok, button.pill-action.pill-forecast-bad { bord
 .plan-gap { color: var(--accent-strong); font-weight: 800; }
 
 /* --- Agent Activity: findings that need a decision (B7) ---------------- */
-.finding { border-left: 4px solid var(--line-2); }
-.finding.open { border-left-color: var(--exp-gold); }
-.finding.closed { border-left-color: var(--state-above-min-line); opacity: .82; }
 .finding-evidence { margin: var(--space-5) 0 var(--space-6); }
 .finding-actions { display: flex; flex-wrap: wrap; gap: var(--space-4); align-items: center; margin-top: var(--space-6); padding-top: var(--space-6); border-top: 1px solid var(--line-2); }
 .finding-pick { display: inline-flex; gap: var(--space-3); align-items: center; margin-right: var(--space-2); }
@@ -2181,7 +2178,7 @@ button.pill-action.pill-forecast-ok, button.pill-action.pill-forecast-bad { bord
 .tcc-expander { width: 28px; padding: 0; text-align: center; }
 .tcc-expander .tcc-cell-btn { width: 100%; line-height: 1; }
 .cov-grid tr.row-open > td,
-.cov-grid tr.row-open > th { background: var(--accent-2-bg); }
+.cov-grid tr.row-open > th { background: var(--select-bg); }
 .tcc-expand-row > td { padding: 0; background: var(--panel-2, var(--panel)); }
 .tcc-expand-table { width: 100%; margin: 0; }
 .tcc-expand-note { padding: var(--space-4) var(--space-6); font-size: var(--text-caption); color: var(--muted); }

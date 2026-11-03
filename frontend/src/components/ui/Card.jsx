@@ -24,6 +24,7 @@ export default function Card({
   tone = 'neutral',
   flush = false,
   as: Element = 'section',
+  label,
   children,
   className = '',
 }) {
@@ -41,7 +42,11 @@ export default function Card({
     .join(' ');
 
   return (
-    <Element className={classes} aria-labelledby={title ? titleId : undefined}>
+    <Element
+      className={classes}
+      aria-labelledby={title ? titleId : undefined}
+      aria-label={!title && label ? label : undefined}
+    >
       {hasHeader && (
         <header className="ui-card-header">
           <div className="ui-card-heading">

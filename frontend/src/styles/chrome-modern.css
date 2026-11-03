@@ -177,7 +177,7 @@ html[data-theme="modern"] .tcc-ask {
 }
 
 /* ---- Informational cards: a hairline, not a coloured stripe --------------
-   A stripe is a verdict (`.prog-verdict`, `.tcc-invariant`, `.finding`,
+   A stripe is a verdict (`.prog-verdict`, `.tcc-invariant`,
    `.trend-block.attention` keep theirs). These carried one as decoration. */
 html[data-theme="modern"] :is(
   .tcc-formula-pair > div, .tcc-method-card, .tcc-recon-grid > div, .tcc-history-strip > div,

@@ -8,6 +8,7 @@ import {
 import { fetchClientScope, fetchScope, fetchWorkspace, hasYear, refreshWorkspace } from './api.js';
 import AgentActivityView from './components/AgentActivityView.jsx';
 import ChatPanel from './components/ChatPanel.jsx';
+import ClientHeader from './components/ClientHeader.jsx';
 import DataIngestionView from './components/DataIngestionView.jsx';
 import EvidenceView from './components/EvidenceView.jsx';
 import RuleLibraryView from './components/RuleLibraryView.jsx';
@@ -532,7 +533,28 @@ export default function App() {
       }))}
     />;
   }
-  else if (routeView === 'eligibility') view = <EligibilityView {...common} scope={resolved.scope} />;
+  else if (routeView === 'eligibility') {
+    // With a client chosen, Eligibility is a step in that client's review, so it
+    // carries the same header and flow as the client page.
+    const industry = (scopeOptions?.clients || [])
+      .find((c) => String(c.account_id) === String(resolved.scope.clientId))?.industry || null;
+    view = <EligibilityView
+      {...common}
+      scope={resolved.scope}
+      header={resolved.scope.clientId === PORTFOLIO ? null : (
+        <ClientHeader
+          clientId={resolved.scope.clientId}
+          clientName={clientDisplayName}
+          industry={industry}
+          year={resolved.scope.year ?? null}
+          search={resolved.scope.year != null ? `year=${resolved.scope.year}` : ''}
+          current="eligibility"
+          clientScope={clientScope}
+          onBack={() => navigate(buildRouteUrl({ clientId: PORTFOLIO }))}
+        />
+      )}
+    />;
+  }
   else if (routeView === 'onezero') view = <OneZeroView {...common} scope={resolved.scope} />;
   else if (routeView === 'compare') view = <CompareView {...common} />;
   else if (routeView === 'assumptions') view = <AssumptionsView {...common} />;

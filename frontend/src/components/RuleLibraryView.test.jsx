@@ -24,12 +24,12 @@ describe('RuleLibraryView', () => {
 
   it('lists the authored rule packs', async () => {
     render(<RuleLibraryView />);
-    expect(await screen.findByText('Georgia Job Tax Credit')).toBeInTheDocument();
+    expect(await screen.findByRole('cell', { name: 'Georgia Job Tax Credit' })).toBeInTheDocument();
   });
 
   it('offers no ingestion action that changes nothing the calculation reads', async () => {
     render(<RuleLibraryView />);
-    await screen.findByText('Georgia Job Tax Credit');
+    await screen.findByRole('cell', { name: 'Georgia Job Tax Credit' });
     expect(screen.queryByRole('button', { name: /re-run ingestion/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /against DCA source/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /confirm & apply/i })).not.toBeInTheDocument();
@@ -37,7 +37,7 @@ describe('RuleLibraryView', () => {
 
   it('does not claim values were retrieved rather than authored', async () => {
     render(<RuleLibraryView />);
-    await screen.findByText('Georgia Job Tax Credit');
+    await screen.findByRole('cell', { name: 'Georgia Job Tax Credit' });
     expect(screen.queryByText(/retrieved with a citation rather than typed in/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/not hand-entered/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Web IQ/i)).not.toBeInTheDocument();
@@ -59,12 +59,33 @@ describe('RuleLibraryView', () => {
     expect(screen.getByText(/no authored years/i)).toBeInTheDocument();
   });
 
+  it('states each programme\u2019s readiness as a verdict card, in words and a border', async () => {
+    api.fetchRules.mockResolvedValue({
+      rules: [
+        { code: 'GA_JTC', citation: 'OCGA § 48-7-40', name: 'Georgia Job Tax Credit', jurisdiction: 'GA', verified: true },
+        { code: 'SC_JTC', citation: 'S.C. Code § 12-6-3360', name: 'South Carolina Jobs Tax Credit', jurisdiction: 'SC', verified: false },
+      ],
+    });
+    render(<RuleLibraryView programs={[
+      { program_code: 'GA_JTC', authored_years: [2023] },
+      { program_code: 'SC_JTC', authored_years: [] },
+    ]} />);
+    const ga = await screen.findByRole('article', { name: 'Georgia Job Tax Credit' });
+    expect(ga).toHaveClass('ui-card-verdict-above-min');
+    expect(ga).toHaveTextContent('Calculable');
+    expect(ga).toHaveTextContent('Signed off');
+    const sc = screen.getByRole('article', { name: 'South Carolina Jobs Tax Credit' });
+    expect(sc).toHaveClass('ui-card-verdict-partial');
+    expect(sc).toHaveTextContent('Not calculated yet');
+    expect(sc).toHaveTextContent('Review pending');
+  });
+
   it('shows no internal build artefacts to an executive reader', async () => {
     api.fetchRules.mockResolvedValue({
       rules: [{ code: 'GA_JTC', citation: 'OCGA § 48-7-40', name: 'Georgia Job Tax Credit', jurisdiction: 'GA', verified: true, version: '0.1.0' }],
     });
     render(<RuleLibraryView programs={[{ program_code: 'GA_JTC', authored_years: [2023] }]} />);
-    await screen.findByText('Georgia Job Tax Credit');
+    await screen.findByRole('cell', { name: 'Georgia Job Tax Credit' });
     expect(screen.queryByRole('columnheader', { name: 'Version' })).not.toBeInTheDocument();
     expect(screen.queryByText('0.1.0')).not.toBeInTheDocument();
     expect(screen.queryByText(/PROGRAM_CODE_TO_PACK/)).not.toBeInTheDocument();
