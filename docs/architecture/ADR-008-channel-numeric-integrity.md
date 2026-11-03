@@ -174,9 +174,10 @@ runs the same numeric guard, at zero tolerance, over a draft.
 
 **Two limits found while proving it, stated rather than fixed.** The guard matches **values**. A wrong figure that
 equals another real figure in the same conversation (`$1` beside a real count of 1) is not seen; the tests pin
-this and the mutation helper leaves such collisions out. And `client_resolve` asks even for one exact name when no
-client is selected, so a skill must confirm and call it again with `current_client_id`; the guard is not involved,
-but a workflow that guessed would have named the wrong client.
+this and the mutation helper leaves such collisions out. And `client_resolve` asked even for one exact name when no
+client was selected, so a skill had to confirm and call it again with `current_client_id`; the guard is not involved,
+but a workflow that guessed would have named the wrong client. *Update (CH-15e): the channel's `client_resolve` now
+returns `resolved: true` for exactly one exact name or alias and still asks about a partial or ambiguous one.*
 
 ## Consequences
 

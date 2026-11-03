@@ -5,6 +5,7 @@ and the tests build the same pipeline around fakes. Every collaborator can be ha
 """
 from __future__ import annotations
 
+import logging
 import os
 from collections.abc import Mapping
 from dataclasses import dataclass
@@ -16,6 +17,8 @@ from app.core.settings import OrchestratorSettings, load_settings
 from app.core.state import StateStore
 from app.core.turn import TurnPipeline
 from application.ai.safety.injection import PromptInjectionGuard
+
+log = logging.getLogger("tcc.orchestrator")
 
 
 @dataclass
@@ -41,6 +44,11 @@ def build_orchestrator(
 ) -> Orchestrator:
     """Build from the environment. Raises `OrchestratorConfigError` naming every problem."""
     settings = load_settings(effective_environment(os.environ if env is None else env))
+    if settings.debug_whoami:
+        log.warning(
+            "CHANNEL_DEBUG_WHOAMI is ON: /whoami, /netcheck and /modelprobe answer anyone who can message this agent. "
+            "Demo and identity spikes only; switch it off afterwards (docs/m365-channel/DEMO-CLEANUP.md).",
+        )
     gateway = gateway or GatewayClient(
         settings.gateway_url, managed_identity_token(settings.gateway_scope), timeout_seconds=settings.request_timeout_seconds,
     )
