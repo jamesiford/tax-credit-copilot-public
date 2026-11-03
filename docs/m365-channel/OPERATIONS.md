@@ -47,6 +47,9 @@ Failure signatures are in [RUNBOOK](../architecture/RUNBOOK.md). Two PoC-specifi
   the workspace was moved. Ask the owner; do not resume or assign a capacity from here.
 * The gateway answers 502 `api_unavailable`: the gateway identity lost its `TCC.Agent` role, or the
   API is stopped. `pwsh scripts/assign-channel-roles.ps1 ...` is idempotent and prints what is missing.
+* A person in the writers **group** but not on the allow-list is refused by the API with `GroupMember.Read.All` granted
+  moments earlier: the identity asked Graph for a token before the grant and the platform keeps that token for about a day.
+  Grant Graph roles **before** the first call, or use the allow-list meanwhile.
 
 ## Take it down
 

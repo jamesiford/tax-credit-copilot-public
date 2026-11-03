@@ -83,3 +83,21 @@ Entra on, on SQLite and synthetic data. It does **not** prove: a live Teams, Cop
 what identity signal a real message carries; that Cowork's model obeys the skills; the Warehouse stores under
 load; or the hardened network. The manual checklist in [DEMO-SCRIPT](DEMO-SCRIPT.md) is where those are
 checked, after the live deployment.
+
+## Found in the live sandbox (CH-13, 3 November 2026)
+
+What the first live deployment showed that the tests could not. Each is a fact about this deployment, not a promise.
+
+| Finding | Detail | What closes it |
+| --- | --- | --- |
+| **The hosted agent cannot reach the Foundry model endpoint** | From the agent's container, a call to the account's `/openai/v1` surface fails at connect (`ConnectError`) while the platform's own storage call and the call to the gateway succeed. The orchestrator then answers from the tools alone: every figure, table and disclaimer is the engine's, with a line saying the commentary is unavailable. Reading the project's own `openai/v1` path, or the agent's private-network route, is the thing to try next (spike S6) | A reachable model endpoint for the agent, or the customer gateway if it is reachable from the agent |
+| **The account firewall must admit the agent, so the demo posture is open to any address** | With the data plane limited to the operator's address, the hosted runtime's own calls to the project were refused (403, "Virtual Network/Firewall rules"). The demo therefore runs `foundry_allowed_ip_ranges` empty: public, Entra-only, local keys off, synthetic data | The hardening plan: a delegated agent subnet and private endpoints |
+| **`x-ms-user-identity` needs delegation the caller does not have** | A direct call carrying it was refused by the platform ("Caller is not authorized to delegate to another user"). The default identity sources therefore depend on `x-ms-original-subject`, which only a real Teams or Copilot message supplies. Direct calls carry no identity and run nothing | The live Teams spike (S1, S2) |
+| **A role granted to an identity that has already asked for a token is not seen for up to a day** | The API's identity asked Microsoft Graph for a token, was refused, and was then granted `GroupMember.Read.All`; the platform keeps the first token until it expires, so a group-only writer is refused by the API even though the gateway admitted them. Grant the role **before** the first call, or put the writer on the allow-list | Waiting out the token, or granting first |
+| **The API reads the writer source too** | It enforces the writer entitlement itself, so Terraform now gives it `CHANNEL_WRITER_SOURCE` and the group id (and its identity needs the Graph role for a group source). Before this, `either` at the gateway still meant allow-list at the API | Fixed in infra |
+| **`claim_transition_prepare` on a year with no claim cell answers 500** | `internal_error` rather than a 409 `not_calculated`, as `claim_cell_history` gives. No data is touched; the audit row says `error` | A guard in the capability |
+| **One gateway worker, one process** | A 40-way burst of 200 calls took 129 seconds and 19 answered 502. The rate limit (60 a minute) cannot be outrun at about 1.5 calls a second, so its 429 is proven offline, not live | Workers behind a shared ledger and limiter |
+| **The deployment hook can report a start failure for a gateway that started** | `az webapp deploy` said the site did not start in ten minutes; the app was serving and ready minutes earlier (its first build is slow). Check `/channel/ready` before believing it | A longer wait in the hook |
+| **The mock model gateway was unreachable until its port matched the platform's probe** | Fixed in Terraform. It is reachable only from the integration subnet, so it was checked from the API app's Kudu console, not from a workstation | n/a |
+| **Portal HTTP endpoints cannot be compared from a workstation** | Behind Easy Auth and the API's subnet rule. The live smoke compares the gateway with the same capability run in process against the same Warehouse; a person compares the portal by eye (the manual checklist) | A signed-in browser session |
+| **No finding exists to resolve** | Findings detection found none for any synthetic client, so `finding_resolve` was not exercised live | A client with an open finding |
