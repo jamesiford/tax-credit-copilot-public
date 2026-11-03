@@ -548,11 +548,9 @@ def test_the_registry_runs_a_capability_by_name(book, claims_repo):
     assert result.facts["client_name"] == "Cascade Retail Partners"
 
 
-def test_an_unbuilt_tool_cannot_be_called():
-    with pytest.raises(NotImplementedError):
-        registry.get("verify_figures")
-    with pytest.raises(NotImplementedError):
-        registry.get("claim_package_create_commit")
+def test_a_name_the_catalog_does_not_know_cannot_be_called():
+    with pytest.raises(KeyError):
+        registry.get("no_such_tool")
 
 
 def test_money_in_facts_stays_exact(book, claims_repo):

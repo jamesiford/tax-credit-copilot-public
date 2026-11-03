@@ -16,6 +16,7 @@ load_dotenv()  # local dev — production env vars come from the host.
 from telemetry import configure_telemetry, instrument_fastapi  # noqa: E402
 from api.artifacts import router as artifacts_router  # noqa: E402
 from api.audit import router as audit_router  # noqa: E402
+from api.capabilities import router as capabilities_router  # noqa: E402
 from api.auth import request_guard, router as auth_router  # noqa: E402
 from application.identity import NotAuthorized  # noqa: E402
 from api.chat import router as chat_router  # noqa: E402
@@ -189,6 +190,7 @@ def health() -> dict:
 app.include_router(auth_router)
 app.include_router(artifacts_router)
 app.include_router(audit_router)
+app.include_router(capabilities_router)
 app.include_router(chat_router)
 app.include_router(claims_router)
 app.include_router(claims_v2_router)

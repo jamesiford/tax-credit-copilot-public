@@ -67,15 +67,15 @@ from application.queries.rebase_unit import RebaseUnitQuery, handle_rebase_unit
 from application.commands.set_base_year import SetBaseYearCommand, handle_set_base_year
 from application.commands.record_claim import RecordClaimCommand, handle_record_claim
 from application.commands.set_engagement import SetEngagementCommand, handle_set_engagement
+from application.commands.create_claim_package import CreateClaimPackageCommand, handle_create_claim_package
 from application.commands.transition_claim import TransitionClaimCommand, handle_transition_claim
 from application.ai.handlers import handle_channel_narration, handle_narrate_brief, handle_route_question
 from application.ai.requests import ChannelNarrationQuery, NarrateBriefQuery, RouteQuestionQuery
 from application.ai_wiring import (  # noqa: F401 - re-exported: one import for every composition getter
     ai_health, get_agent_catalog, get_ai_settings, get_ai_telemetry, get_model_router, get_narration_service,
     get_output_policy, get_provider_registry, get_spec_registry, get_token_budget, reset_ai, set_ai_clock,
-    set_ai_settings,
-    set_ai_telemetry, set_model_router,
-    set_narration_service, set_provider_registry, set_spec_registry,
+    set_ai_settings, set_ai_telemetry, set_model_router, set_narration_service, set_provider_registry,
+    set_spec_registry,
 )
 
 _mediator: Mediator | None = None
@@ -587,7 +587,7 @@ def build_mediator() -> Mediator:
     mediator.register(RecordClaimCommand, handle_record_claim)
     mediator.register(TransitionClaimCommand, handle_transition_claim)
     mediator.register(SetEngagementCommand, handle_set_engagement)
-
+    mediator.register(CreateClaimPackageCommand, handle_create_claim_package)
     return mediator
 
 

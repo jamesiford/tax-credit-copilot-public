@@ -69,7 +69,35 @@ _WRITES: tuple[CapabilitySpec, ...] = (
     *_write_pair(
         "claim_package_create", "Build the claim package for a client-year.",
         {"client_id": _CLIENT_ID, "tax_year": _TAX_YEAR},
-        ("client_id", "tax_year"), needs_year=True, implemented=False,
+        ("client_id", "tax_year"), needs_year=True,
+    ),
+)
+
+#: Tools the API never answers by name over the wire to a channel caller; the
+#: gateway holds what they need (the conversation's facts) or they are plumbing.
+GATEWAY_LOCAL = "gateway-local"
+INTERNAL = "internal"
+
+_PACKAGE_TOOLS: tuple[CapabilitySpec, ...] = (
+    CapabilitySpec(
+        name="claim_package_link",
+        description=(
+            "A short-lived, single-use download link for a client-year's claim package, bound to "
+            "the person who asked. Build the package first with claim_package_create."
+        ),
+        kind=READ, needs_client=True, needs_year=True,
+        schema=_object({"client_id": _CLIENT_ID, "tax_year": _TAX_YEAR}, ("client_id", "tax_year")),
+    ),
+    CapabilitySpec(
+        name="claim_package_redeem",
+        description="Plumbing for the gateway's download route: spend a link ticket. Not offered to callers.",
+        kind=READ, needs_client=False, needs_year=False, tags=(INTERNAL,),
+        schema=_object(
+            {"ticket": {"type": "string", "minLength": 16, "maxLength": 128},
+             "expected_user_oid": {"type": "string", "maxLength": 64,
+                                   "description": "Set when the downloader proved who they are; checked before the ticket is spent."}},
+            ("ticket",),
+        ),
     ),
 )
 
@@ -144,11 +172,18 @@ CATALOG: tuple[CapabilitySpec, ...] = (
     ),
     CapabilitySpec(
         name="verify_figures",
-        description="Check draft text: which numerals are not in the session's tool facts.",
-        kind=READ, needs_client=False, needs_year=False,
-        schema=_object({"draft_text": {"type": "string"}}, ("draft_text",)),
-        implemented=False,
+        description=(
+            "Check draft text: which numerals are not in this conversation's tool facts. "
+            "Pass the reader's own numerals as allowed_context."
+        ),
+        kind=READ, needs_client=False, needs_year=False, tags=(GATEWAY_LOCAL,),
+        schema=_object(
+            {"draft_text": {"type": "string", "maxLength": 20000},
+             "allowed_context": {"type": "array", "items": {"type": "string", "maxLength": 500}, "maxItems": 50}},
+            ("draft_text",),
+        ),
     ),
+    *_PACKAGE_TOOLS,
     *_WRITES,
 )
 
@@ -169,3 +204,13 @@ def get(name: str) -> CapabilitySpec:
 def implemented() -> tuple[CapabilitySpec, ...]:
     """Every capability that is built, in catalog order."""
     return tuple(spec for spec in CATALOG if spec.implemented)
+
+
+def offered() -> tuple[CapabilitySpec, ...]:
+    """What a channel caller may be shown: built, and not plumbing."""
+    return tuple(spec for spec in implemented() if INTERNAL not in spec.tags)
+
+
+def offered_or_declared() -> tuple[CapabilitySpec, ...]:
+    """Everything but plumbing, built or not, so a caller sees what is coming and `implemented` says what is here."""
+    return tuple(spec for spec in CATALOG if INTERNAL not in spec.tags)

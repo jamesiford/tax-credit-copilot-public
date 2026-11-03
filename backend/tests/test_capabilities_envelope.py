@@ -258,13 +258,11 @@ def test_every_schema_property_is_a_parameter_of_its_function():
             assert required in params, (name, required)
 
 
-def test_the_unbuilt_tools_are_the_ones_a_later_work_package_owns():
-    unbuilt = {s.name for s in catalog.CATALOG if not s.implemented}
-    assert "verify_figures" in unbuilt
+def test_every_catalogued_tool_is_built():
+    """Prompt 3 built the last two (`claim_package_create`, `verify_figures`); nothing is declared-only now."""
+    assert {s.name for s in catalog.CATALOG if not s.implemented} == set()
     writes = {s.name for s in catalog.CATALOG if s.kind != catalog.READ}
-    # CH-05 built six of the seven pairs, each behind the mediator and a
-    # confirmation token. The package build is Prompt 3's.
-    assert writes & unbuilt == {"claim_package_create_prepare", "claim_package_create_commit"}
+    assert writes <= {s.name for s in catalog.CATALOG if s.implemented}
     for base in ("finding_resolve", "finding_reopen", "claim_transition", "claim_record",
                  "engagement_set", "base_year_set", "claim_package_create"):
         assert catalog.get(f"{base}_prepare").kind == catalog.WRITE_PREPARE
