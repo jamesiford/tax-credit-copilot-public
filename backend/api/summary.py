@@ -146,8 +146,9 @@ async def _stream(app: Any, req: SummaryRequest) -> AsyncIterator[str]:
 
     yield _sse("brief", {"page": brief["page"], "headline": brief["headline"], "caveats": brief["caveats"]})
 
-    registry = getattr(app.state, "registry", None)
-    if registry is None or AGENT not in getattr(registry, "by_name", {}):
+    from application.wiring import get_narration_service
+
+    if not get_narration_service().available([AGENT]):
         # No model: say the computed facts rather than nothing. They are the
         # brief itself, so there is nothing to check.
         yield _sse("fallback", {"facts": brief["facts"], "note": "Copilot is not connected; these are the computed facts."})
@@ -161,7 +162,7 @@ async def _stream(app: Any, req: SummaryRequest) -> AsyncIterator[str]:
             f"Summarise the {brief['page']} page for {brief['subject']}.\n\n"
             f"JSON:\n{json.dumps(brief, indent=2, default=str)}"
         )
-        async for frame in _stream_agent(AGENT, registry[AGENT].agent, prompt):
+        async for frame in _stream_agent(AGENT, prompt):
             text.append(_token_text(frame))
             yield frame
     finally:

@@ -49,33 +49,20 @@ async def lifespan(app: FastAPI):
     log.info("deployment configuration: %s", app.state.deployment)
 
     configure_telemetry("tax-credit-copilot-api")
-    endpoint = os.getenv("FOUNDRY_PROJECT_ENDPOINT")
-    model = os.getenv("FOUNDRY_MODEL", "gpt-5.4-mini")
 
-    app.state.registry = None
     app.state.agent_metrics = {}
     app.state.agent_spans = []
     app.state.audit_events = []
-    if not endpoint:
-        log.warning(
-            "FOUNDRY_PROJECT_ENDPOINT is not set; agents will NOT be registered. "
-            "/api/chat will fall back to the Phase 1 scripted stream."
-        )
-    else:
-        log.info("Registering agents in Foundry (endpoint=%s, model=%s) ...", endpoint, model)
-        try:
-            from agents import build_all
-            registry = build_all()
-            app.state.registry = registry
-            log.info("=" * 72)
-            log.info("Foundry agent registry ready. Open in the portal:")
-            for r in registry:
-                log.info("  %-22s v%-3s id=%s", r.name, r.version, r.agent_id)
-                log.info("    %s", r.portal_url)
-            log.info("=" * 72)
-        except Exception:
-            log.exception("Failed to register Foundry agents; /api/chat will use the Phase 1 stub.")
-            app.state.registry = None
+    # Model access: settings are validated NOW (a gateway with no auth scheme must
+    # stop startup, not the first question), publishing is warmed in the
+    # background so Foundry being slow or down never blocks the API. A provider
+    # that cannot warm leaves the scripted stream in place.
+    from application.wiring import get_agent_catalog, get_ai_settings, get_model_router
+
+    settings = get_ai_settings()
+    log.info("AI provider chain: %s", ", ".join(settings.provider_chain))
+    get_model_router().statuses()
+    get_agent_catalog().warm()
 
     # Pay the cold-lakehouse cost off the request path. Never blocks startup, and
     # a lakehouse that is unreachable degrades to a slow first request.
@@ -167,16 +154,33 @@ def ready() -> dict:
     """
     warm = getattr(app.state, "warm", {"status": "unknown"})
     started = bool(getattr(app.state, "started", False))
-    return {"ready": started and warm.get("status") != "running", "warm": warm}
+    return {"ready": started and warm.get("status") != "running", "warm": warm, "ai": _ai_state()}
+
+
+def _ai_state() -> str:
+    """`ready` | `degraded` | `disabled`. Reported, never a reason to fail readiness."""
+    from application.wiring import ai_health
+
+    try:
+        return ai_health()["state"]
+    except Exception:  # noqa: BLE001 - a broken AI config must not take the probe down
+        return "degraded"
 
 
 @app.get("/api/health")
 def health() -> dict:
+    from application.wiring import ai_health
+
+    try:
+        ai = ai_health()
+    except Exception as exc:  # noqa: BLE001
+        ai = {"state": "degraded", "providers": [], "agents_published": 0, "detail": type(exc).__name__}
     return {
         "status": "ok",
         "phase": 2,
         "foundry_configured": bool(os.getenv("FOUNDRY_PROJECT_ENDPOINT")),
-        "agents_registered": bool(getattr(app.state, "registry", None)),
+        "agents_registered": ai["agents_published"] > 0,
+        "ai": ai,
         "telemetry_configured": bool(os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING")),
         "warm": getattr(app.state, "warm", {"status": "unknown"}),
     }
