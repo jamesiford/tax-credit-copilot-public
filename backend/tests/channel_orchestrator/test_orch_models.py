@@ -98,5 +98,10 @@ def test_the_gateway_provider_is_external_so_aggregates_only_refuses_a_free_text
     assert state.log == [] and reply.mode == "keywords"
 
 
-def test_a_foundry_project_endpoint_gives_the_accounts_openai_v1_base():
-    assert foundry_openai_base("https://acct.services.ai.azure.com/api/projects/proj") == "https://acct.services.ai.azure.com/openai"
+def test_a_foundry_project_endpoint_gives_the_accounts_openai_v1_base_on_the_host_the_hosted_runtime_can_resolve():
+    """M-01: from the hosted runtime only `<account>.openai.azure.com` resolves; the project's own host does not. [CH-14]"""
+    assert foundry_openai_base("https://acct.services.ai.azure.com/api/projects/proj") == "https://acct.openai.azure.com/openai"
+
+
+def test_a_host_that_is_not_a_public_cloud_foundry_name_keeps_its_own():
+    assert foundry_openai_base("https://acct.services.ai.example.us/api/projects/proj") == "https://acct.services.ai.example.us/openai"

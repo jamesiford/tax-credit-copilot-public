@@ -57,11 +57,20 @@ class Provider:
 
 
 def foundry_openai_base(project_endpoint: str) -> str:
-    """The account's Azure OpenAI v1 base from a project endpoint: `https://<account>.services.ai.azure.com/openai`."""
+    """The account's Azure OpenAI v1 base: `https://<account>.openai.azure.com/openai`.
+
+    Not the project endpoint's own host. From the hosted runtime `<account>.services.ai.azure.com` and
+    `<account>.cognitiveservices.azure.com` do not resolve ("Temporary failure in name resolution",
+    shown by `/netcheck` and by the documented sample's own call, `/modelprobe`) while
+    `<account>.openai.azure.com` resolves and answers, with the same account, token and deployment. [CH-14]
+    A host that is not a public-cloud `services.ai.azure.com` name keeps its own host.
+    """
     parsed = urlparse(project_endpoint)
     if parsed.scheme != "https" or not parsed.netloc:
         raise OrchestratorConfigError("FOUNDRY_PROJECT_ENDPOINT must be an https:// URL")
-    return f"https://{parsed.netloc}/openai"
+    account, _, suffix = parsed.netloc.partition(".")
+    host = f"{account}.openai.azure.com" if suffix == "services.ai.azure.com" else parsed.netloc
+    return f"https://{host}/openai"
 
 
 def build_providers(settings: OrchestratorSettings) -> list[Provider]:

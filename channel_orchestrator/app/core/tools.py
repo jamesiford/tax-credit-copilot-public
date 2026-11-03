@@ -38,6 +38,7 @@ from app.core.toolset import (  # noqa: F401 - re-exported: the names the rest o
     numbers_in, offered_schema, years_in,
 )
 from application.capabilities import catalog
+from app.core.placeholders import with_placeholders
 from application.composer import narrator_brief
 
 log = logging.getLogger("tcc.orchestrator.tools")
@@ -210,7 +211,7 @@ class ToolRunner:
         if spec.kind == catalog.WRITE_PREPARE:
             self._hold(run)
         brief = narrator_brief(self.question, [spec.name], {run.label: run.facts}, notes=list(reply.body.get("warnings") or []))
-        return {"ok": True, "tool": spec.name, "fact_paths": brief["fact_paths"], "notes": brief["notes"]}
+        return {"ok": True, "tool": spec.name, "fact_paths": with_placeholders(brief["fact_paths"]), "notes": brief["notes"]}
 
     def _hold(self, run: ToolRun) -> None:
         """Keep a prepared change for its owner's `confirm`. The token never leaves this object."""
