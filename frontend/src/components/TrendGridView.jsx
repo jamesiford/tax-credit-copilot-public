@@ -12,6 +12,8 @@ import { NUM } from '../lib/reference.js';
 import { trendFromGold } from '../lib/goldTrend.js';
 import InsightBar, { provenanceLine } from './InsightBar.jsx';
 import MethodTabs from './MethodTabs.jsx';
+import EmptyState from './ui/EmptyState.jsx';
+import Skeleton from './ui/Skeleton.jsx';
 import { filterBlocks, formatSort, parseSort, sortRows, toggleSort } from '../lib/gridSort.js';
 import { isWhatIfTarget, whatIfLink } from '../lib/whatIf.js';
 import {
@@ -85,16 +87,6 @@ const UNIT_COLUMN = { key: 'unit', label: 'Location', type: TEXT, read: (block) 
  * - **The base year and the tier are both unconfirmed.** They change whether a
  *   year qualifies, so they are banner-flagged rather than footnoted.
  */
-
-function Kpi({ label, value, sub, tone }) {
-  return (
-    <div className={`kpi-card${tone ? ` ${tone}` : ''}`}>
-      <div className="kpi-label">{label}</div>
-      <div className="kpi-value">{value}</div>
-      {sub ? <div className="kpi-sub">{sub}</div> : null}
-    </div>
-  );
-}
 
 function TierPill({ row }) {
   const code = designationCode(row);
@@ -483,7 +475,7 @@ function ClientPicker({ clients, onPickClient }) {
 }
 
 export default function TrendGridView({
-  scope, scopeOptions, clientScope, scopeError, onPickClient, onOpenUnit, onWhatIf,
+  scope, scopeOptions, clientScope, scopeError, onPickClient, onOpenUnit, onWhatIf, onContext,
 }) {
   const [loaded, setLoaded] = useState(null);
   const [error, setError] = useState(null);
@@ -525,6 +517,13 @@ export default function TrendGridView({
   // grid captioned with someone else's name.
   const payload = loaded?.key === scopeKey ? loaded.data : null;
   const calculated = isCalculated(payload);
+
+  // The page header states the run and the reading this grid is showing. It
+  // only reads them: they are lifted, not recomputed, so the two cannot differ.
+  const run = payload?.run ?? null;
+  useEffect(() => {
+    onContext?.({ run, method });
+  }, [onContext, run, method]);
   const data = useMemo(
     () => (calculated ? trendFromGold(payload) : null),
     [payload, calculated],
@@ -770,7 +769,7 @@ export default function TrendGridView({
           against 656 on the reference client, and the statute has not chosen.
           A dropdown in the top strip reads as a display preference. */}
       <div className="trend-head">
-        <h1 className="page-title">Position by location</h1>
+        <h2 className="page-title trend-title">Position by location</h2>
         <div className="trend-head-controls">
           {data ? (
             <>
@@ -794,10 +793,12 @@ export default function TrendGridView({
         </div>
       </div>
 
-      {loading && !payload ? (
-        <div className="panel trend-loading"><Loader2 size={16} className="spin" /> Reading the warehouse…</div>
+      {loading && !payload ? <Skeleton lines={4} label="Reading the warehouse…" /> : null}
+      {error ? (
+        <EmptyState title="This client's locations are unavailable">
+          {error}<br />Nothing was calculated or changed; reload the page to try again.
+        </EmptyState>
       ) : null}
-      {error ? <div className="callout warn">{error}</div> : null}
 
       {/* Never $0 and never a bare empty grid: "the pipeline has not reached
           this yet" and "we looked and the answer is nothing" are different

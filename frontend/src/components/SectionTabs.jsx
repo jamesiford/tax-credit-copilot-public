@@ -1,3 +1,5 @@
+import Tabs from './ui/Tabs.jsx';
+
 /**
  * Sections of one page, one visible at a time.
  *
@@ -12,33 +14,37 @@
  */
 export default function SectionTabs({ tabs, active, onChange, label = 'Sections', idPrefix = 'section' }) {
   return (
-    <div className="section-tabs" role="tablist" aria-label={label}>
-      {tabs.map((tab) => (
-        <button
-          key={tab.id}
-          type="button"
-          role="tab"
-          id={`${idPrefix}-tab-${tab.id}`}
-          aria-selected={active === tab.id}
-          aria-controls={`${idPrefix}-panel-${tab.id}`}
-          className={active === tab.id ? 'active' : ''}
-          onClick={() => onChange(tab.id)}
-          title={tab.hint}
-        >
-          {tab.label}
-        </button>
-      ))}
-    </div>
+    <Tabs
+      className="section-tabs"
+      tabs={tabs}
+      active={active}
+      onChange={onChange}
+      label={label}
+      idPrefix={idPrefix}
+    />
   );
 }
 
 /**
  * The panel half. `keepMounted` keeps a visited panel alive while hidden, so
  * returning to it costs neither a refetch nor its expand and sort state.
+ *
+ * With a `label` it is a named region rather than a tabpanel: the client page
+ * switches sections with a stepper of links, and a tabpanel with no tab
+ * pointing at it would be a role that promises a control that is not there.
  */
-export function SectionTabPanel({ id, active, idPrefix = 'section', keepMounted = false, visited = true, children }) {
+export function SectionTabPanel({
+  id, active, idPrefix = 'section', keepMounted = false, visited = true, label = null, children,
+}) {
   const shown = id === active;
   if (!shown && !(keepMounted && visited)) return null;
+  if (label) {
+    return (
+      <div role="region" id={`${idPrefix}-panel-${id}`} aria-label={label} hidden={!shown}>
+        {children}
+      </div>
+    );
+  }
   return (
     <div
       role="tabpanel"

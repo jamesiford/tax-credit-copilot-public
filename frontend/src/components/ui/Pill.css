@@ -1,0 +1,65 @@
+.ui-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-6);
+  border: 1px solid var(--ui-pill-line, var(--border-default));
+  border-radius: var(--radius-pill);
+  background: var(--ui-pill-bg, var(--surface-subtle));
+  color: var(--ui-pill-ink, var(--text-default));
+  font-size: var(--text-caption);
+  font-weight: 500;
+  line-height: var(--leading-dense);
+  white-space: nowrap;
+}
+
+.ui-pill-icon {
+  font-size: var(--text-micro);
+  line-height: 1;
+}
+
+.ui-pill-above-min {
+  --ui-pill-bg: var(--state-above-min);
+  --ui-pill-ink: var(--state-above-min-ink);
+  --ui-pill-line: var(--state-above-min-line);
+}
+
+.ui-pill-below-min {
+  --ui-pill-bg: var(--state-below-min);
+  --ui-pill-ink: var(--state-below-min-ink);
+  --ui-pill-line: var(--state-below-min-line);
+}
+
+.ui-pill-base-year {
+  --ui-pill-bg: var(--state-base-year);
+  --ui-pill-ink: var(--state-base-year-ink);
+  --ui-pill-line: var(--state-base-year-line);
+}
+
+.ui-pill-partial {
+  --ui-pill-bg: var(--state-partial);
+  --ui-pill-ink: var(--state-partial-ink);
+  --ui-pill-line: var(--state-partial-line);
+}
+
+.ui-pill-neutral {
+  --ui-pill-bg: var(--state-neutral);
+  --ui-pill-ink: var(--state-neutral-ink);
+  --ui-pill-line: var(--state-neutral-line);
+}
+
+.ui-pill-info {
+  --ui-pill-bg: var(--status-info-bg);
+  --ui-pill-ink: var(--status-info);
+  --ui-pill-line: var(--status-info);
+}
+
+.ui-pill-category {
+  --ui-pill-bg: var(--select-bg);
+  --ui-pill-ink: var(--text-primary);
+  --ui-pill-line: var(--border-default);
+}
+
+.ui-pill-outline {
+  background: var(--surface-card);
+}

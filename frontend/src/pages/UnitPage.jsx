@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Check, Loader2, MapPin, Plus } from 'lucide-react';
+import { Check, MapPin, Plus } from 'lucide-react';
 import { fetchClientUnit, isCalculated } from '../api.js';
 import { MONTH_LABELS, fmtHeadcount } from '../lib/trendGrid.js';
 import { MAX_STACK, stackEntry } from '../lib/whatIf.js';
@@ -10,7 +10,9 @@ import { MONEY } from '../lib/reference.js';
 import { NUMERIC, TEXT, formatFilters, parseFilters } from '../lib/gridFilter.js';
 import Breadcrumb from '../components/Breadcrumb.jsx';
 import PageHeader from '../components/PageHeader.jsx';
-import StatCard, { StatRow } from '../components/StatCard.jsx';
+import KpiTile, { KpiRow } from '../components/ui/KpiTile.jsx';
+import EmptyState from '../components/ui/EmptyState.jsx';
+import Skeleton from '../components/ui/Skeleton.jsx';
 import InsightBar, { provenanceLine } from '../components/InsightBar.jsx';
 import MethodTabs from '../components/MethodTabs.jsx';
 import GridTabs, { GridTabPanel } from '../components/GridTabs.jsx';
@@ -78,7 +80,7 @@ export function shortDate(value) {
 export default function UnitPage({
   clientId, unitId, year, month, method = 'min_max', state,
   clientName, onOpenEmployee, onOpenClient, onOpenPortfolio, onChangeMonth,
-  onChangeMethod,
+  onChangeMethod, showTrail = true,
 }) {
   const [loaded, setLoaded] = useState(null);
   const [error, setError] = useState(null);
@@ -232,7 +234,7 @@ export default function UnitPage({
 
   return (
     <div>
-      <Breadcrumb trail={trail} />
+      {showTrail ? <Breadcrumb trail={trail} /> : null}
 
       <PageHeader
         eyebrow="What is it worth"
@@ -255,19 +257,18 @@ export default function UnitPage({
         )}
       />
 
-      {loading && !payload ? (
-        <div className="panel trend-loading"><Loader2 size={16} className="spin" /> Reading the warehouse…</div>
+      {loading && !payload ? <Skeleton lines={4} label="Reading the warehouse…" /> : null}
+      {error ? (
+        <EmptyState title="This location is unavailable">
+          {error}<br />Nothing was calculated or changed; reload the page to try again.
+        </EmptyState>
       ) : null}
-      {error ? <div className="callout warn">{error}</div> : null}
 
       {payload && !calculated ? (
-        <div className="panel">
-          <h2 className="panel-title">Awaiting the next run</h2>
-          <p className="page-sub">
-            {payload.message
-              || 'This year has not been assessed yet. It carries no figure — not a zero.'}
-          </p>
-        </div>
+        <EmptyState title="Awaiting the next run">
+          {payload.message
+            || 'This year has not been assessed yet. It carries no figure — not a zero.'}
+        </EmptyState>
       ) : null}
 
       {calculated ? (
@@ -281,34 +282,33 @@ export default function UnitPage({
             }}
           />
 
-          <StatRow>
-            <StatCard
+          <KpiRow label="Location summary">
+            <KpiTile
               label={monthIndex == null ? 'Counted this year' : `Counted in ${MONTH_LABELS[monthIndex]}`}
               value={countedTotal}
-              tone="accent"
             />
-            {unit ? <StatCard label="Average headcount" value={fmtHeadcount(unit.average_headcount)} /> : null}
+            {unit ? <KpiTile label="Average headcount" value={fmtHeadcount(unit.average_headcount)} /> : null}
             {/* A labelled card with no value is worse than no card. */}
-            {unit?.base_year != null ? <StatCard label="Base year" value={`TY${unit.base_year}`} /> : null}
+            {unit?.base_year != null ? <KpiTile label="Base year" value={`TY${unit.base_year}`} /> : null}
             {unit?.status ? (
-              <StatCard
+              <KpiTile
                 label="Reading"
                 value={String(unit.status).replace(/_/g, ' ')}
-                tone={unit.qualified ? 'good' : 'warn'}
+                tone={unit.qualified ? 'above-min' : 'partial'}
               />
             ) : null}
             {/* Withheld rather than restated while that list is narrowed: a
                 filtered cusp count is a different figure in the same words. */}
-            <StatCard
+            <KpiTile
               label={`Within ${BAND} hrs of the floor`}
               value={nearWire ? '—' : inBand.length}
               sub={nearWire
                 ? 'a filter is narrowing that list'
                 : (nearTotal ? `${nearTotal} ineligible in all` : null)}
-              tone={!nearWire && inBand.length ? 'warn' : 'neutral'}
+              tone={!nearWire && inBand.length ? 'partial' : 'neutral'}
               empty={!nearTotal}
             />
-          </StatRow>
+          </KpiRow>
 
           <div className="tcc-grid-tabbar">
             <GridTabs
@@ -658,11 +658,10 @@ function Window({ from, to }) {
 function Head({ col, sort, onSort, filters, onFilter, lead = false }) {
   const active = sort.field === col.key;
   return (
-    <th className={lead ? undefined : 'num'}>
+    <th className={lead ? undefined : 'num'} aria-sort={active ? (sort.dir === 'desc' ? 'descending' : 'ascending') : 'none'}>
       <button
         type="button"
         className={`th-sort${active ? ' active' : ''}`}
-        aria-sort={active ? (sort.dir === 'desc' ? 'descending' : 'ascending') : 'none'}
         onClick={() => onSort(col.key)}
       >
         {col.label}

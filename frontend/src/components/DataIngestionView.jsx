@@ -5,6 +5,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import { fetchIngestion, resolveException, fetchIngestionRows, hasYear } from '../api.js';
 import PageHeader from './PageHeader.jsx';
+import KpiTile, { KpiRow } from './ui/KpiTile.jsx';
+import EmptyState from './ui/EmptyState.jsx';
+import Skeleton from './ui/Skeleton.jsx';
 import SortHeader from './SortHeader.jsx';
 import { FilterBar } from './ColumnFilter.jsx';
 import useTableControls from './useTableControls.js';
@@ -118,10 +121,27 @@ export default function DataIngestionView({ taxYear = 2025, accountId = null, ca
     return <>{header}<section className="panel"><p className="small muted">Resolving which tax year to read…</p></section></>;
   }
   if (error) {
-    return <>{header}<section className="panel"><p className="small muted">Unavailable: {error}</p></section></>;
+    return (
+      <>
+        {header}
+        <EmptyState title="Payroll data is unavailable">
+          {error}<br />Nothing was changed; reload the page to try again.
+        </EmptyState>
+      </>
+    );
   }
   if (!data) {
-    return <>{header}<section className="panel"><p className="small muted">Loading the payroll pipeline…</p></section></>;
+    return <>{header}<Skeleton lines={4} label="Loading the payroll pipeline…" /></>;
+  }
+  if (!data.totals || !data.qc) {
+    return (
+      <>
+        {header}
+        <EmptyState title="Payroll data is unavailable">
+          The answer held no pipeline summary, so there is nothing to review. Nothing was changed.
+        </EmptyState>
+      </>
+    );
   }
 
   const t = data.totals;
@@ -138,12 +158,17 @@ export default function DataIngestionView({ taxYear = 2025, accountId = null, ca
         QC — so a reviewer can confirm the transform and resolve anomalies. The agent never drops a record.
       </div>
 
-      <div className="kpi-strip kpi-strip-4">
-        <div className="kpi-card"><div className="kpi-label">Employees</div><div className="kpi-value">{NUM.format(t.distinct_employees)}</div><div className="kpi-sub">Georgia · fiscal {taxYear}</div></div>
-        <div className="kpi-card"><div className="kpi-label">Worksites</div><div className="kpi-value">{NUM.format(t.distinct_worksites)}</div><div className="kpi-sub">unit granularity</div></div>
-        <div className="kpi-card"><div className="kpi-label">Includable wage rows</div><div className="kpi-value">{NUM.format(t.includable_rows)}</div><div className="kpi-sub">cash-basis by pay date</div></div>
-        <div className={`kpi-card ${qc.summary.unresolved > 0 ? 'amber' : 'green'}`}><div className="kpi-label">QC exceptions</div><div className="kpi-value">{qc.summary.total_anomalies}</div><div className="kpi-sub">{qc.summary.unresolved} unresolved</div></div>
-      </div>
+      <KpiRow label="Ingestion summary">
+        <KpiTile label="Employees" value={NUM.format(t.distinct_employees)} sub={`Georgia · fiscal ${taxYear}`} />
+        <KpiTile label="Worksites" value={NUM.format(t.distinct_worksites)} sub="unit granularity" />
+        <KpiTile label="Includable wage rows" value={NUM.format(t.includable_rows)} sub="cash-basis by pay date" />
+        <KpiTile
+          label="QC exceptions"
+          value={qc.summary.total_anomalies}
+          sub={`${qc.summary.unresolved} unresolved`}
+          tone={qc.summary.unresolved > 0 ? 'partial' : 'above-min'}
+        />
+      </KpiRow>
 
       {/* 1) Transform pipeline — how the source becomes the output. */}
       <section className="panel">
@@ -221,6 +246,7 @@ export default function DataIngestionView({ taxYear = 2025, accountId = null, ca
                       ) : (
                         <select
                           className="qc-resolve-select"
+                          aria-label={`Resolve exception ${x.exception_id}`}
                           disabled={!canResolve}
                           defaultValue=""
                           onChange={(e) => {

@@ -1,0 +1,57 @@
+.ui-callout {
+  padding: var(--space-6) var(--space-8);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  background: var(--surface-card);
+  box-shadow: var(--shadow-1);
+  color: var(--text-default);
+  font-size: var(--text-small);
+  line-height: var(--leading-base);
+}
+
+.ui-callout-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  margin: 0 0 var(--space-4);
+  color: var(--text-primary);
+  font-size: var(--text-body);
+  font-weight: 700;
+  line-height: var(--leading-heading);
+}
+
+.ui-callout-dot {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ui-callout-ink, var(--state-neutral-ink));
+}
+
+.ui-callout-body > :first-child {
+  margin-top: 0;
+}
+
+.ui-callout-body > :last-child {
+  margin-bottom: 0;
+}
+
+.ui-callout-neutral {
+  --ui-callout-ink: var(--state-neutral-ink);
+}
+
+.ui-callout-above-min {
+  --ui-callout-ink: var(--state-above-min-ink);
+}
+
+.ui-callout-below-min {
+  --ui-callout-ink: var(--state-below-min-ink);
+}
+
+.ui-callout-partial {
+  --ui-callout-ink: var(--state-partial-ink);
+}
+
+.ui-callout-base-year {
+  --ui-callout-ink: var(--state-base-year-ink);
+}

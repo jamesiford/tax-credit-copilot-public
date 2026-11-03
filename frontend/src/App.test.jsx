@@ -110,6 +110,7 @@ beforeEach(() => {
     (id) => Promise.resolve(CLIENT_SCOPE[id] || CLIENT_SCOPE[1001]),
   );
   vi.spyOn(api, 'fetchWorkspace').mockResolvedValue(WORKSPACE);
+  vi.spyOn(api, 'fetchMe').mockResolvedValue({ auth_mode: 'none', authenticated: false, upn: null });
   vi.spyOn(api, 'refreshWorkspace').mockResolvedValue(WORKSPACE);
   vi.spyOn(api, 'fetchPortfolioCoverage').mockResolvedValue({ clients: [], totals: coverageFor(0).totals });
   // The book is the landing grid now, so the shell cannot mount without it.
@@ -162,12 +163,12 @@ const at = (...entries) => render(
 const where = () => screen.getByTestId('where').textContent;
 
 /**
- * The nav is a persistent left rail again: a drill ladder showing where you
- * are, and a flat "prove the work" list. Both are always on screen at desktop
- * width, so there is no menu to open first.
+ * The navigation is a row of dropdown groups in the top bar, with the drill
+ * trail beneath it. A group is a menu button: open it, then choose the item.
  */
-const goToView = async (name) => {
-  await userEvent.click(screen.getByRole('button', { name }));
+const goToView = async (name, group = /What is it worth/) => {
+  await userEvent.click(screen.getByRole('button', { name: group }));
+  await userEvent.click(await screen.findByRole('menuitem', { name }));
 };
 
 /** The scope the shell RESOLVED and persisted — client and year, as values. */
@@ -231,6 +232,16 @@ describe('the shell opens on the portfolio', () => {
     mount();
     await landed();
     expect(screen.queryByRole('region', { name: 'Scope' })).not.toBeInTheDocument();
+  });
+
+  it('declines no year on a URL that never asked for one', async () => {
+    // Number(null) is 0: a URL without ?year= used to request TY0, which no
+    // client holds, so the book opened under a "Scope adjusted" banner naming
+    // a year nobody chose and pushed the first rows below the fold.
+    mount();
+    await landed();
+    expect(screen.queryByText(/Scope adjusted/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/TY0/)).not.toBeInTheDocument();
   });
 
   it('shows the book at / even when a client was stored last time', async () => {
@@ -355,12 +366,12 @@ describe('the view re-reads when scope changes', () => {
     await userEvent.click(await screen.findByRole('button', { name: 'Open Cascade Retail Partners' }));
 
     await waitFor(() => expect(api.fetchClientScope).toHaveBeenCalledWith(2001));
-    // The client page is tabbed, and only the open section reads. The location
-    // grid opens first; "What was claimed" reads when somebody opens it —
-    // and then for THIS client.
+    // The client page is a flow of steps, and only the open section reads. The
+    // location grid (Trend) opens first; "Position" reads when somebody opens
+    // it — and then for THIS client.
     await waitFor(() => expect(units).toHaveBeenCalledWith(2001, expect.anything()));
     expect(api.fetchClientCoverage).not.toHaveBeenCalledWith(2001, expect.anything());
-    await userEvent.click(await screen.findByRole('tab', { name: 'What was claimed' }));
+    await userEvent.click(await screen.findByRole('link', { name: 'Position' }));
     await waitFor(() => expect(api.fetchClientCoverage).toHaveBeenCalledWith(2001, expect.anything()));
   });
 

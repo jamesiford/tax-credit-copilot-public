@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ArrowRight, ChevronDown, ChevronRight, Loader2, MessageSquare } from 'lucide-react';
 import { fetchClientCoverage } from '../api.js';
 import { ColumnFilter, FilterBar } from './ColumnFilter.jsx';
-import FootprintMap from './FootprintMap.jsx';
 import SortHeader from './SortHeader.jsx';
 import {
   ENUM, NUMERIC, TEXT, applyFilters, presentValues,
@@ -179,117 +178,8 @@ export default function BookGrid({
   );
   const byValue = ranksByValue(sort);
 
-  // Every state anyone in the book operates in, and every one we can price.
-  // Union rather than per-client, because the map is the filter for the whole
-  // book — and a state nobody operates in is not on it at all.
-  //
-  // Clients per state, deliberately NOT dollars. A claim is client-grain and a
-  // client operates in several states, so any per-state money figure would
-  // either double-count or attribute a credit to a state that did not earn it.
-  const footprint = useMemo(() => {
-    const clients = new Map();
-    const priced = new Set();
-    for (const row of all) {
-      for (const s of row.states || []) {
-        if (!clients.has(s)) clients.set(s, 0);
-        clients.set(s, clients.get(s) + 1);
-      }
-      for (const s of row.priceable_states || []) priced.add(s);
-    }
-    const held = [...clients.keys()].sort();
-    return {
-      held,
-      priced: [...priced].sort(),
-      rows: held.map((code) => ({
-        code,
-        clients: clients.get(code),
-        priceable: priced.has(code),
-      })),
-    };
-  }, [all]);
-
-  const selectedStates = useMemo(
-    () => String(filters.state || '').split('|').map((s) => s.trim()).filter(Boolean),
-    [filters.state],
-  );
-
-  // Clicking a state TOGGLES it in the shared filter grammar. The map does not
-  // hold its own selection — if it did, a chip cleared from the filter bar
-  // would leave the map still looking selected.
-  const toggleState = useCallback((code) => {
-    const next = selectedStates.includes(code)
-      ? selectedStates.filter((s) => s !== code)
-      : [...selectedStates, code];
-    onFilter({ ...filters, state: next.join('|') });
-  }, [filters, onFilter, selectedStates]);
-
   return (
-    <section className="panel">
-      {footprint.held.length > 1 ? (
-        <details className="tcc-footprint" open>
-          <summary>
-            Where the book operates
-            {selectedStates.length ? <b> · filtered to {selectedStates.join(', ')}</b> : null}
-          </summary>
-          {/* The map is two thirds whitespace on its own — we hold four states
-              and the other forty-six are the picture. The list fills it with
-              the thing the map is a control for, and gives the same filter a
-              keyboard can reach. */}
-          <div className="tcc-footprint-row">
-            <FootprintMap
-              states={footprint.held}
-              priced={footprint.priced}
-              selected={selectedStates}
-              onSelect={toggleState}
-            />
-            <div className="tcc-footprint-list">
-              <table className="tbl-compact">
-                <thead>
-                  <tr>
-                    <th>State</th>
-                    <th className="num">Clients</th>
-                    <th>Statute</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {footprint.rows.map((s) => {
-                    const on = selectedStates.includes(s.code);
-                    return (
-                      <tr key={s.code} className={on ? 'row-open' : undefined}>
-                        <td>
-                          <button
-                            type="button"
-                            className="tcc-cell-btn tcc-state-btn"
-                            aria-pressed={on}
-                            onClick={() => toggleState(s.code)}
-                          >
-                            {s.code}
-                          </button>
-                        </td>
-                        <td className="num">{s.clients}</td>
-                        <td className={s.priceable ? undefined : 'muted'}>
-                          {s.priceable ? 'Priced' : 'No authored statute'}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-              <p className="small muted">
-                Clients, not dollars. A claim is client-grain and a client
-                operates in several states, so a per-state total would either
-                double-count or credit a state that did not earn it.
-              </p>
-              <p className="small muted">
-                Selecting a state writes the same <code>state:</code> filter the
-                bar below shows, so the map, this list and the chips cannot
-                disagree.
-              </p>
-            </div>
-          </div>
-        </details>
-      ) : null}
-
+    <div className="tcc-book">
       <FilterBar
         specs={SPECS}
         filters={filters}
@@ -458,6 +348,6 @@ export default function BookGrid({
           </>
         )}
       </p>
-    </section>
+    </div>
   );
 }

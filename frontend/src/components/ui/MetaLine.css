@@ -1,0 +1,33 @@
+.ui-meta {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+  color: var(--text-default);
+  font-size: var(--text-small);
+  line-height: var(--leading-base);
+}
+
+.ui-meta-item {
+  display: inline-flex;
+  gap: var(--space-4);
+}
+
+.ui-meta-item + .ui-meta-item::before {
+  content: '·';
+  margin: 0 var(--space-6);
+  color: var(--text-muted);
+}
+
+.ui-meta-label {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.ui-meta-label::after {
+  content: ':';
+}
+
+.ui-meta-value {
+  margin: 0;
+  color: var(--text-default);
+}

@@ -37,3 +37,11 @@ if (typeof window !== 'undefined') {
     });
   }
 }
+
+// The map draws US geometry fetched over HTTP (vendored under public/). No test
+// is about the geography, and a relative URL cannot be fetched in Node, so it
+// is a plain placeholder everywhere; a test that cares about what it CALLS
+// (FootprintPanel) stubs it again with the props it needs.
+vi.mock('./components/FootprintMap.jsx', () => ({
+  default: () => null,
+}));

@@ -1,0 +1,245 @@
+/*
+ * The shell: top bar, navigation groups, drill trail, account menu, skip link.
+ *
+ * Theme-neutral on purpose. It reads ROLES (--surface-*, --border-*,
+ * --text-*, --select*), never a palette value, so the classic and modern themes
+ * both get the new structure and differ only in what the roles resolve to.
+ *
+ * Selection is brand blue (--select*). A reading (a verdict, a status) is a
+ * different colour family and never appears in the chrome.
+ */
+
+.tcc-app { min-height: 100%; color: var(--text-default); background: var(--surface-page); }
+
+.shell-header {
+  position: sticky;
+  top: 0;
+  z-index: 45;
+  background: var(--surface-card);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.shell-skip {
+  position: absolute;
+  left: var(--space-6);
+  top: 0;
+  z-index: 60;
+  padding: var(--space-4) var(--space-7);
+  color: var(--text-inverse);
+  background: var(--select-strong);
+  border-radius: var(--radius-sm);
+  transform: translateY(-200%);
+}
+.shell-skip:focus { transform: translateY(var(--space-4)); }
+
+/* --- the bar --- */
+.shell-bar {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-9);
+  height: 56px;
+  padding: 0 var(--space-13);
+}
+
+.shell-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-5);
+  padding: 0;
+  color: var(--text-primary);
+  background: transparent;
+  border: 0;
+  font: inherit;
+  font-size: var(--text-strong);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.shell-brand img { height: 28px; width: auto; }
+
+.shell-nav { display: flex; align-items: stretch; gap: var(--space-2); }
+
+.shell-group { position: relative; display: flex; align-items: stretch; }
+
+.shell-group-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-6);
+  color: var(--text-default);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  font: inherit;
+  font-size: var(--text-small);
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.shell-group-trigger:hover { color: var(--select-strong); background: var(--select-bg); }
+.shell-group-trigger.is-active {
+  color: var(--select-strong);
+  font-weight: 600;
+  box-shadow: inset 0 -3px 0 var(--select);
+}
+.shell-group-trigger[aria-disabled="true"] { color: var(--text-muted); cursor: default; }
+.shell-group-trigger:focus-visible,
+.shell-menu-item:focus-visible,
+.shell-brand:focus-visible,
+.shell-avatar:focus-visible,
+.shell-rung button:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: -2px;
+}
+
+.shell-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  min-width: 240px;
+  padding: var(--space-3);
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-pop);
+}
+
+.shell-menu-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  min-height: 36px;
+  padding: var(--space-3) var(--space-6);
+  color: var(--text-default);
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-sm);
+  font: inherit;
+  font-size: var(--text-small);
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.shell-menu-item:hover,
+.shell-menu-item:focus-visible { color: var(--select-strong); background: var(--select-bg); }
+.shell-menu-item.is-active { color: var(--select-strong); font-weight: 600; }
+.shell-menu-item[aria-disabled="true"] { color: var(--text-muted); cursor: default; }
+.shell-menu-item[aria-disabled="true"]:hover { background: transparent; color: var(--text-muted); }
+.shell-menu-label { flex: 1 1 auto; }
+.shell-menu-reason { color: var(--text-muted); font-size: var(--text-caption); }
+
+.shell-bar-end { display: flex; align-items: center; gap: var(--space-5); margin-left: auto; }
+
+.shell-actions { display: flex; align-items: center; gap: var(--space-5); }
+
+.shell-avatar {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  color: var(--select-strong);
+  background: var(--select-bg);
+  border: 1px solid var(--select-line);
+  border-radius: 50%;
+  font: inherit;
+  font-size: var(--text-caption);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.shell-account { position: relative; }
+.shell-popover {
+  position: absolute;
+  top: calc(100% + var(--space-3));
+  right: 0;
+  z-index: 60;
+  min-width: 220px;
+  padding: var(--space-6);
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-pop);
+}
+.shell-popover-name { color: var(--text-primary); font-size: var(--text-small); font-weight: 600; }
+.shell-popover-meta { margin-top: var(--space-2); color: var(--text-muted); font-size: var(--text-caption); }
+
+/* --- scope: the tax year where it filters, and any notices on it --- */
+.tcc-top-scope { display: flex; align-items: center; gap: var(--space-4); }
+.tcc-top-axis {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  height: 36px;
+  padding: 0 var(--space-6);
+  color: var(--text-default);
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+}
+.tcc-top-axis select {
+  color: inherit;
+  background: transparent;
+  border: 0;
+  font: inherit;
+  font-size: var(--text-small);
+  font-weight: 500;
+  cursor: pointer;
+}
+.tcc-top-notice { display: inline-flex; align-items: center; }
+/* A scope read that failed. Truncated, because the axes still have to fit. */
+.tcc-top-error {
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--status-warn);
+  font-size: var(--text-small);
+  font-weight: 600;
+}
+
+/* --- the drill trail --- */
+.shell-trail {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  min-height: 32px;
+  padding: 0 var(--space-13);
+  background: var(--surface-subtle);
+  border-top: 1px solid var(--border-subtle);
+  font-size: var(--text-small);
+}
+.shell-trail ol { display: flex; align-items: center; flex-wrap: nowrap; margin: 0; padding: 0; list-style: none; }
+
+.shell-rung { display: inline-flex; align-items: center; gap: var(--space-3); white-space: nowrap; }
+.shell-rung button,
+.shell-rung-body {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4);
+  color: inherit;
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-sm);
+  font: inherit;
+}
+.shell-rung button { cursor: pointer; }
+.shell-rung button:hover { color: var(--select-strong); background: var(--select-bg); }
+.shell-rung.reached { color: var(--text-default); }
+.shell-rung.pending { color: var(--text-muted); }
+.shell-rung.current { color: var(--select-strong); font-weight: 600; }
+.shell-rung.current .shell-rung-body { background: var(--select-bg); }
+.shell-rung-sep { color: var(--text-muted); }
+.shell-rung-hint { color: var(--text-muted); font-size: var(--text-caption); }
+.shell-trail-hint { color: var(--text-muted); font-size: var(--text-caption); }
+
+/* At the book there is nothing below it to show, so the trail is one quiet
+   line rather than a ladder of dimmed rungs. */
+.shell-trail-quiet { min-height: 28px; background: transparent; border-top: 0; }
+
+/* The page's own content starts under the sticky header. */
+.tcc-app > .tcc-main { margin-left: 0; }
+.tcc-app > .tcc-main:focus { outline: none; }

@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
-  AlertTriangle, CheckCircle2, Loader2, TrendingUp,
+  AlertTriangle, CheckCircle2, TrendingUp,
 } from 'lucide-react';
 import { fetchInYearProgress } from '../api.js';
 import { PORTFOLIO, derivedJurisdictions } from '../lib/scopeDimension.js';
 import ProximityView from './ProximityView.jsx';
+import EmptyState from './ui/EmptyState.jsx';
+import Skeleton from './ui/Skeleton.jsx';
 
 /**
  * How am I doing — in-year progress against the statutory finish line.
@@ -103,10 +105,12 @@ export default function ProgressView({ scope, scopeOptions, stack = null, yearOp
         </div>
       ) : (
         <>
-          {loading ? (
-            <div className="prox-loading"><Loader2 size={16} className="spin" /> Calculating…</div>
+          {loading ? <Skeleton lines={3} label="Calculating…" /> : null}
+          {error ? (
+            <EmptyState title="The year so far is unavailable">
+              {error}<br />Nothing was changed; reload the page to try again.
+            </EmptyState>
           ) : null}
-          {error ? <div className="prox-error">{error}</div> : null}
         </>
       )}
 

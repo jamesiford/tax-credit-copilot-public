@@ -1,19 +1,26 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
-  Binary, BookOpenCheck, ChevronLeft, ClipboardList, Database, FileDiff,
-  Menu, MessageSquare, Play, RefreshCw, ShieldCheck,
+  Binary, BookOpenCheck, ClipboardList, Database, FileDiff,
+  MessageSquare, Play, RefreshCw, ShieldCheck,
   ShieldQuestion, Users, X,
 } from 'lucide-react';
 import { fetchClientScope, fetchScope, fetchWorkspace, hasYear, refreshWorkspace } from './api.js';
 import AgentActivityView from './components/AgentActivityView.jsx';
-import ChatPanel from './components/ChatPanel.jsx';
+import PanelBoundary from './components/PanelBoundary.jsx';
+import AskWorkspace from './components/ask/AskWorkspace.jsx';
+import ClientHeader from './components/ClientHeader.jsx';
 import DataIngestionView from './components/DataIngestionView.jsx';
 import EvidenceView from './components/EvidenceView.jsx';
 import RuleLibraryView from './components/RuleLibraryView.jsx';
 import ScopeBar from './components/ScopeBar.jsx';
-import TopScope from './components/TopScope.jsx';
-import SideRail from './components/SideRail.jsx';
+import AppShell from './components/shell/AppShell.jsx';
+import DrillTrail from './components/shell/DrillTrail.jsx';
+import ShellActions from './components/shell/ShellActions.jsx';
+import TopBar from './components/shell/TopBar.jsx';
+import useMe from './components/shell/useMe.js';
+import FloatingAction from './components/ui/FloatingAction.jsx';
+import { navGroups } from './lib/shellNav.js';
 import ClientPage from './pages/ClientPage.jsx';
 import EmployeePage from './pages/EmployeePage.jsx';
 import PortfolioPage from './pages/PortfolioPage.jsx';
@@ -22,7 +29,6 @@ import {
   PORTFOLIO, loadStoredScope, reconcileScope, scopeLabel, storeScope,
 } from './lib/scopeDimension.js';
 import { TOUR_DEFAULT_DWELL_MS, TOUR_STEPS } from './lib/tour.js';
-import { brand } from './brand.config.js';
 import {
   AssumptionsView, CompareView, EligibilityView, OneZeroView,
 } from './components/ReferenceViews.jsx';
@@ -74,7 +80,7 @@ import {
  */
 export const NAV = [
   { section: 'What is it worth', items: [
-    { id: 'eligibility', label: 'Eligibility', icon: Users, primary: true },
+    { id: 'eligibility', label: 'Eligibility', icon: Users, primary: true, needsClient: true },
     { id: 'onezero', label: 'Monthly employment', icon: Binary },
   ] },
   { section: 'What needs a decision', items: [
@@ -156,6 +162,8 @@ const ASK = {
   position: 'Summarize what this client is entitled to against what they have claimed, and where the biggest recoverable gap is.',
   progress: 'Summarize how this client is tracking against the statutory threshold part-way through the year, and which employees are closest to qualifying.',
   plan: 'Summarize which lever moves this client\u2019s credit the most, and by how much.',
+  rules: 'Summarize how rule packs are versioned per tax year, and how a filed claim stays bound to the statute that was in force that year.',
+  evidence: 'What is inside this audit trail, and what makes the calculation reproducible under audit?',
 };
 
 //: At portfolio scope there is no client, so every prompt above is the wrong
@@ -166,6 +174,8 @@ const ASK_PORTFOLIO =
   'Who should we be targeting, and why? Rank them and say what I would open the call with.';
 
 function askForPage(routeView, isPortfolio) {
+  // These two describe the product, not a client, so scope does not matter.
+  if (routeView === 'rules' || routeView === 'evidence') return ASK[routeView];
   return isPortfolio ? ASK_PORTFOLIO : ASK[routeView];
 }
 
@@ -185,8 +195,11 @@ export default function App() {
     return route.view || 'trend';
   }, [route.token, route.view]);
   const routeYear = useMemo(() => {
-    const value = Number(search.get('year'));
-    return Number.isFinite(value) ? value : null;
+    // Number(null) is 0, so a URL with no year would otherwise ask for TY0.
+    const raw = search.get('year');
+    if (raw == null || raw === '') return null;
+    const value = Number(raw);
+    return Number.isFinite(value) && value > 0 ? value : null;
   }, [search]);
   const routeEmployeeToken = route.token ?? null;
   const [summary, setSummary] = useState(null);
@@ -196,7 +209,7 @@ export default function App() {
   // A token resolves only where the run that minted it is served. Sealed views
   // pass no context; per-client views pass the client-year they rendered.
   const [employeeContext, setEmployeeContext] = useState(null);
-  const [navOpen, setNavOpen] = useState(false);
+  const me = useMe();
 
   const [chatOpen, setChatOpen] = useState(false);
   const [queuedPrompt, setQueuedPrompt] = useState(null);
@@ -340,7 +353,6 @@ export default function App() {
       method: search.get('method'),
     });
     navigate(url);
-    setNavOpen(false);
     scrollToTop();
   }, [navigate, scope.clientId, scope.year, search]);
 
@@ -401,7 +413,6 @@ export default function App() {
       // The drill is a route now, so Escape is a step back up it.
       else if (route.token || route.unitId) navigate(-1);
       else if (chatOpen) setChatOpen(false);
-      else setNavOpen(false);
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
@@ -461,6 +472,7 @@ export default function App() {
   const employeeYear = hasYear(search.get('year')) ? Number(search.get('year')) : resolved.scope.year;
   if (route.token) {
     view = <EmployeePage
+      showTrail={false}
       clientId={search.get('sealed') === '1' ? null : route.clientId}
       token={route.token}
       year={employeeYear}
@@ -479,6 +491,7 @@ export default function App() {
   }
   else if (route.unitId) {
     view = <UnitPage
+      showTrail={false}
       clientId={route.clientId}
       unitId={route.unitId}
       year={resolved.scope.year}
@@ -509,10 +522,12 @@ export default function App() {
       clientScope={clientScope}
       onPickClient={(clientId) => changeScope({ ...resolved.scope, clientId })}
       onAskCopilot={ask}
+      identity={me}
     />;
   }
   else if (routeView === 'trend') {
     view = <ClientPage
+      showTrail={false}
       clientName={clientDisplayName}
       onOpenPortfolio={() => navigate(buildRouteUrl({ clientId: PORTFOLIO }))}
       scope={resolved.scope}
@@ -526,12 +541,33 @@ export default function App() {
       }))}
     />;
   }
-  else if (routeView === 'eligibility') view = <EligibilityView {...common} scope={resolved.scope} />;
+  else if (routeView === 'eligibility') {
+    // With a client chosen, Eligibility is a step in that client's review, so it
+    // carries the same header and flow as the client page.
+    const industry = (scopeOptions?.clients || [])
+      .find((c) => String(c.account_id) === String(resolved.scope.clientId))?.industry || null;
+    view = <EligibilityView
+      {...common}
+      scope={resolved.scope}
+      header={resolved.scope.clientId === PORTFOLIO ? null : (
+        <ClientHeader
+          clientId={resolved.scope.clientId}
+          clientName={clientDisplayName}
+          industry={industry}
+          year={resolved.scope.year ?? null}
+          search={resolved.scope.year != null ? `year=${resolved.scope.year}` : ''}
+          current="eligibility"
+          clientScope={clientScope}
+          onBack={() => navigate(buildRouteUrl({ clientId: PORTFOLIO }))}
+        />
+      )}
+    />;
+  }
   else if (routeView === 'onezero') view = <OneZeroView {...common} scope={resolved.scope} />;
   else if (routeView === 'compare') view = <CompareView {...common} />;
   else if (routeView === 'assumptions') view = <AssumptionsView {...common} />;
-  else if (routeView === 'rules') view = <RuleLibraryView onAskCopilot={ask} programs={scopeOptions?.programs ?? null} />;
-  else if (routeView === 'evidence') view = <EvidenceView summary={summary} onAskCopilot={ask} />;
+  else if (routeView === 'rules') view = <RuleLibraryView programs={scopeOptions?.programs ?? null} />;
+  else if (routeView === 'evidence') view = <EvidenceView summary={summary} />;
   else if (routeView === 'ingestion') {
     view = <DataIngestionView
       taxYear={resolved.scope.year}
@@ -555,71 +591,63 @@ export default function App() {
   const label = scopeLabel(resolved.scope, scopeOptions, clientScope);
   const step = tourActive ? TOUR_STEPS[tourStep] : null;
 
-  return <div className="tcc-app tcc-has-rail">
-    <header className="tcc-topbar">
-      <button
-        className="tcc-mobile-menu"
-        onClick={() => setNavOpen((v) => !v)}
-        aria-label="Navigation"
+  const navItems = navGroups(NAV, { hasClient: resolved.scope.clientId !== PORTFOLIO });
+  const goPortfolio = () => navigate(buildRouteUrl({ clientId: PORTFOLIO }));
+
+  return <AppShell
+    mainLabel={activeItem?.label || 'Position'}
+    header={<>
+      <TopBar
+        groups={navItems}
+        activeId={activeItem?.id ?? null}
+        onSelect={navigateToView}
+        onHome={goPortfolio}
       >
-        <Menu size={20} />
-      </button>
-      <div className="tcc-brand"><img src={brand.logoSrc} alt={brand.name} /><span /><b>{brand.name}</b></div>
-      <div className="tcc-top-context">
-        {/* TY and method persist across a drill; the client comes from the URL. */}
-        <TopScope
-          page={page}
-          options={scopeOptions}
-          scope={resolved.scope}
-          resolved={resolved}
-          clientScope={clientScope}
-          error={clientError}
-          onChange={changeScope}
+        {/* TY persists across a drill; the client comes from the URL. */}
+        <ShellActions
+          identity={me}
+          scopeProps={{
+            page,
+            options: scopeOptions,
+            scope: resolved.scope,
+            resolved,
+            clientScope,
+            error: clientError,
+            onChange: changeScope,
+          }}
         />
-        <button className="tcc-top-btn" onClick={() => { setQueuedPrompt(null); setChatOpen(true); }} title="Ask Copilot (Ctrl+K)">
-          <MessageSquare size={15} /><span>Ask</span>
-        </button>
-      </div>
-    </header>
-
-    {navOpen && (
-      <button
-        className="tcc-nav-scrim"
-        onClick={() => setNavOpen(false)}
-        aria-label="Close navigation"
-      />
-    )}
-
-    {/* The rail reads the ROUTE, not a second copy of it, so it cannot
-        disagree with the page about where you are. */}
-    <SideRail
-      clientId={route.clientId}
-      clientName={clientDisplayName}
-      unitId={route.unitId}
-      token={route.token}
-      view={routeView}
-      open={navOpen}
-      onClose={() => setNavOpen(false)}
-      onOpenPortfolio={() => { setNavOpen(false); navigate(buildRouteUrl({ clientId: PORTFOLIO })); }}
-      onOpenClient={() => {
-        setNavOpen(false);
-        navigate(buildRouteUrl({ clientId: route.clientId, year: resolved.scope.year }));
-      }}
-      onOpenUnit={() => {
-        setNavOpen(false);
-        navigate(buildRouteUrl({
+      </TopBar>
+      {/* The trail reads the ROUTE, not a second copy of it, so it cannot
+          disagree with the page about where you are. */}
+      <DrillTrail
+        clientId={route.clientId}
+        clientName={clientDisplayName}
+        unitId={route.unitId}
+        token={route.token}
+        view={routeView}
+        onOpenPortfolio={goPortfolio}
+        onOpenClient={() => navigate(buildRouteUrl({ clientId: route.clientId, year: resolved.scope.year }))}
+        onOpenUnit={() => navigate(buildRouteUrl({
           clientId: route.clientId,
           unitId: route.unitId || search.get('unit'),
           year: resolved.scope.year,
           month: search.get('month'),
           method: search.get('method'),
-        }));
-      }}
-      onSelectView={navigateToView}
-    />
-
-    <main className="tcc-main" aria-label={activeItem?.label || 'Position'}>
+        }))}
+        onSelectView={navigateToView}
+      />
+    </>}
+    main={<>
       {error && <div className="callout warn">Refresh failed; the last sealed run remains active. {error}</div>}
+      {/* A selection the data cannot honour is declined BY NAME, on the page. It
+          used to live only in the year picker's tooltip, so asking for a year with
+          no payroll quietly showed another year's figures. */}
+      {(resolved.notices || []).length > 0 && (
+        <div className="callout info" role="status">
+          <b>Scope adjusted.</b>{' '}
+          {resolved.notices.map((n) => n.message || String(n)).join(' ')}
+        </div>
+      )}
       {sealedMismatch && (
         <div className="callout info">
           <b>This is the certified parity run.</b> It describes{' '}
@@ -632,8 +660,22 @@ export default function App() {
             : 'A per-client audit trail is the next step; today this view exists for the certified run only.'}
         </div>
       )}
-      {view}
-    </main>
+      {/* A view that throws costs the view, not the shell: without this the whole
+          tree unmounts and the page is blank. Keyed by path so moving on resets it. */}
+      <PanelBoundary key={location.pathname} name={activeItem?.label || 'This page'}>
+        {view}
+      </PanelBoundary>
+    </>}
+  >
+    {!chatOpen && (
+      <FloatingAction
+        id="ask-launcher"
+        icon={<MessageSquare size={18} />}
+        label="Ask Copilot"
+        title="Ask Copilot (Ctrl+K)"
+        onClick={() => { setQueuedPrompt(null); setChatOpen(true); }}
+      />
+    )}
 
     {step && (
       <div className="tour-bar">
@@ -658,34 +700,17 @@ export default function App() {
       </div>
     )}
 
-    {chatOpen && <>
-      <button className="chat-drawer-scrim" onClick={() => setChatOpen(false)} aria-label="Close Copilot" />
-      <aside className="chat-drawer">
-        <div className="chat-drawer-head">
-          <span>Ask Copilot</span>
-          <div className="chat-drawer-head-actions">
-            {askForPage(routeView, resolved.scope.clientId === PORTFOLIO) && (
-              <button
-                className="chat-drawer-ask"
-                onClick={() => setQueuedPrompt(
-                  askForPage(routeView, resolved.scope.clientId === PORTFOLIO),
-                )}
-              >
-                Ask about this page
-              </button>
-            )}
-            <button className="chat-drawer-close" onClick={() => setChatOpen(false)} aria-label="Close">×</button>
-          </div>
-        </div>
-        <div className="chat-drawer-body">
-          <ChatPanel
-            scope={resolved.scope}
-            queuedPrompt={queuedPrompt}
-            queuedScope={queuedScope}
-            onQueuedConsumed={() => { setQueuedPrompt(null); setQueuedScope(null); }}
-          />
-        </div>
-      </aside>
-    </>}
-  </div>;
+    <AskWorkspace
+      open={chatOpen}
+      onClose={() => setChatOpen(false)}
+      scope={resolved.scope}
+      nameFor={(id) => (scopeOptions?.clients || [])
+        .find((c) => String(c.account_id) === String(id))?.name}
+      onNavigate={(href) => { setChatOpen(false); navigate(href); }}
+      pagePrompt={askForPage(routeView, resolved.scope.clientId === PORTFOLIO)}
+      queuedPrompt={queuedPrompt}
+      queuedScope={queuedScope}
+      onQueuedConsumed={() => { setQueuedPrompt(null); setQueuedScope(null); }}
+    />
+  </AppShell>;
 }

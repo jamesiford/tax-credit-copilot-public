@@ -1,0 +1,97 @@
+.ui-tabs {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-2);
+  overflow-x: auto;
+}
+
+.ui-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-family: inherit;
+  font-weight: 500;
+  line-height: var(--leading-dense);
+  white-space: nowrap;
+  color: var(--text-secondary);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.ui-tab:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: -2px;
+}
+
+.ui-tab:disabled {
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+/* Underline: the page, section and card tab. */
+.ui-tabs-underline {
+  padding: 0 var(--space-7);
+  border-bottom: 1px solid var(--border-default);
+}
+
+.ui-tabs-underline .ui-tab {
+  min-height: 42px;
+  padding: 0 var(--space-6);
+  font-size: var(--text-small);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+
+.ui-tabs-underline .ui-tab:hover:not(:disabled) {
+  color: var(--select-strong);
+}
+
+.ui-tabs-underline .ui-tab[aria-selected='true'] {
+  color: var(--select-strong);
+  font-weight: 600;
+  border-bottom-color: var(--select);
+}
+
+/* Segmented: a reading or a population chosen inline, beside a grid. */
+.ui-tabs-segmented {
+  display: inline-flex;
+  overflow: visible;
+}
+
+.ui-tabs-segmented .ui-tab {
+  height: 22px;
+  padding: 0 var(--space-4);
+  font-size: var(--text-small);
+  color: var(--text-secondary);
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius);
+}
+
+.ui-tabs-segmented .ui-tab:hover:not(:disabled) {
+  color: var(--select-strong);
+  border-color: var(--select-line);
+}
+
+.ui-tabs-segmented .ui-tab[aria-selected='true'] {
+  color: var(--on-select);
+  background: var(--select-strong);
+  border-color: var(--select-strong);
+  font-weight: 600;
+}
+
+.ui-tab-count {
+  padding: 0 var(--space-3);
+  font-size: var(--text-caption);
+  font-weight: 600;
+  line-height: var(--leading-dense);
+  color: var(--state-neutral-ink);
+  background: var(--state-neutral);
+  border-radius: var(--radius-pill);
+}
+
+.ui-tab[aria-selected='true'] .ui-tab-count {
+  color: var(--select-strong);
+  background: var(--select-bg);
+}

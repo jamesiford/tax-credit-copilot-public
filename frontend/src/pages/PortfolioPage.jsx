@@ -1,12 +1,26 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import InsightBar from '../components/InsightBar.jsx';
 import BookGrid from '../components/BookGrid.jsx';
-import PageHeader from '../components/PageHeader.jsx';
+import FootprintPanel from '../components/FootprintPanel.jsx';
+import GridTabs, { GridTabPanel } from '../components/GridTabs.jsx';
+import StartHereCards from '../components/StartHereCards.jsx';
+import Card from '../components/ui/Card.jsx';
+import EmptyState from '../components/ui/EmptyState.jsx';
+import HeroBand from '../components/ui/HeroBand.jsx';
+import KpiTile, { KpiRow } from '../components/ui/KpiTile.jsx';
+import SectionHeading from '../components/ui/SectionHeading.jsx';
 import { fetchPortfolioV2 } from '../api.js';
 import { portfolioAnswer } from '../lib/answers.js';
+import {
+  activeBookTab, bandCounts, bookTabs, filtersForTab, footprintOf, selectedStates, tileTone,
+} from '../lib/bookCards.js';
+import { band } from '../lib/priority.js';
 import { formatFilters, parseFilters } from '../lib/gridFilter.js';
 import { bookSortQuery, formatBookSort, parseBookSort, toggleBookSort } from '../lib/bookSort.js';
+import { greeting } from '../lib/identity.js';
+import { loadStartHere, storeStartHere } from '../lib/startHere.js';
 
 /**
  * The book. Every client, ranked by why you would call them.
@@ -31,10 +45,28 @@ const FILTER_KEYS = {
   client: 1, band: 1, program: 1, year: 1, identified: 1, margin: 1, state: 1,
 };
 
-export default function PortfolioPage({ onPickClient, onAskCopilot, scopeOptions }) {
+export default function PortfolioPage({
+  onPickClient, onAskCopilot, scopeOptions, identity = null,
+}) {
   const [summary, setSummary] = useState(null);
   const [error, setError] = useState(null);
   const [search, setSearch] = useSearchParams();
+  const navigate = useNavigate();
+  const headingRef = useRef(null);
+
+  // "Start here" is a view preference: open for somebody who has never seen the
+  // page, and closed once they have put it away.
+  const [startOpen, setStartOpen] = useState(() => loadStartHere());
+  const toggleStart = useCallback(() => {
+    setStartOpen((open) => { storeStartHere(!open); return !open; });
+  }, []);
+
+  const showBook = useCallback(() => {
+    const node = headingRef.current;
+    if (!node) return;
+    node.focus({ preventScroll: true });
+    if (typeof node.scrollIntoView === 'function') node.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  }, []);
 
   // NO YEAR. The book asks which client to call, and that is a question about a
   // client across every year they hold — an unclaimed year from four years ago
@@ -82,6 +114,8 @@ export default function PortfolioPage({ onPickClient, onAskCopilot, scopeOptions
   }, [sort.key, sort.desc]);
 
   const rows = summary?.items || [];
+  const counts = useMemo(() => bandCounts(rows), [rows]);
+  const activeTab = activeBookTab(filters);
 
   // 29 Sep: the caption is the COUNTS only. It used to name the single client
   // closest to qualifying and a "top target", which the grid beneath already
@@ -99,20 +133,53 @@ export default function PortfolioPage({ onPickClient, onAskCopilot, scopeOptions
   }, [onAskCopilot]);
 
   const header = (
-    <PageHeader
-      eyebrow="Portfolio"
-      title="Targeting"
-      sub="Who to target — new clients and existing ones — ranked by the reason to act, not by dollar value."
-    />
+    <HeroBand
+      compact
+      title={greeting(identity)}
+      aside={(
+        <button
+          type="button"
+          className="start-here-toggle"
+          aria-expanded={startOpen}
+          aria-controls="start-here"
+          onClick={toggleStart}
+        >
+          {startOpen ? <ChevronUp size={16} aria-hidden="true" /> : <ChevronDown size={16} aria-hidden="true" />}
+          Start here
+        </button>
+      )}
+    >
+      Who to target — new clients and existing ones — ranked by the reason to act, not by dollar value.
+    </HeroBand>
   );
 
+  const cards = startOpen ? (
+    <StartHereCards
+      id="start-here"
+      firstClientId={rows[0]?.client_id ?? null}
+      onNavigate={(href) => navigate(href)}
+      onShowBook={showBook}
+    />
+  ) : null;
+
   if (error) {
-    return <div>{header}<div className="callout warn">The book could not be read: {error}</div></div>;
+    return (
+      <div>
+        {header}
+        <EmptyState title="The book is unavailable">
+          {error}<br />Nothing was changed; reload the page to try again.
+        </EmptyState>
+      </div>
+    );
   }
 
   return (
     <div>
       {header}
+      {cards}
+      <SectionHeading className="book-heading">
+        <span id="targeting" ref={headingRef} tabIndex={-1}>Targeting</span>
+      </SectionHeading>
       {answer ? (
         <InsightBar
           caption={answer.replace(/\.$/, '')}
@@ -125,16 +192,68 @@ export default function PortfolioPage({ onPickClient, onAskCopilot, scopeOptions
         />
       ) : null}
 
-      <BookGrid
-        rows={rows}
-        filters={filters}
-        onFilter={setFilters}
-        sort={sort}
-        onSort={setSort}
-        onPickClient={onPickClient}
-        onAskCopilot={askAbout}
-        unassessedCount={summary?.unassessed_clients || 0}
-      />
+      <Card
+        className="tcc-book-card"
+        flush
+        title="The book"
+        tabs={rows.length ? (
+          <GridTabs
+            label="Population"
+            tabs={bookTabs(rows)}
+            active={activeTab ?? ''}
+            onChange={(id) => setFilters(filtersForTab(filters, id))}
+          />
+        ) : null}
+        footer={rows[0] ? (
+          <div className="tcc-book-foot">
+            <span>First on the list</span>
+            <button type="button" className="tcc-link" onClick={() => onPickClient?.(rows[0].client_id)}>
+              Open {rows[0].client_name || `Account ${rows[0].client_id}`} →
+            </button>
+          </div>
+        ) : null}
+      >
+        <GridTabPanel id={activeTab ?? 'all'} active={activeTab ?? 'all'}>
+          <BookGrid
+            rows={rows}
+            filters={filters}
+            onFilter={setFilters}
+            sort={sort}
+            onSort={setSort}
+            onPickClient={onPickClient}
+            onAskCopilot={askAbout}
+            unassessedCount={summary?.unassessed_clients || 0}
+          />
+        </GridTabPanel>
+      </Card>
+
+      <div className="tcc-card-grid">
+        {footprintOf(rows).held.length > 1 ? (
+          <Card
+            title="Where the book operates"
+            subtitle={selectedStates(filters).length
+              ? `Filtered to ${selectedStates(filters).join(', ')}`
+              : 'Choose a state to filter the book'}
+          >
+            <FootprintPanel rows={rows} filters={filters} onFilter={setFilters} />
+          </Card>
+        ) : null}
+        {counts.length ? (
+          <Card title="Position" subtitle="Clients by the reason to act, not by dollar value">
+            <KpiRow label="Clients by targeting band">
+              {counts.map(({ id, count }) => (
+                <KpiTile
+                  key={id}
+                  label={band(id).label}
+                  value={String(count)}
+                  sub={band(id).line}
+                  tone={tileTone(id)}
+                />
+              ))}
+            </KpiRow>
+          </Card>
+        ) : null}
+      </div>
     </div>
   );
 }

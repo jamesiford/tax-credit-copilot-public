@@ -1,0 +1,57 @@
+/*
+ * Scales that no theme re-values: spacing, data type, row geometry, stacking
+ * and motion. (Chrome type, radius and shadow ARE theme-valued; see the theme
+ * files.)
+ *
+ * Data grids live on their own tokens. The comfortable chrome scale grew in the
+ * modern theme; a table cell did not, because 12px type in a 28px row with 8px
+ * padding is what keeps 17 columns inside a 1024px viewport and the visible-row
+ * gate green. A theme must not change `--text-data`, `--row-height-data` or
+ * `--cell-pad-data`.
+ */
+:root {
+  /* Spacing: 2px steps to 16, then coarser; the tail is for chrome. Odd
+     values round DOWN, because rounding up costs rows. */
+  --space-1: 2px;
+  --space-2: 4px;
+  --space-3: 6px;
+  --space-4: 8px;
+  --space-5: 10px;
+  --space-6: 12px;
+  --space-7: 14px;
+  --space-8: 16px;
+  --space-9: 20px;
+  --space-10: 24px;
+  --space-11: 28px;
+  --space-12: 32px;
+  --space-13: 40px;
+  --space-14: 48px;
+  --space-15: 56px;
+  --space-16: 64px;
+
+  --radius-pill: 999px;
+
+  /* Data register. */
+  --text-data: 12px;
+  --row-height-data: 28px;
+  --cell-pad-data: 8px;
+
+  /* The fixed topbar's height: an offset the main column must clear, not a
+     spacing step. */
+  --topbar-offset: 58px;
+
+  --z-base: 0;
+  --z-sticky: 10;
+  --z-dropdown: 60;
+  --z-overlay: 70;
+  --z-floating: 80;
+  --z-modal: 90;
+
+  --motion-fast: 120ms;
+  --motion: 180ms;
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+
+  /* How far a floating action keeps from the viewport corner, so it clears the
+     scroll bar and never sits over a primary action. */
+  --floating-offset: var(--space-10);
+}

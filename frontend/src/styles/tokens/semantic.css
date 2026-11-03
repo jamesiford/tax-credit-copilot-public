@@ -1,0 +1,84 @@
+/*
+ * Semantic layer: the legacy vocabulary, expressed in roles.
+ *
+ * The stylesheet grew up reading `--ink`, `--line`, `--accent`, `--exp-primary`.
+ * Rather than rename two hundred call sites in one commit, those names stay and
+ * alias the roles a theme assigns. Two groups:
+ *
+ *   Current vocabulary (`--ink`, `--muted`, `--line*`, `--panel`, `--surface-*`,
+ *   `--ok/warn/bad/info*`, `--on-accent`): stable names, still fine to use.
+ *
+ *   DEPRECATED (`--accent*`, `--accent-2*`, `--exp-*`): kept working so nothing
+ *   breaks, counted by src/lib/tokens.test.js, and allowed only to shrink. New
+ *   code reads the role directly: --reading* for a reading, --select* for a
+ *   selection, --identity-* for the header gradient.
+ */
+:root {
+  /* Surfaces and text. */
+  --bg: var(--surface-page);
+  --panel: var(--surface-card);
+  --surface: var(--surface-card);
+  --surface-2: var(--surface-subtle);
+  --surface-3: var(--surface-raised);
+  --surface-4: var(--surface-tint);
+  --on-accent: var(--text-inverse);
+
+  --ink: var(--text-default);
+  --ink-2: var(--text-secondary);
+  --ink-3: var(--text-faint);
+  --ink-4: var(--icon-muted);
+  --muted: var(--text-muted);
+  --text-2: var(--muted);
+
+  --line: var(--border-default);
+  --line-1: var(--line);
+  --line-2: var(--border-subtle);
+  --line-3: var(--border-strong);
+
+  /* Status foregrounds and tints. */
+  --ok: var(--status-ok);
+  --warn: var(--status-warn);
+  --bad: var(--status-bad);
+  --info: var(--status-info);
+  --ok-bg: var(--status-ok-bg);
+  --warn-bg: var(--status-warn-bg);
+  --bad-bg: var(--status-bad-bg);
+  --info-bg: var(--status-info-bg);
+
+  /* DEPRECATED: a reading. */
+  --accent: var(--reading);
+  --accent-strong: var(--reading-strong);
+  --accent-bg: var(--reading-bg);
+
+  /* DEPRECATED: a selection. */
+  --accent-2: var(--select);
+  --accent-2-strong: var(--select-strong);
+  --accent-2-bg: var(--select-bg);
+  --accent-2-line: var(--select-line);
+
+  /* DEPRECATED: the old brand names. */
+  --exp-primary: var(--identity-start);
+  --exp-accent: var(--identity-end);
+  --exp-blue: var(--exp-accent);
+  --exp-purple: var(--overlay-accent-strong);
+  --exp-violet: var(--overlay-accent);
+  --exp-magenta: var(--overlay-accent-2);
+  --exp-gold: var(--highlight);
+  --exp-ink: var(--ink);
+  --exp-muted: var(--muted);
+  --exp-subtle: var(--bg);
+  --exp-subtle-2: var(--line-2);
+
+  /* Bridge for the Tailwind utilities still in ChatPanel (reworked later);
+     a `var()` colour cannot take an alpha modifier, so `/40` is a no-op there. */
+  --tw-brand: var(--identity-start);
+  --tw-brand-deep: var(--text-primary);
+  --tw-brand-ink: var(--text-default);
+  --tw-accent-2: var(--select);
+  --tw-success: var(--status-ok);
+  --tw-success-deep: var(--status-ok-ink);
+  --tw-surface: var(--surface-card);
+  --tw-subtle: var(--surface-page);
+  --tw-subtle-2: var(--border-subtle);
+  --tw-muted: var(--text-muted);
+}

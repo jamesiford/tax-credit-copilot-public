@@ -1,0 +1,42 @@
+/* The home page's task cards: one row of four, equal width. */
+.start-here {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-6);
+  margin-bottom: var(--space-8);
+}
+
+.start-here .ui-task-card {
+  padding: var(--space-6) var(--space-8);
+  gap: var(--space-6);
+}
+
+/* The hero is a card in the page, not a full-bleed band: the page gutter and
+   the rhythm between blocks are the main column's. */
+.tcc-main .ui-hero {
+  margin-bottom: var(--space-6);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius);
+}
+
+/* The hero's own toggle sits in its aside. */
+.start-here-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-6);
+  color: var(--select-strong);
+  background: transparent;
+  border: 1px solid var(--select-line);
+  border-radius: var(--radius-sm);
+  font: inherit;
+  font-size: var(--text-small);
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.start-here-toggle:hover { background: var(--select-bg); }
+.start-here-toggle:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+
+.book-heading { scroll-margin-top: var(--space-16); }
+.book-heading:focus { outline: none; }

@@ -1,4 +1,5 @@
 import { CalendarRange } from 'lucide-react';
+import CountBadge from './ui/CountBadge.jsx';
 
 /**
  * The tax year, and only on the pages where it filters something.
@@ -62,7 +63,7 @@ export default function TopScope({ options, scope, resolved, clientScope, page, 
 
       {notices.length > 0 && (
         <span className="tcc-top-notice" title={notices.map((n) => n.message || n).join(' · ')}>
-          {notices.length}
+          <CountBadge count={notices.length} label="scope notices" />
         </span>
       )}
     </div>

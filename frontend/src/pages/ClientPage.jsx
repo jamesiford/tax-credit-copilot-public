@@ -6,10 +6,12 @@ import ClaimPackageButton from '../components/ClaimPackageButton.jsx';
 import ProgressView from '../components/ProgressView.jsx';
 import PositionView from '../components/PositionView.jsx';
 import PanelBoundary from '../components/PanelBoundary.jsx';
-import SectionTabs, { SectionTabPanel } from '../components/SectionTabs.jsx';
+import ClientHeader from '../components/ClientHeader.jsx';
+import { SectionTabPanel } from '../components/SectionTabs.jsx';
 import { PlanLevers, planJurisdiction } from '../components/PlanView.jsx';
+import { currentStep } from '../lib/clientFlow.js';
 import {
-  addToStack, clientTab, DEFAULT_CLIENT_TAB, parseWhatIf, removeFromStack, stackEntry, stackPatch,
+  addToStack, clientTab, parseWhatIf, removeFromStack, stackEntry, stackPatch,
 } from '../lib/whatIf.js';
 import { placeholderYears } from '../lib/scopeDimension.js';
 import {
@@ -48,7 +50,7 @@ const TABS = [
 const WHAT_IF_KEYS = ['wunit', 'wstack', 'wemp', 'wyear', 'wmethod', 'wlever', 'wmag', 'wrun'];
 
 export default function ClientPage({
-  clientName, onOpenPortfolio, scope, scopeOptions, scopeWindow, clientScope, ...rest
+  clientName, onOpenPortfolio, scope, scopeOptions, scopeWindow, clientScope, showTrail = true, ...rest
 }) {
   const [search, setSearch] = useSearchParams();
   const active = clientTab(search);
@@ -67,10 +69,6 @@ export default function ClientPage({
     }
     setSearch(next, { replace: false });
   }, [search, setSearch]);
-
-  const onTab = useCallback((id) => {
-    patchSearch({ ctab: id === DEFAULT_CLIENT_TAB ? '' : id });
-  }, [patchSearch]);
 
   // A Reading pill replaces What-if's whole scope, not part of it — a lever
   // left over from the last location would be applied to this one.
@@ -189,15 +187,34 @@ export default function ClientPage({
 
   const panel = (id) => ({
     id, active, idPrefix: 'client', keepMounted: true, visited: visited.has(id),
+    label: TABS.find((t) => t.id === id)?.label,
   });
+
+  // What the grid read and is showing, lifted so the header states the same
+  // run and reading rather than recomputing either.
+  const [review, setReview] = useState({ run: null, method: null });
+  const onContext = useCallback((next) => setReview(next), []);
 
   return (
     <div>
-      <Breadcrumb trail={trail} />
-      <ClaimPackageButton clientId={scope?.clientId} taxYear={scope?.year} />
-      <div className="tcc-client-tabs">
-        <SectionTabs tabs={TABS} active={active} onChange={onTab} label="Client sections" idPrefix="client" />
-      </div>
+      {showTrail ? (
+        <div className="tcc-page-bar">
+          <Breadcrumb trail={trail} />
+        </div>
+      ) : null}
+      <ClientHeader
+        clientId={scope?.clientId}
+        clientName={clientName}
+        industry={industry}
+        year={scope?.year ?? null}
+        search={search.toString()}
+        current={currentStep({ view: 'trend', ctab: active })}
+        clientScope={clientScope}
+        run={review.run}
+        method={review.method}
+        onBack={onOpenPortfolio}
+        actions={<ClaimPackageButton clientId={scope?.clientId} taxYear={scope?.year} />}
+      />
 
       {/* Each panel is boundaried so one failing costs a panel, not the page —
           this page rendered completely blank when ProximityView threw inside
@@ -209,6 +226,7 @@ export default function ClientPage({
             scopeOptions={scopeOptions}
             clientScope={clientScope}
             onWhatIf={onWhatIf}
+            onContext={onContext}
             {...rest}
           />
         </PanelBoundary>

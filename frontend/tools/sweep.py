@@ -40,6 +40,8 @@ from pathlib import Path
 
 from playwright.sync_api import sync_playwright, Error as PlaywrightError
 
+from _theme import new_page
+
 WEB = "http://localhost:5173"
 API = "http://localhost:8000/api"
 OUT = Path(__file__).parent / "sweep-output"
@@ -308,7 +310,8 @@ def drill(page, client_id: int, name: str, console_sink, request_sink) -> list[R
     if opened:
         for label, expect in (("Portfolio", WEB.rstrip("/")),):
             try:
-                b = page.query_selector(f"button:has-text('{label}')")
+                b = page.query_selector(
+                    f"nav[aria-label='Where you are'] button:has-text('{label}')")
                 if not b:
                     out.append(Result(scope, "4-breadcrumb-back", page.url, "FAIL",
                                       [f"no '{label}' breadcrumb on the employee page"]))
@@ -343,7 +346,7 @@ def main() -> int:
 
     with sync_playwright() as pw:
         browser = pw.chromium.launch(headless=not args.headed)
-        page = browser.new_page(viewport={"width": 1440, "height": 900})
+        page = new_page(browser, 1440, 900)
 
         page.on("console", lambda m: console_sink.append(f"{m.type}: {m.text[:200]}")
                 if m.type == "error" else None)

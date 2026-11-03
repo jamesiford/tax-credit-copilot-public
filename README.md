@@ -93,6 +93,18 @@ Dockerfiles and `nginx.conf` are optional, for local containers only.
 The application is at `/`. First load builds the calculation workspace,
 which takes 60–75 seconds against local data and longer on a cold Fabric read.
 
+The interface is a token-driven design system with two themes: **modern** (the
+default) and **classic** (the previous look, kept so the revamp can be rolled
+back by configuration — `VITE_THEME=classic`). It is one shell (top bar, drill
+trail, an Ask Copilot workspace that shows its evidence beside the conversation)
+over four routed pages, designed for a 1440×900 desktop. The type is self-hosted,
+and nothing loads from another origin. A customer re-skins it by overriding
+colour roles in `frontend/src/styles/overlay.css`, never by editing a
+component. See [docs/design/DESIGN-SYSTEM.md](docs/design/DESIGN-SYSTEM.md) and
+[docs/design/UI-REVAMP-RESULT.md](docs/design/UI-REVAMP-RESULT.md); the
+checks (`python frontend/tools/check_all.py`) are in
+[frontend/tools/README.md](frontend/tools/README.md).
+
 ### Data sources
 
 Set `DATA_SOURCE` in `backend/.env`. The choice matters more than it looks:
@@ -243,8 +255,11 @@ backend/
   data/             Source readers, synthetic generators, lakehouse projection
   tests/            Parity gate, architecture rules, endpoint contracts
 frontend/src/
-  components/       One file per view, each with a .test.jsx
-  lib/              Pure logic — scope, coverage, derivation
+  pages/            The four routed drill pages, one read each
+  components/       One file per view, each with a .test.jsx; shell/ (top bar,
+                    drill trail), ui/ (the shared components), ask/ (the Ask workspace)
+  lib/              Pure logic — scope, coverage, derivation, evidence contract
+  styles/           Token layers, the two themes, fonts, page patterns
   api.js            Single network layer
 frontend/server/    Express BFF (Node 24) — serves the SPA, proxies /api
 infra/              Terraform — root + modules/ (network, monitoring, identity,
@@ -267,7 +282,7 @@ python backend/tools/verify_reference_independent.py
 
 **1,279 backend** (104 skipped — live-Fabric/live-Azure opt-ins plus the two
 retired methodology source files, 1 expected failure documented below) ·
-**600 frontend** · **17/17** independent verification.
+**923 frontend** · **17/17** independent verification.
 
 Three kinds of test carry most of the weight:
 

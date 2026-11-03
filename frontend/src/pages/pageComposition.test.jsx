@@ -1,4 +1,4 @@
-import { render as rawRender, screen, waitFor } from '@testing-library/react';
+import { render as rawRender, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 
@@ -92,15 +92,20 @@ describe('a client page carries the questions that need a single client', () => 
       />,
     );
 
-    const tabs = screen.getAllByRole('tab').map((t) => t.textContent);
-    expect(tabs).toEqual(['Position by location', 'What was claimed', 'How am I doing', 'What-if']);
-    expect(screen.getByRole('tab', { name: 'Position by location' })).toHaveAttribute('aria-selected', 'true');
+    // The review flow: every step a link, the current one marked. Discovery has
+    // no view in this product, so it is not offered.
+    const flow = within(screen.getByRole('navigation', { name: 'Client review' }));
+    expect(flow.getAllByRole('link').map((a) => a.textContent.replace(/^\d+/, ''))).toEqual([
+      'Position', 'Eligibility', 'Trend', 'At risk', 'What-if', 'Evidence',
+    ]);
+    expect(flow.getByRole('link', { name: 'Trend' })).toHaveAttribute('aria-current', 'step');
+    expect(flow.getAllByRole('link').filter((a) => a.getAttribute('aria-current'))).toHaveLength(1);
     // Only the open section reads.
     await waitFor(() => expect(api.fetchClientUnits).toHaveBeenCalled());
     expect(api.fetchInYearProgress).not.toHaveBeenCalled();
   });
 
-  it('renders progress and the what-if levers on their tabs', async () => {
+  it('renders progress and the what-if levers on their steps', async () => {
     api.fetchClientUnits.mockResolvedValue({ calculation_state: 'not_calculated', message: 'x', items: [] });
     api.fetchInYearProgress.mockResolvedValue({
       on_track: true, closed_months: 6, projection: {}, cohort: null,
@@ -114,10 +119,10 @@ describe('a client page carries the questions that need a single client', () => 
       />,
     );
 
-    await userEvent.click(screen.getByRole('tab', { name: 'How am I doing' }));
+    await userEvent.click(screen.getByRole('link', { name: 'At risk' }));
     await waitFor(() => expect(api.fetchInYearProgress).toHaveBeenCalled());
 
-    await userEvent.click(screen.getByRole('tab', { name: 'What-if' }));
+    await userEvent.click(screen.getByRole('link', { name: 'What-if' }));
     expect(await screen.findByText(/What would change the answer|lever/i)).toBeInTheDocument();
   });
 
@@ -134,7 +139,7 @@ describe('a client page carries the questions that need a single client', () => 
 
     await userEvent.click(await screen.findByRole('button', { name: /Below minimum: open What-if for GA_GA-016 TY2025/ }));
 
-    expect(screen.getByRole('tab', { name: 'What-if' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('link', { name: 'What-if' })).toHaveAttribute('aria-current', 'step');
     await waitFor(() => expect(api.simulateUnit).toHaveBeenCalledWith(expect.objectContaining({
       clientId: 2001, worksiteId: 'GA_GA-016', taxYear: 2025, method: 'min_max',
       action: 'add_headcount', magnitude: 2,
@@ -255,7 +260,7 @@ describe('the book is one ranked grid, not two tabs', () => {
     draw();
     expect(await screen.findByRole('button', { name: 'Open Cascade' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Open Northwind' })).toBeInTheDocument();
-    expect(screen.getByText('On the line')).toBeInTheDocument();
+    expect(screen.getByText('On the line', { selector: '.tcc-band' })).toBeInTheDocument();
     // "Identified", not "Unclaimed": whether they already claimed it is a fact
     // about a filing we do not hold.
     expect(screen.getByText('Identified', { selector: '.tcc-band' })).toBeInTheDocument();

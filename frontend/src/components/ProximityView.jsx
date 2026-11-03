@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
-  AlertTriangle, Check, Loader2, Plus,
+  AlertTriangle, Check, Plus,
 } from 'lucide-react';
+import Skeleton from './ui/Skeleton.jsx';
+import EmptyState from './ui/EmptyState.jsx';
 import { fetchEmployeeProximity } from '../api.js';
 import { MAX_STACK, stackEntry } from '../lib/whatIf.js';
 import { designationCode, designationTitle } from '../lib/trendGrid.js';
@@ -358,11 +360,13 @@ export default function ProximityView({ scope, scopeOptions, embedded = false, s
         </div>
       ) : null}
 
-      {loading ? (
-        <div className="prox-loading"><Loader2 size={16} className="spin" /> Calculating…</div>
-      ) : null}
+      {loading ? <Skeleton lines={3} label="Calculating…" /> : null}
 
-      {error ? <div className="prox-error">{error}</div> : null}
+      {error ? (
+        <EmptyState title="The employees nearest the line are unavailable">
+          {error}<br />Nothing was changed; reload the page to try again.
+        </EmptyState>
+      ) : null}
 
       {/* A year this client has no calculated run for. The endpoint answers 200
           and says so in `calculation_state` rather than 404-ing, because "we

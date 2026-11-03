@@ -93,9 +93,9 @@ const scopeFor = (clientId) => ({
  * be satisfied by the wrong element is not testing what it claims to.
  */
 const kpi = (label) => {
-  const strip = document.querySelector('.tcc-stat-row');
-  const card = [...strip.querySelectorAll('.tcc-stat')]
-    .find((c) => c.querySelector('.tcc-stat-label')?.textContent === label);
+  const strip = document.querySelector('.ui-kpi-row');
+  const card = [...strip.querySelectorAll('.ui-kpi')]
+    .find((c) => c.querySelector('.ui-kpi-label')?.textContent === label);
   if (!card) throw new Error(`no stat card labelled "${label}"`);
   return card;
 };

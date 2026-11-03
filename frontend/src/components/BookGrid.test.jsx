@@ -23,27 +23,6 @@ import * as api from '../api.js';
 
 vi.mock('../api.js', () => ({ fetchClientCoverage: vi.fn() }));
 
-// The map pulls a 10MB topojson from a CDN on mount. The filtering behaviour
-// under test is about what it CALLS, not about the geography, so it is stubbed
-// down to the states the book actually holds.
-vi.mock('./FootprintMap.jsx', () => ({
-  default: ({ states, priced, selected, onSelect }) => (
-    <div data-testid="map">
-      {states.map((code) => (
-        <button
-          key={code}
-          type="button"
-          aria-pressed={selected.includes(code)}
-          data-priced={priced.includes(code)}
-          onClick={() => onSelect(code)}
-        >
-          {code}
-        </button>
-      ))}
-    </div>
-  ),
-}));
-
 const HALLOWAY = {
   client_id: 2004,
   client_name: 'Halloway',
@@ -163,41 +142,6 @@ describe('the declining band', () => {
   });
 });
 
-describe('the map filters the book', () => {
-  it('writes the shared state filter rather than holding its own selection', async () => {
-    // If the map kept its own selection, clearing the chip in the filter bar
-    // would leave the map still looking selected.
-    const { onFilter } = draw();
-    await userEvent.click(within(screen.getByTestId('map')).getByRole('button', { name: 'NC' }));
-    expect(onFilter).toHaveBeenCalledWith({ state: 'NC' });
-  });
-
-  it('toggles a state off when it is already selected', async () => {
-    const { onFilter } = draw({ filters: { state: 'NC' } });
-    await userEvent.click(within(screen.getByTestId('map')).getByRole('button', { name: 'NC' }));
-    expect(onFilter).toHaveBeenCalledWith({ state: '' });
-  });
-
-  it('keeps held-but-unpriceable states visually distinct', () => {
-    // Cascade has payroll in NC and there is no authored NC pack. That is a
-    // real gap in statutory coverage and must not look like a priced state.
-    draw();
-    const map = within(screen.getByTestId('map'));
-    expect(map.getByRole('button', { name: 'GA' })).toHaveAttribute('data-priced', 'true');
-    expect(map.getByRole('button', { name: 'NC' })).toHaveAttribute('data-priced', 'false');
-  });
-
-  it('offers every state anyone in the book operates in', () => {
-    // The union, not one client's footprint — the map filters the whole book.
-    // SC belongs to both, NC only to Cascade, and all three must be clickable.
-    draw();
-    const map = within(screen.getByTestId('map'));
-    expect(map.getByRole('button', { name: 'GA' })).toBeInTheDocument();
-    expect(map.getByRole('button', { name: 'NC' })).toBeInTheDocument();
-    expect(map.getByRole('button', { name: 'SC' })).toBeInTheDocument();
-  });
-});
-
 describe('expanding a row', () => {
   // The drill-down outlived the parent's cleanup: it kept a Claimed column and
   // an Outcome column reading `over claimed` / `unclaimed` / `correctly not
@@ -249,46 +193,6 @@ describe('expanding a row', () => {
     expect(within(row).getByText('base year')).toBeInTheDocument();
   });
 });
-
-describe('the state list beside the map', () => {
-  // The map alone was two thirds whitespace: we hold four states and the other
-  // forty-six were the picture. The list fills it with the thing the map is a
-  // control for, and gives the same filter a keyboard can reach.
-
-  function stateRow(code) {
-    return screen.getByRole('row', { name: new RegExp(`^${code}\\b`) });
-  }
-
-  it('counts clients per state', () => {
-    draw();
-    // GA: both. NC: Cascade only. SC: both.
-    expect(within(stateRow('GA')).getAllByRole('cell')[1]).toHaveTextContent('2');
-    expect(within(stateRow('NC')).getAllByRole('cell')[1]).toHaveTextContent('1');
-  });
-
-  it('shows no per-state dollar figure', () => {
-    // A claim is client-grain and a client operates in several states, so any
-    // per-state money total would either double-count or credit a state that
-    // did not earn it.
-    draw();
-    expect(stateRow('GA').textContent).not.toMatch(/\$/);
-    expect(stateRow('NC').textContent).not.toMatch(/\$/);
-  });
-
-  it('names the coverage gap in words, not only as a shade', () => {
-    draw();
-    expect(stateRow('GA')).toHaveTextContent('Priced');
-    expect(stateRow('NC')).toHaveTextContent('No authored statute');
-  });
-
-  it('writes the same filter the map does', () => {
-    const { onFilter } = draw();
-    return userEvent
-      .click(within(stateRow('NC')).getByRole('button', { name: 'NC' }))
-      .then(() => expect(onFilter).toHaveBeenCalledWith({ state: 'NC' }));
-  });
-});
-
 
 describe('industry on the book (WI-20)', () => {
   it('shows each client\u2019s industry, and says so where none is recorded', () => {

@@ -1,12 +1,37 @@
 import { useEffect, useMemo, useState } from 'react';
-import { BookOpenCheck, Loader2, ShieldCheck } from 'lucide-react';
+import { BookOpenCheck, ShieldCheck } from 'lucide-react';
 import { fetchRules } from '../api.js';
 import { authoredYearsLabel } from '../lib/reference.js';
 import { PageHeader } from './ReferenceViews.jsx';
+import EmptyState from './ui/EmptyState.jsx';
+import KpiTile, { KpiRow } from './ui/KpiTile.jsx';
+import Skeleton from './ui/Skeleton.jsx';
+import VerdictCard from './ui/VerdictCard.jsx';
 import SortHeader from './SortHeader.jsx';
 import { FilterBar } from './ColumnFilter.jsx';
 import useTableControls from './useTableControls.js';
 import { ENUM, NUMERIC, TEXT } from '../lib/gridFilter.js';
+import { programVerdict } from '../lib/programVerdict.js';
+
+function ProgramVerdict({ rule, years, known }) {
+  const v = programVerdict(rule, years, known);
+  return (
+    <VerdictCard
+      level={2}
+      tone={v.tone}
+      title={rule.name}
+      pills={v.pills}
+      assessmentTitle="Why this reading"
+      assessment={v.assessment}
+    >
+      <p className="tcc-verdict-text">
+        <code>{rule.citation}</code>
+        {rule.threshold != null ? ` · minimum ${rule.threshold} new jobs` : ''}
+        {rule.benefit_period_years != null ? ` · ${rule.benefit_period_years}-year benefit` : ''}
+      </p>
+    </VerdictCard>
+  );
+}
 
 /**
  * Rules — statute and methodology, in one place and clearly separated.
@@ -27,7 +52,7 @@ import { ENUM, NUMERIC, TEXT } from '../lib/gridFilter.js';
  * arrives as an authored year pack in git, which is what the table below lists.
  */
 
-export default function RuleLibraryView({ onAskCopilot, programs = null }) {
+export default function RuleLibraryView({ programs = null }) {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -73,18 +98,15 @@ export default function RuleLibraryView({ onAskCopilot, programs = null }) {
       eyebrow="Prove it"
       title="Programs"
       sub="What each jurisdiction published, versioned by tax year, with the citation each value came from"
-      actions={onAskCopilot && (
-        <button
-          className="btn btn-primary"
-          onClick={() => onAskCopilot('Summarize how rule packs are versioned per tax year, and how a filed claim stays bound to the statute that was in force that year.')}
-        >
-          Ask Copilot
-        </button>
-      )}
     />
 
-    {error && <div className="callout warn">{error}</div>}
-    {loading && <div className="callout info"><Loader2 size={15} className="spin" /> Reading rule packs…</div>}
+    {error && (
+      <EmptyState title="The rule packs are unavailable" icon={<ShieldCheck size={20} />}>
+        {error}<br />The statute files are read from the API, so check that it is
+        running, then reload this page.
+      </EmptyState>
+    )}
+    {loading && <Skeleton lines={3} label="Reading rule packs" />}
 
     <div className="callout info">
       <b>Statute is frozen per tax year.</b> Georgia&apos;s minimum weekly wage was
@@ -93,26 +115,18 @@ export default function RuleLibraryView({ onAskCopilot, programs = null }) {
       declined by name rather than estimated from its neighbour.
     </div>
 
-    <div className="kpi-strip tcc-kpi-4">
-      <div className="kpi-card">
-        <div className="kpi-label">Programs codified</div>
-        <div className="kpi-value">{rules.length}</div>
+    <KpiRow label="Rule library summary">
+      <KpiTile label="Programs codified" value={rules.length} />
+      <KpiTile label="Calculable" value={yearScoped ?? '—'} sub="statute authored by tax year" />
+      <KpiTile label="Signed off" value={verified} sub="by a practitioner" tone="above-min" />
+      <KpiTile label="Awaiting review" value={rules.length - verified || '—'} />
+    </KpiRow>
+
+    {rules.length > 0 && (
+      <div className="tcc-verdict-grid" role="list" aria-label="Programs by readiness">
+        {rules.map((r) => <div role="listitem" key={r.code}><ProgramVerdict rule={r} years={yearsFor(r.code)} known={Boolean(programs)} /></div>)}
       </div>
-      <div className="kpi-card accent">
-        <div className="kpi-label">Calculable</div>
-        <div className="kpi-value">{yearScoped ?? '—'}</div>
-        <div className="kpi-sub">statute authored by tax year</div>
-      </div>
-      <div className="kpi-card green">
-        <div className="kpi-label">Signed off</div>
-        <div className="kpi-value">{verified}</div>
-        <div className="kpi-sub">by a practitioner</div>
-      </div>
-      <div className="kpi-card">
-        <div className="kpi-label">Awaiting review</div>
-        <div className="kpi-value">{rules.length - verified || '—'}</div>
-      </div>
-    </div>
+    )}
 
     <section className="panel">
       <h3 className="panel-title">
@@ -206,7 +220,15 @@ export default function RuleLibraryView({ onAskCopilot, programs = null }) {
             );
           })}
           {!rules.length && !loading && (
-            <tr><td colSpan={8} className="muted">No rule packs loaded.</td></tr>
+            <tr>
+              <td colSpan={8}>
+                <EmptyState title="No rule packs are loaded">
+                  The API returned no programs. Statute arrives as authored year
+                  packs under <code>rules/</code>; with none present nothing can
+                  be calculated, by design.
+                </EmptyState>
+              </td>
+            </tr>
           )}
         </tbody>
       </table>

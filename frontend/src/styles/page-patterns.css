@@ -1,0 +1,362 @@
+/*
+ * Page patterns: the dashboard card grid, the client review header and
+ * stepper, the verdict card, and the data-grid skin.
+ *
+ * Theme-neutral where it only lays things out (the card grid, the review
+ * header); the data-grid skin is scoped to the modern theme so classic renders
+ * as it always did. Every value is a token: spacing --space-*, type the named
+ * steps, colour a role. Data grids stay in the data register (12px, 28px rows,
+ * 8px cell padding), which nothing in this file changes.
+ *
+ * Selection is --select*; a reading is --state-* or navy. A verdict is never
+ * the selection blue.
+ */
+
+/* ---- Dashboard: cards in a grid ----------------------------------------- */
+.tcc-card-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-10);
+  margin-top: var(--space-8);
+}
+
+/* Two columns from 1280. Below that one column is a smoke-check layout only. */
+@media (min-width: 1280px) {
+  .tcc-card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.tcc-card-grid > .ui-card {
+  min-width: 0;
+}
+
+/* The map card holds a map beside its list; at half width they stack. */
+.tcc-card-grid .tcc-footprint-row {
+  flex-wrap: wrap;
+  gap: var(--space-10);
+}
+
+.tcc-card-grid .footprint-map {
+  flex: 1 1 240px;
+  max-width: 340px;
+}
+
+.tcc-card-grid .tcc-footprint-list {
+  flex: 1 1 200px;
+}
+
+.tcc-card-grid .ui-kpi-row {
+  margin-bottom: 0;
+}
+
+/* ---- The book card: the grid is the product, so it runs edge to edge ----- */
+.tcc-book-card .ui-card-tabs {
+  padding-bottom: var(--space-6);
+}
+
+.tcc-book > :not(.cov-scroll) {
+  margin-inline: var(--space-10);
+}
+
+.tcc-book > p {
+  margin-block: var(--space-6);
+}
+
+.tcc-book > .tcc-filterbar,
+.tcc-book > :first-child {
+  margin-top: var(--space-6);
+}
+
+.tcc-book > .cov-scroll {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.tcc-book-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8);
+}
+
+/* ---- Client review: header, meta line, stepper ---------------------------- */
+.tcc-header-compact > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-10);
+}
+
+.tcc-header-compact .page-title {
+  margin: 0;
+  font-size: var(--text-title);
+  line-height: var(--leading-heading);
+}
+
+html[data-theme="modern"] .tcc-header.tcc-header-compact {
+  margin-bottom: var(--space-4);
+}
+
+/* The client page's own title is the header above it; this one names the
+   section, so it steps down rather than competing. */
+.trend-head .trend-title {
+  font-size: var(--text-subhead);
+}
+
+.tcc-header-compact .ui-meta {
+  margin: 0;
+}
+
+.tcc-review-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0;
+  color: var(--text-link);
+  background: none;
+  border: 0;
+  font: inherit;
+  font-size: var(--text-small);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tcc-review-back:hover {
+  text-decoration: underline;
+}
+
+.tcc-review-flow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8);
+  margin-bottom: var(--space-4);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.tcc-review-flow .ui-stepper-nav {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.tcc-review-note {
+  margin: 0 0 var(--space-5);
+  color: var(--text-secondary);
+  font-size: var(--text-caption);
+}
+
+/* ---- Verdict card: border = verdict, then pills, title, assessment ------- */
+.tcc-verdict-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: var(--space-10);
+  margin-bottom: var(--space-10);
+}
+
+.tcc-verdict {
+  height: 100%;
+}
+
+.tcc-verdict .ui-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.tcc-verdict-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.tcc-verdict-title {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: var(--text-strong);
+  font-weight: 600;
+  line-height: var(--leading-heading);
+}
+
+.tcc-verdict-text {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--text-small);
+  line-height: var(--leading-base);
+}
+
+.tcc-verdict-more {
+  align-self: flex-start;
+  margin-top: auto;
+  color: var(--text-link);
+  font-size: var(--text-small);
+  font-weight: 600;
+}
+
+/* ---- Calculation trail as a stepped list --------------------------------- */
+.tcc-trail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: trail;
+}
+
+.tcc-trail-step {
+  display: grid;
+  grid-template-columns: var(--space-12) minmax(0, 1fr);
+  gap: var(--space-6);
+  counter-increment: trail;
+}
+
+.tcc-trail-step::before {
+  content: counter(trail);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-12);
+  height: var(--space-12);
+  color: var(--select-strong);
+  background: var(--select-bg);
+  border: 1px solid var(--select-line);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-caption);
+  font-weight: 600;
+}
+
+.tcc-trail-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4);
+  margin: 0;
+  color: var(--text-primary);
+  font-size: var(--text-small);
+  font-weight: 600;
+}
+
+.tcc-trail-io {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+
+.tcc-trail-block {
+  min-width: 0;
+  padding: var(--space-4);
+  background: var(--surface-subtle);
+  border-radius: var(--radius-sm);
+}
+
+.tcc-trail-block b {
+  color: var(--text-secondary);
+  font-size: var(--text-caption);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.tcc-trail-block pre {
+  max-height: 250px;
+  margin: var(--space-3) 0 0;
+  overflow: auto;
+  color: var(--text-default);
+  font-family: var(--font-data);
+  font-size: var(--text-data);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.tcc-trail-card .ui-card-body {
+  padding: var(--space-6) var(--space-8);
+}
+
+/* Verbatim engine output: the data register, never smaller than the floor. */
+.tcc-trail-formula,
+.tcc-trail-output {
+  margin: var(--space-2) 0 0;
+  font-family: var(--font-data);
+  font-size: var(--text-data);
+  color: var(--text-default);
+  overflow-wrap: anywhere;
+}
+
+.tcc-trail-cite {
+  margin: var(--space-2) 0 0;
+  color: var(--text-secondary);
+  font-size: var(--text-caption);
+}
+
+.tcc-trail-hash {
+  display: inline-block;
+  margin-left: var(--space-4);
+  padding: 0 var(--space-3);
+  color: var(--text-secondary);
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-data);
+  font-size: var(--text-data);
+}
+
+/* ---- Data grids (modern theme) ------------------------------------------
+   Header filled, hairline dividers, the name column a link, figures navy, the
+   open row in the selection language. 28px rows / 12px text / 8px padding are
+   the data register and are not touched here. */
+html[data-theme="modern"] :is(.cov-grid, .tbl-compact) thead th {
+  color: var(--text-secondary);
+  background: var(--surface-subtle);
+  border-bottom: 1px solid var(--border-default);
+}
+
+html[data-theme="modern"] :is(.cov-grid, .tbl-compact) :is(td, th) {
+  border-bottom-color: var(--border-subtle);
+}
+
+/* No vertical rules in the book grid: a hairline per row is enough and the
+   columns are already aligned by their headers. */
+html[data-theme="modern"] .cov-grid :is(th, td) {
+  border-right: 0;
+}
+
+html[data-theme="modern"] .cov-grid .cov-rowhead {
+  background: transparent;
+}
+
+html[data-theme="modern"] .cov-grid .cov-corner {
+  background: var(--surface-subtle);
+}
+
+html[data-theme="modern"] .cov-client {
+  color: var(--text-link);
+}
+
+html[data-theme="modern"] :is(.cov-grid, .tbl-compact) td.num {
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+html[data-theme="modern"] :is(.cov-grid, .tbl-compact) tbody tr:hover > :is(td, th) {
+  background: var(--surface-subtle);
+}
+
+/* The header stays in view inside a grid that scrolls on its own. */
+html[data-theme="modern"] .tbl-scroll thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+html[data-theme="modern"] :is(.cov-grid, .tbl-compact) :is(tr.row-open, tr[aria-selected="true"]) > :is(td, th) {
+  background: var(--select-bg);
+}
+
+html[data-theme="modern"] :is(.cov-grid, .tbl-compact) :is(tr.row-open, tr[aria-selected="true"]) > :first-child {
+  box-shadow: inset 3px 0 0 var(--select);
+}

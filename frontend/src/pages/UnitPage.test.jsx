@@ -407,7 +407,7 @@ describe('filtering is pushed to the warehouse, not applied to what came back', 
     draw({ month: null }, ['/?emp_f=avg_weekly_hours:>=35']);
 
     expect(await screen.findByRole('tab', { name: /Counted\s*29/ })).toBeInTheDocument();
-    const card = screen.getByText('Counted this year').closest('.tcc-stat');
+    const card = screen.getByText('Counted this year').closest('.ui-kpi');
     expect(within(card).getByText('29')).toBeInTheDocument();
   });
 

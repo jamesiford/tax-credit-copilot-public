@@ -4,28 +4,25 @@ export default {
   theme: {
     extend: {
       colors: {
-        // The brand palette. Blue is the core thread and purple works beside
-        // it — "generously", per the house style guide — so purple carries
-        // accents and active states rather than sitting unused. A deployment
-        // overrides these at build time; see src/brand.config.js for the
-        // name and logo half of white-labeling.
-        brand: '#1A1F71',
-        'brand-deep': '#0F1450',
-        'brand-ink': '#0A0A23',
-        'accent-2': '#963CBD',
-        success: '#26D07C',
-        'success-deep': '#0FA862',
-        surface: '#FFFFFF',
-        subtle: '#F4F4F6',
-        'subtle-2': '#E8E8EE',
-        muted: '#6B6B7B',
+        // Bridged to the semantic tokens (styles/tokens/semantic.css) so the
+        // Tailwind utilities still left in ChatPanel follow the active theme.
+        // A `var()` colour cannot take an alpha modifier, so `/40` is a no-op.
+        brand: 'var(--tw-brand)',
+        'brand-deep': 'var(--tw-brand-deep)',
+        'brand-ink': 'var(--tw-brand-ink)',
+        'accent-2': 'var(--tw-accent-2)',
+        success: 'var(--tw-success)',
+        'success-deep': 'var(--tw-success-deep)',
+        surface: 'var(--tw-surface)',
+        subtle: 'var(--tw-subtle)',
+        'subtle-2': 'var(--tw-subtle-2)',
+        muted: 'var(--tw-muted)',
       },
       fontFamily: {
-        // Roboto FIRST. It sat fifth behind Inter and Segoe UI, so it never won.
-        sans: ['Roboto', 'ui-sans-serif', 'system-ui', '-apple-system', 'sans-serif'],
+        sans: ['var(--font-sans)'],
       },
       boxShadow: {
-        tile: '0 1px 2px rgba(10, 10, 35, 0.05), 0 1px 3px rgba(10, 10, 35, 0.08)',
+        tile: 'var(--shadow-1)',
       },
     },
   },

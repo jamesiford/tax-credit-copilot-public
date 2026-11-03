@@ -1,0 +1,17 @@
+/*
+ * Token layers, in dependency order. main.jsx imports this BEFORE index.css so
+ * the stylesheet never reads a token that has not been defined yet.
+ *
+ *   primitives   raw scales, no meaning
+ *   scales       spacing, data type, row geometry, stacking, motion
+ *   theme-modern the default look: assigns semantic roles from primitives
+ *   theme-classic the previous look: same roles, the old values
+ *   semantic     the legacy vocabulary (--ink, --line, --accent...) as aliases
+ *   state        the five --state-* families, aliasing status roles
+ */
+@import './primitives.css';
+@import './scales.css';
+@import './theme-modern.css';
+@import './theme-classic.css';
+@import './semantic.css';
+@import './state.css';

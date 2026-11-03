@@ -15,6 +15,13 @@ import {
 import { assumptionEntries, eligibilityLabel, MONEY, monthLabel, NUM, shortHash, stageLabel, statusTone } from '../lib/reference.js';
 import { PORTFOLIO } from '../lib/scopeDimension.js';
 import PageHeader from './PageHeader.jsx';
+import KpiTile from './ui/KpiTile.jsx';
+import EmptyState from './ui/EmptyState.jsx';
+import Skeleton from './ui/Skeleton.jsx';
+import TrailSteps from './TrailSteps.jsx';
+import Tabs from './ui/Tabs.jsx';
+import MethodTabs from './MethodTabs.jsx';
+import { kpiTone } from '../lib/kpiTone.js';
 import SortHeader from './SortHeader.jsx';
 import { FilterBar } from './ColumnFilter.jsx';
 import useTableControls from './useTableControls.js';
@@ -56,11 +63,9 @@ function Status({ status, children }) {
   return <span className={`tcc-status ${statusTone(status)}`}>{children || stageLabel(status)}</span>;
 }
 
-function Kpi({ label, value, sub, tone = '', onClick }) {
-  const content = <><div className="kpi-label">{label}</div><div className="kpi-value">{value}</div><div className="kpi-sub">{sub}</div></>;
-  return onClick
-    ? <button type="button" className={`kpi-card tcc-kpi-button ${tone}`} onClick={onClick}>{content}</button>
-    : <div className={`kpi-card ${tone}`}>{content}</div>;
+// One tile implementation (ui/KpiTile); the `tone` spellings are the old colour names.
+function Kpi({ label, value, sub, tone = '' }) {
+  return <KpiTile label={label} value={value} sub={sub} tone={kpiTone(tone)} />;
 }
 
 function Pager({ total, offset, limit, onChange }) {
@@ -68,7 +73,7 @@ function Pager({ total, offset, limit, onChange }) {
   return <div className="tcc-pager"><button className="btn btn-secondary" disabled={!offset} onClick={() => onChange(Math.max(0, offset - limit))}>Previous</button><span>{NUM.format(offset + 1)}–{NUM.format(Math.min(offset + limit, total))} of {NUM.format(total)}</span><button className="btn btn-secondary" disabled={offset + limit >= total} onClick={() => onChange(offset + limit)}>Next</button></div>;
 }
 
-export function EligibilityView({ summary, openEmployee, scope }) {
+export function EligibilityView({ summary, openEmployee, scope, header = null }) {
   const [data, setData] = useState(null); const [error, setError] = useState(null);
   const [status, setStatus] = useState('all'); const [proximity, setProximity] = useState('all');
   const [query, setQuery] = useState(''); const [offset, setOffset] = useState(0); const limit = 50;
@@ -108,12 +113,24 @@ export function EligibilityView({ summary, openEmployee, scope }) {
   const calculated = isCalculated(data);
   const uncalculated = data != null && !calculated;
   return <>
-    <PageHeader eyebrow="What is it worth" title="Eligibility" sub="One employee total · two independent denominators · two independently validated eligibility lists" />
+    {header ? (
+      <>
+        {header}
+        <h2 className="panel-title">Eligibility</h2>
+        <p className="page-sub">One employee total · two independent denominators · two independently validated eligibility lists</p>
+      </>
+    ) : (
+      <PageHeader eyebrow="What is it worth" title="Eligibility" sub="One employee total · two independent denominators · two independently validated eligibility lists" />
+    )}
     <div className="callout info"><b>Methods are not expected to agree with each other.</b> Min-Max and Pay Period must each agree with the partner’s implementation of that method.</div>
     <div className="tcc-formula-pair"><div><b>Min-Max denominator</b><code>weeks = (last PPE - first PPS) / 7</code><span>BA-11 · exclusive days · zero-hour rows included in span</span></div><div><b>Pay Period denominator</b><code>weeks = Σ (PPE - PPS + 1) / 7</code><span>BA-03 · actual period span · PayFrequency is lineage only</span></div></div>
-    {isPortfolio && <div className="callout info">Eligibility is tested per employee against one client’s fiscal year, so there is no portfolio-wide population to show. Select a client to see theirs.</div>}
-    {error && <div className="callout warn"><b>No population for this selection.</b> {error}</div>}
-    {!isPortfolio && !data && !error && <div className="panel tcc-loading-inline">Reading this client’s population from the warehouse…</div>}
+    {isPortfolio && (
+      <EmptyState title="Pick a client to see who qualifies">
+        Eligibility is tested per employee against one client’s fiscal year, so there is no portfolio-wide population to show. Select a client to see theirs.
+      </EmptyState>
+    )}
+    {error && <EmptyState title="No population for this selection">{error}</EmptyState>}
+    {!isPortfolio && !data && !error && <Skeleton lines={4} label="Reading this client’s population from the warehouse…" />}
     {/* The population is READ from the run that decided it, so a client-year no
         run has reached carries no figure. Rendering zeroes here would say the
         payroll was examined and nobody qualified. */}
@@ -141,7 +158,7 @@ export function EligibilityView({ summary, openEmployee, scope }) {
     <section className={`tcc-invariant ${summary.boundary.boundary_complete ? 'ok' : 'warn'}`}><div><b>Fiscal boundary completeness</b><span>BA-02 / BA-10 · {stageLabel(summary.boundary.status)}</span></div><div><strong>{NUM.format(summary.boundary.prior_ppe_paid_in_fy_rows)}</strong><span>prior PPE paid in FY</span></div><div><strong>{NUM.format(summary.boundary.crossing_start_rows)}</strong><span>crossing-start rows</span></div><div><strong>{NUM.format(summary.boundary.current_ppe_paid_after_fy_rows)}</strong><span>trailing rows excluded</span></div></section>
     {!summary.boundary.boundary_complete && <div className="callout warn"><b>Leading payroll lookback is missing.</b> Earliest valid PPS is {summary.boundary.earliest_valid_pay_period_start}; no rows are synthesized and denominators are not forced to 52 weeks.</div>}
     </>}
-    {calculated && <section className="panel"><div className="tcc-panel-toolbar"><div className="tcc-filter-stack"><div className="tabs">{options.map(([id, label]) => <button className={`tab ${status === id ? 'active' : ''}`} key={id} onClick={() => { setStatus(id); setOffset(0); }}>{label}</button>)}</div><button className={`btn btn-secondary ${proximity === 'near_floor' ? 'active' : ''}`} onClick={() => { setProximity(proximity === 'near_floor' ? 'all' : 'near_floor'); setOffset(0); }}>Within 5% of a floor</button></div><label className="tcc-search"><Search size={16} /><input value={query} onChange={(event) => { setQuery(event.target.value); setOffset(0); }} placeholder="Search employee ID…" /></label></div><div className="tcc-table-wrap tcc-table-tall"><table className="tbl tcc-dense-table"><thead><tr>{ELIGIBILITY_HEADS.map(([key, label, cls]) => (key
+    {calculated && <section className="panel"><div className="tcc-panel-toolbar"><div className="tcc-filter-stack"><Tabs tabs={options.map(([id, label]) => ({ id, label }))} active={status} onChange={(id) => { setStatus(id); setOffset(0); }} label="Eligibility status" idPrefix="eligibility" variant="segmented" controls={false} /><button className={`btn btn-secondary ${proximity === 'near_floor' ? 'active' : ''}`} onClick={() => { setProximity(proximity === 'near_floor' ? 'all' : 'near_floor'); setOffset(0); }}>Within 5% of a floor</button></div><label className="tcc-search"><Search size={16} /><input value={query} onChange={(event) => { setQuery(event.target.value); setOffset(0); }} placeholder="Search employee ID…" /></label></div><div className="tcc-table-wrap tcc-table-tall"><table className="tbl tcc-dense-table"><thead><tr>{ELIGIBILITY_HEADS.map(([key, label, cls]) => (key
   ? <SortHeader key={key} label={label} sortKey={key} sort={sort} multi={false} className={cls} onSort={(k) => { setSort((cur) => [{ key: k, desc: cur[0]?.key === k ? !cur[0].desc : false }]); setOffset(0); }} />
   : <th key={label} className={cls}>{label}</th>))}</tr></thead><tbody>{(data?.rows || []).map((row) => <tr key={row.record_token}><td><button className="tcc-link" onClick={() => openEmployee(row.record_token, drillContext)}>{row.employee_id}</button></td><td><Status status={row.status}>{eligibilityLabel(row.status)}</Status></td><td>{row.near_floor ? <span className="pill pill-warn">within 5%</span> : <span className="muted">—</span>}</td><td className="num">{row.totals.hours}</td><td className="num">{MONEY.format(Number(row.totals.wages))}</td><td className="num">{row.min_max.weeks}</td><td className="num">{row.min_max.avg_hours} / {MONEY.format(Number(row.min_max.avg_wages))}</td><td><FlagPair method={row.min_max} /></td><td className="num">{row.pay_period.weeks}</td><td className="num">{row.pay_period.avg_hours} / {MONEY.format(Number(row.pay_period.avg_wages))}</td><td><FlagPair method={row.pay_period} /></td></tr>)}</tbody></table></div>{data && <Pager total={data.total} limit={limit} offset={offset} onChange={setOffset} />}</section>}
   </>;
@@ -190,18 +207,19 @@ export function OneZeroView({ openEmployee, scope }) {
   const overlaps = data?.overlap_flags || [];
   return <>
     <PageHeader eyebrow="What is it worth" title="Monthly employment" sub="Eligible employees allocated to location × legal entity × month (the one/zero matrix), with every overlap disposition visible" />
-    <div className="tabs tcc-method-tabs"><button className={`tab ${method === 'min_max' ? 'active' : ''}`} onClick={() => setMethod('min_max')}>Min-Max</button><button className={`tab ${method === 'pay_period' ? 'active' : ''}`} onClick={() => setMethod('pay_period')}>Pay Period</button></div>
+    <div className="tcc-method-tabs"><MethodTabs method={method} onChange={setMethod} label="Method" /></div>
     <div className="callout info"><b>{method === 'min_max' ? 'One eligible employee × unit × FEIN span.' : 'One eligible employee × major period × unit × FEIN.'}</b> A month is 1 when the method-specific PPS/PPE range covers its target. Month 12 uses the last PPE when it falls after day 15.</div>
-    {isPortfolio ? <div className="callout info">Monthly employment allocates one client’s employees to their units and months. Select a client to see theirs.</div>
-      : error ? <div className="callout warn">No monthly employment matrix for this selection: {error}</div>
-      : !data ? <div className="panel tcc-loading-inline">Reading the {stageLabel(method)} matrix…</div>
+    {isPortfolio ? (
+      <EmptyState title="Pick a client to see monthly employment">
+        Monthly employment allocates one client’s employees to their units and months. Select a client to see theirs.
+      </EmptyState>
+    )
+      : error ? <EmptyState title="No monthly employment matrix for this selection">{error}</EmptyState>
+      : !data ? <Skeleton lines={4} label={`Reading the ${stageLabel(method)} matrix…`} />
       /* Read from the run that produced it, so a year no run reached carries no
          figure. Zeroes here would say the allocation ran and found nobody. */
       : (perClient && !isCalculated(data)) ? (
-        <div className="panel">
-          <h2 className="panel-title">Awaiting the next run</h2>
-          <p className="page-sub">{data.message}</p>
-        </div>
+        <EmptyState title="Awaiting the next run">{data.message}</EmptyState>
       ) : <>
       <div className="kpi-strip tcc-kpi-4"><Kpi label="Matrix rows" value={NUM.format(data.matrix_rows)} sub="method-specific grain" /><Kpi label="Unit × FEIN rows" value={NUM.format(data.units)} sub="summary grain" tone="accent" />{perClient
         ? <><Kpi label="Contested months" value={NUM.format(data.contested_months)} sub="two units in one month, tie-break applied" tone={data.contested_months ? 'amber' : 'green'} /><Kpi label="Average headcount" value={String(data.annual_average)} sub={`${data.fiscal.begin} → ${data.fiscal.end}`} /></>
@@ -217,7 +235,7 @@ export function OneZeroView({ openEmployee, scope }) {
 
 export function CalculationWalkView({ embedded = false } = {}) {
   const [data, setData] = useState(null); useEffect(() => { fetchWorkspaceCalculationWalk().then(setData); }, []);
-  return <>{!embedded && <PageHeader eyebrow="Prove it" title="Calculation walk" sub="Source → formula → parameters → intermediate output → assumptions → exceptions → citation" />}{!data ? <div className="panel tcc-loading-inline">Loading the audit trail…</div> : <><section className="panel"><h3 className="panel-title">Reproducibility envelope</h3><dl className="tcc-kv tcc-kv-wide">{Object.entries(data.run_context).map(([key, value]) => <Fragment key={key}><dt>{stageLabel(key)}</dt><dd>{value}</dd></Fragment>)}</dl></section><div className="tcc-walk">{data.steps.map((step, index) => <section className="tcc-walk-step" key={step.step_id}><div className="tcc-walk-index">{String(index + 1).padStart(2, '0')}</div><div><div className="tcc-walk-head"><div><span>{stageLabel(step.stage)} · {stageLabel(step.method)}</span><h3>{step.step_id}</h3></div><span className="pill pill-accent">{step.decision_basis}</span></div><code className="tcc-formula">{step.formula}</code><div className="tcc-walk-grid"><div><b>Inputs</b><pre>{JSON.stringify(step.inputs, null, 2)}</pre></div><div><b>Parameters</b><pre>{JSON.stringify(step.parameters, null, 2)}</pre></div><div><b>Output</b><pre>{JSON.stringify(step.output, null, 2)}</pre></div></div><div className="tcc-walk-meta"><span>Assumptions: {(step.assumption_ids || []).join(', ') || 'none'}</span><span>Exceptions: {(step.exceptions || []).join('; ') || 'none'}</span><span>Source: {step.citation}</span></div><details className="tcc-step-proof"><summary>Reproducibility metadata</summary><dl className="tcc-kv"><dt>Calculation ID</dt><dd>{step.calculation_id}</dd><dt>Code</dt><dd>{step.code_ref}</dd><dt>Source hash</dt><dd>{step.source_hash}</dd><dt>Config hash</dt><dd>{step.config_hash}</dd><dt>Timestamp</dt><dd>{step.timestamp}</dd></dl></details></div></section>)}</div></>}</>;
+  return <>{!embedded && <PageHeader eyebrow="Prove it" title="Calculation walk" sub="Source → formula → parameters → intermediate output → assumptions → exceptions → citation" />}{!data ? <Skeleton lines={4} label="Loading the audit trail…" /> : <><section className="panel"><h3 className="panel-title">Reproducibility envelope</h3><dl className="tcc-kv tcc-kv-wide">{Object.entries(data.run_context).map(([key, value]) => <Fragment key={key}><dt>{stageLabel(key)}</dt><dd>{value}</dd></Fragment>)}</dl></section><TrailSteps steps={data.steps} /></>}</>;
 }
 
 export function CompareView({ openEmployee }) {
@@ -225,7 +243,7 @@ export function CompareView({ openEmployee }) {
   const loadStage = async (name) => { try { setStage(await fetchWorkspaceComparisonStage(name)); } catch { setStage(null); } };
   const stageTable = useTableControls(STAGE_COLUMNS, data?.stage_summaries);
   const diffTable = useTableControls(DIFF_COLUMNS, stage?.differences);
-  return <><PageHeader eyebrow="Prove it" title="Back-test" sub="Stage-by-stage reconciliation against the partner’s Access output for the exact same source" />{!data ? <div className="panel tcc-loading-inline">Checking benchmark package…</div> : data.status === 'not_supplied' ? <section className="tcc-awaiting"><FileSearch size={34} /><div><h2>Access outputs not supplied</h2><p>{data.message} No parity claim is made. Our sealed run is ready to compare as soon as the private output package arrives.</p><div className="tcc-chip-row">{data.required_stages.map((item) => <span className="pill pill-neutral" key={item}>{stageLabel(item)}</span>)}</div></div></section> : <><div className={`callout ${data.reconciled ? '' : 'warn'}`}><b>{data.reconciled ? 'All supplied stages reconcile.' : `First divergent stage: ${stageLabel(data.first_divergent_stage)}`}</b></div><section className="panel"><FilterBar {...stageTable.bar('stages')} /><table className="tbl"><thead><tr>{Object.keys(STAGE_COLUMNS).map((key) => <SortHeader key={key} {...stageTable.head(key)} />)}</tr></thead><tbody>{stageTable.rows.map((row) => <tr key={row.stage} onClick={() => loadStage(row.stage)} className="tcc-click-row"><td>{stageLabel(row.stage)}</td><td>{row.benchmark_rows}</td><td>{row.computed_rows}</td><td>{row.exact_rows}</td><td>{row.difference_count}</td><td><Status status={row.reconciled ? 'reconciled' : 'discrepancies'} /></td></tr>)}</tbody></table></section>{stage && <section className="panel"><h3 className="panel-title">{stageLabel(stage.stage)} differences</h3><FilterBar {...diffTable.bar('differences')} /><div className="tcc-table-wrap"><table className="tbl"><thead><tr>{Object.keys(DIFF_COLUMNS).map((key) => <SortHeader key={key} {...diffTable.head(key)} />)}</tr></thead><tbody>{diffTable.rows.slice(0, 500).map((difference, index) => <tr key={index}><td>{difference.record_token ? <button className="tcc-link" onClick={() => openEmployee(difference.record_token)}>{difference.key.join(' · ')}</button> : difference.key?.join(' · ') || '—'}</td><td>{difference.field || 'row'}</td><td>{String(difference.benchmark ?? '—')}</td><td>{String(difference.computed ?? '—')}</td><td>{difference.difference || stageLabel(difference.status)}</td></tr>)}</tbody></table></div></section>}</>}</>;
+  return <><PageHeader eyebrow="Prove it" title="Back-test" sub="Stage-by-stage reconciliation against the partner’s Access output for the exact same source" />{!data ? <Skeleton lines={3} label="Checking benchmark package…" /> : data.status === 'not_supplied' ? <section className="tcc-awaiting"><FileSearch size={34} /><div><h2>Access outputs not supplied</h2><p>{data.message} No parity claim is made. Our sealed run is ready to compare as soon as the private output package arrives.</p><div className="tcc-chip-row">{data.required_stages.map((item) => <span className="pill pill-neutral" key={item}>{stageLabel(item)}</span>)}</div></div></section> : <><div className={`callout ${data.reconciled ? '' : 'warn'}`}><b>{data.reconciled ? 'All supplied stages reconcile.' : `First divergent stage: ${stageLabel(data.first_divergent_stage)}`}</b></div><section className="panel"><FilterBar {...stageTable.bar('stages')} /><table className="tbl"><thead><tr>{Object.keys(STAGE_COLUMNS).map((key) => <SortHeader key={key} {...stageTable.head(key)} />)}</tr></thead><tbody>{stageTable.rows.map((row) => <tr key={row.stage} onClick={() => loadStage(row.stage)} className="tcc-click-row"><td>{stageLabel(row.stage)}</td><td>{row.benchmark_rows}</td><td>{row.computed_rows}</td><td>{row.exact_rows}</td><td>{row.difference_count}</td><td><Status status={row.reconciled ? 'reconciled' : 'discrepancies'} /></td></tr>)}</tbody></table></section>{stage && <section className="panel"><h3 className="panel-title">{stageLabel(stage.stage)} differences</h3><FilterBar {...diffTable.bar('differences')} /><div className="tcc-table-wrap"><table className="tbl"><thead><tr>{Object.keys(DIFF_COLUMNS).map((key) => <SortHeader key={key} {...diffTable.head(key)} />)}</tr></thead><tbody>{diffTable.rows.slice(0, 500).map((difference, index) => <tr key={index}><td>{difference.record_token ? <button className="tcc-link" onClick={() => openEmployee(difference.record_token)}>{difference.key.join(' · ')}</button> : difference.key?.join(' · ') || '—'}</td><td>{difference.field || 'row'}</td><td>{String(difference.benchmark ?? '—')}</td><td>{String(difference.computed ?? '—')}</td><td>{difference.difference || stageLabel(difference.status)}</td></tr>)}</tbody></table></div></section>}</>}</>;
 }
 
 const STAGE_COLUMNS = {
@@ -250,5 +268,5 @@ const DIFF_COLUMNS = {
 
 export function AssumptionsView() {
   const [data, setData] = useState(null); useEffect(() => { fetchWorkspaceAssumptions().then(setData); }, []);
-  return <><PageHeader eyebrow="Prove it" title="Calculations" sub="How each figure is measured — the decisions behind the method, their history, and what would change them" />{!data ? <div className="panel tcc-loading-inline">Loading versioned assumptions…</div> : <><div className="callout info"><b>Tax Year {data.statutory.tax_year} · {data.statutory.minimum_average_weekly_hours} hours · ${data.statutory.minimum_average_weekly_wages_usd} weekly wages.</b> {data.statutory.lowest_wage_county ? `${data.statutory.lowest_wage_county} County, ` : ''}DOL report year {data.statutory.dol_report_year ?? 'n/a'}. Resolved from <code>{data.statutory.source}</code>{data.statutory.prototype_verify ? ' — UNVERIFIED placeholder' : ''}. Active set {data.step1.assumption_set_id}.</div><div className="tcc-history-strip">{Object.entries(data.history).flatMap(([method, rows]) => rows.map((row) => <div key={row.assumption_set_id}><span>{stageLabel(method)} history</span><b>{row.assumption_set_id}</b><code>{shortHash(row.sha256, 16)}</code></div>))}</div><div className="tcc-assumption-columns">{[['step1', 'Step 1 eligibility'], ['onezero', 'Monthly employment']].map(([key, label]) => { const group = data[key]; return <section className="panel" key={key}><h3 className="panel-title">{label}<Status status={group.status}>{stageLabel(group.status)}</Status></h3><p className="small muted">{group.assumption_set_id} · {shortHash(group.sha256, 16)} · supersedes {group.supersedes}</p><details className="tcc-detail-block"><summary>Evidence basis and change control</summary><p className="small">{group.source_basis.join(' · ')}</p><p className="small"><b>Supersession:</b> {group.change_control.supersession_rule}</p></details><div className="tcc-assumption-list">{assumptionEntries(group).map((item) => <article key={item.id}><div><b>{item.id}</b><Status status={item.status}>{stageLabel(item.status)}</Status></div><p>{item.decision}</p><small><b>Revisit when:</b> {item.falsified_by}</small></article>)}</div></section>; })}</div></>}</>;
+  return <><PageHeader eyebrow="Prove it" title="Calculations" sub="How each figure is measured — the decisions behind the method, their history, and what would change them" />{!data ? <Skeleton lines={4} label="Loading versioned assumptions…" /> : <><div className="callout info"><b>Tax Year {data.statutory.tax_year} · {data.statutory.minimum_average_weekly_hours} hours · ${data.statutory.minimum_average_weekly_wages_usd} weekly wages.</b> {data.statutory.lowest_wage_county ? `${data.statutory.lowest_wage_county} County, ` : ''}DOL report year {data.statutory.dol_report_year ?? 'n/a'}. Resolved from <code>{data.statutory.source}</code>{data.statutory.prototype_verify ? ' — UNVERIFIED placeholder' : ''}. Active set {data.step1.assumption_set_id}.</div><div className="tcc-history-strip">{Object.entries(data.history).flatMap(([method, rows]) => rows.map((row) => <div key={row.assumption_set_id}><span>{stageLabel(method)} history</span><b>{row.assumption_set_id}</b><code>{shortHash(row.sha256, 16)}</code></div>))}</div><div className="tcc-assumption-columns">{[['step1', 'Step 1 eligibility'], ['onezero', 'Monthly employment']].map(([key, label]) => { const group = data[key]; return <section className="panel" key={key}><h3 className="panel-title">{label}<Status status={group.status}>{stageLabel(group.status)}</Status></h3><p className="small muted">{group.assumption_set_id} · {shortHash(group.sha256, 16)} · supersedes {group.supersedes}</p><details className="tcc-detail-block"><summary>Evidence basis and change control</summary><p className="small">{group.source_basis.join(' · ')}</p><p className="small"><b>Supersession:</b> {group.change_control.supersession_rule}</p></details><div className="tcc-assumption-list">{assumptionEntries(group).map((item) => <article key={item.id}><div><b>{item.id}</b><Status status={item.status}>{stageLabel(item.status)}</Status></div><p>{item.decision}</p><small><b>Revisit when:</b> {item.falsified_by}</small></article>)}</div></section>; })}</div></>}</>;
 }

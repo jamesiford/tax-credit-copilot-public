@@ -515,6 +515,34 @@ describe('streamChat — the chat wire', () => {
     await streamChat('x', (ev) => events.push(ev));
     expect(events).toEqual([{ event: 'clarify', data: { choices: [{ client_id: 2001 }] } }]);
   });
+
+  it('routes the optional evidence event through the contract, and ignores what it does not know', async () => {
+    const { streamChat, chatEventRouter } = await import('./api.js');
+    const evidence = JSON.stringify({ tool: 'eligibility', blocks: [{ kind: 'text', text: 'x' }] });
+    fetchMock.mockResolvedValue(sse(
+      `event: weather\ndata: {"sunny":true}\n\nevent: evidence\ndata: ${evidence}\n\n`
+      + 'event: evidence\ndata: {"tool":"x","blocks":[{"kind":"hologram"}]}\n\n'
+      + 'event: done\ndata: {}\n\n',
+    ));
+    const seen = { evidence: [], invalid: [], unknown: [], done: 0 };
+    await streamChat('x', chatEventRouter({
+      evidence: (item) => seen.evidence.push(item.tool),
+      invalidEvidence: (reason) => seen.invalid.push(reason),
+      unknown: (ev) => seen.unknown.push(ev.event),
+      done: () => { seen.done += 1; },
+    }));
+    expect(seen).toEqual({
+      evidence: ['eligibility'], invalid: ['no renderable blocks'], unknown: ['weather'], done: 1,
+    });
+  });
+
+  it('a router with no handlers swallows every event without throwing', async () => {
+    const { chatEventRouter } = await import('./api.js');
+    const route = chatEventRouter();
+    for (const event of ['status', 'plan', 'agent_start', 'token', 'agent_end', 'calculation_trail', 'clarify', 'evidence', 'done', 'novel']) {
+      expect(() => route({ event, data: {} })).not.toThrow();
+    }
+  });
 });
 
 describe('the page summary stream (29 Sep)', () => {

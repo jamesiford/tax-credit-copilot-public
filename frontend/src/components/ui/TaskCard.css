@@ -1,0 +1,82 @@
+.ui-task-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  padding: var(--space-8) var(--space-10);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius);
+  background: var(--surface-card);
+  color: var(--text-default);
+  text-decoration: none;
+  box-shadow: none;
+  transition: box-shadow 120ms ease, border-color 120ms ease;
+}
+
+.ui-task-card:hover {
+  border-color: var(--select-line);
+  box-shadow: var(--shadow-1);
+}
+
+.ui-task-card:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.ui-task-icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+  color: var(--text-secondary);
+  font-size: var(--text-subhead);
+  line-height: var(--leading-dense);
+}
+
+.ui-task-body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.ui-task-heading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.ui-task-title {
+  color: var(--text-primary);
+  font-size: var(--text-strong);
+  font-weight: 600;
+  line-height: var(--leading-heading);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ui-task-category {
+  flex: 0 0 auto;
+  padding: var(--space-1) var(--space-4);
+  border-radius: var(--radius-pill);
+  background: var(--select-bg);
+  color: var(--text-primary);
+  font-size: var(--text-caption);
+  line-height: var(--leading-dense);
+}
+
+.ui-task-description {
+  color: var(--text-secondary);
+  font-size: var(--text-small);
+  line-height: var(--leading-base);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ui-task-chevron {
+  flex: 0 0 auto;
+  color: var(--text-muted);
+  font-size: var(--text-title);
+  line-height: var(--leading-dense);
+}

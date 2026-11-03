@@ -1,0 +1,153 @@
+/*
+ * Theme: classic. The PREVIOUS look, kept so the revamp can be rolled back by
+ * configuration (`VITE_THEME=classic`) rather than by a revert.
+ *
+ * Every role is assigned the value the pre-revamp stylesheet used, so
+ * `html[data-theme="classic"]` renders as it did before: Roboto, the blue/purple
+ * brand, 3/5/8/12px radii and the 9-22px chrome scale. The literals live here and
+ * nowhere else; they are classic's own primitives, which is why they are not in
+ * primitives.css (that file holds the modern palette).
+ *
+ * Selector specificity (0,1,1) beats the `:root` defaults of the modern theme.
+ */
+html[data-theme="classic"] {
+  --font-sans: 'Roboto', 'Roboto Fallback', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  --font-data: var(--font-sans);
+
+  --text-primary: #1a1f36;
+  --text-default: #1a1f36;
+  --text-secondary: #4a5170;
+  --text-muted: #7a829c;
+  --text-faint: #6b6f82;
+  --text-link: #406eb3;
+  --text-inverse: #ffffff;
+  --text-inverse-muted: #c7d1e9;
+  --text-inverse-faint: #8294bf;
+
+  --surface-page: #f6f7fb;
+  --surface-card: #ffffff;
+  --surface-subtle: #f7f8fc;
+  --surface-raised: #f1f3f8;
+  --surface-tint: #edf0f6;
+  --surface-hero: #eef3fb;
+  --surface-brand-soft: #eef3fb;
+  --surface-inverse: #26478d;
+  --on-surface-solid: #ffffff;
+
+  --border-default: #e4e7f1;
+  --border-subtle: #eef0f7;
+  --border-strong: #ccd4e7;
+  --border-brand: #406eb3;
+
+  --icon-primary: #26478d;
+  --icon-brand: #406eb3;
+  --icon-muted: #9aa1b4;
+
+  --select: #8246af;
+  --select-strong: #632678;
+  --select-bg: #f5f0fa;
+  --select-line: #e3d4ee;
+  --on-select: #ffffff;
+  --focus-ring: #8246af;
+
+  --reading: #406eb3;
+  --reading-strong: #26478d;
+  --reading-bg: #eef3fb;
+  --reading-ink: #26478d;
+
+  --identity-start: #26478d;
+  --identity-end: #406eb3;
+  --identity-end-strong: #406eb3;
+
+  --overlay-accent: #8246af;
+  --overlay-accent-strong: #632678;
+  --overlay-accent-2: #b52e87;
+  --highlight: #e8a33c;
+
+  --status-ok: #1f9d6a;
+  --status-warn: #d97706;
+  --status-bad: #c2410c;
+  --status-info: #2563eb;
+  --status-info-bg: #e3edfd;
+
+  --status-base-bg: #eef3fb;
+  --status-base-ink: #26478d;
+  --status-base-line: #bcc9e5;
+
+  --status-ok-bg: #e7f6ee;
+  --status-ok-ink: #116342;
+  --status-ok-line: #b7e0c7;
+
+  --status-bad-bg: #fde8de;
+  --status-bad-ink: #c2410c;
+  --status-bad-line: #f0c4b2;
+
+  --status-warn-bg: #fef3e2;
+  --status-warn-ink: #805d16;
+  --status-warn-line: #ead79e;
+
+  --status-neutral-bg: #f0f1f6;
+  --status-neutral-ink: #4a5170;
+  --status-neutral-line: #d9e0ef;
+
+  --badge-bg: #c2410c;
+  --badge-ink: #ffffff;
+
+  --chart-1: #26478d;
+  --chart-2: #406eb3;
+  --chart-3: #8246af;
+  --chart-4: #b52e87;
+  --chart-5: #1f9d6a;
+  --chart-6: #e8a33c;
+  --chart-grid: #e4e7f1;
+  --chart-track: #f1f3f8;
+
+  --map-priced: #26478d;
+  --map-held: #9db4d6;
+  --map-empty: #eef0f4;
+  --map-priced-hover: #406eb3;
+  --map-empty-hover: #e4e7ec;
+
+  --scroll-thumb: rgba(10, 10, 35, 0.18);
+  --scroll-thumb-hover: rgba(10, 10, 35, 0.3);
+
+  --shadow-1: 0 1px 2px rgba(10, 10, 35, 0.05), 0 1px 3px rgba(10, 10, 35, 0.08);
+  --shadow-2: 0 1px 2px rgba(10, 10, 35, 0.05), 0 1px 3px rgba(10, 10, 35, 0.08);
+  --shadow-pop: 0 12px 36px rgba(38, 71, 141, 0.18);
+  --shadow-header: 0 2px 8px rgba(38, 71, 141, 0.18);
+
+  --radius-sm: 3px;
+  --radius: 5px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+
+  --text-micro: 9px;
+  --text-caption: 10px;
+  --text-small: 11px;
+  --text-body: 12px;
+  --text-strong: 13px;
+  --text-subhead: 14px;
+  --text-title: 18px;
+  --text-display: 22px;
+
+  /* Tailwind's preflight sets `html { line-height: 1.5 }`, so 1.5 IS the
+     previous look, not an invention. */
+  --pill-pad-x: var(--space-5);
+
+  --topbar-offset: 58px;
+
+  --leading-base: 1.5;
+  --leading-heading: 1.5;
+  --leading-dense: 1.5;
+
+  /* The Tailwind palette ChatPanel used before the bridge existed. */
+  --tw-brand: #1a1f71;
+  --tw-brand-deep: #0f1450;
+  --tw-brand-ink: #0a0a23;
+  --tw-accent-2: #963cbd;
+  --tw-success: #26d07c;
+  --tw-success-deep: #0fa862;
+  --tw-subtle: #f4f4f6;
+  --tw-subtle-2: #e8e8ee;
+  --tw-muted: #6b6b7b;
+}

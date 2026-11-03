@@ -1,0 +1,14 @@
+.ui-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  padding: var(--space-1) var(--space-4);
+  border-radius: var(--radius-pill);
+  background: var(--badge-bg);
+  color: var(--badge-ink);
+  font-size: var(--text-caption);
+  font-weight: 700;
+  line-height: var(--leading-dense);
+  font-variant-numeric: tabular-nums;
+}

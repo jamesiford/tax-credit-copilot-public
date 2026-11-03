@@ -105,6 +105,25 @@ describe('a finding explains itself', () => {
 
     expect(await screen.findByText(/Nothing is applied until you decide/)).toBeInTheDocument();
   });
+
+  it('is a verdict card: amber while it needs a decision, green once answered', async () => {
+    const { unmount } = render(<AgentActivityView scope={scope()} scopeOptions={SCOPE_OPTIONS} />);
+    const open = await screen.findByRole('article', { name: /counted at two worksites/ });
+    expect(open).toHaveClass('ui-card-verdict-partial');
+    expect(open).toHaveTextContent('Needs a decision');
+    // The derivation sits in the inset callout, in the product's own words.
+    expect(within(open).getByRole('note')).toHaveTextContent(/counted twice/);
+    unmount();
+
+    api.fetchFindings.mockResolvedValue(payload([finding({
+      requires_decision: false,
+      resolution: { resolution: 'assign', decided_by: 'analyst', detail: {} },
+    })]));
+    render(<AgentActivityView scope={scope()} scopeOptions={SCOPE_OPTIONS} />);
+    const done = await screen.findByRole('article', { name: /counted at two worksites/ });
+    expect(done).toHaveClass('ui-card-verdict-above-min');
+    expect(done).toHaveTextContent('Decided');
+  });
 });
 
 // ------------------------------------------------------------ the grain
@@ -165,7 +184,7 @@ describe('findings arrive at the grain a human decides at', () => {
 
     render(<AgentActivityView scope={scope()} scopeOptions={SCOPE_OPTIONS} />);
 
-    const card = (await screen.findByText('Decisions')).closest('.kpi-card');
+    const card = (await screen.findByText('Decisions')).closest('.ui-kpi');
     expect(card).toHaveTextContent('1');
     expect(card).toHaveTextContent('covering 32,219 instances');
   });
@@ -307,7 +326,7 @@ describe('open findings are distinguished from answered ones', () => {
     render(<AgentActivityView scope={scope()} scopeOptions={SCOPE_OPTIONS} />);
 
     const card = await screen.findByText('Awaiting a decision');
-    expect(card.closest('.kpi-card')).toHaveTextContent('1');
+    expect(card.closest('.ui-kpi')).toHaveTextContent('1');
     expect(screen.getByText(/unanswered findings affect the figures/)).toBeInTheDocument();
   });
 
