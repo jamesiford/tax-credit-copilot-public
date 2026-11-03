@@ -9,6 +9,7 @@ html, body, #root {
 body {
   margin: 0;
   font-family: var(--font-sans);
+  line-height: var(--leading-base);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background: var(--bg);
@@ -16,167 +17,12 @@ body {
 
 /* Subtle scroll styling so the chat panel doesn't look industrial */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-thumb { background: rgba(10, 10, 35, 0.18); border-radius: var(--radius); }
-::-webkit-scrollbar-thumb:hover { background: rgba(10, 10, 35, 0.3); }
+::-webkit-scrollbar-thumb { background: var(--scroll-thumb); border-radius: var(--radius); }
+::-webkit-scrollbar-thumb:hover { background: var(--scroll-thumb-hover); }
 
-:root {
-  /* Roboto is the house online typeface; DIN Next is print-only
-     and licensed, Arial is for Office. Bundled locally, so the fallbacks only
-     ever apply for the swap frame. */
-  --font-sans: 'Roboto', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
-
-  /* Brand palette. Blue is the core thread and purple works beside it
-     — the guide asks for the warm purple/raspberry/magenta tones "generously",
-     so purple carries accents and active states rather than sitting unused. */
-  --exp-primary: #26478d;
-  --exp-purple: #632678;
-  --exp-violet: #8246af;
-  --exp-accent: #406eb3;
-  --exp-magenta: #b52e87;
-  --exp-gold: #e8a33c;
-  /* Semantic. Reach for these, not the brand names. */
-  --accent: var(--exp-accent);
-  --accent-strong: var(--exp-primary);
-  --accent-bg: #eef3fb;
-  --bg: #f6f7fb;
-  --panel: #ffffff;
-  --ink: #1a1f36;
-  --ink-2: #4a5170;
-  --muted: #7a829c;
-  --line: #e4e7f1;
-  --line-2: #eef0f7;
-  --ok: #1f9d6a;
-  --warn: #d97706;
-  --bad: #c2410c;
-  --info: #2563eb;
-  /* The brand's shape language is the squircle, a superellipse. The asset hub
-     is unreachable, so this APPROXIMATES it with one radius used everywhere —
-     a single token beats guessing per component. Four steps, because 17
-     distinct radii were being written by hand and 4px next to 5px next to 6px
-     is drift, not a decision. */
-  --radius-sm: 3px;
-  --radius: 5px;
-  --radius-lg: 8px;
-  --radius-xl: 12px;
-  --radius-pill: 999px;
-  --ok-bg: #e7f6ee;
-  --warn-bg: #fef3e2;
-  --bad-bg: #fde8de;
-  --info-bg: #e3edfd;
-
-  /* Surfaces. `--panel` is the card; `--surface-2` is the ONE step between it
-     and the page background — table heads, inset blocks, tab strips. Seven
-     near-identical greys were doing this job by hand and nobody could name the
-     difference between #f7f8fc and #f8f9fc, which is how you can tell they
-     were drift rather than decisions. */
-  --surface: var(--panel);
-  --surface-2: #f7f8fc;
-  /* White as TEXT on a coloured fill. Distinct from `--panel`, which is white
-     as a surface: they are the same value today and would not stay so under a
-     dark theme. */
-  --on-accent: #ffffff;
-
-  /* Spacing scale, 2px steps to 16 then coarser. The five-step scale that was
-     here covered 6/10/16/24/34 and was used ELEVEN times against 381 raw
-     declarations, because the values people actually needed — 2, 4, 8, 12,
-     14 — were not on it. A scale nobody can hit is a scale nobody uses.
-
-     `9px 12px` and `7px 0` were residue, not decisions: odd values round DOWN,
-     because rounding up costs rows and the fold is gated. */
-  --space-1: 2px;
-  --space-2: 4px;
-  --space-3: 6px;
-  --space-4: 8px;
-  --space-5: 10px;
-  --space-6: 12px;
-  --space-7: 14px;
-  --space-8: 16px;
-  --space-9: 20px;
-  --space-10: 24px;
-
-  /* Type scale. 23 sizes across 321 uses, 105 of them HALF-PIXEL — nobody
-     designs a 10.5px step, that is one person nudging one screen. Named for
-     the job, because a token called `--text-12` invites the next 12.5px.
-     Each step is the size that was already most used in its band, so the
-     migration mostly shrinks or holds. */
-  --text-micro: 9px;      /* chip captions, superscripts */
-  --text-caption: 10px;   /* meta lines, column captions */
-  --text-small: 11px;     /* secondary UI text */
-  --text-body: 12px;      /* default UI text and table cells */
-  --text-strong: 13px;    /* emphasised body, unit names */
-  --text-subhead: 14px;   /* panel titles */
-  --text-title: 18px;     /* page titles */
-  --text-display: 22px;   /* KPI figures */
-
-  /* The fixed topbar's height. NOT a spacing step: it is an offset the main
-     column must clear, so it tracks the header rather than the scale. */
-  --topbar-offset: 58px;
-
-  /* Choropleth fills. `react-simple-maps` takes its colours as a JS PROP, so
-     these are read once from here rather than written twice — the legend and
-     the map drifting apart is how a reading stops meaning anything. */
-  --map-priced: var(--exp-primary);
-  --map-held: #9db4d6;
-  --map-empty: #eef0f4;
-  --map-priced-hover: var(--exp-accent);
-  --map-empty-hover: #e4e7ec;
-
-  /* Aliases for names the stylesheet already reached for and never got. These
-     were dead `var()` lookups — 53 declarations silently invalid, which is why
-     the greys ended up hardcoded. Kept as aliases rather than renamed at every
-     call site so the fix is one place, not two hundred. */
-  --exp-blue: var(--exp-accent);
-  --exp-ink: var(--ink);
-  --exp-muted: var(--muted);
-  --exp-subtle: var(--bg);
-  --exp-subtle-2: var(--line-2);
-  --line-1: var(--line);
-  --text-2: var(--muted);
-
-  /* ------------------------------------------------------------------
-     STATE COLOURS — named for what they MEAN, never for the hue.
-     A name like `--blue-100` invites the next person to reuse it where it
-     means nothing, and these carry a reading on the trend grid:
-
-       base year      we hold no prior year to measure against
-       below minimum  they did not grow enough
-
-     Those are different findings that happen to sit near each other on the
-     colour wheel. They may move; they may not converge.
-     ------------------------------------------------------------------ */
-  --state-base-year: var(--accent-bg);
-  --state-base-year-ink: var(--exp-primary);
-  --state-base-year-line: #bcc9e5;
-
-  --state-above-min: var(--ok-bg);
-  --state-above-min-ink: #116342;
-  --state-above-min-line: #b7e0c7;
-
-  --state-below-min: var(--bad-bg);
-  --state-below-min-ink: var(--bad);
-  --state-below-min-line: #f0c4b2;
-
-  --state-partial: var(--warn-bg);
-  --state-partial-ink: #805d16;
-  --state-partial-line: #ead79e;
-
-  --state-neutral: #f0f1f6;
-  --state-neutral-ink: var(--ink-2);
-  --state-neutral-line: #d9e0ef;
-
-  /* Purple, used rather than reserved. Active nav, selected rows, focus. */
-  --accent-2: var(--exp-violet);
-  --accent-2-strong: var(--exp-purple);
-  --accent-2-bg: #f5f0fa;
-  --accent-2-line: #e3d4ee;
-
-  /* The greys that were drift. Four near-identical page tints doing one job. */
-  --surface-3: #f1f3f8;
-  --surface-4: #edf0f6;
-  --line-3: #ccd4e7;
-  --ink-3: #6b6f82;
-  --ink-4: #9aa1b4;
-}
+/* Design tokens live in styles/tokens/ (primitives, semantic roles, state,
+   scales and the two themes); main.jsx imports them before this file. Nothing
+   in here defines a colour, a type size or a radius. */
 
 .app-shell {
   height: 100%;
@@ -433,7 +279,7 @@ body {
 .oz-detail > summary::before { content: '▸ '; color: var(--muted); }
 .oz-detail[open] > summary::before { content: '▾ '; }
 .oz-detail-body { padding: var(--space-2) var(--space-6) var(--space-6); }
-.tbl-compact th, .tbl-compact td { padding: var(--space-2) var(--space-4); font-size: var(--text-body); }
+.tbl-compact th, .tbl-compact td { padding: var(--space-2) var(--space-4); font-size: var(--text-data); }
 
 .avatar {
   width: 28px;
@@ -514,6 +360,7 @@ body {
 .page-title {
   font-size: var(--text-display);
   font-weight: 700;
+  line-height: var(--leading-heading);
   color: var(--ink);
   margin: 0;
 }
@@ -681,7 +528,7 @@ button.pill-action:hover { border-color: currentColor; }
 button.pill-action:focus-visible { outline: 2px solid var(--accent-2-strong); outline-offset: 1px; }
 button.pill-action.pill-forecast-ok, button.pill-action.pill-forecast-bad { border: 1px dashed currentColor; }
 
-.tbl { width: 100%; border-collapse: collapse; font-size: var(--text-strong); }
+.tbl { width: 100%; border-collapse: collapse; font-size: var(--text-data); }
 
 .tbl th {
   text-align: left;
@@ -689,7 +536,7 @@ button.pill-action.pill-forecast-ok, button.pill-action.pill-forecast-bad { bord
   background: var(--surface-2);
   color: var(--muted);
   font-weight: 600;
-  font-size: var(--text-body);
+  font-size: var(--text-data);
   text-transform: uppercase;
   letter-spacing: 0.4px;
   border-bottom: 1px solid var(--line);
@@ -1143,7 +990,7 @@ button.pill-action.pill-forecast-ok, button.pill-action.pill-forecast-bad { bord
   color: var(--ink);
 }
 .evidence-manifest tbody tr:hover { background: var(--surface-2); }
-.evidence-manifest td { padding: var(--space-2) var(--space-3); font-size: var(--text-body); }
+.evidence-manifest td { padding: var(--space-2) var(--space-3); font-size: var(--text-data); }
 .evidence-manifest td:first-child {
   font-family: 'Cascadia Code', 'Consolas', monospace;
   color: var(--exp-accent);
@@ -1623,7 +1470,7 @@ button.pill-action.pill-forecast-ok, button.pill-action.pill-forecast-bad { bord
    rhythm is halved here because the grid is 17 columns in a 1024px viewport;
    at 16px the narrowest cell drops to 39px, which is measured, not guessed. */
 .tbl-compact th,
-.tbl-compact td { padding: var(--space-2) var(--space-4); font-size: var(--text-body); }
+.tbl-compact td { padding: var(--space-2) var(--space-4); font-size: var(--text-data); }
 
 /* Recipients table — inline add-row in tfoot keeps form aligned with columns. */
 .recipients-tbl tfoot tr.recipients-add-row td {
@@ -1928,7 +1775,7 @@ button.pill-action.pill-forecast-ok, button.pill-action.pill-forecast-bad { bord
 /* --- Density (phase 8). The partner's team read spreadsheets; give them one. ---
    28px rows against the reclaimed fold is ~12 rows of a client grid without
    scrolling, against 0 before. */
-.tcc-main table { width: 100%; border-collapse: collapse; font-size: var(--text-strong); }
+.tcc-main table { width: 100%; border-collapse: collapse; font-size: var(--text-data); }
 .tcc-main thead th {
   position: sticky;
   /* Zero, not the top-strip height: these tables sit inside `.tbl-scroll`, so
@@ -1940,7 +1787,7 @@ button.pill-action.pill-forecast-ok, button.pill-action.pill-forecast-bad { bord
   padding: 0 var(--space-4);
   color: var(--muted);
   background: var(--surface-2);
-  font-size: var(--text-body);
+  font-size: var(--text-data);
   font-weight: 700;
   letter-spacing: .05em;
   text-transform: uppercase;
@@ -1960,7 +1807,7 @@ button.pill-action.pill-forecast-ok, button.pill-action.pill-forecast-bad { bord
   gap: var(--space-3);
   margin: 0 0 var(--space-3);
   color: var(--ink-2);
-  font-size: var(--text-body);
+  font-size: var(--text-data);
 }
 .figure-line b { color: var(--ink); font-variant-numeric: tabular-nums; }
 .figure-line b.amber { color: var(--warn); }
@@ -2070,20 +1917,20 @@ button.pill-action.pill-forecast-ok, button.pill-action.pill-forecast-bad { bord
 
 /* --- Position: the coverage matrix and variance grid (B4) --------------- */
 .cov-scroll { overflow-x: auto; margin-bottom: var(--space-8); background: var(--panel); border: 1px solid var(--line-2); border-radius: var(--radius); box-shadow: 0 2px 8px rgba(35, 51, 91, .04); }
-.cov-grid { width: 100%; border-collapse: collapse; font-size: var(--text-body); }
+.cov-grid { width: 100%; border-collapse: collapse; font-size: var(--text-data); }
 .cov-grid th, .cov-grid td { padding: 0; border-bottom: 1px solid var(--line-2); border-right: 1px solid var(--line-2); text-align: center; }
 /* Density (phase 8): the matrix is five clients and must fit the fold whole.
    Cell padding was 9px on a button inside a cell, which made a 53px row. */
-.cov-grid thead th { padding: var(--space-2) var(--space-4); color: var(--muted); background: var(--surface-2); font-size: var(--text-body); font-weight: 800; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
+.cov-grid thead th { padding: var(--space-2) var(--space-4); color: var(--muted); background: var(--surface-2); font-size: var(--text-data); font-weight: 800; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
 .cov-corner, .cov-rowhead { position: sticky; left: 0; z-index: 1; padding: var(--space-2) var(--space-4) !important; background: var(--surface-2); text-align: left !important; white-space: nowrap; }
-.cov-rowhead { color: var(--ink); background: var(--panel); font-size: var(--text-body); font-weight: 700; }
+.cov-rowhead { color: var(--ink); background: var(--panel); font-size: var(--text-data); font-weight: 700; }
 .cov-client { display: inline-flex; gap: var(--space-3); align-items: center; padding: 0; color: var(--accent-strong); background: none; border: 0; font: inherit; cursor: pointer; }
 .cov-client:hover { text-decoration: underline; }
-.cov-total { padding: var(--space-2) var(--space-4) !important; color: var(--ink); background: var(--surface-2); font-size: var(--text-body); font-weight: 700; text-align: right !important; white-space: nowrap; }
+.cov-total { padding: var(--space-2) var(--space-4) !important; color: var(--ink); background: var(--surface-2); font-size: var(--text-data); font-weight: 700; text-align: right !important; white-space: nowrap; }
 .cov-total.cov-exposure { color: var(--state-below-min-ink); }
 
 .cov-cell button { display: flex; flex-direction: column; gap: 0; width: 100%; min-width: 84px; padding: var(--space-2) var(--space-4); background: none; border: 0; font: inherit; cursor: pointer; }
-.cov-amount { color: var(--ink); font-size: var(--text-body); font-weight: 700; font-variant-numeric: tabular-nums; }
+.cov-amount { color: var(--ink); font-size: var(--text-data); font-weight: 700; font-variant-numeric: tabular-nums; }
 .cov-label { color: var(--muted); font-size: var(--text-micro); letter-spacing: .04em; text-transform: uppercase; }
 .cov-unverified { margin-top: var(--space-1); padding: var(--space-1) var(--space-2); color: var(--accent-2-strong); background: var(--accent-2-bg); border-radius: var(--radius-sm); font-size: var(--text-micro); font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
 .cov-empty { color: var(--line-2); }
@@ -2091,7 +1938,7 @@ button.pill-action.pill-forecast-ok, button.pill-action.pill-forecast-bad { bord
 
 /* Where a page sits, derived from the route. Inline; wraps only when it must. */
 .tcc-breadcrumb { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3);
-  margin: 0 0 var(--space-5); font-size: var(--text-body); color: var(--text-2); }
+  margin: 0 0 var(--space-5); font-size: var(--text-body); line-height: var(--leading-dense); color: var(--text-2); }
 .tcc-crumb { display: inline-flex; align-items: center; gap: var(--space-3); }
 .tcc-crumb-badge { display: inline-flex; align-items: center; }
 .tcc-crumb svg { color: var(--line-2); flex: 0 0 auto; }
@@ -2234,7 +2081,7 @@ button.pill-action.pill-forecast-ok, button.pill-action.pill-forecast-bad { bord
 .plan-role { display: inline-flex; flex-wrap: wrap; gap: var(--space-5); align-items: center; padding-left: var(--space-5); border-left: 1px solid var(--line); }
 .plan-role input { width: 76px; }
 .plan-table td, .plan-table th { padding: var(--space-4) var(--space-6); }
-.plan-table td { font-size: var(--text-body); font-weight: 600; text-align: center; }
+.plan-table td { font-size: var(--text-data); font-weight: 600; text-align: center; }
 /* The employee stack: one editable row per person. */
 .plan-stack td input { width: 72px; padding: var(--space-1) var(--space-3); border: 1px solid var(--line-2); border-radius: var(--radius); font-size: var(--text-body); font-weight: 700; text-align: right; }
 .plan-stack td input:focus-visible { outline: 2px solid var(--accent-2-strong); outline-offset: 1px; }
@@ -2328,8 +2175,8 @@ button.pill-action.pill-forecast-ok, button.pill-action.pill-forecast-bad { bord
 .tcc-table-tall { max-height: 560px; }
 .tcc-table-wrap .tbl { margin: 0; min-width: 100%; }
 .tcc-table-wrap thead th { position: sticky; z-index: 2; top: 0; background: var(--surface-4); box-shadow: inset 0 -1px var(--line); white-space: nowrap; }
-.tcc-dense-table th, .tcc-dense-table td { padding: var(--space-3) var(--space-4); font-size: var(--text-body); white-space: nowrap; }
-.tcc-dense-table th { font-size: var(--text-body); }
+.tcc-dense-table th, .tcc-dense-table td { padding: var(--space-3) var(--space-4); font-size: var(--text-data); white-space: nowrap; }
+.tcc-dense-table th { font-size: var(--text-data); }
 .tcc-dense-table .num { text-align: right; font-variant-numeric: tabular-nums; }
 .tcc-link { padding: 0; color: var(--exp-primary); background: transparent; border: 0; font: inherit; font-weight: 700; text-decoration: underline; text-decoration-color: var(--state-base-year-line); text-underline-offset: 2px; cursor: pointer; }
 .tcc-link:hover { color: var(--accent-strong); }
@@ -2365,13 +2212,13 @@ button.pill-action.pill-forecast-ok, button.pill-action.pill-forecast-bad { bord
 .tcc-history-strip code { margin-top: var(--space-1); color: var(--ink-2); font-size: var(--text-micro); }
 
 .tcc-matrix-table { width: max-content; min-width: 100%; }
-.tcc-matrix-table th, .tcc-matrix-table td { min-width: 54px; padding: var(--space-3) var(--space-3); font-size: var(--text-body); text-align: center; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tcc-matrix-table th, .tcc-matrix-table td { min-width: 54px; padding: var(--space-3) var(--space-3); font-size: var(--text-data); text-align: center; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .tcc-matrix-table th:first-child, .tcc-matrix-table td:first-child { position: sticky; z-index: 1; left: 0; min-width: 100px; text-align: left; background: var(--panel); box-shadow: 1px 0 var(--line); }
 .tcc-matrix-table thead th:first-child { z-index: 3; background: var(--surface-4); }
 /* A headcount IS data, so it sits on the 12px floor. `line-height: 1` is what
    keeps the 28px row: the density was being bought with smaller type, which is
    paying for a line-box problem with legibility. */
-.tcc-cell-btn { width: 100%; padding: var(--space-2) var(--space-1); color: var(--exp-primary); background: var(--state-base-year); border: 1px solid var(--state-base-year); border-radius: var(--radius-sm); font: inherit; font-size: var(--text-body); line-height: 1; font-weight: 700; cursor: pointer; }
+.tcc-cell-btn { width: 100%; padding: var(--space-2) var(--space-1); color: var(--exp-primary); background: var(--state-base-year); border: 1px solid var(--state-base-year); border-radius: var(--radius-sm); font: inherit; font-size: var(--text-data); line-height: 1; font-weight: 700; cursor: pointer; }
 .tcc-cell-btn:hover { color: var(--on-accent); background: var(--exp-primary); }
 .tcc-matrix-cell.counted { color: var(--state-above-min-ink); background: var(--ok-bg); font-weight: 700; }
 .tcc-matrix-cell.disposed { color: var(--state-below-min-ink); background: var(--bad-bg); }
@@ -2395,7 +2242,7 @@ button.pill-action.pill-forecast-ok, button.pill-action.pill-forecast-bad { bord
 .tcc-walk-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: var(--space-3); margin-top: var(--space-4); }
 .tcc-walk-grid > div { min-width: 0; padding: var(--space-4); background: var(--surface-2); }
 .tcc-walk-grid b { font-size: var(--text-body); text-transform: uppercase; }
-.tcc-walk-grid pre, .tcc-detail-block pre, .tcc-drill-body .panel pre { max-height: 250px; overflow: auto; margin: var(--space-3) 0 0; color: var(--ink-2); font-size: var(--text-body); white-space: pre-wrap; overflow-wrap: anywhere; }
+.tcc-walk-grid pre, .tcc-detail-block pre, .tcc-drill-body .panel pre { max-height: 250px; overflow: auto; margin: var(--space-3) 0 0; color: var(--ink-2); font-size: var(--text-data); white-space: pre-wrap; overflow-wrap: anywhere; }
 .tcc-walk-meta { display: flex; flex-wrap: wrap; gap: var(--space-3) var(--space-7); margin-top: var(--space-4); color: var(--muted); font-size: var(--text-micro); }
 .tcc-step-proof { margin-top: var(--space-4); padding-top: var(--space-4); border-top: 1px solid var(--line-2); }
 .tcc-step-proof summary { width: fit-content; color: var(--exp-primary); font-size: var(--text-micro); font-weight: 700; cursor: pointer; }
@@ -2733,7 +2580,7 @@ button.pill-action.pill-forecast-ok, button.pill-action.pill-forecast-bad { bord
 }
 .sim-metric-value {
   margin-top: var(--space-1);
-  font-size: var(--text-body);
+  font-size: var(--text-data);
   color: var(--ink);
   font-variant-numeric: tabular-nums;
   line-height: 1.35;
@@ -2767,7 +2614,7 @@ button.pill-action.pill-forecast-ok, button.pill-action.pill-forecast-bad { bord
   .sim-form { grid-template-columns: 1fr; }
 }
 
-.kv { display: flex; justify-content: space-between; padding: var(--space-3) 0; border-bottom: 1px solid var(--line-2); font-size: var(--text-body); }
+.kv { display: flex; justify-content: space-between; padding: var(--space-3) 0; border-bottom: 1px solid var(--line-2); font-size: var(--text-data); }
 .kv:last-child { border-bottom: none; }
 .kv .k { color: var(--muted); }
 .kv .v { color: var(--ink); font-weight: 500; }
@@ -2888,12 +2735,12 @@ button.pill-action.pill-forecast-ok, button.pill-action.pill-forecast-bad { bord
 .prox-band-label { font-size: var(--text-body); font-weight: 600; color: var(--ink); }
 .prox-band-count { font-size: var(--text-small); color: var(--muted); font-variant-numeric: tabular-nums; }
 
-.prox-table { width: 100%; border-collapse: collapse; font-size: var(--text-body); background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
-.prox-table th { padding: var(--space-4) var(--space-4); text-align: left; font-size: var(--text-body); text-transform: uppercase; letter-spacing: .04em; color: var(--muted); background: var(--surface-2); border-bottom: 1px solid var(--line); }
+.prox-table { width: 100%; border-collapse: collapse; font-size: var(--text-data); background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.prox-table th { padding: var(--space-4) var(--space-4); text-align: left; font-size: var(--text-data); text-transform: uppercase; letter-spacing: .04em; color: var(--muted); background: var(--surface-2); border-bottom: 1px solid var(--line); }
 .prox-table td { padding: var(--space-4) var(--space-4); border-bottom: 1px solid var(--line); vertical-align: top; }
 .prox-table tr:last-child td { border-bottom: none; }
 .prox-table .num { text-align: right; font-variant-numeric: tabular-nums; }
-.prox-table .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: var(--text-body); }
+.prox-table .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: var(--text-data); }
 .prox-gap { color: var(--bad); font-size: var(--text-small); }
 
 .prox-mode { display: inline-block; padding: var(--space-1) var(--space-4); border-radius: var(--radius-lg); font-size: var(--text-small); font-weight: 500; white-space: nowrap; }
@@ -2985,11 +2832,11 @@ tr.prox-stacked td { background: var(--accent-2-bg); }
   display: grid;
   grid-template-columns: 18px minmax(120px, 1.3fr) auto minmax(60px, auto) auto auto 74px 84px auto auto;
   gap: var(--space-5); align-items: center; padding: var(--space-1) var(--space-5);
-  font-size: var(--text-body); line-height: 1.5;
+  font-size: var(--text-data); line-height: 1.5;
 }
 .trend-unit-row:hover { background: var(--surface-2); }
 .trend-block-toggle { padding: 0; color: var(--muted); background: none; border: 0; cursor: pointer; display: flex; }
-.trend-unit-name { font-size: var(--text-body); font-weight: 700; color: var(--ink); display: inline-flex; gap: var(--space-2); align-items: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.trend-unit-name { font-size: var(--text-data); font-weight: 700; color: var(--ink); display: inline-flex; gap: var(--space-2); align-items: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .trend-unit-flag { flex-shrink: 0; color: var(--warn); }
 .trend-unit-id { font-size: var(--text-caption); color: var(--ink-2); }
 .trend-unit-fein { font-size: var(--text-caption); color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -2998,8 +2845,8 @@ tr.prox-stacked td { background: var(--accent-2-bg); }
 .trend-unit-more:hover { color: var(--accent-strong); border-color: var(--accent); }
 /* The figures that decide something. Tabular so a column of them lines up. */
 .trend-unit-figure { display: flex; gap: var(--space-2); align-items: baseline; justify-content: flex-end; font-variant-numeric: tabular-nums; }
-.trend-unit-cap { font-size: var(--text-micro); font-weight: 800; letter-spacing: .06em; color: var(--muted); text-transform: uppercase; }
-.trend-unit-figure b { font-size: var(--text-body); font-weight: 700; color: var(--ink); }
+.trend-unit-cap { font-size: var(--text-micro); font-weight: 800; letter-spacing: .06em; color: var(--muted); text-transform: uppercase; white-space: nowrap; }
+.trend-unit-figure b { font-size: var(--text-data); font-weight: 700; color: var(--ink); }
 /* Colour ONLY where it encodes state. A base year renders neutral: it has no
    prior year to measure against, which is not the same as failing to grow. */
 .trend-green-text { color: var(--ok); }
@@ -3019,7 +2866,7 @@ tr.prox-stacked td { background: var(--accent-2-bg); }
 .trend-credit { display: flex; flex-direction: column; align-items: center; min-width: 60px; padding: var(--space-1) var(--space-3); background: var(--panel); border: 1px solid var(--line-2); border-radius: var(--radius); }
 .trend-credit.projected { opacity: .55; border-style: dashed; }
 .trend-credit-label { font-size: var(--text-micro); font-weight: 800; letter-spacing: .08em; color: var(--muted); }
-.trend-credit-value { font-size: var(--text-body); font-weight: 700; color: var(--accent-strong); font-variant-numeric: tabular-nums; }
+.trend-credit-value { font-size: var(--text-data); font-weight: 700; color: var(--accent-strong); font-variant-numeric: tabular-nums; }
 .trend-credit-year { font-size: var(--text-micro); color: var(--muted); }
 
 .trend-scroll { max-height: none; }

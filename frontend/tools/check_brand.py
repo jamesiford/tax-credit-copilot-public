@@ -9,6 +9,8 @@ import json
 
 from playwright.sync_api import sync_playwright
 
+from _theme import new_page
+
 BASE = "http://localhost:5173"
 CLIENT = "/c/2001?year=2023"
 
@@ -19,7 +21,7 @@ def main() -> int:
 
     with sync_playwright() as p:
         browser = p.chromium.launch()
-        page = browser.new_page(viewport={"width": 1024, "height": 768})
+        page = new_page(browser, 1024, 768)
         page.on("request", lambda r: external.append(r.url)
                 if ("googleapis.com" in r.url or "gstatic.com" in r.url) else None)
 

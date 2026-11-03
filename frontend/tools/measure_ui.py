@@ -14,6 +14,8 @@ import sys
 
 from playwright.sync_api import sync_playwright
 
+from _theme import new_page
+
 BASE = "http://localhost:5173"
 
 PAGES = {
@@ -56,7 +58,7 @@ def main() -> int:
     out = {}
     with sync_playwright() as p:
         browser = p.chromium.launch()
-        page = browser.new_page(viewport={"width": width, "height": height})
+        page = new_page(browser, width, height)
         for name, path in PAGES.items():
             page.goto(BASE + path, wait_until="networkidle", timeout=120_000)
             try:

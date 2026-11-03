@@ -7,13 +7,15 @@ from __future__ import annotations
 
 from playwright.sync_api import sync_playwright
 
+from _theme import new_page
+
 BASE = "http://localhost:5173"
 
 
 def main() -> None:
     with sync_playwright() as p:
         browser = p.chromium.launch()
-        page = browser.new_page(viewport={"width": 1440, "height": 900})
+        page = new_page(browser, 1440, 900)
 
         print("=== client grid: ENUM (Reading) and YEAR (Tax year), client-side ===")
         page.goto(f"{BASE}/c/2001?year=2023", wait_until="networkidle", timeout=120_000)

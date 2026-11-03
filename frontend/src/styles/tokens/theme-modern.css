@@ -1,0 +1,196 @@
+/*
+ * Theme: modern. The default look.
+ *
+ * A theme is nothing but assignments of SEMANTIC ROLES from primitives. No
+ * component reads a primitive and no component knows which theme is active, so
+ * a customer overlay re-skins by overriding roles in one file, and rolling the
+ * whole revamp back is `VITE_THEME=classic`.
+ *
+ * `:root` is listed alongside the attribute so the theme is also the default
+ * when nothing has set `data-theme` (a unit test, a print stylesheet, the first
+ * frame before `applyTheme` runs).
+ *
+ * Two jobs, two treatments, never swapped:
+ *   SELECTION (active nav, tab, row, focus, open menu item, current step) is
+ *   the brand blue: --select*.
+ *   READINGS (a figure, a status, a statutory verdict) are navy figures plus the
+ *   --state-* pills and tints: --reading*, --status-*. A verdict is never the
+ *   selection blue, which is what stops a selected tab reading as a finding.
+ */
+:root,
+html[data-theme="modern"] {
+  --font-sans: 'Poppins', 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  /* The data register keeps the compact face. Poppins runs ~10% wider than
+     Roboto, which is invisible in a card and fatal in a 17-column grid at
+     1024px (the widest table overflowed its holder by 3-4%). */
+  --font-data: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+
+  /* Text. Grey 700 is the lightest grey permitted for text; grey 600 fails
+     AA at body size and is for icons and large type only. */
+  --text-primary: var(--denim-500);
+  --text-default: var(--grey-800); /* not --text-body: that is the 14px type step */
+  --text-secondary: var(--grey-700);
+  --text-muted: var(--grey-700);
+  --text-faint: var(--grey-700);
+  --text-link: var(--brand-700);
+  --text-inverse: var(--white);
+  --text-inverse-muted: var(--brand-100);
+
+  /* Surfaces. `subtle` is the one step between a card and the page: table
+     heads, inset blocks, tab strips. */
+  --surface-page: var(--brand-50);
+  --surface-card: var(--white);
+  --surface-subtle: var(--denim-50);
+  --surface-raised: var(--grey-100);
+  --surface-tint: var(--brand-75);
+  --surface-hero: var(--brand-75);
+  --surface-brand-soft: var(--brand-100);
+  --surface-inverse: var(--denim-500);
+  --on-surface-solid: var(--white);
+
+  --border-default: var(--brand-100);
+  --border-subtle: var(--grey-200);
+  --border-strong: var(--denim-100);
+  --border-brand: var(--brand-500);
+
+  --icon-primary: var(--denim-500);
+  --icon-brand: var(--brand-500);
+  --icon-muted: var(--grey-600);
+
+  /* Selection. */
+  --select: var(--brand-500);
+  --select-strong: var(--brand-700);
+  --select-bg: var(--brand-75);
+  --select-line: var(--brand-200);
+  --on-select: var(--white);
+  --focus-ring: var(--brand-500);
+
+  /* Readings. */
+  --reading: var(--denim-500);
+  --reading-strong: var(--denim-700);
+  --reading-bg: var(--denim-50);
+  --reading-ink: var(--denim-500);
+
+  /* Identity: the header gradient and primary buttons. */
+  --identity-start: var(--denim-500);
+  --identity-end: var(--brand-500);
+  --identity-end-strong: #194bd9;
+
+  /* Optional overlay accents. A customer palette may point these anywhere;
+     nothing requires them to differ from the brand. */
+  --overlay-accent: var(--brand-600);
+  --overlay-accent-strong: var(--brand-800);
+  --overlay-accent-2: var(--teal-700);
+  --highlight: var(--amber-400);
+
+  /* Status roles. State tokens alias these (state.css). */
+  --status-ok: var(--green-600);
+  --status-warn: var(--amber-700);
+  --status-bad: var(--red-500);
+  --status-info: var(--sky-800);
+  --status-info-bg: var(--sky-100);
+
+  --status-base-bg: var(--brand-75);
+  --status-base-ink: var(--brand-700);
+  --status-base-line: var(--brand-200);
+
+  --status-ok-bg: var(--green-50);
+  --status-ok-ink: var(--green-700);
+  --status-ok-line: var(--green-400);
+
+  --status-bad-bg: var(--red-50);
+  --status-bad-ink: var(--red-700);
+  --status-bad-line: var(--red-200);
+
+  --status-warn-bg: var(--amber-50);
+  --status-warn-ink: var(--amber-700);
+  --status-warn-line: var(--amber-200);
+
+  --status-neutral-bg: var(--grey-100);
+  --status-neutral-ink: var(--grey-700);
+  --status-neutral-line: var(--grey-300);
+
+  --badge-bg: var(--red-400);
+  --badge-ink: var(--white);
+
+  /* Charts and the choropleth, derived from brand, teal, sky and status
+     primitives so a chart cannot introduce a hue the product does not own. */
+  --chart-1: var(--brand-500);
+  --chart-2: var(--teal-600);
+  --chart-3: var(--sky-500);
+  --chart-4: var(--denim-300);
+  --chart-5: var(--green-500);
+  --chart-6: var(--amber-400);
+  --chart-grid: var(--grey-200);
+  --chart-track: var(--denim-50);
+
+  --map-priced: var(--denim-500);
+  --map-held: var(--brand-200);
+  --map-empty: var(--grey-100);
+  --map-priced-hover: var(--brand-500);
+  --map-empty-hover: var(--grey-200);
+
+  /* Scrollbar thumb. */
+  --scroll-thumb: var(--denim-200);
+  --scroll-thumb-hover: var(--denim-300);
+
+  /* Elevation: very soft and navy-tinted. Borders do most of the work. */
+  --shadow-1: 0 2px 8px rgba(13, 40, 115, 0.06);
+  --shadow-2: 0 1px 4px rgba(13, 40, 115, 0.08), 0 4px 10px rgba(13, 40, 115, 0.1);
+  --shadow-pop: 0 12px 36px rgba(13, 40, 115, 0.18);
+  --shadow-header: 0 2px 8px rgba(13, 40, 115, 0.18);
+
+  /* Shape: 8 / 12 / 16 / 20 / pill. */
+  --radius-sm: 8px;
+  --radius: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+
+  /* Line height is a theme token because the face is: Poppins' natural line
+     box is ~28% taller than Roboto's, and an unset line-height would spend
+     that on every line of every card. `base` is body copy; `heading` is a
+     title; `dense` is a compact chrome row such as a tab or breadcrumb. */
+  --leading-base: 1.35;
+  --leading-heading: 1.1;
+  --leading-dense: 1.25;
+
+  /* Chrome type, comfortable. Data does not follow this scale: it reads
+     --text-data, which no theme changes. */
+  --text-micro: 12px;
+  --text-caption: 12px;
+  --text-small: 13px;
+  --text-body: 14px;
+  --text-strong: 15px;
+  --text-subhead: 16px;
+  --text-title: 24px;
+  --text-display: 32px;
+}
+
+/*
+ * The data register. Chrome grew in this theme; a grid did not. Inside a table
+ * or a location block every chrome step up to body collapses onto the data
+ * size, so a pill, a sub-label or a superscript sitting in a cell cannot be
+ * wider than the 12px column it was designed for. Custom properties inherit,
+ * so scoping the override to the container needs no change to any selector
+ * inside it, and the classic theme (whose steps were already at or under 12)
+ * is deliberately not touched.
+ */
+html[data-theme="modern"] :is(table, .trend-block, .tcc-stat) {
+  font-family: var(--font-data);
+  --text-micro: var(--text-data);
+  --text-caption: var(--text-data);
+  --text-small: var(--text-data);
+  --text-body: var(--text-data);
+  --text-strong: var(--text-data);
+}
+
+/*
+ * The dense page header and the figure tiles read "display" as a page title and
+ * a KPI figure. At 32px both would push the first grid row below the fold the
+ * visible-row gate defends (1024x768), so inside them display collapses onto
+ * the title step. The hero band and any other roomy surface still gets the
+ * full display size.
+ */
+html[data-theme="modern"] :is(.tcc-page-header, .tcc-header, .tcc-stat) {
+  --text-display: var(--text-title);
+}

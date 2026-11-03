@@ -40,6 +40,8 @@ from pathlib import Path
 
 from playwright.sync_api import sync_playwright, Error as PlaywrightError
 
+from _theme import new_page
+
 WEB = "http://localhost:5173"
 API = "http://localhost:8000/api"
 OUT = Path(__file__).parent / "sweep-output"
@@ -343,7 +345,7 @@ def main() -> int:
 
     with sync_playwright() as pw:
         browser = pw.chromium.launch(headless=not args.headed)
-        page = browser.new_page(viewport={"width": 1440, "height": 900})
+        page = new_page(browser, 1440, 900)
 
         page.on("console", lambda m: console_sink.append(f"{m.type}: {m.text[:200]}")
                 if m.type == "error" else None)

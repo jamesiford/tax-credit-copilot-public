@@ -1,0 +1,110 @@
+/*
+ * Primitives: raw colour scales. No meaning lives here.
+ *
+ * A primitive says what a value IS (denim 500), never what it is FOR. Nothing
+ * outside `styles/tokens/` may reference these directly: a component that
+ * reaches for `--brand-500` has hard-wired a hue, and the theme can no longer
+ * move it. Components read semantic roles (`semantic.css`), which a theme
+ * assigns from these.
+ *
+ * Neutral and blue scales follow the modern theme's design language. The
+ * status scales (green, red, amber) are SAMPLED from the reference renderings
+ * rather than invented; where a step was not sampled it is derived by mixing a
+ * sampled hue with white or black at the ratio recorded beside it. The
+ * sample coordinates are in docs/design/UI-DECISIONS.md.
+ */
+:root {
+  /* Denim: ink and inverse surfaces. */
+  --denim-50: #f3f4f8;
+  --denim-100: #cfd4e3;
+  --denim-200: #a0a9c9;
+  --denim-300: #6f7ead;
+  --denim-400: #3e5390;
+  --denim-500: #0d2873;
+  --denim-600: #0b2468;
+  --denim-700: #0a1f57;
+  --denim-800: #081946;
+  --denim-900: #07102e;
+
+  /* Brand blue: selection, links, primary actions. */
+  --brand-50: #f7f8ff;
+  --brand-75: #ecf0fc;
+  --brand-100: #dae1fa;
+  --brand-200: #b4c3f4;
+  --brand-300: #8ea6ef;
+  --brand-400: #6987e8;
+  --brand-500: #4169e1;
+  --brand-600: #3d5fcd;
+  --brand-700: #324fa9;
+  --brand-800: #273f88;
+  --brand-900: #1b2a5a;
+
+  --sky-50: #f8fcff;
+  --sky-100: #dfefff;
+  --sky-200: #c0e0ff;
+  --sky-300: #9dcfff;
+  --sky-400: #7bbfff;
+  --sky-500: #56b0ff;
+  --sky-600: #4e9fe5;
+  --sky-700: #4383c0;
+  --sky-800: #346998;
+  --sky-900: #244667;
+
+  --teal-50: #f8fcfc;
+  --teal-100: #e2f4f3;
+  --teal-200: #c4e8ea;
+  --teal-300: #a5dfdd;
+  --teal-400: #86d2d2;
+  --teal-500: #64c6c6;
+  --teal-600: #549f9f;
+  --teal-700: #4d9595;
+  --teal-800: #3c7878;
+  --teal-900: #294f51;
+
+  --cadet-50: #f9fafb;
+  --cadet-100: #e7eff4;
+  --cadet-200: #c8dde4;
+  --cadet-300: #b0cbd8;
+  --cadet-400: #90b7c9;
+  --cadet-500: #5d98b2;
+  --cadet-600: #558aa0;
+  --cadet-700: #426a7c;
+  --cadet-800: #385c6d;
+  --cadet-900: #253e47;
+
+  --grey-100: #f1f3f4;
+  --grey-200: #e8eaed;
+  --grey-300: #dadce0;
+  --grey-400: #bdc1c6;
+  --grey-500: #9aa0a6;
+  --grey-600: #80868b; /* icons and large text only: 3.7:1 on white */
+  --grey-700: #5f6368;
+  --grey-800: #3c4043;
+  --grey-900: #202124;
+
+  /* Status: sampled. 50 = tile background, 100 = pill background,
+     500 = the figure or fill, 700 = the ink that reads on a tint. */
+  --green-50: #f3fdf5;
+  --green-100: #d5f7dc;
+  --green-400: #7ca376;
+  --green-500: #4fa053;
+  --green-600: #3f8042; /* derived: green-500 at 80% over black */
+  --green-700: #34643a;
+
+  --red-50: #fcf2f1;
+  --red-100: #f8e3e2;
+  --red-200: #f6d4d2;
+  --red-400: #de5241; /* the notification badge */
+  --red-500: #c93b31;
+  --red-700: #99423b;
+
+  /* Amber was sampled once (the star); the tints are derived from it:
+     50 = 12% amber over white, 100 = 28%, 200 = 50%, 700 = 45% over black. */
+  --amber-50: #fdf8ea;
+  --amber-100: #fbeecd;
+  --amber-200: #f8e0a6;
+  --amber-400: #f1c24e;
+  --amber-700: #6c5723;
+
+  --white: #ffffff;
+}

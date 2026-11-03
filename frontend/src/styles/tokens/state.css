@@ -1,0 +1,33 @@
+/*
+ * State colours: named for what they MEAN, never for the hue.
+ *
+ *   base year      we hold no prior year to measure against
+ *   below minimum  they did not grow enough
+ *
+ * Different findings that happen to sit near each other on the colour wheel.
+ * They may move; they may not converge (check_brand.py measures the distance).
+ *
+ * These ALIAS the semantic status roles and restate no literal: a literal is
+ * how a tint silently drifts during a migration.
+ */
+:root {
+  --state-base-year: var(--status-base-bg);
+  --state-base-year-ink: var(--status-base-ink);
+  --state-base-year-line: var(--status-base-line);
+
+  --state-above-min: var(--status-ok-bg);
+  --state-above-min-ink: var(--status-ok-ink);
+  --state-above-min-line: var(--status-ok-line);
+
+  --state-below-min: var(--status-bad-bg);
+  --state-below-min-ink: var(--status-bad-ink);
+  --state-below-min-line: var(--status-bad-line);
+
+  --state-partial: var(--status-warn-bg);
+  --state-partial-ink: var(--status-warn-ink);
+  --state-partial-line: var(--status-warn-line);
+
+  --state-neutral: var(--status-neutral-bg);
+  --state-neutral-ink: var(--status-neutral-ink);
+  --state-neutral-line: var(--status-neutral-line);
+}
