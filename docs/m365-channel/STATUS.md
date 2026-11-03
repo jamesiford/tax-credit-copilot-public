@@ -21,8 +21,8 @@ runs in a worktree, so `feat/m365-channel` is held by the main checkout).
 | AI-04 | Resilience | done | `wp/AI-04-resilience` | merge `045aaef`; stack, budget, degraded narration (1975 passed) |
 | AI-06 | Observability, prompt versioning, evals | done | `wp/AI-06-observability` | merge `2c72519`; OTel GenAI telemetry, prompt manifest, evals (1997 passed) |
 | AI-07 | Safety | done | `wp/AI-07-safety` | merge `83fa319`; injection screen, output policy, stream gate (2104 passed) |
-| AI-08 | Coding-standards ratchet | in_progress | `wp/AI-08-standards` | — |
-| AI-05 | Conversation continuity (stretch, last) | todo | — | — |
+| AI-08 | Coding-standards ratchet | done | `wp/AI-08-standards` | merge `3a782d6`; ratchet baseline 540 → 483, five channel modules split (2128 passed) |
+| AI-05 | Conversation continuity (stretch, last) | deferred | — | see D-60: needs a migration, two store adapters, a deployed-store check and Terraform; not started |
 
 ## Evidence
 
@@ -141,6 +141,31 @@ and its `discovery` / `multi_state` scans read the configured default tenant.
   `test_capabilities_envelope.py` and `test_capabilities_equivalence.py`.
 - Open for Prompt 3: the channel route that wraps reads in the auditor; the writes
   audit themselves, so it must not audit write capabilities a second time.
+
+### AI-01 … AI-08 (Prompt 2B, merged `6b36f0f` … `3a782d6`)
+
+- Suite trajectory (`cd backend ; ..\.venv\Scripts\python.exe -m pytest tests/ -q
+  -p no:cacheprovider`): 1793 (AI-02) → 1929 (AI-03) → 1975 (AI-04) → 1997 (AI-06) →
+  2104 (AI-07) → **2128 passed, 136 skipped, 1 xfailed** (AI-08). Skips are the
+  opt-in Fabric tests, the absent private reference fixtures and the opt-in live AI
+  evals; no skip or xfail was added to pass a gate. Synthetic parity gate (81/51/49)
+  green throughout; the pinned constants and `certified-figures.json` are untouched.
+- Every WP ran: `pwsh scripts/check-whitelabel.ps1 -Enforce` (0 enforced, 29
+  allow-listed), `python scripts/audit-export.py --enforce` (0 findings) and
+  `gitleaks git --no-banner --redact --exit-code 1 .` (no leaks). AI-03 also ran the
+  infra gate: `terraform fmt -check -recursive`, `init -backend=false`, `validate`,
+  `tflint --recursive`, `terraform test` (30 passed, 0 failed).
+- `python scripts/prompt-manifest.py` agrees; `python scripts/ai-eval.py` offline:
+  routing 19/19, narration 10/10, refusal 10/10.
+- Existing tests edited, all recorded in DECISIONS (D-39/D-40, D-50, D-55, D-56,
+  D-59): `test_agent_modules`, `test_channel_narrator`, `test_channel_audit`,
+  `test_chat_scope`, `test_page_summary`, `test_architecture`, `test_architecture_ai`,
+  `test_ai_fallthrough` (single injected fault → three, as a lone fault is now
+  retried), `test_ai_degraded` (held text is not "shown"), `test_composer` and
+  `test_numeric_guard` (import-purity now spans the split sibling set), `conftest.py`.
+- Not verified against live Azure: `scripts/create-model-connection.ps1` (Bicep
+  parameter names are a guess); the mock gateway's code deployment is a manual step;
+  no `az`/`azd` was run.
 
 ## Blockers
 

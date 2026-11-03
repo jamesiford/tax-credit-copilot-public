@@ -622,3 +622,23 @@ One short entry per decision: context, choice, why.
   `test_architecture` (vendored-module rule: stdlib plus vendored siblings),
   `test_architecture_ai` (domain stdlib check includes `ai_errors`). No behavioural
   test was edited; the mutation tests over the guard pass unchanged.
+
+## D-60 AI-05 deferred (stretch): conversation continuity is not started
+
+- **Decision.** Not built. It needs, in one WP: migration `0003_conversation.sql`
+  (`tcc_ops.conversation_turn`, Fabric constraints as in 0001), a SQLite and a
+  Warehouse `ConversationStore` with contract tests, a deployed-store check in
+  `application/deployment.py`, a Terraform setting and `terraform test` case, a purge
+  job for `CONVERSATION_RETENTION_DAYS` (default 30), redaction before write, the
+  server preferring its own history when `conversation_id` is supplied, and a new
+  `suggestions` SSE event with frontend handling. That is a schema, an infra change and
+  a UI change; the manual says to defer a stretch package rather than spend long, and
+  the rest of Prompt 2B is complete and gated.
+- **Ready to pick up.** The `ConversationStore` port already exists in
+  `application/ai/ports.py`; the chat already sends history with each request
+  (`ChatRequest.history`) and pins scope (`api/chat/scope.py`), so the server-side
+  store replaces what the client sends, not a new concept. Follow `ConfirmationRepository`
+  (`sqlite_channel_state.py` / `warehouse_channel_state.py`) for the adapter pair.
+  Redact with the same rules as the egress invariant and the output policy; store
+  rule codes, never matched text. Follow-up suggestions should be a pure function of
+  the intents that ran (deterministic, no model).
