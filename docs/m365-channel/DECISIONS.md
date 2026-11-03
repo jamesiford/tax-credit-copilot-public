@@ -201,3 +201,40 @@ One short entry per decision: context, choice, why.
   values; the narrator's instructions contain no digit.
 - **Why.** A model that has not seen a figure cannot copy it as a digit, so the
   guarantee does not rest on the model obeying an instruction.
+
+## D-20 Reads write one `single` audit event; writes write `begin` + `end`
+
+- **Choice.** A read is one row (`phase = single`). A write is `begin` (outcome
+  `pending`) then `end`. `collapse()` reports a `begin` with no `end` as `pending`.
+- **Why.** A crash between begin and end must still leave evidence that a write was
+  attempted. Doubling every read would add cost and no information.
+
+## D-21 The opening audit event fails closed
+
+- **Choice.** If the `begin`/`single` event cannot be written the call is blocked.
+  A failure on the closing event is logged, not raised.
+- **Why.** An unaudited action must not happen; once the action has happened,
+  raising would misreport it as failed.
+
+## D-22 `CHANNEL_STORE` defaults by deployment, with no Terraform change
+
+- **Choice.** `store_choice("CHANNEL_STORE")` is `sqlite` locally and `warehouse` when
+  `ENVIRONMENT` is not `local`; an explicit `sqlite`/`memory` when deployed is refused.
+- **Why.** Keeps the existing deployment tests and `infra/` untouched while the
+  durable store is still the only one a deployed process can use. Setting it
+  explicitly in Terraform is a later, owner-approved infra change.
+
+## D-23 Migrations keep `NOT ENFORCED` primary keys
+
+- **Choice.** `0001` declares PKs `NOT ENFORCED`, as the bootstrap DDL does. The
+  SQL Server runner path strips it as `generate_variants.py` does; `channel_user`
+  declares no PK.
+- **Why.** Fabric Warehouse only accepts non-enforced constraints.
+
+## D-24 Channel tables are reached through named tenant exemptions
+
+- **Choice.** `warehouse_channel*.py` declare module-level `tenant_exempt(...)`
+  objects with reasons; `test_architecture.py` pins the exact reason set, limits
+  those modules to the four channel tables and forbids other adapters reusing them.
+- **Why.** The audit trail spans clients by nature, so `TenantScopedQuery` does not
+  fit; the exemption is explicit and enforced rather than a bypass.

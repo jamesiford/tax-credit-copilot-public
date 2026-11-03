@@ -12,6 +12,9 @@ runs in a worktree, so `feat/m365-channel` is held by the main checkout).
 | --- | --- | --- | --- | --- |
 | CH-01 | Capability layer (`application/capabilities/`) | done | `wp/CH-01-capabilities` | `0c8a4d8` |
 | CH-02 | Numeric guard, composer, narrator agent, ADR-008 | done | `wp/CH-02-numeric-guard` | `f1c7815` |
+| CH-03 | Channel audit trail | done | `wp/CH-03-channel-audit` | `087847f` |
+| CH-04 | Identity, authorization, writer entitlement | not started | `wp/CH-04-identity-authz` | — |
+| CH-05 | Prepare/commit safe writes | not started | `wp/CH-05-safe-writes` | — |
 
 ## Evidence
 
@@ -79,6 +82,21 @@ and its `discovery` / `multi_state` scans read the configured default tenant.
 - Docs: ADR-008 written and linked from `docs/README.md`; ADR-004 carries a
   status note; the "honest limit" paragraph in `.github/copilot-instructions.md`
   now says the portal chat path still streams unvalidated prose.
+
+### CH-03 (merged `087847f`)
+
+- Full backend suite: **1639 passed, 135 skipped, 1 xfailed** (CH-02: 1565 passed).
+  The extra skips are the Warehouse contract variants (`TCC_FABRIC_TESTS`); no
+  `skip`/`xfail` added to pass a gate; pins untouched.
+- Migrations (SHA-256):
+  - `0001_channel_audit.sql` `b3e9a9af988c9acc70bcb158c589358eca6983477654cb35f5385c12a0f8ef83`
+  - `0002_engagement_actor.sql` `b6dea4400282db7c2b3198d0a75792c069f55fb0a0a477bd52a07b21cd37e7fa`
+- New route `GET /api/audit/channel` (added to `tests/route_inventory.json`).
+- New: `domain/channel.py`, four persistence adapters, `application/channel_audit.py`,
+  `application/agent_audit.py`, `scripts/channel-audit.py`, gateway grant profile in
+  `grant-warehouse-sql.py`, `CHANNEL_STORE` in ENV-VARS. Decisions D-20..D-24.
+- No existing test edited. Standard gate: whitelabel 0 enforced, audit-export 0
+  findings, gitleaks clean. `infra/` untouched.
 
 ## Blockers
 
