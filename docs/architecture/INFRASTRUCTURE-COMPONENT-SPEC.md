@@ -313,6 +313,42 @@ Variables: `app_service_sku`, `api_worker_count`, `auth_mode`,
 `source_schema`, `foundry_model`, `ai_gateway_endpoint`,
 `outputs_retention_days`, `git_commit`.
 
+### 4.7a Channel gateway (optional, `enable_m365_channel`)
+
+| | |
+|---|---|
+| Resource | `azurerm_linux_web_app.this[0]` (`app-tcc-channel-<s>`) · module `channel`. **Count 0 unless `enable_m365_channel = true`**: with the toggle off the module creates nothing and the plan is unchanged |
+| Profiles | `public` only (PoC). The enterprise profile refuses the toggle: the gateway is a public surface |
+| Runtime | Python `3.12`, code (zip) deploy by azd service `channel` (`project: ./backend`). Startup command `sh startup-channel.sh` ([`backend/startup-channel.sh`](../../backend/startup-channel.sh)): `gunicorn -k uvicorn.workers.UvicornWorker -w ${WEB_CONCURRENCY:-1} ... channel.main:app`. **One worker** by default: the fact ledger and the rate limiter are per process |
+| Health | `health_check_path = "/channel/health"` (no credentials). `/channel/ready` likewise |
+| Always On / HTTP | `always_on = true`, `https_only = true`, `http2_enabled = true`, `minimum_tls_version = "1.2"` |
+| FTP / SCM | `ftps_state = "Disabled"`, both basic-auth publishing flags `false`, `scm_ip_restriction_default_action = "Allow"` |
+| Identity | its own user-assigned `id-tcc-channel-<s>`. It is granted Monitoring Metrics Publisher and nothing else in Azure RBAC |
+| Outbound network | VNet integration into the **same app subnet** as the API and web apps, `vnet_route_all_enabled = true` |
+| Inbound network | `public_network_access_enabled = true`. `ip_restriction_default_action = "Allow"` unless `channel_allowed_ip_ranges` is non-empty, then `"Deny"` with one allow rule per range. Callers are authenticated **in the app** by token validation, not by Easy Auth or by network |
+| API restriction | **Unchanged.** The API's `web-app-subnet` allow rule already admits the gateway because it shares the subnet; `module.app_service.api_access_restriction` is asserted equal with the channel on and off |
+| Logs / Diagnostics | as the API; `diag-channel`: `allLogs` and `AllMetrics` |
+| Tags | §3 + `azd-service-name = channel` |
+
+**App settings.** None is a secret. Telemetry settings follow the other apps (§4.7).
+The gateway's own are listed in [ENV-VARS.md §9a](ENV-VARS.md#9a-channel-gateway-backendchannel-only-when-enable_m365_channel):
+`ENVIRONMENT`, `DATA_CLASSIFICATION`, `TENANT_ID`, `GATEWAY_AUDIENCE`, `API_BASE_URL`
+(the API's default hostname, as the web app uses), `API_AUDIENCE`, `CHANNEL_STORE =
+warehouse`, `WAREHOUSE_SERVER`, `WAREHOUSE_DATABASE`, `FABRIC_WORKSPACE`,
+`WEB_CONCURRENCY = 1`, `CHANNEL_WRITER_SOURCE`, and only when set:
+`CHANNEL_ALLOWED_CALLER_APP_IDS`, `CHANNEL_WRITER_GROUP_ID`, `GIT_COMMIT`. A test fails
+if any setting name or value looks like a secret. The API receives **no** new setting:
+it accepts the gateway because the token carries the `TCC.Agent` role.
+
+Variables: `enable_m365_channel`, `channel_gateway_audience`,
+`channel_allowed_caller_app_ids`, `channel_writer_source`, `channel_writer_group_id`,
+`channel_allowed_ip_ranges`. Outputs: `CHANNEL_APP_NAME`, `CHANNEL_BASE_URL`,
+`GATEWAY_IDENTITY_NAME` (the T-SQL grant target), `GATEWAY_IDENTITY_PRINCIPAL_ID` (the
+object id the operator assigns the API's `TCC.Agent` role to), `GATEWAY_IDENTITY_CLIENT_ID`.
+Enabling the channel needs the API to validate tokens: set `auth_mode = "entra"` and
+`api_client_id` (the public profile defaults to `none`); the plan fails with that message
+otherwise.
+
 ### 4.8 Web app
 
 | | |
@@ -494,6 +530,7 @@ The schema-level T-SQL grants are never made by Terraform. See §5.
 | API identity | Key Vault Secrets User | Key Vault | `module.keyvault.azurerm_role_assignment.secrets_user[0]` | `enable_key_vault` |
 | Web identity | Monitoring Metrics Publisher | App Insights | `module.monitoring.azurerm_role_assignment.publisher["web"]` | both |
 | API identity | Fabric workspace role `fabric_workspace_role` (default Contributor) | Fabric workspace | `module.fabric.fabric_workspace_role_assignment.api[0]` | `manage_fabric_access` (public default) |
+| Gateway identity | Monitoring Metrics Publisher | App Insights | `module.channel.azurerm_role_assignment.publisher[0]` | `enable_m365_channel` |
 
 The outputs `api_role_assignments` and `web_role_assignments` list the Azure
 role assignments for review. `infra/tests/enterprise.tftest.hcl` asserts
@@ -509,6 +546,7 @@ Every setting sends to the Log Analytics workspace (§4.4).
 | `diag-api` | API app | `allLogs` | `AllMetrics` |
 | `diag-web` | web app | `allLogs` | `AllMetrics` |
 | `diag-plan` | App Service plan | none | `AllMetrics` |
+| `diag-channel` | channel gateway app (if enabled) | `allLogs` | `AllMetrics` |
 | `diag-blob` | storage `blobServices/default` | `allLogs` | `Transaction` |
 | `diag-kv` | Key Vault (if enabled) | `allLogs` | `AllMetrics` |
 | `diag-aif` | Foundry account | `allLogs` | `AllMetrics` |
@@ -531,7 +569,8 @@ API's OpenTelemetry exporter.
 | **Fabric private link / DNS** | customer | Not provisioned (NET-4) |
 | **Fabric workspace role** (enterprise, `manage_fabric_access = false`) | customer Fabric admin | Grant the API identity a workspace role that allows OneLake read and Warehouse writes (the Terraform default is Contributor). The deploying principal needs Admin or Member to run the T-SQL scripts. `scripts/grant-fabric-mi-access.ps1` predates v2: it was written for Container Apps and defaults to Viewer |
 | **Fabric capacity admin** (`create_fabric = true`) | operator | `azd env set FABRIC_CAPACITY_ADMIN <UPN>`. The plan fails without it |
-| **T-SQL grants** | `scripts/grant-warehouse-sql.py` (azd postprovision and `deploy.yml`) | `GRANT SELECT, INSERT, UPDATE, DELETE ON SCHEMA::tcc_gold` and the same on `tcc_ops`, `TO [<API_IDENTITY_NAME>]`. Idempotent |
+| **T-SQL grants** | `scripts/grant-warehouse-sql.py` (azd postprovision and `deploy.yml`) | `GRANT SELECT, INSERT, UPDATE, DELETE ON SCHEMA::tcc_gold` and the same on `tcc_ops`, `TO [<API_IDENTITY_NAME>]`. Idempotent. With the channel enabled, a second run with `--profile gateway` grants `INSERT, SELECT ON OBJECT::tcc_ops.channel_audit TO [<GATEWAY_IDENTITY_NAME>]` and nothing else |
+| **Channel registrations and roles** (`enable_m365_channel`) | customer Entra admin / operator | Terraform creates no registration and assigns no directory role. Needed: the gateway registration (`GATEWAY_AUDIENCE`) with app role `Channel.Invoke` and delegated scope `Channel.Access`; the API's app role `TCC.Agent` assigned to the gateway identity (`GATEWAY_IDENTITY_PRINCIPAL_ID`); `Channel.Invoke` assigned to the orchestrator's agent identity; a Fabric workspace role for the gateway identity; and, only for a group-based writer source, Graph `GroupMember.Read.All`. Register `Microsoft.BotService` before the bot is published. Terraform never registers resource providers |
 | **Schema** | `scripts/apply-migrations.py` | Runs the DDL v2.0 bootstrap only when `TCC_FABRIC_CREATED = true` and the Warehouse has no `tcc_ops.schema_migration`. Otherwise it applies pending forward migrations (D22) |
 | **Synthetic data and seed** | `scripts/postprovision.ps1` | load-synthetic (public profile only), then `seed-operational-store.ps1`. `deploy.yml` runs neither |
 | **Terraform state** | customer | Local by default. [`infra/backend.azurerm.tf.example`](../../infra/backend.azurerm.tf.example) is the remote template. `deploy.yml` requires remote state (`TF_BACKEND_*`) |
@@ -559,6 +598,7 @@ Default variables; ✔ = created, — = not created, BYO = supplied by the custo
 | Web app | ✔ (public inbound) | ✔ (no public access) | `web_inbound` |
 | Web app Easy Auth | — | ✔ | `auth_mode` (§1) |
 | Web app private endpoint | — | ✔ | `web_inbound = private_endpoint` |
+| Channel gateway app, its identity, its telemetry role and diagnostic setting (4 resources) | — (✔ only with the toggle) | refused | `enable_m365_channel` |
 | Storage account, 2 containers, lifecycle policy, blob PE, 2 role assignments, diagnostic setting | ✔ | ✔ | — |
 | Key Vault, PE, role assignment, diagnostic setting | — | — | `enable_key_vault` |
 | Foundry account, project, deployment, PE, role assignment, diagnostic setting, purge action | ✔ | ✔ | — |

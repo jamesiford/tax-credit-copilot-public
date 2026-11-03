@@ -15,7 +15,9 @@ hooks:
   #                          deployment just created; otherwise applies pending
   #                          migrations (a re-run applies nothing)
   #   2. load-synthetic    - public profile only: the synthetic source dataset
-  #   3. grant-warehouse-sql - T-SQL grants on tcc_gold / tcc_ops to the API identity
+  #   3. grant-warehouse-sql - T-SQL grants on tcc_gold / tcc_ops to the API identity,
+  #                          and, when the channel is enabled, INSERT/SELECT on
+  #                          tcc_ops.channel_audit to the gateway identity (object level)
   #   4. seed-operational-store - idempotent onboarding assertions
   postprovision:
     windows:
@@ -29,6 +31,16 @@ hooks:
 
 services:
   api:
+    project: ./backend
+    language: python
+    host: appservice
+  # The Microsoft 365 channel gateway: the same `backend/` package, started with
+  # `sh startup-channel.sh` (channel.main:app). The app exists only when Terraform
+  # is run with enable_m365_channel = true (azd env set TCC_ENABLE_M365_CHANNEL true);
+  # azd resolves it by the azd-service-name tag the channel module sets. With the
+  # channel off there is no such app, so deploy the others by name
+  # (`azd deploy api`, `azd deploy web`) or enable the channel.
+  channel:
     project: ./backend
     language: python
     host: appservice

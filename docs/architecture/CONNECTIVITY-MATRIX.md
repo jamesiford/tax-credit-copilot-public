@@ -14,7 +14,8 @@ Each row is one caller reaching one target. **Network path** is one of:
 Both apps set `vnet_route_all_enabled = true`. Every outbound call from
 either app therefore leaves through the integration subnet, including calls
 to public endpoints, and follows that subnet's routing. In the enterprise
-profile, the customer owns that routing.
+profile, the customer owns that routing. The channel gateway (§1a), when enabled,
+is a third app on the same subnet and the same rule.
 
 ## 1. Runtime paths
 
@@ -39,6 +40,45 @@ The API has **no** grant on the Fabric REST API, the Azure Resource Manager
 API, or another app.
 
 The web identity has **only** R11 and R12. It holds no data permission.
+
+### 1a. Microsoft 365 channel paths (only when `enable_m365_channel = true`)
+
+The channel gateway is a third App Service app on the same plan, in the **same
+integration subnet** as the API and web apps (`vnet_route_all_enabled = true`). It
+is the only new public surface. The API's restriction `web-app-subnet` already
+admits it, because it shares that subnet; **the restriction is not widened** (a
+Terraform test asserts it). The API remains the authority: the gateway reaches
+Gold, claims and artifacts only through `POST /api/capabilities/{tool}`.
+
+| # | From | To | Protocol / port | Network path | Identity | Permission | Token audience | Granted by |
+|---|---|---|---|---|---|---|---|---|
+| CH1 | Microsoft 365 (Teams, Copilot Chat) via Azure Bot Service | The hosted orchestrator in Foundry | Activity protocol | Foundry-managed; **out of scope here** (Prompts 4 and 6) | Entra, validated by the channel | n/a | n/a | Operator (publish) |
+| CH2 | Orchestrator (its agent identity) | Gateway `CHANNEL_BASE_URL`: `/channel/v1/*` | HTTPS 443 | **public**, optionally narrowed by `channel_allowed_ip_ranges` | App-only token | App role **`Channel.Invoke`** on the gateway registration, or the caller's app id on `CHANNEL_ALLOWED_CALLER_APP_IDS` (the PoC fallback; the path used is logged). The person it acts for arrives in `X-Acting-*` headers and is a **channel assertion**, audited `channel-asserted` | `GATEWAY_AUDIENCE` | Operator (role assignment; Prompt 6) |
+| CH3 | Cowork (the user's own session) | Gateway `/mcp` | HTTPS 443 | **public** | The user's delegated token | Scope **`Channel.Access`**. The user IS the acting user; any acting header is ignored. Audited `delegated` | `GATEWAY_AUDIENCE` | Customer (consent; Prompt 6) |
+| CH4 | A browser opening a Teams card link | Gateway `/channel/v1/downloads/{ticket}` | HTTPS 443 | **public** | None: the **ticket** is the credential (256-bit, single use, 15 minutes, bound to one person). A presented token must be that person's | Streams one claim package. No SAS and no storage URL exists | n/a | Application (`claim_package_link`) |
+| CH5 | Gateway | API `POST /api/capabilities/{tool}`, `GET /api/health`, `GET /api/clients/{id}/artifacts/{id}` | HTTPS 443 to `API_BASE_URL` | VNet integration → **service endpoint** → API restriction `web-app-subnet` (the gateway shares the subnet) | Gateway identity `id-tcc-channel-<s>`, app-only token | App role **`TCC.Agent`** on the API registration, plus `X-TCC-Acting-User`. The API enforces the writer entitlement itself, and refuses an agent token with no acting user (400) | `API_AUDIENCE` | Operator (`TCC.Agent` assignment; Terraform cannot) |
+| CH6 | Gateway | Entra ID (JWKS) | HTTPS 443 | VNet integration → public | none | public keys | n/a | n/a |
+| CH7 | Gateway | Warehouse, **only** `tcc_ops.channel_audit` | TDS 1433 | VNet integration → public | Gateway identity | A Fabric workspace role (enough to connect) **and** object-level T-SQL `GRANT INSERT, SELECT ON OBJECT::tcc_ops.channel_audit` (no schema grant, no `UPDATE`/`DELETE`). The gateway reads and changes business data only through the API | `https://database.windows.net/.default` | Script `scripts/grant-warehouse-sql.py --profile gateway` (postprovision). The workspace role is the operator's: `manage_fabric_access` grants the API identity only |
+| CH8 | Gateway | Microsoft Graph `checkMemberGroups` (only if `CHANNEL_WRITER_SOURCE` is `entra_group` or `either`) | HTTPS 443 | VNet integration → public | Gateway identity | Graph application role `GroupMember.Read.All`. Fails closed: no answer is "not a writer" | `https://graph.microsoft.com/.default` | Operator (needs a privileged role; Prompt 6) |
+| CH9 | Gateway | Application Insights ingestion | HTTPS 443 | VNet integration → public | Gateway identity (`APPLICATIONINSIGHTS_AUTHENTICATION_STRING`) | Monitoring Metrics Publisher on App Insights | `https://monitor.azure.com/.default` | Terraform `channel` |
+
+Identities and roles the channel adds, in one place:
+
+| Principal | Holds | Where it is granted | Who grants it |
+|---|---|---|---|
+| Orchestrator's agent identity | `Channel.Invoke` (app role on the gateway registration) | Entra | Operator (Prompt 6) |
+| Cowork users | `Channel.Access` (delegated scope on the gateway registration) | Entra consent | Customer |
+| Gateway identity `id-tcc-channel-<s>` | `TCC.Agent` (app role on the API registration) | Entra | Operator (Prompt 6) |
+| Gateway identity | Monitoring Metrics Publisher on App Insights | Azure RBAC | Terraform |
+| Gateway identity | Fabric workspace role to connect, and `INSERT`, `SELECT` on `tcc_ops.channel_audit` | Fabric; T-SQL | Operator; `grant-warehouse-sql.py --profile gateway` |
+| Gateway identity | Graph `GroupMember.Read.All` (optional) | Entra | Operator, only for a group-based writer source |
+
+The gateway holds **no** role on Blob Storage, Foundry, Key Vault or Fabric data
+beyond the audit table. The API still has no grant on another app.
+
+Terraform never registers resource providers: Azure Bot Service
+(`Microsoft.BotService`) must be registered by the operator before the channel is
+published (Prompts 4 and 6).
 
 ## 2. Operator and CI paths
 

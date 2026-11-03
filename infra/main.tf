@@ -225,3 +225,37 @@ module "mock_ai_gateway" {
   mock_auth             = var.mock_ai_gateway_auth
   entra_audience        = var.mock_ai_gateway_entra_audience
 }
+
+# CH-07: the Microsoft 365 channel gateway. Count 0 unless enable_m365_channel,
+# so the default plan is unchanged. A third App Service on the same plan and in
+# the same integration subnet as the API, which is why the API's access
+# restriction needs no change.
+module "channel" {
+  source                         = "./modules/channel"
+  enabled                        = var.enable_m365_channel
+  name_suffix                    = local.token
+  resource_group_name            = azurerm_resource_group.this.name
+  location                       = var.location
+  tags                           = local.tags
+  service_plan_id                = module.app_service.plan_id
+  integration_subnet_id          = module.network.app_subnet_id
+  tenant_id                      = local.tenant_id
+  gateway_audience               = trimspace(var.channel_gateway_audience)
+  api_base_url                   = module.app_service.api_url
+  api_audience                   = local.api_audience
+  data_classification            = local.data_classification
+  allowed_caller_app_ids         = var.channel_allowed_caller_app_ids
+  writer_source                  = var.channel_writer_source
+  writer_group_id                = var.channel_writer_group_id
+  allowed_ip_ranges              = var.channel_allowed_ip_ranges
+  git_commit                     = var.git_commit
+  app_insights_id                = module.monitoring.app_insights_id
+  app_insights_connection_string = module.monitoring.app_insights_connection_string
+  log_analytics_workspace_id     = module.monitoring.log_analytics_workspace_id
+
+  warehouse = {
+    server    = module.fabric.warehouse_server
+    database  = module.fabric.warehouse_database
+    workspace = module.fabric.workspace_name
+  }
+}
