@@ -148,7 +148,7 @@ def test_a_client_nobody_calculated_is_a_409_and_an_unauthored_year_a_422(entra,
 def test_a_client_the_caller_may_not_see_is_refused_before_the_tool_runs(entra, api, book, claims_repo):  # noqa: F811
     wiring.set_client_authorizer(AllowListAuthorizer({}))
     response = post(api, "client_situation", {"client_id": 2001})
-    assert response.status_code == 403 and response.json()["error"]["code"] == "not_authorized"
+    assert response.status_code == 403 and response.json()["error"]["code"] == "client_not_authorized"
 
 
 def test_a_commit_naming_a_client_is_authorized_on_the_client_inside_it(entra, api, world):  # noqa: F811

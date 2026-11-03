@@ -108,6 +108,14 @@ class EntraTokenValidator:
             principal_type=PRINCIPAL_AGENT if shape == "agent" else PRINCIPAL_USER,
         )
 
+    def claims(self, token: str | None) -> dict[str, Any]:
+        """The verified claims of a token: signature, issuer, audience and dates checked.
+
+        Public so a second app (the channel gateway) can reuse the same JWKS and
+        issuer handling with its own audience and its own rules about roles.
+        """
+        return self._claims(token)
+
     def _claims(self, token: str | None) -> dict[str, Any]:
         if not token:
             raise AuthenticationFailed("no bearer token")
