@@ -17,6 +17,8 @@ from typing import Any
 
 @dataclass(frozen=True)
 class SafetySettings:
+    """Which safety controls are on, and the link allow-list for model prose."""
+
     injection_guard: bool = True
     output_policy: bool = True
     output_allowed_hosts: tuple[str, ...] = ()

@@ -23,6 +23,12 @@ from domain.calculation.trail import (
 #: looked and found nothing" are different statements.
 ABSENT = "—"
 
+#: Said beside any figure from a rule pack that is not the authored Georgia one.
+ILLUSTRATIVE_PACKS = (
+    "Rule packs other than the Georgia Jobs Tax Credit are illustrative. "
+    "Do not rely on a figure from one."
+)
+
 
 def result(
     tool: str,

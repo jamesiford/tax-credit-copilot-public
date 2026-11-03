@@ -8,6 +8,14 @@ job-creation tax credits, computed directly from payroll.
 for where it is going and how far along it is. The ADRs in `docs/architecture/`
 constrain the code; where this file and an ADR disagree, the ADR wins.
 
+**Coding standards** (modules ≤250 lines, classes ≤150, functions ≤40, complexity ≤10,
+≤7 arguments, docstrings that say *why*) are enforced as a ratchet:
+`tests/test_code_standards.py` fails on a new or worse violation, and after an
+improvement you run `python scripts/code-standards.py --update` to tighten the
+baseline. See [`docs/architecture/CODE-STANDARDS.md`](../docs/architecture/CODE-STANDARDS.md).
+Model access goes through the ports in `application/ai/ports.py`; SDKs live only under
+`infrastructure/ai/`.
+
 ---
 
 ## The one rule that matters most

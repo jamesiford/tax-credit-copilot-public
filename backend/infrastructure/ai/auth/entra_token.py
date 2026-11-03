@@ -16,6 +16,8 @@ from domain.ai import ModelAuth
 
 
 class EntraTokenAuth:
+    """Bearer token from Entra for the gateway's audience, via the app's managed identity. No secret."""
+
     def __init__(self, audience: str, *, credential: Any = None) -> None:
         if not audience:
             raise ValueError("entra_token auth needs AI_GATEWAY_ENTRA_AUDIENCE")

@@ -110,26 +110,39 @@ def _withheld(gate) -> None:
     raise OutputWithheld(gate.blocked)
 
 
+class _Release:
+    """The output gate, or a pass-through when the policy is switched off."""
+
+    def __init__(self) -> None:
+        self._gate = _output_gate()
+
+    def _checked(self, released: str) -> str:
+        if self._gate is not None and self._gate.blocked:
+            _withheld(self._gate)
+        return released
+
+    def feed(self, text: str) -> str:
+        """The part of `text` that may be shown now; raises `OutputWithheld` once a rule fires."""
+        return text if self._gate is None else self._checked(self._gate.feed(text))
+
+    def finish(self) -> str:
+        """Whatever is still held, if it passes."""
+        return "" if self._gate is None else self._checked(self._gate.finish())
+
+
 async def _frames(agent_name: str, prompt: str, run: _Run) -> AsyncIterator[str]:
     """Token frames for one narration, each released only once the output policy accepts it."""
     from application.wiring import get_mediator
 
-    gate = _output_gate()
+    release = _Release()
     async for event in get_mediator().stream(NarrateBriefQuery(agent_name=agent_name, prompt=prompt)):
         if isinstance(event, StreamEnd):
             run.end = event
-        if not (isinstance(event, TextDelta) and event.text):
-            continue
-        text = gate.feed(event.text) if gate else event.text
-        if gate and gate.blocked:
-            _withheld(gate)
-        if text:
-            run.chars += len(text)
-            yield _sse("token", {"agent": agent_name, "content": text})
-    tail = gate.finish() if gate else ""
-    if gate and gate.blocked:
-        _withheld(gate)
-    if tail:
+        elif isinstance(event, TextDelta) and event.text:
+            if text := release.feed(event.text):
+                run.chars += len(text)
+                yield _sse("token", {"agent": agent_name, "content": text})
+    if tail := release.finish():
         run.chars += len(tail)
         yield _sse("token", {"agent": agent_name, "content": tail})
 

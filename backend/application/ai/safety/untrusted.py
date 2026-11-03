@@ -46,6 +46,8 @@ def unwrap(text: str) -> str:
 
 @dataclass(frozen=True)
 class UntrustedText:
+    """Text the product did not write. `fenced()` is the only form that should reach a model."""
+
     value: str
     source: str = "input"
 

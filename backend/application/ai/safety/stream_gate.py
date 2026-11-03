@@ -21,6 +21,8 @@ from application.ai.ports import OutputPolicy
 
 
 class OutputGate:
+    """Releases streamed text only after the policy has reviewed everything that would be shown."""
+
     def __init__(self, policy: OutputPolicy) -> None:
         self._policy = policy
         self._released, self._held = "", ""

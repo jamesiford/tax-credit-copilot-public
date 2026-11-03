@@ -22,33 +22,27 @@ disclaimer, nothing else. The composer never softens, rounds or patches a
 sentence: a rejected narration is dropped whole and the reader sees the engine's
 words instead, with the violations returned so the caller can audit them.
 
-Standard library only, plus the guard, the formatter and the envelope — all
-standard-library only themselves, and all vendored into the orchestrator
-container.
+**Where the pieces live.** The assembly is here; placeholders (`composer_placeholders`)
+and block rendering (`composer_render`) were split out by size and are re-exported
+below, so every import path is unchanged.
+
+Standard library only, plus the guard, the formatter, the envelope and the sibling
+`composer_*` modules — all standard-library only themselves, and all vendored into
+the orchestrator container.
 """
 from __future__ import annotations
 
-import re
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any
 
 from application import numeric_guard, output_policy
-from application.capabilities import format as fmt
 from application.capabilities.envelope import DISCLAIMER, Block
+from application.composer_placeholders import (  # noqa: F401 - re-exported
+    PlaceholderError, _mask_placeholders, narrator_brief, placeholders, substitute,
+)
+from application.composer_render import cards_payload, render_markdown  # noqa: F401 - re-exported
 from application.numeric_guard import AllowedContext, FactIndex, GuardResult, Numeral, Violation
-
-_PLACEHOLDER = re.compile(r"\{\{\s*facts\.([^{}|\s]+?)\s*(?:\|\s*([A-Za-z_]+)\s*)?\}\}")
-_ANY_BRACES = re.compile(r"\{\{|\}\}")
-_FENCE = re.compile(r"^[ \t]*(```|~~~)", re.MULTILINE)
-
-#: Stands where a placeholder was while the raw narration is checked. A letter,
-#: so it can never join with a neighbouring digit into a numeral.
-_HOLE = "\u2588"
-
-
-class PlaceholderError(ValueError):
-    """A placeholder that cannot be rendered exactly. Never rendered as a guess."""
 
 
 @dataclass(frozen=True)
@@ -69,175 +63,12 @@ class Composed:
     notice: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
+        """The JSON-safe form, for the channel and the audit trail."""
         return {
             "text": self.text, "cards": self.cards_payload, "guard": self.guard.to_dict(),
             "narration_used": self.narration_used, "blocks_verified": self.blocks_verified,
             "notice": self.notice,
         }
-
-
-# --------------------------------------------------------------- placeholders
-
-
-def _fenced_ranges(text: str) -> list[tuple[int, int]]:
-    """Character ranges that sit inside a fenced code block."""
-    ranges: list[tuple[int, int]] = []
-    opener: re.Match[str] | None = None
-    for match in _FENCE.finditer(text):
-        if opener is None:
-            opener = match
-        elif match.group(1) == opener.group(1):
-            ranges.append((opener.start(), match.end()))
-            opener = None
-    if opener is not None:
-        ranges.append((opener.start(), len(text)))
-    return ranges
-
-
-def placeholders(text: str) -> list[re.Match[str]]:
-    return list(_PLACEHOLDER.finditer(text))
-
-
-def substitute(narration: str, facts: "FactIndex | Mapping[str, Any] | Sequence[Mapping[str, Any]]") -> tuple[str, FactIndex]:
-    """Replace every `{{facts.path|format}}` with the engine's figure, formatted.
-
-    Returns the text and the fact index, told which paths were rendered as
-    percentages so the final guard accepts exactly those spellings. Raises
-    `PlaceholderError` for anything it cannot render exactly: an unknown or
-    ambiguous path, a path that is not a single value, a null, an unknown
-    formatter, a value the formatter refuses, a placeholder inside a code fence,
-    or braces that are not a well-formed placeholder.
-    """
-    index = FactIndex.coerce(facts)
-    fences = _fenced_ranges(narration)
-    rendered: list[str] = []
-    cursor = 0
-    for match in _PLACEHOLDER.finditer(narration):
-        if any(start <= match.start() < end for start, end in fences):
-            raise PlaceholderError(
-                f"placeholder {match.group(0)!r} is inside a code fence, where its formatting cannot be trusted"
-            )
-        path, name = match.group(1), match.group(2)
-        if path in index.ambiguous:
-            raise PlaceholderError(f"facts.{path} is defined differently by more than one result")
-        if path not in index.leaves:
-            raise PlaceholderError(f"unknown fact path facts.{path}")
-        value = index.leaves[path]
-        if value is None:
-            raise PlaceholderError(f"facts.{path} is null; there is no figure to render")
-        formatter = name or fmt.infer_formatter(path, value)
-        if formatter not in fmt.FORMATTERS:
-            raise PlaceholderError(f"unknown formatter {formatter!r} for facts.{path}")
-        try:
-            text = fmt.format_value(value, formatter)
-        except ValueError as exc:
-            raise PlaceholderError(f"facts.{path} cannot be rendered as {formatter}: {exc}") from exc
-        if formatter in fmt.PERCENT_FORMATTERS:
-            index = index.with_percent(path)
-        rendered.append(narration[cursor:match.start()])
-        rendered.append(text)
-        cursor = match.end()
-    rendered.append(narration[cursor:])
-    out = "".join(rendered)
-    stray = _ANY_BRACES.search(_PLACEHOLDER.sub("", narration))
-    if stray:
-        raise PlaceholderError("braces that are not a well-formed {{facts.path}} placeholder")
-    return out, index
-
-
-def _mask_placeholders(narration: str) -> str:
-    return _PLACEHOLDER.sub(_HOLE, narration)
-
-
-def narrator_brief(
-    question: str,
-    tools: Sequence[str],
-    facts: "FactIndex | Mapping[str, Any] | Sequence[Mapping[str, Any]]",
-    *,
-    notes: Sequence[str] = (),
-    declined: str | None = None,
-) -> dict[str, Any]:
-    """What the narrator is handed: the NAMES of the facts, never their values.
-
-    A model that has not seen a figure cannot copy it as a digit. It is told
-    which paths exist and how each prints, writes a placeholder, and the engine's
-    own rendering is substituted afterwards. `notes` are platform sentences it
-    may paraphrase; `declined` is a statute refusal to restate plainly.
-    """
-    index = FactIndex.coerce(facts)
-    return {
-        "question": question,
-        "tools": list(tools),
-        "fact_paths": [
-            {"path": path, "format": fmt.infer_formatter(path, value)}
-            for path, value in sorted(index.leaves.items())
-            if value is not None and not isinstance(value, bool)
-        ],
-        "notes": list(notes),
-        "declined": declined,
-    }
-
-
-# ---------------------------------------------------------------------- blocks
-
-
-def _escape_cell(text: str) -> str:
-    return text.replace("|", "\\|").replace("\n", " ")
-
-
-def render_markdown(blocks: Sequence[Block]) -> str:
-    """The platform's blocks as Markdown. Pure formatting: no figure is added."""
-    parts: list[str] = []
-    for block in blocks:
-        if block.kind == "heading":
-            parts.append(f"### {block.text}")
-        elif block.kind in ("paragraph",):
-            parts.append(block.text)
-        elif block.kind == "callout":
-            parts.append("\n".join(f"> {line}" for line in block.text.splitlines() or [""]))
-        elif block.kind == "bullets":
-            parts.append("\n".join(f"- {row[0]}" for row in block.rows))
-        elif block.kind == "table" and block.rows:
-            header, *body = block.rows
-            lines = [
-                "| " + " | ".join(_escape_cell(c) for c in header) + " |",
-                "| " + " | ".join("---" for _ in header) + " |",
-                *("| " + " | ".join(_escape_cell(c) for c in row) + " |" for row in body),
-            ]
-            parts.append("\n".join(lines))
-    return "\n\n".join(p for p in parts if p)
-
-
-def cards_payload(blocks: Sequence[Block], *, disclaimer: str = DISCLAIMER) -> dict[str, Any]:
-    """A neutral structure for the orchestrator to turn into Adaptive Cards.
-
-    The first heading is the title. A two-column table is a list of facts; any
-    other table keeps its columns. No Adaptive Card JSON here — that is a
-    presentation concern and belongs to the channel.
-    """
-    title: str | None = None
-    body: list[dict[str, Any]] = []
-    for block in blocks:
-        if block.kind == "heading" and title is None and not body:
-            title = block.text
-        elif block.kind == "heading":
-            body.append({"type": "heading", "text": block.text})
-        elif block.kind == "paragraph":
-            body.append({"type": "paragraph", "text": block.text})
-        elif block.kind == "callout":
-            body.append({"type": "callout", "text": block.text})
-        elif block.kind == "bullets":
-            body.append({"type": "bullets", "items": [row[0] for row in block.rows]})
-        elif block.kind == "table" and block.rows:
-            header, *rows = block.rows
-            if len(header) == 2:
-                body.append({"type": "facts", "columns": list(header), "rows": [list(r) for r in rows]})
-            else:
-                body.append({"type": "table", "columns": list(header), "rows": [list(r) for r in rows]})
-    return {"title": title, "body": body, "disclaimer": disclaimer}
-
-
-# --------------------------------------------------------------------- compose
 
 
 def _verdict(violations: Sequence[Violation]) -> GuardResult:
@@ -252,6 +83,48 @@ def _policy_violations(narration: str, allowed_hosts: Sequence[str]) -> list[Vio
     """Output-policy codes as violations, so the caller audits them with the rest."""
     codes = output_policy.review(narration, allowed_hosts=allowed_hosts).violations
     return [Violation(Numeral(f"output policy: {c}", 0, 0, "output_policy"), f"output policy: {c}", stage="output_policy") for c in codes]
+
+
+def _narrate(
+    narration: str, index: FactIndex, context: AllowedContext, allowed_hosts: Sequence[str],
+) -> tuple[str, FactIndex, list[Violation]]:
+    """Screen the model's own words: no typed digit, every placeholder renderable, policy clean.
+
+    Returns the substituted text ("" when it could not be rendered), the index told
+    which paths were percentages, and every violation found.
+    """
+    violations = list(numeric_guard.check_raw(_mask_placeholders(narration), allowed_context=context).violations)
+    try:
+        substituted, index = substitute(narration, index)
+    except PlaceholderError as exc:
+        return "", index, [*violations, _placeholder_violation(str(exc))]
+    narrated = substituted.strip()
+    return narrated, index, [*violations, *_policy_violations(narrated, allowed_hosts)]
+
+
+def _blocks_only(
+    blocks_md: str, cards: dict[str, Any], disclaimer: str, index: FactIndex, context: AllowedContext,
+    violations: Sequence[Violation],
+) -> Composed:
+    """The platform's own blocks and the disclaimer, after the guard confirms they are clean."""
+    fallback = "\n\n".join(p for p in (blocks_md, disclaimer) if p)
+    if not blocks_md:
+        return Composed(fallback, cards, _verdict(violations), narration_used=False)
+    # The blocks are platform-rendered, so they should always pass. If they do
+    # not, a formatter is wrong, and the one thing worse than dropping the
+    # narration is showing a figure nothing can vouch for.
+    blocks_guard = numeric_guard.check(fallback, facts=index, allowed_context=context)
+    if blocks_guard.passed:
+        return Composed(fallback, cards, _verdict(violations), narration_used=False)
+    notice = (
+        "The figures in this answer could not be verified against the engine's output, "
+        "so none are shown."
+    )
+    return Composed(
+        "\n\n".join((notice, disclaimer)), {"title": None, "body": [], "disclaimer": disclaimer},
+        _verdict([*violations, *blocks_guard.violations]),
+        narration_used=False, blocks_verified=False, notice=notice,
+    )
 
 
 def compose(
@@ -273,18 +146,9 @@ def compose(
     blocks_md = render_markdown(blocks)
     cards = cards_payload(blocks, disclaimer=disclaimer)
 
-    narrated = ""
-    violations: list[Violation] = []
+    narrated, violations = "", []
     if narration and narration.strip():
-        # 1. The model's own words, before any figure is substituted.
-        violations.extend(numeric_guard.check_raw(_mask_placeholders(narration), allowed_context=context).violations)
-        try:
-            substituted, index = substitute(narration, index)
-        except PlaceholderError as exc:
-            violations.append(_placeholder_violation(str(exc)))
-        else:
-            narrated = substituted.strip()
-            violations.extend(_policy_violations(narrated, allowed_hosts))
+        narrated, index, violations = _narrate(narration, index, context, allowed_hosts)
 
     if not violations and narrated:
         # 2. The finished reply, against the facts, trusting no formatter.
@@ -294,22 +158,4 @@ def compose(
             return Composed(full, cards, final, narration_used=True)
         violations.extend(final.violations)
 
-    fallback = "\n\n".join(p for p in (blocks_md, disclaimer) if p)
-    if not blocks_md:
-        return Composed(fallback, cards, _verdict(violations), narration_used=False)
-
-    # The blocks are platform-rendered, so they should always pass. If they do
-    # not, a formatter is wrong, and the one thing worse than dropping the
-    # narration is showing a figure nothing can vouch for.
-    blocks_guard = numeric_guard.check(fallback, facts=index, allowed_context=context)
-    if blocks_guard.passed:
-        return Composed(fallback, cards, _verdict(violations), narration_used=False)
-    notice = (
-        "The figures in this answer could not be verified against the engine's output, "
-        "so none are shown."
-    )
-    return Composed(
-        "\n\n".join((notice, disclaimer)), {"title": None, "body": [], "disclaimer": disclaimer},
-        _verdict([*violations, *blocks_guard.violations]),
-        narration_used=False, blocks_verified=False, notice=notice,
-    )
+    return _blocks_only(blocks_md, cards, disclaimer, index, context, violations)

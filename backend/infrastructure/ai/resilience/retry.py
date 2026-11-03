@@ -26,6 +26,8 @@ from infrastructure.ai.resilience.clock import Clock, RealClock
 
 
 class RetryRuntime(RuntimeDecorator):
+    """Retries a retryable failure before any text, with jittered backoff, within attempt and time bounds."""
+
     def __init__(
         self, inner, policy: ResilienceSettings, clock: Clock | None = None,
         rng: random.Random | None = None, telemetry: Any = None,
@@ -41,6 +43,7 @@ class RetryRuntime(RuntimeDecorator):
         return self._rng.uniform(0, min(self._p.retry_max_s, self._p.retry_base_s * 2 ** (attempt - 1)))
 
     async def stream(self, spec: AgentSpec, prompt: str) -> AsyncIterator[ModelEvent]:
+        """Attempt the call, retrying a retryable failure only while nothing has been emitted."""
         started, attempt = self._clock.now(), 0
         while True:
             attempt += 1

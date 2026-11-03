@@ -18,6 +18,8 @@ from domain.ai import (
 
 
 class ChatModelAgentRuntime:
+    """Adapts a `ChatModel` (a bare model endpoint) to the `AgentRuntime` the chain runs: instructions become the system message."""
+
     def __init__(self, chat_model: ChatModel, settings: AiSettings, *, name: str | None = None) -> None:
         self._chat, self._settings = chat_model, settings
         self.name = name or chat_model.name

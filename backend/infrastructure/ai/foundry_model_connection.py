@@ -41,6 +41,6 @@ def build_connection_runtime(settings: AiSettings, specs: Iterable[AgentSpec], *
     """A runtime over a catalog that publishes connection-backed agents."""
     catalog = FoundryAgentCatalog(
         settings, specs, model_for=lambda spec: connection_model(settings, spec),
-        name_suffix=SUFFIX, provider=PROVIDER, **overrides,
+        variant=(PROVIDER, SUFFIX), **overrides,
     )
     return FoundryAgentRuntime(catalog)

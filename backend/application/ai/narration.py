@@ -20,6 +20,8 @@ log = logging.getLogger(__name__)
 
 
 class NarrationService:
+    """Resolves an agent and its provider chain, screens the prompt, and streams the answer."""
+
     def __init__(
         self, specs: SpecRegistry, router: ModelRouter, injection_guard: PromptInjectionGuard | None = None,
         telemetry: Any = None,

@@ -30,6 +30,8 @@ CLOSED, OPEN, HALF_OPEN = "closed", "open", "half_open"
 
 
 class CircuitBreaker:
+    """The closed / open / half-open state machine. Time comes from the `Clock`, so tests control it."""
+
     def __init__(self, failure_threshold: int, reset_seconds: float, clock: Clock | None = None) -> None:
         self._threshold, self._reset, self._clock = failure_threshold, reset_seconds, clock or RealClock()
         self.state, self._failures, self._opened_at, self._probing = CLOSED, 0, 0.0, False
@@ -78,6 +80,8 @@ def counts_against_provider(error: BaseException) -> bool:
 
 
 class BreakerRuntime(RuntimeDecorator):
+    """Refuses calls to a provider whose breaker is open, and reports its state in `status()`."""
+
     def __init__(self, inner, breaker: CircuitBreaker, telemetry: Any = None) -> None:
         super().__init__(inner)
         self.breaker, self._telemetry = breaker, telemetry
@@ -91,6 +95,7 @@ class BreakerRuntime(RuntimeDecorator):
         return self._inner.status()
 
     async def stream(self, spec: AgentSpec, prompt: str) -> AsyncIterator[ModelEvent]:
+        """Refuse at once when the breaker is open; otherwise pass the call through and record how it ended."""
         if not self.breaker.allow():
             raise ModelUnavailable(f"{self.name} is out of service (circuit open)")
         opens_before = self.breaker.opens

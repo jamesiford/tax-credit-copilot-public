@@ -18,6 +18,8 @@ from domain.ai import AgentSpec, ModelEvent, ModelUsage, ProviderStatus, StreamE
 
 
 class ObservedRuntime:
+    """Wraps a provider so every call produces one span, whatever stopped it."""
+
     def __init__(self, inner: AgentRuntime, telemetry: AiTelemetry) -> None:
         self._inner, self._telemetry = inner, telemetry
         self.name = inner.name
@@ -32,6 +34,7 @@ class ObservedRuntime:
         return self._inner.status()
 
     async def stream(self, spec: AgentSpec, prompt: str) -> AsyncIterator[ModelEvent]:
+        """Pass events through unchanged, and end one span with how the call finished."""
         span = self._telemetry.start_call(role=spec.role, provider=self.name, model=None, agent=spec.name)
         outcome, error_type = "abandoned", None
         usage: ModelUsage | None = None

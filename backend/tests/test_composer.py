@@ -282,22 +282,22 @@ def test_a_composed_reply_serialises_for_the_audit_row():
 
 
 def test_the_composer_imports_only_the_standard_library_and_its_vendored_siblings():
+    """The composer was split into `composer_*` siblings by size; the vendored set is all of them."""
     import sys
 
     stdlib = set(sys.stdlib_module_names) | {"__future__"}
-    allowed_local = {
-        "application.numeric_guard",
-        "application.numeric_guard.AllowedContext", "application.numeric_guard.FactIndex",
-        "application.numeric_guard.GuardResult", "application.numeric_guard.Numeral",
-        "application.numeric_guard.Violation", "application.output_policy",
-        "application.capabilities.format",
-        "application.capabilities.envelope.DISCLAIMER", "application.capabilities.envelope.Block",
-    }
-    found: set[str] = set()
-    for node in ast.walk(ast.parse(Path(composer.__file__).read_text(encoding="utf-8"))):
-        if isinstance(node, ast.Import):
-            found.update(a.name for a in node.names)
-        elif isinstance(node, ast.ImportFrom) and node.module and node.level == 0:
-            found.update(f"{node.module}.{a.name}" for a in node.names)
-    bad = {m for m in found if m.split(".")[0] not in stdlib and m not in allowed_local}
-    assert not bad, f"composer imports {sorted(bad)}"
+    local_prefixes = (
+        "application.numeric_", "application.composer_", "application.output_policy",
+        "application.capabilities.format", "application.capabilities.envelope",
+    )
+    root = Path(composer.__file__).parent
+    for name in ("composer", "composer_placeholders", "composer_render"):
+        found: set[str] = set()
+        for node in ast.walk(ast.parse((root / f"{name}.py").read_text(encoding="utf-8"))):
+            if isinstance(node, ast.Import):
+                found.update(a.name for a in node.names)
+            elif isinstance(node, ast.ImportFrom) and node.module and node.level == 0:
+                found.update(f"{node.module}.{a.name}" for a in node.names)
+        bad = {m for m in found if m.split(".")[0] not in stdlib and not m.startswith(local_prefixes)
+               and m != "application.numeric_guard" and not m.startswith("application.numeric_guard.")}
+        assert not bad, f"{name} imports {sorted(bad)}"

@@ -2,9 +2,8 @@
 
 Pure data, standard library only. The portal chat, the channel gateway, the
 orchestrator and the tests all read this one list, so a tool cannot be renamed
-in one place and still be offered under its old name in another. This file is
-vendored into the orchestrator container unchanged, which is why it imports
-nothing — not even a sibling module.
+in one place and still be offered under its old name in another. It is vendored
+into the orchestrator container with its siblings.
 
 Two vocabularies live here and they are deliberately different:
 
@@ -15,169 +14,19 @@ Two vocabularies live here and they are deliberately different:
 
 The router is a language model and will invent names, so an intent it names that
 is not in `CAPABILITIES` is dropped, never dispatched.
+
+**Where the pieces live.** The list is here. The spec type and schema helpers are in
+`catalog_types`, the chat intents in `catalog_intents`; both were split out by size
+and are re-exported below, so every import of `application.capabilities.catalog` is
+unchanged.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from typing import Any
-
-READ = "read"
-WRITE_PREPARE = "write_prepare"
-WRITE_COMMIT = "write_commit"
-KINDS = (READ, WRITE_PREPARE, WRITE_COMMIT)
-
-METHODS = ("min_max", "pay_period", "both")
-ACTIONS = ("add_headcount", "remove_headcount", "adjust_hours", "adjust_wages")
-
-
-@dataclass(frozen=True)
-class CapabilitySpec:
-    """One tool the platform offers.
-
-    `implemented=False` declares a tool that a later work package builds. It is
-    listed so the orchestrator and the audit schema already know the name, and
-    the tests refuse to let an unimplemented tool be called.
-    """
-
-    name: str
-    description: str
-    kind: str
-    needs_client: bool
-    needs_year: bool
-    schema: dict[str, Any]
-    sensitive: bool = False
-    implemented: bool = True
-    chat_intent: str | None = None
-    tags: tuple[str, ...] = field(default=())
-
-    def __post_init__(self) -> None:
-        if self.kind not in KINDS:
-            raise ValueError(f"{self.name}: kind must be one of {KINDS}, got {self.kind!r}")
-        if self.schema.get("type") != "object":
-            raise ValueError(f"{self.name}: schema must be a JSON-Schema object")
-
-
-# ------------------------------------------------------------ the portal's intents
-
-#: Everything the chat can actually answer, and what each one costs.
-#:
-#: A plan is validated against these names. The router is a language model and
-#: will happily invent `trend_analysis` or `client_deep_dive`; an unrecognised
-#: intent is DROPPED rather than dispatched, because a made-up intent that
-#: silently runs the default pipeline answers a question nobody asked.
-CAPABILITIES: dict[str, str] = {
-    "book": (
-        "who to call ACROSS EVERY CLIENT, ranked by why — the portfolio question. "
-        "Needs no client selected; naming one would be the opposite of what was asked."
-    ),
-    "situation": "why this client is worth calling — bands, programmes, years. Claims only.",
-    "eligibility": "the credit figure and headcount for the selected client-year.",
-    "at_risk": (
-        "which employees ALREADY counted toward the credit sit close enough to a "
-        "statutory floor that they could fall out of it — jobs the client could lose."
-    ),
-    "trend": "how a client has moved across years, and whether they have been eligible since their base year.",
-    "multi_state": (
-        "which PROGRAMMES across every state one client may qualify for — a rule-pack "
-        "scan for the selected client, NOT a view across clients."
-    ),
-    "discovery": "other programmes the client may qualify for, excluding the one in scope.",
-    "simulate": "what-if: hiring, losing, hours or wages against the statutory engine.",
-    "explain": "re-narrate the cached calculation trail, step by step.",
-}
-
-#: Which intents are about ONE client, and therefore cannot be answered without
-#: one selected.
-#:
-#: The chat used to refuse every question without a client, which made the
-#: portfolio question — "who should we reach out to?" — unanswerable from the
-#: title bar, where no client is selected BY DESIGN. The refusal itself is
-#: right and stays: it exists so nothing silently answers against the default
-#: tenant. It just belongs per capability rather than across the whole door.
-NEEDS_CLIENT: frozenset[str] = frozenset({
-    "situation", "eligibility", "at_risk", "trend", "multi_state",
-    "discovery", "simulate", "explain",
-})
-
-#: The tool each intent runs. `multi_state` and `discovery` are one scan with
-#: different exclusions, so they share a tool.
-CHAT_INTENT_TOOL: dict[str, str] = {
-    "book": "book_rank",
-    "situation": "client_situation",
-    "eligibility": "client_eligibility",
-    "at_risk": "client_at_risk",
-    "trend": "client_trend",
-    "multi_state": "client_discovery",
-    "discovery": "client_discovery",
-    "simulate": "simulate",
-    "explain": "calc_walkthrough",
-}
-
-
-# -------------------------------------------------------------------- schemas
-
-
-def _object(properties: dict[str, Any], required: tuple[str, ...] = ()) -> dict[str, Any]:
-    return {
-        "type": "object",
-        "properties": properties,
-        "required": list(required),
-        "additionalProperties": False,
-    }
-
-
-_CLIENT_ID = {"type": "integer", "description": "The client's account id."}
-_TAX_YEAR = {"type": "integer", "minimum": 1900, "maximum": 2100, "description": "Tax year, labelled per the programme's statute."}
-_STATE = {"type": "string", "minLength": 2, "maxLength": 2, "default": "GA", "description": "Two-letter work state; selects the programme."}
-_METHOD = {"type": "string", "enum": list(METHODS), "default": "min_max", "description": "Certified headcount method."}
-_PROGRAM = {"type": "string", "description": "Programme code, e.g. GA_JTC."}
-_TOKEN = {"type": "string", "minLength": 8, "maxLength": 128, "description": "Opaque employee handle. Never an employee id."}
-_CLAIM_STATUSES = ["not_assessed", "assessed", "proposed", "declined", "claimed", "certified", "amended"]
-
-
-def _read(
-    name: str, description: str, properties: dict[str, Any], required: tuple[str, ...] = (), *,
-    needs_client: bool = True, needs_year: bool = False, sensitive: bool = False,
-    chat_intent: str | None = None,
-) -> CapabilitySpec:
-    return CapabilitySpec(
-        name=name, description=description, kind=READ,
-        needs_client=needs_client, needs_year=needs_year,
-        schema=_object(properties, required), sensitive=sensitive, chat_intent=chat_intent,
-    )
-
-
-def _write_pair(
-    name: str, description: str, properties: dict[str, Any], required: tuple[str, ...],
-    *, needs_year: bool = False, implemented: bool = True,
-) -> tuple[CapabilitySpec, CapabilitySpec]:
-    """A write is two steps: a preview bound to the caller, then a commit.
-
-    `prepare` changes nothing and returns a single-use confirmation token. `commit`
-    takes that token, the SAME `arguments` and an idempotency key; the change goes
-    through the mediator, behind the writer policy (`capabilities/writes.py`).
-    """
-    prepare = CapabilitySpec(
-        name=f"{name}_prepare",
-        description=f"Preview: {description} Changes nothing; returns a confirmation token.",
-        kind=WRITE_PREPARE, needs_client=True, needs_year=needs_year,
-        schema=_object(properties, required), implemented=implemented,
-    )
-    commit = CapabilitySpec(
-        name=f"{name}_commit",
-        description=(
-            f"Commit: {description} Requires the token from the preview and the same arguments."
-        ),
-        kind=WRITE_COMMIT, needs_client=True, needs_year=needs_year,
-        schema=_object(
-            {"confirmation_token": {"type": "string"}, "idempotency_key": {"type": "string"},
-             "arguments": _object(properties, required)},
-            ("confirmation_token", "idempotency_key", "arguments"),
-        ),
-        implemented=implemented,
-    )
-    return prepare, commit
-
+from application.capabilities.catalog_intents import CAPABILITIES, CHAT_INTENT_TOOL, NEEDS_CLIENT  # noqa: F401
+from application.capabilities.catalog_types import (  # noqa: F401 - re-exported
+    ACTIONS, KINDS, METHODS, READ, WRITE_COMMIT, WRITE_PREPARE, CapabilitySpec, _CLAIM_STATUSES,
+    _CLIENT_ID, _METHOD, _PROGRAM, _STATE, _TAX_YEAR, _TOKEN, _object, _read, _write_pair,
+)
 
 _WRITES: tuple[CapabilitySpec, ...] = (
     *_write_pair(
@@ -310,6 +159,7 @@ if len(BY_NAME) != len(CATALOG):
 
 
 def get(name: str) -> CapabilitySpec:
+    """The spec for `name`, or a `KeyError` naming it."""
     try:
         return BY_NAME[name]
     except KeyError:
@@ -317,4 +167,5 @@ def get(name: str) -> CapabilitySpec:
 
 
 def implemented() -> tuple[CapabilitySpec, ...]:
+    """Every capability that is built, in catalog order."""
     return tuple(spec for spec in CATALOG if spec.implemented)

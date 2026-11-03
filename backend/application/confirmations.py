@@ -46,35 +46,51 @@ class ConfirmationError(Exception):
 
 
 class UnknownConfirmation(ConfirmationError):
+    """No such token: never issued, or issued by another instance."""
+
     code = "unknown"
 
 
 class ExpiredConfirmation(ConfirmationError):
+    """The token's time ran out before it was committed."""
+
     code = "expired"
 
 
 class ReplayedConfirmation(ConfirmationError):
+    """The token was already used; a token commits at most once."""
+
     code = "replayed"
 
 
 class WrongUser(ConfirmationError):
+    """The person committing is not the person who previewed."""
+
     code = "wrong_user"
 
 
 class WrongTool(ConfirmationError):
+    """The commit names a different tool than the preview did."""
+
     code = "wrong_tool"
 
 
 class ArgumentsChanged(ConfirmationError):
+    """The commit's arguments differ from the previewed ones: what was agreed is not what lands."""
+
     code = "wrong_args"
 
 
 class IdempotencyConflict(ConfirmationError):
+    """The idempotency key was already used for a different request."""
+
     code = "idempotency_conflict"
 
 
 @dataclass(frozen=True)
 class Prepared:
+    """A preview that was recorded: the id to look it up and the single-use token to commit it."""
+
     confirmation_id: str
     token: str
     expires_at: datetime
@@ -82,6 +98,8 @@ class Prepared:
 
 @dataclass(frozen=True)
 class Committed:
+    """The outcome of a commit; `replayed` is True when an idempotent retry returned the first result."""
+
     result: dict[str, Any]
     replayed: bool
     confirmation_id: str = ""
@@ -92,6 +110,8 @@ def token_sha256(token: str) -> str:
 
 
 class ConfirmationService:
+    """Prepare and commit a write: the preview a person agrees to is the row that lands."""
+
     def __init__(
         self, repository: ConfirmationRepository, authorize: Callable[[Principal], None],
         *, ttl_seconds: int = 600, clock: Callable[[], datetime] = utcnow,

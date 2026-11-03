@@ -437,15 +437,21 @@ def test_capabilities_import_no_framework_router_or_agent():
     )
 
 
-@pytest.mark.parametrize("relative", [
-    "application/capabilities/catalog.py",
-    "application/capabilities/format.py",
-    "application/capabilities/envelope.py",
-])
+_VENDORED_CAPABILITY_MODULES = (
+    "catalog", "catalog_types", "catalog_intents", "format", "format_core", "format_renderers", "envelope",
+)
+
+
+@pytest.mark.parametrize("relative", [f"application/capabilities/{n}.py" for n in _VENDORED_CAPABILITY_MODULES])
 def test_vendored_capability_modules_import_only_the_standard_library(relative):
-    """These are copied into the orchestrator container unchanged."""
-    bad = _non_stdlib_imports((BACKEND / relative).read_text(encoding="utf-8"))
-    assert not bad, f"{relative} imports {bad}; it is vendored and may use the stdlib only"
+    """These are copied into the orchestrator container, together, unchanged.
+
+    `catalog` and `format` were split into siblings by size (AI-08); a vendored file
+    may import the standard library and the other vendored files, nothing else.
+    """
+    siblings = {f"application.capabilities.{n}" for n in _VENDORED_CAPABILITY_MODULES}
+    bad = [m for m in _non_stdlib_imports((BACKEND / relative).read_text(encoding="utf-8")) if m not in siblings]
+    assert not bad, f"{relative} imports {bad}; it is vendored and may use the stdlib and its vendored siblings only"
 
 
 def test_chat_pipelines_call_capabilities_not_tools():

@@ -30,6 +30,8 @@ class GatewayConfigurationError(ValueError):
 
 @dataclass(frozen=True)
 class GatewaySettings:
+    """Everything needed to reach and authenticate to the customer's gateway. Holds no secret values."""
+
     endpoint: str
     auth: str
     api_style: str = "openai_v1"

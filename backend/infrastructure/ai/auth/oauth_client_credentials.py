@@ -21,6 +21,8 @@ SKEW_SECONDS = 60.0
 
 
 class OAuthClientCredentials:
+    """OAuth2 client-credentials: fetches a token, caches it until shortly before expiry, one fetch at a time."""
+
     def __init__(
         self, settings: GatewaySettings, *, client: httpx.AsyncClient | None = None,
         clock: Callable[[], float] = time.monotonic,

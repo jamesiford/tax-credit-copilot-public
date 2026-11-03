@@ -20,8 +20,8 @@ runs in a worktree, so `feat/m365-channel` is held by the main checkout).
 | AI-03 | External model gateway | done | `wp/AI-03-model-gateway` | merge `e7de7fc`; gateway adapter, auth, egress, mock gateway, Terraform (terraform test 30/30) |
 | AI-04 | Resilience | done | `wp/AI-04-resilience` | merge `045aaef`; stack, budget, degraded narration (1975 passed) |
 | AI-06 | Observability, prompt versioning, evals | done | `wp/AI-06-observability` | merge `2c72519`; OTel GenAI telemetry, prompt manifest, evals (1997 passed) |
-| AI-07 | Safety | in_progress | `wp/AI-07-safety` | — |
-| AI-08 | Coding-standards ratchet | todo | — | — |
+| AI-07 | Safety | done | `wp/AI-07-safety` | merge `83fa319`; injection screen, output policy, stream gate (2104 passed) |
+| AI-08 | Coding-standards ratchet | in_progress | `wp/AI-08-standards` | — |
 | AI-05 | Conversation continuity (stretch, last) | todo | — | — |
 
 ## Evidence
