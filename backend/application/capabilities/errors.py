@@ -32,6 +32,14 @@ class NotCalculated(CapabilityError):
     """
 
 
+class ClaimNotFound(CapabilityError):
+    """A change was asked of a claim cell nobody has recorded, so there is nothing to change.
+
+    A 404, not a crash: the cell is simply not there. Distinct from `NotCalculated`, which says a
+    figure has not been produced yet; here the request names a record that does not exist.
+    """
+
+
 class InvalidArguments(CapabilityError):
     """The arguments are well-formed but not acceptable (a lever out of range)."""
 

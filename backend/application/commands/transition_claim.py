@@ -10,12 +10,13 @@ from dataclasses import dataclass
 from decimal import Decimal
 from typing import Any
 
+from application.capabilities.errors import ClaimNotFound
 from application.identity import Policy
 from application.mediator import Command
 from domain.claims import ClaimStatus, ProgramClaim, Provenance
 
 
-class NoClaimToTransition(LookupError):
+class NoClaimToTransition(ClaimNotFound, LookupError):
     """There is no recorded claim for this cell, so there is nothing to move."""
 
 
