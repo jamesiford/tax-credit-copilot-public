@@ -12,7 +12,9 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
+
+from api.auth import attributed
 from pydantic import BaseModel
 
 from data.claims import get_all_claims
@@ -141,7 +143,7 @@ def rules() -> dict[str, Any]:
 
 
 @router.post("/rules/{code}/verify")
-def verify_rule_pack(code: str, payload: RuleVerificationRequest) -> dict[str, Any]:
+def verify_rule_pack(code: str, payload: RuleVerificationRequest, request: Request) -> dict[str, Any]:
     """Record a tax-practitioner sign-off on a rule pack (in-memory)."""
     code_upper = code.upper()
     pack_codes = set()
@@ -156,7 +158,7 @@ def verify_rule_pack(code: str, payload: RuleVerificationRequest) -> dict[str, A
     if code_upper not in pack_codes:
         raise HTTPException(status_code=404, detail=f"Unknown rule pack code: {code}")
     _RULE_VERIFICATION[code_upper] = {
-        "verified_by": payload.verified_by,
+        "verified_by": attributed(request, payload.verified_by),
         "verified_at": date.today().isoformat(),
         "note": payload.note,
     }

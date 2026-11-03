@@ -12,6 +12,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any
 
+from application.identity import Policy
 from application.mediator import Command
 
 
@@ -38,6 +39,7 @@ class ResolveFindingCommand(Command):
     resolution: str = ""
     keep_worksite: str | None = None
     note: str | None = None
+    policy = Policy.WRITER
 
     def __post_init__(self) -> None:
         if not self.finding_id:
@@ -54,6 +56,7 @@ class ReopenFindingCommand(Command):
 
     finding_id: str = ""
     client_id: int = 0
+    policy = Policy.WRITER
 
     def __post_init__(self) -> None:
         if not self.finding_id:

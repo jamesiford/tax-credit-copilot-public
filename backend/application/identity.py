@@ -14,7 +14,9 @@ Two small types the API and the commands share:
 """
 from __future__ import annotations
 
+from contextvars import ContextVar
 from dataclasses import dataclass, field
+from enum import Enum
 from typing import Protocol
 
 
@@ -45,8 +47,21 @@ class ActingUser:
         return self.upn or self.oid
 
 
+PRINCIPAL_USER = "user"
+PRINCIPAL_AGENT = "agent"
+
+
 @dataclass(frozen=True)
 class Principal:
+    """The caller. A `user` is a person with a delegated token; an `agent` is a
+    service (the channel gateway) holding an app-only token, acting for the
+    person in `acting_for`.
+
+    An agent's own object id is never the author of a write: attributing a
+    change to the gateway would say "a bot did it" about something a named
+    person asked for, so `actor` follows `acting_for`.
+    """
+
     oid: str | None = None
     upn: str | None = None
     name: str | None = None
@@ -54,11 +69,26 @@ class Principal:
     roles: tuple[str, ...] = ()
     scopes: tuple[str, ...] = ()
     authenticated: bool = False
+    principal_type: str = PRINCIPAL_USER
+    acting_for: ActingUser | None = None
+
+    @property
+    def is_agent(self) -> bool:
+        return self.principal_type == PRINCIPAL_AGENT
 
     @property
     def actor(self) -> str:
         """The identity a write is attributed to: UPN, else object id."""
+        if self.is_agent:
+            return self.acting_for.actor if self.acting_for else "anonymous"
         return self.upn or self.oid or "anonymous"
+
+    @property
+    def effective_oid(self) -> str | None:
+        """The object id entitlements are checked against: the person, never the bot."""
+        if self.is_agent:
+            return self.acting_for.oid if self.acting_for else None
+        return self.oid
 
     def to_dict(self) -> dict:
         return {
@@ -67,11 +97,45 @@ class Principal:
             "oid": self.oid,
             "name": self.name,
             "roles": list(self.roles),
+            "principal_type": self.principal_type,
+            "acting_for": None if self.acting_for is None else {
+                "oid": self.acting_for.oid,
+                "name": self.acting_for.display_name,
+                "upn": self.acting_for.upn,
+                "assurance": self.acting_for.assurance,
+                "channel": self.acting_for.channel,
+            },
         }
 
 
 #: The caller when AUTH_MODE=none. Not a user: an absence of one.
 ANONYMOUS = Principal()
+
+#: The principal of the request being served. Set once by the API guard so a
+#: router that forgets to hand its principal to the mediator cannot turn an
+#: agent into an anonymous caller: the pipeline reads this when none is passed.
+_CURRENT: ContextVar[Principal | None] = ContextVar("tcc_current_principal", default=None)
+
+
+def set_ambient_principal(principal: Principal | None) -> None:
+    _CURRENT.set(principal)
+
+
+def ambient_principal() -> Principal | None:
+    return _CURRENT.get()
+
+
+class Policy(Enum):
+    """What a command demands of its caller, declared on the command class."""
+
+    WRITER = "writer"
+
+
+class WriterEntitlement(Protocol):
+    """May this person change what the business believes? Keyed by object id."""
+
+    def is_writer(self, user_oid: str) -> bool:
+        ...
 
 
 class ClientAuthorizer(Protocol):

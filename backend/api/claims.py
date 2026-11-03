@@ -16,6 +16,7 @@ that is arithmetically true and completely misleading.
 """
 from __future__ import annotations
 
+from datetime import datetime, timezone
 import os
 from decimal import Decimal
 from typing import Any
@@ -310,13 +311,15 @@ def transition_cell(
 
 
 @router.put("/engagement")
-def set_engagement(body: EngagementBody) -> dict[str, Any]:
+def set_engagement(body: EngagementBody, request: Request = None) -> dict[str, Any]:
     """Declare whether a program is our mandate for this client."""
     engagement = ProgramEngagement(
         client_id=body.client_id,
         program_code=body.program_code,
         scope=body.scope,
         note=body.note,
+        set_by=attributed(request, None),
+        set_at=datetime.now(timezone.utc),
     )
     return get_repository().set_engagement(engagement).to_dict()
 

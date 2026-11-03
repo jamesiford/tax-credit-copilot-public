@@ -238,3 +238,62 @@ One short entry per decision: context, choice, why.
   those modules to the four channel tables and forbids other adapters reusing them.
 - **Why.** The audit trail spans clients by nature, so `TenantScopedQuery` does not
   fit; the exemption is explicit and enforced rather than a bypass.
+
+## D-25 Two token shapes, never mixed; the gateway is an agent principal
+
+- **Choice.** A delegated token (`scp` ∋ `user_impersonation`, role `TCC.User`) is a
+  `user`. An app-only token (no `scp`; `idtyp=app`, or `sub == oid` with no user
+  name) with role `TCC.Agent` is an `agent`. A token showing both shapes, or the
+  other shape's role, is a 403.
+- **Why.** Guessing which a half-and-half token means is how a service acquires a
+  person's rights.
+
+## D-26 An agent must name its user on every request; users cannot
+
+- **Choice.** `X-TCC-Acting-User` (base64url JSON) is parsed only for agent
+  principals and is required on every route except `/api/health` and `/api/ready`
+  (400 when absent, malformed, oversized, a non-GUID `oid` or a foreign `tid`).
+  From a signed-in person it is ignored with a warning.
+- **Why.** A read with no named user cannot be audited per user, and a header a
+  person can set is impersonation.
+
+## D-27 Authorization runs first, refuses when it cannot decide, and checks authorship
+
+- **Choice.** `Authorization → Validation → Handler → Audit`. A command declaring a
+  policy on a mediator with no authorizer is refused. For an agent, the command's
+  `actor` must equal the acting user's actor. The caller is the `principal`
+  argument, else the ambient principal the API guard set for the request.
+- **Why.** A control that silently does not run is the failure this stage exists to
+  prevent; an author mismatch means code built the command without the principal.
+  The ambient principal means a router that forgets to pass one cannot demote an
+  agent to anonymous. `_scope_tenant` stays absent.
+
+## D-28 Entitlement is by person; users are exempt unless enforced
+
+- **Choice.** Writer entitlement is checked against the acting user's oid, never the
+  gateway's. Signed-in people and the anonymous local caller keep writing unless
+  `CHANNEL_ENFORCE_WRITER_FOR_USERS=true`. `CHANNEL_WRITER_SOURCE` is `allowlist`
+  (default) | `entra_group` | `either`; every source fails closed and an unknown
+  value raises.
+- **Why.** Shipping the channel must not lock out the portal's existing users.
+
+## D-29 Person-only write routes are refused to the agent
+
+- **Choice.** `AGENT_FORBIDDEN_WRITES` in `api/auth.py` lists eight state-changing
+  routes that do not go through a writer-gated command (QC resolve, employee review,
+  rule verify, rule apply, workspace refresh and comparison stage, calculation run,
+  claims assess). A test checks each pattern still matches a real route.
+- **Why.** An agent token would otherwise reach them with no entitlement check.
+  Prompt 3 may re-open any of them behind a command.
+
+## D-30 Existing tests and docs changed deliberately in CH-04
+
+- `test_mediator.py::test_the_pipeline_does_not_claim_stages_it_does_not_have` now
+  asserts `_authorize` IS a stage (and `_scope_tenant` still is not), because an
+  identity to authorize now exists. ADR-003, `.github/copilot-instructions.md`
+  ("That is the whole pipeline") and the mediator docstring were rewritten to match.
+- `test_auth.py::test_me_returns_the_callers_identity` gained `principal_type` and
+  `acting_for` (additive fields on `/api/me`).
+- Routers `ingestion`, `onezero` and `rules` now attribute through `attributed()`;
+  `PUT /api/claims/engagement` records `set_by`/`set_at`. Unauthenticated behaviour
+  is unchanged.

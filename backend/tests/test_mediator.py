@@ -174,14 +174,17 @@ class TestTheAuditStage:
 
 
 def test_the_pipeline_does_not_claim_stages_it_does_not_have():
-    """Authorization and TenantScope need an identity that does not exist yet.
+    """Authorization is a real stage (CH-04); TenantScope is still absent.
 
-    They are absent rather than stubbed on purpose: a stage that runs and always
-    passes reads as a control. This test exists so that adding a no-op one to
-    satisfy a diagram fails loudly.
+    TenantScope needs an employer binding that does not exist yet. It is absent
+    rather than stubbed on purpose: a stage that runs and always passes reads as
+    a control. This test exists so that adding a no-op one to satisfy a diagram
+    fails loudly. (It used to assert Authorization absent too; that changed when
+    an identity to authorize arrived, and test_authorization.py proves the stage
+    is not a no-op.)
     """
     stages = [name for name in dir(Mediator) if not name.startswith("__")]
-    assert "_authorize" not in stages
+    assert "_authorize" in stages
     assert "_scope_tenant" not in stages
 
 

@@ -451,6 +451,47 @@ def set_writer_repository(repo: Any) -> None:
     _writer_repo = repo
 
 
+_writer_entitlement: Any | None = None
+
+
+def get_writer_entitlement() -> Any:
+    """The `WriterEntitlement` for `CHANNEL_WRITER_SOURCE`."""
+    global _writer_entitlement
+    if _writer_entitlement is None:
+        from application.deployment import writer_group_id, writer_source
+        from infrastructure.auth.writers import EitherEntitlement, EntraGroupEntitlement
+
+        source = writer_source()
+        allow = get_writer_repository()
+        if source == "allowlist":
+            _writer_entitlement = allow
+        else:
+            group = EntraGroupEntitlement(writer_group_id())
+            _writer_entitlement = group if source == "entra_group" else EitherEntitlement((allow, group))
+    return _writer_entitlement
+
+
+def set_writer_entitlement(entitlement: Any) -> None:
+    """Swap the entitlement source. Used by tests."""
+    global _writer_entitlement
+    _writer_entitlement = entitlement
+
+
+class _LazyEntitlement:
+    """Resolves the real entitlement on first use, so building the mediator
+    touches no store and a test can swap the source after it."""
+
+    def is_writer(self, user_oid: str) -> bool:
+        return get_writer_entitlement().is_writer(user_oid)
+
+
+def get_authorizer() -> Any:
+    from application.authorization import WriterPolicy
+    from application.deployment import enforce_writer_for_users
+
+    return WriterPolicy(_LazyEntitlement(), enforce_for_users=enforce_writer_for_users())
+
+
 def get_confirmation_repository() -> Any:
     """Prepare/commit tokens, by hash (`tcc_ops.channel_confirmation`)."""
     global _confirmation_repo
@@ -486,7 +527,7 @@ def get_agent_action_recorder() -> Any:
 
 def build_mediator() -> Mediator:
     """Construct and wire a mediator. Called once; safe to call again in tests."""
-    mediator = Mediator()
+    mediator = Mediator(authorizer=get_authorizer())
 
     # --- Queries: compute and return, change nothing ---
     mediator.register(GetProximityQuery, handle_get_proximity)

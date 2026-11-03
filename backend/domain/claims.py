@@ -601,6 +601,10 @@ class ProgramEngagement:
     effective_from: datetime = field(default_factory=_now)
     effective_to: datetime | None = None
     note: str | None = None
+    #: Who set it and when. Additive, and None on rows recorded before CH-04:
+    #: an old engagement stays unattributed rather than being given a name.
+    set_by: str | None = None
+    set_at: datetime | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "program_code", self.program_code.upper())
@@ -613,6 +617,8 @@ class ProgramEngagement:
             "effective_from": self.effective_from.isoformat(),
             "effective_to": self.effective_to.isoformat() if self.effective_to else None,
             "note": self.note,
+            "set_by": self.set_by,
+            "set_at": self.set_at.isoformat() if self.set_at else None,
         }
 
 

@@ -161,6 +161,8 @@ def test_me_returns_the_callers_identity(entra, api):
     assert body == {
         "auth_mode": "entra", "authenticated": True, "upn": "analyst@example.com",
         "oid": OID, "name": "Ana Lyst", "roles": ["TCC.User"],
+        # CH-04: additive. A person is a `user` and acts for no one.
+        "principal_type": "user", "acting_for": None,
     }
 
 

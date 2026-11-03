@@ -20,8 +20,10 @@ from __future__ import annotations
 from datetime import date
 from typing import Any
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from fastapi import Query as FastAPIQuery
+
+from api.auth import attributed
 from pydantic import BaseModel, Field
 
 from data.claims import get_all_claims
@@ -393,7 +395,7 @@ def one_zero_employee(
 
 
 @router.post("/onezero/employee/{employee_id}/review")
-def review_employee(employee_id: str, req: EmployeeReviewRequest) -> dict[str, Any]:
+def review_employee(employee_id: str, req: EmployeeReviewRequest, request: Request) -> dict[str, Any]:
     """Record a human validation/correction annotation for an employee
     (in-memory; resets on restart — prod persists to the audit store)."""
     if req.status == "cleared":
@@ -403,7 +405,7 @@ def review_employee(employee_id: str, req: EmployeeReviewRequest) -> dict[str, A
         "employee_id": employee_id,
         "status": req.status,
         "note": req.note,
-        "reviewer": req.reviewer,
+        "reviewer": attributed(request, req.reviewer, default="Reviewer"),
         "reviewed_at": date.today().isoformat(),
     }
     _EMPLOYEE_REVIEWS[employee_id] = entry

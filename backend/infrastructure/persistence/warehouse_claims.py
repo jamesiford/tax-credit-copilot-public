@@ -52,7 +52,10 @@ _COLUMNS = (
     "filing_reference", "decided_by", "decided_at", "decline_reason",
     "effective_from", "effective_to",
 )
-_ENGAGEMENT_COLUMNS = ("client_id", "program_code", "scope", "effective_from", "effective_to", "note")
+_ENGAGEMENT_COLUMNS = (
+    "client_id", "program_code", "scope", "effective_from", "effective_to", "note",
+    "set_by", "set_at",
+)
 
 _PORTFOLIO = tenant_exempt("portfolio coverage spans clients by design")
 
@@ -312,6 +315,8 @@ class WarehouseClaimRepository:
                 effective_from=from_db_instant(r["effective_from"]),
                 effective_to=from_db_instant(r["effective_to"]),
                 note=r["note"],
+                set_by=r["set_by"],
+                set_at=from_db_instant(r["set_at"]),
             )
             for r in rows
         ]
@@ -337,6 +342,8 @@ class WarehouseClaimRepository:
                     to_db_date(engagement.effective_from),
                     to_db_date(engagement.effective_to),
                     engagement.note,
+                    engagement.set_by,
+                    to_db_date(engagement.set_at),
                 ]],
             )
 
