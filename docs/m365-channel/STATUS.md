@@ -30,6 +30,10 @@ runs in a worktree, so `feat/m365-channel` is held by the main checkout).
 | CH-08 | Hosted orchestrator (`channel_orchestrator/`), narration audit | done | `wp/CH-08-orchestrator` | merge `063afec` |
 | CH-08b | Orchestrator gaps found re-reading the brief (D-85) | done | `wp/CH-08b-spec-gaps` | merge `4221270` |
 | CH-09 | `scripts/publish-m365.ps1` | done | `wp/CH-09-publish-m365` | merge `3285ade` |
+| CH-10 | Cowork plugin (`channels/cowork/`), builder and offline validator | done | `wp/CH-10-cowork-plugin` | merge `e93ed3d` |
+| CH-11 | End-to-end workflow and exactness tests | todo | - | - |
+| CH-12 | Documentation, ADR-009, runbook, demo script | todo | - | - |
+| CH-12b | Demo network posture toggle and hardening plan | todo | - | - |
 
 ## Evidence
 
@@ -241,6 +245,12 @@ and its `discovery` / `multi_state` scans read the configured default tenant.
 - `docs/m365-channel/evidence/publish-whatif.txt`: the `-WhatIf` transcript, placeholders only (a test pins that). `PUBLISHING.md` written. `infra/` untouched. Whitelabel 0 enforced; audit-export 0; `gitleaks git` clean; links 0 broken.
 - Not run against a live subscription (Prompt 6). Decisions: D-84.
 
+### CH-10 (merged `e93ed3d`)
+
+- Full backend suite: **2686 passed**, 136 skipped, 1 xfailed (CH-09: 2615 passed). New: `tests/channel/test_cowork_package.py` (67) and `tests/channel/test_gw_render.py` (4). No skip or xfail added; parity pins untouched; `infra/` untouched.
+- `python scripts/build-cowork-plugin.py --config channels/cowork/config.example.json`: builds offline, 13 files, reproducible (two builds, same bytes). Placeholder-config SHA-256 `972fd949ccaed5a6fe996f58be4856c3577909bfee9d0c44c5ace816583ef663` (app id from the default seed); `--strict` refuses it with exit 1. The manifest also validates (0 errors) against the published 1.29 JSON schema; `atk package` 1.1.14 builds the tree in a throwaway Agents Toolkit project. `wiqd` was not installed and `atk validate` needs sign-in (D-87).
+- Gateway change (D-88): the MCP text carries a `Provenance:` line so a footer is copied, not invented.
+- Whitelabel 0 enforced; audit-export 0; `gitleaks git` clean; links 0 broken.
 ## Blockers
 
 _None._
