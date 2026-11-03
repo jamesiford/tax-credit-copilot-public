@@ -93,6 +93,12 @@ variable "debug_whoami" {
   default     = false
 }
 
+variable "resolve_display_names" {
+  description = "CHANNEL_RESOLVE_DISPLAY_NAMES: resolve a Teams user's display name and UPN from Microsoft Graph."
+  type        = bool
+  default     = false
+}
+
 variable "warehouse" {
   description = "The Warehouse the audit trail is written to (the same one the API uses)."
   type = object({
@@ -145,6 +151,7 @@ locals {
     trimspace(var.writer_group_id) != "" ? { CHANNEL_WRITER_GROUP_ID = trimspace(var.writer_group_id) } : {},
     trimspace(var.git_commit) != "" ? { GIT_COMMIT = var.git_commit } : {},
     var.debug_whoami ? { CHANNEL_DEBUG_WHOAMI = "true" } : {},
+    var.resolve_display_names ? { CHANNEL_RESOLVE_DISPLAY_NAMES = "true" } : {},
   )
 }
 

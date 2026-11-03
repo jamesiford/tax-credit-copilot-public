@@ -16,6 +16,15 @@
                                     the API identity: it enforces the writer entitlement itself) the
                                     Microsoft Graph application role GroupMember.Read.All (nothing
                                     else), which the Entra-group writer check needs
+      -GrantUserReadBasic           gives the gateway identity the Microsoft Graph application role
+                                    User.ReadBasic.All (display name and UPN of a user, nothing
+                                    else), which CHANNEL_RESOLVE_DISPLAY_NAMES needs. Needs
+                                    -GatewayIdentityPrincipalId. ADMIN ACTION: the signed-in
+                                    account must be able to grant application permissions
+                                    (Privileged Role Administrator or Global Administrator);
+                                    otherwise the script prints the exact command for one,
+                                    exactly as it does for the other roles. Idempotent: an
+                                    existing assignment is reported and left alone
 
     When Graph answers Forbidden the script does not try anything else: it prints the exact
     commands for someone who can assign app roles, and exits 2 so a caller can tell
@@ -32,7 +41,8 @@ param(
     [string]$GatewayIdentityPrincipalId,
     [string]$AgentIdentityPrincipalId,
     [string]$ApiIdentityPrincipalId,
-    [switch]$GrantGraphGroupMemberRead
+    [switch]$GrantGraphGroupMemberRead,
+    [switch]$GrantUserReadBasic
 )
 
 $ErrorActionPreference = 'Stop'
@@ -102,6 +112,11 @@ try {
         if ($GrantGraphGroupMemberRead) {
             Grant-AppRole (Get-ServicePrincipal $graphApplicationId) 'GroupMember.Read.All' $GatewayIdentityPrincipalId 'the gateway identity'
         }
+        if ($GrantUserReadBasic) {
+            Grant-AppRole (Get-ServicePrincipal $graphApplicationId) 'User.ReadBasic.All' $GatewayIdentityPrincipalId 'the gateway identity'
+        }
+    } elseif ($GrantUserReadBasic) {
+        throw '-GrantUserReadBasic needs -GatewayIdentityPrincipalId: the role goes to the gateway identity.'
     }
     if ($AgentIdentityPrincipalId) {
         Write-Host "Agent identity" -ForegroundColor Cyan

@@ -122,11 +122,21 @@ def test_the_azd_environment_maps_the_scalar_channel_variables_with_safe_default
     assert {"channel_gateway_audience", "channel_writer_group_id"} <= set(mapping)
 
 
+def test_display_name_resolution_is_one_off_by_default_azd_value_and_one_conditional_setting():
+    """CH-15a: TCC_CHANNEL_RESOLVE_DISPLAY_NAMES -> channel_resolve_display_names -> CHANNEL_RESOLVE_DISPLAY_NAMES, only when true."""
+    assert json.loads(read("infra", "main.tfvars.json"))["channel_resolve_display_names"] == "${TCC_CHANNEL_RESOLVE_DISPLAY_NAMES=false}"
+    module = read("infra", "modules", "channel", "main.tf")
+    assert 'var.resolve_display_names ? { CHANNEL_RESOLVE_DISPLAY_NAMES = "true" } : {}' in module
+    assert module.count("CHANNEL_RESOLVE_DISPLAY_NAMES") == 2  # the description and the one conditional setting
+    assert "resolve_display_names          = var.channel_resolve_display_names" in read("infra", "main.tf")
+
+
 def test_every_new_terraform_variable_is_off_or_empty_by_default():
     variables = read("infra", "variables.tf")
     for name, default in (("enable_m365_channel", "false"), ("channel_gateway_audience", '""'),
                           ("channel_allowed_caller_app_ids", "[]"), ("channel_writer_source", '"allowlist"'),
-                          ("channel_writer_group_id", '""'), ("channel_allowed_ip_ranges", "[]")):
+                          ("channel_writer_group_id", '""'), ("channel_allowed_ip_ranges", "[]"),
+                          ("channel_resolve_display_names", "false")):
         block = re.search(rf'variable "{name}" \{{(.*?)\n\}}', variables, re.DOTALL)
         assert block and re.search(rf"default\s*=\s*{re.escape(default)}", block.group(1)), name
 

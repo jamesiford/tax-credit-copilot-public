@@ -397,3 +397,35 @@ run "debug_whoami_absent_when_not_asked_for" {
     error_message = "the diagnostic is not offered by default"
   }
 }
+
+# CH-15a: display-name resolution is off unless asked for; one variable adds one setting.
+run "display_name_resolution_is_off_by_default" {
+  command = apply
+  variables {
+    enable_m365_channel      = true
+    channel_gateway_audience = "api://00000000-0000-0000-0000-0000000000c1"
+    auth_mode                = "entra"
+    api_client_id            = "00000000-0000-0000-0000-0000000000a1"
+  }
+
+  assert {
+    condition     = !contains(keys(module.channel.settings), "CHANNEL_RESOLVE_DISPLAY_NAMES")
+    error_message = "the default plan adds no display-name setting"
+  }
+}
+
+run "one_variable_turns_display_name_resolution_on" {
+  command = apply
+  variables {
+    enable_m365_channel           = true
+    channel_gateway_audience      = "api://00000000-0000-0000-0000-0000000000c1"
+    auth_mode                     = "entra"
+    api_client_id                 = "00000000-0000-0000-0000-0000000000a1"
+    channel_resolve_display_names = true
+  }
+
+  assert {
+    condition     = lookup(module.channel.settings, "CHANNEL_RESOLVE_DISPLAY_NAMES", "") == "true"
+    error_message = "channel_resolve_display_names = true sets CHANNEL_RESOLVE_DISPLAY_NAMES"
+  }
+}
