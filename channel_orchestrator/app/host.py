@@ -10,13 +10,17 @@ hands the message to the turn pipeline.
 """
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
+import os
 import re
 import uuid
 from typing import Any
 
 from app.core.identity import ActingIdentity, Refusal, describe_signals, resolve_identity
+from app.core.modelprobe import run_modelprobe
+from app.core.netcheck import run_netcheck
 from app.wiring import Orchestrator
 
 log = logging.getLogger("tcc.orchestrator.host")
@@ -69,11 +73,25 @@ def whoami(orchestrator: Orchestrator, context: Any, identity: ActingIdentity | 
     }, indent=2)
 
 
+async def diagnostics(orchestrator: Orchestrator, command: str) -> str:
+    """`/netcheck` (where can this container connect) or `/modelprobe` (the sample's model call). Debug only."""
+    env = os.environ
+    if command == "/modelprobe":
+        return await run_modelprobe(env)
+    settings = orchestrator.settings
+    return await asyncio.get_running_loop().run_in_executor(None, lambda: run_netcheck(
+        env=env, project_endpoint=settings.ai.foundry_endpoint or "", gateway_url=settings.gateway_url,
+        providers=tuple(settings.ai.provider_chain)))
+
+
 async def answer(orchestrator: Orchestrator, context: Any, text: str) -> str:
     """The reply text for one request."""
     identity = who_is_asking(orchestrator, context)
-    if orchestrator.settings.debug_whoami and text.strip().lower() == "/whoami":
+    command = text.strip().lower() if orchestrator.settings.debug_whoami else ""
+    if command == "/whoami":
         return whoami(orchestrator, context, identity)
+    if command in ("/netcheck", "/modelprobe"):
+        return await diagnostics(orchestrator, command)
     if isinstance(identity, Refusal):
         log.warning("turn refused: %s", identity.reason)
     reply = await orchestrator.pipeline.handle(text, identity if isinstance(identity, ActingIdentity) else None)

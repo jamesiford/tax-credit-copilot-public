@@ -11,3 +11,6 @@ opentelemetry-api==1.45.1
 # The stable Responses-protocol host. `agent-framework-foundry-hosting` is a pre-release (beta) as
 # of 2026-11-02, so the thin handler in app/main.py uses this package directly (D-76).
 azure-ai-agentserver-responses==2.4.0
+
+# The documented hosted-agent model client (AIProjectClient.get_openai_client), used by /modelprobe and the foundry provider. [CH-14]
+azure-ai-projects==2.7.0

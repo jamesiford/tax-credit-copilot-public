@@ -82,3 +82,33 @@ def test_every_gateway_call_carries_the_acting_user_and_nothing_else_identifying
     (call,) = rig.gateway.calls
     assert call.headers["x-acting-user-oid"] == USER_OID and call.headers["x-channel"] == "teams"
     assert call.headers["x-conversation-id"] == "conv-1" and call.headers["authorization"] == "Bearer fake-token"
+
+
+# ---- CH-14: x-agent-user-id as an opt-in source, and a shape report that settles whether it can be one ----
+
+
+def test_the_agent_user_id_is_a_source_only_when_asked_for_and_only_when_it_is_an_object_id():
+    assert isinstance(resolve({"x-agent-user-id": USER_OID}), Refusal), "off by default"
+    who = resolve({"x-agent-user-id": USER_OID.upper()}, sources=("agent-user-id",))
+    assert isinstance(who, ActingIdentity) and who.oid == USER_OID and who.source == "agent-user-id"
+    assert who.tenant_id == TENANT.lower(), "no tenant came with it: the deployment's own is recorded"
+
+
+def test_an_opaque_agent_user_id_is_no_signal_so_the_next_source_still_answers():
+    who = resolve({"x-agent-user-id": "opaque-partition-key", "x-ms-user-identity": OTHER_OID}, sources=("agent-user-id", "platform"))
+    assert who.oid == OTHER_OID and who.source == "platform"
+    assert isinstance(resolve({"x-agent-user-id": "opaque"}, sources=("agent-user-id",)), Refusal)
+
+
+def test_the_shape_report_shows_an_object_id_and_hides_an_opaque_key():
+    guid = describe_signals({"x-agent-user-id": USER_OID, "x-client-acting-user-oid": USER_OID})["agent_user_id"]
+    assert guid == {"kind": "guid", "length": 36, "equals_an_oid_signal": True, "value": USER_OID}
+    opaque = describe_signals({"x-agent-user-id": "k" * 40})["agent_user_id"]
+    assert opaque == {"kind": "opaque", "length": 40, "equals_an_oid_signal": False}
+    assert describe_signals({})["agent_user_id"] is None
+
+
+def test_by_default_the_platforms_agent_user_id_is_a_source_after_the_two_platform_signals():
+    """Live (CH-14): for a caller's own token the platform's x-agent-user-id equalled that caller's object id."""
+    rig = build_rig([], env={})
+    assert rig.settings.identity_sources == ("original-subject", "platform", "agent-user-id")

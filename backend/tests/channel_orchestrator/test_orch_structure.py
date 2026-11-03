@@ -17,7 +17,7 @@ STDLIB = __import__("sys").stdlib_module_names
 
 #: Third-party packages the orchestrator may import, and the one module allowed each.
 THIRD_PARTY = {
-    "httpx": None, "jsonschema": None, "agent_framework": {"maf_agent.py"}, "azure": {"gateway_client.py", "main.py"},
+    "httpx": None, "jsonschema": None, "agent_framework": {"maf_agent.py"}, "azure": {"gateway_client.py", "main.py", "modelprobe.py"},
     "opentelemetry": {"telemetry.py"},
 }
 #: The repo layers it may import (all vendored, all standard-library-only or model-access adapters).

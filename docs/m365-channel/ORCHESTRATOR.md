@@ -197,7 +197,7 @@ that the closure stays inside the allowed layers, and that the copy runs without
 
 ## Open for the live sandbox (Prompt 6)
 
-1. Which identity signal a Teams and a Copilot Chat message actually carries, and whether it is the Entra
+1. Which identity signal a Teams and a Copilot Chat message actually carries (for a direct caller, `x-agent-user-id` is the object id), and whether it is the Entra
    object id (spike S3). Until then the default sources fail closed.
 2. Whether a hosted agent in a network-isolated project can reach the gateway and the model endpoint. **Per
    the Foundry documentation, unproven until spike S6** ([HARDENING-SPIKE](HARDENING-SPIKE.md)): the hosted-agent
@@ -209,3 +209,19 @@ that the closure stays inside the allowed layers, and that the copy runs without
    `(name not provided)`; the object id is still recorded).
 4. Whether `azd ai agent` accepts `channel_orchestrator/azure.yaml` as written, and the hosted-agent region
    for the sandbox.
+
+## Live findings (CH-14, 3 November 2026)
+
+- **Teams reaches the container through the Responses bridge.** `azure.yaml` declares `activity` on the **endpoint** only
+  (`agentEndpoint.protocols`), never under the container's `protocols:`: this container serves Responses, and a container that
+  declares `activity` is sent Teams messages at `/activity/messages` (a 404 here). Authorization schemes `Entra` and `BotServiceRbac`.
+  After every `azd deploy` or publish, `GET /agents/<name>` and check `definition.protocol_versions` is `responses` only ([D-100](DECISIONS.md)).
+- **The model is reached on `<account>.openai.azure.com`**, not the project's own host, which the hosted runtime cannot resolve ([D-101](DECISIONS.md)).
+  The agent's instance identity needs **Foundry User** and **Cognitive Services User** on the account.
+- **Diagnostics, with `CHANNEL_DEBUG_WHOAMI`:** `/whoami` (identity signals, and the *shape* of `x-agent-user-id`), `/netcheck` (name resolution, TCP, TLS and
+  an unauthenticated HTTP status for the project and account hosts, the gateway, the login host and a public control; names of environment variables, never a value
+  beyond a short allow-list) and `/modelprobe` (the model call exactly as Microsoft's `bring-your-own/responses/hello-world` sample makes it). None returns a token.
+- **Identity.** `x-agent-user-id` is a default source (`agent-user-id`), used only when it is a GUID; for a caller's own token it equalled the caller's object id.
+- **What a model needs to be handed.** Every `fact_paths` entry carries its exact `placeholder` (`{{facts.<path>|<format>}}`); without it a model dropped `facts.` and the
+  whole narration was withheld by the guard.
+- **A hosted orchestrator can use a customer gateway only if that gateway is reachable from the hosted runtime's network.** The mock is not (subnet-only), so the chain is `foundry`.

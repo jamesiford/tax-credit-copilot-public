@@ -34,11 +34,15 @@ services:
       CHANNEL_NAME: ${CHANNEL_NAME=teams}
       CHANNEL_DEBUG_WHOAMI: ${CHANNEL_DEBUG_WHOAMI=false}
       LOG_LEVEL: ${LOG_LEVEL=INFO}
-      CHANNEL_IDENTITY_SOURCES: ${CHANNEL_IDENTITY_SOURCES=original-subject,platform}
+      CHANNEL_IDENTITY_SOURCES: ${CHANNEL_IDENTITY_SOURCES=original-subject,platform,agent-user-id}
       FOUNDRY_MODEL: ${FOUNDRY_MODEL=gpt-4.1-mini}
       AI_PROVIDER_CHAIN: ${AI_PROVIDER_CHAIN=foundry}
     agentEndpoint:
+      # The endpoint (not the container) declares `activity`: with it only here the platform converts a Teams
+      # message to a Responses call for this Responses-only container. Declared on the container too, it posts
+      # Teams messages to /activity/messages, which this container does not serve (404). [CH-14, D-100]
       authorizationSchemes:
+        - type: Entra
         - type: BotServiceRbac
       protocols:
         - responses
@@ -53,8 +57,6 @@ services:
         memory: 1Gi
     protocols:
       - protocol: responses
-        version: 2.0.0
-      - protocol: activity
         version: 2.0.0
 infra:
   provider: microsoft.foundry

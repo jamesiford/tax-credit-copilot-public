@@ -23,6 +23,7 @@ from typing import Any
 from app.core.compose import compose_reply, facts_of
 from app.core.maf_agent import ModelTrace, build_agent
 from app.core.models import ModelChain
+from app.core.placeholders import with_placeholders
 from app.core.prompts import PLAN_JSON, PLANNER, narrator_instructions, tool_catalogue
 from app.core.tools import ToolRunner
 from application.ai.safety.untrusted import UntrustedText
@@ -100,6 +101,7 @@ class Planner:
             UntrustedText(runner.question, "reader question").fenced(), runner.tool_names, facts_of(runner.runs),
             notes=[w for run in runner.runs for w in run.envelope.get("warnings") or []],
         )
+        brief["fact_paths"] = with_placeholders(brief["fact_paths"])
         asked = [ChatMessage("system", text), ChatMessage("user", "JSON:\n" + json.dumps(brief))]
         turn = await self._chain.complete(asked, prefer=planned.trace.last.provider if planned.trace.last else None)
         planned.trace.turns.append(turn)

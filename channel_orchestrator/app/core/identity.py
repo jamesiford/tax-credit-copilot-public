@@ -95,7 +95,19 @@ def _from_original_subject(signals: Mapping[str, str]) -> tuple[str, str | None,
     return oid, _clean(signals.get("x-client-acting-user-name")), _clean(signals.get("x-ms-original-subject-tid"))
 
 
-_READERS = {"original-subject": _from_original_subject, "platform": _from_platform, "client-headers": _from_client_headers}
+def _from_agent_user_id(signals: Mapping[str, str]) -> tuple[str, str | None, str | None] | None:
+    """The platform's `x-agent-user-id`, used only when it IS an Entra object id.
+
+    Documented as a per-user partition key, not a credential, so it may be opaque: a value that is not a
+    GUID is no signal at all (the next source is tried), never a refusal. Opt-in: whether Teams sends the
+    object id here is what the live `/whoami` shape report settles. It names no tenant.
+    """
+    value = _clean(signals.get("x-agent-user-id"))
+    return (value, _clean(signals.get("x-client-acting-user-name")), None) if value and GUID.match(value) else None
+
+
+_READERS = {"original-subject": _from_original_subject, "platform": _from_platform, "client-headers": _from_client_headers,
+            "agent-user-id": _from_agent_user_id}
 
 
 def resolve_identity(
@@ -133,4 +145,21 @@ def describe_signals(signals: Mapping[str, str]) -> dict[str, object]:
     return {
         "present": [name for name in WATCHED if name in signals],
         "values": {name: signals[name] for name in shown if name in signals},
+        "agent_user_id": agent_user_id_shape(signals),
     }
+
+
+def agent_user_id_shape(signals: Mapping[str, str]) -> dict[str, object] | None:
+    """What `x-agent-user-id` looks like, without showing it unless it is an object id.
+
+    The question the live spike answers: is it the person's Entra object id (then `agent-user-id` can be a
+    source) or an opaque key (then it cannot)? `equals_an_oid_signal` compares it with the other oid signals.
+    """
+    value = _clean(signals.get("x-agent-user-id"))
+    if not value:
+        return None
+    oids = {signals[n].strip().lower() for n in ("x-ms-original-subject-oid", "x-ms-user-identity", "x-client-acting-user-oid") if signals.get(n)}
+    shape: dict[str, object] = {"kind": "guid" if GUID.match(value) else "opaque", "length": len(value), "equals_an_oid_signal": value.lower() in oids}
+    if shape["kind"] == "guid":
+        shape["value"] = value
+    return shape

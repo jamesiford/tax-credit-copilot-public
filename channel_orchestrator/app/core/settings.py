@@ -20,7 +20,7 @@ from application.ai.settings import AiSettings, load_ai_settings
 
 _GUID = re.compile(r"^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$")
 CHANNELS = ("teams", "m365-copilot")
-IDENTITY_SOURCES = ("original-subject", "platform", "client-headers")
+IDENTITY_SOURCES = ("original-subject", "platform", "client-headers", "agent-user-id")
 
 
 class OrchestratorConfigError(ValueError):
@@ -42,7 +42,7 @@ class OrchestratorSettings:
     request_timeout_seconds: float = 40.0
     turn_timeout_seconds: float = 90.0
     debug_whoami: bool = False
-    identity_sources: tuple[str, ...] = ("original-subject", "platform")
+    identity_sources: tuple[str, ...] = ("original-subject", "platform", "agent-user-id")
     agent_name: str = "tcc-channel-orchestrator"
     agent_version: str = "0"
 
@@ -72,7 +72,7 @@ def _flag(env: Mapping[str, str], name: str) -> bool:
 
 
 def _identity_sources(env: Mapping[str, str]) -> tuple[str, ...]:
-    chosen = tuple(p.strip().lower() for p in _text(env, "CHANNEL_IDENTITY_SOURCES", "original-subject,platform").split(",") if p.strip())
+    chosen = tuple(p.strip().lower() for p in _text(env, "CHANNEL_IDENTITY_SOURCES", "original-subject,platform,agent-user-id").split(",") if p.strip())
     unknown = [p for p in chosen if p not in IDENTITY_SOURCES]
     if unknown or not chosen:
         raise OrchestratorConfigError(f"CHANNEL_IDENTITY_SOURCES must list some of {IDENTITY_SOURCES}; got {unknown or 'nothing'}")

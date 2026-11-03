@@ -21,7 +21,7 @@ from jsonschema import Draft202012Validator
 from application.capabilities import catalog, registry
 from application.capabilities.envelope import ToolResult
 from application.capabilities.errors import (
-    Ambiguous, CapabilityError, ClientNotFound, InvalidArguments, NotCalculated, YearNotAuthored,
+    Ambiguous, CapabilityError, ClaimNotFound, ClientNotFound, InvalidArguments, NotCalculated, YearNotAuthored,
 )
 from application.confirmations import ConfirmationError
 from application.identity import NotAuthorized, Principal
@@ -59,6 +59,7 @@ class CapabilityFailure(Exception):
 _BY_TYPE: tuple[tuple[type, int, str], ...] = (
     (NotAuthorized, 403, "not_authorized"),
     (ClientNotFound, 404, "client_not_found"),
+    (ClaimNotFound, 404, "claim_not_found"),
     (NotCalculated, 409, "not_calculated"),
     (YearNotAuthored, 422, "year_not_authored"),
     (InvalidArguments, 422, "invalid_arguments"),

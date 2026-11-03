@@ -1192,7 +1192,7 @@ One short entry per decision: context, choice, why.
   setting the repo's own demo toggle provides; nothing new was added. It is documented in KNOWN-LIMITATIONS and must be
   closed (OPERATIONS.md, "Turning the demo posture off") before any real data.
 - **What it did not fix:** the agent's call to the account's model endpoint still fails at connect. The orchestrator
-  degrades by design to the engine's own answer without commentary. Left open as spike S6.
+  degrades by design to the engine's own answer without commentary. Left open as M-01 (resolved in D-101).
 
 ## D-99 CH-13: how the agent was deployed and published
 
@@ -1205,3 +1205,72 @@ One short entry per decision: context, choice, why.
   gateway (spike S3) and switched off again before publishing.
 - Files `azd ai agent` generates carry the bot id; they are gitignored and were removed from the one unmerged commit that
   first included them.
+
+## D-100 CH-14: the silent Teams chat: `activity` declared as a container protocol
+
+- **Symptom.** Teams showed `/whoami` as delivered and nothing came back, twice (13:05 and 13:34 PST). Bot Service
+  metrics showed HTTP 200 only, so Teams to Bot Service to the agent endpoint was accepted.
+- **Root cause, from the container's own log** (session of the 13:34 message, agent version 13): `POST /activity/messages` ...
+  `404`. `channel_orchestrator/azure.yaml` declared `activity` under the **container** `protocols:`, and the orchestrator
+  serves the Responses protocol only (`app/main.py`). A container that declares `activity` is sent Teams messages
+  as Activities at `/activity/messages`, which nothing serves. The sibling project that works in Teams found the same
+  thing ("declaring `activity` as a container protocol had made the platform post Teams messages to `/activity/messages`,
+  which nothing serves", its go-no-go Run 35) and rolled back to the **Responses bridge**: `activity` declared only on the
+  endpoint, where the platform converts an Activity into a Responses call for a Responses-only container.
+- **Fix.** `activity` removed from the container's `protocols:`; `agentEndpoint.protocols` stays `[responses, activity]`;
+  `agentEndpoint.authorizationSchemes` is `Entra` and `BotServiceRbac` (the working agent's pair; the spelling is azd's).
+  Verified by `GET /agents/<name>` after **every** deploy and after the re-publish (the evidence is
+  [evidence/model-access-2026-11-03.md](evidence/model-access-2026-11-03.md), "agent definition"): `definition.protocol_versions` is
+  `responses` only; `agent_endpoint.protocols` is `activity, responses`; `protocol_configuration.activity.enable_m365_public_endpoint`
+  is `true`; schemes `Entra, BotServiceRbac`. The agent was re-published at scope Shared; the package manifest is 1.0.2.
+- **What was not shown.** A direct Activity sent as the operator to the Activity Protocol URL was accepted (HTTP 202, version
+  resolved to the latest) but the hosted-agent session list does not show the session it created, so the request could not be
+  watched arriving. Web Chat is unavailable: the bot's public network access is `Disabled` (the publish script's setting). The
+  proof is therefore the next real Teams message: see "Retry in Teams" in DEMO-SCRIPT.
+
+## D-101 CH-14: M-01 (model access from the hosted agent): root cause and fix
+
+- **Naming.** Prompt 6 called this S6, which `HARDENING-SPIKE.md` already uses for the hardened-network spike. The live issue is **M-01**.
+- **Root cause.** `/netcheck` (new, gated by `CHANNEL_DEBUG_WHOAMI`) run in the container: `<account>.services.ai.azure.com` and
+  `<account>.cognitiveservices.azure.com` did not resolve ("Temporary failure in name resolution"), while `<account>.openai.azure.com`
+  resolved to a public address, accepted TCP and TLS and answered an unauthenticated request with 401. The documented sample's own call
+  (`AIProjectClient.get_openai_client().responses`, probed by `/modelprobe`) failed the same way, at the same DNS step, because it uses
+  the project's `services.ai.azure.com` host. It was never a firewall, a role or a timeout: from the workstation all three names resolve to
+  the same address. Why the hosted runtime's resolver refuses two of the account's names and not the third is not known (the account has
+  private endpoints and private DNS zones for all three); the fix does not depend on it.
+- **Fix.** The `foundry` provider's base is `https://<account>.openai.azure.com/openai` (v1 chat completions, Entra token for
+  `https://cognitiveservices.azure.com`). The same account, token and deployment. A non-public-cloud host keeps its own.
+  Connect timeout unchanged at 5 s: the failure was DNS, not slow connects.
+- **Roles** (each an Azure RBAC assignment inside `rg-tcc-poc-channel`, built-in, at the account): the agent's instance identity
+  holds **Foundry User** (granted in Prompt 6, inherited by the project) and now also **Cognitive Services User**
+  (`a97b65f3-24c7-4388-baec-2e87135dc908`), which the working sibling agent's publish script grants as well. The identity is read from
+  `GET /agents/<name>` `instance_identity`; it did not change across the versions deployed here.
+- **Two more findings once the model answered.** (1) The model wrote `{{book_rank.clients.0.identified_usd|money}}`, dropping the `facts.`
+  the narrator prompt requires; the composer rightly refused it and withheld the narration (live audit: `rejected_by_guard`, "5 figure(s)
+  not in the tool facts": the digits of the unresolved path). Every `fact_paths` entry the model is shown now carries the exact `placeholder`
+  (`app/core/placeholders.py`); the composer, the guard and the platform's narrator prompt are untouched. (2) The model chose `book_rank` for a
+  one-client question and the engine's figures for the *first ranked client* were narrated as the asked-about client's: figures exact, attribution
+  wrong, which no value-matching guard can see. The planner prompt now says when to use the client's tools and when the whole book.
+- **Mock gateway in the chain.** The orchestrator's chain is `foundry` only and must stay so: the mock admits only the integration subnet,
+  which the hosted runtime is not in. Stated plainly in `AI-GATEWAY.md` and `ORCHESTRATOR.md`: the hosted orchestrator can use a customer gateway only
+  if that gateway is reachable from the hosted runtime's network.
+- **A test rule changed, narrowly:** `test_orch_structure.py` allows `modelprobe.py` to import `azure` (it lazy-imports the project client); `azure-ai-projects` is
+  pinned in the orchestrator's requirements at the backend's version and `test_orch_requirements.py` keeps the two in step.
+
+## D-102 CH-14: `x-agent-user-id` is a default identity source
+
+- **Evidence.** The same sibling project found that under `BotServiceRbac` the platform refuses an activity without a tenant and a caller object
+  id and names the person with `x-agent-user-id`, not the activity's `aadObjectId`. Documented as "a per-user partition key, not a credential",
+  so it can be opaque. `/whoami` now reports its *shape* (a GUID, or opaque with a length, and whether it equals another oid signal) and shows it only
+  when it is a GUID. Live, for the operator's own call: **GUID, 36 characters, equal to the operator's object id**, with no client headers sent.
+- **Choice.** `agent-user-id` joins the default `CHANNEL_IDENTITY_SOURCES` (`original-subject,platform,agent-user-id`), last, and only a GUID counts: an opaque
+  value is no signal and the next source is tried, never a refusal. It names no tenant, so the deployment's own is recorded; assurance stays
+  `channel-asserted`. A direct, authenticated caller now resolves as themselves. What a *Teams* message carries is still to be confirmed by `/whoami` in Teams.
+
+## D-103 CH-14: the live checks use the mock's fixed test credentials, supplied at command time
+
+- The brief says secret-based gateway modes use Key Vault references only. No real secret exists here: the mock's `api_key` and `oauth`
+  credentials are fixed, documented, non-secret test strings. They were given only in the environment of the command that ran the check
+  (never in an app setting, a file or the repository), so the Key Vault toggle was not enabled. Entra mode needs a real token; the operator's own,
+  short-lived, was written to a temporary folder for the run and deleted after. Flipping the mock's `MOCK_AUTH` is a Terraform-managed app setting:
+  it was set back to `entra` at the end and the plan re-checked.

@@ -9,9 +9,9 @@
 useDefault = true
 
 [[allowlists]]
-description = "record_token fixtures in frontend tests are opaque row handles, not credentials"
+description = "record_token fixtures in frontend tests and the live egress check are made-up opaque row handles, not credentials"
 condition = "AND"
-paths = ['''^frontend/src/.*\.test\.jsx?$''']
+paths = ['''^frontend/src/.*\.test\.jsx?$''', '''^scripts/live-ai-checks\.py$''']
 regexTarget = "line"
 regexes = ['''(?i)record_?token''']
 

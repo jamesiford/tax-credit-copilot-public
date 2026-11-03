@@ -53,9 +53,11 @@ foreach ($required in 'WAREHOUSE_SERVER', 'WAREHOUSE_DATABASE') {
 }
 
 $env:CHANNEL_STORE = 'warehouse'
-$since = $Since.ToUniversalTime().ToString('o')
-Write-Host "== Audit rows for $UserOid since $since" -ForegroundColor Cyan
-& $python (Join-Path $PSScriptRoot 'channel-audit.py') --user $UserOid --since $since --detail
+# Not `$since`: PowerShell variable names are case-insensitive, so that would assign to the [datetime]
+# parameter $Since above and turn the ISO text back into a culture-formatted date channel-audit.py rejects. [CH-14]
+$sinceIso = $Since.ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ')
+Write-Host "== Audit rows for $UserOid since $sinceIso" -ForegroundColor Cyan
+& $python (Join-Path $PSScriptRoot 'channel-audit.py') --user $UserOid --since $sinceIso --detail
 if ($LASTEXITCODE -ne 0) { throw "channel-audit.py exited $LASTEXITCODE" }
 
 if ($GatewayBaseUrl -and $GatewayAudience) {

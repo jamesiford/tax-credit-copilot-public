@@ -19,7 +19,7 @@ def pins(path: Path) -> dict[str, str]:
 
 def test_every_shared_dependency_is_pinned_to_the_version_the_platform_runs():
     ours, theirs = pins(ORCHESTRATOR / "requirements.txt"), pins(ROOT / "backend" / "requirements.txt")
-    shared = {"azure-identity", "httpx", "jsonschema"}
+    shared = {"azure-identity", "httpx", "jsonschema", "azure-ai-projects"}
     assert shared <= set(ours)
     for name in shared:
         assert ours[name] == theirs[name], f"{name}: orchestrator {ours[name]} vs backend {theirs[name]}"

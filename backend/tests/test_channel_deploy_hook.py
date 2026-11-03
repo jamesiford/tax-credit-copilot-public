@@ -48,7 +48,9 @@ def shim(tmp_path):
 
 def run(shim, *args, **env):
     environment = {**os.environ, "PATH": f"{shim.dir}{os.pathsep}{os.environ['PATH']}",
-                   "CHANNEL_APP_NAME": "", "AZURE_RESOURCE_GROUP": "", "TCC_ENABLE_M365_CHANNEL": "", **env}
+                   "CHANNEL_APP_NAME": "", "AZURE_RESOURCE_GROUP": "", "TCC_ENABLE_M365_CHANNEL": "",
+                   # These tests are about packaging and the deploy call; the health wait has its own file (CH-14).
+                   "TCC_CHANNEL_HEALTH_CHECK": "off", **env}
     return subprocess.run(
         [PWSH, "-NoProfile", "-NonInteractive", "-File", str(SCRIPT), *args],
         capture_output=True, text=True, env=environment, timeout=180,

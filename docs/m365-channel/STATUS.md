@@ -38,6 +38,7 @@ ran on `jamesiford-m365-channel-live-deploy`, fast-forwarded to the tip of `feat
 | CH-12 | Documentation, ADR-009, runbook, demo script | done | `wp/CH-12-documentation` | merge `b470494` |
 | CH-12b | Demo network posture toggle and hardening plan | done | `wp/CH-12b-demo-posture` | merge `0bda7b9` |
 | CH-13 | Live deployment, spikes, smoke tests and hand-off (Prompt 6) | done with open items (see Blockers) | `wp/CH-13-live-deploy` | merge `fec797d` |
+| CH-14 | Hosted-agent model access (M-01), the silent Teams chat, claim_not_found, deploy health wait, live AI checks (Prompt 7) | done with open items (Teams proof is the owner's; see Blockers) | `wp/CH-14-model-access` | merge `PENDING` |
 
 ## Evidence
 
@@ -288,14 +289,14 @@ and its `discovery` / `multi_state` scans read the configured default tenant.
 | S3 | Can the hosted agent reach the gateway, and by which rule? | **Answered**: yes; authorised by the `Channel.Invoke` role; egress is the public internet. A direct call carries no identity (nothing runs), and `x-ms-user-identity` is refused unless delegation is authorised |
 | S4 | Does `azd ai agent` accept the orchestrator project? | **Answered**: after the schema fix (D-99), and it creates the Bot resource too |
 | S5 | Cowork end to end | **Needs a person** (OAuth client registration, install, W1 and W2) |
-| S6 | Can the hosted agent reach the Foundry model endpoint? | **Answered: no** (connect fails); the orchestrator degrades to engine-only answers. The firewall also had to be opened (D-98) |
+| M-01 | Can the hosted agent reach the Foundry model endpoint? (named S6 in Prompt 6; S6 is the hardening spike) | **Fixed in CH-14**: DNS, not a firewall; see D-101 |
 
 ### CH-13 merge
 
 Merged `--no-ff` into the session integration branch `jamesiford-m365-channel-live-deploy` as `fec797d`; `feat/m365-channel` itself is left for the owner to fast-forward.
 
 1. **Spikes S1, S2 and S5 need people.** Nothing can send a Teams message or sign into Cowork. The manual checklist is the appendix of [DEMO-SCRIPT](DEMO-SCRIPT.md); `scripts/channel-smoke.ps1 -Since <time>` prints what the platform received.
-2. **The hosted agent cannot reach the Foundry model endpoint** (spike S6, open). Replies are the engine's own, without commentary. See KNOWN-LIMITATIONS, "Found in the live sandbox".
+2. **M-01 (model access) is fixed**; the silent Teams chat (container-level `activity`) is fixed (D-100). Both are verified only up to the agent definition and a direct call; the Teams proof is the owner's retry (DEMO-SCRIPT, "Retry in Teams").
 3. **A group-only writer is refused by the API** until its Graph token cache turns over (about a day after 3 Nov 2026); the operator is on the allow-list as well. Not an admin action: every role this prompt allowed was granted.
 4. **The live external model gateway test is pending the customer's real endpoint.** The mock was deployed and checked from inside the network; the API's narration through it, the forced fallbacks in both orders, the `api_key` and `oauth_client_credentials` modes, and the spans in Application Insights were **not** exercised live (the API is reachable only through the signed-in portal). See CH-13 evidence.
 5. `finding_resolve` was not exercised live (no open finding exists); the 429 rate limit was not reachable live (proven offline).

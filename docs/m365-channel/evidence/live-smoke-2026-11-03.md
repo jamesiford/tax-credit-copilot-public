@@ -97,8 +97,29 @@ RESULT  1 passed, 0 failed, 1 checks  (smoke id c5f31680, 2026-11-03)
 Since the first smoke call, for the operator: 659 events with a `smoke-` correlation id, every one
 `channel=cowork`, `identity_assurance=delegated`; 330 distinct correlation ids; 8 `end/refused` rows, all
 "this user is not entitled to make changes" (the non-writer run and the group-only attempts); 1 `end/error` (a
-claim transition on a year that has no claim cell, which returns a 500 `internal_error` instead of a 409: a defect found, recorded
-in KNOWN-LIMITATIONS, not fixed here). Longest `request_summary` is 98 characters and none contains a wage, an hour
+claim transition on a year that has no claim cell, which returns a 500 `internal_error` instead of a 409: a defect found here and closed in CH-14b: it is now a typed 404 claim_not_found). Longest `request_summary` is 98 characters and none contains a wage, an hour
 count, an employee identifier or an email address. The engagement and claim rows the writes made are in the
 Warehouse, labelled "live smoke <id>" (engagement history is append-only; the claim cell was restored to its original
 status, its history rows remain).
+## Run 4: live AI provider-chain checks (CH-14b, 3 November 2026)
+
+Run through the API app's Kudu command API, which reaches the subnet-only mock gateway, using the real
+`get_narration_service()` chain (`scripts/live-ai-checks.py`). Kudu has no managed identity, so short-lived operator
+tokens were staged in a temporary folder and deleted afterwards.
+
+| Check | Result |
+| --- | --- |
+| Gateway, `api_key` auth, streamed | PASS |
+| Gateway, `oauth_client_credentials` auth | PASS (first run failed: the mock lacked `python-multipart`; requirements file added, mock redeployed) |
+| Gateway, `entra_token` auth (token shape only on the mock) | PASS, 1 call, streamed |
+| Queued 429 with `Retry-After: 2` | PASS, honoured (2 calls, 2.6 s) |
+| Chain `foundry,gateway`, foundry deployment wrong | PASS, hopped to the gateway |
+| Egress: prompt with a `record_token` field and a 24-hex token | refused by the gateway; every provider unavailable (`NarrationUnavailable`), nothing leaked |
+| Chain `gateway,foundry`, gateway queued 503 | gateway failed, chain tried the next provider, then `NarrationUnavailable` because foundry cannot authenticate from Kudu |
+| Foundry from Kudu | NOT EXERCISED: no managed identity there. Foundry is proven live from the hosted agent (model-access evidence) |
+| Per-user 429 rate limit | NOT REACHABLE live: one gateway worker handles about 1.5 calls per second. Proven offline only |
+| `finding_resolve` / `finding_reopen` | NOT EXERCISED: no open finding existed on the synthetic clients |
+| Application Insights GenAI spans and narration metrics | NOT OBSERVED: 1 day of telemetry holds traces, dependencies, requests and platform metrics, and no `gen_ai` dimension at all. The hosted agent logs `appinsights_configured=False` and the Kudu runs have no identity |
+
+After the runs the mock gateway was set back to `MOCK_AUTH=entra` and `azd provision --preview` reported
+"No changes". The temporary token folder was deleted.

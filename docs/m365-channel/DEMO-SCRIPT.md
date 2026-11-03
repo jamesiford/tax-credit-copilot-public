@@ -248,14 +248,37 @@ Copilot, because nothing can send a message on a person's behalf.
    If the share link does not open the agent, sideload the package azd generated (`channel_orchestrator/appPackage.zip`
    on the deploying machine, ignored by git): Teams, Apps, Manage your apps, Upload a custom app.
 2. **Copilot Chat.** Find the agent under *Your agents*; run the three demo prompts (book, client brief, what-if).
-   Compare the figures with the portal. Replies carry no model commentary in this sandbox: see the limitation about
-   the hosted agent's model path; the figures and the disclaimer are the engine's.
+   Compare the figures with the portal. A reply has one or two sentences of model commentary above the engine's tables (M-01 is fixed); the figures, tables and disclaimer are the engine's.
 3. **Write flow.** "Move `<client>` TY`<year>` to proposed", read the preview, reply `confirm`. Check the row in the portal
    and the preview and commit pair in the audit. Try the same as a non-writer account if you have one.
 4. **Guard.** Run `/whoami` after a few turns and confirm narration-audit rows exist when a model took part (it does not
-   in this sandbox, so expect none). There is no flag that forces a bad narration; skip the blocks-only check.
+   in the sandbox it does, so expect a 
+arrate row per turn). There is no flag that forces a bad narration; skip the blocks-only check.
 5. **Cowork (S5).** Register the OAuth client in the Teams Developer Portal for the gateway scope
    ([COWORK-SETUP](COWORK-SETUP.md)), put its registration id in `overlays/<name>/cowork.config.json`, rebuild with
    `python scripts/build-cowork-plugin.py --config overlays/<name>/cowork.config.json --strict`, install through
    *Shared with me*, run W1 and W2, then show the per-user audit.
 6. Report back anything that differs from these documents.
+
+### Retry in Teams (after the CH-14 fix), exactly
+
+The earlier silence was a deployment fault, not Teams: see [D-100](DECISIONS.md). Do this, in order:
+
+1. Use **Teams on the web in an InPrivate window**. Open the app from *Your agents* (or the share link). If you installed **either** app package by sideloading, remove it first and
+   keep exactly **one** install: the publish package (`publish-appPackage-v1.0.2.zip`) and azd's sideload package share one app id and one bot id.
+2. If the agent still shows as delivered with no reply, re-upload the package as a **new version** (the publish package is manifest 1.0.2; the next publish is 1.0.3) as an admin
+   (Teams admin center, Manage apps, Upload new app), check the app's status is **Allowed**, then refresh the client.
+3. Send `/whoami`. Expect JSON with `identity.resolved: true`, your object id, a source (`original-subject`, `platform` or `agent-user-id`), and under
+   `signals.agent_user_id` its `kind` (`guid`) and `equals_an_oid_signal`. Paste it into the private notes.
+4. Send `Which of our clients is closest to a threshold and what should I say if I call them?`. Expect a sentence or two, then the ranked table and the disclaimer.
+5. Run `pwsh scripts/channel-smoke.ps1 -Since '<UTC time just before you typed>'`; the audit rows must show `channel=teams`, `identity_assurance=channel-asserted`, your id and
+   a `narrate` row with `guard=pass`.
+
+### Troubleshooting: the agent does not answer
+
+| What you see | What it means | What to do |
+| --- | --- | --- |
+| Delivered, no reply; Bot Service shows only 200 | The platform could not hand the message to the container. Seen once: `activity` declared as a container protocol, so Teams messages went to `/activity/messages` (404) | `pwsh` the agent definition (`GET /agents/<name>`): `definition.protocol_versions` must be `responses` only, `agent_endpoint.protocols` `activity, responses`, schemes `Entra, BotServiceRbac`. Then `azd ai agent monitor <name> --session-id <id> --type console` and look for `POST /activity/messages ... 404` |
+| "I can't tell who you are" | No identity signal carried an object id | `/whoami`: read `signals` and `agent_user_id`; see ORCHESTRATOR.md, Identity |
+| A reply with tables but "the language model is unavailable" | The model call failed (it was M-01) | `/netcheck` then `/modelprobe`: a name that does not resolve is the DNS finding in D-101 |
+| "You cannot send messages to this bot", or delivered but nothing reaches it | Teams-side install state | Re-upload as a new version, refresh, check Allowed in the admin center ([KNOWN-LIMITATIONS](KNOWN-LIMITATIONS.md)) |
