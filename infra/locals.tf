@@ -29,8 +29,11 @@ locals {
   subscription_id = trimspace(var.subscription_id) == "" ? null : trimspace(var.subscription_id)
   tenant_id       = trimspace(var.tenant_id) != "" ? trimspace(var.tenant_id) : data.azurerm_client_config.current.tenant_id
 
-  auth_mode            = var.auth_mode != null ? var.auth_mode : local.d.auth_mode
-  easy_auth            = local.auth_mode == "entra" ? local.d.easy_auth || var.profile == "enterprise" : false
+  auth_mode = var.auth_mode != null ? var.auth_mode : local.d.auth_mode
+  # The public profile with auth_mode = entra (the channel needs the API to validate tokens)
+  # puts Easy Auth on the web app when a web registration is supplied; without it the BFF
+  # would forward no token and every portal call would be a 401. [D-CH13-1]
+  easy_auth            = local.auth_mode == "entra" ? local.d.easy_auth || var.profile == "enterprise" || trimspace(var.web_client_id) != "" : false
   data_classification  = var.data_classification != null ? var.data_classification : local.d.data_classification
   create_fabric        = var.create_fabric != null ? var.create_fabric : local.d.create_fabric
   manage_fabric_access = var.manage_fabric_access != null ? var.manage_fabric_access : local.d.manage_fabric_access
