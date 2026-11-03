@@ -456,7 +456,23 @@ and not a button; an unreached one is dimmed text with a hint and is **never** a
 disabled button. At the book it collapses to one quiet line. Pages take
 `showTrail` (default true, so a page rendered alone keeps its `Breadcrumb`); the
 shell passes `false` so there is one trail, not two. The claim-package button
-sits on the client tabs row.
+sits on the client's review row, beside the stepper.
+
+**The client page is a review flow, not a tab row.** `ClientHeader` is a back
+link, the client as the page's one `h1`, a `MetaLine` of values the page already
+holds (client, tax year, method, run, rule pack), and a `Stepper` of router links
+across the client's views: Position, Eligibility, Trend, At risk, What-if,
+Evidence (`lib/clientFlow.js`). `current` is derived from the ROUTE; the stepper
+never gates content; a step with nothing to show is disabled WITH its reason on
+screen; **a step with no view behind it (Discovery) is omitted, not stubbed.**
+The sections are named regions, not tabpanels, because nothing is a tab.
+
+**The book is a dashboard of cards.** The book itself is one full-width `Card`
+whose tabs are "All clients" then one per priority band that has anyone in it;
+every tab carries its count from the UNFILTERED rows and writes the same `band:`
+term the column header writes. The footprint map and a `KpiRow` of band counts
+sit beneath in a two-column grid. Tiles show client counts only: money is summed
+by the warehouse, never re-summed in the browser.
 
 **`/` opens on a hero and four task cards, then the book.** The hero greets by
 first name when somebody is signed in (`lib/identity.js`, from `/api/me`) and
@@ -1177,10 +1193,11 @@ for a client whose Gold holds only TY2023. 964 rows had accumulated. Stub
   Tailwind preflight makes every `<svg>` a block, which is why
   `svg.lucide` and `:where(button, a, summary):has(> svg)` are inline in
   `index.css`); (2) a chip, pill or button label never wraps (`nowrap`);
-  (3) no coloured stripe unless it is a verdict (`.prog-verdict`, `.finding`);
+  (3) no coloured stripe unless it is a verdict (`.prog-verdict`, or a
+  `VerdictCard`, whose border carries the reading);
   (4) titles are sentence case at 600 weight, not 800-weight uppercase;
   (5) a page's one primary action shares a row with its tabs or title (the
-  claim button is on the client tabs row), not a row of its own; (6) text blocks
+  claim button is on the client's stepper row), not a row of its own; (6) text blocks
   stop at ~80ch. The modern page skin is `src/styles/chrome-modern.css`, scoped
   to `html[data-theme="modern"]` so classic is untouched; the shell (top bar,
   navigation, drill trail) is `src/components/shell/shell.css`, theme-neutral
@@ -1221,19 +1238,33 @@ for a client whose Gold holds only TY2023. 964 rows had accumulated. Stub
 - **Compose the shared components; do not hand-roll their job.** The set is
   `src/components/ui/` (`Button`, `Card`, `Pill`, `CountBadge`, `Tabs`,
   `KpiTile`/`KpiRow`, `Callout`, `Stepper`, `TaskCard`, `HeroBand`,
-  `MetaLine`, `SectionHeading`, `FloatingAction`, `EmptyState`, `Skeleton`),
-  and there is ONE of each: `PageHeader` owns eyebrow/title/sub/meta/actions,
+  `MetaLine`, `SectionHeading`, `FloatingAction`, `EmptyState`, `Skeleton`,
+  `VerdictCard`),
+  and there is ONE of each: `PageHeader` owns eyebrow/title/sub/meta/actions
+  (and the back link and `compact` row the client review uses),
   `KpiTile` + `KpiRow` the figure strip (they replaced `StatCard`/`StatRow` and
   three hand-rolled `kpi-card` markups), `Tabs` every tab (`MethodTabs`,
   `GridTabs` and `SectionTabs` are wrappers), `Breadcrumb` the trail,
   `InsightBar` the page-opening caption, notes and Copilot summary,
-  `ColumnFilter` + `FilterBar` the per-column narrowing. The legacy `.pill-*`
+  `ColumnFilter` + `FilterBar` the per-column narrowing, `TrailSteps` the
+  calculation trail. The legacy `.pill-*`
   classes still exist and migrate to `Pill` with the page work. A second
   `PageHeader` once lived in `ReferenceViews.jsx` with a different prop name and
   different classes, and eight call sites used it — two header treatments kept
   in step by hand. If a shared component genuinely cannot express what a view
   needs, say so and leave the duplicate: an abstraction bent to fit is worse
   than an honest one.
+- **A verdict is a `VerdictCard`, and it never invents its derivation.** Where
+  the product states a verdict per programme, year or finding, the card's border
+  carries the reading from `--state-*`, a pill row repeats it in words and a
+  glyph, and an inset `Callout` holds the derivation sentence the page already
+  has; with none, the callout is omitted. A verdict is never the selection blue
+  (`check_brand.py` asserts it over the rendered book). A finding that needs a
+  decision is amber, not red: nothing has failed.
+- **An empty, loading or error state says what is missing and what to do.**
+  `Skeleton` for a read in flight, `EmptyState` (an `h3` title, then the action)
+  for an absence or a failure; an error says nothing was changed. "Not
+  calculated" is a statement and never a zero.
 - **Two peer grids over one scope are TABS, and the tab carries its count.**
   `GridTabs` and `MethodTabs` are both `ui/Tabs` on purpose — a third tab style
   makes "which of these is a tab" something a reader works out. Both take the

@@ -11,10 +11,10 @@ afterEach(() => {
 describe('the style guide', () => {
   it('shows every base component', () => {
     render(<Styleguide />);
-    for (const name of ['Button', 'Pill', 'CountBadge', 'Tabs', 'KpiTile', 'Card', 'Callout', 'Stepper', 'TaskCard']) {
+    for (const name of ['Button', 'Pill', 'CountBadge', 'Tabs', 'KpiTile', 'Card', 'Callout', 'Stepper', 'TaskCard', 'VerdictCard', 'TrailSteps']) {
       expect(screen.getByRole('heading', { name, level: 2 })).toBeInTheDocument();
     }
-    expect(screen.getByRole('navigation', { name: 'Client review' })).toBeInTheDocument();
+    expect(screen.getAllByRole('navigation', { name: 'Client review' }).length).toBeGreaterThan(0);
   });
 
   it('switches the theme and remembers the choice', async () => {

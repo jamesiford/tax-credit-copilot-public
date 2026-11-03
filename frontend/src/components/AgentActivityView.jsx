@@ -177,8 +177,8 @@ export default function AgentActivityView({ scope, scopeOptions }) {
     <Header />
 
     {error && (
-      <EmptyState title="Findings could not be read" icon={<Flag size={20} />}>
-        {error}. Nothing was changed; reload the page to try again.
+      <EmptyState title="Findings are unavailable" icon={<Flag size={20} />}>
+        {error}<br />Nothing was changed; reload the page to try again.
       </EmptyState>
     )}
     {loading && !data && <Skeleton lines={3} label="Looking for findings" />}

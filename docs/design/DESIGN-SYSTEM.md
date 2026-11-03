@@ -138,7 +138,14 @@ what it must never do. Import from `components/ui/index.js`.
 | `MetaLine` | `Label: value · Label: value` as a `<dl>`. `PageHeader` has a `meta` slot for it. | Render a pair with no value. |
 | `SectionHeading` | `Title (count)`. | |
 | `FloatingAction` | A fixed bottom-right pill. | Cover the primary action area (`FLOATING_CLEARANCE_CLASS`). |
-| `EmptyState`, `Skeleton` | The sanctioned empty and loading treatments. | Say "no data" without saying why. |
+| `EmptyState`, `Skeleton` | The sanctioned empty and loading treatments. `EmptyState`'s title is an `h3`; its body says what to do. | Say "no data" without saying why. |
+| `VerdictCard` | Where a verdict is stated per programme, year or finding: border = the reading, pill row, title, inset `Callout` for the derivation, body, `Details →`. | Invent a verdict or a derivation sentence. |
+
+`Card` takes `flush` (no body padding, for a dense grid) and a verdict `tone`
+(`above-min`, `below-min`, `partial`, `base-year`), which colours the border from
+`--state-*`. `Stepper` steps take `to` (a router link) and a `reason` when
+disabled. Page-level pieces built from these live beside the views:
+`ClientHeader`, `FootprintPanel`, `TrailSteps`.
 
 `StatCard`/`StatRow` and three hand-rolled `kpi-card` markups were replaced by
 `KpiTile`/`KpiRow`. The legacy `.pill-*` classes in `index.css` remain in use
@@ -160,6 +167,44 @@ bar, the drill trail at each level, hero and task cards).
 
 `shell.css` reads roles only, so both themes share the structure, and it is held
 to the token gate (`check_tokens.py`).
+
+## Page patterns
+
+Four compositions, each built from the `ui/` components and the tokens above.
+Nothing here adds a colour, a size or a spacing step.
+
+**Dashboard card grid** (`PortfolioPage`). The page's product is full width:
+the book is one `Card` (`flush`, so the grid runs edge to edge) with a `Tabs`
+row in its header slot. Beneath it, a two-column grid from 1280px (one column
+below) of supporting cards: the footprint map and a `KpiRow` of tiles. Tabs carry
+a count taken from the unfiltered rows and write the same filter grammar the
+column header writes. A tile's tint is a `--state-*` reading (`lib/bookCards.js`),
+never a topic colour. Money is not summed in the browser, so tiles show counts.
+
+**Review header and stepper** (`ClientHeader`, `lib/clientFlow.js`). A back link,
+the client as the page's one `h1`, and a `MetaLine` (client, tax year, method,
+run, rule pack) on a single compact row via `PageHeader compact`; below it a
+`Stepper` of links across the client's views. The stepper is route-driven and
+never gates content: the current step comes from the URL, an unavailable step is
+disabled with its reason on screen and announced, and a view with no place to go
+(Discovery) is omitted, not stubbed.
+
+**Verdict card** (`ui/VerdictCard`). Border = the reading (`--state-*`); a pill
+row (what it is about, then the verdict with a glyph so colour is never the only
+signal); the title; an inset `Callout` for the derivation sentence, omitted when
+the caller has none; a body; `Details →`. A verdict is never the selection blue,
+and `check_brand.py` asserts that over the rendered book.
+
+**Data grid.** Header filled `--surface-subtle`, hairline row dividers
+`--border-subtle`, the name column `--text-link`, figures navy and tabular, hover
+tint, and an open or selected row in the selection language (`--select-bg`, a
+`--select` bar on its first cell). 28px rows, 12px text and 8px cell padding are
+the data register and do not change. Verdict cells use `Pill`. Sorting and
+filtering are behaviour and keep their grammar.
+
+**Calculation trail** (`TrailSteps`). A numbered list of cards; engine output is
+verbatim JSON in the data register at 12px or more; a hash chip ties a step to
+its source and configuration.
 
 ## Accessibility
 

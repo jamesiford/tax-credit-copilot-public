@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Check, Loader2, MapPin, Plus } from 'lucide-react';
+import { Check, MapPin, Plus } from 'lucide-react';
 import { fetchClientUnit, isCalculated } from '../api.js';
 import { MONTH_LABELS, fmtHeadcount } from '../lib/trendGrid.js';
 import { MAX_STACK, stackEntry } from '../lib/whatIf.js';
@@ -11,6 +11,8 @@ import { NUMERIC, TEXT, formatFilters, parseFilters } from '../lib/gridFilter.js
 import Breadcrumb from '../components/Breadcrumb.jsx';
 import PageHeader from '../components/PageHeader.jsx';
 import KpiTile, { KpiRow } from '../components/ui/KpiTile.jsx';
+import EmptyState from '../components/ui/EmptyState.jsx';
+import Skeleton from '../components/ui/Skeleton.jsx';
 import InsightBar, { provenanceLine } from '../components/InsightBar.jsx';
 import MethodTabs from '../components/MethodTabs.jsx';
 import GridTabs, { GridTabPanel } from '../components/GridTabs.jsx';
@@ -255,19 +257,18 @@ export default function UnitPage({
         )}
       />
 
-      {loading && !payload ? (
-        <div className="panel trend-loading"><Loader2 size={16} className="spin" /> Reading the warehouse…</div>
+      {loading && !payload ? <Skeleton lines={4} label="Reading the warehouse…" /> : null}
+      {error ? (
+        <EmptyState title="This location is unavailable">
+          {error}<br />Nothing was calculated or changed; reload the page to try again.
+        </EmptyState>
       ) : null}
-      {error ? <div className="callout warn">{error}</div> : null}
 
       {payload && !calculated ? (
-        <div className="panel">
-          <h2 className="panel-title">Awaiting the next run</h2>
-          <p className="page-sub">
-            {payload.message
-              || 'This year has not been assessed yet. It carries no figure — not a zero.'}
-          </p>
-        </div>
+        <EmptyState title="Awaiting the next run">
+          {payload.message
+            || 'This year has not been assessed yet. It carries no figure — not a zero.'}
+        </EmptyState>
       ) : null}
 
       {calculated ? (

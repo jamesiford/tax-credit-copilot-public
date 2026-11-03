@@ -1,5 +1,5 @@
 .ui-callout {
-  padding: var(--space-10) var(--space-12);
+  padding: var(--space-6) var(--space-8);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-sm);
   background: var(--surface-card);

@@ -12,6 +12,8 @@ import { NUM } from '../lib/reference.js';
 import { trendFromGold } from '../lib/goldTrend.js';
 import InsightBar, { provenanceLine } from './InsightBar.jsx';
 import MethodTabs from './MethodTabs.jsx';
+import EmptyState from './ui/EmptyState.jsx';
+import Skeleton from './ui/Skeleton.jsx';
 import { filterBlocks, formatSort, parseSort, sortRows, toggleSort } from '../lib/gridSort.js';
 import { isWhatIfTarget, whatIfLink } from '../lib/whatIf.js';
 import {
@@ -791,10 +793,12 @@ export default function TrendGridView({
         </div>
       </div>
 
-      {loading && !payload ? (
-        <div className="panel trend-loading"><Loader2 size={16} className="spin" /> Reading the warehouse…</div>
+      {loading && !payload ? <Skeleton lines={4} label="Reading the warehouse…" /> : null}
+      {error ? (
+        <EmptyState title="This client's locations are unavailable">
+          {error}<br />Nothing was calculated or changed; reload the page to try again.
+        </EmptyState>
       ) : null}
-      {error ? <div className="callout warn">{error}</div> : null}
 
       {/* Never $0 and never a bare empty grid: "the pipeline has not reached
           this yet" and "we looked and the answer is nothing" are different

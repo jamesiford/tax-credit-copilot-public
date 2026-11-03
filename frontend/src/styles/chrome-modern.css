@@ -46,8 +46,7 @@ html[data-theme="modern"] .ui-kpi {
 }
 
 /* ---- Page header: one rhythm ------------------------------------------ */
-html[data-theme="modern"] .tcc-header,
-html[data-theme="modern"] .tcc-page-header {
+html[data-theme="modern"] .tcc-header {
   margin-bottom: var(--space-8);
 }
 
@@ -64,8 +63,7 @@ html[data-theme="modern"] .page-title {
   color: var(--text-primary);
 }
 
-html[data-theme="modern"] .tcc-header .page-sub,
-html[data-theme="modern"] .tcc-page-header .page-sub {
+html[data-theme="modern"] .tcc-header .page-sub {
   margin: var(--space-4) 0 0;
   max-width: 90ch;
   font-size: var(--text-body);
@@ -250,10 +248,6 @@ html[data-theme="modern"] .tcc-page-bar .tcc-claim-package {
 html[data-theme="modern"] .section-tabs {
   padding-left: 0;
   background: transparent;
-}
-
-html[data-theme="modern"] .tcc-client-tabs {
-  margin-bottom: var(--space-7);
 }
 
 /* ---- Insight line and the book's map: quieter ---------------------------- */

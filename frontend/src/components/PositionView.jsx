@@ -9,6 +9,8 @@ import {
 import FootprintMap from './FootprintMap.jsx';
 import PageHeader from './PageHeader.jsx';
 import KpiTile, { KpiRow } from './ui/KpiTile.jsx';
+import EmptyState from './ui/EmptyState.jsx';
+import Skeleton from './ui/Skeleton.jsx';
 import { PORTFOLIO } from '../lib/scopeDimension.js';
 import { TEXT, applyFilters } from '../lib/gridFilter.js';
 import { ColumnFilter, FilterBar } from './ColumnFilter.jsx';
@@ -201,7 +203,9 @@ function PortfolioMatrix({
         onClear={() => onFilter('')}
       />
       {ranked.length ? null : (
-        <div className="callout info">No client matches that filter.</div>
+        <EmptyState title="No client matches that filter">
+          Clear or loosen a filter above to see the book again; nothing has been removed.
+        </EmptyState>
       )}
       <div className="cov-scroll">
         <table className="cov-grid">
@@ -446,9 +450,7 @@ export default function PositionView({
         </>
       )}
 
-      {loading && !coverage && (
-        <div className="callout info"><Loader2 size={15} className="spin" /> Reading coverage…</div>
-      )}
+      {loading && !coverage && <Skeleton lines={4} label="Reading coverage…" />}
 
       {declined.length > 0 && (
         <section className="panel">

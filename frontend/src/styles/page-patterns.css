@@ -231,10 +231,50 @@ html[data-theme="modern"] .tcc-header.tcc-header-compact {
 }
 
 .tcc-trail-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4);
   margin: 0;
   color: var(--text-primary);
   font-size: var(--text-small);
   font-weight: 600;
+}
+
+.tcc-trail-io {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+
+.tcc-trail-block {
+  min-width: 0;
+  padding: var(--space-4);
+  background: var(--surface-subtle);
+  border-radius: var(--radius-sm);
+}
+
+.tcc-trail-block b {
+  color: var(--text-secondary);
+  font-size: var(--text-caption);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.tcc-trail-block pre {
+  max-height: 250px;
+  margin: var(--space-3) 0 0;
+  overflow: auto;
+  color: var(--text-default);
+  font-family: var(--font-data);
+  font-size: var(--text-data);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.tcc-trail-card .ui-card-body {
+  padding: var(--space-6) var(--space-8);
 }
 
 /* Verbatim engine output: the data register, never smaller than the floor. */

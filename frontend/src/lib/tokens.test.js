@@ -66,7 +66,7 @@ function countDeprecated() {
 
 // The ratchet. Measured at the start of UI-01; the next prompts shrink it.
 const CEILING = {
-  '--exp-primary': 36,
+  '--exp-primary': 35,
   '--exp-accent': 12,
   '--exp-magenta': 6,
   '--exp-subtle-2': 10,

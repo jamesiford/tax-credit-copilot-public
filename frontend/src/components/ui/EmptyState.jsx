@@ -23,7 +23,7 @@ export default function EmptyState({
           {icon}
         </div>
       )}
-      {title && <p className="ui-empty-title">{title}</p>}
+      {title && <h3 className="ui-empty-title">{title}</h3>}
       {children && <div className="ui-empty-body">{children}</div>}
       {action && <div className="ui-empty-action">{action}</div>}
     </div>

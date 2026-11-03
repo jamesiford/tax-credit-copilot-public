@@ -203,6 +203,6 @@ html[data-theme="modern"] :is(table, .trend-block, .ui-kpi) {
  * the title step. The hero band and any other roomy surface still gets the
  * full display size.
  */
-html[data-theme="modern"] :is(.tcc-page-header, .tcc-header, .ui-kpi) {
+html[data-theme="modern"] :is(.tcc-header, .ui-kpi) {
   --text-display: var(--text-title);
 }

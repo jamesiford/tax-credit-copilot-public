@@ -1,8 +1,10 @@
 # UI status
 
-Prompts UI-01 (foundation) and UI-02/UI-03 (shell and home) of the modern-theme
-revamp. Branch `jamesiford-ui-01-foundation` (cut from `feat/ui-modern-theme`);
-nothing pushed. Decisions and reasons: [UI-DECISIONS.md](UI-DECISIONS.md).
+Prompts UI-01 (foundation), UI-02/UI-03 (shell and home) and UI-04..06 (pages
+and data) of the modern-theme revamp. Branch `jamesiford-ui-pages-and-data` (cut
+from `feat/ui-modern-theme`; the UI-01 branch name above in the older sections
+is historical); nothing pushed. Decisions and reasons:
+[UI-DECISIONS.md](UI-DECISIONS.md).
 Reference: [DESIGN-SYSTEM.md](DESIGN-SYSTEM.md).
 
 ## Work packages
@@ -15,9 +17,119 @@ Reference: [DESIGN-SYSTEM.md](DESIGN-SYSTEM.md).
 | UI-01d | Docs: `DESIGN-SYSTEM.md`, overlay docs, Frontend rules in `copilot-instructions.md` | done |
 | UI-01e | Layout audit and calm pass (owner-directed): icon-beside-label fix, light shell, rhythm, 1440×900 acceptance viewport | done |
 | UI-02 | Top bar, three dropdown nav groups, drill trail, account menu, floating Ask launcher, skip link; `SideRail` deleted | done |
-| UI-03 | Home hero, four task cards, persisted "Start here" | done |
+| UI-03 | Home hero, four task cards, persisted "Start here" | done (`8b89eff`) |
+| UI-04 | Portfolio dashboard: the book as a `Card` with band tabs, footprint and position cards, data-grid skin | done (`7267629`) |
+| UI-05 | Client review: `ClientHeader`, route-driven stepper, `VerdictCard` (programmes, findings) | done (`2611f30`) |
+| UI-06 | `TrailSteps`, `EmptyState`/`Skeleton` across the views, dead CSS removed, docs | done (this commit) |
 
 No work package is blocked.
+
+## UI-04 / UI-05 / UI-06
+
+Measured against the same offline stand-in as the sections below (D10, D17): the
+mock API on :8000 forwarding to a real backend on :8001 (`DATA_SOURCE=csv`).
+Figures are relative, not product numbers. "Before" is the end of UI-03.
+
+### Fold (visible rows / first-row y)
+
+| Page | 1440×900 before → after (modern) | first-row y before → after | 1440×900 classic | 1024×768 before → after (smoke only) |
+| --- | --- | --- | --- | --- |
+| Portfolio | 7 → 7 | 398 → 447 | 7 | 7 → 5 |
+| Client | 13 → 13 | 295 → 319 | 13 | 11 → 9 |
+| Unit | 17 → 17 | 415 → 415 | 17 | 9 → 9 |
+
+The gate holds at 1440×900 in both themes. The portfolio count is the book's five
+clients plus the first two rows of the state list in the card beneath it: the
+footprint moved out of the book (it used to push the grid down), so all five
+clients are visible and the metric now also counts the card below. What it took:
+Card padding on the 24px gutter (D21), no card subtitle on the book (D21), a
+compact review header on one row, and the location grid's own title stepping
+down to an `h2` (D23). At 1024×768 (no gate) the extra header, tabs and card
+chrome cost two rows on the portfolio and client pages; nothing overflows
+(content width 1024, `check_table_width` clean) and everything stays reachable.
+
+### Metrics
+
+| Metric | Before | After |
+| --- | --- | --- |
+| `npm test` | 798 passed | **848 passed** in 71 files, no skips added |
+| `npm run build` | js 663.84 kB, css 152.93 kB | js 685.36 kB, css 163.37 kB |
+| `index.css` | 2702 lines | **2669 lines** (−33; new rules live in `styles/page-patterns.css`, 362 lines, theme-scoped where they skin) |
+| Deprecated aliases (uses) | 220 | **217** |
+| Smallest rendered data text | 12.0px | 12.0px, both themes |
+| `check_tokens` | 0 problems | 0 problems (17 stylesheets) |
+| `check_contrast` | 0 below AA (modern) | 0 below AA (modern) |
+| `check_brand` | 0 problems | 0 problems, plus the new check below |
+| `check_cell_fit` / `check_table_width` / `check_filters` | clean | clean, both themes |
+| Sweep | 44 FAIL, 5 WARN | 44 FAIL, 5 WARN (the stand-in's limits; no new FAIL) |
+| white-label / export audit | pass | pass |
+| gitleaks | known failure on other refs | `--log-opts=HEAD` and `--no-git`: no leaks. The all-refs run reports 6 hits in refs that are not ancestors of this branch (3 before; not from this work) |
+
+`python frontend/tools/check_all.py` → 19/20; the one failure is the gitleaks
+all-refs scan above.
+
+**New gate.** `check_brand.py` now opens the book and asserts that no rendered
+verdict surface (state tile, non-neutral pill, verdict card, band chip) computes
+to a selection colour: 9 surfaces checked per theme.
+
+### Deprecated-alias ratchet (`src/lib/tokens.test.js`)
+
+| Alias | Ceiling before → after |
+| --- | --- |
+| `--exp-gold` | 6 → 5 (the `.finding` stripes became `VerdictCard`) |
+| `--exp-primary` | 36 → 35 |
+| `--accent-2-bg` | 26 → 25 (an open row now reads `--select-bg`) |
+
+### Existing tests whose selectors changed, and why
+
+- `pageComposition.test.jsx`, `App.test.jsx`: the client sections were found by
+  `role="tab"`; they are steps of links now (`role="link"`, `aria-current="step"`).
+  The same assertions, a different control.
+- `pageComposition.test.jsx` (the book): `getByText('On the line')` now matches
+  a tab, a tile and a chip; scoped to the chip (`.tcc-band`).
+- `BookGrid.test.jsx`: the map and state-list tests moved with the component to
+  `FootprintPanel.test.jsx`, unchanged.
+- `RuleLibraryView.test.jsx`: the programme name is in a card and a table cell;
+  the table cell is selected by role. A card test was added.
+- `Styleguide.test.jsx`: two new sections.
+
+### Added
+
+`components/ClientHeader`, `FootprintPanel`, `TrailSteps`, `ui/VerdictCard`,
+`lib/bookCards`, `lib/clientFlow`, `lib/reviewMeta`, `lib/programVerdict`,
+`styles/page-patterns.css`, and a test file for each; `portfolioCards.test.jsx`.
+
+### Removed
+
+The client page's tab row (`SectionTabs` stays for the employee walk); the
+hand-rolled `.tcc-walk*` list and the Evidence summary table (one `TrailSteps`);
+the `.finding` stripe rules; `.tcc-client-tabs`, `.tcc-page-header`,
+`.tcc-loading-inline`, `.prox-loading`, `.prox-error`, `.trend-loading`; the
+book's `<details>` footprint.
+
+### For the owner to review visually
+
+Screenshots are in the gitignored `frontend/tools/sweep-output/` (`before`,
+`ui04`, `ui05`, `final-modern`, `final-classic`; 1440×900; portfolio, client,
+client what-if, unit, employee, eligibility, evidence, programs, payroll data,
+agents). `shoot_pages.py` captures 1440×900 only.
+
+1. **The stepper's step names.** Position is "What was claimed", Trend is the
+   location grid, At risk is "How am I doing"; Discovery is omitted (D22).
+2. **The Programs page** now opens on ten verdict cards above the table; the
+   page is longer. The table stays for sorting and filtering.
+3. **The map geometry is hotlinked** (`cdn.jsdelivr.net/npm/us-atlas`). It
+   predates this work, but the book is now one of the pages the brand gate opens,
+   so `check_brand.py` reports it as a WARN rather than hiding it. Offline, the
+   map draws nothing. Vendoring the topojson is an owner decision.
+4. **Chart:** none was added. The only series is the band counts the tiles
+   already show (D20).
+5. **Reminders and alerts:** not built; the app has no such data (D20).
+
+### Ambiguous design choices
+
+Tabs on the book (D19), what the stepper's steps map to (D22), amber for a
+finding that needs a decision (D24), and which tables became cards (D24).
 
 ## UI-02 / UI-03
 

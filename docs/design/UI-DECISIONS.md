@@ -228,3 +228,116 @@ On Node ≥ 25 an experimental `localStorage` shadows jsdom's, so 14 `App` tests
 fail on `localStorage.clear`. The supported runtime is Node 24. Rather than
 edit those tests, the tools run vitest with
 `NODE_OPTIONS=--no-experimental-webstorage` and the README says why.
+
+## D18. Working branch for UI-04..06 (UI-04, UI-05, UI-06)
+
+**Context.** The brief asks for one short-lived branch per work package merged
+`--no-ff` into `feat/ui-modern-theme`. This session runs in its own worktree
+branch (cut from `feat/ui-modern-theme`), and nothing may be pushed.
+**Choice.** Three commits on the session branch, one per work package
+(`feat(UI-04)`, `feat(UI-05)`, `feat(UI-06)`), each with the full gate behind it.
+**Why.** The worktree is already the isolation a per-WP branch gives, and a
+local merge commit adds no review value. Nothing was pushed.
+
+## D19. The book's tabs are the bands, and write the band filter (UI-04)
+
+**Context.** The brief asks for the existing `GridTabs` (complete population
+first, counts on every tab) inside the book card. The book was one grid with no
+tabs, and a tab that selects a different population needs a population.
+**Choice.** Tabs are "All clients" then one per priority band that has anyone in
+it. Selecting one writes the same `band:` term the column header writes, so a
+tab, a chip and the header cannot disagree. Counts come from the unfiltered
+rows: a filter narrows the list, never the tab.
+**Why.** Bands are the one population split the product already ranks by.
+Inventing another (by state, by size) would be a second grouping that nothing
+else in the book uses.
+
+## D20. The map card, the position tiles, and what was left out (UI-04)
+
+**Choice.** The footprint (map plus state list) is its own card under the book,
+beside a "Position" card of `KpiTile`s, one per band that has clients, tinted by
+`lib/bookCards.tileTone` onto the `--state-*` family the band means (`forecast`
+maps to the amber reading, never the red one). The tiles show client COUNTS only.
+**Left out on purpose.** A dollar total (money is summed by the warehouse, not
+the browser); a chart (the only series that exists is those same counts, so a
+bar would restate the tiles); "Reminders and alerts" (the app has no triggers or
+alerts endpoint, and the brief says only if the data exists).
+
+## D21. Card padding is on the 24px gutter, not 64px (UI-04)
+
+**Context.** The first cut of `Card` padded 32px by 64px (`--space-12`, `--space-16`;
+`--space-16` is 64px in this scale). On the book that moved the first row from
+y 398 to 509 and dropped the fold from 7 rows to 5.
+**Choice.** Header 16/24, body 16/24, footer 12/24, tabs 8/24, all from the
+named scale. The book's grid runs edge to edge (`flush`). The book card carries
+no subtitle (the hero says the same thing).
+**Also.** `EmptyState` padded with `--space-32`, which is not in the scale and so
+computed to nothing; it uses `--space-12`/`--space-10`. Its title is an `h3` so
+a state that replaces a page body is a heading, not loose text.
+
+## D22. Client review: the stepper replaces the tab row (UI-05)
+
+**Context.** The brief names six steps: Position, Eligibility, Trend, At risk,
+Discovery, Evidence, and says to omit one with no target.
+**Choice.** Position is "What was claimed", Trend is the location grid, At risk
+is "How am I doing" (the year so far and the employees nearest the floor),
+Eligibility and Evidence are the existing views. **Discovery is omitted**: the
+product has no such view. **What-if is kept** between At risk and Evidence: it is
+an existing section and nothing else reaches it.
+Every step is a router link and `current` is derived from the route
+(`lib/clientFlow.currentStep`). The sections become named regions rather than
+tabpanels, since nothing is a tab any more. The client page opens on Trend, the
+step with the page's answer, not on step one.
+**Unavailable steps** are disabled with the reason on screen and announced.
+The only reason that exists today is "nothing can be calculated for this client"
+(no payroll, or no payroll year overlapping an authored statute). Evidence reads
+the certified run, so it stays enabled.
+**Eligibility** carries the same header and stepper when a client is selected
+(`EligibilityView` takes a `header`). Evidence is sealed and not per-client, so
+it does not.
+**Tests.** `pageComposition.test.jsx` and `App.test.jsx` found the sections by
+`role="tab"`; they find the steps by `role="link"` now. Assertions are the same.
+
+## D23. Header meta values come from what the page already holds (UI-05)
+
+Client, tax year, method, run and rule pack. The run and the method are the ones
+the location grid read and is showing: `TrendGridView` lifts them through an
+`onContext` callback rather than the header re-fetching. Before the grid has
+loaded the header shows Client and Tax year only; `MetaLine` omits a value that is
+missing instead of printing a bare label. The rule pack is the last two segments
+of `rule_pack_version` (a path), e.g. `ga_jtc/2023`.
+The location grid's own title is an `h2` now: the client name is the page's `h1`.
+
+## D24. Verdict cards (UI-05)
+
+`ui/VerdictCard` composes `Card` (border = the reading, from `--state-*`),
+`Pill`s (jurisdiction or kind, then the verdict with a glyph), the title, an
+inset `Callout` for the derivation sentence, a body, and an optional
+`Details →` link. The callout is omitted when the caller has no sentence.
+Used where the product states a verdict per thing:
+programmes on the Programs page (Calculable / Not calculated yet, plus Signed off
+or Review pending, with the sentence built from the authored years the page
+already holds) and agent findings (Needs a decision / Decided, with the finding's
+own "why it matters" as the assessment).
+**Not converted:** the book's expanded cells and the client Position cross-tabs.
+They are dense grids whose chips already read `--state-*`; a card per cell would
+cost the fold the gate defends. A finding that needs a decision is amber, not
+red: nothing has failed.
+
+## D25. The calculation trail is one component (UI-06)
+
+`TrailSteps` draws the walk as a numbered list of cards: step, stage and method,
+formula, inputs/parameters/output (verbatim engine JSON in the data register),
+assumptions, citation and a hash chip for the source and config hashes. `compact`
+is the printed summary and replaces the Evidence page's table. The hand-rolled
+`.tcc-walk*` markup and CSS are gone. The walk is deliberately not sortable or
+filterable: its order is the statement.
+
+## D26. Empty, loading and error states (UI-06)
+
+Every page-level state in the views touched uses `Skeleton` (the label keeps the
+old wording, so it is still announced) or `EmptyState`, whose title says what is
+missing and whose body says what to do. An error says nothing was changed. "Not
+calculated" stays a statement, never a zero.
+Left as callouts: notes and caveats that sit beside data (they are information,
+not an absence).

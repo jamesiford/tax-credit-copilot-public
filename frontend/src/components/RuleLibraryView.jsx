@@ -108,8 +108,8 @@ export default function RuleLibraryView({ onAskCopilot, programs = null }) {
     />
 
     {error && (
-      <EmptyState title="The rule packs could not be read" icon={<ShieldCheck size={20} />}>
-        {error}. The statute files are read from the API, so check that it is
+      <EmptyState title="The rule packs are unavailable" icon={<ShieldCheck size={20} />}>
+        {error}<br />The statute files are read from the API, so check that it is
         running, then reload this page.
       </EmptyState>
     )}

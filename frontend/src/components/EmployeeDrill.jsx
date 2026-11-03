@@ -10,6 +10,8 @@ import { FilterBar } from './ColumnFilter.jsx';
 import useTableControls from './useTableControls.js';
 import { ENUM, NUMERIC, TEXT } from '../lib/gridFilter.js';
 import PageHeader from './PageHeader.jsx';
+import EmptyState from './ui/EmptyState.jsx';
+import Skeleton from './ui/Skeleton.jsx';
 import SectionTabs from './SectionTabs.jsx';
 import { decisionBreakdown, employeeAnswer } from '../lib/answers.js';
 
@@ -308,8 +310,12 @@ export default function EmployeeDrill({ recordToken, context, method = 'min_max'
           />
         ) : null}
         <div className="tcc-drill-body">
-          {error && <div className="callout warn">{error}</div>}
-          {!data && !error && <div className="tcc-loading-inline">Loading the employee calculation…</div>}
+          {error && (
+            <EmptyState title="This employee's calculation is unavailable">
+              {error}<br />Nothing was changed; close this and open the employee again to retry.
+            </EmptyState>
+          )}
+          {!data && !error && <Skeleton lines={4} label="Loading the employee calculation…" />}
           {data && tab === 'source' && (
             <>
               {/* `included` is a boolean and cannot say WHICH reason applied.

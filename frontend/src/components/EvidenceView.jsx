@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react';
-import { FileCheck2, Loader2, Printer, ShieldCheck } from 'lucide-react';
+import { FileCheck2, Printer, ShieldCheck } from 'lucide-react';
 import { fetchWorkspaceAssumptions, fetchWorkspaceCalculationWalk } from '../api.js';
 import { NUM } from '../lib/reference.js';
 import { CalculationWalkView, PageHeader } from './ReferenceViews.jsx';
 import ProvenanceView from './ProvenanceView.jsx';
+import TrailSteps from './TrailSteps.jsx';
+import EmptyState from './ui/EmptyState.jsx';
+import Skeleton from './ui/Skeleton.jsx';
 
 /**
  * The evidence pack — what a client or an examiner is actually handed.
@@ -133,26 +136,14 @@ export default function EvidenceView({ summary, onAskCopilot }) {
           </button>
         </span>
       </h3>
-      {loading && <div className="callout info"><Loader2 size={15} className="spin" /> Reading the walk…</div>}
-      {!loading && !steps.length && <p className="small muted">No recorded walk for this run.</p>}
-      {steps.length > 0 && !fullWorking && (
-        <table className="tbl">
-          <thead>
-            <tr><th>Step</th><th>Stage</th><th>Formula</th><th>Assumptions</th><th>Citation</th></tr>
-          </thead>
-          <tbody>
-            {steps.map((s) => (
-              <tr key={s.step_id}>
-                <td className="small"><code>{s.step_id}</code></td>
-                <td className="small">{s.stage}{s.method && s.method !== 'shared' ? ` · ${s.method}` : ''}</td>
-                <td className="small">{s.formula}</td>
-                <td className="small">{(s.assumption_ids || []).join(', ') || '—'}</td>
-                <td className="small">{s.citation || '—'}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {loading && <Skeleton lines={3} label="Reading the walk…" />}
+      {!loading && !steps.length && (
+        <EmptyState title="No recorded walk for this run">
+          The run holds no calculation steps, so there is nothing to list. A
+          sealed run records one; rebuild the workspace to produce it.
+        </EmptyState>
       )}
+      {steps.length > 0 && !fullWorking && <TrailSteps steps={steps} compact />}
       <p className="small muted">
         Every step names the assumption it applied and the clause it came from.
         The summary is the version that fits on a printed page; full working adds

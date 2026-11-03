@@ -1,13 +1,24 @@
 import { useState } from 'react';
+import { MemoryRouter } from 'react-router-dom';
 import { applyTheme, THEME_STORAGE_KEY, THEMES } from '../brand.config.js';
 import {
   Button, Callout, Card, CountBadge, EmptyState, FloatingAction, HeroBand, KpiRow, KpiTile,
-  MetaLine, Pill, SectionHeading, Skeleton, Stepper, Tabs, TaskCard,
+  MetaLine, Pill, SectionHeading, Skeleton, Stepper, Tabs, TaskCard, VerdictCard,
 } from '../components/ui/index.js';
 import './Styleguide.css';
+import ClientHeader from '../components/ClientHeader.jsx';
 import DrillTrail from '../components/shell/DrillTrail.jsx';
 import TopBar from '../components/shell/TopBar.jsx';
 import StartHereCards from '../components/StartHereCards.jsx';
+import TrailSteps from '../components/TrailSteps.jsx';
+
+const TRAIL = [{
+  step_id: 'S-01', stage: 'selection', method: 'shared', decision_basis: 'BA-02',
+  formula: 'rows WHERE pay_date IN window',
+  inputs: { rows: 391000 }, parameters: { window: '2023-07-28..2024-07-31' }, output: { rows: 384418 },
+  assumption_ids: ['BA-02'], exceptions: [], citation: 'BA-02',
+  source_hash: 'sha256:aaaaaaaaaaaaaaaaaaaa', config_hash: 'sha256:bbbbbbbbbbbbbbbbbbbb',
+}];
 
 const NOOP = {
   onOpenPortfolio: () => {}, onOpenClient: () => {}, onOpenUnit: () => {}, onSelectView: () => {},
@@ -177,6 +188,69 @@ export default function Styleguide() {
           Who to target, ranked by the reason to act, not by dollar value.
         </HeroBand>
         <StartHereCards id="sg-start" firstClientId={2001} onNavigate={() => {}} onShowBook={() => {}} />
+      </Section>
+
+      <Section title="Card: verdict tones and flush grid">
+        <div className="tcc-verdict-grid">
+          {['above-min', 'below-min', 'partial', 'base-year'].map((t) => (
+            <Card key={t} tone={t} title={`Border: ${t}`}><p>The border encodes the reading, from --state-*.</p></Card>
+          ))}
+        </div>
+        <Card flush title="Flush body" subtitle="A dense grid runs edge to edge">
+          <table className="tbl-compact">
+            <thead><tr><th>Client</th><th className="num">Identified</th></tr></thead>
+            <tbody>
+              <tr><td>Cascade</td><td className="num">$149k</td></tr>
+              <tr className="row-open"><td>Northwind</td><td className="num">$31k</td></tr>
+            </tbody>
+          </table>
+        </Card>
+      </Section>
+
+      <Section title="VerdictCard">
+        <div className="tcc-verdict-grid">
+          <VerdictCard
+            tone="above-min"
+            title="Georgia job tax credit"
+            pills={[{ variant: 'category', label: 'GA' }, { variant: 'above-min', icon: 'check', label: 'Calculable' }]}
+            assessment="Statute is authored for 2019–2025, so each of those years prices under the rules in force that year."
+            details={{ onClick: () => {} }}
+          >
+            <p className="tcc-verdict-text">O.C.G.A. § 48-7-40 · minimum 2 new jobs</p>
+          </VerdictCard>
+          <VerdictCard
+            tone="partial"
+            title="Employee counted at two worksites"
+            pills={[{ variant: 'category', label: 'E00200' }, { variant: 'partial', icon: 'dot', label: 'Needs a decision' }]}
+            assessmentTitle="Why it matters"
+            assessment="The engine counts headcount per unit, so a person at two worksites is counted twice."
+          />
+        </div>
+      </Section>
+
+      <Section title="Client review header">
+        <MemoryRouter>
+          <ClientHeader
+            clientId={2001}
+            clientName="Cascade Retail Partners"
+            industry="Retail"
+            year={2023}
+            current="location"
+            method="min_max"
+            run={{ run_id: 'abcdef0123456789', rule_pack_version: 'rules/ga_jtc/2023.json' }}
+            onBack={() => {}}
+          />
+          <ClientHeader
+            clientId={9}
+            clientName="No payroll yet"
+            clientScope={{ payroll_years: [], calculable_years: [] }}
+            onBack={() => {}}
+          />
+        </MemoryRouter>
+      </Section>
+
+      <Section title="TrailSteps">
+        <TrailSteps steps={TRAIL} />
       </Section>
 
       <Section title="EmptyState / Skeleton">

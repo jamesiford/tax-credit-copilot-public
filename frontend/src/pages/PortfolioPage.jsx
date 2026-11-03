@@ -7,6 +7,7 @@ import FootprintPanel from '../components/FootprintPanel.jsx';
 import GridTabs, { GridTabPanel } from '../components/GridTabs.jsx';
 import StartHereCards from '../components/StartHereCards.jsx';
 import Card from '../components/ui/Card.jsx';
+import EmptyState from '../components/ui/EmptyState.jsx';
 import HeroBand from '../components/ui/HeroBand.jsx';
 import KpiTile, { KpiRow } from '../components/ui/KpiTile.jsx';
 import SectionHeading from '../components/ui/SectionHeading.jsx';
@@ -162,7 +163,14 @@ export default function PortfolioPage({
   ) : null;
 
   if (error) {
-    return <div>{header}<div className="callout warn">The book could not be read: {error}</div></div>;
+    return (
+      <div>
+        {header}
+        <EmptyState title="The book is unavailable">
+          {error}<br />Nothing was changed; reload the page to try again.
+        </EmptyState>
+      </div>
+    );
   }
 
   return (
