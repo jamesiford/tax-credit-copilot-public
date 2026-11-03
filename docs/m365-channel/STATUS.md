@@ -31,7 +31,7 @@ runs in a worktree, so `feat/m365-channel` is held by the main checkout).
 | CH-08b | Orchestrator gaps found re-reading the brief (D-85) | done | `wp/CH-08b-spec-gaps` | merge `4221270` |
 | CH-09 | `scripts/publish-m365.ps1` | done | `wp/CH-09-publish-m365` | merge `3285ade` |
 | CH-10 | Cowork plugin (`channels/cowork/`), builder and offline validator | done | `wp/CH-10-cowork-plugin` | merge `e93ed3d` |
-| CH-11 | End-to-end workflow and exactness tests | todo | - | - |
+| CH-11 | End-to-end workflow and exactness tests | done | `wp/CH-11-workflow-tests` | merge `f33ffa4` |
 | CH-12 | Documentation, ADR-009, runbook, demo script | todo | - | - |
 | CH-12b | Demo network posture toggle and hardening plan | todo | - | - |
 
@@ -251,6 +251,12 @@ and its `discovery` / `multi_state` scans read the configured default tenant.
 - `python scripts/build-cowork-plugin.py --config channels/cowork/config.example.json`: builds offline, 13 files, reproducible (two builds, same bytes). Placeholder-config SHA-256 `972fd949ccaed5a6fe996f58be4856c3577909bfee9d0c44c5ace816583ef663` (app id from the default seed); `--strict` refuses it with exit 1. The manifest also validates (0 errors) against the published 1.29 JSON schema; `atk package` 1.1.14 builds the tree in a throwaway Agents Toolkit project. `wiqd` was not installed and `atk validate` needs sign-in (D-87).
 - Gateway change (D-88): the MCP text carries a `Provenance:` line so a footer is copied, not invented.
 - Whitelabel 0 enforced; audit-export 0; `gitleaks git` clean; links 0 broken.
+### CH-11 (merged `f33ffa4`)
+
+- Full backend suite: **2765 passed**, 136 skipped, 1 xfailed (CH-10: 2686). New: `tests/channel/test_workflows.py` (38), `test_workflows_audit.py` (16), `test_workflows_chaos.py` (25) over `workflow_harness.py`: the gateway in front of the REAL API app and capability layer (Entra on, SQLite stores, the synthetic book, findings detection over the committed synthetic payroll), driven as the orchestrator (REST, app-only token acting for a person) and as Cowork (MCP, the person's own token). No skip or xfail added; parity pins untouched; `infra/` untouched.
+- W1 and W2 run as scripts of tool calls on both surfaces; a document built only from returned blocks verifies, every one-figure mutation of it is rejected; a writer's changes are two steps, land once, are attributed and audited with the commit's `confirmation_ref` equal to its preview's; a reader is refused every commit and nothing is written. Per-user audit separation through `GET /api/audit/channel` and `scripts/channel-audit.py`; ten reads agree across REST, MCP, the API capability endpoint and the direct call (and four against the portal's own endpoints). Chaos: API timeout and broken road, rate limit, oversized body, replayed/tampered/wrong-user/expired confirmation, a writer revoked mid-conversation. A corrupted capability is caught by the envelope scan and by `verify_figures` end to end.
+- Two findings, both recorded as limits rather than fixed: `client_resolve` asks even for one exact name when no client is selected (the skills now confirm and call again with `current_client_id`); the figure guard compares values, so a wrong figure equal to another real figure in the conversation is not seen (pinned by `test_known_limit_*`).
+- Whitelabel 0 enforced; audit-export 0; `gitleaks git` clean.
 ## Blockers
 
 _None._
