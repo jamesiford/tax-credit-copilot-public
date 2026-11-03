@@ -49,7 +49,9 @@ Failure signatures are in [RUNBOOK](../architecture/RUNBOOK.md). Two PoC-specifi
   API is stopped. `pwsh scripts/assign-channel-roles.ps1 ...` is idempotent and prints what is missing.
 * A person in the writers **group** but not on the allow-list is refused by the API with `GroupMember.Read.All` granted
   moments earlier: the identity asked Graph for a token before the grant and the platform keeps that token for about a day.
-  Grant Graph roles **before** the first call, or use the allow-list meanwhile.
+  Since CH-15e the Graph client drops the cached token and retries once on that refusal (at most once a minute), so the
+  grant is normally picked up on the next check; if it is not, grant Graph roles **before** the first call, or use the
+  allow-list meanwhile.
 
 ## Take it down
 
@@ -82,6 +84,9 @@ Then, by hand, what Terraform cannot know about:
 Observed teardown time is roughly 6 to 12 minutes.
 
 ## Turning the demo posture off
+
+The ordered checklist, with every command, is [DEMO-CLEANUP](DEMO-CLEANUP.md): debug whoami, the open Foundry
+firewall, allowed caller app ids, the mock model gateway and the group writer source.
 
 The PoC runs the Foundry data plane public to one operator address
 (`TCC_FOUNDRY_PUBLIC_NETWORK_ACCESS=true`, `TCC_FOUNDRY_ALLOWED_IP_RANGES=<operator>/32`) and the

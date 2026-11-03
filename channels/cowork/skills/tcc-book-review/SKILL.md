@@ -31,11 +31,10 @@ before it is shared, and make every change in two confirmed steps.
    that some rows rest on an unverified claimed figure, carry that sentence into the plan.
    If it says no client has been assessed, say so and stop: that is not "nobody to call".
 2. **Read each client.** `book_rank` returns names, not ids. For each client, in rank order:
-   call `client_resolve` with the name exactly as returned. With nothing selected it answers
-   "clarify" even for one exact name, listing that single candidate: a name taken from
-   `book_rank` is unambiguous, so call `client_resolve` again with `current_client_id` set to the
-   candidate's `client_id` and it resolves. If it lists several candidates, ask the user and never
-   pick. Then call `client_situation` and `client_trend` with the `client_id`. If either answers `not_calculated`, mark that client "Not calculated" in the
+   call `client_resolve` with the name exactly as returned. A name taken from `book_rank` is
+   exact, so it answers `resolved: true` with the `client_id`; use it without asking the user
+   anything. Only if it answers `resolved: false` and lists several candidates, ask the user and
+   never pick. Then call `client_situation` and `client_trend` with the `client_id`. If either answers `not_calculated`, mark that client "Not calculated" in the
    plan and leave its figures blank. Do not report zero.
 3. **Find the last contact.** Using your own built-in Microsoft 365 abilities (mail, Teams
    chat and channel messages, calendar), look for the most recent contact with each client and

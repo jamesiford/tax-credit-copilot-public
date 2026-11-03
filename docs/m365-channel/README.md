@@ -155,6 +155,7 @@ the orchestrator does not, and a model that writes a Word briefing cannot be ass
 | [COWORK-SETUP.md](COWORK-SETUP.md) · [`channels/cowork/`](../../channels/cowork/README.md) | The plugin and how to install it |
 | [DEMO-SCRIPT.md](DEMO-SCRIPT.md) | A demo and the manual test checklist |
 | [KNOWN-LIMITATIONS.md](KNOWN-LIMITATIONS.md) | What it does not do |
+| [DEMO-CLEANUP.md](DEMO-CLEANUP.md) | What to switch off after a demo, with the commands |
 | [RUNBOOK §13](../architecture/RUNBOOK.md) · [CONNECTIVITY-MATRIX §1a](../architecture/CONNECTIVITY-MATRIX.md) | Operating it; who calls what |
 | [HARDENING-PLAN](../architecture/HARDENING-PLAN.md) · [HARDENING-SPIKE](HARDENING-SPIKE.md) | The demo posture and the later private one |
 | [DECISIONS.md](DECISIONS.md) · [STATUS.md](STATUS.md) | Every decision, and what is done |

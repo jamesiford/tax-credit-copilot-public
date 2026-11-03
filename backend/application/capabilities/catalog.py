@@ -111,7 +111,7 @@ CATALOG: tuple[CapabilitySpec, ...] = (
         needs_client=False, chat_intent="book",
     ),
     _read(
-        "client_resolve", "Resolve a name or a pronoun to one client, or return candidates to ask about.",
+        "client_resolve", "Resolve a name or a pronoun to one client (resolved=true) or return candidates to ask about. One exact name resolves; never guess.",
         {"name_or_text": {"type": "string"},
          "history": {"type": "array", "items": _object({"role": {"type": "string"}, "text": {"type": "string"}}, ("role", "text"))},
          "current_client_id": {"type": ["integer", "null"]}},

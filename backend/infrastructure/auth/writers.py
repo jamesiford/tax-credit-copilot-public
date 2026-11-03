@@ -11,6 +11,10 @@ what the business believes — and three sources can answer it:
 Every adapter FAILS CLOSED. A Graph outage, a 403 for a missing permission or a
 malformed reply means "not a writer": denying a legitimate writer for a minute is
 an inconvenience, granting a non-writer is a change on a filed return.
+
+The Graph call itself goes through `graph_client.GraphClient`, which refreshes a
+token that predates a permission grant and retries once [CH-15e]; a refusal that
+survives the retry is still a denial.
 """
 from __future__ import annotations
 
@@ -23,11 +27,11 @@ from typing import Callable
 import httpx
 
 from application.identity import WriterEntitlement
+from infrastructure.auth.graph_client import GRAPH_BASE, GRAPH_SCOPE, GraphClient, GraphTokenProvider  # noqa: F401 - GRAPH_SCOPE re-exported
 
 logger = logging.getLogger(__name__)
 
-GRAPH_SCOPE = "https://graph.microsoft.com/.default"
-GRAPH_URL = "https://graph.microsoft.com/v1.0/users/{oid}/checkMemberGroups"
+GRAPH_URL = GRAPH_BASE + "/users/{oid}/checkMemberGroups"
 
 #: Long enough to spare Graph one call per request, short enough that removing
 #: someone from the group takes effect within a minute.
@@ -36,10 +40,7 @@ CACHE_SECONDS = 60.0
 
 def default_token_provider() -> Callable[[], str]:
     """A Graph token from the process identity (Managed Identity deployed, `az login` locally)."""
-    from azure.identity import DefaultAzureCredential
-
-    credential = DefaultAzureCredential()
-    return lambda: credential.get_token(GRAPH_SCOPE).token
+    return GraphTokenProvider()
 
 
 @dataclass
@@ -72,12 +73,10 @@ class EntraGroupEntitlement:
         return answer
 
     def _ask_graph(self, user_oid: str) -> bool | None:
+        # built per call: the provider and client are plain attributes a caller may swap
+        graph = GraphClient(self.token_provider, self.client)
         try:
-            response = self.client.post(
-                GRAPH_URL.format(oid=user_oid),
-                headers={"Authorization": f"Bearer {self.token_provider()}"},
-                json={"groupIds": [self.group_id]},
-            )
+            response = graph.request("POST", GRAPH_URL.format(oid=user_oid), json={"groupIds": [self.group_id]})
             response.raise_for_status()
             groups = response.json().get("value")
             if not isinstance(groups, list):

@@ -42,7 +42,7 @@ flowchart TD
 | Decision | Who makes it | Where |
 | --- | --- | --- |
 | Who is asking | The platform's signals, or nobody | `identity.resolve_identity` |
-| Whose client this is | The platform's deterministic resolver (`client_resolve`, the portal chat's own rule); the model's `client_id` is overwritten | `tools.ToolRunner.ensure_client` |
+| Whose client this is | The platform's deterministic resolver (`client_resolve`; the channel settles one exact full name or alias as `resolved: true`, while partial or ambiguous text still asks and the portal chat stays strict). The model's `client_id` is overwritten | `tools.ToolRunner.ensure_client` |
 | Which tax year | The reader's words, or the conversation's, or a question back. A year the model names is used only if the reader said it. A write never inherits one | `tools.ToolRunner._year` |
 | Which method | The reader's. Eligibility runs under **both** certified methods unless one is named, each labelled | `tools._method`, `compose.blocks_of` |
 | A what-if's size, a base year | The reader's. A number or year the model chose is dropped; a missing size or base year is a question back | `tools._scenario`, `tools._years` |

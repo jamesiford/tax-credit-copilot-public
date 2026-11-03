@@ -28,6 +28,11 @@ def create_app(settings: GatewaySettings | None = None, **overrides: Any) -> Fas
     """Build the gateway. `overrides` are `build_services` collaborators (the fakes of a test)."""
     settings = settings or load_settings()
     services: Services = build_services(settings, **overrides)
+    if settings.debug_whoami:
+        log.warning(
+            "CHANNEL_DEBUG_WHOAMI is ON: the channel_ping diagnostic is offered and echoes the acting-user headers as received. "
+            "Demo and identity spikes only; switch it off afterwards (docs/m365-channel/DEMO-CLEANUP.md).",
+        )
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):

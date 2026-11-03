@@ -168,7 +168,8 @@ its own preview and its own confirmation.
 
 > **Prepare a credit review pack for Cascade Retail Partners, tax year 2023, Georgia.**
 
-*Watch for:* it asks you to **confirm** the client (the resolver always asks when nothing is selected); reads
+*Watch for:* it takes the client from the name you gave without asking you to confirm it (an exact name
+resolves; a partial or ambiguous one is asked back as a numbered list); reads
 eligibility, trend, jobs at risk and other programmes; asks you for a **decision on each open finding** with its
 evidence, and records each only after you say yes; moves the claim to `proposed` only if you ask; authors a Word
 briefing and a deck of at most six slides from tool output only, with the disclaimer and a provenance footer
