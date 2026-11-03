@@ -229,6 +229,7 @@ variable.
 | `TCC_CHANNEL_GATEWAY_AUDIENCE` | `channel_gateway_audience` | public | The gateway's app registration (`api://<id>` or the bare id). Required with the toggle |
 | `TCC_CHANNEL_WRITER_SOURCE` | `channel_writer_source` | public | Who may make changes through the channel: `allowlist` (default), `entra_group` or `either`. A group source needs Graph `GroupMember.Read.All` on the gateway identity |
 | `TCC_CHANNEL_WRITER_GROUP_ID` | `channel_writer_group_id` | public | The Entra group for `entra_group` / `either`. Required for those |
+| `TCC_CHANNEL_RESOLVE_DISPLAY_NAMES` | `channel_resolve_display_names` | public | `true` resolves a Teams user's name and UPN from Graph (default `false`). Needs `User.ReadBasic.All` on the gateway identity first (`assign-channel-roles.ps1 -GrantUserReadBasic`, an admin action) |
 | `TCC_TENANT_ID` | `tenant_id` | enterprise | Entra tenant for Easy Auth and token validation; empty uses the deployer's tenant |
 | `TCC_WEB_CLIENT_ID` | `web_client_id` | enterprise | Web app registration (Easy Auth). Required: the plan fails without it |
 | `TCC_API_CLIENT_ID` | `api_client_id` | enterprise | API app registration (`user_impersonation`, role `TCC.User`). Required |

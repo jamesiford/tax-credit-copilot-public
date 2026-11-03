@@ -31,6 +31,7 @@ ALLOWED_APPLICATION = frozenset({
     "application.channel_wiring",              # the audit trail and writer entitlement, without the engine
     "application.composer_render",             # the platform's own block renderer
     "application.deployment",                  # is_deployed, store_choice
+    "application.display_names",               # the display-name port and the placeholder rule (standard library only)
     "application.identity",                    # ActingUser
 })
 FORBIDDEN_PREFIXES = ("api.", "agents.", "tools.", "infrastructure.persistence", "application.wiring",

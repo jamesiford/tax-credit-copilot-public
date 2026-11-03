@@ -29,6 +29,7 @@ from typing import Any
 
 from application.capabilities import catalog
 from channel.auth import AuthFailure, CallerAuthenticator
+from channel.people import CallerPeople
 from channel.pipeline import ToolCall, ToolPipeline
 from channel.render import render_error_text, render_tool_text
 from channel.tools import offered_tools
@@ -94,8 +95,10 @@ class McpServer:
 
     def __init__(
         self, authenticator: CallerAuthenticator, pipeline: ToolPipeline, settings: Any, name: str, version: str,
+        people: CallerPeople | None = None,
     ) -> None:
         self._auth, self._pipeline, self._settings = authenticator, pipeline, settings
+        self._people = people or CallerPeople(None)
         self._info = {"name": name, "version": version}
         self._sessions: OrderedDict[str, tuple[str, float]] = OrderedDict()
 
@@ -174,6 +177,7 @@ class McpServer:
             return _rpc_error(request_id, _INVALID_PARAMS, "tools/call needs a tool name and an arguments object")
         if all(t.name != name for t in offered_tools(self._settings)):
             return _rpc_error(request_id, _INVALID_PARAMS, f"unknown tool: {name}")
+        caller = await self._people.enrich(caller)
         outcome = await self._pipeline.run(caller, name, ToolCall(args=arguments, headers=headers))
         failed = outcome.status != 200
         text = render_error_text(outcome.body["error"]) if failed else render_tool_text(outcome.body, base_url)

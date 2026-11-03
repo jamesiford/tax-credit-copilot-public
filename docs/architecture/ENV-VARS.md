@@ -181,6 +181,7 @@ refused. Nothing below is a secret.
 | `CHANNEL_RATE_LIMIT_PER_MINUTE` | `backend/channel/config.py` | Calls per minute per user (token bucket, `1`–`6000`). Default `60`. Per process | not set | — | No |
 | `CHANNEL_REQUEST_TIMEOUT_SECONDS` | `backend/channel/config.py` | How long the gateway waits for the API, `1`–`600`. Default `30`, above the API's own `CAPABILITY_TIMEOUT_SECONDS` | not set | — | No |
 | `CHANNEL_DEBUG_WHOAMI` | `backend/channel/config.py` | `true` offers the `channel_ping` diagnostic (who the platform believes is calling, by which rule, whether the API answers). Never returns a token. Default off; logs a WARNING at startup when on ([DEMO-CLEANUP](../m365-channel/DEMO-CLEANUP.md)) | not set | — | No |
+| `CHANNEL_RESOLVE_DISPLAY_NAMES` | `backend/channel/config.py` | `true` makes the gateway look up the display name and UPN of a Teams or Copilot Chat user (an object id and the placeholder `(name not provided)` from the orchestrator) in Microsoft Graph (`GET /users/{oid}?$select=displayName,userPrincipalName`, 2 s timeout, 24 h cache, 5 min negative cache, fail-soft), so audit rows and the author of a write name a person. Needs the Graph application role `User.ReadBasic.All` on the gateway identity (admin action: `scripts/assign-channel-roles.ps1 -GrantUserReadBasic`). A Cowork caller already carries its name and never reaches Graph. Default off, so tests and local runs never reach Graph | TF channel: variable `channel_resolve_display_names` (azd `TCC_CHANNEL_RESOLVE_DISPLAY_NAMES`) | — | No |
 | `WEB_CONCURRENCY` | `backend/startup-channel.sh` | Gunicorn workers. Default **`1`**: the fact ledger (`verify_figures`) and the rate limiter are per process | not set | — | No |
 | `ENVIRONMENT`, `DATA_CLASSIFICATION` | `backend/application/deployment.py` | As for the API (a non-`local` environment switches the durable-store checks on) | TF channel: `azure`, from the profile | — | Enforced |
 | `WAREHOUSE_SERVER`, `WAREHOUSE_DATABASE`, `FABRIC_WORKSPACE` | `backend/infrastructure/persistence/` | The Warehouse the audit trail is written to (the gateway holds `INSERT`/`SELECT` on `tcc_ops.channel_audit` only) | TF channel: the API's values | — | Enforced |
@@ -278,6 +279,7 @@ into the settings above. Full guidance is in [DEPLOYMENT-HANDOVER.md](DEPLOYMENT
 | `TCC_CHANNEL_GATEWAY_AUDIENCE` | `channel_gateway_audience` | none | public (required with the toggle) | `GATEWAY_AUDIENCE` |
 | `TCC_CHANNEL_WRITER_SOURCE` | `channel_writer_source` | `allowlist` | public | `CHANNEL_WRITER_SOURCE` |
 | `TCC_CHANNEL_WRITER_GROUP_ID` | `channel_writer_group_id` | none | public (required unless `allowlist`) | `CHANNEL_WRITER_GROUP_ID` |
+| `TCC_CHANNEL_RESOLVE_DISPLAY_NAMES` | `channel_resolve_display_names` | `false` | public | `CHANNEL_RESOLVE_DISPLAY_NAMES` (only when true; needs Graph `User.ReadBasic.All` on the gateway identity) |
 | `AZURE_ENV_NAME` | `environment_name` | written by azd | both | Resource names, `azd-env-name` tag |
 | `AZURE_LOCATION` | `location` | none | both | Region; output `AZURE_LOCATION` |
 | `AZURE_RESOURCE_GROUP` | `resource_group_name` | `rg-<env>` | both | Output `AZURE_RESOURCE_GROUP` |

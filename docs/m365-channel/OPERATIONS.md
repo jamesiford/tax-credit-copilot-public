@@ -52,6 +52,13 @@ Failure signatures are in [RUNBOOK](../architecture/RUNBOOK.md). Two PoC-specifi
   Since CH-15e the Graph client drops the cached token and retries once on that refusal (at most once a minute), so the
   grant is normally picked up on the next check; if it is not, grant Graph roles **before** the first call, or use the
   allow-list meanwhile.
+* Teams audit rows say `(name not provided)` and a write is attributed to a GUID: display-name resolution is off or has no role.
+  It is an admin action and two settings. An administrator who can grant application permissions runs
+  `pwsh scripts/assign-channel-roles.ps1 -ApiApplicationId <id> -GatewayApplicationId <id> -GatewayIdentityPrincipalId <oid> -GrantUserReadBasic`
+  (idempotent; Graph `User.ReadBasic.All`, nothing broader), then `azd env set TCC_CHANNEL_RESOLVE_DISPLAY_NAMES true` and `azd provision`
+  (or `CHANNEL_RESOLVE_DISPLAY_NAMES=true` on the gateway app). A lookup that fails never stops a request: the placeholder stays, and
+  the gateway logs a warning with the object id only. A refused role is retried at most once a minute (CH-15e) and a failed lookup is not
+  repeated for five minutes.
 
 ## Take it down
 

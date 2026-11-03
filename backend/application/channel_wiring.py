@@ -21,6 +21,7 @@ _agent_action_repo: Any | None = None
 _writer_repo: Any | None = None
 _confirmation_repo: Any | None = None
 _writer_entitlement: Any | None = None
+_display_name_resolver: Any | None = None
 
 
 def _channel_store(name: str) -> str:
@@ -117,6 +118,22 @@ def set_writer_entitlement(entitlement: Any) -> None:
     """Swap the entitlement source. Used by tests."""
     global _writer_entitlement
     _writer_entitlement = entitlement
+
+
+def get_display_name_resolver() -> Any:
+    """The Graph display-name lookup [CH-15a]. The gateway asks for it only when CHANNEL_RESOLVE_DISPLAY_NAMES is on."""
+    global _display_name_resolver
+    if _display_name_resolver is None:
+        from infrastructure.auth.graph_people import GraphDisplayNameResolver
+
+        _display_name_resolver = GraphDisplayNameResolver()
+    return _display_name_resolver
+
+
+def set_display_name_resolver(resolver: Any) -> None:
+    """Swap the display-name lookup. Used by tests."""
+    global _display_name_resolver
+    _display_name_resolver = resolver
 
 
 def get_confirmation_repository() -> Any:

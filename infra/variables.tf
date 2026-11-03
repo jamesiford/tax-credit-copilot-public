@@ -533,6 +533,12 @@ variable "channel_debug_whoami" {
   default     = false
 }
 
+variable "channel_resolve_display_names" {
+  description = "Let the gateway look a Teams user's display name and UPN up in Microsoft Graph (CHANNEL_RESOLVE_DISPLAY_NAMES), so audit rows and writes name a person rather than an object id. Needs the Graph application role User.ReadBasic.All on the gateway identity (an admin action: scripts/assign-channel-roles.ps1 -GrantUserReadBasic). Without the role the lookup fails soft and the request is unaffected."
+  type        = bool
+  default     = false
+}
+
 # --- mock AI gateway (proof of concept only) --------------------------------------
 
 variable "enable_mock_ai_gateway" {
