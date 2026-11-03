@@ -115,8 +115,8 @@ key of the same name in `var.tags`:
 | `profile` | `public` or `enterprise` |
 | *(any)* | extra tags from the variable `tags` (default `{}`) |
 
-Both App Services also carry `azd-service-name`, with the value `api` or
-`web`. azd uses this tag to find its deploy targets. `deploy.yml` reads
+The API and web App Services carry `azd-service-name`, with the value `api` or
+`web` (the channel gateway does not: it is deployed by `scripts/deploy-channel.ps1`). azd uses this tag to find its deploy targets. `deploy.yml` reads
 `azd-env-name` on an existing resource group and refuses to deploy into a
 group tagged for another environment.
 
@@ -319,7 +319,7 @@ Variables: `app_service_sku`, `api_worker_count`, `auth_mode`,
 |---|---|
 | Resource | `azurerm_linux_web_app.this[0]` (`app-tcc-channel-<s>`) · module `channel`. **Count 0 unless `enable_m365_channel = true`**: with the toggle off the module creates nothing and the plan is unchanged |
 | Profiles | `public` only (PoC). The enterprise profile refuses the toggle: the gateway is a public surface |
-| Runtime | Python `3.12`, code (zip) deploy by azd service `channel` (`project: ./backend`). Startup command `sh startup-channel.sh` ([`backend/startup-channel.sh`](../../backend/startup-channel.sh)): `gunicorn -k uvicorn.workers.UvicornWorker -w ${WEB_CONCURRENCY:-1} ... channel.main:app`. **One worker** by default: the fact ledger and the rate limiter are per process |
+| Runtime | Python `3.12`, code (zip) deploy by `scripts/deploy-channel.ps1` (the azd `postdeploy` hook and `deploy.yml`; the same `backend/` package as the API). Startup command `sh startup-channel.sh` ([`backend/startup-channel.sh`](../../backend/startup-channel.sh)): `gunicorn -k uvicorn.workers.UvicornWorker -w ${WEB_CONCURRENCY:-1} ... channel.main:app`. **One worker** by default: the fact ledger and the rate limiter are per process |
 | Health | `health_check_path = "/channel/health"` (no credentials). `/channel/ready` likewise |
 | Always On / HTTP | `always_on = true`, `https_only = true`, `http2_enabled = true`, `minimum_tls_version = "1.2"` |
 | FTP / SCM | `ftps_state = "Disabled"`, both basic-auth publishing flags `false`, `scm_ip_restriction_default_action = "Allow"` |
@@ -328,7 +328,7 @@ Variables: `app_service_sku`, `api_worker_count`, `auth_mode`,
 | Inbound network | `public_network_access_enabled = true`. `ip_restriction_default_action = "Allow"` unless `channel_allowed_ip_ranges` is non-empty, then `"Deny"` with one allow rule per range. Callers are authenticated **in the app** by token validation, not by Easy Auth or by network |
 | API restriction | **Unchanged.** The API's `web-app-subnet` allow rule already admits the gateway because it shares the subnet; `module.app_service.api_access_restriction` is asserted equal with the channel on and off |
 | Logs / Diagnostics | as the API; `diag-channel`: `allLogs` and `AllMetrics` |
-| Tags | §3 + `azd-service-name = channel` |
+| Tags | §3 only. No `azd-service-name`: azd has no `channel` service |
 
 **App settings.** None is a secret. Telemetry settings follow the other apps (§4.7).
 The gateway's own are listed in [ENV-VARS.md §9a](ENV-VARS.md#9a-channel-gateway-backendchannel-only-when-enable_m365_channel):

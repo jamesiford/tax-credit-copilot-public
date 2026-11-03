@@ -223,7 +223,7 @@ variable.
 | `GIT_COMMIT` | `git_commit` | both | Recorded on every run manifest. Unset, runs record `working-tree` |
 | `FOUNDRY_MODEL`, `FOUNDRY_MODEL_VERSION` | `foundry_model`, `foundry_model_version` | both | Model the narrating agents use (default `gpt-4.1-mini` / `2025-04-14`). Check regional availability and quota |
 | `TCC_APP_SERVICE_SKU` | `app_service_sku` | both | Plan SKU shared by both apps (default `P1v3`) |
-| `TCC_ENABLE_M365_CHANNEL` | `enable_m365_channel` | public | `false` (default) creates nothing. `true` adds the Microsoft 365 channel gateway: a third App Service on the same plan, in the same subnet, with its own identity ([component spec §4.7a](INFRASTRUCTURE-COMPONENT-SPEC.md)). It needs the API to validate tokens, so set `auth_mode = "entra"` and `api_client_id` in an overlay too; the plan fails with that message otherwise. The enterprise profile refuses it. With it off, deploy by name (`azd deploy api`, `azd deploy web`): `azure.yaml` lists the `channel` service and azd finds no app for it |
+| `TCC_ENABLE_M365_CHANNEL` | `enable_m365_channel` | public | `false` (default) creates nothing. `true` adds the Microsoft 365 channel gateway: a third App Service on the same plan, in the same subnet, with its own identity ([component spec §4.7a](INFRASTRUCTURE-COMPONENT-SPEC.md)). It needs the API to validate tokens, so set `auth_mode = "entra"` and `api_client_id` in an overlay too; the plan fails with that message otherwise. The enterprise profile refuses it. With it off, a default `azd up` / `azd deploy` is exactly what it was: the gateway is not an azd service. With it on, the `postdeploy` hook runs `scripts/deploy-channel.ps1` (needs `TCC_ENABLE_M365_CHANNEL=true` in the azd environment as well as the Terraform variable) |
 | `TCC_CHANNEL_GATEWAY_AUDIENCE` | `channel_gateway_audience` | public | The gateway's app registration (`api://<id>` or the bare id). Required with the toggle |
 | `TCC_CHANNEL_WRITER_SOURCE` | `channel_writer_source` | public | Who may make changes through the channel: `allowlist` (default), `entra_group` or `either`. A group source needs Graph `GroupMember.Read.All` on the gateway identity |
 | `TCC_CHANNEL_WRITER_GROUP_ID` | `channel_writer_group_id` | public | The Entra group for `entra_group` / `either`. Required for those |
@@ -279,7 +279,10 @@ azd up --no-prompt
    `npm run build`. `.webappignore` files keep `.env` and payroll out of both
    packages.
 4. **Deploy.** Zip deploy of both apps (matched by the `azd-service-name` tags
-   `api` and `web`). App Service builds on deploy
+   `api` and `web`). With the channel enabled, the `postdeploy` hook
+   (`scripts/deploy-channel.ps1`) then zip-deploys the gateway from the same `backend/`
+   package; with it off the hook exits 0 at once. azd has no conditional service, so the
+   gateway is deliberately not a service in `azure.yaml`. App Service builds on deploy
    (`SCM_DO_BUILD_DURING_DEPLOYMENT=true`); the API starts with
    `backend/startup.sh` (gunicorn with uvicorn workers, `--timeout 600`).
 

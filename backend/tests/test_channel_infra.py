@@ -1,9 +1,10 @@
-"""The channel gateway's deployment wiring, outside Terraform. [CH-07]
+"""The channel gateway's deployment wiring, outside Terraform. [CH-07, CH-07b]
 
-What `infra/tests/channel.tftest.hcl` cannot see: azd knows the `channel` service and
-the same `backend/` package carries it, postprovision grants the gateway identity at
-object level only when the channel is on, `deploy.yml` stays dispatch-only, and every
-setting the gateway reads is documented where an operator looks.
+What `infra/tests/channel.tftest.hcl` cannot see: azd has no `channel` service (it cannot
+make one conditional), the same `backend/` package carries the gateway, postprovision
+grants the gateway identity at object level only when the channel is on, `deploy.yml`
+stays dispatch-only, and every setting the gateway reads is documented where an
+operator looks.
 """
 from __future__ import annotations
 
@@ -22,6 +23,13 @@ def read(*parts: str) -> str:
     return REPO.joinpath(*parts).read_text(encoding="utf-8")
 
 
+def service_names() -> list[str]:
+    """The keys directly under `services:` in azure.yaml (no YAML dependency)."""
+    text = read("azure.yaml")
+    block = text[text.index("\nservices:"):]
+    return re.findall(r"^  ([A-Za-z][\w-]*):\s*$", block, re.MULTILINE)
+
+
 def service_block(name: str) -> str:
     text = read("azure.yaml")
     match = re.search(rf"^  {name}:\n((?:    .*\n|\s*#.*\n)+)", text, re.MULTILINE)
@@ -29,17 +37,25 @@ def service_block(name: str) -> str:
     return match.group(1)
 
 
-def test_azd_knows_the_channel_service_and_the_others_are_unchanged():
-    channel = service_block("channel")
-    assert "project: ./backend" in channel and "host: appservice" in channel and "language: python" in channel
+def test_azd_has_exactly_the_api_and_web_services_so_a_default_azd_up_is_unchanged():
+    assert service_names() == ["api", "web"]
     assert "project: ./backend" in service_block("api") and "language: python" in service_block("api")
     assert "project: ./frontend" in service_block("web")
 
 
-def test_the_azd_service_name_tag_the_module_sets_matches_the_service():
-    module = read("infra", "modules", "channel", "main.tf")
-    assert '"azd-service-name" = "channel"' in module
-    assert "sh startup-channel.sh" in module
+def test_nothing_in_infra_or_the_hooks_needs_the_channel_when_the_toggle_is_off():
+    terraform = "".join(
+        p.read_text(encoding="utf-8") for p in (REPO / "infra").rglob("*.tf") if ".terraform" not in p.parts)
+    assert not re.search(r'"azd-service-name"\s*=\s*"channel"', terraform)
+    azure = read("azure.yaml")
+    hooks = azure[azure.index("\nhooks:"): azure.index("\nservices:")]
+    assert "deploy-channel.ps1" in hooks and "postdeploy:" in hooks
+    # The only hook that names the channel is the one that exits 0 when it is off.
+    assert "postprovision.ps1" in hooks and hooks.count("deploy-channel.ps1") == 2
+
+
+def test_the_module_starts_the_gateway_with_its_own_script():
+    assert "sh startup-channel.sh" in read("infra", "modules", "channel", "main.tf")
 
 
 def test_the_channel_package_is_the_backend_package_and_carries_the_gateway(tmp_path):

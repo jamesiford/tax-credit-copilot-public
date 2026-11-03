@@ -308,7 +308,7 @@ azd env get-values | ForEach-Object { if ($_ -match '^([^=]+)="?(.*?)"?$') { Set
 
 | Operation | Command | Notes |
 |---|---|---|
-| Redeploy code only (no infra change) | `azd deploy` (local azd environment) or dispatch `.github/workflows/deploy.yml` (`workflow_dispatch` only — there is no push trigger, D23) | `azd deploy` packages and zip-deploys both apps without re-running `terraform apply`; the postprovision hooks do not re-run |
+| Redeploy code only (no infra change) | `azd deploy` (local azd environment) or dispatch `.github/workflows/deploy.yml` (`workflow_dispatch` only — there is no push trigger, D23) | `azd deploy` packages and zip-deploys both apps without re-running `terraform apply`; the postprovision hooks do not re-run. The `postdeploy` hook then runs `scripts/deploy-channel.ps1`, which deploys the channel gateway only when `TCC_ENABLE_M365_CHANNEL=true` and otherwise exits 0 (`pwsh scripts/deploy-channel.ps1 -WhatIf` shows what it would do) |
 | Full provision + deploy | `azd up --no-prompt` | Idempotent: a second `azd provision --preview` reports no changes |
 | Run pending migrations | `python scripts/apply-migrations.py --target deployed` | Never pass `--bootstrap` against a Warehouse that already has `tcc_ops.schema_migration` — bootstrap is destructive and is gated to run only once, on a Warehouse Terraform just created (D22) |
 | Re-grant Warehouse SQL | `python scripts/grant-warehouse-sql.py --target deployed` | `GRANT` is idempotent; re-run after rotating or recreating the API identity |

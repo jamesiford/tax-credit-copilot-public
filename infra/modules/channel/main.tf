@@ -16,7 +16,10 @@
 # Terraform's: an app role assignment needs directory permissions Terraform's
 # principal usually lacks, and the T-SQL grant is scripts/grant-warehouse-sql.py.
 #
-# Code is deployed by azd (service `channel`, tag azd-service-name).
+# Code is deployed by scripts/deploy-channel.ps1 (azd postdeploy hook and deploy.yml), NOT by an
+# azd service: azd cannot make a service conditional and resolves each service by its
+# azd-service-name tag, so a `channel` service would break `azd up` whenever this app is
+# absent. Hence the app carries no azd-service-name tag.
 
 variable "enabled" {
   type = bool
@@ -157,7 +160,7 @@ resource "azurerm_linux_web_app" "this" {
   virtual_network_subnet_id                      = var.integration_subnet_id
   ftp_publish_basic_authentication_enabled       = false
   webdeploy_publish_basic_authentication_enabled = false
-  tags                                           = merge(var.tags, { "azd-service-name" = "channel" })
+  tags                                           = var.tags
 
   identity {
     type         = "UserAssigned"
