@@ -262,7 +262,9 @@ def test_the_unbuilt_tools_are_the_ones_a_later_work_package_owns():
     unbuilt = {s.name for s in catalog.CATALOG if not s.implemented}
     assert "verify_figures" in unbuilt
     writes = {s.name for s in catalog.CATALOG if s.kind != catalog.READ}
-    assert writes <= unbuilt, "a write is not built until it is behind the mediator and a signed confirmation"
+    # CH-05 built six of the seven pairs, each behind the mediator and a
+    # confirmation token. The package build is Prompt 3's.
+    assert writes & unbuilt == {"claim_package_create_prepare", "claim_package_create_commit"}
     for base in ("finding_resolve", "finding_reopen", "claim_transition", "claim_record",
                  "engagement_set", "base_year_set", "claim_package_create"):
         assert catalog.get(f"{base}_prepare").kind == catalog.WRITE_PREPARE
