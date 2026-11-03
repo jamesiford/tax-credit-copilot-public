@@ -108,3 +108,8 @@ output "web_role_assignments" {
 output "easy_auth_enabled" {
   value = module.app_service.easy_auth_enabled
 }
+
+output "mock_ai_gateway_url" {
+  description = "URL of the PoC mock model gateway; empty unless enable_mock_ai_gateway."
+  value       = module.mock_ai_gateway.default_hostname == "" ? "" : "https://${module.mock_ai_gateway.default_hostname}"
+}

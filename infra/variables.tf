@@ -307,9 +307,170 @@ variable "foundry_capacity" {
 }
 
 variable "ai_gateway_endpoint" {
-  description = "Optional AI gateway (AI-2). Must carry the Foundry Agents protocol. Empty calls Foundry directly."
+  description = "Optional model gateway (AI-2, AI-03): an https:// base URL without a path. It must expose an OpenAI-compatible chat-completions API with streaming and tool calling (not the Foundry Agents protocol). Empty calls Foundry directly."
   type        = string
   default     = ""
+}
+
+# Everything below is non-secret and emitted to the API only when set, so the
+# defaults leave an existing deployment's plan a no-op (AI-03).
+
+variable "ai_provider_chain" {
+  description = "Ordered model providers (AI_PROVIDER_CHAIN), comma separated from foundry | foundry_connection | gateway, e.g. 'foundry,gateway'. Empty keeps the application default (foundry)."
+  type        = string
+  default     = ""
+  validation {
+    condition     = trimspace(var.ai_provider_chain) == "" || alltrue([for p in split(",", var.ai_provider_chain) : contains(["foundry", "foundry_connection", "gateway"], trimspace(p))])
+    error_message = "ai_provider_chain must be a comma-separated list of foundry, foundry_connection or gateway."
+  }
+}
+
+variable "ai_gateway_auth" {
+  description = "How the API authenticates to the gateway (AI_GATEWAY_AUTH): none | api_key | oauth_client_credentials | entra_token. Empty leaves it unset."
+  type        = string
+  default     = ""
+  validation {
+    condition     = var.ai_gateway_auth == "" || contains(["none", "api_key", "oauth_client_credentials", "entra_token"], var.ai_gateway_auth)
+    error_message = "ai_gateway_auth must be empty, none, api_key, oauth_client_credentials or entra_token."
+  }
+}
+
+variable "ai_gateway_api_style" {
+  description = "Gateway URL shape (AI_GATEWAY_API_STYLE): openai_v1 | azure_deployments. Empty leaves the application default (openai_v1)."
+  type        = string
+  default     = ""
+  validation {
+    condition     = var.ai_gateway_api_style == "" || contains(["openai_v1", "azure_deployments"], var.ai_gateway_api_style)
+    error_message = "ai_gateway_api_style must be empty, openai_v1 or azure_deployments."
+  }
+}
+
+variable "ai_gateway_entra_audience" {
+  description = "Audience the API's managed identity requests a token for when ai_gateway_auth = entra_token (AI_GATEWAY_ENTRA_AUDIENCE)."
+  type        = string
+  default     = ""
+}
+
+variable "ai_gateway_oauth_token_url" {
+  description = "Token endpoint for ai_gateway_auth = oauth_client_credentials (AI_GATEWAY_OAUTH_TOKEN_URL)."
+  type        = string
+  default     = ""
+}
+
+variable "ai_gateway_oauth_client_id" {
+  description = "Client id for ai_gateway_auth = oauth_client_credentials (AI_GATEWAY_OAUTH_CLIENT_ID). An identifier, not a secret."
+  type        = string
+  default     = ""
+}
+
+variable "ai_gateway_oauth_scope" {
+  description = "Scope for ai_gateway_auth = oauth_client_credentials (AI_GATEWAY_OAUTH_SCOPE)."
+  type        = string
+  default     = ""
+}
+
+variable "ai_gateway_timeout_seconds" {
+  description = "Gateway read timeout in seconds (AI_GATEWAY_TIMEOUT_SECONDS). A string so empty means unset."
+  type        = string
+  default     = ""
+  validation {
+    condition     = trimspace(var.ai_gateway_timeout_seconds) == "" || can(regex("^[0-9]+(\\.[0-9]+)?$", trimspace(var.ai_gateway_timeout_seconds)))
+    error_message = "ai_gateway_timeout_seconds must be empty or a positive number of seconds."
+  }
+}
+
+variable "ai_egress_policy" {
+  description = "What may leave Microsoft's boundary in a prompt (AI_EGRESS_POLICY): allow_all | aggregates_only | block. Empty leaves the application default."
+  type        = string
+  default     = ""
+  validation {
+    condition     = var.ai_egress_policy == "" || contains(["allow_all", "aggregates_only", "block"], var.ai_egress_policy)
+    error_message = "ai_egress_policy must be empty, allow_all, aggregates_only or block."
+  }
+}
+
+variable "ai_model_router" {
+  description = "Model for the router role on every provider (AI_MODEL_ROUTER)."
+  type        = string
+  default     = ""
+}
+
+variable "ai_model_narrator" {
+  description = "Model for the narrator role on every provider (AI_MODEL_NARRATOR)."
+  type        = string
+  default     = ""
+}
+
+variable "ai_model_analysis" {
+  description = "Model for the analysis role on every provider (AI_MODEL_ANALYSIS)."
+  type        = string
+  default     = ""
+}
+
+variable "ai_foundry_connection_name" {
+  description = "Foundry model connection used by the foundry_connection provider (AI_FOUNDRY_CONNECTION_NAME)."
+  type        = string
+  default     = ""
+}
+
+# Key Vault REFERENCE inputs: the NAME of a secret that already exists in the
+# vault. Terraform never sees the value; App Service resolves it at runtime
+# through the API identity, which the keyvault module grants Key Vault Secrets User.
+
+variable "ai_gateway_api_key_secret_name" {
+  description = "Name of an existing Key Vault secret holding the gateway API key (surfaced as AI_GATEWAY_API_KEY, a Key Vault reference). Needs enable_key_vault."
+  type        = string
+  default     = ""
+  validation {
+    condition     = trimspace(var.ai_gateway_api_key_secret_name) == "" || var.enable_key_vault
+    error_message = "ai_gateway_api_key_secret_name is a Key Vault reference and needs enable_key_vault = true."
+  }
+  validation {
+    condition     = trimspace(var.ai_gateway_api_key_secret_name) == "" || can(regex("^[A-Za-z0-9-]{1,127}$", trimspace(var.ai_gateway_api_key_secret_name)))
+    error_message = "ai_gateway_api_key_secret_name must be a Key Vault secret name (letters, digits and hyphens)."
+  }
+}
+
+variable "ai_gateway_oauth_secret_name" {
+  description = "Name of an existing Key Vault secret holding the OAuth client secret (surfaced as AI_GATEWAY_OAUTH_CLIENT_SECRET, a Key Vault reference). Needs enable_key_vault."
+  type        = string
+  default     = ""
+  validation {
+    condition     = trimspace(var.ai_gateway_oauth_secret_name) == "" || var.enable_key_vault
+    error_message = "ai_gateway_oauth_secret_name is a Key Vault reference and needs enable_key_vault = true."
+  }
+  validation {
+    condition     = trimspace(var.ai_gateway_oauth_secret_name) == "" || can(regex("^[A-Za-z0-9-]{1,127}$", trimspace(var.ai_gateway_oauth_secret_name)))
+    error_message = "ai_gateway_oauth_secret_name must be a Key Vault secret name (letters, digits and hyphens)."
+  }
+}
+
+# --- mock AI gateway (proof of concept only) --------------------------------------
+
+variable "enable_mock_ai_gateway" {
+  description = "Create a mock OpenAI-compatible gateway App Service on the existing plan (scripts/mock-ai-gateway.py) for a proof of concept. Never in the enterprise profile."
+  type        = bool
+  default     = false
+  validation {
+    condition     = !var.enable_mock_ai_gateway || var.profile != "enterprise"
+    error_message = "enable_mock_ai_gateway must never be true in the enterprise profile: the mock validates token shape, not signatures."
+  }
+}
+
+variable "mock_ai_gateway_auth" {
+  description = "Auth scheme the mock enforces (MOCK_AUTH): none | api_key | oauth | entra."
+  type        = string
+  default     = "none"
+  validation {
+    condition     = contains(["none", "api_key", "oauth", "entra"], var.mock_ai_gateway_auth)
+    error_message = "mock_ai_gateway_auth must be none, api_key, oauth or entra."
+  }
+}
+
+variable "mock_ai_gateway_entra_audience" {
+  description = "Audience the mock expects in an Entra token (MOCK_ENTRA_AUDIENCE)."
+  type        = string
+  default     = "api://mock-gateway"
 }
 
 # --- storage ---------------------------------------------------------------------
