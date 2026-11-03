@@ -28,18 +28,23 @@ first. Registration is explicit and lives in one file.
 THE PIPELINE, AND WHAT IS NOT IN IT
 -----------------------------------
 
-A command runs Validation -> Handler -> Audit, and every dispatch is timed.
-That is the whole list. Two further stages are frequently described as being
-here and are NOT:
+A command runs Authorization -> Validation -> Handler -> Audit, and every
+dispatch is timed.
 
-* **Authorization** — there is no identity to authorize. Every request today
-  arrives unauthenticated.
-* **TenantScope** — there is no employer binding to scope to.
-
-Both are gated on Entra (see SECURITY.md). They are absent rather than
-stubbed ON PURPOSE: a stage that runs and always passes reads as a control, and
-the first person to audit this would find a name where an enforcement should
-be. When identity lands, they become real stages here and this paragraph goes.
+* **Authorization** is real as of the Microsoft 365 channel (CH-04). A command
+  class may declare `policy = Policy.WRITER`; the stage asks the configured
+  authorizer whether the caller's PERSON — for the channel gateway, the user it
+  acts for — is entitled. A command that declares a policy on a mediator with no
+  authorizer is REFUSED, not waved through: a control that silently does not run
+  is the failure this stage exists to prevent. A refusal is recorded as
+  `refused`, because "somebody tried and was turned away" gets asked about.
+  The caller is the `principal` argument, else the principal the API guard set
+  for the request, so a router that forgets to pass one cannot demote an agent
+  to anonymous.
+* **TenantScope** is still NOT here: there is no employer binding to scope to.
+  It is absent rather than stubbed because a stage that runs and always passes
+  reads as a control, and an auditor would find a name where an enforcement
+  should be. It becomes a stage when that binding exists.
 """
 from __future__ import annotations
 
@@ -48,7 +53,9 @@ import time
 from collections import deque
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import Any, Callable, Deque, Protocol, TypeVar
+from typing import Any, Callable, ClassVar, Deque, Protocol, TypeVar
+
+from application.identity import ANONYMOUS, NotAuthorized, Policy, Principal, ambient_principal
 
 logger = logging.getLogger(__name__)
 
@@ -57,6 +64,13 @@ TResult = TypeVar("TResult")
 
 class Request(Protocol):
     """Marker for anything the mediator can dispatch."""
+
+
+class Authorizer(Protocol):
+    """The Authorization stage's port: raise `NotAuthorized` or return."""
+
+    def check(self, request: Any, principal: Principal) -> None:
+        ...
 
 
 @dataclass(frozen=True)
@@ -75,9 +89,13 @@ class Command:
     Every command carries `actor` — who is responsible. On a system whose
     outputs land on tax returns, an unattributed state change is not an audit
     trail, it is a rumour.
+
+    `policy` is what the Authorization stage demands of the caller; `None`
+    leaves the command open to any authenticated caller, as before.
     """
 
     actor: str = "system"
+    policy: ClassVar[Policy | None] = None
 
 
 #: What `actor` falls back to. An audit record says so rather than presenting a
@@ -141,9 +159,10 @@ class Mediator:
     dispatch. Dispatch itself holds no state.
     """
 
-    def __init__(self, audit: AuditLog | None = None) -> None:
+    def __init__(self, audit: AuditLog | None = None, authorizer: Authorizer | None = None) -> None:
         self._handlers: dict[type, Handler] = {}
         self.audit = audit if audit is not None else AuditLog()
+        self._authorizer = authorizer
 
     def register(self, request_type: type, handler: Handler) -> None:
         """Bind one request type to one handler.
@@ -160,9 +179,9 @@ class Mediator:
             )
         self._handlers[request_type] = handler
 
-    def send(self, request: Any) -> Any:
-        """Validation → Handler → Audit, timed. See the module docstring for
-        the two stages this deliberately does not have."""
+    def send(self, request: Any, principal: Principal | None = None) -> Any:
+        """Authorization → Validation → Handler → Audit, timed. See the module
+        docstring for the stage this deliberately does not have."""
         handler = self._handlers.get(type(request))
         if handler is None:
             raise HandlerNotRegistered(
@@ -171,6 +190,7 @@ class Mediator:
             )
 
         is_command = isinstance(request, Command)
+        self._authorize(request, principal or ambient_principal() or ANONYMOUS, is_command)
 
         # Validation runs BEFORE the audit clock starts: a malformed request was
         # never a write, and recording it as an attempted one would put noise in
@@ -204,6 +224,23 @@ class Mediator:
         else:
             logger.debug("query %s in %.0fms", type(request).__name__, elapsed_ms)
         return result
+
+    def _authorize(self, request: Any, principal: Principal, is_command: bool) -> None:
+        """Refuse before anything runs, and say so in the trail."""
+        if getattr(type(request), "policy", None) is None:
+            return
+        started_at = datetime.now(timezone.utc).isoformat()
+        try:
+            if self._authorizer is None:
+                raise NotAuthorized(
+                    f"{type(request).__name__} declares a policy and this mediator has no authorizer"
+                )
+            self._authorizer.check(request, principal)
+        except NotAuthorized as refusal:
+            logger.warning("refused %s: %s", type(request).__name__, refusal)
+            if is_command:
+                self._audit(request, started_at, 0.0, "refused", refusal)
+            raise
 
     def _audit(
         self, request: Any, at: str, elapsed_ms: float, outcome: str,

@@ -7,8 +7,9 @@ import os
 from contextlib import asynccontextmanager
 
 from dotenv import load_dotenv
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 load_dotenv()  # local dev — production env vars come from the host.
 
@@ -16,6 +17,7 @@ from telemetry import configure_telemetry, instrument_fastapi  # noqa: E402
 from api.artifacts import router as artifacts_router  # noqa: E402
 from api.audit import router as audit_router  # noqa: E402
 from api.auth import request_guard, router as auth_router  # noqa: E402
+from application.identity import NotAuthorized  # noqa: E402
 from api.chat import router as chat_router  # noqa: E402
 from api.claims import router as claims_router, v2_router as claims_v2_router  # noqa: E402
 from api.eligibility import router as eligibility_router  # noqa: E402
@@ -142,6 +144,12 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT", "OPTIONS"],
     allow_headers=["*"],
 )
+
+
+@app.exception_handler(NotAuthorized)
+async def _not_authorized(_request: Request, exc: NotAuthorized) -> JSONResponse:
+    """A command refused by the Authorization stage is a 403, wherever it was sent from."""
+    return JSONResponse(status_code=403, content={"detail": str(exc) or "not authorized"})
 
 # Must run here, before the app serves: middleware cannot be added once the
 # stack is built, and the lifespan runs inside the first call that builds it.

@@ -28,6 +28,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any
 
+from application.identity import Policy
 from application.mediator import Command
 
 logger = logging.getLogger(__name__)
@@ -44,6 +45,7 @@ class SetBaseYearCommand(Command):
     justification: str | None = None
     #: False in tests, so the command can be checked without starting a run.
     recalculate: bool = True
+    policy = Policy.WRITER
 
     def __post_init__(self) -> None:
         if self.client_id <= 0:

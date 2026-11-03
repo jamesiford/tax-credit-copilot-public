@@ -75,6 +75,42 @@ def auth_tenant_id(env: Mapping[str, str] | None = None) -> str:
     return _get(env, "AUTH_TENANT_ID") or _get(env, "AZURE_TENANT_ID")
 
 
+WRITER_SOURCES = ("allowlist", "entra_group", "either")
+DEFAULT_CONFIRM_TTL_SECONDS = 600
+
+
+def writer_source(env: Mapping[str, str] | None = None) -> str:
+    """Where writer entitlement comes from. An unknown value raises: guessing a
+    source for a permission check is how a typo grants everyone."""
+    env = os.environ if env is None else env
+    value = (_get(env, "CHANNEL_WRITER_SOURCE") or "allowlist").lower()
+    if value not in WRITER_SOURCES:
+        raise ValueError(f"CHANNEL_WRITER_SOURCE must be one of {', '.join(WRITER_SOURCES)}; got {value!r}")
+    return value
+
+
+def writer_group_id(env: Mapping[str, str] | None = None) -> str:
+    env = os.environ if env is None else env
+    return _get(env, "CHANNEL_WRITER_GROUP_ID")
+
+
+def enforce_writer_for_users(env: Mapping[str, str] | None = None) -> bool:
+    env = os.environ if env is None else env
+    return _get(env, "CHANNEL_ENFORCE_WRITER_FOR_USERS").lower() in ("1", "true", "yes", "on")
+
+
+def confirm_ttl_seconds(env: Mapping[str, str] | None = None) -> int:
+    env = os.environ if env is None else env
+    raw = _get(env, "CHANNEL_CONFIRM_TTL_SECONDS")
+    try:
+        seconds = int(raw) if raw else DEFAULT_CONFIRM_TTL_SECONDS
+    except ValueError as exc:
+        raise ValueError(f"CHANNEL_CONFIRM_TTL_SECONDS must be an integer; got {raw!r}") from exc
+    if not 30 <= seconds <= 3600:
+        raise ValueError("CHANNEL_CONFIRM_TTL_SECONDS must be between 30 and 3600")
+    return seconds
+
+
 def normalise_store(value: str) -> str:
     value = value.strip().lower()
     return _ALIASES.get(value, value)
