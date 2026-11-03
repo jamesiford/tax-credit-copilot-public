@@ -149,7 +149,7 @@ def test_the_api_gets_only_the_writer_settings_for_the_channel_and_only_with_it_
 
 def gateway_env_names() -> set[str]:
     source = (BACKEND / "channel" / "config.py").read_text(encoding="utf-8")
-    names = set(re.findall(r'_text\(env, "([A-Z_]+)"\)', source)) | set(re.findall(r'_number\(env, "([A-Z_]+)"', source))
+    names = set(re.findall(r'_(?:text|flag)\(env, "([A-Z_]+)"\)', source)) | set(re.findall(r'_number\(env, "([A-Z_]+)"', source))
     names |= set(re.findall(r'"(TENANT_ID|GATEWAY_AUDIENCE|API_BASE_URL|API_AUDIENCE)"', source))
     names |= {"CHANNEL_STORE", "CHANNEL_WRITER_SOURCE", "CHANNEL_WRITER_GROUP_ID", "WEB_CONCURRENCY"}
     return names

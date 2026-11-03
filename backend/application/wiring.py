@@ -15,9 +15,9 @@ from typing import Any
 from application.deployment import store_choice
 from application.channel_wiring import (  # noqa: F401 - re-exported: the channel stores are composed in their own module
     get_agent_action_audit_repository, get_agent_action_recorder, get_channel_audit_repository,
-    get_channel_auditor, get_confirmation_repository, get_writer_entitlement, get_writer_repository,
-    set_agent_action_audit_repository, set_channel_audit_repository, set_confirmation_repository,
-    set_writer_entitlement, set_writer_repository,
+    get_channel_auditor, get_confirmation_repository, get_display_name_resolver, get_writer_entitlement,
+    get_writer_repository, set_agent_action_audit_repository, set_channel_audit_repository,
+    set_confirmation_repository, set_display_name_resolver, set_writer_entitlement, set_writer_repository,
 )
 from application.commands.assess_client import AssessClientCommand, handle_assess_client
 from application.commands.resolve_finding import (

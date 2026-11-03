@@ -46,6 +46,7 @@ class GatewaySettings:
     rate_limit_per_minute: int = DEFAULT_RATE_LIMIT_PER_MINUTE
     request_timeout_seconds: float = DEFAULT_REQUEST_TIMEOUT_SECONDS
     debug_whoami: bool = False
+    resolve_display_names: bool = False
     deployed: bool = False
     channel_store: str = "sqlite"
 
@@ -57,6 +58,10 @@ class GatewaySettings:
 
 def _text(env: Mapping[str, str], name: str) -> str:
     return (env.get(name) or "").strip()
+
+
+def _flag(env: Mapping[str, str], name: str) -> bool:
+    return _text(env, name).lower() in ("1", "true", "yes", "on")
 
 
 def _number(env: Mapping[str, str], name: str, default: float, low: float, high: float) -> float:
@@ -103,7 +108,8 @@ def load_settings(env: Mapping[str, str] | None = None) -> GatewaySettings:
         allowed_caller_app_ids=apps,
         rate_limit_per_minute=int(_number(env, "CHANNEL_RATE_LIMIT_PER_MINUTE", DEFAULT_RATE_LIMIT_PER_MINUTE, 1, 6000)),
         request_timeout_seconds=_number(env, "CHANNEL_REQUEST_TIMEOUT_SECONDS", DEFAULT_REQUEST_TIMEOUT_SECONDS, 1, 600),
-        debug_whoami=_text(env, "CHANNEL_DEBUG_WHOAMI").lower() in ("1", "true", "yes", "on"),
+        debug_whoami=_flag(env, "CHANNEL_DEBUG_WHOAMI"),
+        resolve_display_names=_flag(env, "CHANNEL_RESOLVE_DISPLAY_NAMES"),
         deployed=deployed,
         channel_store=store,
     )

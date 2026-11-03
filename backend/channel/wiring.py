@@ -22,6 +22,7 @@ from channel.ledger import FactLedger
 from channel.limiter import RateLimiter
 from channel.mcp import McpServer
 from channel.narration import NarrationAudit
+from channel.people import CallerPeople
 from channel.pipeline import ToolPipeline
 from infrastructure.auth.entra import EntraTokenValidator
 
@@ -61,6 +62,7 @@ class Services:
     mcp: McpServer
     api: ApiClient
     narration: NarrationAudit
+    people: CallerPeople
 
 
 def build_services(
@@ -78,6 +80,7 @@ def build_services(
         ledger=ledger or FactLedger(), api=api, version=VERSION,
     )
     downloads = DownloadService(settings=settings, auditor=auditor, api=api, limiter=limiter)
-    mcp = McpServer(authenticator, pipeline, settings, NAME, VERSION)
+    people = CallerPeople(channel_wiring.get_display_name_resolver() if settings.resolve_display_names else None)
+    mcp = McpServer(authenticator, pipeline, settings, NAME, VERSION, people)
     return Services(settings, authenticator, pipeline, downloads, mcp, api,
-                    NarrationAudit(auditor, _LazyRecorder()))
+                    NarrationAudit(auditor, _LazyRecorder()), people)

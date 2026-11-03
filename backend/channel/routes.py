@@ -119,6 +119,7 @@ class GatewayRoutes:
             message = "the body must be {args, idempotency_key?, confirmation_token?}"
             out = error_outcome(422, "invalid_request", message, caller.acting.correlation_id or "")
             return _json(out.status, out.body)
+        caller = await self._s.people.enrich(caller)
         outcome = await self._s.pipeline.run(
             caller, tool, ToolCall(call.args, call.idempotency_key, call.confirmation_token, _headers(request)),
         )
@@ -130,6 +131,7 @@ class GatewayRoutes:
             caller = self._authenticate(request)
         except AuthFailure as exc:
             return _refusal(exc)
+        caller = await self._s.people.enrich(caller)
         cid = caller.acting.correlation_id or ""
         if caller.kind != "agent":
             out = error_outcome(403, "not_authorized", "only the orchestrator reports narrations", cid)
