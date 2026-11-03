@@ -342,3 +342,28 @@ One short entry per decision: context, choice, why.
   pairs are now built; only the package build remains unbuilt) and
   `test_capabilities_equivalence.py` (the unbuilt-tool probe uses
   `claim_package_create_commit`).
+
+## D-36 AI-01: SDK pins, Python version, and the breaking changes read
+
+- **Choice.** `agent-framework-foundry` 1.7.0 → **1.16.0** (newest stable; pulls
+  `agent-framework-core` 1.24.0 and `agent-framework-openai` 1.18.0),
+  `azure-ai-projects` 2.1.0 → **2.7.0** (newest 1.16.0 accepts, `<2.8.0`; 2.10.0
+  exists but the framework would refuse it), `azure-identity` 1.25.3 → 1.27.0,
+  `azure-monitor-opentelemetry` 1.8.8 → 1.8.11. `httpx` 0.28.1 is already latest.
+  `azure-ai-agentserver-responses` (2.4.0) is NOT added: it belongs to the
+  orchestrator's requirements (Prompt 4).
+- **Python.** `py -3.12` is not installed here; the suite ran on 3.14 (D-02). Nothing
+  introduced needs more than 3.12 features.
+- **Breaking items read** (Learn "Python 2026 significant changes", updated
+  2026-10-26, and the 1.7 → 1.23 entries): MCP SDK 2.x lifecycle (1.23), AG-UI
+  authorization ownership (1.23), `Content` metadata and stream merge modes (1.22),
+  middleware must be a sequence (1.17), `SecretString` no longer a `str` (1.18),
+  Responses/Invocations hosting changes (1.20), Lab installs separately (1.18).
+  None touches what this product calls — a `FoundryAgent` built from
+  `project_endpoint`/`agent_name`/`agent_version`/`credential` and streamed with
+  `run(prompt, stream=True)` — so the code needed **no migration**. We use no MCP,
+  AG-UI, middleware or persisted sessions, so the persisted-state warning does not
+  apply. Sources: <https://learn.microsoft.com/en-us/agent-framework/support/upgrade/python-2026-significant-changes>.
+- **Guard.** `tests/test_ai_sdk_surface.py` pins the symbols the adapters use;
+  `scripts/check-sdk-versions.py` prints pinned vs latest (offline-safe).
+- **Why.** A bump should fail on a named symbol in CI, not at runtime.
