@@ -35,7 +35,7 @@ function Row({ label, children }) {
   return <><dt>{label}</dt><dd>{children}</dd></>;
 }
 
-export default function EvidenceView({ summary, onAskCopilot }) {
+export default function EvidenceView({ summary }) {
   const [walk, setWalk] = useState(null);
   const [assumptions, setAssumptions] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -63,19 +63,11 @@ export default function EvidenceView({ summary, onAskCopilot }) {
       eyebrow="Prove it"
       title="Audit trail"
       sub="The sealed dossier for this run — identity, statute, source, result, and every step that produced it"
-      actions={<>
+      actions={(
         <button className="btn btn-secondary" onClick={() => window.print()}>
           <Printer size={15} /> Print / Save PDF
         </button>
-        {onAskCopilot && (
-          <button
-            className="btn btn-primary"
-            onClick={() => onAskCopilot('What is inside this audit trail, and what makes the calculation reproducible under audit?')}
-          >
-            Ask Copilot
-          </button>
-        )}
-      </>}
+      )}
     />
 
     <div className="callout info">

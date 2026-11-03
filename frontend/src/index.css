@@ -564,67 +564,7 @@ button.pill-action.pill-forecast-ok, button.pill-action.pill-forecast-bad { bord
 .map-legend-item { display: inline-flex; align-items: center; gap: var(--space-2); }
 .map-legend-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
 
-.chat-drawer-scrim {
-  position: fixed;
-  inset: 0;
-  background: rgba(10, 10, 35, 0.32);
-  z-index: 60;
-  animation: fade-in 0.15s ease;
-}
-.chat-drawer {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: min(460px, 92vw);
-  background: var(--panel);
-  border-left: 1px solid var(--line);
-  box-shadow: -8px 0 24px rgba(10, 10, 35, 0.12);
-  z-index: 61;
-  display: flex;
-  flex-direction: column;
-  animation: slide-in 0.18s ease;
-}
-.chat-drawer-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--space-6) var(--space-8);
-  background: linear-gradient(90deg, var(--exp-primary), var(--exp-accent));
-  color: var(--on-accent);
-  font-weight: 600;
-  font-size: var(--text-subhead);
-}
-.chat-drawer-close {
-  width: 26px;
-  height: 26px;
-  border: none;
-  padding: 0;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.15);
-  color: var(--on-accent);
-  font-size: var(--text-title);
-  line-height: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-.chat-drawer-close:hover { background: rgba(255, 255, 255, 0.3); }
-.chat-drawer-body { flex: 1; min-height: 0; display: flex; padding: var(--space-5); }
-.chat-drawer-body > section { flex: 1; min-height: 0; }
-.chat-drawer-head-actions { display: inline-flex; align-items: center; gap: var(--space-4); }
-.chat-drawer-ask {
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  background: rgba(255, 255, 255, 0.14);
-  color: var(--on-accent);
-  font-size: var(--text-small);
-  font-weight: 600;
-  padding: var(--space-2) var(--space-5);
-  border-radius: var(--radius-pill);
-  cursor: pointer;
-}
-.chat-drawer-ask:hover { background: rgba(255, 255, 255, 0.26); }
+
 
 /* Calculation walk excerpts and other verbatim engine output. */
 .tcc-code {
@@ -663,9 +603,6 @@ button.pill-action.pill-forecast-ok, button.pill-action.pill-forecast-bad { bord
 .footprint-legend .swatch-priced { background: var(--map-priced); }
 .footprint-legend .swatch-held { background: var(--map-held); }
 .footprint-svg { width: 100%; height: auto; }
-
-@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
-@keyframes slide-in { from { transform: translateX(20px); opacity: 0.4; } to { transform: translateX(0); opacity: 1; } }
 
 /* Credit Portfolio: tabs + toolbar */
 .portfolio-toolbar {
@@ -732,23 +669,7 @@ button.pill-action.pill-forecast-ok, button.pill-action.pill-forecast-bad { bord
 }
 .modal-body { padding: var(--space-7); overflow-y: auto; display: flex; flex-direction: column; gap: var(--space-6); }
 
-.pipeline-modal { width: min(640px, 92vw); }
-.pipeline-modal .modal-head {
-  background: var(--panel);
-  color: var(--ink);
-  border-bottom: 1px solid var(--line);
-  padding: var(--space-6) var(--space-8);
-}
-.pipeline-modal .modal-head .chat-drawer-close { color: var(--muted); }
-.pipeline-modal .modal-head .chat-drawer-close:hover { color: var(--ink); }
-.pipeline-modal .modal-body { padding: var(--space-8); gap: var(--space-7); }
-.pipeline-modal .agent-section-title { margin: var(--space-3) 0 var(--space-2); }
-.pipeline-modal .agent-prose { margin: 0; }
-.pipeline-modal .modal-foot {
-  padding: var(--space-6) var(--space-8);
-  border-top: 1px solid var(--line);
-  background: var(--line-2);
-}
+
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-5); }
 .form-grid label { font-size: var(--text-body); color: var(--ink-2); display: flex; flex-direction: column; gap: var(--space-2); }
 .form-grid input, .form-grid select, .form-grid textarea {
@@ -2354,8 +2275,7 @@ button.pill-action.pill-forecast-ok, button.pill-action.pill-forecast-bad { bord
   .shell-skip,
   .ui-floating,
   .sidenav,
-  .chat-drawer,
-  .chat-drawer-scrim,
+  .ask-overlay,
   .modal,
   .top-actions-local,
   .tcc-header-actions,

@@ -17,7 +17,11 @@ import { ComposableMap, Geographies, Geography } from 'react-simple-maps';
  * marker in the middle of a county implies a precision the credit does not have.
  */
 
-const GEO_URL = 'https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json';
+// Vendored (frontend/public/us-states-10m.json): the geometry is the same file
+// the `us-atlas` package ships (US Census cartographic boundaries, ISC licence,
+// see docs/design/DESIGN-SYSTEM.md). It used to load from a CDN at runtime,
+// which broke offline and sent a request off the origin.
+const GEO_URL = `${import.meta.env.BASE_URL}us-states-10m.json`;
 
 const NAME_TO_CODE = {
   Alabama: 'AL', Alaska: 'AK', Arizona: 'AZ', Arkansas: 'AR', California: 'CA',

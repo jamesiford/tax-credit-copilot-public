@@ -53,3 +53,9 @@
 .sg-row > .start-here {
   flex: 1 1 100%;
 }
+
+/* A demo that is a block of its own (a header and its note), not a flex item. */
+.sg-row > .sg-block {
+  flex: 1 1 100%;
+  min-width: 0;
+}

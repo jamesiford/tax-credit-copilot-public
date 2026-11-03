@@ -7,7 +7,8 @@ import {
 } from 'lucide-react';
 import { fetchClientScope, fetchScope, fetchWorkspace, hasYear, refreshWorkspace } from './api.js';
 import AgentActivityView from './components/AgentActivityView.jsx';
-import ChatPanel from './components/ChatPanel.jsx';
+import PanelBoundary from './components/PanelBoundary.jsx';
+import AskWorkspace from './components/ask/AskWorkspace.jsx';
 import ClientHeader from './components/ClientHeader.jsx';
 import DataIngestionView from './components/DataIngestionView.jsx';
 import EvidenceView from './components/EvidenceView.jsx';
@@ -161,6 +162,8 @@ const ASK = {
   position: 'Summarize what this client is entitled to against what they have claimed, and where the biggest recoverable gap is.',
   progress: 'Summarize how this client is tracking against the statutory threshold part-way through the year, and which employees are closest to qualifying.',
   plan: 'Summarize which lever moves this client\u2019s credit the most, and by how much.',
+  rules: 'Summarize how rule packs are versioned per tax year, and how a filed claim stays bound to the statute that was in force that year.',
+  evidence: 'What is inside this audit trail, and what makes the calculation reproducible under audit?',
 };
 
 //: At portfolio scope there is no client, so every prompt above is the wrong
@@ -171,6 +174,8 @@ const ASK_PORTFOLIO =
   'Who should we be targeting, and why? Rank them and say what I would open the call with.';
 
 function askForPage(routeView, isPortfolio) {
+  // These two describe the product, not a client, so scope does not matter.
+  if (routeView === 'rules' || routeView === 'evidence') return ASK[routeView];
   return isPortfolio ? ASK_PORTFOLIO : ASK[routeView];
 }
 
@@ -558,8 +563,8 @@ export default function App() {
   else if (routeView === 'onezero') view = <OneZeroView {...common} scope={resolved.scope} />;
   else if (routeView === 'compare') view = <CompareView {...common} />;
   else if (routeView === 'assumptions') view = <AssumptionsView {...common} />;
-  else if (routeView === 'rules') view = <RuleLibraryView onAskCopilot={ask} programs={scopeOptions?.programs ?? null} />;
-  else if (routeView === 'evidence') view = <EvidenceView summary={summary} onAskCopilot={ask} />;
+  else if (routeView === 'rules') view = <RuleLibraryView programs={scopeOptions?.programs ?? null} />;
+  else if (routeView === 'evidence') view = <EvidenceView summary={summary} />;
   else if (routeView === 'ingestion') {
     view = <DataIngestionView
       taxYear={resolved.scope.year}
@@ -643,11 +648,16 @@ export default function App() {
             : 'A per-client audit trail is the next step; today this view exists for the certified run only.'}
         </div>
       )}
-      {view}
+      {/* A view that throws costs the view, not the shell: without this the whole
+          tree unmounts and the page is blank. Keyed by path so moving on resets it. */}
+      <PanelBoundary key={location.pathname} name={activeItem?.label || 'This page'}>
+        {view}
+      </PanelBoundary>
     </>}
   >
     {!chatOpen && (
       <FloatingAction
+        id="ask-launcher"
         icon={<MessageSquare size={18} />}
         label="Ask Copilot"
         title="Ask Copilot (Ctrl+K)"
@@ -678,34 +688,17 @@ export default function App() {
       </div>
     )}
 
-    {chatOpen && <>
-      <button className="chat-drawer-scrim" onClick={() => setChatOpen(false)} aria-label="Close Copilot" />
-      <aside className="chat-drawer">
-        <div className="chat-drawer-head">
-          <span>Ask Copilot</span>
-          <div className="chat-drawer-head-actions">
-            {askForPage(routeView, resolved.scope.clientId === PORTFOLIO) && (
-              <button
-                className="chat-drawer-ask"
-                onClick={() => setQueuedPrompt(
-                  askForPage(routeView, resolved.scope.clientId === PORTFOLIO),
-                )}
-              >
-                Ask about this page
-              </button>
-            )}
-            <button className="chat-drawer-close" onClick={() => setChatOpen(false)} aria-label="Close">×</button>
-          </div>
-        </div>
-        <div className="chat-drawer-body">
-          <ChatPanel
-            scope={resolved.scope}
-            queuedPrompt={queuedPrompt}
-            queuedScope={queuedScope}
-            onQueuedConsumed={() => { setQueuedPrompt(null); setQueuedScope(null); }}
-          />
-        </div>
-      </aside>
-    </>}
+    <AskWorkspace
+      open={chatOpen}
+      onClose={() => setChatOpen(false)}
+      scope={resolved.scope}
+      nameFor={(id) => (scopeOptions?.clients || [])
+        .find((c) => String(c.account_id) === String(id))?.name}
+      onNavigate={(href) => { setChatOpen(false); navigate(href); }}
+      pagePrompt={askForPage(routeView, resolved.scope.clientId === PORTFOLIO)}
+      queuedPrompt={queuedPrompt}
+      queuedScope={queuedScope}
+      onQueuedConsumed={() => { setQueuedPrompt(null); setQueuedScope(null); }}
+    />
   </AppShell>;
 }

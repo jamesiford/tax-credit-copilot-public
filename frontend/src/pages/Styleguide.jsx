@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { MemoryRouter } from 'react-router-dom';
 import { applyTheme, THEME_STORAGE_KEY, THEMES } from '../brand.config.js';
 import {
   Button, Callout, Card, CountBadge, EmptyState, FloatingAction, HeroBand, KpiRow, KpiTile,
@@ -11,6 +10,12 @@ import DrillTrail from '../components/shell/DrillTrail.jsx';
 import TopBar from '../components/shell/TopBar.jsx';
 import StartHereCards from '../components/StartHereCards.jsx';
 import TrailSteps from '../components/TrailSteps.jsx';
+import ConfirmCard from '../components/ask/ConfirmCard.jsx';
+import EvidencePane from '../components/ask/EvidencePane.jsx';
+import { CONFIRMATION_EVIDENCE, ELIGIBILITY_EVIDENCE, PLAN_EVENT, TREND_EVIDENCE } from '../lib/askFixtures.js';
+import { validateEvidence } from '../lib/evidence.js';
+
+const ASK_ITEMS = [ELIGIBILITY_EVIDENCE, TREND_EVIDENCE, CONFIRMATION_EVIDENCE].map((raw) => validateEvidence(raw).item);
 
 const TRAIL = [{
   step_id: 'S-01', stage: 'selection', method: 'shared', decision_basis: 'BA-02',
@@ -191,7 +196,7 @@ export default function Styleguide() {
       </Section>
 
       <Section title="Card: verdict tones and flush grid">
-        <div className="tcc-verdict-grid">
+        <div className="tcc-verdict-grid sg-block">
           {['above-min', 'below-min', 'partial', 'base-year'].map((t) => (
             <Card key={t} tone={t} title={`Border: ${t}`}><p>The border encodes the reading, from --state-*.</p></Card>
           ))}
@@ -208,7 +213,7 @@ export default function Styleguide() {
       </Section>
 
       <Section title="VerdictCard">
-        <div className="tcc-verdict-grid">
+        <div className="tcc-verdict-grid sg-block">
           <VerdictCard
             tone="above-min"
             title="Georgia job tax credit"
@@ -229,7 +234,7 @@ export default function Styleguide() {
       </Section>
 
       <Section title="Client review header">
-        <MemoryRouter>
+        <div className="sg-block">
           <ClientHeader
             clientId={2001}
             clientName="Cascade Retail Partners"
@@ -246,7 +251,15 @@ export default function Styleguide() {
             clientScope={{ payroll_years: [], calculable_years: [] }}
             onBack={() => {}}
           />
-        </MemoryRouter>
+        </div>
+      </Section>
+
+      <Section title="Ask: evidence pane">
+        <div className="sg-block">
+          <EvidencePane items={ASK_ITEMS} plan={{ intents: PLAN_EVENT.intents, needsClient: [] }} scope={{ clientId: 2001, year: 2023 }} />
+          <EvidencePane items={[]} plan={{ intents: PLAN_EVENT.intents, needsClient: [] }} scope={{ clientId: 2001, year: 2023 }} />
+          <ConfirmCard item={ASK_ITEMS[2]} onConfirm={() => {}} onCancel={() => {}} />
+        </div>
       </Section>
 
       <Section title="TrailSteps">

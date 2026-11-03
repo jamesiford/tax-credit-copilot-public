@@ -92,9 +92,19 @@ button.ui-stepper__control:hover {
   font-weight: 700;
 }
 
+/* Disabled is not just grey: grey is also what an upcoming step looks like. A
+   dashed marker and a struck label say 'not available' without colour. */
 .ui-stepper__item--disabled .ui-stepper__control {
   color: var(--text-muted);
   cursor: not-allowed;
+}
+
+.ui-stepper__item--disabled .ui-stepper__marker {
+  border-style: dashed;
+}
+
+.ui-stepper__item--disabled .ui-stepper__label {
+  text-decoration: line-through;
 }
 
 .ui-stepper__sr {

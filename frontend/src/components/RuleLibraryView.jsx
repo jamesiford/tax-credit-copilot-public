@@ -51,7 +51,7 @@ function ProgramVerdict({ rule, years, known }) {
  * arrives as an authored year pack in git, which is what the table below lists.
  */
 
-export default function RuleLibraryView({ onAskCopilot, programs = null }) {
+export default function RuleLibraryView({ programs = null }) {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -97,14 +97,6 @@ export default function RuleLibraryView({ onAskCopilot, programs = null }) {
       eyebrow="Prove it"
       title="Programs"
       sub="What each jurisdiction published, versioned by tax year, with the citation each value came from"
-      actions={onAskCopilot && (
-        <button
-          className="btn btn-primary"
-          onClick={() => onAskCopilot('Summarize how rule packs are versioned per tax year, and how a filed claim stays bound to the statute that was in force that year.')}
-        >
-          Ask Copilot
-        </button>
-      )}
     />
 
     {error && (

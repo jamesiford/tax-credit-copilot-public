@@ -188,14 +188,6 @@ def main() -> int:
             page.context.close()
         browser.close()
 
-    # The footprint map loads its state geometry from a CDN. That predates this
-    # gate (the book, where the map lives, was not one of the pages it opened),
-    # so it is reported loudly rather than failed: vendoring the topojson is an
-    # owner decision, recorded in UI-STATUS.md.
-    known = [u for u in external if "us-atlas" in u]
-    external = [u for u in external if "us-atlas" not in u]
-    for url in sorted(set(known)):
-        print(f"WARN known hotlink (pre-existing, see UI-STATUS.md): {url}")
     if external:
         failures.append(f"requests left the origin: {sorted(set(external))}")
     for failure in failures:

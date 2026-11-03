@@ -170,8 +170,14 @@ def check_repo() -> list[Result]:
     code, out = run([PY, str(REPO / "scripts" / "audit-export.py"), "--enforce"], cwd=REPO)
     results.append(("audit-export --enforce", code == 0, (out.strip().splitlines() or [""])[-1][:100]))
     if shutil.which("gitleaks"):
-        code, out = run(["gitleaks", "detect", "--no-banner", "--redact"], cwd=REPO)
-        results.append(("gitleaks", code == 0, "no leaks" if code == 0 else out[-100:]))
+        # Scoped to THIS branch: `detect` alone scans every ref, so another
+        # branch's history fails a gate it has nothing to do with. The history
+        # of HEAD plus the working tree (`--no-git`, which also sees files not
+        # yet committed) covers everything this branch can ship.
+        code, out = run(["gitleaks", "detect", "--no-banner", "--redact", "--log-opts=HEAD"], cwd=REPO)
+        code2, out2 = run(["gitleaks", "detect", "--no-banner", "--redact", "--no-git"], cwd=REPO)
+        ok = code == 0 and code2 == 0
+        results.append(("gitleaks (HEAD + working tree)", ok, "no leaks" if ok else (out + out2)[-100:]))
     else:
         results.append(("gitleaks (info)", True, "not installed; skipped"))
     return results

@@ -206,6 +206,17 @@ filtering are behaviour and keep their grammar.
 verbatim JSON in the data register at 12px or more; a hash chip ties a step to
 its source and configuration.
 
+## Third-party assets
+
+The footprint map's state geometry is vendored, not fetched:
+`frontend/public/us-states-10m.json`, the `states-10m.json` file from the
+[`us-atlas`](https://github.com/topojson/us-atlas) package v3.0.1 (ISC licence,
+Copyright 2013-2019 Michael Bostock), which is TopoJSON derived from the US Census
+Bureau's cartographic boundary files (public domain). It is referenced as
+`${import.meta.env.BASE_URL}us-states-10m.json`. Fonts are bundled through
+`@fontsource` (SIL OFL). Nothing is loaded from a third-party origin, and
+`check_brand.py` fails on any request that leaves the origin.
+
 ## Accessibility
 
 Semantic landmarks; visible focus (`--focus-ring`); keyboard operation (roving

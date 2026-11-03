@@ -58,6 +58,20 @@ WORKSPACE = {
         },
     },
     "onezero": {"min_max": {"overlap_flags": 30}, "pay_period": {}},
+    "source": {
+        "source_kind": "lakehouse",
+        "controls": {
+            "usable_rows": 384433, "distinct_employees": 10236, "zero_hour_rows": 1204,
+            "negative_hour_rows": 88, "negative_wage_rows": 91, "pay_date_before_period_end_rows": 3,
+        },
+        "files": [{"file_name": "One.csv", "usable_rows": 100000, "padded_rows": 10, "sha256": "sha256:aaa"}],
+    },
+    "equivalence": {
+        "matches": True, "source_kind": "lakehouse",
+        "expected": {"employees_evaluated": 10236, "min_max_eligible": 539, "pay_period_eligible": 656},
+        "observed": {"employees_evaluated": 10236, "min_max_eligible": 539, "pay_period_eligible": 656},
+    },
+    "exceptions": {"step1": [], "onezero": []},
     "boundary": {
         "boundary_complete": True, "status": "complete", "prior_ppe_paid_in_fy_rows": 0,
         "crossing_start_rows": 0, "current_ppe_paid_after_fy_rows": 0,

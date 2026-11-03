@@ -3,6 +3,8 @@
 // API base — empty by default so requests go through the Vite proxy in dev.
 // Override with VITE_API_BASE for any non-proxied deployment (e.g. cloud
 // frontend talking to a Container App backend).
+import { validateEvidence } from './lib/evidence.js';
+
 const BASE = import.meta.env?.VITE_API_BASE ?? '';
 
 async function workspaceRequest(path, options = {}) {
@@ -695,6 +697,40 @@ export async function streamChat(message, onEvent, signal, scope = {}, history =
   await readSse(r, onEvent);
 }
 
+/**
+ * Route chat SSE events to handlers. The one place that knows which events the
+ * workspace consumes.
+ *
+ * Events: `status`, `plan`, `agent_start`, `token`, `agent_end`,
+ * `calculation_trail`, `clarify`, `evidence`, `done`. Anything else is IGNORED
+ * (and handed to `unknown` if given), so a backend that grows a new event never
+ * breaks a client that has not heard of it. `evidence` is OPTIONAL: today's
+ * stream emits none, and the workspace then shows deep links instead. An
+ * evidence payload that fails the contract (lib/evidence.js) is dropped and
+ * reported through `invalidEvidence`, never repaired.
+ */
+export function chatEventRouter(handlers = {}) {
+  return (ev) => {
+    const data = ev?.data ?? {};
+    switch (ev?.event) {
+      case 'status': handlers.status?.(data); break;
+      case 'plan': handlers.plan?.(data); break;
+      case 'agent_start': handlers.agentStart?.(data); break;
+      case 'token': handlers.token?.(data); break;
+      case 'agent_end': handlers.agentEnd?.(data); break;
+      case 'calculation_trail': handlers.trail?.(data); break;
+      case 'clarify': handlers.clarify?.(data); break;
+      case 'done': handlers.done?.(data); break;
+      case 'evidence': {
+        const result = validateEvidence(data);
+        if (result.ok) handlers.evidence?.(result.item, { dropped: result.dropped });
+        else handlers.invalidEvidence?.(result.reason);
+        break;
+      }
+      default: handlers.unknown?.(ev);
+    }
+  };
+}
 /**
  * The Copilot summary for one page (29 Sep). Streams the same SSE shape as
  * chat — `brief`, `token`, then `check` (or `fallback` when Copilot is not

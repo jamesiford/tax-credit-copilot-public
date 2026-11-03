@@ -1,0 +1,488 @@
+/*
+ * The Ask workspace: a split conversation / evidence panel over the page.
+ *
+ * Tokens only. Selection (the user's turn, the open choice, the focus ring) is
+ * --select*; a reading in the evidence pane is a --state-* tone through the
+ * shared KpiTile / Callout / Pill, never a colour chosen here.
+ */
+.ask-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.ask-scrim {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--text-primary) 40%, transparent);
+}
+
+.ask-workspace {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background: var(--surface-card);
+  border-left: 1px solid var(--border-default);
+  box-shadow: var(--shadow-pop);
+}
+
+/* About 60% from 1280px, with room left to see the page it is about. */
+@media (min-width: 1280px) {
+  .ask-workspace {
+    width: 60vw;
+    min-width: 800px;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ask-workspace {
+    animation: ask-in 0.18s ease;
+  }
+
+  .ask-agent-active .ask-agent-dot,
+  .ask-streaming .ask-agent-dot {
+    animation: ask-pulse 1.2s ease-in-out infinite;
+  }
+}
+
+@keyframes ask-in {
+  from { transform: translateX(var(--space-10)); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
+@keyframes ask-pulse {
+  50% { opacity: 0.35; }
+}
+
+/* The page behind keeps its scope and its scroll position; it just cannot move. */
+html.ask-open {
+  overflow: hidden;
+}
+
+/* ---- Header: what the conversation is ABOUT ------------------------------ */
+.ask-head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-6) var(--space-10);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.ask-head-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8);
+}
+
+.ask-title {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin: 0;
+  color: var(--text-primary);
+  font-size: var(--text-subhead);
+  font-weight: 600;
+}
+
+.ask-title svg {
+  color: var(--select);
+}
+
+.ask-head-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.ask-about {
+  margin: 0;
+}
+
+/* ---- Body: split when wide, one pane behind a tab when not --------------- */
+.ask-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.ask-body > .ui-tabs {
+  padding: 0 var(--space-10);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.ask-body-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.ask-body-split > .ask-pane {
+  border-left: 1px solid var(--border-subtle);
+}
+
+.ask-stack {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.ask-stack > * {
+  flex: 1;
+  min-height: 0;
+}
+
+/* ---- Conversation --------------------------------------------------------- */
+.ask-convo {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.ask-scroll {
+  flex: 1;
+  min-height: 0;
+  padding: var(--space-8) var(--space-10);
+  overflow-y: auto;
+}
+
+.ask-turns {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ask-turn-user {
+  align-self: flex-end;
+  max-width: 88%;
+}
+
+.ask-user {
+  padding: var(--space-4) var(--space-7);
+  color: var(--text-primary);
+  background: var(--select-bg);
+  border: 1px solid var(--select-line);
+  border-radius: var(--radius);
+  font-size: var(--text-body);
+  line-height: var(--leading-base);
+}
+
+.ask-assistant {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-width: 94%;
+}
+
+.ask-card {
+  padding: var(--space-5) var(--space-7);
+  color: var(--text-default);
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  font-size: var(--text-body);
+  line-height: var(--leading-base);
+}
+
+.ask-muted {
+  color: var(--text-secondary);
+}
+
+.ask-agent {
+  align-self: flex-start;
+}
+
+.ask-agent-dot {
+  display: inline-block;
+  width: var(--space-3);
+  height: var(--space-3);
+  background: var(--select);
+  border-radius: 50%;
+}
+
+.ask-plan {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--text-caption);
+}
+
+.ask-plan b {
+  color: var(--text-primary);
+}
+
+.ask-streaming {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: var(--space-5) 0 0;
+  color: var(--text-secondary);
+  font-size: var(--text-caption);
+}
+
+.ask-num {
+  margin-right: var(--space-2);
+  color: var(--text-secondary);
+}
+
+/* The intro and the suggested prompts. */
+.ask-intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.ask-intro-title {
+  margin: var(--space-4) 0 0;
+  color: var(--text-primary);
+  font-size: var(--text-small);
+  font-weight: 600;
+}
+
+.ask-suggest {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ask-suggest-btn {
+  width: 100%;
+  padding: var(--space-4) var(--space-6);
+  color: var(--text-primary);
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  font: inherit;
+  font-size: var(--text-small);
+  text-align: left;
+  cursor: pointer;
+}
+
+.ask-suggest-btn:hover {
+  background: var(--select-bg);
+  border-color: var(--select-line);
+}
+
+.ask-note {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--text-small);
+  line-height: var(--leading-base);
+}
+
+/* The composer. */
+.ask-composer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-10) var(--space-2);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.ask-composer input {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-4) var(--space-6);
+  color: var(--text-default);
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  font: inherit;
+  font-size: var(--text-body);
+}
+
+.ask-composer input:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 1px;
+}
+
+.ask-foot {
+  margin: 0;
+  padding: var(--space-2) var(--space-10) var(--space-5);
+  color: var(--text-secondary);
+  font-size: var(--text-caption);
+}
+
+/* ---- Evidence pane --------------------------------------------------------- */
+.ask-pane {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--space-6) var(--space-10);
+}
+
+.ask-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding-top: var(--space-6);
+}
+
+.ask-blocks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.ask-block-title {
+  margin: 0 0 var(--space-3);
+  color: var(--text-primary);
+  font-size: var(--text-small);
+  font-weight: 600;
+}
+
+.ask-text {
+  margin: 0;
+  color: var(--text-default);
+  font-size: var(--text-small);
+  line-height: var(--leading-base);
+}
+
+.ask-list {
+  margin: 0;
+  padding-left: var(--space-9);
+  color: var(--text-default);
+  font-size: var(--text-small);
+  list-style: disc;
+}
+
+.ask-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+}
+
+.ask-table {
+  width: 100%;
+}
+
+.ask-table th,
+.ask-table td {
+  font-size: var(--text-data);
+  text-align: left;
+}
+
+.ask-table thead th {
+  color: var(--text-secondary);
+  background: var(--surface-subtle);
+  font-weight: 600;
+}
+
+.ask-table th.num,
+.ask-table td.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.ask-table caption {
+  padding: var(--space-3) var(--space-4);
+  color: var(--text-primary);
+  font-size: var(--text-small);
+  font-weight: 600;
+  text-align: left;
+}
+
+.ask-pane .ui-kpi-row {
+  margin-bottom: 0;
+}
+
+.ask-provenance {
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.ask-hash {
+  font-family: var(--font-data);
+  font-size: var(--text-data);
+  overflow-wrap: anywhere;
+}
+
+.ask-disclaimer {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--text-caption);
+}
+
+/* Nothing from the platform yet: the deep links. */
+.ask-empty {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-6) 0;
+  color: var(--text-secondary);
+  font-size: var(--text-small);
+  line-height: var(--leading-base);
+}
+
+.ask-empty p {
+  margin: 0;
+}
+
+.ask-empty-title {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: var(--text-strong);
+  font-weight: 600;
+}
+
+.ask-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ask-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6);
+  color: var(--select-strong);
+  background: var(--select-bg);
+  border: 1px solid var(--select-line);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-small);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+a.ask-chip:hover {
+  border-color: var(--select);
+}
+
+.ask-chip[aria-disabled="true"] {
+  color: var(--text-secondary);
+  background: var(--surface-subtle);
+  border-color: var(--border-subtle);
+  cursor: not-allowed;
+}
+
+.ask-chip-reason {
+  font-weight: 400;
+}
+
+.ask-confirm-actions {
+  display: flex;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+
+@media print {
+  .ask-overlay {
+    display: none;
+  }
+}
