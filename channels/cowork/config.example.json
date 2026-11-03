@@ -1,0 +1,13 @@
+{
+  "_comment": "Shape only. Copy to overlays/<name>/cowork.json, fill in real values, and pass it with --config. Every value here is a placeholder; a build with --strict refuses them.",
+  "developer_name": "Example Developer",
+  "developer_website_url": "https://developer.example.com",
+  "developer_privacy_url": "https://developer.example.com/privacy",
+  "developer_terms_url": "https://developer.example.com/terms",
+  "gateway_mcp_url": "https://gateway.example.com/mcp",
+  "oauth_reference_id": "00000000-0000-0000-0000-000000000000",
+  "app_id_seed": "tcc-channel.cowork-plugin",
+  "version": "1.0.0",
+  "manifest_version": "1.29",
+  "accent_color": "#0F6CBD"
+}
