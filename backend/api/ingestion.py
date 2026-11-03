@@ -18,7 +18,9 @@ from collections import Counter
 from datetime import date
 from typing import Any
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
+
+from api.auth import attributed
 from pydantic import BaseModel, Field
 
 from api._payperiods import require_pay_periods
@@ -266,7 +268,7 @@ def ingestion_overview(
 
 @router.post("/ingestion/{tax_year}/exceptions/{exception_id}/resolve")
 def resolve_exception(
-    tax_year: int, exception_id: str, req: ResolveExceptionRequest
+    tax_year: int, exception_id: str, req: ResolveExceptionRequest, request: Request
 ) -> dict[str, Any]:
     """Record a human resolution for a QC exception (accept / drop / flag /
     reopen). In-memory; resets on restart — prod persists to the audit store."""
@@ -278,7 +280,7 @@ def resolve_exception(
         "resolution": req.resolution,
         "keep_worksite": req.keep_worksite,
         "note": req.note,
-        "reviewer": req.reviewer,
+        "reviewer": attributed(request, req.reviewer, default="Reviewer"),
         "resolved_at": date.today().isoformat(),
     }
     _QC_RESOLUTIONS[exception_id] = entry
