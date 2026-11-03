@@ -27,8 +27,8 @@ runs in a worktree, so `feat/m365-channel` is held by the main checkout).
 | CH-06b | Channel gateway (`backend/channel`), MCP facade, `verify_figures`, ticketed downloads | done | `wp/CH-06b-gateway` | merge `f9a4711` |
 | CH-07 | Terraform `channel` module, packaging, grants, docs | done | `wp/CH-07-channel-infra` | merge `ed36927` |
 | CH-07b | Deploy the gateway from a hook (azd has no conditional service) | done | `wp/CH-07b-channel-deploy-hook` | merge `47a8741` |
-| CH-08 | Hosted orchestrator (`channel_orchestrator/`), narration audit | in_progress | `wp/CH-08-orchestrator` | — |
-| CH-09 | `scripts/publish-m365.ps1` | todo | `wp/CH-09-publish-m365` | — |
+| CH-08 | Hosted orchestrator (`channel_orchestrator/`), narration audit | done | `wp/CH-08-orchestrator` | merge `063afec` |
+| CH-09 | `scripts/publish-m365.ps1` | in_progress | `wp/CH-09-publish-m365` | — |
 
 ## Evidence
 
@@ -221,6 +221,13 @@ and its `discovery` / `multi_state` scans read the configured default tenant.
 
 - Full backend suite: **2400 passed**, 136 skipped, 1 xfailed (CH-07: 2385). `terraform fmt/validate/tflint` clean, `terraform test` 43 passed. Whitelabel 0 enforced, audit-export 0, gitleaks clean, links 0 broken.
 - `azure.yaml` services are `api` and `web` only (tested); `scripts/deploy-channel.ps1` runs from a `postdeploy` hook and `deploy.yml`; with the toggle off it exits 0 (tested by running it against a stubbed `az`). Edited assertions are listed in D-73.
+
+### CH-08 (merged `063afec`)
+
+- Full backend suite: **2569 passed**, 136 skipped, 1 xfailed (CH-07b: 2400). New: `tests/channel_orchestrator/` (160: 49 golden conversations in `golden/*.json`, the exactness property over four narrator behaviours, identity, runner, MAF, model adapters against the mock gateway, host, structure rules, vendoring, and 4 end-to-end tests against the REAL gateway and API) and `tests/channel/test_gw_narration.py` (6). No skip or xfail added; parity pins untouched; `tests/channel_route_inventory.json` gained `POST /channel/v1/audit/narration` (the gateway now serves 9 routes). One existing allow-list line was added to `test_gw_architecture.py` (`application.agent_audit`, with its reason).
+- `infra/` untouched, so no Terraform checks (D-79: no container registry). Whitelabel 0 enforced; audit-export 0; `gitleaks git` clean (one allow-list entry for the generated vendor manifest's SHA-256 digests); links 0 broken; coding-standards ratchet green with no baseline change.
+- The real Responses host (`azure-ai-agentserver-responses` 2.4.0) was driven in-process (`/readiness`, `POST /responses`, `/whoami`). Docker: stages up to `pip install` build and the later stages were checked without it; `pip install` in the build could not complete here (TLS interception on the egress), so the image was not built end to end (D-79).
+- Not verified live, by design (Prompt 6): which identity signal Teams and Copilot Chat carry; whether the hosted agent reaches the gateway and the model from the private project (D-78); `azd ai agent` accepting `channel_orchestrator/azure.yaml`; Foundry-account `/openai/v1` access for the agent's identity (D-75).
 
 ## Blockers
 
