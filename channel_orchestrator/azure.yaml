@@ -1,28 +1,31 @@
 # The orchestrator as an azd project of its own, deployed from source (no container registry).
-# Written to the `azd ai agent` schema documented at
+# Written to the `azd ai agent` schema (extension azure.ai.agents 1.0.0-beta.23; the shape below is what
+# `azd ai agent init --deploy-mode code --protocol responses --protocol activity` generates, adapted):
 # https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/deploy-hosted-agent-code
-# (consulted 2026-11-02). It has NOT been run against a live azd or a live project: that is the
-# Prompt 6 sandbox work, and the first thing to check there is that `azd ai agent` accepts it.
 #
 #   python scripts/vendor-orchestrator.py          # copy the shared modules in first (the zip needs them)
-#   cd channel_orchestrator && azd up
+#   cd channel_orchestrator && azd env new <name>  # then set the values below with `azd env set`
+#   azd deploy
 #
 # The deploying person needs "Foundry Project Manager" on the project. Environment variables the
 # platform injects (FOUNDRY_*, APPLICATIONINSIGHTS_CONNECTION_STRING, AZURE_AI_MODEL_DEPLOYMENT_NAME)
 # are reserved and are not set here. The orchestrator's own variables are in docs/architecture/ENV-VARS.md
 # section "Channel orchestrator"; supply them with `azd env set` and list them under `env:` below.
+# `proj-tcc` is the existing Foundry project: set `endpoint` to your project's endpoint (the azd
+# environment value FOUNDRY_PROJECT_ENDPOINT is what the deploy actually uses).
 name: tcc-channel-orchestrator
 services:
+  foundry-project:
+    host: azure.ai.project
+    endpoint: ${FOUNDRY_PROJECT_ENDPOINT}
   tcc-channel-orchestrator:
-    host: azure.ai.agent
     project: .
+    host: azure.ai.agent
+    language: python
     kind: hosted
-    codeConfiguration:
-      runtime: python_3_13
-      entryPoint:
-        - python
-        - main.py
-      dependencyResolution: remote_build
+    name: tcc-channel-orchestrator
+    uses:
+      - foundry-project
     env:
       PYTHONNOUSERSITE: "1"
       CHANNEL_GATEWAY_URL: ${CHANNEL_GATEWAY_URL}
@@ -30,5 +33,28 @@ services:
       TENANT_ID: ${TENANT_ID}
       CHANNEL_NAME: ${CHANNEL_NAME=teams}
       CHANNEL_DEBUG_WHOAMI: ${CHANNEL_DEBUG_WHOAMI=false}
+      LOG_LEVEL: ${LOG_LEVEL=INFO}
+      CHANNEL_IDENTITY_SOURCES: ${CHANNEL_IDENTITY_SOURCES=original-subject,platform}
       FOUNDRY_MODEL: ${FOUNDRY_MODEL=gpt-4.1-mini}
       AI_PROVIDER_CHAIN: ${AI_PROVIDER_CHAIN=foundry}
+    agentEndpoint:
+      authorizationSchemes:
+        - type: BotServiceRbac
+      protocols:
+        - responses
+        - activity
+    codeConfiguration:
+      dependencyResolution: remote_build
+      entryPoint: main.py
+      runtime: python_3_13
+    container:
+      resources:
+        cpu: "0.5"
+        memory: 1Gi
+    protocols:
+      - protocol: responses
+        version: 2.0.0
+      - protocol: activity
+        version: 2.0.0
+infra:
+  provider: microsoft.foundry

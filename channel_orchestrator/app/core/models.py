@@ -128,7 +128,7 @@ class ModelChain:
             try:
                 return await asyncio.wait_for(self._one(provider, messages, tools, tuple(hops)), self._timeout)
             except (ModelError, asyncio.TimeoutError, EgressRefused) as exc:
-                log.warning("provider %s failed (%s); trying the next", provider.name, type(exc).__name__)
+                log.warning("provider %s failed (%s: %s); trying the next", provider.name, type(exc).__name__, str(exc)[:200])
         raise NarrationUnavailable("no provider could answer", tuple(hops))
 
     async def _one(self, provider: Provider, messages: Sequence[ChatMessage], tools: Sequence[ToolSpec],

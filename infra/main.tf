@@ -209,7 +209,13 @@ module "app_service" {
     }, local.auth_mode == "entra" ? {
     AUTH_TENANT_ID = local.tenant_id
     API_AUDIENCE   = local.api_audience
-  } : {}, local.api_ai_settings)
+    } : {},
+    # The API enforces the writer entitlement itself (it refuses an agent token whose acting
+    # user may not write), so it must read the same source as the gateway. [CH-13]
+    var.enable_m365_channel ? merge(
+      { CHANNEL_WRITER_SOURCE = var.channel_writer_source },
+      trimspace(var.channel_writer_group_id) != "" ? { CHANNEL_WRITER_GROUP_ID = trimspace(var.channel_writer_group_id) } : {},
+  ) : {}, local.api_ai_settings)
 
   web_app_settings = {}
 }

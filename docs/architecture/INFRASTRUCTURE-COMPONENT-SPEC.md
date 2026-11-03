@@ -337,8 +337,11 @@ The gateway's own are listed in [ENV-VARS.md §9a](ENV-VARS.md#9a-channel-gatewa
 warehouse`, `WAREHOUSE_SERVER`, `WAREHOUSE_DATABASE`, `FABRIC_WORKSPACE`,
 `WEB_CONCURRENCY = 1`, `CHANNEL_WRITER_SOURCE`, and only when set:
 `CHANNEL_ALLOWED_CALLER_APP_IDS`, `CHANNEL_WRITER_GROUP_ID`, `GIT_COMMIT`. A test fails
-if any setting name or value looks like a secret. The API receives **no** new setting:
-it accepts the gateway because the token carries the `TCC.Agent` role.
+if any setting name or value looks like a secret. The API receives **only** `CHANNEL_WRITER_SOURCE` (and
+`CHANNEL_WRITER_GROUP_ID` when set), and only with the channel on: it enforces the writer entitlement itself, so it
+must read the same source as the gateway. With a group source the API's identity needs Graph `GroupMember.Read.All`
+too (`scripts/assign-channel-roles.ps1 -ApiIdentityPrincipalId`). It accepts the gateway because the token carries
+the `TCC.Agent` role.
 
 Variables: `enable_m365_channel`, `channel_gateway_audience`,
 `channel_allowed_caller_app_ids`, `channel_writer_source`, `channel_writer_group_id`,

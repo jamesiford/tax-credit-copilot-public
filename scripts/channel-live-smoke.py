@@ -138,6 +138,11 @@ def run_reads(gw: Gateway, clients: list[int], compare: bool) -> None:
                     check(f"client {client}: {tool} local comparison ran", False, type(exc).__name__)
 
 
+def claim_year(gw: Gateway, client: int) -> int | None:
+    years = gw.facts("client_situation", {"client_id": client}).get("tax_years") or []
+    return max(years, default=None)
+
+
 def run_writes(gw: Gateway, client: int, program: str) -> None:
     note = f"live smoke {SMOKE}"
     args = {"client_id": client, "program_code": program, "scope": "prospective", "note": note}
@@ -146,18 +151,18 @@ def run_writes(gw: Gateway, client: int, program: str) -> None:
     if committed.status_code == 200:
         replay = gw.call("engagement_set_commit", args, confirmation_token=prepared.json()["facts"]["confirmation"]["token"], idempotency_key=f"smoke-{SMOKE}-eng")
         check("an idempotent retry returns the first result", replay.status_code == 200 and replay.json()["facts"].get("replayed") is True)
-    year = last_year(gw, client)
+    year = claim_year(gw, client)
     found = gw.facts("findings_list", {"client_id": client, "tax_year": year}).get("findings") if year else None
     if found:
         resolve = {"client_id": client, "tax_year": year, "finding_id": found[0]["finding_id"], "resolution": "flag", "note": note}
         _, done = gw.two_steps("finding_resolve", resolve, f"smoke-{SMOKE}-fnd")
         check("finding_resolve prepare then commit", done.status_code == 200, str(done.status_code))
     else:
-        say(f"SKIP  finding_resolve: client {client} has no open finding to resolve")
-    cell = {"client_id": client, "program_code": program, "tax_year": year, "status": "assessed"}
-    _, moved = gw.two_steps("claim_transition", cell, f"smoke-{SMOKE}-clm") if year else (None, None)
-    say(f"INFO  claim_transition to 'assessed' answered {getattr(moved, 'status_code', 'n/a')}"
-        + (f" {moved.json().get('error', {}).get('code', '')}" if moved is not None and moved.status_code != 200 else ""))
+        say(f"SKIP  finding_resolve: client {client} TY{year} has no open finding to resolve")
+    for step, status in (("forward", "proposed"), ("restore", "assessed")):
+        cell = {"client_id": client, "program_code": program, "tax_year": year, "status": status}
+        _, moved = gw.two_steps("claim_transition", cell, f"smoke-{SMOKE}-clm-{step}")
+        check(f"claim_transition {step} to '{status}' (TY{year}) prepare then commit", moved.status_code == 200, str(moved.status_code))
 
 
 def run_nonwriter(gw: Gateway, client: int, program: str) -> None:

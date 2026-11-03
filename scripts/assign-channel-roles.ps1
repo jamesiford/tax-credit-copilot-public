@@ -12,9 +12,10 @@
                                     (the gateway calls the API as an agent)
       -AgentIdentityPrincipalId     gets  Channel.Invoke  on the gateway registration
                                     (the hosted orchestrator calls the gateway)
-      -GrantGraphGroupMemberRead    also gives the gateway identity the Microsoft Graph
-                                    application role GroupMember.Read.All (nothing else),
-                                    which the Entra-group writer check needs
+      -GrantGraphGroupMemberRead    also gives the gateway identity (and, with -ApiIdentityPrincipalId,
+                                    the API identity: it enforces the writer entitlement itself) the
+                                    Microsoft Graph application role GroupMember.Read.All (nothing
+                                    else), which the Entra-group writer check needs
 
     When Graph answers Forbidden the script does not try anything else: it prints the exact
     commands for someone who can assign app roles, and exits 2 so a caller can tell
@@ -30,6 +31,7 @@ param(
     [Parameter(Mandatory)][string]$GatewayApplicationId,
     [string]$GatewayIdentityPrincipalId,
     [string]$AgentIdentityPrincipalId,
+    [string]$ApiIdentityPrincipalId,
     [switch]$GrantGraphGroupMemberRead
 )
 
@@ -46,7 +48,13 @@ function Invoke-Graph([string]$Method, [string]$Path, $Body) {
         [IO.File]::WriteAllText($bodyFile.FullName, ($Body | ConvertTo-Json -Compress))
         $arguments += @('--headers', 'Content-Type=application/json', '--body', "@$($bodyFile.FullName)")
     }
-    try { $text = & az @arguments 2>&1 } finally { if ($bodyFile) { Remove-Item $bodyFile -Force -ErrorAction SilentlyContinue } }
+    try {
+        for ($attempt = 1; $attempt -le 3; $attempt++) {
+            $text = & az @arguments 2>&1
+            if ($LASTEXITCODE -eq 0 -or ($text | Out-String) -notmatch 'RemoteDisconnected|Connection aborted|timed out') { break }
+            Start-Sleep -Seconds (2 * $attempt)
+        }
+    } finally { if ($bodyFile) { Remove-Item $bodyFile -Force -ErrorAction SilentlyContinue } }
     if ($LASTEXITCODE -ne 0) {
         $message = ($text | Out-String).Trim()
         $denied = $message -match 'Authorization_RequestDenied|Forbidden|Insufficient privileges|403'
@@ -98,6 +106,10 @@ try {
     if ($AgentIdentityPrincipalId) {
         Write-Host "Agent identity" -ForegroundColor Cyan
         Grant-AppRole $gateway 'Channel.Invoke' $AgentIdentityPrincipalId 'the agent identity'
+    }
+    if ($ApiIdentityPrincipalId -and $GrantGraphGroupMemberRead) {
+        Write-Host "API identity (it enforces the writer entitlement itself)" -ForegroundColor Cyan
+        Grant-AppRole (Get-ServicePrincipal $graphApplicationId) 'GroupMember.Read.All' $ApiIdentityPrincipalId 'the API identity'
     }
 } catch {
     $detail = if ($_.TargetObject -and $_.TargetObject.Message) { $_.TargetObject.Message } else { $_.Exception.Message }
