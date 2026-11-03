@@ -1026,3 +1026,66 @@ One short entry per decision: context, choice, why.
 - **Conversation state** is an in-memory dictionary with a TTL. The runtime's session storage (`$HOME`) is a
   filesystem the platform may discard on idle and is not shared across replicas, and what is held is a
   convenience and one safety device whose loss costs a repeated question.
+
+## D-86 Prompt 5 runs in the main checkout, on `feat/m365-channel`
+
+- **Context.** The session began in the main checkout on `main`, which holds only the initial commit; the channel work
+  is on `feat/m365-channel`, which no worktree has checked out (the earlier sessions' worktrees hold their own
+  branches, all ancestors of it). The brief requires that branch.
+- **Choice.** `git checkout feat/m365-channel` in the main checkout (the only untracked path was a stray `__pycache__`
+  folder under `channel_orchestrator/`, which the checkout did not touch), then one `wp/CH-nn-*` branch per package.
+  Nothing is pushed.
+- **Why.** The brief names the branch explicitly; no other worktree is affected.
+
+## D-87 CH-10: what was read, and how the package was validated
+
+- **Read 3 Nov 2026:** `https://learn.microsoft.com/en-us/copilot/cowork/cowork-plugin-development` (updated 3 Nov),
+  `https://learn.microsoft.com/en-us/microsoft-365/copilot/extensibility/plugin-authentication` and
+  `.../plugin-authentication-oauth` (auth config, redirect URI, Teams Developer Portal fields),
+  `https://microsoft.github.io/wiqd/getting-started/installation/` and `.../cli/reference/`.
+- **Manifest 1.29**, URL-only connector (`mcpToolDescription` optional). 1.28 stays buildable (`manifest_version`);
+  its tool file is generated from the catalog through `channel.mcp.describe`, the same code as `tools/list`.
+- **`wiqd` was not installed.** Its installer is a remote script; running one unattended on a shared machine is not
+  worth a validation convenience. The offline validator implements the documented rules instead (ASKILL-M001..M003,
+  P001..P008, connector and companion-file rules). **`atk` 1.1.14 was already installed**: `atk package` built the
+  generated tree inside a throwaway Agents Toolkit project (`m365agents.yml` with a `package` lifecycle), and the
+  rendered manifest was also validated against the published 1.29 JSON schema fetched for the occasion (0 errors).
+  `atk validate` and `wiqd plugin validate --mode deep` need sign-in and were not run; the setup guide says to run them.
+- **Frontmatter reader.** PyYAML is not a repository dependency, so `scripts/cowork_plugin/frontmatter.py` reads the
+  narrow slice skills use and rejects the rest as ASKILL-P003.
+- **Neutrality.** The deny-list is read from `scripts/audit-export.py` (where it is already spelled out), not copied.
+
+## D-88 CH-10: the gateway's MCP text gains a provenance line
+
+- **Context.** The brief wants a briefing footer with the run id, rule-pack version and trail hash "taken from the
+  envelopes". The MCP text block carried blocks, handover lines and the disclaimer, not the provenance; a client that
+  shows the model only the text would leave it nothing to copy, and a model with nothing to copy writes something.
+- **Choice.** `channel/render.provenance_line` adds `Provenance: run X; rule pack Y; assumptions Z; trail hash W.`
+  between the body and the disclaimer, omitted when a result has none (a claims-only read has no run). The label says
+  "trail hash", not "sha256", because the figure check reads the digits of a digest as numerals and the word adds one.
+  The skills pass the four values as `allowed_context` when they verify the footer, so a footer with an altered digit
+  still fails the check.
+- **Why.** Additive; the frame the tests rely on (`VERBATIM` first, the disclaimer last) is unchanged.
+
+## D-89 CH-10: `book_rank` returns names, not ids
+
+- **Context.** `book_rank`'s facts carry `client_name` but no `client_id`, so W1's per-client reads need an id.
+- **Choice.** The W1 skill calls `client_resolve` with the name exactly as returned, asks when it is ambiguous, and
+  never picks. The facts are not changed.
+- **Why.** The rows are the chat's book brief too; adding a field changes what the portal's narrator is handed and the
+  equivalence tests pin it. Revisit by adding `client_id` to the brief if the extra call proves slow in the demo.
+
+## D-90 CH-10: a preview is not read-only, so Cowork may ask twice
+
+- **Choice.** The tool annotations stay as built: reads `readOnlyHint: true`, commits `destructiveHint: true`, a preview
+  neither. Cowork treats `readOnlyHint: false` as needing confirmation, so a preview can prompt before the skill's own
+  confirmation. That is one more confirmation, never one fewer, and annotation-driven prompts for non-Microsoft servers
+  are still rolling out, so the skills do not depend on them. Documented in the setup guide.
+
+## D-91 CH-10: two OAuth registrations, and `offline_access`
+
+- **Choice.** The setup guide separates the Entra client registration (the identity Cowork presents, with the redirect
+  URI `https://teams.microsoft.com/api/platform/v1.0/oAuthRedirect` and admin consent for `Channel.Access`) from the
+  Teams Developer Portal registration that yields the `referenceId`. It tells the operator to restrict usage by app to
+  **Any Teams app** (a specific app id makes every tool call return 404 for an MCP server, per the documentation) and
+  to include `offline_access` in the scope so the token refreshes.

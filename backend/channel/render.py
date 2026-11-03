@@ -9,6 +9,8 @@ carried it.
 Two lines are added where a caller needs a value that is not a figure: a write
 preview's confirmation token (the model must pass it to the commit tool) and a
 claim package's download address (absolute, built from the address the caller used).
+A third, the provenance line (run, rule pack, assumption set, trail hash), lets a
+document footer be copied rather than invented. [CH-10]
 """
 from __future__ import annotations
 
@@ -42,10 +44,29 @@ def _handover_lines(facts: Mapping[str, Any], base_url: str) -> list[str]:
     return lines
 
 
+_PROVENANCE_LABELS = (
+    ("run_id", "run"), ("rule_pack_version", "rule pack"), ("assumption_set_id", "assumptions"), ("trail_sha256", "trail hash"),
+)
+
+
+def provenance_line(envelope: Mapping[str, Any]) -> str:
+    """One line naming the run, rule pack, assumption set and trail hash behind a result, or "" when it has none.
+
+    A skill that builds a footer for a briefing needs these values as text. They also
+    arrive in `structuredContent`, but a client that shows the model only the text block
+    would otherwise have nothing to copy, and a model that cannot copy an identifier
+    will write one. The label says "trail hash", not "sha256": the figure check reads
+    the digits of a digest as numerals, and the word would add one more.
+    """
+    provenance = envelope.get("provenance") or {}
+    parts = [f"{label} {provenance[key]}" for key, label in _PROVENANCE_LABELS if provenance.get(key)]
+    return "Provenance: " + "; ".join(parts) + "." if parts else ""
+
+
 def render_tool_text(envelope: Mapping[str, Any], base_url: str = "") -> str:
     """The complete text block for one tool result."""
     body = render_markdown(blocks_from(envelope))
-    parts = [VERBATIM, body, *_handover_lines(envelope.get("facts") or {}, base_url),
+    parts = [VERBATIM, body, *_handover_lines(envelope.get("facts") or {}, base_url), provenance_line(envelope),
              envelope.get("disclaimer") or DISCLAIMER]
     return "\n\n".join(p for p in parts if p)
 
