@@ -1,0 +1,110 @@
+/*
+ * Self-hosted type, woff2 only.
+ *
+ * Why not `@fontsource/<family>/latin-<weight>.css`: each of those declares a
+ * woff2 AND a woff fallback, so the bundle shipped both of every face (a woff
+ * nobody's browser asks for). Every browser this product supports reads woff2,
+ * so only that is declared. The files are still @fontsource's (SIL OFL), the
+ * latin subset, and only the weights the product renders.
+ *
+ *   Poppins  400 500 600 700  chrome (modern theme)
+ *   Roboto   400 500 600 700 800  the data register, and the whole classic theme
+ *
+ * `font-display: swap` shows text at once in the fallback and swaps. A swap is a
+ * layout shift unless the fallback occupies the same space, so each family has a
+ * metric-matched fallback: Arial, scaled (`size-adjust`) and re-spaced
+ * (`*-override`) to Poppins' / Roboto's advance widths and vertical metrics. The
+ * numbers are measured from the font files (frequency-weighted average advance
+ * of English text against Arial, and the hhea ascent / descent / line gap),
+ * not guessed; `tools/check_perf.py` measures the shift itself.
+ */
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url('../../node_modules/@fontsource/poppins/files/poppins-latin-400-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 500;
+  src: url('../../node_modules/@fontsource/poppins/files/poppins-latin-500-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 600;
+  src: url('../../node_modules/@fontsource/poppins/files/poppins-latin-600-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Poppins';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 700;
+  src: url('../../node_modules/@fontsource/poppins/files/poppins-latin-700-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url('../../node_modules/@fontsource/roboto/files/roboto-latin-400-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 500;
+  src: url('../../node_modules/@fontsource/roboto/files/roboto-latin-500-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 600;
+  src: url('../../node_modules/@fontsource/roboto/files/roboto-latin-600-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 700;
+  src: url('../../node_modules/@fontsource/roboto/files/roboto-latin-700-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 800;
+  src: url('../../node_modules/@fontsource/roboto/files/roboto-latin-800-normal.woff2') format('woff2');
+}
+
+/* Metric-matched fallbacks (Arial / its metric-compatible Liberation Sans). */
+@font-face {
+  font-family: 'Poppins Fallback';
+  src: local('Arial'), local('Liberation Sans');
+  size-adjust: 113.3%;
+  ascent-override: 92.7%;
+  descent-override: 30.9%;
+  line-gap-override: 8.8%;
+}
+
+@font-face {
+  font-family: 'Roboto Fallback';
+  src: local('Arial'), local('Liberation Sans');
+  size-adjust: 100.3%;
+  ascent-override: 92.5%;
+  descent-override: 24.3%;
+  line-gap-override: 0%;
+}

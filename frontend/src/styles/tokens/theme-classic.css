@@ -11,7 +11,7 @@
  * Selector specificity (0,1,1) beats the `:root` defaults of the modern theme.
  */
 html[data-theme="classic"] {
-  --font-sans: 'Roboto', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  --font-sans: 'Roboto', 'Roboto Fallback', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
   --font-data: var(--font-sans);
 
   --text-primary: #1a1f36;

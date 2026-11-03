@@ -50,9 +50,17 @@ writes `localStorage['tcc-theme']` before the app boots).
 | `check_cell_fit.py`, `check_table_width.py` | No figure wider than its cell; the widest grid still fits 1024px. |
 | `check_filters.py` | Every filter type is live in the UI. |
 | `sweep.py` | The landmine sweep: every reachable state renders or says plainly why not. Compared with `sweep-output/before-sweep-report.md`. |
-| `shoot_pages.py <label> [theme]` | Screenshots of every routed page at both viewports into the gitignored `sweep-output/`. |
+| `check_states.py [--quick]` | Forces loading, empty, error, no-client, sealed-run-down, assistant-down and wrong-year on every routed page; fails on a crash, a blank page, a stuck skeleton or banned wording. |
+| `check_a11y.py [--quick]` | axe-core (pinned in `package.json`) on every routed page, the styleguide and the open Ask workspace, both themes. Zero serious/critical; classic `color-contrast` reported only (D9). |
+| `check_perf.py` | Needs `npx vite preview --port 4173` after a build. `dist/` sizes, which font files load (woff2 only, same origin), font-swap CLS ≤ 0.10. Not in `check_all.py` because it needs the preview server. |
+| `compare.py <before> <after> [--diff N]` | One self-contained HTML contact sheet, before / after / changed pixels, per file name; `--diff N` lists pairs that changed by more than N%. |
+| `dead_css.mjs [--write]` | Lists (or removes) top-level selectors in `src/index.css` that no source file references. Run it, then rebuild and compare screenshots: it cannot see a class assembled at run time. |
+| `shoot_pages.py <label> [modern\|classic] [WxH ...]` | Every routed page, the Ask workspace on each (`ask-<page>-<W>.png`), the dev-fixture conversation and evidence pane, and the styleguide, at 1024×768 and 1440×900 by default, into the gitignored `sweep-output/<label>[-<theme>]/`. Prints per shot whether the page overflows horizontally. |
 
 Repo checks that `check_all.py` also runs: `pwsh scripts/check-whitelabel.ps1
 -Enforce`, `python scripts/audit-export.py --enforce`, and `gitleaks` if it is
-installed. Screenshots go to `sweep-output/`, which is gitignored: they may
+installed. gitleaks is scoped to this branch — `--log-opts=HEAD` for its
+history plus `--no-git` for the working tree — because a bare `detect` scans
+every ref, and another branch's history would fail a gate it has nothing to do
+with. Screenshots go to `sweep-output/`, which is gitignored: they may
 render data and must never be committed.

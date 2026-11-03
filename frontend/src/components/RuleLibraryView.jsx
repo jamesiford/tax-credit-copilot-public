@@ -17,6 +17,7 @@ function ProgramVerdict({ rule, years, known }) {
   const v = programVerdict(rule, years, known);
   return (
     <VerdictCard
+      level={2}
       tone={v.tone}
       title={rule.name}
       pills={v.pills}

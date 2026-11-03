@@ -341,3 +341,89 @@ missing and whose body says what to do. An error says nothing was changed. "Not
 calculated" stays a statement, never a zero.
 Left as callouts: notes and caveats that sit beside data (they are information,
 not an absence).
+
+## D27. The Ask workspace replaces the chat drawer (UI-07)
+
+**Context.** The drawer was a 420px column over the page: a conversation with no
+place for the evidence behind an answer, and a second "Ask Copilot" button in two
+page headers besides the floating one.
+**Choice.** One modal workspace, conversation beside an evidence pane (tabs below
+1280px), opened by the floating launcher or any row's Ask button. The per-page
+header buttons are gone; their prompts live in App's `ASK` map. It is always
+mounted so closing does not end the conversation.
+**Why.** An answer a reader cannot check is the one thing this product exists
+not to produce. A modal because the conversation and the page it is about cannot
+both be read at once; the about-header names the scope so it is clear what is
+being asked about.
+
+## D28. Evidence is a typed stream event; figures are strings (UI-07)
+
+**Choice.** The backend (not built yet) will emit `evidence` events; the front
+end validates each block and DROPS, then counts, any that fail. A figure is a
+string rendered verbatim. Unknown event types are ignored. A `confirmation` item
+is supported but inert until a write flow exists.
+**Why.** ADR-004: agents narrate, tools calculate. A number the browser
+re-formats is a second derivation; a block "repaired" on the way in is a figure
+nobody computed. Ignoring unknown events lets the backend add one without
+breaking an older client. Contract: [ASK-EVIDENCE-CONTRACT.md](ASK-EVIDENCE-CONTRACT.md).
+
+## D29. Fonts: woff2 only, our own fallback faces (UI-08)
+
+**Choice.** `styles/fonts.css` replaces the `@fontsource/*` CSS imports. Faces
+are the same latin woff2 files, declared once; each family gets a metric-matched
+fallback; the two first-paint faces are preloaded.
+**Why.** The `@fontsource` CSS declares a woff beside every woff2, so the bundle
+shipped both of every face. The fallback faces are what make `font-display: swap`
+free: the measured layout shift from the swap is 0.001 to 0.002 against a 0.10
+gate. Left alone: the classic theme also preloads Poppins 400, a small waste.
+
+## D30. The deprecated colour aliases are now unused, not removed (UI-08)
+
+**Choice.** The ratchet is at zero (233 uses at the start of the revamp): every
+`var(--accent*)`, `var(--accent-2*)` and `var(--exp-*)` in the product reads the
+role it aliases. The aliases are still defined.
+**Why.** A customer overlay written against the old names keeps resolving; the
+ratchet stops a new use. Deleting the definitions is a breaking change for
+overlays and belongs to a release that says so.
+
+## D31. Accessibility is a gate, with one stated carve-out (UI-08)
+
+**Choice.** axe-core 4.11.0 (pinned, exact) runs on every routed page, the
+styleguide and the open Ask workspace, both themes. Zero serious or critical.
+Classic `color-contrast` is reported, not failed. Moderate findings are printed.
+**Why.** An accessibility check that is not run is a claim. The carve-out is
+D9's, unchanged: the classic palette is the rollback and is not edited. Fixed on
+the way: `Callout` is a `div role="note"` (an `aside` per callout multiplied
+landmarks), verdict cards and evidence blocks take a heading level, `aria-sort`
+sits on the `th`, small toggles meet a 24px target, and the disabled stepper
+step is drawn differently from an upcoming one.
+
+## D32. A missing year is `null`, and a declined scope is said on the page (UI-08)
+
+**Context.** `Number(search.get('year'))` is `0` for a URL with no `?year=`, so
+every such page asked for TY0, was "adjusted", and (once the notice was shown)
+opened under a banner naming a year nobody chose.
+**Choice.** An absent, empty or non-positive year is `null`. When a scope really
+is declined, a visible `role="status"` banner names it; it used to be the tooltip
+of the year picker.
+**Why.** A year decides which statute applies. Answering for a different year
+silently is the failure; so is a warning about a year the user never asked for.
+Test: `App.test.jsx`, "declines no year on a URL that never asked for one".
+
+## D33. The modern page header sits on the content column (UI-08)
+
+**Choice.** `.tcc-main > .tcc-header { margin-inline: auto }` in the modern
+skin. **Why.** `.tcc-main > *` centres each block at the 1320px content width,
+and `.tcc-header`'s margin shorthand overrode it, leaving every non-compact
+page title 20px left of the cards below it. Found in the before/after contact
+sheet; present since UI-02.
+
+## D34. Dead CSS is removed by a tool, then checked by eye (UI-08)
+
+**Choice.** `tools/dead_css.mjs --write` removed 373 rules whose every selector
+names a class no source file mentions (and no run-time prefix builds):
+`index.css` 2669 → 1447 lines, built CSS 165 → 126 kB.
+**Why.** Three UI revamps leave rules nothing renders. The tool is conservative
+(it keeps `:is`/`:has`/`:not` selectors, keyframes, print rules). Its blind spot
+is a class assembled at run time with no recognisable prefix, which is why it is
+followed by a rebuild, the contact sheet and the full gate rather than trusted.

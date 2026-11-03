@@ -50,6 +50,12 @@ html[data-theme="modern"] .tcc-header {
   margin-bottom: var(--space-8);
 }
 
+/* `.tcc-main > *` centres each block at the content width; the header's own
+   margin shorthand beat that, leaving the title 20px left of the cards below. */
+html[data-theme="modern"] .tcc-main > .tcc-header {
+  margin-inline: auto;
+}
+
 html[data-theme="modern"] .tcc-eyebrow {
   margin-bottom: var(--space-2);
   color: var(--text-muted);

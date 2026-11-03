@@ -14,7 +14,8 @@ export default function Callout({ title, tone = 'neutral', children }) {
   const safeTone = TONES.includes(tone) ? tone : 'neutral';
 
   return (
-    <aside
+    <div
+      role="note"
       className={`ui-callout ui-callout-${safeTone}`}
       aria-labelledby={title ? titleId : undefined}
     >
@@ -25,6 +26,6 @@ export default function Callout({ title, tone = 'neutral', children }) {
         </p>
       )}
       <div className="ui-callout-body">{children}</div>
-    </aside>
+    </div>
   );
 }

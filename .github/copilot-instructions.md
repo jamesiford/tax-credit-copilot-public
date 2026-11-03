@@ -414,7 +414,7 @@ store chain. Real client payroll, de-identified at source. Four synthetic client
 **One shell, four routed pages.** `frontend/src/App.jsx` is the shell — a top
 bar (brand, three dropdown navigation groups, the tax-year scope, the account
 menu), the drill trail beneath it, the page, a floating **Ask Copilot** launcher
-(Ctrl+K), chat and tour — and every route renders it; `/golden` redirects. The
+(Ctrl+K) that opens the Ask workspace, and the tour — and every route renders it; `/golden` redirects. The
 shell's parts live in `src/components/shell/` (`AppShell`, `TopBar`, `NavGroup`,
 `DrillTrail`, `ShellActions`) and are theme-neutral: they read colour roles, so
 classic and modern share the structure. Inside, the URL selects a page:
@@ -646,7 +646,7 @@ costs a query rather than a replay. `ClientSituationAgent` narrates it.
   the exact instinct the band ranking corrects. An agent arguing against the
   screen it sits on is worse than no agent.
 - **A row-level ask carries its own scope.** `ask(prompt, scopeOverride)` →
-  `ChatPanel` → `streamChat`, so asking about a row answers about THAT client
+  `AskWorkspace` → `streamChat`, so asking about a row answers about THAT client
   without moving the user's selection.
 - **The chat reads Gold, not payroll.** `_request_scope` resolves `resolve_statute`
   (it never read the payroll `resolve_client_run` loaded), and
@@ -654,6 +654,34 @@ costs a query rather than a replay. `ClientSituationAgent` narrates it.
   `load_payroll_snapshot`, which reads a synthetic CSV and says so in its own
   citation — so the answer described 9,477 invented employees while the question
   was about a client with 10,236.
+
+### The Ask workspace is a conversation beside its evidence
+
+`src/components/ask/` replaced the slide-in chat drawer (`ChatPanel`, deleted).
+A modal workspace: at 1280px and wider the conversation sits left and the
+evidence right; narrower, they are tabs ("Conversation | Evidence (n)").
+Contract: [`docs/design/ASK-EVIDENCE-CONTRACT.md`](../docs/design/ASK-EVIDENCE-CONTRACT.md).
+
+- **There is ONE launcher.** The floating `#ask-launcher` and the row "Ask"
+  buttons open the same workspace; a page does not grow its own Ask button. A
+  page's prompt lives in App's `ASK` map, and portfolio scope is ignored for
+  the two sealed pages (`rules`, `evidence`).
+- **The workspace is always mounted and draws nothing when closed**, so a
+  conversation survives a close. Esc, the focus trap, the scroll lock and
+  returning focus to the launcher are `useModal`.
+- **Evidence is a typed stream event, validated, never repaired.** Every figure
+  is a STRING rendered verbatim (a number would be re-formatted, and a figure
+  re-formatted in the browser is a second derivation). A block that fails the
+  validator is dropped and COUNTED, never fixed up. `chatEventRouter` in
+  `api.js` ignores event types it does not know, so the backend can add one
+  without breaking an older client.
+- **An answer's deep links come from `lib/evidenceRoutes.js`'s `CATALOG`.** A
+  link to a page that does not exist is a 404 the user finds, so the catalog
+  is the only place a route is named.
+- **Fixtures are dev-only** (`?askFixture=1`, behind `import.meta.env.DEV` and a
+  dynamic import), so they cannot ship in a production bundle.
+- **The error copy follows the EmptyState wording** — "The assistant is
+  unavailable…" with a retry, never "request failed".
 
 ### The router picks tools; it never produces a figure
 
@@ -1163,12 +1191,36 @@ for a client whose Gold holds only TY2023. 964 rows had accumulated. Stub
   var(--status-bad-bg)`, not a fresh literal (`tokens.test.js` fails on a
   literal in `state.css`). A literal is how a tint silently drifts during a
   migration.
-- **The typeface is a theme token, `--font-sans`, self-hosted.** Poppins in the
-  modern theme, Roboto in the classic one and in a customer overlay that points
-  it back, both via `@fontsource` imports in `main.jsx`. The data register uses
+- **The typeface is a theme token, `--font-sans`, self-hosted, woff2 only.**
+  Poppins in the modern theme, Roboto in the classic one and in a customer
+  overlay that points it back. `src/styles/fonts.css` declares the faces
+  (`main.jsx` imports it); do NOT import an `@fontsource/*/*.css` file, which
+  declares a woff beside every woff2 and ships both (`fonts.test.js` fails on
+  it). Each family has a metric-matched fallback face (`Poppins Fallback`,
+  `Roboto Fallback`: size-adjust and the three overrides), so the swap moves
+  the layout ~0.001, and `vite.config.js` preloads the two faces the first
+  paint uses. The data register uses
   `--font-data` (Roboto): Poppins runs ~10% wider, which a 17-column grid
   cannot afford. Never hotlink Google Fonts — a demo on a network that
-  cannot reach `fonts.gstatic.com` falls back silently.
+  cannot reach `fonts.gstatic.com` falls back silently. The map geometry is
+  vendored too (`public/us-states-10m.json`); `check_brand.py` fails on ANY
+  request to another origin.
+- **The accessibility, state and performance gates are part of "done".**
+  `check_a11y.py` (axe-core 4.11.0, pinned) allows zero serious or critical
+  violations on every routed page, the styleguide and the open Ask workspace,
+  in both themes; classic `color-contrast` is reported only (the legacy palette
+  is kept for rollback, D9).
+  `check_states.py` makes the app fail on purpose — loading, empty, error,
+  no-client, sealed-run down, assistant down, wrong year — and fails on an
+  uncaught error, the error boundary's fallback, a blank page, a skeleton still
+  on screen after the answers arrive, or banned wording ("could not be read").
+  `check_perf.py` (needs `vite preview` on 4173) reports `dist/` sizes, which
+  font files a cold load requests, and gates font-swap CLS at 0.10. Keyboard
+  walk-throughs of the stepper, the sort header and the filter bar are unit
+  tests (`keyboard.test.jsx`).
+- **The deprecated-alias ratchet is at ZERO.** No component reads `--accent*`,
+  `--accent-2*` or `--exp-*`; they still resolve, so an overlay written against
+  them keeps working, but a new use fails the test. Read the role.
 - **Type is a scale of eight, named for the job, and a theme token.**
   `--text-micro`, `--text-caption`, `--text-small`, `--text-body`,
   `--text-strong`, `--text-subhead`, `--text-title`, `--text-display`

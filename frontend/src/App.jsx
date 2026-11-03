@@ -195,8 +195,11 @@ export default function App() {
     return route.view || 'trend';
   }, [route.token, route.view]);
   const routeYear = useMemo(() => {
-    const value = Number(search.get('year'));
-    return Number.isFinite(value) ? value : null;
+    // Number(null) is 0, so a URL with no year would otherwise ask for TY0.
+    const raw = search.get('year');
+    if (raw == null || raw === '') return null;
+    const value = Number(raw);
+    return Number.isFinite(value) && value > 0 ? value : null;
   }, [search]);
   const routeEmployeeToken = route.token ?? null;
   const [summary, setSummary] = useState(null);
@@ -636,6 +639,15 @@ export default function App() {
     </>}
     main={<>
       {error && <div className="callout warn">Refresh failed; the last sealed run remains active. {error}</div>}
+      {/* A selection the data cannot honour is declined BY NAME, on the page. It
+          used to live only in the year picker's tooltip, so asking for a year with
+          no payroll quietly showed another year's figures. */}
+      {(resolved.notices || []).length > 0 && (
+        <div className="callout info" role="status">
+          <b>Scope adjusted.</b>{' '}
+          {resolved.notices.map((n) => n.message || String(n)).join(' ')}
+        </div>
+      )}
       {sealedMismatch && (
         <div className="callout info">
           <b>This is the certified parity run.</b> It describes{' '}

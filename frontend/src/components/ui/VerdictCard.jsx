@@ -36,9 +36,12 @@ export default function VerdictCard({
   assessmentTitle = 'Why',
   assessment = null,
   details = null,
+  level = 3,
   className = '',
   children,
 }) {
+  // The heading level is the page's to choose: a card under an h1 is an h2.
+  const Heading = `h${Math.min(Math.max(Number(level) || 3, 2), 6)}`;
   return (
     <Card as="article" tone={tone} label={title} className={['tcc-verdict', className].filter(Boolean).join(' ')}>
       {pills.length ? (
@@ -48,7 +51,7 @@ export default function VerdictCard({
           ))}
         </div>
       ) : null}
-      <h3 className="tcc-verdict-title">{title}</h3>
+      <Heading className="tcc-verdict-title">{title}</Heading>
       {assessment ? <Callout title={assessmentTitle} tone={tone}>{assessment}</Callout> : null}
       {children}
       <Details details={details} />

@@ -112,7 +112,7 @@ describe('a finding explains itself', () => {
     expect(open).toHaveClass('ui-card-verdict-partial');
     expect(open).toHaveTextContent('Needs a decision');
     // The derivation sits in the inset callout, in the product's own words.
-    expect(within(open).getByRole('complementary')).toHaveTextContent(/counted twice/);
+    expect(within(open).getByRole('note')).toHaveTextContent(/counted twice/);
     unmount();
 
     api.fetchFindings.mockResolvedValue(payload([finding({

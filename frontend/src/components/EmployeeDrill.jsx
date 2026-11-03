@@ -263,7 +263,15 @@ export default function EmployeeDrill({ recordToken, context, method = 'min_max'
       ? fetchClientEmployeeDrill({ recordToken, ...context, taxYear: Number(context.taxYear) })
       : fetchWorkspaceEmployee(recordToken);
     request
-      .then((result) => active && setData(result))
+      .then((result) => {
+        if (!active) return;
+        // An empty answer is not an employee: say so rather than drawing blanks.
+        if (!result || typeof result !== 'object' || !(result.step1 || result.raw_source_rows)) {
+          setError('The answer held no calculation for this employee.');
+          return;
+        }
+        setData(result);
+      })
       .catch((reason) => active && setError(String(reason)));
     return () => { active = false; };
   }, [recordToken, context]);
@@ -309,7 +317,7 @@ export default function EmployeeDrill({ recordToken, context, method = 'min_max'
             } : null}
           />
         ) : null}
-        <div className="tcc-drill-body">
+        <div className="tcc-drill-body" role="tabpanel" id={`drill-panel-${tab}`} aria-labelledby={`drill-tab-${tab}`}>
           {error && (
             <EmptyState title="This employee's calculation is unavailable">
               {error}<br />Nothing was changed; close this and open the employee again to retry.

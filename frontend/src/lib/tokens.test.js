@@ -64,25 +64,27 @@ function countDeprecated() {
   return counts;
 }
 
-// The ratchet. Measured at the start of UI-01; the next prompts shrink it.
+// The ratchet. Measured at the start of UI-01 and shrunk by every prompt since;
+// at 0 no component reads a deprecated alias. The aliases still RESOLVE (a customer
+// overlay written against them keeps working), they are just never read here.
 const CEILING = {
-  '--exp-primary': 34,
-  '--exp-accent': 11,
-  '--exp-magenta': 6,
-  '--exp-subtle-2': 10,
-  '--exp-muted': 12,
-  '--exp-blue': 10,
-  '--exp-subtle': 4,
-  '--exp-ink': 3,
-  '--exp-gold': 5,
+  '--exp-primary': 0,
+  '--exp-accent': 0,
+  '--exp-magenta': 0,
+  '--exp-subtle-2': 0,
+  '--exp-muted': 0,
+  '--exp-blue': 0,
+  '--exp-subtle': 0,
+  '--exp-ink': 0,
+  '--exp-gold': 0,
   '--exp-violet': 0,
-  '--accent': 20,
-  '--accent-strong': 26,
-  '--accent-bg': 3,
-  '--accent-2': 1,
-  '--accent-2-strong': 41,
-  '--accent-2-bg': 25,
-  '--accent-2-line': 4,
+  '--accent': 0,
+  '--accent-strong': 0,
+  '--accent-bg': 0,
+  '--accent-2': 0,
+  '--accent-2-strong': 0,
+  '--accent-2-bg': 0,
+  '--accent-2-line': 0,
 };
 
 describe('token files', () => {

@@ -28,10 +28,10 @@ describe('VerdictCard', () => {
 
   it('puts the derivation in an inset callout, and omits it when there is none', () => {
     const { unmount } = draw({ assessment: 'Statute is authored for 2019–2025.' });
-    expect(within(screen.getByRole('complementary')).getByText(/authored for 2019/)).toBeInTheDocument();
+    expect(within(screen.getByRole('note')).getByText(/authored for 2019/)).toBeInTheDocument();
     unmount();
     draw({});
-    expect(screen.queryByRole('complementary')).toBeNull();
+    expect(screen.queryByRole('note')).toBeNull();
   });
 
   it('never takes a free colour: an unknown tone is neutral', () => {

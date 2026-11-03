@@ -234,6 +234,16 @@ describe('the shell opens on the portfolio', () => {
     expect(screen.queryByRole('region', { name: 'Scope' })).not.toBeInTheDocument();
   });
 
+  it('declines no year on a URL that never asked for one', async () => {
+    // Number(null) is 0: a URL without ?year= used to request TY0, which no
+    // client holds, so the book opened under a "Scope adjusted" banner naming
+    // a year nobody chose and pushed the first rows below the fold.
+    mount();
+    await landed();
+    expect(screen.queryByText(/Scope adjusted/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/TY0/)).not.toBeInTheDocument();
+  });
+
   it('shows the book at / even when a client was stored last time', async () => {
     // `/` is not "the URL omits the client" — it POSITIVELY means the book.
     // Restoring the stored client there rendered Cascade under the portfolio's

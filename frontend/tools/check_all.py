@@ -34,10 +34,6 @@ BASE = "http://localhost:5173"
 
 # Measured before the revamp began (docs/design/UI-STATUS.md, "Baseline"). The
 # gate is that none of these gets worse: the partner must still see their data
-# without scrolling at 1024x768.
-BASELINE_TESTS = 600
-# Measured before the revamp began (docs/design/UI-STATUS.md, "Baseline"). The
-# gate is that none of these gets worse: the partner must still see their data
 # without scrolling at 1440x900, the acceptance viewport (desktop only).
 BASELINE_TESTS = 600
 BASELINE_ROWS = {
@@ -149,6 +145,10 @@ def check_browser_pass_fail() -> list[Result]:
                         f"{out.count('OVERFLOWS')} overflowing table(s)"))
         code, out = tool("check_filters.py", theme=theme)
         results.append((f"check_filters [{theme}]", code == 0, "every filter type live" if code == 0 else out[-120:]))
+    code, out = tool("check_states.py")
+    results.append(("check_states [forced states]", code == 0, last(out, r"(states: [^\n]+)") or "no output"))
+    code, out = tool("check_a11y.py")
+    results.append(("check_a11y [axe, serious/critical]", code == 0, last(out, r"a11y: ([^\n]+)") or "no output"))
     return results
 
 

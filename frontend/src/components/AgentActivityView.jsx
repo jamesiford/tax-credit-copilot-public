@@ -120,7 +120,11 @@ export default function AgentActivityView({ scope, scopeOptions }) {
     setLoading(true);
     setError(null);
     try {
-      setData(await fetchFindings(scope.clientId, scope.year, jurisdiction));
+      const body = await fetchFindings(scope.clientId, scope.year, jurisdiction);
+      if (!body || !Array.isArray(body.findings) || !body.summary) {
+        throw new Error('The answer held no findings summary.');
+      }
+      setData(body);
     } catch (reason) {
       setError(String(reason));
       setData(null);
@@ -222,6 +226,7 @@ export default function AgentActivityView({ scope, scopeOptions }) {
 
     {(data?.findings || []).map((finding) => (
       <VerdictCard
+        level={2}
         key={finding.finding_id}
         tone={finding.requires_decision ? 'partial' : 'above-min'}
         title={finding.title}

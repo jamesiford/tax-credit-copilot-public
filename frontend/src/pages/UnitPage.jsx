@@ -658,11 +658,10 @@ function Window({ from, to }) {
 function Head({ col, sort, onSort, filters, onFilter, lead = false }) {
   const active = sort.field === col.key;
   return (
-    <th className={lead ? undefined : 'num'}>
+    <th className={lead ? undefined : 'num'} aria-sort={active ? (sort.dir === 'desc' ? 'descending' : 'ascending') : 'none'}>
       <button
         type="button"
         className={`th-sort${active ? ' active' : ''}`}
-        aria-sort={active ? (sort.dir === 'desc' ? 'descending' : 'ascending') : 'none'}
         onClick={() => onSort(col.key)}
       >
         {col.label}

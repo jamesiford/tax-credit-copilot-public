@@ -3,9 +3,9 @@ import { describe, expect, it } from 'vitest';
 import Callout from './Callout';
 
 describe('Callout', () => {
-  it('renders an aside labelled by its title', () => {
+  it('renders a note labelled by its title', () => {
     render(<Callout title="Assessment">Body text</Callout>);
-    const aside = screen.getByRole('complementary', { name: 'Assessment' });
+    const aside = screen.getByRole('note', { name: 'Assessment' });
     expect(aside).toHaveClass('ui-callout', 'ui-callout-neutral');
     expect(screen.getByText('Body text')).toBeInTheDocument();
   });
@@ -18,7 +18,7 @@ describe('Callout', () => {
           Body
         </Callout>,
       );
-      expect(screen.getByRole('complementary')).toHaveClass(
+      expect(screen.getByRole('note')).toHaveClass(
         `ui-callout-${tone}`,
       );
     },
@@ -30,7 +30,7 @@ describe('Callout', () => {
         Body
       </Callout>,
     );
-    expect(screen.getByRole('complementary')).toHaveClass('ui-callout-neutral');
+    expect(screen.getByRole('note')).toHaveClass('ui-callout-neutral');
   });
 
   it('hides the status dot from assistive technology', () => {
@@ -41,9 +41,9 @@ describe('Callout', () => {
     );
   });
 
-  it('works without a title and leaves the aside unlabelled', () => {
+  it('works without a title and leaves the note unlabelled', () => {
     const { container } = render(<Callout>Only body</Callout>);
-    expect(container.querySelector('aside')).not.toHaveAttribute(
+    expect(container.querySelector('[role=note]')).not.toHaveAttribute(
       'aria-labelledby',
     );
     expect(container.querySelector('.ui-callout-dot')).toBeNull();

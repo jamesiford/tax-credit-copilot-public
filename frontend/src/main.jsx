@@ -19,15 +19,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 // asks for. The active face is a theme token (`--font-sans`): Poppins in the
 // modern theme, Roboto in the classic one and in a customer overlay that
 // points it back.
-import '@fontsource/poppins/latin-400.css';
-import '@fontsource/poppins/latin-500.css';
-import '@fontsource/poppins/latin-600.css';
-import '@fontsource/poppins/latin-700.css';
-import '@fontsource/roboto/latin-400.css';
-import '@fontsource/roboto/latin-500.css';
-import '@fontsource/roboto/latin-600.css';
-import '@fontsource/roboto/latin-700.css';
-import '@fontsource/roboto/latin-800.css';
+import './styles/fonts.css';
 import App from './App.jsx';
 import { applyTheme } from './brand.config.js';
 import './styles/tokens/index.css';

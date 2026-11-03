@@ -213,9 +213,60 @@ The footprint map's state geometry is vendored, not fetched:
 [`us-atlas`](https://github.com/topojson/us-atlas) package v3.0.1 (ISC licence,
 Copyright 2013-2019 Michael Bostock), which is TopoJSON derived from the US Census
 Bureau's cartographic boundary files (public domain). It is referenced as
-`${import.meta.env.BASE_URL}us-states-10m.json`. Fonts are bundled through
-`@fontsource` (SIL OFL). Nothing is loaded from a third-party origin, and
-`check_brand.py` fails on any request that leaves the origin.
+`${import.meta.env.BASE_URL}us-states-10m.json`. The type is the latin subset of
+`@fontsource` Poppins and Roboto (SIL OFL), woff2 only, declared in
+`src/styles/fonts.css` (see "Type, fonts and performance"). Nothing is loaded
+from a third-party origin, and `check_brand.py` fails on any request that leaves
+the origin.
+
+## The Ask workspace
+
+`src/components/ask/` is the one conversation surface (it replaced the slide-in
+chat drawer). It is a modal `role="dialog"` titled "Ask Copilot", always mounted
+and drawing nothing when closed, so a conversation survives a close.
+
+| Part | What it is |
+| --- | --- |
+| About header | `MetaLine` (client / tax year / method) and an "Ask about this page" button that sends the page's own prompt |
+| Conversation | Plan strip (what the router chose), numbered clarification, composer, suggested prompts, "Need clarification?" footer |
+| Evidence pane | The typed `evidence` blocks the answer came from: tables, figures, trails, links, with a count |
+| Layout | At 1280px and wider, conversation \| evidence side by side; narrower, tabs "Conversation \| Evidence (n)" |
+| Confirm card | The write-flow extension point: a `kind: "confirmation"` item shows what WOULD be recorded and two buttons. Inert today: nothing emits one, and with no `onConfirm` wired the Confirm button is disabled and says so. An expired confirmation cannot be confirmed |
+
+Rules: one launcher (the floating pill, `#ask-launcher`, and the row "Ask"
+buttons open the same workspace); Esc closes, Tab is trapped, the page does not
+scroll behind it, and focus returns to what opened it; every figure in the
+evidence pane is a string rendered verbatim; a block that fails validation is
+dropped and counted, never repaired. The contract with the backend is
+[ASK-EVIDENCE-CONTRACT.md](ASK-EVIDENCE-CONTRACT.md).
+
+## Type, fonts and performance
+
+`src/styles/fonts.css` declares the faces: Poppins 400/500/600/700 and Roboto
+400/500/600/700/800, woff2 only. Not `@fontsource/*/*.css`, because each of those
+declares a woff beside every woff2 and the bundle shipped both. Each family also
+has a metric-matched fallback face (`Poppins Fallback`, `Roboto Fallback`:
+`size-adjust` and the three overrides computed from the font's metrics), listed
+after the real family in `--font-sans` / `--font-data`, so `font-display: swap`
+shows text at once and the swap does not move the layout. `vite.config.js`
+preloads the two faces the first paint uses (Poppins 400, Roboto 400).
+`fonts.test.js` guards all of it.
+
+| Measure | Before | After |
+| --- | --- | --- |
+| Font files in `dist/` | woff + woff2 | **woff2 only**, 138.8 kB |
+| Layout shift from the font swap (fonts held 6s) | not measured | 0.001 to 0.002, both themes (gate: 0.10) |
+| Built CSS | 165 kB | 125.9 kB (dead rules removed, `tools/dead_css.mjs`) |
+
+## States
+
+Every routed page has to say what it is doing when it cannot show data. The four
+states and the components that draw them: **loading** (`Skeleton`, labelled),
+**empty** (`EmptyState` for an absence), **error** (`EmptyState`, which says
+nothing was changed), and **declined** (a scope the data cannot honour is named
+in a "Scope adjusted" banner under the shell, never answered with another
+year's figures or a zero). `tools/check_states.py` forces each of them on every
+page.
 
 ## Accessibility
 
@@ -224,6 +275,15 @@ tabindex on tabs); `aria-current`, `aria-selected`, labelled regions; colour is
 never the only signal; text contrast ≥ WCAG AA (4.5:1, or 3:1 for large text and
 icons). **Use grey 700 (or darker) for text; grey 600 is for icons and large
 type only.** `check_contrast.py` measures the pairs actually rendered.
+
+The gate is `tools/check_a11y.py` (axe-core, pinned): zero violations of impact
+serious or critical on every routed page, the styleguide and the open Ask
+workspace, in both themes. Classic `color-contrast` is reported, not failed
+(D9). What is reported but not gated, so it can be worked down: moderate
+`landmark-unique` / `landmark-no-duplicate-banner` on the shell header and
+repeated specimen navs, and `heading-order` where a page starts on an `h2`.
+Disabled stepper steps carry a dashed marker and a struck label, so "not
+available" is not mistaken for "not yet".
 
 ## Layout and spacing: the calm pass
 
@@ -255,6 +315,9 @@ visible-row gate is held at the pre-revamp 7 / 13 / 17 rows at that size.
 python frontend/tools/check_all.py            # the whole table
 python frontend/tools/check_all.py --quick    # no unit tests, build or sweep
 $env:TCC_THEME='classic'; python frontend/tools/measure_ui.py   # one tool, one theme
+python frontend/tools/check_perf.py           # needs `npx vite preview --port 4173` after a build
+python frontend/tools/shoot_pages.py after modern   # Visual QA pack, gitignored
+python frontend/tools/compare.py before after-modern --diff 2   # contact sheet
 ```
 
 See [frontend/tools/README.md](../../frontend/tools/README.md) for each check

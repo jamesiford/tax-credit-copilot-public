@@ -19,11 +19,11 @@
  */
 :root,
 html[data-theme="modern"] {
-  --font-sans: 'Poppins', 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --font-sans: 'Poppins', 'Poppins Fallback', 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
   /* The data register keeps the compact face. Poppins runs ~10% wider than
      Roboto, which is invisible in a card and fatal in a 17-column grid at
      1024px (the widest table overflowed its holder by 3-4%). */
-  --font-data: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --font-data: 'Roboto', 'Roboto Fallback', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
 
   /* Text. Grey 700 is the lightest grey permitted for text; grey 600 fails
      AA at body size and is for icons and large type only. */

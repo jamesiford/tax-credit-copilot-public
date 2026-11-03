@@ -1,7 +1,7 @@
 # UI status
 
-Prompts UI-01 (foundation), UI-02/UI-03 (shell and home) and UI-04..06 (pages
-and data) of the modern-theme revamp. Branch `jamesiford-ui-pages-and-data` (cut
+Prompts UI-01 (foundation), UI-02/UI-03 (shell and home), UI-04..06 (pages
+and data) and UI-07/UI-08 (Ask workspace; states, accessibility, performance) of the modern-theme revamp. Branch `jamesiford-ui-pages-and-data` (cut
 from `feat/ui-modern-theme`; the UI-01 branch name above in the older sections
 is historical); nothing pushed. Decisions and reasons:
 [UI-DECISIONS.md](UI-DECISIONS.md).
@@ -20,9 +20,40 @@ Reference: [DESIGN-SYSTEM.md](DESIGN-SYSTEM.md).
 | UI-03 | Home hero, four task cards, persisted "Start here" | done (`8b89eff`) |
 | UI-04 | Portfolio dashboard: the book as a `Card` with band tabs, footprint and position cards, data-grid skin | done (`7267629`) |
 | UI-05 | Client review: `ClientHeader`, route-driven stepper, `VerdictCard` (programmes, findings) | done (`2611f30`) |
-| UI-06 | `TrailSteps`, `EmptyState`/`Skeleton` across the views, dead CSS removed, docs | done (this commit) |
+| UI-06 | `TrailSteps`, `EmptyState`/`Skeleton` across the views, dead CSS removed, docs | done (`9be54a2`) |
+| UI-07 | Ask workspace: conversation beside the evidence it came from, evidence contract, one launcher; `ChatPanel` deleted | done (`7f4ed5d`) |
+| UI-08 | States, accessibility, performance, cleanup, docs, final gate | done (this commit) |
 
 No work package is blocked.
+
+## UI-07 / UI-08
+
+Summary and the owner's review list are in
+[UI-REVAMP-RESULT.md](UI-REVAMP-RESULT.md); decisions D27 to D34. Same stand-in
+as below. "Before" is the end of UI-06.
+
+| Metric | Before | After |
+| --- | --- | --- |
+| `npm test` | 848 passed, 71 files | **923 passed**, 79 files, no skips added |
+| `npm run build` | js 685.36 kB, css 163.37 kB | js 700.44 kB, css **125.89 kB**; fonts woff2 only |
+| `index.css` | 2669 lines | **1447 lines** (373 dead rules removed by `dead_css.mjs`) |
+| Deprecated aliases (uses) | 217 | **0** (ratchet ceilings all 0) |
+| Raw-px padding / margin / gap | 5 | **0** |
+| Visible rows 1440×900 | 7 / 13 / 17 | **7 / 13 / 17**, both themes |
+| `check_states` | n/a | 37 / 37 |
+| `check_a11y` | n/a | 0 serious/critical, both themes (classic contrast reported) |
+| Font-swap CLS | n/a | 0.001 to 0.002 (gate 0.10) |
+| `check_all` | 19/20 (gitleaks all-refs) | **22/22**: tests, build, static, type floor ×2, rows ×2, brand, contrast, cell fit, table width, filters ×2 each theme, states, a11y, sweep, white-label, export audit, gitleaks (HEAD + working tree) |
+
+Found by the work and fixed: a nested router crashed the styleguide; a URL with
+no `?year=` asked for TY0 (D32); the Payroll data, Agent activity and employee
+drill crashed or blanked on an empty body; the page header sat 20px left of its
+cards (D33); a disabled stepper step looked like an upcoming one; the styleguide's
+shell specimen overflowed 1024px.
+
+Left alone, and why: the client page's data-load layout shift (CLS ≈ 0.49 on the
+stand-in; needs the real backend to tune), moderate axe notes, classic contrast
+(D9), and the aliases' definitions (D30).
 
 ## UI-04 / UI-05 / UI-06
 
@@ -118,10 +149,9 @@ agents). `shoot_pages.py` captures 1440×900 only.
    location grid, At risk is "How am I doing"; Discovery is omitted (D22).
 2. **The Programs page** now opens on ten verdict cards above the table; the
    page is longer. The table stays for sorting and filtering.
-3. **The map geometry is hotlinked** (`cdn.jsdelivr.net/npm/us-atlas`). It
-   predates this work, but the book is now one of the pages the brand gate opens,
-   so `check_brand.py` reports it as a WARN rather than hiding it. Offline, the
-   map draws nothing. Vendoring the topojson is an owner decision.
+3. **The map geometry** was hotlinked at this point; it is vendored now
+   (`public/us-states-10m.json`) and `check_brand.py` fails on any off-origin
+   request (UI-07 carry-over).
 4. **Chart:** none was added. The only series is the band counts the tiles
    already show (D20).
 5. **Reminders and alerts:** not built; the app has no such data (D20).

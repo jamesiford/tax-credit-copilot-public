@@ -124,7 +124,7 @@ export default function Styleguide() {
       </Section>
 
       <Section title="Tabs">
-        <Tabs tabs={TABS} active={tab} onChange={setTab} label="Underline tabs" idPrefix="sg-u" />
+        <Tabs tabs={TABS} active={tab} onChange={setTab} label="Underline tabs" idPrefix="sg-u" controls={false} />
         <Tabs
           tabs={[{ id: 'min_max', label: 'Min-Max' }, { id: 'pay_period', label: 'Pay Period' }]}
           active={seg}
@@ -149,7 +149,7 @@ export default function Styleguide() {
 
       <Section title="Card">
         <Card title="Portfolio value" subtitle="Identified, not claimed" actions={<Button size="sm">View</Button>}
-          tabs={<Tabs tabs={TABS} active={tab} onChange={setTab} label="Card tabs" idPrefix="sg-c" />}
+          tabs={<Tabs tabs={TABS} active={tab} onChange={setTab} label="Card tabs" idPrefix="sg-c" controls={false} />}
           footer={<span>Total identified: $149k</span>}>
           <p>Body content sits here.</p>
         </Card>

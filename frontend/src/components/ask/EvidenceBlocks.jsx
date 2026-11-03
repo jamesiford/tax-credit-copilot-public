@@ -42,14 +42,14 @@ function Block({ block }) {
     case 'text':
       return (
         <div className="ask-block">
-          {block.title ? <h4 className="ask-block-title">{block.title}</h4> : null}
+          {block.title ? <h3 className="ask-block-title">{block.title}</h3> : null}
           <p className="ask-text">{block.text}</p>
         </div>
       );
     case 'list':
       return (
         <div className="ask-block">
-          {block.title ? <h4 className="ask-block-title">{block.title}</h4> : null}
+          {block.title ? <h3 className="ask-block-title">{block.title}</h3> : null}
           <ul className="ask-list">
             {block.rows.map((row, i) => <li key={i}>{row}</li>)}
           </ul>
