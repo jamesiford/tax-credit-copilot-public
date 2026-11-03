@@ -65,6 +65,9 @@ from application.queries.simulate_unit import SimulateUnitQuery, handle_simulate
 from application.queries.simulate_employee import SimulateEmployeeQuery, handle_simulate_employee
 from application.queries.rebase_unit import RebaseUnitQuery, handle_rebase_unit
 from application.commands.set_base_year import SetBaseYearCommand, handle_set_base_year
+from application.commands.record_claim import RecordClaimCommand, handle_record_claim
+from application.commands.set_engagement import SetEngagementCommand, handle_set_engagement
+from application.commands.transition_claim import TransitionClaimCommand, handle_transition_claim
 
 _mediator: Mediator | None = None
 
@@ -492,6 +495,20 @@ def get_authorizer() -> Any:
     return WriterPolicy(_LazyEntitlement(), enforce_for_users=enforce_writer_for_users())
 
 
+def get_confirmation_service() -> Any:
+    """Prepare/commit for channel writes, over the confirmation store."""
+    from application.authorization import WriterProbe
+    from application.confirmations import ConfirmationService
+    from application.deployment import confirm_ttl_seconds
+
+    policy = get_authorizer()
+    return ConfirmationService(
+        get_confirmation_repository(),
+        lambda principal: policy.check(WriterProbe(actor=principal.actor), principal),
+        ttl_seconds=confirm_ttl_seconds(),
+    )
+
+
 def get_confirmation_repository() -> Any:
     """Prepare/commit tokens, by hash (`tcc_ops.channel_confirmation`)."""
     global _confirmation_repo
@@ -553,6 +570,9 @@ def build_mediator() -> Mediator:
     mediator.register(ReopenFindingCommand, handle_reopen_finding)
     mediator.register(RunClientCalculationCommand, handle_run_client_calculation)
     mediator.register(SetBaseYearCommand, handle_set_base_year)
+    mediator.register(RecordClaimCommand, handle_record_claim)
+    mediator.register(TransitionClaimCommand, handle_transition_claim)
+    mediator.register(SetEngagementCommand, handle_set_engagement)
 
     return mediator
 

@@ -16,7 +16,6 @@ that is arithmetically true and completely misleading.
 """
 from __future__ import annotations
 
-from datetime import datetime, timezone
 import os
 from decimal import Decimal
 from typing import Any
@@ -27,6 +26,9 @@ from api.auth import attributed
 from pydantic import BaseModel, Field
 
 from application.commands.assess_client import AssessClientCommand, ClientHasNoPayroll
+from application.commands.record_claim import RecordClaimCommand
+from application.commands.set_engagement import SetEngagementCommand
+from application.commands.transition_claim import NoClaimToTransition, TransitionClaimCommand
 from application.queries import get_portfolio as portfolio
 from application.queries.get_client_situation import (
     GetClientSituationQuery,
@@ -45,8 +47,6 @@ from domain.claims import (
     ClaimStatus,
     EngagementScope,
     Outcome,
-    ProgramClaim,
-    ProgramEngagement,
     Provenance,
 )
 from domain.coverage import matrix, totals
@@ -130,22 +130,6 @@ class AssessBody(BaseModel):
 
 
 # ------------------------------------------------------------------- helpers
-
-
-def _statutory_threshold(program_code: str) -> float | None:
-    """The programme's minimum-new-jobs figure, or None if we hold no pack."""
-    from tools.credit_math import PROGRAM_CODE_TO_PACK, _load_pack
-
-    pack_file = PROGRAM_CODE_TO_PACK.get(program_code.upper())
-    if not pack_file:
-        return None
-    try:
-        pack = _load_pack(pack_file)
-    except FileNotFoundError:
-        return None
-    value = (pack.get("thresholds") or {}).get("minimum_new_jobs")
-    return float(value) if value is not None else None
-
 
 # `_totals` and `_matrix` moved to domain/coverage.py. How a cell reads in the
 # light of the engagement we hold is a business rule, and it must be identical
@@ -250,36 +234,13 @@ def cell_history(client_id: int, program_code: str, tax_year: int) -> dict[str, 
 def record_claim(body: RecordClaimBody, request: Request = None) -> dict[str, Any]:
     """Record a claim directly — onboarding assertions and inherited records."""
     try:
-        claim = ProgramClaim(
-            client_id=body.client_id,
-            program_code=body.program_code,
-            tax_year=body.tax_year,
-            status=body.status,
-            provenance=body.provenance,
-            identified_usd=body.identified_usd,
-            claimed_usd=body.claimed_usd,
-            certified_usd=body.certified_usd,
-            average_headcount=body.average_headcount,
-            base_average_headcount=body.base_average_headcount,
-            threshold_jobs=body.threshold_jobs if body.threshold_jobs is not None else (
-                # Default to the programme's statutory minimum so a caller
-                # supplying headcounts alone still gets a real gap.
-                _statutory_threshold(body.program_code)
-                if body.average_headcount is not None else None
-            ),
-            entity_id=body.entity_id,
-            filing_reference=body.filing_reference,
-            decline_reason=body.decline_reason,
-            identified_run_id=body.identified_run_id,
-            assumption_set_id=body.assumption_set_id,
-            rule_pack_version=body.rule_pack_version,
-            decided_by=attributed(request, body.decided_by),
-        )
+        return get_mediator().send(RecordClaimCommand(
+            actor=attributed(request, body.decided_by),
+            **body.model_dump(exclude={"decided_by"}),
+        ))
     except ClaimError as exc:
         # A domain rejection is the caller's error, not a server fault.
         raise HTTPException(status_code=422, detail=str(exc)) from exc
-
-    return get_repository().record(claim).to_dict()
 
 
 @router.post("/cell/{client_id}/{program_code}/{tax_year}/transition")
@@ -287,41 +248,24 @@ def transition_cell(
     client_id: int, program_code: str, tax_year: int, body: TransitionBody, request: Request = None
 ) -> dict[str, Any]:
     """Move a cell along the lifecycle, appending to its history."""
-    repo = get_repository()
-    current = repo.current(client_id, program_code, tax_year)
-    if current is None:
-        raise HTTPException(
-            status_code=404,
-            detail=f"No claim recorded for client {client_id}, {program_code.upper()}, TY{tax_year}.",
-        )
     try:
-        nxt = current.transition_to(
-            body.status,
-            decided_by=attributed(request, body.decided_by),
-            decline_reason=body.decline_reason,
-            claimed_usd=body.claimed_usd,
-            certified_usd=body.certified_usd,
-            filing_reference=body.filing_reference,
-            provenance=body.provenance,
-        )
+        return get_mediator().send(TransitionClaimCommand(
+            actor=attributed(request, body.decided_by),
+            client_id=client_id, program_code=program_code, tax_year=tax_year,
+            **body.model_dump(exclude={"decided_by"}),
+        ))
+    except NoClaimToTransition as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
     except ClaimError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
-
-    return repo.record(nxt).to_dict()
 
 
 @router.put("/engagement")
 def set_engagement(body: EngagementBody, request: Request = None) -> dict[str, Any]:
     """Declare whether a program is our mandate for this client."""
-    engagement = ProgramEngagement(
-        client_id=body.client_id,
-        program_code=body.program_code,
-        scope=body.scope,
-        note=body.note,
-        set_by=attributed(request, None),
-        set_at=datetime.now(timezone.utc),
-    )
-    return get_repository().set_engagement(engagement).to_dict()
+    return get_mediator().send(SetEngagementCommand(
+        actor=attributed(request, None), **body.model_dump(),
+    ))
 
 
 @router.post("/assess")

@@ -101,10 +101,24 @@ def recalculation_running(client_id: int) -> bool:
         return bool(_RUNNING.get(client_id))
 
 
-def handle_set_base_year(command: SetBaseYearCommand) -> dict[str, Any]:
+@dataclass(frozen=True)
+class BaseYearPlan:
+    """What a base-year choice would act on, once it has passed every check."""
+
+    run: dict[str, Any]
+    rows_by_year: dict[int, dict[str, Any]]
+    current_base: int | None
+    saved: int | None
+
+
+def plan_base_year(command: SetBaseYearCommand) -> BaseYearPlan:
+    """Check the choice and gather what it acts on. Writes nothing.
+
+    The handler and a channel preview both call this, so a preview can never
+    accept a choice the commit would refuse.
+    """
     from application.queries.simulate_unit import location_series
-    from application.wiring import get_gold_reader, get_override_repository, get_run_manifest_repository
-    from domain.warehouse import ManualOverride, base_year_key
+    from application.wiring import get_gold_reader, get_override_repository
 
     reader = get_gold_reader()
     with reader.scope():
@@ -115,9 +129,6 @@ def handle_set_base_year(command: SetBaseYearCommand) -> dict[str, Any]:
     rows_by_year, current_base = location_series(items, command.worksite_id)
     if not rows_by_year:
         raise BaseYearNotAllowed(f"the run holds no location {command.worksite_id}")
-
-    repo = get_override_repository()
-    saved = repo.base_years(command.client_id, command.program_code).get(command.worksite_id)
 
     if command.base_year is not None:
         row = rows_by_year.get(command.base_year)
@@ -133,6 +144,17 @@ def handle_set_base_year(command: SetBaseYearCommand) -> dict[str, Any]:
                 f"TY{command.base_year} is still open at {command.worksite_id}; a base is "
                 f"measured on a year that has finished"
             )
+    saved = get_override_repository().base_years(command.client_id, command.program_code).get(command.worksite_id)
+    return BaseYearPlan(run, rows_by_year, current_base, saved)
+
+
+def handle_set_base_year(command: SetBaseYearCommand) -> dict[str, Any]:
+    from application.wiring import get_override_repository, get_run_manifest_repository
+    from domain.warehouse import ManualOverride, base_year_key
+
+    plan = plan_base_year(command)
+    run, rows_by_year, current_base, saved = plan.run, plan.rows_by_year, plan.current_base, plan.saved
+    repo = get_override_repository()
     if command.base_year == saved:
         return {"recorded": False, "reason": "unchanged", "base_year": saved, "recalculation": "not_needed"}
     if command.base_year is None and saved is None:
