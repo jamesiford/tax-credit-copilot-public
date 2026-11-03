@@ -118,6 +118,77 @@ def artifact_repo(request, tmp_path, client_ids):
 
 AZURE = os.getenv("TCC_AZURE_TESTS") == "1"
 
+#: Per-run marker so a live run can find and delete exactly the rows it wrote in
+#: the channel tables, none of which is keyed by client_id alone.
+RUN_TAG = f"t{int(time.time())}x{random.randint(100, 999)}"
+
+
+def _purge_channel_rows(user_prefix: str) -> None:
+    from infrastructure.persistence.fabric_warehouse import OPS_SCHEMA, FabricWarehouseConnection
+    from infrastructure.persistence.tenant_sql import run_in_transaction, tenant_exempt
+
+    cleanup = tenant_exempt("contract-test cleanup of this run's own channel rows")
+    connection = FabricWarehouseConnection().open()
+    try:
+        def work(cursor):
+            for table in ("channel_audit", "channel_user", "channel_confirmation"):
+                cleanup.execute(cursor, f"DELETE FROM {OPS_SCHEMA}.{table} WHERE user_oid LIKE ?", [f"{user_prefix}%"])
+            cleanup.execute(cursor, f"DELETE FROM {OPS_SCHEMA}.agent_action_audit WHERE agent_name LIKE ?", [f"{user_prefix}%"])
+
+        run_in_transaction(connection, work)
+    finally:
+        connection.close()
+
+
+@pytest.fixture
+def user_prefix() -> str:
+    """Every user oid and agent name a channel contract test uses starts with this."""
+    return f"contract-{RUN_TAG}-"
+
+
+def _channel_fixture(request, tmp_path, user_prefix, sqlite_factory, warehouse_factory):
+    if request.param == "sqlite":
+        repo = sqlite_factory(tmp_path / "channel.db")
+        yield repo
+        repo.close()
+        return
+    yield warehouse_factory()
+    _purge_channel_rows(user_prefix)
+
+
+@pytest.fixture(params=_PARAMS)
+def channel_audit_repo(request, tmp_path, user_prefix, client_ids):
+    from infrastructure.persistence.sqlite_channel import SqliteChannelAuditRepository
+    from infrastructure.persistence.warehouse_channel import WarehouseChannelAuditRepository
+
+    yield from _channel_fixture(request, tmp_path, user_prefix, SqliteChannelAuditRepository, WarehouseChannelAuditRepository)
+    if request.param == "warehouse":
+        _purge_warehouse(("channel_audit",), client_ids.issued)
+
+
+@pytest.fixture(params=_PARAMS)
+def agent_action_repo(request, tmp_path, user_prefix):
+    from infrastructure.persistence.sqlite_channel import SqliteAgentActionAuditRepository
+    from infrastructure.persistence.warehouse_channel import WarehouseAgentActionAuditRepository
+
+    yield from _channel_fixture(request, tmp_path, user_prefix, SqliteAgentActionAuditRepository, WarehouseAgentActionAuditRepository)
+
+
+@pytest.fixture(params=_PARAMS)
+def writer_repo(request, tmp_path, user_prefix):
+    from infrastructure.persistence.sqlite_channel_state import SqliteWriterRepository
+    from infrastructure.persistence.warehouse_channel_state import WarehouseWriterRepository
+
+    yield from _channel_fixture(request, tmp_path, user_prefix, SqliteWriterRepository, WarehouseWriterRepository)
+
+
+@pytest.fixture(params=_PARAMS)
+def confirmation_repo(request, tmp_path, user_prefix):
+    from infrastructure.persistence.sqlite_channel_state import SqliteConfirmationRepository
+    from infrastructure.persistence.warehouse_channel_state import WarehouseConfirmationRepository
+
+    yield from _channel_fixture(request, tmp_path, user_prefix, SqliteConfirmationRepository, WarehouseConfirmationRepository)
+
 
 @pytest.fixture(params=["local", pytest.param("blob", marks=pytest.mark.skipif(
     not AZURE, reason="set TCC_AZURE_TESTS=1 and ARTIFACT_BLOB_ACCOUNT_URL to run the store contract against Blob"))])
