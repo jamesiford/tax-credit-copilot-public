@@ -13,6 +13,7 @@ import json
 
 import pytest
 
+from application import wiring
 from tools import page_brief as pb
 
 
@@ -143,7 +144,7 @@ def test_without_copilot_it_says_the_computed_facts(client, monkeypatch):
     import api.summary as summary
 
     monkeypatch.setattr(summary, "build_brief", lambda req: BRIEF)
-    monkeypatch.setattr(client.app.state, "registry", None, raising=False)
+    wiring.reset_ai()  # no provider configured: the scripted path
     events = _events(client.post("/api/summary", json={"page": "portfolio"}).text)
     names = [e for e, _ in events]
     assert names == ["brief", "fallback", "done"]
@@ -152,28 +153,16 @@ def test_without_copilot_it_says_the_computed_facts(client, monkeypatch):
 
 def test_with_copilot_it_streams_and_then_checks_every_figure(client, monkeypatch):
     import api.summary as summary
+    from tests.ai_fakes import FakeAgent, foundry_runtime_over, install_providers
 
-    class _Update:
-        def __init__(self, text):
-            self.text = text
-
-    class _Agent:
+    class _Agent(FakeAgent):
         async def run(self, prompt, stream=True):
             assert "0.83 jobs short" in prompt
             for piece in ("- **Ironbridge** is 0.83 jobs short", "; worth $40,000."):
-                yield _Update(piece)
-
-    class _Record:
-        agent = _Agent()
-
-    class _Registry:
-        by_name = {"PageSummaryAgent": _Record()}
-
-        def __getitem__(self, name):
-            return self.by_name[name]
+                yield type("U", (), {"text": piece})()
 
     monkeypatch.setattr(summary, "build_brief", lambda req: BRIEF)
-    monkeypatch.setattr(client.app.state, "registry", _Registry(), raising=False)
+    install_providers(foundry_runtime_over(_Agent()))
     events = _events(client.post("/api/summary", json={"page": "portfolio"}).text)
     tokens = "".join(d.get("content", "") for e, d in events if e == "token")
     assert tokens == "- **Ironbridge** is 0.83 jobs short; worth $40,000."

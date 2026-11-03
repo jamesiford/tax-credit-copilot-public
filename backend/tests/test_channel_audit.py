@@ -19,10 +19,12 @@ from pathlib import Path
 
 import pytest
 
+from application import wiring
 from application.channel_audit import AuditCall, ChannelAuditor, request_sha256, summarise_request
 from application.identity import ActingUser, NotAuthorized
 from domain.channel import ChannelAuditEvent, collapse
 from infrastructure.persistence.sqlite_channel import SqliteChannelAuditRepository
+from tests.ai_fakes import FakeAgent, foundry_runtime_over, install_providers
 
 REPO = Path(__file__).resolve().parents[2]
 SCRIPTS = REPO / "scripts"
@@ -557,17 +559,8 @@ def test_the_gateway_dry_run_prints_its_one_grant(grants, capsys, monkeypatch):
 # --------------------------------------------------------------- agent action audit
 
 
-class _FakeAgent:
-    agent_version = "7"
-
-    def __init__(self, chunks=("Hello ", "world"), fail=False):
-        self.chunks, self.fail = chunks, fail
-
-    async def run(self, prompt, stream=True):
-        for chunk in self.chunks:
-            yield type("U", (), {"text": chunk})()
-        if self.fail:
-            raise RuntimeError("model down")
+class _FakeAgent(FakeAgent):
+    """The shared fake, under the name this file has always used."""
 
 
 @pytest.fixture
@@ -588,14 +581,16 @@ def _drive(agent, prompt="Brief: $3,500 for E123"):
     async def run():
         from types import SimpleNamespace
 
+        install_providers(foundry_runtime_over(agent))
         app = SimpleNamespace(state=SimpleNamespace())
         token = chat._TELEMETRY_CONTEXT.set({"app": app, "request_id": "r", "intent": "book"})
         actor = chat._ACTOR.set("analyst@example.com")
         try:
-            return [frame async for frame in chat._stream_agent("ClientSituationAgent", agent, prompt)]
+            return [frame async for frame in chat._stream_agent("ClientSituationAgent", prompt)]
         finally:
             chat._ACTOR.reset(actor)
             chat._TELEMETRY_CONTEXT.reset(token)
+            wiring.reset_ai()
 
     return asyncio.run(run())
 
@@ -640,10 +635,10 @@ def test_an_audit_outage_does_not_break_the_stream(monkeypatch, tmp_path):
 
 
 def test_the_stream_is_byte_identical_with_and_without_the_hook(action_repo, monkeypatch):
-    import api.chat as chat
+    import api.chat.narration as narration
 
     with_hook = _drive(_FakeAgent())
-    monkeypatch.setattr(chat, "_record_agent_action", lambda *a, **k: None)
+    monkeypatch.setattr(narration, "_record_agent_action", lambda *a, **k: None)
     assert _drive(_FakeAgent()) == with_hook
 
 
