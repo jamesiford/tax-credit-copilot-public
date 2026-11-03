@@ -71,8 +71,9 @@ from application.commands.transition_claim import TransitionClaimCommand, handle
 from application.ai.handlers import handle_channel_narration, handle_narrate_brief, handle_route_question
 from application.ai.requests import ChannelNarrationQuery, NarrateBriefQuery, RouteQuestionQuery
 from application.ai_wiring import (  # noqa: F401 - re-exported: one import for every composition getter
-    ai_health, get_agent_catalog, get_ai_settings, get_model_router, get_narration_service,
-    get_provider_registry, get_spec_registry, reset_ai, set_ai_settings, set_model_router,
+    ai_health, get_agent_catalog, get_ai_settings, get_ai_telemetry, get_model_router, get_narration_service,
+    get_provider_registry, get_spec_registry, get_token_budget, reset_ai, set_ai_clock, set_ai_settings,
+    set_ai_telemetry, set_model_router,
     set_narration_service, set_provider_registry, set_spec_registry,
 )
 

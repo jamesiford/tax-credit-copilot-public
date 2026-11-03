@@ -162,7 +162,7 @@ async def _stream(app: Any, req: SummaryRequest) -> AsyncIterator[str]:
             f"Summarise the {brief['page']} page for {brief['subject']}.\n\n"
             f"JSON:\n{json.dumps(brief, indent=2, default=str)}"
         )
-        async for frame in _stream_agent(AGENT, prompt):
+        async for frame in _stream_agent(AGENT, prompt, degrade=False):
             text.append(_token_text(frame))
             yield frame
     finally:
