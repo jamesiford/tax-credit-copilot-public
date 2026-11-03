@@ -39,6 +39,7 @@ ran on `jamesiford-m365-channel-live-deploy`, fast-forwarded to the tip of `feat
 | CH-12b | Demo network posture toggle and hardening plan | done | `wp/CH-12b-demo-posture` | merge `0bda7b9` |
 | CH-13 | Live deployment, spikes, smoke tests and hand-off (Prompt 6) | done with open items (see Blockers) | `wp/CH-13-live-deploy` | merge `fec797d` |
 | CH-14 | Hosted-agent model access (M-01), the silent Teams chat, claim_not_found, deploy health wait, live AI checks (Prompt 7) | done with open items (Teams proof is the owner's; see Blockers) | `wp/CH-14-model-access` | merge `b8ce56e` |
+| CH-15e | Known issues from the live run: shared Graph client with stale-token refresh, exact-name `client_resolve`, typed-error goldens, debug-switch posture and DEMO-CLEANUP (Prompt 8, item 5) | done (live behaviour of the token refresh unverified) | `wp/CH-15e-known-issues` | merge `c06c63c` |
 
 ## Evidence
 
@@ -300,3 +301,13 @@ Merged `--no-ff` into the session integration branch `jamesiford-m365-channel-li
 3. **A group-only writer is refused by the API** until its Graph token cache turns over (about a day after 3 Nov 2026); the operator is on the allow-list as well. Not an admin action: every role this prompt allowed was granted.
 4. **The live external model gateway test is pending the customer's real endpoint.** The mock was deployed and checked from inside the network; the API's narration through it, the forced fallbacks in both orders, the `api_key` and `oauth_client_credentials` modes, and the spans in Application Insights were **not** exercised live (the API is reachable only through the signed-in portal). See CH-13 evidence.
 5. `finding_resolve` was not exercised live (no open finding exists); the 429 rate limit was not reachable live (proven offline).
+
+### CH-15e (merged `c06c63c`)
+
+Prompt 8, item 5 (known issues). Offline; no `az`, `azd`, Graph or live calls.
+
+- **Graph client (D-104).** `infrastructure/auth/graph_client.py`: `GraphClient` and `GraphTokenProvider`; a 401 or a 403 `Authorization_RequestDenied` invalidates the cached token and retries once (60 s cool-down); `EntraGroupEntitlement` refactored onto it with fail-closed unchanged and no existing test edited. CH-15a reuses `GraphClient.request`. Tests: `tests/test_graph_client.py` (403 then 200 after refresh, 401, persistent denial, cool-down, plain-callable provider, claims fallback).
+- **`client_resolve` (D-105).** One exact full name or alias resolves (`facts.resolved`), a full name beats a shared first-word alias, partial and ambiguous text still ask, portal `strict` and `chat_scope` untouched. Cowork skills updated; `tests/test_client_resolve_channel.py`; orchestrator goldens `golden/known_issues.json` (exact name, "their", typed `claim_transition_prepare` errors in plain words). One existing test helper edited (`test_workflows.resolve`, it asserted the removed limitation).
+- **Debug switch (D-106).** Defaults already false everywhere; startup WARNING in gateway and orchestrator; `DEMO-CLEANUP.md`; pinned by `tests/channel/test_gw_debug_posture.py` and `tests/channel_orchestrator/test_orch_debug_posture.py`.
+- **Gate.** Backend `pytest tests/ -q` on the merged tree: **2866 passed, 136 skipped, 1 xfailed** (baseline 2817/136/1; the skip count is unchanged). Code-standards ratchet green, baseline tightened by two entries (`client_resolve`), none added. `check-whitelabel.ps1 -Enforce`: 0 enforced; `audit-export.py --enforce`: 0 findings; `gitleaks` on the branch commits: no leaks; no raster file tracked. Infrastructure, routes and frontend untouched, so Terraform, the route inventory and the frontend gates were not run. Parity pins untouched.
+- **Unverified offline.** That the App Service managed-identity endpoint honours the cache bypass (needs the live redeploy; see KNOWN-LIMITATIONS).
