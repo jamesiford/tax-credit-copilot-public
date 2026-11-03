@@ -132,6 +132,7 @@ _STATE = {"type": "string", "minLength": 2, "maxLength": 2, "default": "GA", "de
 _METHOD = {"type": "string", "enum": list(METHODS), "default": "min_max", "description": "Certified headcount method."}
 _PROGRAM = {"type": "string", "description": "Programme code, e.g. GA_JTC."}
 _TOKEN = {"type": "string", "minLength": 8, "maxLength": 128, "description": "Opaque employee handle. Never an employee id."}
+_CLAIM_STATUSES = ["not_assessed", "assessed", "proposed", "declined", "claimed", "certified", "amended"]
 
 
 def _read(
@@ -148,28 +149,32 @@ def _read(
 
 def _write_pair(
     name: str, description: str, properties: dict[str, Any], required: tuple[str, ...],
-    *, needs_year: bool = False,
+    *, needs_year: bool = False, implemented: bool = True,
 ) -> tuple[CapabilitySpec, CapabilitySpec]:
     """A write is two steps: a preview bound to the caller, then a commit.
 
-    Declared now so the audit schema and the orchestrator know the names; built
-    in a later work package, behind the mediator and a signed confirmation.
+    `prepare` changes nothing and returns a single-use confirmation token. `commit`
+    takes that token, the SAME `arguments` and an idempotency key; the change goes
+    through the mediator, behind the writer policy (`capabilities/writes.py`).
     """
     prepare = CapabilitySpec(
         name=f"{name}_prepare",
         description=f"Preview: {description} Changes nothing; returns a confirmation token.",
         kind=WRITE_PREPARE, needs_client=True, needs_year=needs_year,
-        schema=_object(properties, required), implemented=False,
+        schema=_object(properties, required), implemented=implemented,
     )
     commit = CapabilitySpec(
         name=f"{name}_commit",
-        description=f"Commit: {description} Requires the token from the preview.",
+        description=(
+            f"Commit: {description} Requires the token from the preview and the same arguments."
+        ),
         kind=WRITE_COMMIT, needs_client=True, needs_year=needs_year,
         schema=_object(
-            {"confirmation_token": {"type": "string"}, "idempotency_key": {"type": "string"}},
-            ("confirmation_token", "idempotency_key"),
+            {"confirmation_token": {"type": "string"}, "idempotency_key": {"type": "string"},
+             "arguments": _object(properties, required)},
+            ("confirmation_token", "idempotency_key", "arguments"),
         ),
-        implemented=False,
+        implemented=implemented,
     )
     return prepare, commit
 
@@ -179,7 +184,8 @@ _WRITES: tuple[CapabilitySpec, ...] = (
         "finding_resolve", "Record a human decision about a finding.",
         {"client_id": _CLIENT_ID, "tax_year": _TAX_YEAR, "finding_id": {"type": "string"},
          "resolution": {"type": "string", "enum": ["accept", "assign", "drop", "flag"]},
-         "keep_worksite": {"type": "string"}, "note": {"type": "string"}},
+         "keep_worksite": {"type": "string", "description": "Required for `assign`: the unit that keeps the employee."},
+         "note": {"type": "string"}},
         ("client_id", "tax_year", "finding_id", "resolution"), needs_year=True,
     ),
     *_write_pair(
@@ -190,30 +196,31 @@ _WRITES: tuple[CapabilitySpec, ...] = (
     *_write_pair(
         "claim_transition", "Move a claim cell along its lifecycle.",
         {"client_id": _CLIENT_ID, "program_code": _PROGRAM, "tax_year": _TAX_YEAR,
-         "status": {"type": "string"}, "decline_reason": {"type": "string"}},
+         "status": {"type": "string", "enum": _CLAIM_STATUSES}, "decline_reason": {"type": "string"}},
         ("client_id", "program_code", "tax_year", "status"), needs_year=True,
     ),
     *_write_pair(
-        "claim_record", "Record a claim the platform did not compute.",
+        "claim_record", "Record a claim the platform did not compute (recorded as an unverified client assertion).",
         {"client_id": _CLIENT_ID, "program_code": _PROGRAM, "tax_year": _TAX_YEAR,
-         "status": {"type": "string"}},
+         "status": {"type": "string", "enum": _CLAIM_STATUSES}},
         ("client_id", "program_code", "tax_year", "status"), needs_year=True,
     ),
     *_write_pair(
         "engagement_set", "Declare whether a programme is our mandate for a client.",
         {"client_id": _CLIENT_ID, "program_code": _PROGRAM,
-         "scope": {"type": "string"}, "note": {"type": "string"}},
+         "scope": {"type": "string", "enum": ["in_scope", "out_of_scope", "prospective"]},
+         "note": {"type": "string"}},
         ("client_id", "program_code", "scope"),
     ),
     *_write_pair(
-        "base_year_set", "Set a location's base year.",
+        "base_year_set", "Set a location's base year and recalculate the client from it.",
         {"client_id": _CLIENT_ID, "unit_id": {"type": "string"}, "base_year": _TAX_YEAR},
         ("client_id", "unit_id", "base_year"),
     ),
     *_write_pair(
         "claim_package_create", "Build the claim package for a client-year.",
         {"client_id": _CLIENT_ID, "tax_year": _TAX_YEAR},
-        ("client_id", "tax_year"), needs_year=True,
+        ("client_id", "tax_year"), needs_year=True, implemented=False,
     ),
 )
 

@@ -10,7 +10,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any
 
-from application.capabilities import book, catalog, claims, client, findings, simulate, walkthrough
+from application.capabilities import book, catalog, claims, client, findings, simulate, walkthrough, writes
 from application.capabilities.envelope import ToolResult
 
 FUNCTIONS: dict[str, Callable[..., ToolResult]] = {
@@ -26,6 +26,15 @@ FUNCTIONS: dict[str, Callable[..., ToolResult]] = {
     "employee_drill": walkthrough.employee_drill,
     "findings_list": findings.findings_list,
     "claim_cell_history": claims.claim_cell_history,
+    # Writes take `principal` first: who is asking, not part of the question.
+    **{name: getattr(writes, name) for name in (
+        "finding_resolve_prepare", "finding_resolve_commit",
+        "finding_reopen_prepare", "finding_reopen_commit",
+        "claim_transition_prepare", "claim_transition_commit",
+        "claim_record_prepare", "claim_record_commit",
+        "engagement_set_prepare", "engagement_set_commit",
+        "base_year_set_prepare", "base_year_set_commit",
+    )},
 }
 
 
