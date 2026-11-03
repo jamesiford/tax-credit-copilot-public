@@ -1,0 +1,32 @@
+# The orchestrator as an azd project of its own, deployed from source (no container registry).
+# Written to the `azd ai agent` schema documented at
+# https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/deploy-hosted-agent-code
+# (consulted 2026-11-02). It has NOT been run against a live azd or a live project: that is the
+# Prompt 6 sandbox work, and the first thing to check there is that `azd ai agent` accepts it.
+#
+#   python scripts/vendor-orchestrator.py          # copy the shared modules in first (the zip needs them)
+#   cd channel_orchestrator && azd up
+#
+# The deploying person needs "Foundry Project Manager" on the project. Environment variables the
+# platform injects (FOUNDRY_*, APPLICATIONINSIGHTS_CONNECTION_STRING, AZURE_AI_MODEL_DEPLOYMENT_NAME)
+# are reserved and are not set here. The orchestrator's own variables are in docs/architecture/ENV-VARS.md
+# section "Channel orchestrator"; supply them with `azd env set` and list them under `env:` below.
+name: tcc-channel-orchestrator
+services:
+  tcc-channel-orchestrator:
+    host: azure.ai.agent
+    project: .
+    kind: hosted
+    codeConfiguration:
+      runtime: python_3_13
+      entryPoint:
+        - python
+        - main.py
+      dependencyResolution: remote_build
+    env:
+      PYTHONNOUSERSITE: "1"
+      CHANNEL_GATEWAY_URL: ${CHANNEL_GATEWAY_URL}
+      CHANNEL_GATEWAY_AUDIENCE: ${CHANNEL_GATEWAY_AUDIENCE}
+      TENANT_ID: ${TENANT_ID}
+      CHANNEL_NAME: ${CHANNEL_NAME=teams}
+      AI_PROVIDER_CHAIN: ${AI_PROVIDER_CHAIN=foundry}

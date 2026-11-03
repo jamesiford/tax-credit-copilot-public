@@ -101,7 +101,7 @@ class Planner:
             notes=[w for run in runner.runs for w in run.envelope.get("warnings") or []],
         )
         asked = [ChatMessage("system", text), ChatMessage("user", "JSON:\n" + json.dumps(brief))]
-        turn = await self._chain.complete(asked)
+        turn = await self._chain.complete(asked, prefer=planned.trace.last.provider if planned.trace.last else None)
         planned.trace.turns.append(turn)
         planned.trace.prompt_parts.append("\n".join(m.content for m in asked))
         return turn.text

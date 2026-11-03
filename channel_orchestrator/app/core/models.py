@@ -108,11 +108,16 @@ class ModelChain:
         """True when `text` carries an instruction-override attempt: no model is called for it."""
         return bool(self._injection and self._injection.scan(text).flagged)
 
-    async def complete(self, messages: Sequence[ChatMessage], tools: Sequence[ToolSpec] = ()) -> ModelTurn:
-        """One whole answer from the first provider that gives one, or `NarrationUnavailable`."""
+    async def complete(self, messages: Sequence[ChatMessage], tools: Sequence[ToolSpec] = (), *, prefer: str | None = None) -> ModelTurn:
+        """One whole answer from the first provider that gives one, or `NarrationUnavailable`.
+
+        `prefer` names the provider that answered earlier in the same turn: a tool loop stays with
+        one model while it can, and moves on only when that provider fails.
+        """
         prompt = "\n".join(m.content for m in messages)
+        ordered = sorted(self._providers, key=lambda p: p.name != prefer)
         hops: list[str] = []
-        for provider in self._providers:
+        for provider in ordered:
             if tools and not provider.supports_tools:
                 continue
             hops.append(provider.name)

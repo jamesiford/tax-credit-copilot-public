@@ -87,7 +87,7 @@ class PortChatClient(FunctionInvocationLayer, BaseChatClient):
         tools = [ToolSpec(t.name, t.description, t.parameters()) for t in (options.get("tools") or [])]
         chat = _as_chat_messages(messages, options.get("instructions"))
         self._trace.prompt_parts.append("\n".join(m.content for m in chat))
-        turn = await self._chain.complete(chat, tools)
+        turn = await self._chain.complete(chat, tools, prefer=self._trace.last.provider if self._trace.last else None)
         self._trace.turns.append(turn)
         known = {t.name for t in tools}
         for call in turn.tool_calls:

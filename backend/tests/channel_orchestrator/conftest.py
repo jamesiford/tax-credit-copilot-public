@@ -18,7 +18,8 @@ ORCHESTRATOR = ROOT / "channel_orchestrator"
 
 subprocess.run([sys.executable, str(ROOT / "scripts" / "vendor-orchestrator.py")], check=True, capture_output=True)
 if str(ORCHESTRATOR) not in sys.path:
-    sys.path.insert(0, str(ORCHESTRATOR))
+    # Appended: its root holds a `main.py` of its own, which must never shadow the backend's.
+    sys.path.append(str(ORCHESTRATOR))
 
 from orch_harness import patch_book  # noqa: E402
 

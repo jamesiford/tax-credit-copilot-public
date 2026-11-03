@@ -266,9 +266,9 @@ class Rig:
 
 def build_rig(
     script: list[dict[str, Any]] | None = None, *, supports_tools: bool = True, gateway: FakeGateway | None = None,
-    env: dict[str, str] | None = None, configured: bool = True,
+    env: dict[str, str] | None = None, configured: bool = True, client: GatewayClient | None = None,
 ) -> Rig:
-    """A pipeline over a fake gateway and a scripted model. `configured=False` has no model at all."""
+    """A pipeline over a fake gateway (or a real one's `client`) and a scripted model. `configured=False` has no model."""
     from application.ai.safety.injection import PromptInjectionGuard
 
     settings = load_settings({**ENV, **(env or {})})
@@ -276,7 +276,7 @@ def build_rig(
     providers = [Provider("gateway", chat, "test-model", supports_tools)] if configured else []
     chain = ModelChain(providers, egress_policy=settings.ai.egress_policy, timeout_seconds=5.0,
                        injection=PromptInjectionGuard() if settings.ai.safety.injection_guard else None)
-    pipeline = TurnPipeline(settings, gateway.client(), Planner(chain), StateStore(settings.state_ttl_seconds, clock), clock)
+    pipeline = TurnPipeline(settings, client or gateway.client(), Planner(chain), StateStore(settings.state_ttl_seconds, clock), clock)
     return Rig(pipeline, gateway, chat, clock, settings)
 
 

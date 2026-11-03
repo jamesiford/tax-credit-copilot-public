@@ -838,3 +838,143 @@ One short entry per decision: context, choice, why.
 - **jsonschema.** `backend/requirements.txt` is the only requirements file and the only
   install step (`deploy.yml`, `ci.yml` use it), and already pins `jsonschema`. The channel
   zip is the `backend/` zip, which includes `channel/` and `startup-channel.sh` (tested).
+
+## D-74 CH-08: a separate deployable, and what it shares by copying
+
+- **Context.** The orchestrator is a Foundry hosted agent, not an App Service app, and must not import
+  `backend/`. It still has to apply the very same numeric guard, composer, formatter, catalog and
+  model adapters as the portal; a second implementation of the guard is the thing the design forbids.
+- **Choice.** `scripts/vendor-orchestrator.py` copies the shared modules verbatim into
+  `channel_orchestrator/app/vendor/tcc_shared/` with a SHA-256 manifest. The set is COMPUTED from a seed
+  list by following imports, and the script fails if the closure leaves `application`, `domain` and
+  `infrastructure.ai`, or imports a third-party package outside `httpx`/`azure` in the model-access
+  adapters. 40 files today. The directory is gitignored (a generated copy would drift); `--check`
+  verifies it, the script is idempotent, and `app/__init__.py` APPENDS it to `sys.path` so that in the
+  backend's own test run the real packages win (a prepended copy would shadow `infrastructure`).
+- **Extracted for sharing.** `application/chat_keywords.py` (the keyword table and `keyword_intents`) moved out
+  of `api/chat/routing.py`, which re-exports the two names, so the portal and the channel cannot route the same
+  words differently. Behaviour-preserving; no test was edited.
+- **Rejected.** Hand-listed files (the AI-08 split already showed a list goes stale), and importing
+  `backend/` into the container (drags the engine and FastAPI into a hosted agent).
+
+## D-75 CH-08: how the orchestrator reaches a model
+
+- **Context.** `ORCHESTRATOR.md` (Prompt 2B) said to call models only through `NarrationService`. That path
+  wraps `AgentRuntime`, which drops a model's tool calls by design (ADR-004: agents hold no tools), and the
+  orchestrator's job is to let the MODEL choose which deterministic tool runs.
+- **Choice.** `ModelChain` (`app/core/models.py`) builds the shared `OpenAICompatibleChatModel` from the same
+  `AI_*` settings: `gateway` as configured; `foundry` is the agent's own Foundry account over its Azure OpenAI
+  v1 surface (`https://<account>.services.ai.azure.com/openai`, derived from `FOUNDRY_PROJECT_ENDPOINT`, Entra
+  audience `https://cognitiveservices.azure.com`, the model from `FOUNDRY_MODEL`, defaulting to the platform's
+  `AZURE_AI_MODEL_DEPLOYMENT_NAME`). `foundry_connection` is refused at start: BYOM serves prompt agents only.
+  It keeps the chain's rule (fall to the next provider only when one fails, never splice two models' sentences,
+  stay with one provider through a tool loop), the egress policy and the injection screen. It drops the
+  budget/breaker/bulkhead/retry wrappers, which wrap `AgentRuntime`; a call has the total deadline and the chain.
+- **Three modes.** `tools` (MAF `Agent` with `FunctionTool`s from the catalog and a middleware that replaces the
+  model's text with the composer's), `json` (`AI_GATEWAY_SUPPORTS_TOOLS=false`), `keywords` (no model, a failed
+  model, or the injection screen). The MAF bridge is `PortChatClient(FunctionInvocationLayer, BaseChatClient)`
+  over `ModelChain`; verified against agent-framework-core 1.24.0.
+- **Unverified live.** That the `/openai/v1` chat-completions path accepts the hosted agent's identity on a
+  Foundry account is from the Azure OpenAI v1 documentation, not run (Prompt 6).
+
+## D-76 CH-08: the hosting package, the protocol and what a reply is
+
+- **Docs consulted 2026-11-02 and 2026-11-03.**
+  https://learn.microsoft.com/en-us/azure/foundry/how-to/develop/framework-hosted-agents ;
+  https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/deploy-hosted-agent-code ;
+  https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/publish-copilot ;
+  https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/publish-copilot-virtual-network.
+- **Choice.** The container implements the **Responses** protocol (2.0.0): the platform bridges Teams and
+  Microsoft 365 Copilot to it. The handler uses the stable `azure-ai-agentserver-responses` 2.4.0 directly
+  (`ResponsesAgentServerHost`, `TextResponse`); `agent-framework-foundry-hosting` is a pre-release (beta) on
+  PyPI as of 2026-11-02 and a production build does not take a `--pre` dependency. The handler was exercised
+  against the real host in-process (`/readiness`, `POST /responses`, `/whoami`).
+- **Text only.** Published agents do not stream, and no card or attachment path through the hosted runtime was
+  found in the documentation, so replies are Markdown. Files do not upload in Microsoft 365 Copilot. The
+  composer's `cards_payload` is unused.
+- **Conversation key.** `conversation_id`, else the response chain id, so state follows the person's thread.
+
+## D-77 CH-08: who is asking
+
+- **Choice.** `CHANNEL_IDENTITY_SOURCES` (default `original-subject,platform`; `client-headers` opt-in). The
+  platform documents `x-agent-user-id` (opaque, not an object id), `x-ms-original-subject` (`oid`/`tid`/`idtype`,
+  an experimental draft described as attribution, not proof) and `x-ms-user-identity` (only with end-user
+  delegation). Nothing resolvable means the turn runs nothing and says so. The resolution records its source;
+  `/whoami` (only with `CHANNEL_DEBUG_WHOAMI`) reports header names, and values only for identity fields.
+- **Why client headers are off.** They are caller-supplied: anyone who can call the agent could claim anyone.
+- **Name.** If no signal carries a display name the audit row says `(name not provided)`; the gateway requires a
+  name and the object id is still recorded. Not invented.
+- **Assurance.** The gateway records `channel-asserted` for every orchestrator call, whatever the source.
+- **Prompt 6 must verify live**: which signal a Teams and a Copilot Chat message carry; whether Activity-to-
+  Responses preserves `from.name`.
+
+## D-78 CH-08: region and network isolation (not applied)
+
+- **Facts.** Hosted agents are supported in specific regions (West US 3 among them in the March 2026 list);
+  a hosted agent in a network-isolated project needs the "standard agent setup" (a bring-your-own-VNet agent
+  subnet and a capability host). `infra/modules/foundry` is a basic account with a private endpoint and public
+  network access off, so a hosted agent there cannot reach the gateway or the model until that setup exists.
+- **Not done, deliberately.** No Terraform changes in this work package. It is recorded as an infrastructure
+  gap for the sandbox decision (Prompt 6, spike S3), with the choice of region left to the owner.
+
+## D-79 CH-08: no container registry; Python 3.13
+
+- **Choice.** The recommended deployment is the **source-code (zip) path** (`codeConfiguration`, runtime
+  `python_3_13`, `remote_build`): it needs no registry and Terraform adds none, so `infra/` is untouched by
+  this work package. A `Dockerfile` (python:3.13-slim, uid 10001, port 8088, `PYTHONNOUSERSITE=1`) is kept for
+  the container path and a local build. The hosted runtime supports `python_3_13` and `python_3_14`, not the
+  backend's 3.12, so the orchestrator targets 3.13; the vendored modules are version-neutral.
+- **Verified.** The image's stages up to the `pip` step build and the later stages were checked without it
+  (non-root, Python 3.13, vendored manifest present). `pip install` inside the build could not complete in this
+  environment (TLS interception on the egress), so the image was not built end to end; the requirements were
+  dry-run resolved on the host. Private-network source deployments need outbound access to
+  `mcr.microsoft.com` and `*.login.microsoft.com`.
+- **azd.** `channel_orchestrator/azure.yaml` follows the documented `azure.ai.agent` schema; it has not been run
+  against a live `azd` (Prompt 6).
+
+## D-80 CH-08: the runner's rules
+
+- **The model chooses a tool; code chooses everything else.** Client: resolved by the platform's own
+  `client_resolve` and written over any `client_id` the model passes. Year: the reader's words, else the
+  conversation's, else a question; a year the model names counts only if the reader said it; a write never
+  inherits a year. Method: the reader's; eligibility runs under BOTH certified methods when none is named
+  (`method=both` on the tool reads pay-period only, so two runs, each labelled "Min-Max method" / "Pay Period
+  method", facts namespaced `client_eligibility_min_max` / `_pay_period`). Budget: `CHANNEL_MAX_TOOL_CALLS`.
+- **One named client selects it.** Teams has no page selection, so when the reader names exactly one client the
+  portal rule's "a different client is in scope: ask" is not applied; two clients named, or none and nothing
+  recoverable, still ask, with the candidates numbered and a bare number selecting one.
+- **The model's schema.** `client_id` and the year are not offered or required (the runner supplies or asks);
+  extra properties are tolerated at the door and judged against the catalog's strict schema by the runner.
+  `employee_drill` is not offered to a model (a record token is never in its view).
+- **What a model sees of a result** is the fact paths, never values; a prepare's confirmation token is stripped.
+
+## D-81 CH-08: confirming a change
+
+- Exact words (`confirm`, `yes, apply`, `cancel`), the same person and conversation, within
+  `CHANNEL_CONFIRM_TTL_SECONDS` (300). Any other message drops the pending change. The pending change is cleared
+  before the commit is sent with a fresh idempotency key and a commit is never retried; a lost answer is reported
+  as unknown. Commit tools are not model tools; names and the single call site are pinned by
+  `test_orch_structure.py`. Proved against the real stack in `test_orch_e2e.py`.
+
+## D-82 CH-08: narration audit
+
+- **`POST /channel/v1/audit/narration`** (route 9; `channel_route_inventory.json` updated). An agent caller only
+  (a delegated Cowork token is 403). Body `{agent_name, agent_version, model, prompt_sha256, tool_names,
+  guard_status, violations_count, output_summary}`, unknown fields refused. It writes a `channel_audit` event
+  with the new `action_kind='narrate'` (`ACTION_KINDS` extended; `ChannelAuditor.audited` treats it as a read-like
+  single event) and `numeric_guard` = the verdict, outcome `ok` or `rejected_by_guard`, and a `tcc_ops.agent_action_audit`
+  row with `is_deterministic_path` true only when the guard passed (`AgentInvocation` gained `prompt_sha256` and
+  `output_note`). The gateway may import `application.agent_audit` (stdlib + domain only; allow-listed with the reason).
+- **No migration.** `action_kind` is `VARCHAR(16)` with the values named in a comment, not a CHECK; `narrate`
+  fits. The comment in `0001_channel_audit.sql` is left as published (editing a published migration changes its hash).
+- **Failure.** An unwritable channel event is a 503 `audit_unavailable`; the orchestrator logs it, counts it
+  (`/whoami`) and sends the answer anyway. The report carries a hash of the prompt and a short note, never the
+  prompt or the reply.
+
+## D-83 CH-08: guard-rejection UX and the footer
+
+- A rejected narration is dropped whole; the reply is the blocks and the disclaimer, a line saying the commentary
+  was withheld, and the footer. The provenance footer (run, rule-pack path, trail hash, or source) is appended
+  AFTER the composer from the envelopes' provenance fields verbatim: identifiers, not figures, no model touches them.
+- No identity, an injection-flagged message, a model outage and a tool outage each have a plain sentence
+  (`app/core/replies.py`); none carries a figure.

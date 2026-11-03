@@ -1,0 +1,11 @@
+# The orchestrator's own dependencies. It does NOT install backend/requirements.txt: this is a
+# separate deployable (a Foundry hosted agent) and the engine, FastAPI and the warehouse drivers
+# have no business in it. Pins are the ones the platform already runs (backend/requirements.txt)
+# plus the Foundry hosting package; test_orch_requirements.py keeps the shared ones in step.
+agent-framework-core==1.24.0
+azure-identity==1.27.0
+httpx==0.28.1
+jsonschema==4.26.0
+# The stable Responses-protocol host. `agent-framework-foundry-hosting` is a pre-release (beta) as
+# of 2026-11-02, so the thin handler in app/main.py uses this package directly (D-76).
+azure-ai-agentserver-responses==2.4.0
