@@ -13,7 +13,7 @@ runs in a worktree, so `feat/m365-channel` is held by the main checkout).
 | CH-01 | Capability layer (`application/capabilities/`) | done | `wp/CH-01-capabilities` | `0c8a4d8` |
 | CH-02 | Numeric guard, composer, narrator agent, ADR-008 | done | `wp/CH-02-numeric-guard` | `f1c7815` |
 | CH-03 | Channel audit trail | done | `wp/CH-03-channel-audit` | `087847f` |
-| CH-04 | Identity, authorization, writer entitlement | not started | `wp/CH-04-identity-authz` | — |
+| CH-04 | Identity, authorization, writer entitlement | done | `wp/CH-04-identity-authz` | `603418e` |
 | CH-05 | Prepare/commit safe writes | not started | `wp/CH-05-safe-writes` | — |
 
 ## Evidence
@@ -97,6 +97,26 @@ and its `discovery` / `multi_state` scans read the configured default tenant.
   `grant-warehouse-sql.py`, `CHANNEL_STORE` in ENV-VARS. Decisions D-20..D-24.
 - No existing test edited. Standard gate: whitelabel 0 enforced, audit-export 0
   findings, gitleaks clean. `infra/` untouched.
+
+### CH-04 (merged `603418e`)
+
+- Full backend suite: **1706 passed, 135 skipped, 1 xfailed** (CH-03: 1639 passed).
+  No skip/xfail added; pins untouched.
+- New: `application/acting_user.py`, `application/authorization.py`,
+  `infrastructure/auth/writers.py`, `scripts/channel-writers.py`,
+  `tests/test_agent_principal.py` (67 tests). `Principal` gained `principal_type`
+  and `acting_for`; `Mediator` gained a real Authorization stage. Decisions
+  D-25..D-30.
+- Routes: no route added or removed. `/api/me` gained `principal_type` and
+  `acting_for`; `GET /api/audit/channel` refuses an agent principal;
+  `PUT /api/claims/engagement` now records `set_by`/`set_at`.
+- Existing tests edited (D-30): `test_mediator.py` stage test (Authorization is now
+  a stage; `_scope_tenant` still is not) and `test_auth.py::test_me_...` (two
+  additive fields).
+- Docs: ADR-003 status note, `.github/copilot-instructions.md` pipeline bullet,
+  mediator docstring, SECURITY.md, ENV-VARS (four new variables).
+- Standard gate clean; `infra/` untouched. Owner actions: assign `TCC.Agent` to the
+  gateway's service principal; for `entra_group`, grant Graph `GroupMember.Read.All`.
 
 ## Blockers
 
