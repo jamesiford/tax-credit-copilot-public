@@ -289,7 +289,7 @@ def test_the_composer_imports_only_the_standard_library_and_its_vendored_sibling
         "application.numeric_guard",
         "application.numeric_guard.AllowedContext", "application.numeric_guard.FactIndex",
         "application.numeric_guard.GuardResult", "application.numeric_guard.Numeral",
-        "application.numeric_guard.Violation",
+        "application.numeric_guard.Violation", "application.output_policy",
         "application.capabilities.format",
         "application.capabilities.envelope.DISCLAIMER", "application.capabilities.envelope.Block",
     }

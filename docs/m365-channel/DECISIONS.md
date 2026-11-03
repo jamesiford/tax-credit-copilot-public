@@ -544,3 +544,49 @@ One short entry per decision: context, choice, why.
   no model (same rule as the live-Fabric tests).
 - **Removed.** `application/ai/telemetry_null.py` (added in AI-04, never used once
   the OTel adapter, which is a no-op without an SDK, became the default).
+
+## D-54 AI-07: the injection screen refuses to SEND; it does not rewrite
+
+- **Choice.** `PromptInjectionGuard` runs in `NarrationService` (every model call
+  passes it). On a hit it raises `PromptInjectionBlocked(rules)`: no provider is
+  called, the portal shows the engine's figures with a sentence saying why, and the
+  router's existing exception path falls back to keyword routing. Rule NAMES are
+  logged and counted (`ai.injection_blocked`), never the text. Well-formed
+  `UntrustedText` fences are unwrapped before scanning so the product's own wrapper
+  is not an attack; a stray marker is `fence_spoof`.
+- **Why.** Rewriting or "neutralising" attacker text invites a second bypass; not
+  calling the model is simple and safe because the engine answers without one. A
+  false positive costs prose, never an answer, which is what lets the rules be strict.
+- **Also.** Every pipeline now sends the reader's question through
+  `UntrustedText.fenced()`; `defang` breaks `<<<`, `>>>` and `JSON:` so a question
+  cannot forge a fence or plant a second figures block (the degraded answer reads
+  the LAST `JSON:`). The routing prompt labels assistant turns `copilot:` because a
+  line starting `assistant:` is what a forged turn looks like.
+
+## D-55 AI-07: the output policy is stdlib-only so the composer can vendor it
+
+- **Choice.** Rules live in `application/output_policy.py` (stdlib only, like
+  `numeric_guard`); `RuleOutputPolicy` adapts them to the port. `compose` applies
+  them to the narration after substitution and drops it like a bad figure
+  (`allowed_hosts` parameter; default none). Codes only, never text.
+- **Existing test touched.** `test_composer.py` import allow-list gains
+  `application.output_policy` (the composer is vendored, so its imports are pinned).
+
+## D-56 AI-07: portal prose is gated as it streams, at word boundaries
+
+- **Choice.** `OutputGate` holds text after the last whitespace and reviews
+  everything that would be released, whole, before releasing it; once a rule fires
+  nothing further is released and the reader gets the withheld sentence plus the
+  engine's figures. `_stream_agent` was split (`_Run`, `_frames`, `_withheld`).
+- **Why.** Tokens are shown as they arrive, so the policy cannot wait for the end.
+  Whitespace-delimited leaks (links, addresses) are held whole; a phone number can
+  show its first digits before its last are stopped — stated in ADR-008/SECURITY.
+- **Existing test touched.** `test_ai_degraded` cancellation case now yields text
+  ending in a space (held text is not "shown").
+
+## D-57 AI-07: both controls default ON; OFF is logged
+
+- **Choice.** `AI_INJECTION_GUARD` / `AI_OUTPUT_POLICY` (`on`|`off`), and
+  `AI_OUTPUT_ALLOWED_HOSTS`. A value other than on/off is a startup error.
+- **Why.** A control silently off reads as on. `off` is a break-glass for a false
+  positive in production while a rule is fixed.

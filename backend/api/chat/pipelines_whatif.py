@@ -5,7 +5,7 @@ import re
 import uuid
 from typing import AsyncIterator
 
-from api.chat.narration import _brief, _stream_agent
+from api.chat.narration import _brief, _question, _stream_agent
 from api.chat.sse import _TELEMETRY_CONTEXT, _sse
 from application.capabilities.simulate import simulate_headcount
 from domain.calculation.trail import TrailRecorder, reset_recorder, set_recorder
@@ -68,7 +68,7 @@ async def _pipeline_simulate(app, message: str) -> AsyncIterator[str]:
             yield f
 
         async for f in _stream_agent("ReportingAgent", _brief(
-                                         f"Summarize the what-if delta for an exec. Original question: {message}",
+                                         f"Summarize the what-if delta for an exec. Original question:\n{_question(message)}",
                                          {"fte_change": new_hires, "direction": direction_verb,
                                           "location": city,
                                           "delta_annual_usd": sim["delta"]["annual_credit_usd"],

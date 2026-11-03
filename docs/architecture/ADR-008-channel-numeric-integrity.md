@@ -92,12 +92,48 @@ the blocks of every capability, so CH-01's rendering is held to CH-02's guard.
 | --- | --- |
 | Placeholder substitution through one formatter | MAF `WorkflowBuilder` workflows |
 | The numeric guard and the composer | Checkpointing and human-gated resume |
-| A narrator that is never shown a value | `TenantScopeMiddleware`, `PromptInjectionMiddleware`, `CostGuardMiddleware` |
+| A narrator that is never shown a value | `TenantScopeMiddleware`, `CostGuardMiddleware` (the budget is built as a decorator: AI-04) |
 | Fallback to platform blocks on any rejection | Structured-output field-by-field comparison for authored artifacts |
+| A prompt-injection screen and an output policy (AI-07, below) | `PromptInjectionMiddleware` as MAF middleware — the same check runs today as a service-level screen |
 
 The guard and composer are plain functions rather than `ChatMiddleware`. The
 hosted orchestrator (a later work package) calls them in code; wrapping them as
 middleware when MAF workflows land changes the call site, not the check.
+
+## Safety of the words, not only the figures (AI-07)
+
+The numeric guard decides whether a figure is the engine's. It does not decide
+whether the words around it are ones the product will say. Two further controls,
+both rule-based and both explainable in a sentence:
+
+- **Untrusted text is fenced and screened going IN.** Anything a reader typed
+  reaches a model only through `UntrustedText`: between markers, with a reminder
+  that it is data, with forged markers defanged. `PromptInjectionGuard` — in
+  `NarrationService`, the one place every model call passes — refuses to send a
+  prompt carrying an instruction-override attempt ("ignore your instructions",
+  "you are now…", a forged `system:` turn, a spoofed fence). The model is not called;
+  the reader is told so and still gets the engine's figures, and the router falls
+  back to keyword routing, which cannot be talked into anything. A false positive
+  therefore costs prose, never an answer.
+- **Prose is reviewed going OUT.** `application/output_policy.py` (standard
+  library only, vendored beside the numeric guard) flags links to hosts not on an
+  allow-list, email addresses, phone numbers, SSN/EIN shapes, code blocks, and the
+  narrator presenting itself as counsel or guaranteeing an outcome (audit safety,
+  entitlement). On the channel, `compose` drops a narration that breaks it exactly
+  as it drops one with a bad figure. On the portal, `OutputGate` reviews the reply as
+  it streams: text is held to the last word boundary and everything that would be
+  released is reviewed whole first, so a link or address is never shown, in whole or
+  in part; what a reader has already seen has always passed.
+
+Violations are recorded as rule codes. The offending text is never repeated into a
+log, a span or an error, because it is exactly what must not be repeated.
+
+**Stated limits.** These are patterns. A new phrasing will get past them, and text
+containing no command at all can still steer a model; that is why they are two layers
+beside a third (no model produces a figure), and why
+`tests/ai_evals/datasets/injection.jsonl` is the thing to extend when an attempt is
+seen. A phone number can have its first digits shown before the last are stopped.
+Both controls default on; setting either `off` is logged at startup.
 
 ## Writes (CH-05)
 
@@ -130,10 +166,12 @@ strict gate on the model's raw output is what keeps a model from using that door
 
 **What this does not cover — said plainly.**
 
-- **The portal chat is unchanged.** `api/chat.py` still streams the narrator agents'
-  prose to the browser unvalidated. It takes its *briefs* from the same capabilities
-  now, so its figures are the engine's, but nothing checks what the model says about
-  them. The channel path validates narration; the portal path does not.
+- **The portal chat's figures are still not number-checked.** The portal streams
+  the narrator agents' prose to the browser. It takes its *briefs* from the same
+  capabilities, so its figures are the engine's, but nothing checks what the model
+  says about them. Since AI-07 that prose is at least screened and reviewed by the
+  injection guard and output policy; the numeric guard still runs only on the
+  channel path.
 - **Number words are not numerals.** "twelve" is invisible to the guard. The
   narrator's prompt forbids them for figures; the guard does not, because a guard
   that guessed at English would be wrong in both directions.

@@ -9,7 +9,7 @@ from __future__ import annotations
 import uuid
 from typing import Any, AsyncIterator
 
-from api.chat.narration import _brief, _stream_agent
+from api.chat.narration import _brief, _question, _stream_agent
 from api.chat.scope import _detect_state
 from api.chat.sse import _TELEMETRY_CONTEXT, _sse
 from application.capabilities.client import client_discovery, client_eligibility
@@ -39,7 +39,7 @@ async def _pipeline_eligibility(app, message: str, *, scope: dict[str, Any] | No
         scope_text = (
             f"Selected scope: client_id={account_id}, tax_year={tax_year}, state={state}, method={method}."
         )
-        async for f in _stream_agent("OrchestratorAgent", f"User question: {message}\n{scope_text}"):
+        async for f in _stream_agent("OrchestratorAgent", f"User question:\n{_question(message)}\n{scope_text}"):
             yield f
 
         # What the RUN concluded about this client, not a synthetic fixture.
@@ -81,7 +81,7 @@ async def _pipeline_eligibility(app, message: str, *, scope: dict[str, Any] | No
                                          )):
                 yield f
             async for f in _stream_agent("ReportingAgent", _brief(
-                                             f"Summarize for an exec in one sentence. Original question: {message}",
+                                             f"Summarize for an exec in one sentence. Original question:\n{_question(message)}",
                                              {"state": state, "no_state_pack": True,
                                               "available_state_packs": ["GA", "NY", "SC", "NC", "TN", "FL", "OH", "CO", "VA"],
                                               "suggested_next_question": "Show me our full credit portfolio across every state."},
@@ -91,7 +91,7 @@ async def _pipeline_eligibility(app, message: str, *, scope: dict[str, Any] | No
             async for f in _stream_agent("CreditRulesAgent", _brief(f"Report the {credit['credit_name']} result in one sentence.", credit)):
                 yield f
 
-            async for f in _stream_agent("ReportingAgent", _brief(f"Summarize for an exec. Original question: {message}", {
+            async for f in _stream_agent("ReportingAgent", _brief(f"Summarize for an exec. Original question:\n{_question(message)}", {
                                              "credit_name": credit["credit_name"],
                                              "citation": credit["citation"],
                                              "qualifying_jobs": credit["qualifying_jobs"],
@@ -122,7 +122,7 @@ async def _pipeline_portfolio(app, message: str) -> AsyncIterator[str]:
     try:
         yield _sse("status", {"phase": 3, "intent": "portfolio"})
 
-        async for f in _stream_agent("OrchestratorAgent", f"User question: {message}\nIntent: full multi-state portfolio across every rule pack."):
+        async for f in _stream_agent("OrchestratorAgent", f"User question:\n{_question(message)}\nIntent: full multi-state portfolio across every rule pack."):
             yield f
 
         result = client_discovery(exclude_codes=[]).facts  # no exclusions — include GA + every other pack
@@ -137,7 +137,7 @@ async def _pipeline_portfolio(app, message: str) -> AsyncIterator[str]:
         total_lifetime = sum(h["lifetime_credit_usd"] for h in result["hits"])
         total_annual = sum(h["annual_credit_usd"] for h in result["hits"])
         async for f in _stream_agent("ReportingAgent", _brief(
-                                         f"Summarize the full multi-state portfolio for an exec. Original question: {message}",
+                                         f"Summarize the full multi-state portfolio for an exec. Original question:\n{_question(message)}",
                                          {"portfolio_total_annual_usd": total_annual,
                                           "portfolio_total_lifetime_usd": total_lifetime,
                                           "hit_count": len(result["hits"]),
@@ -162,7 +162,7 @@ async def _pipeline_discovery(app, message: str) -> AsyncIterator[str]:
     try:
         yield _sse("status", {"phase": 3, "intent": "discovery"})
 
-        async for f in _stream_agent("OrchestratorAgent", f"User question: {message}\nIntent: discover additional credits across the rule library."):
+        async for f in _stream_agent("OrchestratorAgent", f"User question:\n{_question(message)}\nIntent: discover additional credits across the rule library."):
             yield f
 
         # Exclude GA_JTC since the user's asking what *other* credits apply.
@@ -177,7 +177,7 @@ async def _pipeline_discovery(app, message: str) -> AsyncIterator[str]:
         # Reporting closes with an exec line about the discovery total.
         total_lifetime = sum(h["lifetime_credit_usd"] for h in result["hits"])
         async for f in _stream_agent("ReportingAgent", _brief(
-                                         f"Summarize the discovery scan for an exec. Original question: {message}",
+                                         f"Summarize the discovery scan for an exec. Original question:\n{_question(message)}",
                                          {"total_other_credits_lifetime_usd": total_lifetime, "hit_count": len(result["hits"]), "hits": result["hits"]},
                                      )):
             yield f

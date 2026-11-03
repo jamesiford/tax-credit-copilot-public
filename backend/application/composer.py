@@ -13,7 +13,11 @@ module substitutes through the one formatter, and every reply is checked twice:
    against the fact index. That is defence in depth against a formatter bug — the
    first gate trusts the formatter, the second does not.
 
-If either fails, the reply is the platform's own blocks and the standing
+Between them the narration is also reviewed by `output_policy` [AI-07]: a link, an
+address, an identifier shape, a code block, or the narrator presenting itself as
+counsel drops the narration exactly as a bad figure does.
+
+If any fails, the reply is the platform's own blocks and the standing
 disclaimer, nothing else. The composer never softens, rounds or patches a
 sentence: a rejected narration is dropped whole and the reader sees the engine's
 words instead, with the violations returned so the caller can audit them.
@@ -29,7 +33,7 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any
 
-from application import numeric_guard
+from application import numeric_guard, output_policy
 from application.capabilities import format as fmt
 from application.capabilities.envelope import DISCLAIMER, Block
 from application.numeric_guard import AllowedContext, FactIndex, GuardResult, Numeral, Violation
@@ -244,6 +248,12 @@ def _placeholder_violation(message: str) -> Violation:
     return Violation(Numeral(message, 0, 0, "placeholder"), message, stage="narration")
 
 
+def _policy_violations(narration: str, allowed_hosts: Sequence[str]) -> list[Violation]:
+    """Output-policy codes as violations, so the caller audits them with the rest."""
+    codes = output_policy.review(narration, allowed_hosts=allowed_hosts).violations
+    return [Violation(Numeral(f"output policy: {c}", 0, 0, "output_policy"), f"output policy: {c}", stage="output_policy") for c in codes]
+
+
 def compose(
     blocks: Sequence[Block],
     narration: str | None,
@@ -251,6 +261,7 @@ def compose(
     allowed_context: AllowedContext | None = None,
     *,
     disclaimer: str = DISCLAIMER,
+    allowed_hosts: Sequence[str] = (),
 ) -> Composed:
     """Assemble one reply, or fall back to the platform's blocks alone.
 
@@ -273,6 +284,7 @@ def compose(
             violations.append(_placeholder_violation(str(exc)))
         else:
             narrated = substituted.strip()
+            violations.extend(_policy_violations(narrated, allowed_hosts))
 
     if not violations and narrated:
         # 2. The finished reply, against the facts, trusting no formatter.

@@ -103,7 +103,7 @@ def test_a_cancelled_stream_is_recorded_and_the_cancellation_propagates(monkeypa
 
     class Cancelled(ScriptedRuntime):
         async def stream(self, spec, prompt):
-            yield TextDelta("partial")
+            yield TextDelta("partial ")
             raise asyncio.CancelledError
 
     install_providers(Cancelled("p"))
@@ -113,4 +113,4 @@ def test_a_cancelled_stream_is_recorded_and_the_cancellation_propagates(monkeypa
 
     with pytest.raises(asyncio.CancelledError):
         asyncio.run(go())
-    assert recorded == [("ClientSituationAgent", len("partial"), False)]
+    assert recorded == [("ClientSituationAgent", len("partial "), False)]

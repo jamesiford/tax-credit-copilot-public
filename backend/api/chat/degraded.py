@@ -21,8 +21,11 @@ _MARKER = "JSON:\n"
 
 
 def _brief_payload(prompt: str) -> Any:
-    """The JSON object after the `JSON:` marker a pipeline's brief carries, or None."""
-    start = prompt.find(_MARKER)
+    """The JSON object after the LAST `JSON:` marker a pipeline's brief carries, or None.
+
+    Last, because the brief is appended after anything a reader typed.
+    """
+    start = prompt.rfind(_MARKER)
     if start < 0:
         return None
     try:
@@ -55,11 +58,13 @@ def figures_text(prompt: str) -> str:
     return "\n".join(lines)
 
 
-def degraded_message(prompt: str, *, interrupted: bool, with_sentence: bool) -> str:
-    """The text to append. The sentence is omitted when it was already said once."""
+def degraded_message(prompt: str, *, sentence: str, with_sentence: bool, after_text: bool) -> str:
+    """The text to append in place of prose. `after_text` starts a new paragraph.
+
+    `with_sentence` is False when the reason was already given earlier in the request.
+    """
     figures = figures_text(prompt)
-    sentence = INTERRUPTED_SENTENCE if interrupted else UNAVAILABLE_SENTENCE
     parts = ([sentence] if with_sentence else []) + ([figures] if figures else [])
     if not parts:
         return ""
-    return ("\n\n" if interrupted else "") + "\n\n".join(parts)
+    return ("\n\n" if after_text else "") + "\n\n".join(parts)

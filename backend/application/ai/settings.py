@@ -11,6 +11,7 @@ build any of those from a plain dict, with no `os.environ` monkeypatching.
     AI_AGENT_VERSION_PINS              (none)                   AgentName=version,AgentName=version
     AI_TOKEN_BUDGET_DAILY              (none)                   global ceiling; unset = no ceiling
     AI_TOKEN_BUDGET_PER_PRINCIPAL_DAILY (none)                  per-user ceiling
+    AI_INJECTION_GUARD / AI_OUTPUT_POLICY / AI_OUTPUT_ALLOWED_HOSTS   see `safety/settings.py`
 
 The gateway's own variables live in `gateway_settings.py`; the Foundry ones keep
 their existing names (`FOUNDRY_PROJECT_ENDPOINT`, `FOUNDRY_MODEL`).
@@ -22,6 +23,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from application.ai.gateway_settings import GatewaySettings, load_gateway_settings
+from application.ai.safety.settings import SafetySettings, load_safety_settings
 from domain.ai import ModelRole
 
 DEFAULT_FOUNDRY_MODEL = "gpt-5.4-mini"
@@ -61,6 +63,7 @@ class AiSettings:
     budget_principal_daily: int | None = None
     resilience: ResilienceSettings = field(default_factory=ResilienceSettings)
     gateway: GatewaySettings | None = None
+    safety: SafetySettings = field(default_factory=SafetySettings)
 
     def chain_for(self, role: ModelRole) -> tuple[str, ...]:
         """Providers to try for `role`, in order."""
@@ -168,7 +171,7 @@ def load_ai_settings(env: Mapping[str, Any]) -> AiSettings:
         version_pins=parse_pins(_text(env, "AI_AGENT_VERSION_PINS")),
         budget_global_daily=_optional_int(env, "AI_TOKEN_BUDGET_DAILY"),
         budget_principal_daily=_optional_int(env, "AI_TOKEN_BUDGET_PER_PRINCIPAL_DAILY"),
-        resilience=_resilience(env),
+        resilience=_resilience(env), safety=load_safety_settings(env),
         gateway=load_gateway_settings(env) if "gateway" in in_use else None,
     )
     if "foundry_connection" in in_use and not settings.connection_name:
