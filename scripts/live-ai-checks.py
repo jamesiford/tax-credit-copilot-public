@@ -13,7 +13,7 @@ environment the command is run with, never by code in this file.
     rate-limit   queues a 429 with Retry-After on the mock first; prints whether the wait was honoured
     hop          queues failures on the mock first (`--faults N`): the chain must move on to the next
                  provider, and the hops must say so
-    egress       a prompt carrying an employee-identifier-shaped token and a record-token-shaped one:
+    egress       a prompt carrying a record-token field and a 24-hex record token (the shapes `application/ai/egress.py` refuses):
                  every provider must refuse it
 
 Optional `LIVE_TOKEN_DIR`: a folder holding one file per token scope (the scope with every non-alphanumeric
@@ -35,7 +35,7 @@ import time
 from pathlib import Path
 
 PROMPT = "Narrate this brief in one sentence: 5 of 5 clients were assessed."
-IDENTIFIER_PROMPT = "Narrate this brief: employee E200200000 has record token 9f2c1ab04d7e55a1b3c6d8e0f1a2b3c4 and 38.5 weekly hours."
+IDENTIFIER_PROMPT = 'Narrate this brief: {"record_token": "9f2c1ab04d7e55a1b3c6d8e0", "weekly_hours": 38.5}'
 
 
 def install_file_credentials() -> None:
