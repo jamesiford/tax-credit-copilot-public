@@ -40,6 +40,7 @@ ran on `jamesiford-m365-channel-live-deploy`, fast-forwarded to the tip of `feat
 | CH-13 | Live deployment, spikes, smoke tests and hand-off (Prompt 6) | done with open items (see Blockers) | `wp/CH-13-live-deploy` | merge `fec797d` |
 | CH-14 | Hosted-agent model access (M-01), the silent Teams chat, claim_not_found, deploy health wait, live AI checks (Prompt 7) | done with open items (Teams proof is the owner's; see Blockers) | `wp/CH-14-model-access` | merge `b8ce56e` |
 | CH-15e | Known issues from the live run: shared Graph client with stale-token refresh, exact-name `client_resolve`, typed-error goldens, debug-switch posture and DEMO-CLEANUP (Prompt 8, item 5) | done (live behaviour of the token refresh unverified) | `wp/CH-15e-known-issues` | merge `c06c63c` |
+| CH-15a | Resolve display names from Microsoft Graph (Prompt 8, item 1): port, adapter on the shared Graph client, gateway agent-caller step, `CHANNEL_RESOLVE_DISPLAY_NAMES` / `channel_resolve_display_names` / `TCC_CHANNEL_RESOLVE_DISPLAY_NAMES`, `-GrantUserReadBasic` | done offline (live role, Graph and token-refresh behaviour unverified) | `wp/CH-15a-display-names` | merge `dc03820` |
 
 ## Evidence
 
@@ -311,3 +312,13 @@ Prompt 8, item 5 (known issues). Offline; no `az`, `azd`, Graph or live calls.
 - **Debug switch (D-106).** Defaults already false everywhere; startup WARNING in gateway and orchestrator; `DEMO-CLEANUP.md`; pinned by `tests/channel/test_gw_debug_posture.py` and `tests/channel_orchestrator/test_orch_debug_posture.py`.
 - **Gate.** Backend `pytest tests/ -q` on the merged tree: **2866 passed, 136 skipped, 1 xfailed** (baseline 2817/136/1; the skip count is unchanged). Code-standards ratchet green, baseline tightened by two entries (`client_resolve`), none added. `check-whitelabel.ps1 -Enforce`: 0 enforced; `audit-export.py --enforce`: 0 findings; `gitleaks` on the branch commits: no leaks; no raster file tracked. Infrastructure, routes and frontend untouched, so Terraform, the route inventory and the frontend gates were not run. Parity pins untouched.
 - **Unverified offline.** That the App Service managed-identity endpoint honours the cache bypass (needs the live redeploy; see KNOWN-LIMITATIONS).
+
+### CH-15a (merged `dc03820`)
+
+Prompt 8, item 1 (display names). Offline; no `az`, `azd`, Graph or live calls.
+
+- **Port and adapter (D-107).** `application/display_names.py`; `infrastructure/auth/graph_people.py` over `GraphClient`/`GraphTokenProvider` (2 s timeout, 24 h / 5 min cache, bounded, single-flight, fail-soft, oid-only warnings).
+- **Gateway.** `channel/people.py` names an agent caller whose name is missing or `(name not provided)` in `run_tool`, narration audit and MCP `tools/call`; Cowork never reaches Graph. Composed in `application/channel_wiring.py` (re-exported by `wiring.py`).
+- **Configuration.** `CHANNEL_RESOLVE_DISPLAY_NAMES` (default false); Terraform `channel_resolve_display_names` (default false, one setting only when true); azd `TCC_CHANNEL_RESOLVE_DISPLAY_NAMES` in `infra/main.tfvars.json`; ENV-VARS, DEPLOYMENT-HANDOVER, OPERATIONS, SECURITY updated. `assign-channel-roles.ps1 -GrantUserReadBasic` (idempotent; admin action).
+- **Gate.** Backend `pytest tests/ -q`: **2932 passed, 136 skipped, 1 xfailed** (was 2866/136/1; +66 new: 35 adapter, 19 gateway, 7 role-script, 5 infra). Code-standards ratchet green, no baseline change. `check-whitelabel.ps1 -Enforce` 0 enforced; `audit-export.py --enforce` 0 findings; `terraform fmt -check -recursive`, `init -backend=false`, `validate`, `tflint --recursive` clean; `terraform test` 63 passed; gitleaks on the branch commits: no leaks.
+- **Unverified.** The role grant, the Graph call and the token refresh on the live platform (the redeploy's job). Live settings to set: `TCC_CHANNEL_RESOLVE_DISPLAY_NAMES=true` (then `azd provision`) after an administrator runs `assign-channel-roles.ps1 -GrantUserReadBasic`.
