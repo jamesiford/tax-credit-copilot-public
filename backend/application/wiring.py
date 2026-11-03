@@ -54,6 +54,7 @@ from application.queries.get_client_situation import (
     handle_get_client_situation,
 )
 from application.queries.get_proximity import GetProximityQuery, handle_get_proximity
+from application.queries.get_channel_audit import GetChannelAuditQuery, handle_get_channel_audit
 from application.queries.list_findings import ListFindingsQuery, handle_list_findings
 from application.queries.get_unit_trend import GetUnitTrendQuery, handle_get_unit_trend
 from application.queries.simulate_portfolio import (
@@ -369,6 +370,120 @@ def set_claim_package_source(source: Any) -> None:
     _claim_package_source = source
 
 
+# --- The channel: audit, writers, confirmations [CH-03, ADR-008] -----------------
+
+_channel_audit_repo: Any | None = None
+_agent_action_repo: Any | None = None
+_writer_repo: Any | None = None
+_confirmation_repo: Any | None = None
+
+
+def _channel_store(name: str) -> str:
+    store = store_choice("CHANNEL_STORE")
+    if store not in ("warehouse", "sqlite", "memory"):
+        raise ValueError(
+            f"CHANNEL_STORE={store!r} is not a known adapter. Use 'warehouse' (alias "
+            f"'fabric'), 'sqlite' or 'memory'. Guessing would put the {name} somewhere nobody is looking."
+        )
+    return store
+
+
+def get_channel_audit_repository() -> Any:
+    """The per-user channel audit trail. `CHANNEL_STORE` selects the adapter."""
+    global _channel_audit_repo
+    if _channel_audit_repo is None:
+        store = _channel_store("channel audit trail")
+        if store == "warehouse":
+            from infrastructure.persistence.warehouse_channel import WarehouseChannelAuditRepository
+
+            _channel_audit_repo = WarehouseChannelAuditRepository()
+        else:
+            from infrastructure.persistence.sqlite_channel import SqliteChannelAuditRepository
+
+            _channel_audit_repo = SqliteChannelAuditRepository(":memory:" if store == "memory" else None)
+    return _channel_audit_repo
+
+
+def set_channel_audit_repository(repo: Any) -> None:
+    global _channel_audit_repo
+    _channel_audit_repo = repo
+
+
+def get_agent_action_audit_repository() -> Any:
+    """`tcc_ops.agent_action_audit`: one row per narrator-agent call."""
+    global _agent_action_repo
+    if _agent_action_repo is None:
+        store = _channel_store("agent action trail")
+        if store == "warehouse":
+            from infrastructure.persistence.warehouse_channel import WarehouseAgentActionAuditRepository
+
+            _agent_action_repo = WarehouseAgentActionAuditRepository()
+        else:
+            from infrastructure.persistence.sqlite_channel import SqliteAgentActionAuditRepository
+
+            _agent_action_repo = SqliteAgentActionAuditRepository(":memory:" if store == "memory" else None)
+    return _agent_action_repo
+
+
+def set_agent_action_audit_repository(repo: Any) -> None:
+    global _agent_action_repo
+    _agent_action_repo = repo
+
+
+def get_writer_repository() -> Any:
+    """The writer allow-list (`tcc_ops.channel_user`)."""
+    global _writer_repo
+    if _writer_repo is None:
+        store = _channel_store("writer allow-list")
+        if store == "warehouse":
+            from infrastructure.persistence.warehouse_channel_state import WarehouseWriterRepository
+
+            _writer_repo = WarehouseWriterRepository()
+        else:
+            from infrastructure.persistence.sqlite_channel_state import SqliteWriterRepository
+
+            _writer_repo = SqliteWriterRepository(":memory:" if store == "memory" else None)
+    return _writer_repo
+
+
+def set_writer_repository(repo: Any) -> None:
+    global _writer_repo
+    _writer_repo = repo
+
+
+def get_confirmation_repository() -> Any:
+    """Prepare/commit tokens, by hash (`tcc_ops.channel_confirmation`)."""
+    global _confirmation_repo
+    if _confirmation_repo is None:
+        store = _channel_store("confirmation tokens")
+        if store == "warehouse":
+            from infrastructure.persistence.warehouse_channel_state import WarehouseConfirmationRepository
+
+            _confirmation_repo = WarehouseConfirmationRepository()
+        else:
+            from infrastructure.persistence.sqlite_channel_state import SqliteConfirmationRepository
+
+            _confirmation_repo = SqliteConfirmationRepository(":memory:" if store == "memory" else None)
+    return _confirmation_repo
+
+
+def set_confirmation_repository(repo: Any) -> None:
+    global _confirmation_repo
+    _confirmation_repo = repo
+
+
+def get_channel_auditor() -> Any:
+    from application.channel_audit import ChannelAuditor
+
+    return ChannelAuditor(get_channel_audit_repository())
+
+
+def get_agent_action_recorder() -> Any:
+    from application.agent_audit import AgentActionRecorder
+
+    return AgentActionRecorder(get_agent_action_audit_repository())
+
+
 def build_mediator() -> Mediator:
     """Construct and wire a mediator. Called once; safe to call again in tests."""
     mediator = Mediator()
@@ -389,6 +504,7 @@ def build_mediator() -> Mediator:
     mediator.register(GetInYearProgressQuery, handle_get_in_year_progress)
     mediator.register(GetClientSituationQuery, handle_get_client_situation)
     mediator.register(ListFindingsQuery, handle_list_findings)
+    mediator.register(GetChannelAuditQuery, handle_get_channel_audit)
 
     # --- Commands: change what the business believes ---
     mediator.register(AssessClientCommand, handle_assess_client)

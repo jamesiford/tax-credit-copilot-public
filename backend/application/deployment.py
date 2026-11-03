@@ -27,11 +27,14 @@ DURABLE_STORES = frozenset({"warehouse"})
 #: Accepted spellings, normalised. `fabric` is the v1 name for the Warehouse.
 _ALIASES = {"fabric": "warehouse"}
 
-#: The four operational stores and their LOCAL defaults.
+#: The operational stores and their LOCAL defaults.
 STORE_DEFAULTS = {
     "CLAIM_STORE": "sqlite",
     "FINDING_STORE": "sqlite",
     "RUN_MANIFEST_STORE": "memory",
+    #: The channel audit trail, writer allow-list, confirmations and the
+    #: agent-action trail. A deployed process refuses anything but `warehouse`.
+    "CHANNEL_STORE": "sqlite",
 }
 
 
@@ -86,6 +89,12 @@ def store_choice(name: str, env: Mapping[str, str] | None = None) -> str:
     env = os.environ if env is None else env
     if name == "OVERRIDE_STORE":
         default = store_choice("RUN_MANIFEST_STORE", env)
+    elif name == "CHANNEL_STORE":
+        # Durable by default once deployed. The channel trail is the only record
+        # of who did what from Teams, so an unset value must not mean "SQLite on a
+        # filesystem the platform may discard"; an explicit non-durable value is
+        # still refused by `check_deployment_configuration`.
+        default = "warehouse" if is_deployed(env) else STORE_DEFAULTS[name]
     else:
         default = STORE_DEFAULTS[name]
     return normalise_store(_get(env, name) or default)

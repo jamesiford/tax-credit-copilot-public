@@ -24,6 +24,7 @@ Three rules, in order of how much damage breaking them does:
 from __future__ import annotations
 
 import ast
+import re
 from pathlib import Path
 
 import pytest
@@ -703,3 +704,83 @@ def test_the_tenant_rule_catches_a_mutated_real_adapter(module, original, mutate
     assert original in source, f"{module} changed; update this mutation"
     assert direct_executions(source) == []
     assert direct_executions(source.replace(original, mutated, 1)), f"mutating {module} went undetected"
+
+
+# --- The channel's exemptions name exactly what they exempt [CH-03] ----------
+#
+# The channel tables are not per-client for the questions asked of them (what did
+# this person do; may this person write; which token was issued), so their
+# statements are tenant-exempt. That is a door, and a door needs to be the width
+# of what goes through it: these tests pin the reasons, the tables, and the fact
+# that nothing else shares them.
+
+_CHANNEL_MODULES = ("warehouse_channel.py", "warehouse_channel_state.py")
+_CHANNEL_TABLES = frozenset({"channel_audit", "channel_user", "channel_confirmation", "agent_action_audit"})
+_CHANNEL_EXEMPTIONS = frozenset({
+    "channel audit event that names no client has no tenant to bind",
+    "channel audit by user: an operator's timeline spans clients by design",
+    "channel audit by correlation id: one turn can touch several clients",
+    "agent action that names no client has no tenant to bind",
+    "agent action trail read: the narrator's activity spans clients by design",
+    "channel_user allow-list is not per client",
+    "channel_confirmation tokens are not per client",
+})
+_OPS_TABLE = re.compile(r"\{OPS_SCHEMA\}\.([A-Za-z_][A-Za-z0-9_]*)")
+
+
+def exemption_reasons(source: str) -> set[str]:
+    """The reason string of every `tenant_exempt("…")` call in a module."""
+    return {
+        node.args[0].value
+        for node in ast.walk(ast.parse(source))
+        if isinstance(node, ast.Call) and _callee(node) == "tenant_exempt"
+        and node.args and isinstance(node.args[0], ast.Constant) and isinstance(node.args[0].value, str)
+    }
+
+
+def ops_tables(source: str) -> set[str]:
+    return set(_OPS_TABLE.findall(source))
+
+
+def _channel_sources() -> dict[str, str]:
+    return {name: (_PERSISTENCE / name).read_text(encoding="utf-8") for name in _CHANNEL_MODULES}
+
+
+def test_the_channel_exemptions_are_exactly_the_documented_ones():
+    found: set[str] = set()
+    for name, source in _channel_sources().items():
+        found |= exemption_reasons(source)
+    assert found == _CHANNEL_EXEMPTIONS, (
+        f"unexpected: {sorted(found - _CHANNEL_EXEMPTIONS)}; missing: {sorted(_CHANNEL_EXEMPTIONS - found)}"
+    )
+
+
+def test_the_channel_adapters_touch_only_the_channel_tables():
+    for name, source in _channel_sources().items():
+        assert ops_tables(source) and ops_tables(source) <= _CHANNEL_TABLES, (name, ops_tables(source))
+
+
+def test_the_channel_exemption_does_not_extend_to_any_other_adapter():
+    """No other warehouse module may borrow a channel reason, or the door widens."""
+    for path in _tenant_scoped_modules():
+        if path.name in _CHANNEL_MODULES:
+            continue
+        shared = exemption_reasons(path.read_text(encoding="utf-8")) & _CHANNEL_EXEMPTIONS
+        assert not shared, f"{path.name} reuses a channel exemption: {sorted(shared)}"
+
+
+def test_the_channel_modules_are_under_the_tenant_rule():
+    names = {p.name for p in _tenant_scoped_modules()}
+    assert set(_CHANNEL_MODULES) <= names
+
+
+def test_the_channel_exemption_rules_catch_a_crafted_violation():
+    widened = (
+        "_X = tenant_exempt('channel_user allow-list is not per client')\n"
+        "_Y = tenant_exempt('read every claim')\n"
+        "def f(cursor):\n"
+        "    _X.execute(cursor, f'SELECT * FROM {OPS_SCHEMA}.program_claim')\n"
+    )
+    assert exemption_reasons(widened) - _CHANNEL_EXEMPTIONS == {"read every claim"}
+    assert not ops_tables(widened) <= _CHANNEL_TABLES
+    assert ops_tables("f'SELECT 1 FROM {OPS_SCHEMA}.channel_audit'") <= _CHANNEL_TABLES

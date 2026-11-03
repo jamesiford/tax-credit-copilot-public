@@ -21,6 +21,7 @@ import asyncio
 from contextvars import ContextVar
 import json
 import logging
+import os
 import re
 import time
 import uuid
@@ -31,7 +32,7 @@ from fastapi import APIRouter, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
-from application.capabilities.catalog import CAPABILITIES, NEEDS_CLIENT as _NEEDS_CLIENT
+from application.capabilities.catalog import CAPABILITIES, CHAT_INTENT_TOOL, NEEDS_CLIENT as _NEEDS_CLIENT
 from application.capabilities.book import book_rank
 from application.capabilities.client import (
     client_at_risk,
@@ -48,6 +49,8 @@ from domain.calculation.trail import TrailRecorder, reset_recorder, set_recorder
 log = logging.getLogger(__name__)
 router = APIRouter(prefix="/api", tags=["chat"])
 _TELEMETRY_CONTEXT: ContextVar[dict[str, Any] | None] = ContextVar("chat_telemetry_context", default=None)
+#: Who asked, for `tcc_ops.agent_action_audit`. Set once per request by `chat()`.
+_ACTOR: ContextVar[str | None] = ContextVar("chat_actor", default=None)
 
 
 class ChatTurn(BaseModel):
@@ -432,6 +435,29 @@ def _extract_simulation(message: str) -> tuple[int, str]:
 
 # ---------------- agent streaming helper ----------------
 
+def _record_agent_action(agent_name: str, foundry_agent, prompt: str, char_count: int, ok: bool) -> None:
+    """One `agent_action_audit` row per agent call. Never alters the stream.
+
+    `is_deterministic_path` is False: this path streams the model's prose to the
+    browser without checking its figures against the brief [ADR-008], and the
+    row must not claim otherwise.
+    """
+    try:
+        from application.agent_audit import AgentInvocation
+        from application.wiring import get_agent_action_recorder
+
+        intent = (_TELEMETRY_CONTEXT.get() or {}).get("intent")
+        tool = CHAT_INTENT_TOOL.get(intent or "")
+        get_agent_action_recorder().record(AgentInvocation(
+            agent_name=agent_name, prompt=prompt, output_chars=char_count, ok=ok,
+            tool_calls=[tool] if tool else [], intent=intent, actor=_ACTOR.get(),
+            agent_version=getattr(foundry_agent, "agent_version", None),
+            model_deployment=os.getenv("FOUNDRY_MODEL"),
+        ))
+    except Exception:  # noqa: BLE001 - an audit failure must not break an answer
+        log.exception("agent action audit failed for %s", agent_name)
+
+
 async def _stream_agent(agent_name: str, foundry_agent, prompt: str) -> AsyncIterator[str]:
     yield _sse("agent_start", {"agent": agent_name})
     started = time.perf_counter()
@@ -449,6 +475,8 @@ async def _stream_agent(agent_name: str, foundry_agent, prompt: str) -> AsyncIte
         ok = False
         error_text = str(e)
         yield _sse("token", {"agent": agent_name, "content": f"[{agent_name} failed: {e}]"})
+
+    _record_agent_action(agent_name, foundry_agent, prompt, char_count, ok)
 
     ctx = _TELEMETRY_CONTEXT.get()
     if ctx is not None:
@@ -917,6 +945,10 @@ async def _stub_stream(message: str) -> AsyncIterator[str]:
 
 @router.post("/chat")
 async def chat(req: ChatRequest, request: Request) -> StreamingResponse:
+    from api.auth import current_principal
+
+    principal = current_principal(request)
+    _ACTOR.set(principal.actor if principal.authenticated else None)
     app = request.app
     registry = getattr(app.state, "registry", None)
     needed = ("OrchestratorAgent", "PayrollIngestAgent", "HeadcountAgent",
