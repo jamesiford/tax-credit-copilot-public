@@ -297,3 +297,48 @@ One short entry per decision: context, choice, why.
 - Routers `ingestion`, `onezero` and `rules` now attribute through `attributed()`;
   `PUT /api/claims/engagement` records `set_by`/`set_at`. Unauthenticated behaviour
   is unchanged.
+
+## D-31 Writes are prepare/commit, bound to person, tool and arguments
+
+- **Choice.** `application/confirmations.py`: a token (256-bit, only its SHA-256 stored)
+  is bound to the acting user's oid, the base tool name and the SHA-256 of the
+  arguments; single use by atomic `consume`; TTL `CHANNEL_CONFIRM_TTL_SECONDS`
+  (default 600, 30–3600). Commit re-supplies the arguments, so the commit schema
+  gained an `arguments` property (the declared schema had only token and key).
+- **Why.** The person agrees to what they were shown; a token for a different
+  person, tool or change is refused with a distinct error (unknown, expired,
+  replayed, wrong_user, wrong_tool, wrong_args, idempotency_conflict).
+
+## D-32 A retry replays; a consumed token with no recorded result is refused
+
+- **Choice.** Same idempotency key + same confirmation replays the stored result.
+  If the process died between consuming and recording, or the write failed, the
+  retry is refused as replayed and a fresh prepare is needed.
+- **Why.** The safe failure is "do it again on purpose", never a second write.
+
+## D-33 Prepare is audited, authorised first, and previews are derived, not duplicated
+
+- **Choice.** Prepare and commit each run inside the channel auditor
+  (`write_prepare`, `write_commit`); a non-writer is refused before anything is
+  read. Each preview comes from the command's own pure function (`build_claim`,
+  `next_claim`, `plan_base_year`, the rebase query), so preview and row cannot drift.
+- **Why.** A write cannot happen unaudited, and a preview that disagreed with the
+  commit would be a figure nobody can vouch for.
+
+## D-34 The channel can only record an unverified claim
+
+- **Choice.** `claim_record` fixes provenance to `client_asserted` and takes no
+  provenance argument. `claim_package_create` stays unimplemented (Prompt 3).
+- **Why.** A claim typed into a chat is somebody's word, never a filing; the
+  platform's own rule is that a band is never derived from an unverified claim.
+
+## D-35 Claims and engagement writes moved behind the mediator
+
+- **Choice.** `RecordClaimCommand`, `TransitionClaimCommand`, `SetEngagementCommand`
+  (all `Policy.WRITER`) replace the logic in `api/claims.py`; the routers are thin
+  and their existing tests pass unedited. `plan_base_year` was extracted from
+  `handle_set_base_year` so a preview and the commit share the same checks.
+- **Existing tests edited.** `test_capabilities_envelope.py` (six of seven write
+  pairs are now built; only the package build remains unbuilt) and
+  `test_capabilities_equivalence.py` (the unbuilt-tool probe uses
+  `claim_package_create_commit`).
