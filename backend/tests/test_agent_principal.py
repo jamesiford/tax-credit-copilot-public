@@ -120,12 +120,13 @@ def test_a_user_with_no_upn_is_attributed_by_object_id():
         encode({"oid": "not-a-guid", "tid": TENANT}),
         encode({"oid": USER_OID, "tid": TENANT, "name": "x" * 300}),
         encode({"oid": USER_OID, "tid": TENANT, "assurance": "trust-me"}),
+        encode({"oid": USER_OID, "tid": TENANT, "channel": "carrier-pigeon"}),
         encode({"oid": USER_OID, "tid": TENANT, "name": {"a": 1}}),
         "W10",                                                       # a JSON list, not an object
         "A" * 4000,
     ],
     ids=["none", "empty", "blank", "garbage", "no-tid", "other-tenant", "bad-oid", "long-name",
-         "assurance", "name-type", "list", "oversize"],
+         "assurance", "channel", "name-type", "list", "oversize"],
 )
 def test_a_malformed_or_foreign_header_is_refused(value):
     with pytest.raises(ActingUserError):
@@ -488,20 +489,21 @@ def test_an_unknown_writer_source_is_refused(monkeypatch):
 # ------------------------------------------------------- engagement actor
 
 
-def test_an_engagement_records_who_set_it(tmp_path, entra, api):
+def test_an_engagement_records_who_set_it(tmp_path, writable, api):
     from api import claims as claims_api
     from infrastructure.persistence.sqlite_claims import SqliteClaimRepository
 
+    _grant(writable)
     repo = SqliteClaimRepository(tmp_path / "claims.db")
-    original = claims_api.get_repository
-    claims_api.get_repository = lambda: repo
+    original = wiring.get_claim_repository()
+    claims_api.set_repository(repo)
     try:
         response = api.put(
             "/api/claims/engagement", headers=_agent(acting_header()),
             json={"client_id": 1001, "program_code": "GA_JTC", "scope": "in_scope"},
         )
     finally:
-        claims_api.get_repository = original
+        claims_api.set_repository(original)
     assert response.status_code == 200, response.text
     body = response.json()
     assert body["set_by"] == "pat@example.com" and body["set_at"]

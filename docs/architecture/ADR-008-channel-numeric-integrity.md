@@ -99,6 +99,19 @@ The guard and composer are plain functions rather than `ChatMiddleware`. The
 hosted orchestrator (a later work package) calls them in code; wrapping them as
 middleware when MAF workflows land changes the call site, not the check.
 
+## Writes (CH-05)
+
+The same rule governs a write: the preview a person agrees to must be the row
+that lands. A channel write is a `_prepare` and a `_commit`. Prepare builds the
+real mediator command (so a request the command would refuse never gets a token),
+derives the proposed state from that command's own pure functions, writes nothing,
+and mints a single-use token bound to the person, the tool and the exact arguments.
+Commit presents the token, the same arguments and an idempotency key, and sends
+the command through the mediator, where the writer policy decides again. A retry
+with the same key replays the first outcome. The preview blocks are rendered from
+facts like every other capability and pass the same guard. The full flow is in
+`application/confirmations.py` and `application/capabilities/writes.py`.
+
 ## Consequences
 
 **Good.** On the channel path a wrong figure cannot reach a reader: it is either

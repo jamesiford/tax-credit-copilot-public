@@ -552,7 +552,7 @@ def test_an_unbuilt_tool_cannot_be_called():
     with pytest.raises(NotImplementedError):
         registry.get("verify_figures")
     with pytest.raises(NotImplementedError):
-        registry.get("claim_transition_commit")
+        registry.get("claim_package_create_commit")
 
 
 def test_money_in_facts_stays_exact(book, claims_repo):

@@ -19,6 +19,19 @@ from dataclasses import dataclass
 from typing import Any
 
 from application.identity import NotAuthorized, Policy, Principal, WriterEntitlement
+from application.mediator import Command
+
+
+@dataclass(frozen=True)
+class WriterProbe(Command):
+    """A command that does nothing, declaring the writer policy.
+
+    Lets a flow that is not itself a command (preparing a change, which writes
+    nothing) ask the SAME question the mediator asks, instead of a second
+    implementation of "is this person a writer" that could disagree with it.
+    """
+
+    policy = Policy.WRITER
 
 
 @dataclass

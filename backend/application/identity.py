@@ -90,6 +90,20 @@ class Principal:
             return self.acting_for.oid if self.acting_for else None
         return self.oid
 
+    def as_acting_user(self) -> ActingUser | None:
+        """The person this principal speaks for, in the shape an audit row carries.
+
+        A signed-in person is `delegated`: their own token proves who they are.
+        """
+        if self.is_agent:
+            return self.acting_for
+        if not self.oid:
+            return None
+        return ActingUser(
+            oid=self.oid, tenant_id=self.tenant_id, display_name=self.name, upn=self.upn,
+            assurance="delegated",
+        )
+
     def to_dict(self) -> dict:
         return {
             "authenticated": self.authenticated,

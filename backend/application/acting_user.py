@@ -20,6 +20,7 @@ import uuid
 from typing import Any
 
 from application.identity import ActingUser
+from domain.channel import CHANNELS
 
 HEADER = "X-TCC-Acting-User"
 
@@ -87,6 +88,8 @@ def parse_acting_user(value: str | None, tenant_id: str) -> ActingUser:
     if assurance not in _ASSURANCES:
         raise ActingUserError("acting-user assurance is not recognised")
     fields = {key: _text(payload, key) for key in _OPTIONAL}
+    if fields["channel"] is not None and fields["channel"] not in CHANNELS:
+        raise ActingUserError(f"acting-user channel must be one of {', '.join(CHANNELS)}")
     return ActingUser(
         oid=_guid(payload.get("oid"), "oid"),
         tenant_id=_guid(payload["tid"], "tid"),
