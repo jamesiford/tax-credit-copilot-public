@@ -3,11 +3,19 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import InsightBar from '../components/InsightBar.jsx';
 import BookGrid from '../components/BookGrid.jsx';
+import FootprintPanel from '../components/FootprintPanel.jsx';
+import GridTabs, { GridTabPanel } from '../components/GridTabs.jsx';
 import StartHereCards from '../components/StartHereCards.jsx';
+import Card from '../components/ui/Card.jsx';
 import HeroBand from '../components/ui/HeroBand.jsx';
+import KpiTile, { KpiRow } from '../components/ui/KpiTile.jsx';
 import SectionHeading from '../components/ui/SectionHeading.jsx';
 import { fetchPortfolioV2 } from '../api.js';
 import { portfolioAnswer } from '../lib/answers.js';
+import {
+  activeBookTab, bandCounts, bookTabs, filtersForTab, footprintOf, selectedStates, tileTone,
+} from '../lib/bookCards.js';
+import { band } from '../lib/priority.js';
 import { formatFilters, parseFilters } from '../lib/gridFilter.js';
 import { bookSortQuery, formatBookSort, parseBookSort, toggleBookSort } from '../lib/bookSort.js';
 import { greeting } from '../lib/identity.js';
@@ -105,6 +113,8 @@ export default function PortfolioPage({
   }, [sort.key, sort.desc]);
 
   const rows = summary?.items || [];
+  const counts = useMemo(() => bandCounts(rows), [rows]);
+  const activeTab = activeBookTab(filters);
 
   // 29 Sep: the caption is the COUNTS only. It used to name the single client
   // closest to qualifying and a "top target", which the grid beneath already
@@ -174,16 +184,68 @@ export default function PortfolioPage({
         />
       ) : null}
 
-      <BookGrid
-        rows={rows}
-        filters={filters}
-        onFilter={setFilters}
-        sort={sort}
-        onSort={setSort}
-        onPickClient={onPickClient}
-        onAskCopilot={askAbout}
-        unassessedCount={summary?.unassessed_clients || 0}
-      />
+      <Card
+        className="tcc-book-card"
+        flush
+        title="The book"
+        tabs={rows.length ? (
+          <GridTabs
+            label="Population"
+            tabs={bookTabs(rows)}
+            active={activeTab ?? ''}
+            onChange={(id) => setFilters(filtersForTab(filters, id))}
+          />
+        ) : null}
+        footer={rows[0] ? (
+          <div className="tcc-book-foot">
+            <span>First on the list</span>
+            <button type="button" className="tcc-link" onClick={() => onPickClient?.(rows[0].client_id)}>
+              Open {rows[0].client_name || `Account ${rows[0].client_id}`} →
+            </button>
+          </div>
+        ) : null}
+      >
+        <GridTabPanel id={activeTab ?? 'all'} active={activeTab ?? 'all'}>
+          <BookGrid
+            rows={rows}
+            filters={filters}
+            onFilter={setFilters}
+            sort={sort}
+            onSort={setSort}
+            onPickClient={onPickClient}
+            onAskCopilot={askAbout}
+            unassessedCount={summary?.unassessed_clients || 0}
+          />
+        </GridTabPanel>
+      </Card>
+
+      <div className="tcc-card-grid">
+        {footprintOf(rows).held.length > 1 ? (
+          <Card
+            title="Where the book operates"
+            subtitle={selectedStates(filters).length
+              ? `Filtered to ${selectedStates(filters).join(', ')}`
+              : 'Choose a state to filter the book'}
+          >
+            <FootprintPanel rows={rows} filters={filters} onFilter={setFilters} />
+          </Card>
+        ) : null}
+        {counts.length ? (
+          <Card title="Position" subtitle="Clients by the reason to act, not by dollar value">
+            <KpiRow label="Clients by targeting band">
+              {counts.map(({ id, count }) => (
+                <KpiTile
+                  key={id}
+                  label={band(id).label}
+                  value={String(count)}
+                  sub={band(id).line}
+                  tone={tileTone(id)}
+                />
+              ))}
+            </KpiRow>
+          </Card>
+        ) : null}
+      </div>
     </div>
   );
 }

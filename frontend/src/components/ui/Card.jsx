@@ -2,11 +2,18 @@
  * Why: one container for a block of content so surface, border and shadow are
  * decided once. The section is labelled by its title so it is a landmark-like
  * region a screen reader can name.
+ * `tone` is a surface ('neutral' | 'subtle') or a verdict (a --state-* family:
+ * the border then encodes the reading). `flush` removes the body padding for a
+ * dense data grid, which is the point of its page.
  * Never: render an empty header, hard-code a colour, or lay out its children
  * (the caller owns the body).
  */
 import { useId } from 'react';
 import './Card.css';
+
+//: A verdict card's border carries the reading. These are the --state-* families
+//: and nothing else, so a border is never the selection blue.
+const VERDICTS = ['above-min', 'below-min', 'partial', 'base-year'];
 
 export default function Card({
   title,
@@ -15,15 +22,19 @@ export default function Card({
   tabs,
   footer,
   tone = 'neutral',
+  flush = false,
   as: Element = 'section',
   children,
   className = '',
 }) {
   const titleId = useId();
   const hasHeader = Boolean(title || subtitle || actions);
+  const verdict = VERDICTS.includes(tone) ? tone : null;
   const classes = [
     'ui-card',
     tone === 'subtle' ? 'ui-card-subtle' : 'ui-card-neutral',
+    verdict ? `ui-card-verdict ui-card-verdict-${verdict}` : '',
+    flush ? 'ui-card-flush' : '',
     className,
   ]
     .filter(Boolean)

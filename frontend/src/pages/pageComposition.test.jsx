@@ -258,7 +258,7 @@ describe('the book is one ranked grid, not two tabs', () => {
     draw();
     expect(await screen.findByRole('button', { name: 'Open Cascade' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Open Northwind' })).toBeInTheDocument();
-    expect(screen.getByText('On the line')).toBeInTheDocument();
+    expect(screen.getByText('On the line', { selector: '.tcc-band' })).toBeInTheDocument();
     // "Identified", not "Unclaimed": whether they already claimed it is a fact
     // about a filing we do not hold.
     expect(screen.getByText('Identified', { selector: '.tcc-band' })).toBeInTheDocument();

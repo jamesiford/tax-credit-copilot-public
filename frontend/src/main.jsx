@@ -33,6 +33,7 @@ import { applyTheme } from './brand.config.js';
 import './styles/tokens/index.css';
 import './index.css';
 import './styles/chrome-modern.css';
+import './styles/page-patterns.css';
 import './styles/overlay.css';
 
 // Applied before the first render, so the page never paints in one theme and flips.

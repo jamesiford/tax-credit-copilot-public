@@ -81,6 +81,21 @@ describe('Card', () => {
     expect(container.querySelector('section')).toBeNull();
   });
 
+  it('encodes a verdict in the border with a --state-* family, never a free colour', () => {
+    const { container } = render(<Card tone="below-min" title="T">Body</Card>);
+    expect(container.firstChild).toHaveClass('ui-card-verdict', 'ui-card-verdict-below-min');
+  });
+
+  it('treats an unknown tone as neutral rather than inventing a verdict', () => {
+    const { container } = render(<Card tone="brand-blue">Body</Card>);
+    expect(container.firstChild).not.toHaveClass('ui-card-verdict');
+  });
+
+  it('drops body padding for a dense grid when flush', () => {
+    const { container } = render(<Card flush>Body</Card>);
+    expect(container.firstChild).toHaveClass('ui-card-flush');
+  });
+
   it('merges a custom className', () => {
     const { container } = render(<Card className="extra">Body</Card>);
     expect(container.firstChild).toHaveClass('ui-card', 'extra');
