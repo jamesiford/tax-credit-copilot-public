@@ -33,7 +33,7 @@ runs in a worktree, so `feat/m365-channel` is held by the main checkout).
 | CH-10 | Cowork plugin (`channels/cowork/`), builder and offline validator | done | `wp/CH-10-cowork-plugin` | merge `e93ed3d` |
 | CH-11 | End-to-end workflow and exactness tests | done | `wp/CH-11-workflow-tests` | merge `f33ffa4` |
 | CH-12 | Documentation, ADR-009, runbook, demo script | todo | - | - |
-| CH-12b | Demo network posture toggle and hardening plan | todo | - | - |
+| CH-12b | Demo network posture toggle and hardening plan | done | `wp/CH-12b-demo-posture` | merge `0bda7b9` |
 
 ## Evidence
 
@@ -257,6 +257,12 @@ and its `discovery` / `multi_state` scans read the configured default tenant.
 - W1 and W2 run as scripts of tool calls on both surfaces; a document built only from returned blocks verifies, every one-figure mutation of it is rejected; a writer's changes are two steps, land once, are attributed and audited with the commit's `confirmation_ref` equal to its preview's; a reader is refused every commit and nothing is written. Per-user audit separation through `GET /api/audit/channel` and `scripts/channel-audit.py`; ten reads agree across REST, MCP, the API capability endpoint and the direct call (and four against the portal's own endpoints). Chaos: API timeout and broken road, rate limit, oversized body, replayed/tampered/wrong-user/expired confirmation, a writer revoked mid-conversation. A corrupted capability is caught by the envelope scan and by `verify_figures` end to end.
 - Two findings, both recorded as limits rather than fixed: `client_resolve` asks even for one exact name when no client is selected (the skills now confirm and call again with `current_client_id`); the figure guard compares values, so a wrong figure equal to another real figure in the conversation is not seen (pinned by `test_known_limit_*`).
 - Whitelabel 0 enforced; audit-export 0; `gitleaks git` clean.
+### CH-12b (merged `0bda7b9`)
+
+- Full backend suite: **2765 passed**, 136 skipped, 1 xfailed (unchanged: no Python added). Terraform: `terraform fmt -check -recursive` clean, `init -backend=false` and `validate` clean, `tflint --recursive` exit 0, `terraform test` **57 passed, 0 failed** (baseline 43; 14 new in `tests/foundry_network.tftest.hcl` and `tests/foundry_network_enterprise.tftest.hcl`, no existing test edited). A mutation (the any-address rule made always true) was shown to fail its test.
+- `foundry_public_network_access` (default `false`), `foundry_allowed_ip_ranges` and `foundry_allow_any_ip`; azd values `TCC_FOUNDRY_PUBLIC_NETWORK_ACCESS` and `TCC_FOUNDRY_ALLOWED_IP_RANGES`. Default: the account body is byte for byte what it was (asserted through the module's `network_settings` output) and the check resource has `count` 0, so the default plan gains nothing. On: only `publicNetworkAccess` and `networkAcls` differ, local auth stays off, the private endpoint stays; output `network_posture` and a plan warning. Refused: enterprise, customer data, a malformed or `/31` range, any `/0` without the second switch, ranges without the toggle (D-93).
+- Docs: `docs/architecture/HARDENING-PLAN.md`, `docs/m365-channel/HARDENING-SPIKE.md` (spike S6, runnable), `SECURITY.md` posture row, CONNECTIVITY-MATRIX §4a, DEPLOYMENT-HANDOVER and ENV-VARS rows, RUNBOOK §13.5, `docs/README.md`. **D-78 is corrected** (D-92) in DECISIONS and ORCHESTRATOR.md: the "standard agent setup" is the classic path; the hosted-agent path is per the documentation, unproven until S6; Cosmos DB is ruled out.
+- Whitelabel 0 enforced; audit-export 0; `gitleaks git` clean. No Azure resource was created or changed.
 ## Blockers
 
 _None._
