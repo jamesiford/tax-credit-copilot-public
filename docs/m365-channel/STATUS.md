@@ -26,6 +26,9 @@ runs in a worktree, so `feat/m365-channel` is held by the main checkout).
 | CH-06a | `POST /api/capabilities/{tool}`, `GET /api/capabilities`, claim package create/link | done | `wp/CH-06a-capabilities-api` | merge `cbaad1a` |
 | CH-06b | Channel gateway (`backend/channel`), MCP facade, `verify_figures`, ticketed downloads | done | `wp/CH-06b-gateway` | merge `f9a4711` |
 | CH-07 | Terraform `channel` module, packaging, grants, docs | done | `wp/CH-07-channel-infra` | merge `ed36927` |
+| CH-07b | Deploy the gateway from a hook (azd has no conditional service) | done | `wp/CH-07b-channel-deploy-hook` | merge `47a8741` |
+| CH-08 | Hosted orchestrator (`channel_orchestrator/`), narration audit | in_progress | `wp/CH-08-orchestrator` | — |
+| CH-09 | `scripts/publish-m365.ps1` | todo | `wp/CH-09-publish-m365` | — |
 
 ## Evidence
 
@@ -213,6 +216,11 @@ and its `discovery` / `multi_state` scans read the configured default tenant.
   (`c4arch.py validate`: 0 errors, 0 warnings; `build` regenerated the HTML, no raster images).
   `scripts/check-links.py` 0 broken.
 - Standard gate: whitelabel 0 enforced; audit-export 0 findings; gitleaks clean.
+
+### CH-07b (merged `47a8741`)
+
+- Full backend suite: **2400 passed**, 136 skipped, 1 xfailed (CH-07: 2385). `terraform fmt/validate/tflint` clean, `terraform test` 43 passed. Whitelabel 0 enforced, audit-export 0, gitleaks clean, links 0 broken.
+- `azure.yaml` services are `api` and `web` only (tested); `scripts/deploy-channel.ps1` runs from a `postdeploy` hook and `deploy.yml`; with the toggle off it exits 0 (tested by running it against a stubbed `az`). Edited assertions are listed in D-73.
 
 ## Blockers
 
