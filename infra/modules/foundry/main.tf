@@ -2,6 +2,12 @@
 # because the project resource is not in azurerm. Local auth is off and public
 # network access is off; the API reaches it over a private endpoint as its
 # managed identity with Azure AI User.
+#
+# DEMO POSTURE (CH-12b): public_network_access = true turns the data plane's public
+# endpoint on so an operator's workstation can deploy and smoke-test the hosted agent.
+# It changes exactly two properties (publicNetworkAccess and networkAcls); local
+# auth stays off and the private endpoint and DNS are untouched. Default false is
+# today's behaviour, byte for byte. See docs/architecture/HARDENING-PLAN.md.
 
 variable "name_suffix" {
   type = string
@@ -57,10 +63,31 @@ variable "log_analytics_workspace_id" {
   type = string
 }
 
+variable "public_network_access" {
+  description = "DEMO ONLY. true enables the account's public endpoint (Entra-only). false (default) keeps it private."
+  type        = bool
+  default     = false
+}
+
+variable "allowed_ip_ranges" {
+  description = "With public_network_access, the CIDR ranges allowed through the account firewall. Empty allows any address (still Entra-only)."
+  type        = list(string)
+  default     = []
+}
+
 locals {
   account_name    = "aif-tcc-${var.name_suffix}"
   project_name    = "proj-tcc"
   subscription_id = split("/", var.resource_group_id)[2]
+
+  restrict_to_ranges = var.public_network_access && length(var.allowed_ip_ranges) > 0
+  # The firewall takes a single address bare and has no /32 form.
+  ip_rules = [for r in var.allowed_ip_ranges : { value = endswith(r, "/32") ? trimsuffix(r, "/32") : r }]
+  # Private: exactly the block this module has always sent (no ipRules key).
+  network_acls = merge(
+    { defaultAction = var.public_network_access && !local.restrict_to_ranges ? "Allow" : "Deny" },
+    local.restrict_to_ranges ? { ipRules = local.ip_rules } : {},
+  )
 }
 
 # A deleted AIServices account sits in soft-delete for 48 hours and holds its
@@ -96,10 +123,8 @@ resource "azapi_resource" "account" {
       customSubDomainName    = local.account_name
       allowProjectManagement = true
       disableLocalAuth       = true
-      publicNetworkAccess    = "Disabled"
-      networkAcls = {
-        defaultAction = "Deny"
-      }
+      publicNetworkAccess    = var.public_network_access ? "Enabled" : "Disabled"
+      networkAcls            = local.network_acls
     }
   }
 
@@ -204,6 +229,21 @@ output "account_id" {
 output "project_endpoint" {
   # The code expects <account endpoint>api/projects/<project>.
   value = "https://${local.account_name}.services.ai.azure.com/api/projects/${local.project_name}"
+}
+
+output "network_settings" {
+  description = "The network properties the account is created with, read back from its own body."
+  value = {
+    public_network_access = azapi_resource.account.body.properties.publicNetworkAccess
+    default_action        = azapi_resource.account.body.properties.networkAcls.defaultAction
+    ip_rules              = try(azapi_resource.account.body.properties.networkAcls.ipRules, [])
+    local_auth_disabled   = azapi_resource.account.body.properties.disableLocalAuth
+  }
+}
+
+output "private_endpoint_id" {
+  description = "The account's private endpoint, kept in every posture: the API's private path does not change."
+  value       = azurerm_private_endpoint.account.id
 }
 
 output "model" {

@@ -223,6 +223,8 @@ variable.
 | `GIT_COMMIT` | `git_commit` | both | Recorded on every run manifest. Unset, runs record `working-tree` |
 | `FOUNDRY_MODEL`, `FOUNDRY_MODEL_VERSION` | `foundry_model`, `foundry_model_version` | both | Model the narrating agents use (default `gpt-4.1-mini` / `2025-04-14`). Check regional availability and quota |
 | `TCC_APP_SERVICE_SKU` | `app_service_sku` | both | Plan SKU shared by both apps (default `P1v3`) |
+| `TCC_FOUNDRY_PUBLIC_NETWORK_ACCESS` | `foundry_public_network_access` | public | **DEMO ONLY.** `false` (default) keeps the Foundry data plane private, exactly as before. `true` enables its public endpoint (Entra-only, local auth off; the private endpoint and DNS stay) so an operator's workstation can run `azd ai agent`, `scripts/publish-m365.ps1` and smoke tests. Refused with the enterprise profile and with `data_classification = customer`. The plan prints a warning and the output `network_posture` reads `demo-public-foundry`. Set it back to `false` after the demo. See [HARDENING-PLAN](HARDENING-PLAN.md) |
+| `TCC_FOUNDRY_ALLOWED_IP_RANGES` | `foundry_allowed_ip_ranges` | public | **DEMO ONLY.** With the toggle above, the IPv4 CIDR ranges allowed through the account firewall, comma-separated (for example `203.0.113.0/24,198.51.100.7/32`). Empty allows any address (still Entra-only). Ranges without the toggle, a malformed range, a `/31`, or `0.0.0.0/0` without `foundry_allow_any_ip` make the plan fail |
 | `TCC_ENABLE_M365_CHANNEL` | `enable_m365_channel` | public | `false` (default) creates nothing. `true` adds the Microsoft 365 channel gateway: a third App Service on the same plan, in the same subnet, with its own identity ([component spec §4.7a](INFRASTRUCTURE-COMPONENT-SPEC.md)). It needs the API to validate tokens, so set `auth_mode = "entra"` and `api_client_id` in an overlay too; the plan fails with that message otherwise. The enterprise profile refuses it. With it off, a default `azd up` / `azd deploy` is exactly what it was: the gateway is not an azd service. With it on, the `postdeploy` hook runs `scripts/deploy-channel.ps1` (needs `TCC_ENABLE_M365_CHANNEL=true` in the azd environment as well as the Terraform variable) |
 | `TCC_CHANNEL_GATEWAY_AUDIENCE` | `channel_gateway_audience` | public | The gateway's app registration (`api://<id>` or the bare id). Required with the toggle |
 | `TCC_CHANNEL_WRITER_SOURCE` | `channel_writer_source` | public | Who may make changes through the channel: `allowlist` (default), `entra_group` or `either`. A group source needs Graph `GroupMember.Read.All` on the gateway identity |
@@ -248,7 +250,7 @@ CI, `TF_VARS_JSON`): `auth_mode`, `data_classification`, `create_fabric`,
 `vnet_address_space`, `private_dns_zone_ids`, `fabric_capacity_sku`,
 `fabric_workspace_role`, `foundry_deployment_sku`, `foundry_capacity`,
 `ai_gateway_endpoint`, `channel_allowed_caller_app_ids`,
-`channel_allowed_ip_ranges`, `outputs_retention_days`, `tags`. See
+`channel_allowed_ip_ranges`, `foundry_allow_any_ip`, `outputs_retention_days`, `tags`. See
 `infra/variables.tf` for each default.
 
 ### 3. Run it

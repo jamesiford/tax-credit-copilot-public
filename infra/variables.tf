@@ -445,6 +445,34 @@ variable "ai_gateway_oauth_secret_name" {
   }
 }
 
+# --- Foundry network posture (DEMO ONLY) -------------------------------------------
+
+variable "foundry_public_network_access" {
+  description = "DEMO ONLY. false (default) keeps the Foundry data plane private. true enables its public endpoint (Entra-only; local auth stays off; the private endpoint and DNS stay) so an operator's workstation can deploy and smoke-test the hosted agent. Synthetic data only: refused with the enterprise profile and with data_classification = customer. See docs/architecture/HARDENING-PLAN.md."
+  type        = bool
+  default     = false
+  validation {
+    condition     = !var.foundry_public_network_access || var.profile != "enterprise"
+    error_message = "foundry_public_network_access is a demo posture and is refused in the enterprise profile: the Foundry data plane would be reachable from the internet."
+  }
+  validation {
+    condition     = !var.foundry_public_network_access || var.data_classification != "customer"
+    error_message = "foundry_public_network_access is refused when data_classification = customer: customer data never sits behind a publicly reachable data plane."
+  }
+}
+
+variable "foundry_allowed_ip_ranges" {
+  description = "With foundry_public_network_access, the IPv4 CIDR ranges allowed through the account firewall (default action then Deny). A list of strings, or one comma-separated string (what azd passes from TCC_FOUNDRY_ALLOWED_IP_RANGES). Empty allows any address. A /32 is sent as a bare address; /31 is not supported."
+  type        = any
+  default     = []
+}
+
+variable "foundry_allow_any_ip" {
+  description = "Permit 0.0.0.0/0 (or any /0) in foundry_allowed_ip_ranges. A second, deliberate switch, because an open range defeats the point of listing ranges."
+  type        = bool
+  default     = false
+}
+
 # --- Microsoft 365 channel gateway (proof of concept) -------------------------------
 
 variable "enable_m365_channel" {

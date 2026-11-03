@@ -91,6 +91,11 @@ output "DATA_CLASSIFICATION" {
   value = local.data_classification
 }
 
+output "network_posture" {
+  description = "private (default) or demo-public-foundry. The second is a DEMO posture: the Foundry data plane is reachable from the internet (Entra-only). Synthetic data only."
+  value       = local.network_posture
+}
+
 output "api_role_assignments" {
   description = "Every role the API identity holds, for review against REQUIREMENTS section 6."
   value = concat(

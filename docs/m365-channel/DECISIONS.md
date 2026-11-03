@@ -910,6 +910,10 @@ One short entry per decision: context, choice, why.
 
 ## D-78 CH-08: region and network isolation (not applied)
 
+> **Corrected by [D-92](#d-92-ch-12b-the-hosted-agent-network-path-per-the-documentation-unproven).** The
+> second fact below was wrong: the "standard agent setup" is the classic path, not the hosted-agent path.
+> The text is left as written so the correction is visible.
+
 - **Facts.** Hosted agents are supported in specific regions (West US 3 among them in the March 2026 list);
   a hosted agent in a network-isolated project needs the "standard agent setup" (a bring-your-own-VNet agent
   subnet and a capability host). `infra/modules/foundry` is a basic account with a private endpoint and public
@@ -1089,3 +1093,38 @@ One short entry per decision: context, choice, why.
   Teams Developer Portal registration that yields the `referenceId`. It tells the operator to restrict usage by app to
   **Any Teams app** (a specific app id makes every tool call return 404 for an MCP server, per the documentation) and
   to include `offline_access` in the scope so the token refreshes.
+
+## D-92 CH-12b: the hosted-agent network path, per the documentation, unproven
+
+- **Context.** D-78 said a hosted agent in a network-isolated project needs the "standard agent setup". The Foundry
+  documentation read on 2 November shows that setup is the **classic** path (Cosmos DB, AI Search, Storage and a
+  capability host, for threads, files and vector stores). The hosted-agent path and the networking deep dive describe a
+  customer-delegated agent subnet plus private endpoints to the customer's own Storage, SQL and Key Vault, and no
+  Cosmos, Search or capability host. Our agents use no threads, files or vector stores.
+- **Choice.** State it as **per the documentation, unproven until spike S6**. The customer has ruled Cosmos DB out, so the
+  hardened path must prove a network-injected account running hosted and prompt agents with no capability host and no
+  Cosmos, or stop and escalate. D-78 and `ORCHESTRATOR.md` are corrected in place (D-78 keeps its original text under a
+  correction note). The plan and the runnable checklist are `docs/architecture/HARDENING-PLAN.md` and
+  `docs/m365-channel/HARDENING-SPIKE.md`.
+- **Why.** An unproven claim stated as fact would have sent the hardened build towards Cosmos, which is ruled out, and
+  away from the path the documentation actually describes for hosted agents.
+
+## D-93 CH-12b: how the demo toggle is built
+
+- **Choice.** `foundry_public_network_access` (default `false`), `foundry_allowed_ip_ranges` and `foundry_allow_any_ip`
+  thread to `modules/foundry`, which sends `publicNetworkAccess` and `networkAcls` from two locals; with the toggle off
+  they evaluate to exactly the block the module always sent (no `ipRules` key). The module exposes `network_settings`
+  (read back from the account's own body) and `private_endpoint_id`, so the tests assert the real properties and that the
+  private endpoint stays.
+- **The ranges are `type = any`.** azd substitutes strings into `main.tfvars.json`, and a list variable cannot take one, so
+  the input accepts a list or a comma-separated string; `infra/foundry_network.tf` normalises it. That is also why the
+  range rules are `precondition`s on a `terraform_data` rather than variable validations: a validation can only read the
+  raw variable. The resource has `count` 0 unless the demo posture or a range is asked for, so the default plan gains
+  nothing. Enterprise and `data_classification = customer` are plain variable validations on the toggle.
+- **The rules.** IPv4 CIDRs only (the account firewall takes no IPv6); a `/32` is sent as a bare address and `/31` is
+  refused (the firewall supports neither form); any `/0` needs the second switch; ranges or the second switch without the
+  toggle are refused, because a firewall rule that is silently ignored is worse than none. A toggle with no ranges means
+  `Allow`, as the brief says; the warning names "no address restriction".
+- **The warning is a `check`.** A failed `check` is a warning in the plan, so it cannot be missed and does not block the
+  demo. The tests expect it. A mutation (the any-address rule made always true) was shown to fail its test.
+- **Not built.** No agent subnet, ops VM, Bastion, private endpoint or registry.

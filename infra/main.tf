@@ -131,6 +131,10 @@ module "foundry" {
   ]
   user_principal_id          = module.identity.api.principal_id
   log_analytics_workspace_id = module.monitoring.log_analytics_workspace_id
+  public_network_access      = var.foundry_public_network_access
+  allowed_ip_ranges          = local.foundry_ip_ranges
+
+  depends_on = [terraform_data.foundry_network_inputs]
 }
 
 module "fabric" {
