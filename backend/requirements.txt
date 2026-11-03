@@ -7,23 +7,26 @@ python-multipart==0.0.29           # multipart file uploads
 # --- microsoft agent framework (GA) ---
 # `agent-framework-foundry` is the canonical Foundry integration package.
 # It transitively pins agent-framework-core, agent-framework-openai,
-# azure-ai-projects (>=2.1.0,<3.0), and azure-ai-inference.
-agent-framework-foundry==1.7.0
+# azure-ai-projects (>=2.2.0,<2.8.0) and azure-ai-inference.
+# AI-01, 2026-11-02: bumped from 1.7.0 to the latest stable. The SDK surface the
+# product uses is pinned by tests/test_ai_sdk_surface.py, so the next bump fails
+# loudly on a changed symbol rather than at runtime.
+agent-framework-foundry==1.16.0
 
 # --- azure identity (DefaultAzureCredential — uses `az login` locally) ---
-azure-identity==1.25.3
+azure-identity==1.27.0
 # Artifact bytes (ARTIFACT_STORE=blob): claim packages and rule sources, via the API only.
 azure-storage-blob==12.29.0
 
-# --- foundry v2 SDK. 2.1.0 is current GA on PyPI; 2.2.0 changelog dated
-#     2026-05-29 but not yet published. Both expose .agents.create_version. ---
-azure-ai-projects==2.1.0
+# --- foundry v2 SDK. 2.7.0 is the newest release agent-framework-foundry 1.16.0
+#     accepts (<2.8.0); newer 2.x exist but the framework would refuse them. ---
+azure-ai-projects==2.7.0
 
 # --- async transport used by azure.ai.projects.aio (required by FoundryAgent runtime) ---
 aiohttp>=3.10,<4
 
 # --- telemetry: app insights via the unified opentelemetry distro (optional) ---
-azure-monitor-opentelemetry==1.8.8
+azure-monitor-opentelemetry==1.8.11
 
 # --- misc ---
 python-dotenv==1.0.1

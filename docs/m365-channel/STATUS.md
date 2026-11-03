@@ -15,6 +15,14 @@ runs in a worktree, so `feat/m365-channel` is held by the main checkout).
 | CH-03 | Channel audit trail | done | `wp/CH-03-channel-audit` | `087847f` |
 | CH-04 | Identity, authorization, writer entitlement | done | `wp/CH-04-identity-authz` | `603418e` |
 | CH-05 | Prepare/commit safe writes | done | `wp/CH-05-safe-writes` | `e5634c3` |
+| AI-01 | Latest stable SDKs | in_progress | `wp/AI-01-sdk-upgrade` | — |
+| AI-02 | Ports, adapters, streaming mediator | todo | — | — |
+| AI-03 | External model gateway | todo | — | — |
+| AI-04 | Resilience | todo | — | — |
+| AI-06 | Observability, prompt versioning, evals | todo | — | — |
+| AI-07 | Safety | todo | — | — |
+| AI-08 | Coding-standards ratchet | todo | — | — |
+| AI-05 | Conversation continuity (stretch, last) | todo | — | — |
 
 ## Evidence
 
