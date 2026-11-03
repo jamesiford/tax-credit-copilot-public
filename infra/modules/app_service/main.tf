@@ -320,3 +320,11 @@ output "plan_id" {
 output "easy_auth_enabled" {
   value = length(azurerm_linux_web_app.web.auth_settings_v2) > 0
 }
+
+# The AI-* settings as the resource holds them. Sensitive because the provider
+# marks app_settings so; present for the root tests, which prove what reaches
+# the app rather than what a local intended.
+output "api_ai_settings" {
+  value     = { for k, v in azurerm_linux_web_app.api.app_settings : k => v if startswith(k, "AI_") }
+  sensitive = true
+}

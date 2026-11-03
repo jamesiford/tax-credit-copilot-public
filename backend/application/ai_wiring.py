@@ -69,8 +69,28 @@ def _register_builtin_providers(registry: ProviderRegistry) -> None:
         _catalog.add(runtime.catalog)
         return runtime
 
+    def gateway(settings: AiSettings) -> Any:
+        from application.ai.settings import AiConfigurationError
+        from infrastructure.ai.auth import build_authenticator
+        from infrastructure.ai.chat_model_runtime import ChatModelAgentRuntime
+        from infrastructure.ai.openai_compatible import OpenAICompatibleChatModel
+
+        if settings.gateway is None:
+            raise AiConfigurationError("the gateway provider is configured without AI_GATEWAY_* settings")
+        model = OpenAICompatibleChatModel(settings.gateway, build_authenticator(settings.gateway))
+        return ChatModelAgentRuntime(model, settings)
+
     registry.register("foundry", foundry)
     registry.register("foundry_connection", foundry_connection)
+    registry.register("gateway", gateway)
+
+
+def _decorate(runtime: Any, _provider: str) -> Any:
+    """Layer the guards over a provider. Outermost first; AI-04 adds resilience here."""
+    from application.ai.egress import build_egress_policy
+    from application.ai.guarded import GuardedRuntime
+
+    return GuardedRuntime(runtime, build_egress_policy(get_ai_settings().egress_policy))
 
 
 def get_provider_registry() -> ProviderRegistry:
@@ -90,7 +110,7 @@ def set_provider_registry(registry: ProviderRegistry | None) -> None:
 def get_model_router() -> ModelRouter:
     global _router
     if _router is None:
-        _router = ModelRouter(get_ai_settings(), get_provider_registry())
+        _router = ModelRouter(get_ai_settings(), get_provider_registry(), decorate=_decorate)
     return _router
 
 

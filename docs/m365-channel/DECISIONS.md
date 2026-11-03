@@ -428,3 +428,38 @@ One short entry per decision: context, choice, why.
   `/api/ready` adds `ai` and its `ready` value is unchanged by a model being down.
 - **Why.** The engine answers without a model. A `conftest` autouse fixture
   (`reset_ai_wiring`) clears the cached composition between tests.
+
+## D-42 AI-03: the gateway is a provider, not a second pipeline
+
+- **Choice.** An OpenAI-compatible `ChatModel` is wrapped by `ChatModelAgentRuntime`
+  into the same `AgentRuntime` unit Foundry uses, registered as `gateway`. It joins
+  the provider chain like any other; nothing in `api/` knows it exists. Tool-call
+  events from a model are dropped — agents hold no tools (ADR-004).
+- **Why.** One chain, one failure taxonomy, one place to add resilience.
+
+## D-43 AI-03: no default gateway auth; secrets only as Key Vault references
+
+- **Choice.** `AI_GATEWAY_AUTH` has no default (`api_key`, `oauth_client_credentials`,
+  `entra_token`, `none`). A deployed process refuses to start with TLS verification
+  off or auth `none`. Terraform emits `AI_GATEWAY_API_KEY` /
+  `AI_GATEWAY_OAUTH_CLIENT_SECRET` only as `@Microsoft.KeyVault(...)` references and
+  only with `enable_key_vault`; the secret must already exist in the vault.
+- **Why.** The customer's scheme is unknown; guessing one would be an invented control.
+
+## D-44 AI-03: egress invariant for external providers
+
+- **Choice.** Providers in `EXTERNAL_PROVIDERS` (`gateway`, `foundry_connection`) are
+  wrapped in `GuardedRuntime`: a prompt containing a record token, SSN shape or an
+  employee-identifier JSON key is refused (`EgressRefused`, never echoing the match).
+  `AI_EGRESS_POLICY` is the lever (`allow_all` | `aggregates_only` | `block`).
+- **Why.** Narration briefs already carry aggregates only; the guard makes that a
+  checked property when the model is outside the tenant.
+
+## D-45 AI-03: mock gateway and connection script are manual-deploy aids
+
+- **Choice.** Terraform creates only the empty mock App Service (non-enterprise,
+  tagged `purpose=poc-mock`); the script is copied to it by hand. The
+  `create-model-connection.ps1` Bicep parameter names (`apiKey` …) are a best guess
+  and the script has not been run against Azure.
+- **Why.** No cloud-changing commands are permitted in this run; flagged as an open
+  owner question.

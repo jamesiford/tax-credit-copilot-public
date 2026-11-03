@@ -379,7 +379,7 @@
      "icon": "azure/integration/api-management-services",
      "status": "off",
      "detail": {
-      "what": "Optional route for model traffic. Must speak the Foundry Agents protocol, not only chat completions."
+      "what": "Optional route for model traffic. Needs only an OpenAI-compatible chat-completions API with streaming and tool calling; the Foundry Agents protocol is not required."
      },
      "x": 960,
      "y": 140,
@@ -1048,7 +1048,7 @@
      "icon": "azure/integration/api-management-services",
      "status": "off",
      "detail": {
-      "what": "If model traffic must route through the customer's gateway, it has to pass the Foundry Agents protocol, not only chat completions. Default is direct to Foundry.",
+      "what": "If model traffic must route through the customer's gateway, the gateway needs an OpenAI-compatible chat-completions API with streaming and tool calling (not the Foundry Agents protocol). Default is direct to Foundry.",
       "spikes": "Contract and auth to agree with the gateway owner."
      },
      "x": 325,
@@ -1362,7 +1362,7 @@
       },
       {
        "t": "Optional gateway",
-       "x": "If the customer requires it, agent traffic routes through their AI gateway. It must carry the Foundry Agents protocol.",
+       "x": "If the customer requires it, model traffic routes through their AI gateway. It needs an OpenAI-compatible chat-completions API with streaming and tool calling.",
        "n": [
         "gw",
         "f-proj"

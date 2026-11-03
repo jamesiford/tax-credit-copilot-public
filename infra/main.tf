@@ -15,6 +15,40 @@ locals {
     var.enable_key_vault ? { vault = "privatelink.vaultcore.azure.net" } : {},
     local.web_inbound == "private_endpoint" ? { sites = "privatelink.azurewebsites.net" } : {},
   )
+
+  # AI-03: a setting is emitted only when its variable is set, so the defaults
+  # leave an existing deployment's plan unchanged. Nothing here is a secret.
+  ai_plain_settings = {
+    AI_GATEWAY_ENDPOINT        = trimspace(var.ai_gateway_endpoint)
+    AI_PROVIDER_CHAIN          = join(",", [for p in split(",", var.ai_provider_chain) : trimspace(p)])
+    AI_GATEWAY_AUTH            = trimspace(var.ai_gateway_auth)
+    AI_GATEWAY_API_STYLE       = trimspace(var.ai_gateway_api_style)
+    AI_GATEWAY_ENTRA_AUDIENCE  = trimspace(var.ai_gateway_entra_audience)
+    AI_GATEWAY_OAUTH_TOKEN_URL = trimspace(var.ai_gateway_oauth_token_url)
+    AI_GATEWAY_OAUTH_CLIENT_ID = trimspace(var.ai_gateway_oauth_client_id)
+    AI_GATEWAY_OAUTH_SCOPE     = trimspace(var.ai_gateway_oauth_scope)
+    AI_GATEWAY_TIMEOUT_SECONDS = trimspace(var.ai_gateway_timeout_seconds)
+    AI_EGRESS_POLICY           = trimspace(var.ai_egress_policy)
+    AI_MODEL_ROUTER            = trimspace(var.ai_model_router)
+    AI_MODEL_NARRATOR          = trimspace(var.ai_model_narrator)
+    AI_MODEL_ANALYSIS          = trimspace(var.ai_model_analysis)
+    AI_FOUNDRY_CONNECTION_NAME = trimspace(var.ai_foundry_connection_name)
+  }
+
+  # Key Vault references, never values: App Service resolves them at runtime
+  # with the API identity (key_vault_reference_identity_id), which the keyvault
+  # module grants Key Vault Secrets User. The secret must already exist.
+  ai_secret_names = {
+    AI_GATEWAY_API_KEY             = trimspace(var.ai_gateway_api_key_secret_name)
+    AI_GATEWAY_OAUTH_CLIENT_SECRET = trimspace(var.ai_gateway_oauth_secret_name)
+  }
+
+  api_ai_settings = merge(
+    { for k, v in local.ai_plain_settings : k => v if v != "" },
+    var.enable_key_vault ? {
+      for k, v in local.ai_secret_names : k => "@Microsoft.KeyVault(VaultName=${module.keyvault.name};SecretName=${v})" if v != ""
+    } : {},
+  )
 }
 
 module "identity" {
@@ -171,9 +205,23 @@ module "app_service" {
     }, local.auth_mode == "entra" ? {
     AUTH_TENANT_ID = local.tenant_id
     API_AUDIENCE   = local.api_audience
-    } : {}, trimspace(var.ai_gateway_endpoint) != "" ? {
-    AI_GATEWAY_ENDPOINT = trimspace(var.ai_gateway_endpoint)
-  } : {})
+  } : {}, local.api_ai_settings)
 
   web_app_settings = {}
+}
+
+# PoC only. Creates the App Service and its settings; deploying
+# scripts/mock-ai-gateway.py (copied as mock_ai_gateway.py) is a separate manual
+# step, as the module comment explains. Refused for the enterprise profile.
+module "mock_ai_gateway" {
+  source                = "./modules/mock_ai_gateway"
+  enabled               = var.enable_mock_ai_gateway
+  name_suffix           = local.token
+  resource_group_name   = azurerm_resource_group.this.name
+  location              = var.location
+  tags                  = local.tags
+  service_plan_id       = module.app_service.plan_id
+  integration_subnet_id = module.network.app_subnet_id
+  mock_auth             = var.mock_ai_gateway_auth
+  entra_audience        = var.mock_ai_gateway_entra_audience
 }
