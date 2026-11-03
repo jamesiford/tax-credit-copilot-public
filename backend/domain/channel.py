@@ -27,7 +27,7 @@ from typing import Protocol
 PHASES = ("begin", "end", "single")
 CHANNELS = ("teams", "m365-copilot", "cowork", "api-test")
 ASSURANCES = ("channel-asserted", "delegated")
-ACTION_KINDS = ("read", "write_prepare", "write_commit")
+ACTION_KINDS = ("read", "write_prepare", "write_commit", "narrate")
 OUTCOMES = ("pending", "ok", "error", "refused", "rejected_by_guard")
 GUARD_STATES = ("pass", "rejected", "n/a")
 ROLE_WRITER = "writer"

@@ -160,6 +160,7 @@ class Gateway:
     clock: "Clock"
     writers: set[str]
     services: Any
+    actions: Any = None
 
     def events(self, oid: str = USER_OID):
         return sorted(self.audit.for_user(oid), key=lambda e: (e.occurred_at, e.event_seq))
@@ -194,10 +195,14 @@ def build_gateway(
     The audit trail is a SQLite FILE, not `:memory:`: the adapter keeps one connection
     per thread, and the app runs on a different thread from the test.
     """
+    from application.agent_audit import AgentActionRecorder
     from channel.ledger import FactLedger
+    from channel.narration import NarrationAudit
+    from infrastructure.persistence.sqlite_channel import SqliteAgentActionAuditRepository
 
     gw_settings = settings(**setting_overrides)
     audit = SqliteChannelAuditRepository(tmp_path / "audit.db")
+    actions = SqliteAgentActionAuditRepository(tmp_path / "actions.db")
     clock, ledger = Clock(), FactLedger()
     writer_set = {USER_OID} if writers is None else writers
     fake = api or (FakeApi() if transport is None else None)
@@ -207,7 +212,8 @@ def build_gateway(
         api=api_client, auditor=ChannelAuditor(audit), entitlement=Writers(writer_set), ledger=ledger,
         limiter=RateLimiter(gw_settings.rate_limit_per_minute, clock=clock),
     )
-    return Gateway(TestClient(app), audit, fake, ledger, clock, writer_set, app.state.services)
+    app.state.services.narration = NarrationAudit(ChannelAuditor(audit), AgentActionRecorder(actions))
+    return Gateway(TestClient(app), audit, fake, ledger, clock, writer_set, app.state.services, actions)
 
 
 def correlation() -> str:

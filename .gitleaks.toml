@@ -14,3 +14,7 @@ condition = "AND"
 paths = ['''^frontend/src/.*\.test\.jsx?$''']
 regexTarget = "line"
 regexes = ['''(?i)record_?token''']
+
+[[allowlists]]
+description = "the orchestrator's vendor manifest is a list of SHA-256 digests of source files (generated, gitignored; one WIP commit held it)"
+paths = ['''^channel_orchestrator/app/vendor/tcc_shared/MANIFEST\.json$''']

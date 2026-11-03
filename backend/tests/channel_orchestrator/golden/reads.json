@@ -1,0 +1,121 @@
+[
+  {
+    "name": "book_question_needs_no_client",
+    "turns": [{
+      "say": "Who should we call first?",
+      "model": [{"tools": [{"tool": "book_rank", "args": {"limit": 3}}]}, {"text": "The table ranks every client by why to call them."}],
+      "expect": {"kind": "answer", "mode": "tools", "gateway": ["book_rank"], "guard": "pass", "narration_used": true, "audit": "ok",
+                 "contains": ["Who to call", "Cascade Retail Partners", "Not tax advice"]}
+    }]
+  },
+  {
+    "name": "situation_for_a_named_client",
+    "turns": [{
+      "say": "Brief me on Northwind",
+      "model": [{"tools": [{"tool": "client_situation", "args": {}}]}, {"text": "Here is where they stand."}],
+      "expect": {"kind": "answer", "gateway": ["client_resolve", "client_situation"], "args": {"client_situation": {"client_id": 2002}}, "guard": "pass"}
+    }]
+  },
+  {
+    "name": "eligibility_is_shown_under_both_methods",
+    "turns": [{
+      "say": "What is Cascade's credit for 2023?",
+      "model": [{"tools": [{"tool": "client_eligibility", "args": {"tax_year": 2023}}]},
+                {"text": "Under Min-Max the annual credit is {{facts.client_eligibility_min_max.credit.annual_credit_usd|money}} and under Pay Period it is {{facts.client_eligibility_pay_period.credit.annual_credit_usd|money}}."}],
+      "expect": {"kind": "answer", "gateway": ["client_resolve", "client_eligibility", "client_eligibility"], "guard": "pass", "narration_used": true,
+                 "contains": ["Min-Max method", "Pay Period method", "$227,605", "$643,125", "Source: run run-0001"]}
+    }]
+  },
+  {
+    "name": "a_named_method_is_the_only_one_run",
+    "turns": [{
+      "say": "Cascade's credit for 2023 under Pay Period",
+      "model": [{"tools": [{"tool": "client_eligibility", "args": {"tax_year": 2023}}]}, {"text": "The credit is {{facts.client_eligibility_pay_period.credit.annual_credit_usd|money}}."}],
+      "expect": {"kind": "answer", "gateway": ["client_resolve", "client_eligibility"], "args": {"client_eligibility": {"method": "pay_period", "tax_year": 2023}},
+                 "contains": ["Pay Period method", "$643,125"], "absent": ["Min-Max method"], "guard": "pass"}
+    }]
+  },
+  {
+    "name": "trend_since_the_base_year",
+    "turns": [{
+      "say": "How has Cascade trended since its base year?",
+      "model": [{"tools": [{"tool": "client_trend", "args": {}}]}, {"text": "The table shows each year's average."}],
+      "expect": {"kind": "answer", "gateway": ["client_resolve", "client_trend"], "contains": ["Trend", "410.13", "494.25"], "guard": "pass"}
+    }]
+  },
+  {
+    "name": "jobs_at_risk_of_falling_out",
+    "turns": [{
+      "say": "Which of Cascade's counted jobs could fall out in 2023?",
+      "model": [{"tools": [{"tool": "client_at_risk", "args": {"tax_year": 2023}}]}, {"text": "The table lists the cushion."}],
+      "expect": {"kind": "answer", "gateway": ["client_resolve", "client_at_risk"], "args": {"client_at_risk": {"client_id": 2001, "tax_year": 2023}}}
+    }]
+  },
+  {
+    "name": "other_programmes_for_a_client",
+    "turns": [{
+      "say": "What else might Ironbridge qualify for?",
+      "model": [{"tools": [{"tool": "client_discovery", "args": {}}]}, {"text": "These are the other programmes the library suggests."}],
+      "expect": {"kind": "answer", "gateway": ["client_resolve", "client_discovery"], "args": {"client_discovery": {"client_id": 2003}}}
+    }]
+  },
+  {
+    "name": "what_if_a_hire",
+    "turns": [{
+      "say": "What if Cascade hired a few people at site A-1 in 2023?",
+      "model": [{"tools": [{"tool": "simulate", "args": {"worksite_id": "A-1", "action": "add_headcount", "magnitude": 2}}]}, {"text": "The what-if is shown below."}],
+      "expect": {"kind": "answer", "gateway": ["client_resolve", "simulate"], "args": {"simulate": {"worksite_id": "A-1", "tax_year": 2023, "client_id": 2001}}}
+    }]
+  },
+  {
+    "name": "calculation_walk_through",
+    "turns": [{
+      "say": "Walk me through Cascade's 2023 calculation",
+      "model": [{"tools": [{"tool": "calc_walkthrough", "args": {"tax_year": 2023}}]}, {"text": "Each step is listed with its citation."}],
+      "expect": {"kind": "answer", "gateway": ["client_resolve", "calc_walkthrough"]}
+    }]
+  },
+  {
+    "name": "findings_awaiting_a_decision",
+    "turns": [{
+      "say": "Which findings need a decision for Cascade in 2023?",
+      "model": [{"tools": [{"tool": "findings_list", "args": {"tax_year": 2023}}]}, {"text": "They are listed below."}],
+      "expect": {"kind": "answer", "gateway": ["client_resolve", "findings_list"]}
+    }]
+  },
+  {
+    "name": "history_of_one_claim_cell",
+    "turns": [{
+      "say": "What has happened to Cascade's GA_JTC claim for 2023?",
+      "model": [{"tools": [{"tool": "claim_cell_history", "args": {"program_code": "GA_JTC", "tax_year": 2023}}]}, {"text": "The history is below."}],
+      "expect": {"kind": "answer", "gateway": ["client_resolve", "claim_cell_history"], "args": {"claim_cell_history": {"program_code": "GA_JTC"}}}
+    }]
+  },
+  {
+    "name": "a_claim_package_link",
+    "turns": [{
+      "say": "Give me the claim package link for Cascade 2023",
+      "model": [{"tools": [{"tool": "claim_package_link", "args": {"tax_year": 2023}}]}, {"text": "The link is below."}],
+      "expect": {"kind": "answer", "gateway": ["client_resolve", "claim_package_link"]}
+    }]
+  },
+  {
+    "name": "one_question_two_tools",
+    "turns": [{
+      "say": "Brief me on Cascade and what else they might qualify for",
+      "model": [{"tools": [{"tool": "client_situation", "args": {}}, {"tool": "client_discovery", "args": {}}]}, {"text": "First where they stand, then the other programmes."}],
+      "expect": {"kind": "answer", "gateway": ["client_resolve", "client_situation", "client_discovery"], "guard": "pass", "narration_used": true}
+    }]
+  },
+  {
+    "name": "their_means_the_client_we_were_just_discussing",
+    "turns": [
+      {"say": "How has Cascade trended since its base year?",
+       "model": [{"tools": [{"tool": "client_trend", "args": {}}]}, {"text": "The table shows each year."}],
+       "expect": {"kind": "answer", "gateway": ["client_resolve", "client_trend"]}},
+      {"say": "And what is their eligibility for 2023?",
+       "model": [{"tools": [{"tool": "client_eligibility", "args": {"tax_year": 2023}}]}, {"text": "Both methods are shown."}],
+       "expect": {"kind": "answer", "gateway": ["client_resolve", "client_eligibility", "client_eligibility"], "args": {"client_eligibility": {"client_id": 2001}}}}
+    ]
+  }
+]

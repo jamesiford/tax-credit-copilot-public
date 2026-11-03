@@ -190,6 +190,31 @@ The gateway authenticates to the API as itself: a managed-identity token (no sec
 `API_AUDIENCE`, holding the app role `TCC.Agent`, plus `X-TCC-Acting-User` naming the
 person it acts for.
 
+## 9b. Channel orchestrator (`channel_orchestrator/`, a Foundry hosted agent)
+
+A separate deployable: it is NOT an App Service app and Terraform does not set its variables.
+They are supplied at deploy time (`azd env set`, or the `environment_variables` of the hosted-agent
+version). The model-access settings are the **same `AI_*` variables as the API** (section 8), read by
+the same `load_ai_settings`. The platform injects the reserved `FOUNDRY_*` names; never set those.
+
+| Variable | Read by | Purpose / default | Deployed value | TF output | Required (deployed) |
+|---|---|---|---|---|---|
+| `CHANNEL_GATEWAY_URL` | `app/core/settings.py` | The gateway's `https://` base URL. The orchestrator calls `/channel/v1/tools/{tool}` and `/channel/v1/audit/narration` there. No default | `CHANNEL_BASE_URL` output | `CHANNEL_BASE_URL` | Enforced |
+| `CHANNEL_GATEWAY_AUDIENCE` | `app/core/settings.py` | The gateway's app registration (`api://<id>`); the orchestrator's managed identity requests `<audience>/.default` and must hold `Channel.Invoke`. No default | same value as the gateway's `GATEWAY_AUDIENCE` | `CHANNEL_GATEWAY_AUDIENCE` | Enforced |
+| `TENANT_ID` | `app/core/settings.py` | The Entra tenant (a GUID). A person from another tenant is refused before any call. No default | same as the gateway's | — | Enforced |
+| `CHANNEL_NAME` | `app/core/settings.py` | `teams` (default) or `m365-copilot`: the `X-Channel` the gateway records | not set | — | No |
+| `CHANNEL_MAX_TOOL_CALLS` | `app/core/settings.py` | Tools one turn may run, `1`–`20`. Default `6`. Eligibility under both methods counts as two | not set | — | No |
+| `CHANNEL_CONFIRM_TTL_SECONDS` | `app/core/settings.py` | How long a prepared change waits for its owner's `confirm`, `30`–`3600`. Default `300` | not set | — | No |
+| `CHANNEL_STATE_TTL_SECONDS` | `app/core/settings.py` | Idle time before a conversation's state (last client and year, pending change) is forgotten, `60`–`86400`. Default `3600`. In memory, per replica | not set | — | No |
+| `CHANNEL_REQUEST_TIMEOUT_SECONDS` | `app/core/settings.py` | How long one gateway call may take, `5`–`300`. Default `40`, above the gateway's own `30` | not set | — | No |
+| `CHANNEL_IDENTITY_SOURCES` | `app/core/settings.py` | Where the acting person's Entra object id may come from: `original-subject` (the platform's `x-ms-original-subject`), `platform` (`x-ms-user-identity`), `client-headers` (caller-supplied `x-client-*`; **opt-in**). Default `original-subject,platform`. With none resolvable the turn runs nothing | not set | — | No |
+| `CHANNEL_DEBUG_WHOAMI` | `app/core/settings.py`, `app/host.py` | `true` answers the message `/whoami` with the identity signals received (header names, and values only for the identity fields) and what was resolved. Never a credential. Default off | not set | — | No |
+| `AI_PROVIDER_CHAIN`, `AI_GATEWAY_*`, `AI_EGRESS_POLICY`, `AI_MODEL_*`, … | `application/ai/settings.py` (vendored) | Section 8, unchanged. `foundry` calls the agent's own Foundry account over its Azure OpenAI v1 surface with the agent's identity; `gateway` calls the customer's gateway. `foundry_connection` is refused (prompt agents only) | per customer | — | Per provider |
+| `FOUNDRY_MODEL` | `app/wiring.py` | The `foundry` provider's model. Defaults to the platform-injected `AZURE_AI_MODEL_DEPLOYMENT_NAME` when unset | not set | — | No |
+| `FOUNDRY_PROJECT_ENDPOINT`, `FOUNDRY_AGENT_NAME`, `FOUNDRY_AGENT_VERSION`, `AZURE_AI_MODEL_DEPLOYMENT_NAME`, `APPLICATIONINSIGHTS_CONNECTION_STRING` | platform | **Injected by the Foundry runtime; reserved.** The orchestrator reads the endpoint (to derive the account's model URL), the agent name and version (recorded on every narration audit row) and the model name | platform | — | Platform |
+| `PYTHONNOUSERSITE` | the runtime | `1`. Dependencies are installed in the runtime environment, never with `pip install --user` | `1` in `azure.yaml` and the Dockerfile | — | Yes |
+| `LOG_LEVEL` | `app/main.py` | Default `INFO`. Nothing logged carries a token, a header value or a message | not set | — | No |
+
 ## 10. Web app (Express BFF) and SPA build
 
 | Variable | Read by | Purpose / default | Deployed value | TF output | v1 Bicep | Required (deployed) |

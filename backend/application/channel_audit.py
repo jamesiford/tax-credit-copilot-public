@@ -187,11 +187,12 @@ class ChannelAuditor:
     def audited(self, call: AuditCall) -> Iterator[AuditHandle]:
         """Guarantee a closing event, whatever the work does.
 
-        Reads write one event on exit; prepare and commit write `begin` first.
+        Reads (and `narrate`, which changes nothing) write one event on exit;
+        prepare and commit write `begin` first.
         `NotAuthorized` is `refused`; any other exception is `error`; otherwise
         the outcome the work set on the handle, else `ok`.
         """
-        is_write = call.action_kind != "read"
+        is_write = call.action_kind in ("write_prepare", "write_commit")
         handle = self.begin_write(call) if is_write else self._open(call)
         try:
             yield handle
