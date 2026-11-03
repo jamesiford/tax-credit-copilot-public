@@ -56,7 +56,8 @@ def whoami(orchestrator: Orchestrator, context: Any, identity: ActingIdentity | 
     """The identity spike's report: signals received and what was resolved. Never a credential."""
     settings = orchestrator.settings
     resolved = (
-        {"resolved": True, "source": identity.source, "oid": identity.oid, "tenant": identity.tenant_id}
+        {"resolved": True, "source": identity.source, "oid": identity.oid, "tenant": identity.tenant_id,
+         "display_name": identity.name, "channel": identity.channel, "conversation": identity.conversation_id}
         if isinstance(identity, ActingIdentity) else {"resolved": False, "reason": identity.reason}
     )
     return json.dumps({
@@ -76,4 +77,6 @@ async def answer(orchestrator: Orchestrator, context: Any, text: str) -> str:
     if isinstance(identity, Refusal):
         log.warning("turn refused: %s", identity.reason)
     reply = await orchestrator.pipeline.handle(text, identity if isinstance(identity, ActingIdentity) else None)
+    if isinstance(identity, Refusal) and orchestrator.settings.debug_whoami:
+        return f"{reply.text}\n\n```\n{whoami(orchestrator, context, identity)}\n```"
     return reply.text

@@ -66,7 +66,7 @@
        "expect": {"kind": "answer"}},
       {"say": "Actually, how has Cascade trended?",
        "model": [{"tools": [{"tool": "client_trend", "args": {}}]}, {"text": "The table shows each year."}],
-       "expect": {"kind": "answer"}},
+       "expect": {"kind": "answer", "contains": ["earlier was dropped"]}},
       {"say": "confirm", "expect": {"kind": "commit_refused", "gateway": []}}
     ]
   },

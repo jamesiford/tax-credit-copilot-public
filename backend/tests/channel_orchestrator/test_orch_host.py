@@ -74,6 +74,23 @@ def test_whoami_with_no_identity_says_why_which_is_the_point_of_the_spike():
     assert report["signals"]["present"] == ["x-agent-user-id"]
 
 
+def test_whoami_names_the_person_the_channel_and_the_conversation():
+    orch, _ = orchestrator(CHANNEL_DEBUG_WHOAMI="true", CHANNEL_IDENTITY_SOURCES="client-headers")
+    ctx = context(headers={"x-client-acting-user-oid": USER_OID, "x-client-acting-user-name": "Pat Writer"})
+    identity = json.loads(run(orch, ctx, "/whoami"))["identity"]
+    assert identity == {"resolved": True, "source": "client-headers", "oid": USER_OID, "tenant": TENANT,
+                        "display_name": "Pat Writer", "channel": "teams", "conversation": "conv-1"}
+
+
+def test_a_refused_turn_shows_what_was_received_only_when_debugging():
+    quiet, _ = orchestrator([{"text": "never"}])
+    assert "signals" not in run(quiet, context(headers={"x-agent-user-id": "opaque"}), "Who should we call?")
+    debug, _ = orchestrator(CHANNEL_DEBUG_WHOAMI="true")
+    text = run(debug, context(headers={"x-agent-user-id": "opaque", "authorization": "Bearer secret-token"}), "Who should we call?")
+    assert "can't tell who you are" in text and '"present"' in text and "x-agent-user-id" in text
+    assert "secret-token" not in text
+
+
 def test_a_correlation_id_is_made_safe_for_the_gateway():
     orch, _ = orchestrator()
     who = who_is_asking(orch, context(headers={"x-client-acting-user-oid": USER_OID}, response_id="resp/ bad:id"))

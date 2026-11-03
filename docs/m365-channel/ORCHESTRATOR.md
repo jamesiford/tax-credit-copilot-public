@@ -45,9 +45,10 @@ flowchart TD
 | Whose client this is | The platform's deterministic resolver (`client_resolve`, the portal chat's own rule); the model's `client_id` is overwritten | `tools.ToolRunner.ensure_client` |
 | Which tax year | The reader's words, or the conversation's, or a question back. A year the model names is used only if the reader said it. A write never inherits one | `tools.ToolRunner._year` |
 | Which method | The reader's. Eligibility runs under **both** certified methods unless one is named, each labelled | `tools._method`, `compose.blocks_of` |
+| A what-if's size, a base year | The reader's. A number or year the model chose is dropped; a missing size or base year is a question back | `tools._scenario`, `tools._years` |
 | Any figure | The tools' facts, rendered by the platform's formatter | `composer.compose` |
 | Whether a model sentence survives | The numeric guard and output policy, on the model's raw words and on the finished reply | `composer.compose` |
-| How many tools run | `CHANNEL_MAX_TOOL_CALLS` | `tools.ToolRunner.run` |
+| How many tools run, how long a turn takes | `CHANNEL_MAX_TOOL_CALLS`, `CHANNEL_TURN_TIMEOUT_SECONDS` | `tools.ToolRunner.run`, `turn.TurnPipeline` |
 | Whether a change is made | The same person, typing `confirm`, within `CHANNEL_CONFIRM_TTL_SECONDS` | `writes.commit_pending` |
 
 What the model sees of a tool result is the **names** of the facts (`narrator_brief`), never their
@@ -85,7 +86,8 @@ A model may only **prepare**. The preview is shown with *Reply **confirm** to ap
 - **exact words only**: `confirm`, `yes, apply`, `cancel` (case and trailing punctuation ignored);
   "please go ahead" is a new question;
 - **per person and conversation**: somebody else's `confirm` finds nothing, and is told so;
-- **any other message** drops the pending change, so a stale preview cannot be confirmed by a stray word;
+- **any other message** drops the pending change, and the reply to that message says so ("The change I
+  previewed earlier was dropped; nothing was changed");
 - **expiry**: after `CHANNEL_CONFIRM_TTL_SECONDS` the preview is refused with a fresh-preview hint;
 - **the pending change is cleared before the commit is sent**, with a fresh idempotency key, and a
   commit is **never retried** by the orchestrator. If the answer is lost the person is told the outcome is
@@ -135,6 +137,28 @@ Not carried over from the API's stack, and why: the token budget, breaker, bulkh
 (`ai_wiring._decorate`) wrap `AgentRuntime`, which has no tool calls; here a call has a timeout
 (`AI_TOTAL_DEADLINE_SECONDS`) and the chain's fallback. A shared budget is the follow-up if a customer needs it.
 
+## Claim packages
+
+"Send me the claim package for <client> <year>" is a write like any other: the model prepares
+`claim_package_create`, the person confirms, the code commits, and then the **code** (not the model) asks the
+gateway for `claim_package_link` and shows that link. A storage URL is never shown. If the package was built but
+the link could not be had, the reply says so after "Done."
+
+## Limits and failures
+
+A turn has a deadline (`CHANNEL_TURN_TIMEOUT_SECONDS`, default 90). A gateway call that fails is a plain sentence
+(`replies.py`): unreachable or timed out ("did not answer, nothing has been changed"), rate limited, the gateway
+refusing the orchestrator's credentials, or the platform's own message for a refusal such as an unauthored tax
+year. No status code, error code or stack trace reaches the reader. Conversation state is an in-memory dictionary
+with a time to live, per replica: the runtime's session storage is a filesystem the platform may discard, and a
+lost state costs a repeated question, never a wrong answer or a silent write (D-81).
+
+## Telemetry
+
+One span per gateway call (`tcc.tool.<name>`) through the hosting adapter's OpenTelemetry provider, carrying the
+tool, its kind, the channel, the correlation id and the outcome. Never an argument, a fact, a client name, a figure
+or a message (`test_orch_resilience.py` asserts this).
+
 ## Text, not cards
 
 Published agents cannot stream, and no adaptive-card or attachment path through the hosted Responses runtime
@@ -164,7 +188,7 @@ To run the host itself against the mock gateway, export the variables in
 Recommended: the **source-code (zip) path**: `python scripts/vendor-orchestrator.py`, then `azd up` in
 `channel_orchestrator/` (`azure.yaml`, `codeConfiguration`, `remote_build`). It needs no container registry
 and Terraform adds none. A `Dockerfile` is kept for a local build and for the container path. See
-PUBLISHING.md (CH-09) for putting the agent in Teams and Copilot, and D-74 to D-83 in
+PUBLISHING.md (CH-09) for putting the agent in Teams and Copilot, and D-74 to D-84 in
 [DECISIONS.md](DECISIONS.md) for the choices and the facts they rest on.
 
 Vendored code is not committed (`channel_orchestrator/app/vendor/` is gitignored): the script copies it

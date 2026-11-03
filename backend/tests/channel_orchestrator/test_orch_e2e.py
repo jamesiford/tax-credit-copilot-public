@@ -45,7 +45,7 @@ def orchestrator(gw, script):
     return build_rig(script, client=client)
 
 
-def say(rig, text, who=None):
+def say(rig, text, who="default"):
     return asyncio.run(rig.say(text, who))
 
 

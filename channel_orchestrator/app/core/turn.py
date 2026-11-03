@@ -4,33 +4,35 @@
 
 - **No identity, no turn.** An unresolved person gets one sentence and nothing runs.
 - **Writes.** A model can only prepare; `confirm` is handled here, before any model sees
-  the message, and is the only path to `writes.commit_pending`.
+  the message, and is the only path to `writes.commit_pending`. Any other message drops a
+  pending change, and the reply says so.
 - **Clarify, never guess.** An ambiguous client or a missing year is a question back, with
-  the candidates numbered; the next turn's bare number selects one.
+  the candidates numbered `1) Name`; the next turn's bare number selects one.
 - **The reply is composed.** The engine's own blocks, the model's sentence only if the
   numeric guard passes it, the disclaimer, and a provenance footer from the envelopes.
-- **The audit is the last step and never hides the answer.** The narration report is
-  filed with the gateway, which writes the per-user trail; if that fails the reply still
-  goes out, the failure is logged, and `/whoami` reports the count.
+- **A turn has a deadline** (`CHANNEL_TURN_TIMEOUT_SECONDS`). A lost commit answer is reported as
+  unknown, never retried.
+- **The audit is the last step and never hides the answer** (`audit.NarrationAuditor`).
 """
 from __future__ import annotations
 
-import hashlib
+import asyncio
 import logging
 import time
 from collections.abc import Callable
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
+from typing import Any
 
 from app.core import replies
+from app.core.audit import NarrationAuditor
 from app.core.compose import compose_reply, provenance_footer
 from app.core.gateway_client import GatewayClient
 from app.core.identity import ActingIdentity
 from app.core.planner import Planned, Planner
-from app.core.prompts import narrator_instructions
 from app.core.settings import OrchestratorSettings
 from app.core.state import ConversationState, StateStore
 from app.core.tools import Clarification, ToolRunner
-from app.core.writes import commit_pending, parse_command
+from app.core.writes import CommitOutcome, commit_pending, parse_command
 from application.composer import Composed
 
 log = logging.getLogger("tcc.orchestrator.turn")
@@ -55,6 +57,7 @@ class TurnReply:
     narration_used: bool = False
     audit: str = "skipped"
     refused: tuple[str, ...] = field(default=())
+    runs: tuple[Any, ...] = field(default=())
 
 
 class TurnPipeline:
@@ -65,8 +68,7 @@ class TurnPipeline:
         clock: Callable[[], float] = time.monotonic,
     ) -> None:
         self._s, self._gateway, self._planner, self._store, self._clock = settings, gateway, planner, store, clock
-        self.audit_failures = 0
-        self.last_audit_error = ""
+        self._auditor = NarrationAuditor(settings, gateway)
 
     async def handle(self, text: str, who: ActingIdentity | None) -> TurnReply:
         """Answer `text` for `who`, or refuse when nobody can be named."""
@@ -76,24 +78,35 @@ class TurnPipeline:
         command = parse_command(text)
         if command:
             return await self._command(command, who, state)
-        state.pending = None
-        question, chosen = self._select_candidate(text, state)
-        if question is None:
-            return TurnReply(replies.clarification(Clarification("client", "", tuple(state.candidates))), "clarify")
-        return await self._answer(question, who, state, chosen)
+        dropped, state.pending = state.pending is not None, None
+        reply = await self._respond(text, who, state)
+        return replace(reply, text=f"{reply.text}\n\n{replies.DROPPED}") if dropped else reply
 
     # ------------------------------------------------------------ confirm / cancel
 
     async def _command(self, command: str, who: ActingIdentity, state: ConversationState) -> TurnReply:
         if command == "cancel":
-            had = state.pending is not None
-            state.pending = None
+            had, state.pending = state.pending is not None, None
             return TurnReply(replies.CANCELLED if had else replies.NOTHING_PENDING, "cancel")
-        outcome = await commit_pending(self._gateway, who, state, self._clock)
+        try:
+            outcome = await asyncio.wait_for(commit_pending(self._gateway, who, state, self._clock), self._s.turn_timeout_seconds)
+        except asyncio.TimeoutError:
+            outcome = CommitOutcome(replies.commit_failure("timeout", ""), False, code="timeout")
         state.remember("assistant", outcome.text)
-        return TurnReply(outcome.text, "commit" if outcome.made else "commit_refused", tools=(outcome.tool,) if outcome.tool else ())
+        return TurnReply(outcome.text, "commit" if outcome.made else "commit_refused", tools=(outcome.tool,) if outcome.tool else (),
+                         runs=outcome.runs)
 
     # ------------------------------------------------------------- numbered reply
+
+    async def _respond(self, text: str, who: ActingIdentity, state: ConversationState) -> TurnReply:
+        question, chosen = self._select_candidate(text, state)
+        if question is None:
+            return TurnReply(replies.clarification(Clarification("client", "", tuple(state.candidates))), "clarify")
+        try:
+            return await asyncio.wait_for(self._answer(question, who, state, chosen), self._s.turn_timeout_seconds)
+        except asyncio.TimeoutError:
+            log.warning("a turn passed its deadline")
+            return TurnReply(replies.TIMED_OUT, "failure")
 
     def _select_candidate(self, text: str, state: ConversationState) -> tuple[str | None, int | None]:
         """`(question, chosen client)`: the message, or the earlier question once a numbered choice picks its client.
@@ -125,17 +138,16 @@ class TurnPipeline:
             return await self._ask(runner, planned, who, state, question)
         if not runner.runs:
             text = replies.failure(runner.problems) if runner.problems or runner.refused else HELP
-            kind = "failure" if runner.problems else "help"
-            audit = await self._audit(who, runner, planned, None, text)
-            return TurnReply(text, kind, planned.mode, refused=tuple(runner.refused), audit=audit)
+            audit = await self._auditor.report(who, planned, runner, None, text)
+            return TurnReply(text, "failure" if runner.problems else "help", planned.mode, refused=tuple(runner.refused), audit=audit)
         composed = planned.composed or compose_reply(question, runner.runs, planned.narration, self._s.ai.safety.output_allowed_hosts)
         text = self._assemble(runner, planned, composed)
         state.pending = runner.pending
         state.remember("assistant", text)
-        audit = await self._audit(who, runner, planned, composed, text)
+        audit = await self._auditor.report(who, planned, runner, composed, text)
         return TurnReply(
             text, "answer", planned.mode, tuple(runner.tool_names), composed.guard.status, composed.narration_used,
-            audit, tuple(runner.refused),
+            audit, tuple(runner.refused), tuple(runner.runs),
         )
 
     def _assemble(self, runner: ToolRunner, planned: Planned, composed: Composed) -> str:
@@ -155,37 +167,10 @@ class TurnPipeline:
         if clarify.kind == "client":
             state.candidates, state.question = [dict(c) for c in clarify.candidates], question
         text = replies.clarification(clarify)
-        audit = await self._audit(who, runner, planned, None, text)
+        audit = await self._auditor.report(who, planned, runner, None, text)
         return TurnReply(text, "clarify", planned.mode, tuple(runner.tool_names), audit=audit)
-
-    # ---------------------------------------------------------------------- audit
-
-    async def _audit(self, who: ActingIdentity, runner: ToolRunner, planned: Planned, composed: Composed | None, text: str) -> str:
-        """Report the narration to the gateway when a model took part. Returns `ok`, `failed` or `skipped`; never raises."""
-        trace = planned.trace
-        if not trace.turns:
-            return "skipped"
-        _, prompt_version = narrator_instructions()
-        rejected = composed is not None and not composed.guard.passed
-        report = {
-            "agent_name": self._s.agent_name, "agent_version": f"{self._s.agent_version}+prompt{prompt_version}"[:50],
-            "model": (trace.last.model if trace.last else "")[:100],
-            "prompt_sha256": hashlib.sha256("\n".join(trace.prompt_parts).encode("utf-8")).hexdigest(),
-            "tool_names": sorted(set(runner.tool_names)),
-            "guard_status": "rejected" if rejected else "pass",
-            "violations_count": len(composed.guard.violations) if composed and rejected else 0,
-            "output_summary": f"mode={planned.mode}; narration_used={bool(composed and composed.narration_used)}; "
-                              f"tools={len(runner.runs)}; chars={len(text)}",
-        }
-        reply = await self._gateway.report_narration(who, report)
-        if reply.ok:
-            self.last_audit_error = ""
-            return "ok"
-        self.audit_failures += 1
-        self.last_audit_error = reply.error_code
-        log.error("narration audit failed: %s", reply.error_code)
-        return "failed"
 
     def status(self) -> dict[str, object]:
         """For `/whoami`: counts and states, never a name, a token or a message."""
-        return {"audit_failures": self.audit_failures, "last_audit_error": self.last_audit_error or None, "conversations": len(self._store)}
+        return {"audit_failures": self._auditor.failures, "last_audit_error": self._auditor.last_error or None,
+                "conversations": len(self._store)}
