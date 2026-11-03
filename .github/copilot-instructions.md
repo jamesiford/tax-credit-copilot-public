@@ -62,15 +62,20 @@ before moving code. The essentials:
   depends on `api/_payperiods.py`, a payroll reader that raises `HTTPException`.
   Moving both is tracked work; do not add a second exception.
 - **Writes are commands, reads are queries.** Every write lands on a number on a
-  filed return, so it goes through the mediator pipeline: **Validation →
-  Handler → Audit**, timed. One use case per file, named for the use case.
-  - **That is the whole pipeline.** Authorization and TenantScope are *not*
-    stages — there is no identity to authorize and no employer binding to scope
-    to. They are absent rather than stubbed because a stage that runs and
-    always passes reads as a control, and an auditor would find a name where an
-    enforcement should be. Gated on Entra; see [SECURITY.md](../SECURITY.md).
-    `test_the_pipeline_does_not_claim_stages_it_does_not_have` fails if a no-op
-    is added to satisfy a diagram.
+  filed return, so it goes through the mediator pipeline: **Authorization →
+  Validation → Handler → Audit**, timed. One use case per file, named for the use case.
+  - **Authorization is a real stage; TenantScope is not.** A command declares
+    `policy = Policy.WRITER`, and the stage checks that the PERSON — for the
+    Microsoft 365 channel gateway, the user it acts for, never its own service
+    principal — is entitled (`application/authorization.py`). A command that
+    declares a policy on a mediator with no authorizer is refused, not waved
+    through, and a refusal is recorded as `refused`. TenantScope is still absent:
+    there is no employer binding to scope to, and a stage that runs and always
+    passes reads as a control. `test_the_pipeline_does_not_claim_stages_it_does_not_have`
+    fails if a no-op TenantScope is added to satisfy a diagram, and
+    `test_every_registered_command_declares_a_policy_or_is_named_open` fails if a
+    command reaches the mediator with no decision about who may run it. [ADR-008,
+    CH-04]
   - **The audit trail records failed writes too.** "Somebody tried to resolve
     this finding and it errored" is a question that gets asked, and a trail of
     successes cannot answer it. `AuditLog` is bounded and in-memory — a support
@@ -83,7 +88,7 @@ before moving code. The essentials:
 
 ### The API surface is a decided set, not an accumulation
 
-`tests/route_inventory.json` pins all 67 routes. Adding one means updating the
+`tests/route_inventory.json` pins all 72 routes. Adding one means updating the
 inventory in the same commit; removing one means saying so out loud. The file
 exists because a router split once dropped nine endpoints silently — the modules
 still imported, the unit tests still passed, and only a client found the 404.

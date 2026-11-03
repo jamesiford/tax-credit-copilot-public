@@ -161,6 +161,12 @@ Python would be ceremony.
 Queries skip `TransactionBehaviour` and `AuditBehaviour` — reads are not
 decisions.
 
+> **Status (CH-04).** What is built is `Authorization → Validation → Handler →
+> Audit`, timed. `AuthorizationBehaviour` exists in a narrower form than drawn:
+> it asks whether the caller's person is entitled to run a command that declares
+> `Policy.WRITER` (`application/authorization.py`), not about tenant membership
+> or site scope. `TenantScopeBehaviour` and `TransactionBehaviour` are not built.
+
 ### Testing consequence
 
 Handlers take ports by constructor injection, so a handler test needs no
