@@ -37,14 +37,14 @@ PROBE = """
   const heights = rows.slice(0, 20).map(r => Math.round(r.getBoundingClientRect().height));
   heights.sort((a, b) => a - b);
   const main = document.querySelector('main');
-  const side = document.querySelector('.tcc-sidenav');
+  const header = document.querySelector('.shell-header');
   return {
     firstRowY: top(rows[0]),
     rowsVisibleNoScroll: visible.length,
     rowsTotal: rows.length,
     medianRowHeight: heights.length ? heights[Math.floor(heights.length / 2)] : null,
     contentWidth: main ? Math.round(main.getBoundingClientRect().width) : null,
-    sidebarWidth: side ? Math.round(side.getBoundingClientRect().width) : 0,
+    headerHeight: header ? Math.round(header.getBoundingClientRect().height) : 0,
     scrollHeight: Math.round(document.documentElement.scrollHeight),
     viewport: vh,
   };
@@ -71,11 +71,11 @@ def main() -> int:
 
     print(f"=== {width}x{height} ===")
     print(f"{'page':<11} {'VISIBLE':>8} {'total':>6} {'1st row y':>10} "
-          f"{'row h':>6} {'content':>8} {'sidebar':>8} {'scroll':>7}")
+          f"{'row h':>6} {'content':>8} {'header':>8} {'scroll':>7}")
     for name, m in out.items():
         print(f"{name:<11} {m['rowsVisibleNoScroll']:>8} {m['rowsTotal']:>6} "
               f"{str(m['firstRowY']):>10} {str(m['medianRowHeight']):>6} "
-              f"{str(m['contentWidth']):>8} {m['sidebarWidth']:>8} {m['scrollHeight']:>7}")
+              f"{str(m['contentWidth']):>8} {m['headerHeight']:>8} {m['scrollHeight']:>7}")
     print()
     print(json.dumps(out, indent=2))
     return 0

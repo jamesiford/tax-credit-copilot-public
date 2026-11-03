@@ -78,7 +78,7 @@ export function shortDate(value) {
 export default function UnitPage({
   clientId, unitId, year, month, method = 'min_max', state,
   clientName, onOpenEmployee, onOpenClient, onOpenPortfolio, onChangeMonth,
-  onChangeMethod,
+  onChangeMethod, showTrail = true,
 }) {
   const [loaded, setLoaded] = useState(null);
   const [error, setError] = useState(null);
@@ -232,7 +232,7 @@ export default function UnitPage({
 
   return (
     <div>
-      <Breadcrumb trail={trail} />
+      {showTrail ? <Breadcrumb trail={trail} /> : null}
 
       <PageHeader
         eyebrow="What is it worth"

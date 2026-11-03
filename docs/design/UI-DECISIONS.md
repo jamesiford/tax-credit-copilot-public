@@ -175,7 +175,52 @@ around the data. Rows were recovered by tightening only the blocks that are not
 data (page-bar gap, header gap, KPI tile padding, the padding of a panel that
 holds a grid), never the grids.
 **Not done here, deliberately.** A top navigation, hero band and task cards are
-the next prompt's structure; the rail is restyled, not removed.
+the next prompt's structure; the rail is restyled, not removed. (Done in D14–D17.)
+
+## D14. The shell is a top bar, a drill trail and a launcher (UI-02)
+
+**Context.** The reference has a top navigation and no rail; the rail cost 216–248px
+of width and held two lists (the drill ladder and "prove the work") that read as
+one menu.
+**Choice.** `components/shell/`: `TopBar` with three `NavGroup` dropdowns (one per
+NAV section), `DrillTrail` under it, `ShellActions` (year scope, account menu),
+`AppShell` (skip link, `<header>`, one `<main id>`), and a `FloatingAction`
+"Ask Copilot" (Ctrl+K kept). The rail's drill rules moved verbatim to
+`lib/drill.js`; `SideRail.jsx` is deleted. Mobile (drawer, scrim, hamburger) is
+gone with it: out of scope.
+**Why.** The width goes back to the data, and the trail answers "where am I" on
+every page in one line. `NAV` is unchanged (3 sections, 8 items); only `eligibility`
+gained `needsClient`, so it is disabled with a reason at the book instead of
+hidden.
+**Consequences.** The group menus are menu buttons, so tests open a group and
+then pick a `menuitem` (`App.test.jsx` `goToView`). The account menu exists only
+when `/api/me` says somebody is signed in (AUTH_MODE=entra); with `none` there is
+no identity to show and no stand-in "guest".
+
+## D15. One trail, not two: `showTrail`
+
+The page `Breadcrumb` would have repeated the `DrillTrail`. Pages take
+`showTrail` (default `true`, so a page rendered alone still has its breadcrumb)
+and the shell passes `false`. The claim-package button, which shared a row with
+the breadcrumb, now sits on the client tabs row, and `.tcc-page-bar` is only
+rendered when the breadcrumb is.
+
+## D16. The home hero replaces the page header; the `ptab` deep link is obsolete
+
+`PortfolioPage` is a single grid with no tabs, and `portfolioAnswer` returns
+counts only, so the brief's `?ptab=call&focus=` deep link has nothing to land on.
+The "Who to call" card scrolls to and focuses the book's "Targeting" heading
+instead. The hero owns the page's `h1` ("Hi, Jane" / "Welcome back"); "Targeting"
+is the book's `h2`, so the outline stays valid and `App.test.jsx` still finds it.
+"Start here" defaults to open the first time and is remembered
+(`lib/startHere.js`). The cards are real links, so a modified click opens a tab.
+
+## D17. Backend used for measurement
+
+The stand-in on :8000 forwarding to a real backend on :8001 (`DATA_SOURCE=csv`),
+as in D10. Pointing the app at the real backend alone cannot boot the shell: it
+needs the sealed reference workspace and the Warehouse, neither of which is in a
+clone. Figures are comparable with the baseline, not with production.
 
 ## D12. Node 26 and the unit tests
 

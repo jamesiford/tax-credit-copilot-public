@@ -3,7 +3,8 @@
 Fails when the design system's own files step around the tokens:
 
   1. a literal colour (hex, rgb/rgba/hsl, or a named colour) in
-     `src/components/ui/*.css` or `src/pages/Styleguide.css`;
+     `src/components/ui/*.css`, `src/components/shell/*.css` or
+     `src/pages/Styleguide.css`;
   2. a `px` value in font-size, padding, margin, gap or border-radius in the same
      files (`0` is fine; `1px` borders, outlines and sizes are not spacing);
   3. `style={{` anywhere in `src/` except the two documented exceptions.
@@ -20,7 +21,11 @@ import sys
 from pathlib import Path
 
 SRC = Path(__file__).resolve().parents[1] / "src"
-UI_CSS = [*sorted((SRC / "components" / "ui").glob("*.css")), SRC / "pages" / "Styleguide.css"]
+UI_CSS = [
+    *sorted((SRC / "components" / "ui").glob("*.css")),
+    *sorted((SRC / "components" / "shell").glob("*.css")),
+    SRC / "pages" / "Styleguide.css",
+]
 
 # The two places an inline style is correct, each carrying a comment saying why:
 # a width computed per render, and a library prop that takes style objects.

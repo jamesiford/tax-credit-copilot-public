@@ -411,9 +411,13 @@ store chain. Real client payroll, de-identified at source. Four synthetic client
 
 ## The portal
 
-**One shell, four routed pages.** `frontend/src/App.jsx` is the shell — nav,
-scope bar, chat, tour — and every route renders it; `/golden` redirects. Inside,
-the URL selects a page:
+**One shell, four routed pages.** `frontend/src/App.jsx` is the shell — a top
+bar (brand, three dropdown navigation groups, the tax-year scope, the account
+menu), the drill trail beneath it, the page, a floating **Ask Copilot** launcher
+(Ctrl+K), chat and tour — and every route renders it; `/golden` redirects. The
+shell's parts live in `src/components/shell/` (`AppShell`, `TopBar`, `NavGroup`,
+`DrillTrail`, `ShellActions`) and are theme-neutral: they read colour roles, so
+classic and modern share the structure. Inside, the URL selects a page:
 
 ```
 /                       PortfolioPage   the book
@@ -430,13 +434,36 @@ Query string carries `year`, `month` and `method`, so a pasted URL renders that
 exact state cold. **An employee id never appears in a URL** — the route carries
 the `record_token`.
 
-Navigation is what is LEFT once the pages absorbed the rest:
+Navigation is what is LEFT once the pages absorbed the rest. Each section is a
+**dropdown group in the top bar** (a WAI-ARIA menu button: arrows, Home/End,
+Escape returns focus, Tab and outside-click close):
 
 ```
-What is it worth       Who qualifies · One/Zero detail
-What needs a decision  Data ingestion · Agent activity
-Prove it               Evidence pack* · Compare to Access* · Rules & statute · Methodology*
+What is it worth       Eligibility · Monthly employment
+What needs a decision  Payroll data · Agents
+Prove it               Audit trail* · Back-test* · Programs · Calculations*
 ```
+
+An entry that needs a client (`needsClient`: Eligibility) is **disabled with its
+reason** ("Pick a client first") at portfolio scope, never hidden: a missing
+entry says "this product does not do that", a disabled one says "not yet".
+
+**The drill trail replaces both the left rail and the page breadcrumb.**
+`lib/drill.js` derives Portfolio → Client → Location → Eligibility → Employee
+from the ROUTE (never from state of its own), so the trail and the page cannot
+disagree. A reached rung is a button; the current one is `aria-current="page"`
+and not a button; an unreached one is dimmed text with a hint and is **never** a
+disabled button. At the book it collapses to one quiet line. Pages take
+`showTrail` (default true, so a page rendered alone keeps its `Breadcrumb`); the
+shell passes `false` so there is one trail, not two. The claim-package button
+sits on the client tabs row.
+
+**`/` opens on a hero and four task cards, then the book.** The hero greets by
+first name when somebody is signed in (`lib/identity.js`, from `/api/me`) and
+says "Welcome back" otherwise. "Start here" is a persisted preference
+(`lib/startHere.js`): open the first time, collapsible after, and the collapsed
+state is what the visible-row gate measures. The cards are shortcuts to places
+that exist — they compute nothing.
 
 **An entry earns its place by answering a question no other entry answers.**
 `NAV` is exported and pinned by `test_the_navigation_is_a_decided_set`, for the
@@ -1152,11 +1179,12 @@ for a client whose Gold holds only TY2023. 964 rows had accumulated. Stub
   `index.css`); (2) a chip, pill or button label never wraps (`nowrap`);
   (3) no coloured stripe unless it is a verdict (`.prog-verdict`, `.finding`);
   (4) titles are sentence case at 600 weight, not 800-weight uppercase;
-  (5) a page's one primary action shares a row with its breadcrumb
-  (`.tcc-page-bar`), not a row of its own; (6) text blocks stop at ~80ch. The
-  modern shell skin is `src/styles/chrome-modern.css`, scoped to
-  `html[data-theme="modern"]` so classic is untouched; the structural rebuild
-  (top navigation, hero, task cards) replaces its rail and top-bar sections.
+  (5) a page's one primary action shares a row with its tabs or title (the
+  claim button is on the client tabs row), not a row of its own; (6) text blocks
+  stop at ~80ch. The modern page skin is `src/styles/chrome-modern.css`, scoped
+  to `html[data-theme="modern"]` so classic is untouched; the shell (top bar,
+  navigation, drill trail) is `src/components/shell/shell.css`, theme-neutral
+  and held to the token gate.
 - **A half-pixel size is a density problem wearing a font-size.** Fix it with
   `line-height` or `letter-spacing`, which is what it was actually asking for.
   `.tcc-cell-btn` is the worked example: it bought its 28px row with 10px type

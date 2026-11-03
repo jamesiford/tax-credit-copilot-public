@@ -110,6 +110,7 @@ beforeEach(() => {
     (id) => Promise.resolve(CLIENT_SCOPE[id] || CLIENT_SCOPE[1001]),
   );
   vi.spyOn(api, 'fetchWorkspace').mockResolvedValue(WORKSPACE);
+  vi.spyOn(api, 'fetchMe').mockResolvedValue({ auth_mode: 'none', authenticated: false, upn: null });
   vi.spyOn(api, 'refreshWorkspace').mockResolvedValue(WORKSPACE);
   vi.spyOn(api, 'fetchPortfolioCoverage').mockResolvedValue({ clients: [], totals: coverageFor(0).totals });
   // The book is the landing grid now, so the shell cannot mount without it.
@@ -162,12 +163,12 @@ const at = (...entries) => render(
 const where = () => screen.getByTestId('where').textContent;
 
 /**
- * The nav is a persistent left rail again: a drill ladder showing where you
- * are, and a flat "prove the work" list. Both are always on screen at desktop
- * width, so there is no menu to open first.
+ * The navigation is a row of dropdown groups in the top bar, with the drill
+ * trail beneath it. A group is a menu button: open it, then choose the item.
  */
-const goToView = async (name) => {
-  await userEvent.click(screen.getByRole('button', { name }));
+const goToView = async (name, group = /What is it worth/) => {
+  await userEvent.click(screen.getByRole('button', { name: group }));
+  await userEvent.click(await screen.findByRole('menuitem', { name }));
 };
 
 /** The scope the shell RESOLVED and persisted — client and year, as values. */

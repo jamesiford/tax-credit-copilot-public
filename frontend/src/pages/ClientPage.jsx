@@ -48,7 +48,7 @@ const TABS = [
 const WHAT_IF_KEYS = ['wunit', 'wstack', 'wemp', 'wyear', 'wmethod', 'wlever', 'wmag', 'wrun'];
 
 export default function ClientPage({
-  clientName, onOpenPortfolio, scope, scopeOptions, scopeWindow, clientScope, ...rest
+  clientName, onOpenPortfolio, scope, scopeOptions, scopeWindow, clientScope, showTrail = true, ...rest
 }) {
   const [search, setSearch] = useSearchParams();
   const active = clientTab(search);
@@ -193,12 +193,14 @@ export default function ClientPage({
 
   return (
     <div>
-      <div className="tcc-page-bar">
-        <Breadcrumb trail={trail} />
-        <ClaimPackageButton clientId={scope?.clientId} taxYear={scope?.year} />
-      </div>
+      {showTrail ? (
+        <div className="tcc-page-bar">
+          <Breadcrumb trail={trail} />
+        </div>
+      ) : null}
       <div className="tcc-client-tabs">
         <SectionTabs tabs={TABS} active={active} onChange={onTab} label="Client sections" idPrefix="client" />
+        <ClaimPackageButton clientId={scope?.clientId} taxYear={scope?.year} />
       </div>
 
       {/* Each panel is boundaried so one failing costs a panel, not the page —

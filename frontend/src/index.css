@@ -1523,48 +1523,13 @@ button.pill-action.pill-forecast-ok, button.pill-action.pill-forecast-bad { bord
   background-size: 28px 28px;
 }
 
-.tcc-topbar {
-  position: fixed;
-  inset: 0 0 auto 0;
-  z-index: 45;
-  height: 52px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-8);
-  padding: 0 var(--space-8);
-  color: var(--on-accent);
-  background: var(--surface-inverse);
-  border-bottom: 3px solid transparent;
-  border-image: linear-gradient(90deg, var(--exp-gold), var(--exp-magenta) 45%, var(--exp-violet)) 1;
-  box-shadow: 0 3px 16px rgba(20, 37, 78, 0.22);
-}
-
-/* --- Top strip: brand, the two persistent axes, ask -----------------------
-   The rail carries navigation again (see .tcc-siderail below), so the top
-   strip holds only what is not a destination: the year, and Ask. */
-.tcc-brand,
-.tcc-top-context,
+/* The top bar, navigation and drill trail live in components/shell/shell.css. */
 .tcc-contributor,
 .tcc-agent-grid article {
   display: flex;
   align-items: center;
 }
 
-.tcc-brand { gap: var(--space-5); min-width: 0; }
-.tcc-brand img { width: 96px; height: 24px; object-fit: contain; padding: var(--space-1) var(--space-3); border-radius: var(--radius); background: var(--panel); }
-.tcc-brand > span { width: 1px; height: 22px; background: rgba(255,255,255,.32); }
-.tcc-brand b { font-size: var(--text-strong); white-space: nowrap; }
-.tcc-top-context { gap: var(--space-4); }
-.tcc-top-scope { display: flex; align-items: center; gap: var(--space-3); }
-.tcc-top-axis { display: inline-flex; align-items: center; gap: var(--space-2); padding: 0 var(--space-4); height: 30px; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.22); border-radius: var(--radius); }
-.tcc-top-axis select { color: var(--on-accent); background: transparent; border: 0; font: inherit; font-size: var(--text-small); font-weight: 600; cursor: pointer; }
-.tcc-top-axis select option { color: var(--ink); background: var(--panel); }
-.tcc-top-notice { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; padding: 0 var(--space-2); background: var(--exp-magenta); border-radius: var(--radius-lg); font-size: var(--text-caption); font-weight: 700; }
-/* A scope read that failed. Truncated, because the axes still have to fit. */
-.tcc-top-error { max-width: 320px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--text-small); font-weight: 600; color: var(--warn); }
-.tcc-top-btn { display: inline-flex; align-items: center; gap: var(--space-3); height: 30px; padding: 0 var(--space-5); color: var(--on-accent); background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.22); border-radius: var(--radius); font: inherit; font-size: var(--text-small); cursor: pointer; }
-.tcc-top-btn:hover { background: rgba(255,255,255,.2); }
 .tcc-overflow { position: relative; }
 .tcc-overflow-menu { position: absolute; top: 36px; right: 0; z-index: 60; min-width: 224px; padding: var(--space-3); color: var(--ink); background: var(--panel); border: 1px solid var(--line-2); border-radius: var(--radius); box-shadow: 0 10px 30px rgba(20, 37, 78, .18); }
 .tcc-overflow-section { padding: var(--space-3) var(--space-4) var(--space-2); color: var(--muted); font-size: var(--text-micro); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
@@ -1576,158 +1541,7 @@ button.pill-action.pill-forecast-ok, button.pill-action.pill-forecast-bad { bord
 .spin { animation: tcc-spin .8s linear infinite; }
 @keyframes tcc-spin { to { transform: rotate(360deg); } }
 
-/* --- The left rail: where you are, and what proves the work ---------------
-
-   Two sections with deliberately different affordances.
-
-   The DRILL is a vertical breadcrumb. A rung you have reached shows its real
-   name and is a button; a rung you have not is dimmed, is NOT a button, and
-   carries a hint. That distinction is the whole point: it has to read as "you
-   haven't got here yet", never as "this is broken".
-
-   PROVE THE WORK is a flat list. Most of it will never be clicked in a demo —
-   it earns its place by being visible. */
-:root { --rail-w: 216px; }
-
-.tcc-siderail {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 40;
-  display: flex;
-  flex-direction: column;
-  width: var(--rail-w);
-  height: 100vh;
-  padding-top: calc(var(--topbar-offset) - var(--space-4));
-  overflow-y: auto;
-  color: var(--text-inverse-muted);
-  background: var(--surface-inverse);
-}
-
-.tcc-rail-section {
-  padding: var(--space-5) var(--space-6) var(--space-2);
-  color: var(--text-inverse-faint);
-  font-size: var(--text-micro);
-  font-weight: 700;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-}
-
-/* --- the drill ladder --- */
-
-.tcc-rail-drill ol { margin: 0; padding: 0; list-style: none; }
-
-.tcc-rung > button,
-.tcc-rung > div {
-  position: relative;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  min-height: 32px;
-  padding: var(--space-2) var(--space-5);
-  color: inherit;
-  background: transparent;
-  border: 0;
-  font: inherit;
-  font-size: var(--text-small);
-  text-align: left;
-}
-
-.tcc-rung > button { cursor: pointer; }
-.tcc-rung > button:hover { color: var(--on-accent); background: rgba(255,255,255,.055); }
-
-/* Indent by depth so the hierarchy is legible without drawing a tree. */
-.tcc-rung.depth-1 > button, .tcc-rung.depth-1 > div { padding-left: calc(var(--space-5) + 11px); }
-.tcc-rung.depth-2 > button, .tcc-rung.depth-2 > div,
-.tcc-rung.depth-3 > button, .tcc-rung.depth-3 > div { padding-left: calc(var(--space-5) + 22px); }
-.tcc-rung.depth-4 > button, .tcc-rung.depth-4 > div { padding-left: calc(var(--space-5) + 33px); }
-
-/* The connecting spine. Drawn per-rung so it tracks the indent. */
-.tcc-rung-rail {
-  position: absolute;
-  left: var(--space-5);
-  top: 0;
-  bottom: 0;
-  width: 1px;
-  background: rgba(255,255,255,.14);
-}
-.tcc-rung.depth-0 .tcc-rung-rail { top: 50%; }
-.tcc-rung:last-child .tcc-rung-rail { bottom: 50%; }
-
-.tcc-rung-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-.tcc-rung.reached > button,
-.tcc-rung.reached > div { color: var(--text-inverse-muted); }
-
-.tcc-rung.current > button,
-.tcc-rung.current > div {
-  color: var(--on-accent);
-  background: rgba(255,255,255,.1);
-  font-weight: 600;
-  box-shadow: inset 3px 0 0 var(--exp-gold);
-}
-
-/* Not reached yet. Dimmed, and deliberately not a control. */
-.tcc-rung.pending > div { color: var(--text-inverse-faint); }
-.tcc-rung.pending svg { opacity: .55; }
-
-.tcc-rung-hint {
-  display: block;
-  padding: 0 var(--space-6) var(--space-2) calc(var(--space-5) + 33px);
-  color: var(--text-inverse-faint);
-  font-size: var(--text-micro);
-  font-style: italic;
-  line-height: 1.3;
-}
-
-/* --- prove the work --- */
-
-.tcc-rail-gov { display: flex; flex-direction: column; }
-
-.tcc-rail-gov button {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  min-height: 32px;
-  padding: var(--space-2) var(--space-5);
-  color: var(--text-inverse-muted);
-  background: transparent;
-  border: 0;
-  border-left: 3px solid transparent;
-  font: inherit;
-  font-size: var(--text-small);
-  text-align: left;
-  cursor: pointer;
-}
-
-.tcc-rail-gov button:hover { color: var(--on-accent); background: rgba(255,255,255,.055); }
-
-.tcc-rail-gov button.active {
-  color: var(--on-accent);
-  background: rgba(255,255,255,.1);
-  border-left-color: var(--exp-gold);
-  font-weight: 600;
-}
-
-.tcc-rail-footer {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  margin: auto var(--space-5) var(--space-6);
-  padding: var(--space-4) var(--space-2) 0;
-  border-top: 1px solid rgba(255,255,255,.12);
-  color: var(--text-inverse-muted);
-}
-.tcc-rail-footer span { display: flex; flex-direction: column; }
-.tcc-rail-footer b { color: var(--text-inverse-muted); font-size: var(--text-micro); }
-.tcc-rail-footer small { margin-top: 1px; font-size: var(--text-caption); }
-
-/* The main column clears the rail. */
-.tcc-has-rail .tcc-main { margin-left: var(--rail-w); }
-
-.tcc-main { min-height: 100vh; padding: var(--topbar-offset) var(--space-9) var(--space-10); }
+.tcc-main { min-height: 100vh; padding: var(--space-4) var(--space-9) calc(var(--space-16) + var(--floating-offset)); }
 .tcc-main > * { max-width: 1500px; margin-left: auto; margin-right: auto; }
 .tcc-page-header { margin-bottom: var(--space-6); }
 
@@ -2211,7 +2025,9 @@ button.pill-action.pill-forecast-ok, button.pill-action.pill-forecast-bad { bord
    cannot grow two tab styles. Purple, because choosing a section is chrome
    selection, not a reading. */
 .section-tabs { background: var(--surface-subtle); }
-.tcc-client-tabs { margin-bottom: var(--space-6); }
+.tcc-client-tabs { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--space-8); margin-bottom: var(--space-6); }
+.tcc-client-tabs > :first-child { flex: 1 1 auto; min-width: 0; }
+.tcc-client-tabs .tcc-claim-package { flex: 0 0 auto; margin-bottom: var(--space-2); }
 .tcc-claim-package { display: flex; align-items: center; justify-content: flex-end; margin-bottom: var(--space-4); font-size: var(--text-small); }
 .tcc-drill-body { min-height: 0; overflow: auto; padding: var(--space-8); background: var(--surface-2); }
 .tcc-total-band { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: var(--space-1); margin-bottom: var(--space-5); background: var(--line); border: 1px solid var(--line); }
@@ -2235,44 +2051,6 @@ button.pill-action.pill-forecast-ok, button.pill-action.pill-forecast-bad { bord
 .tcc-shell-state { min-height: 100%; display: grid; place-content: center; justify-items: center; gap: var(--space-4); padding: var(--space-10); color: var(--ink); text-align: center; background: var(--surface-2); }
 .tcc-shell-state h1 { margin: var(--space-4) 0 0; font-size: var(--text-display); }
 
-/* The rail is permanent furniture at desktop width — which is what the demo
-   runs at — and a drawer below it. The scrim only exists in drawer mode. */
-.tcc-mobile-menu { display: none; }
-.tcc-nav-scrim { display: none; }
-
-@media (max-width: 1100px) {
-  .tcc-siderail {
-    transform: translateX(-100%);
-    transition: transform .18s ease;
-    box-shadow: 0 0 40px rgba(20, 37, 78, .35);
-  }
-  .tcc-siderail.open { transform: none; }
-  .tcc-has-rail .tcc-main { margin-left: 0; }
-
-  .tcc-mobile-menu {
-    display: grid;
-    place-items: center;
-    width: 32px;
-    height: 32px;
-    margin-right: var(--space-3);
-    color: var(--on-accent);
-    background: rgba(255,255,255,.12);
-    border: 1px solid rgba(255,255,255,.22);
-    border-radius: var(--radius);
-    cursor: pointer;
-  }
-
-  .tcc-nav-scrim {
-    display: block;
-    position: fixed;
-    inset: 0;
-    z-index: 35;
-    padding: 0;
-    background: rgba(20, 37, 78, .45);
-    border: 0;
-    cursor: pointer;
-  }
-}
 .tcc-shell-state p { max-width: 540px; margin: 0; color: var(--muted); font-size: var(--text-body); }
 .tcc-loader { width: 34px; height: 34px; border: 3px solid var(--line); border-top-color: var(--exp-primary); border-radius: 50%; animation: tcc-spin .8s linear infinite; }
 
@@ -2281,10 +2059,7 @@ button.pill-action.pill-forecast-ok, button.pill-action.pill-forecast-bad { bord
    readable — dropping to two rows instead costs vertical space, and 768px tall
    is the scarcer axis. So the chrome shrinks and the content grid does not. */
 @media (max-width: 1120px) {
-  .tcc-topbar { height: var(--topbar-offset); gap: var(--space-6); padding: 0 var(--space-7); }
-  .tcc-brand img { width: 100px; height: 26px; }
-  .tcc-brand small { font-size: var(--text-caption); }
-  .tcc-main { padding: calc(var(--topbar-offset) + var(--space-2)) var(--space-8) var(--space-10); }
+  .tcc-main { padding: var(--space-2) var(--space-8) var(--space-10); }
   .tcc-page-header { margin-bottom: var(--space-5); }
   .tcc-page-header .page-title { font-size: var(--text-title); }
   /* Nothing to the left any more, so the bar spans the content. */
@@ -2299,10 +2074,7 @@ button.pill-action.pill-forecast-ok, button.pill-action.pill-forecast-bad { bord
 }
 
 @media (max-width: 760px) {
-  .tcc-topbar { height: 52px; padding: 0 var(--space-6); }
-  .tcc-brand img { width: 92px; height: 26px; }
-  .tcc-brand > span, .tcc-brand b { display: none; }
-  .tcc-main { padding: calc(var(--topbar-offset) + var(--space-2)) var(--space-6) var(--space-10); }
+  .tcc-main { padding: var(--space-2) var(--space-6) var(--space-10); }
   .tour-bar { left: 0; width: calc(100% - 24px); margin-left: var(--space-6); }
   .tcc-page-header .page-title { font-size: var(--text-title); }
   .tcc-security-banner { align-items: flex-start; flex-direction: column; }
@@ -2608,8 +2380,10 @@ button.pill-action.pill-forecast-ok, button.pill-action.pill-forecast-bad { bord
 @media print {
   body { background: var(--panel); }
   .topbar,
+  .shell-header,
+  .shell-skip,
+  .ui-floating,
   .sidenav,
-  .footer,
   .chat-drawer,
   .chat-drawer-scrim,
   .modal,

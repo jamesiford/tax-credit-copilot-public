@@ -145,7 +145,21 @@ what it must never do. Import from `components/ui/index.js`.
 and are migrated to `Pill` with the page work that follows (see UI-STATUS.md).
 
 `/__styleguide` (dev only; absent from the production bundle) renders every
-component in every variant with a theme toggle.
+component in every variant with a theme toggle, plus the shell compositions (top
+bar, the drill trail at each level, hero and task cards).
+
+### The shell (`src/components/shell/`)
+
+| Piece | Job | Never |
+| --- | --- | --- |
+| `AppShell` | Skip link, one `<header>` (bar + trail), one `<main id="main-content">`. | Render a second `<main>`, or know which routes exist. |
+| `TopBar` | Brand, the navigation groups (`navGroups(NAV, …)`), the right-hand cluster. A one-item group is a link. | Decide what is disabled. |
+| `NavGroup` | A WAI-ARIA menu button. Arrows/Home/End move and wrap, Escape returns focus, Tab and outside-click close. A disabled item is focusable, `aria-disabled`, with a visible reason. | Keep a closed menu in the DOM, or fire a disabled item. |
+| `DrillTrail` | Portfolio → Client → Location → Eligibility → Employee from the route (`lib/drill.js`). Reached = button, current = `aria-current`, unreached = dimmed text with a hint. Collapses to one line at the book. | Render an unreached rung as a disabled button. |
+| `ShellActions` | The year scope and the account menu (only when signed in). | Offer an action the platform does not provide. |
+
+`shell.css` reads roles only, so both themes share the structure, and it is held
+to the token gate (`check_tokens.py`).
 
 ## Accessibility
 
@@ -168,8 +182,8 @@ busier, not cleaner. The audit that followed, and what it fixed:
 | --- | --- |
 | Icon above label on `Download claim package` and every row `Ask` (Tailwind preflight sets `svg { display: block }`) | `svg.lucide` is inline; any button/link/summary with an `<svg>` child is an inline-flex row. Fixed for both themes. |
 | Chips wrapping to two lines (`ONE FILE`) | `white-space: nowrap` on `.pill` and `.cov-scope`; the engagement list is a 3-column grid. |
-| Navy top bar and navy rail | White bar and white rail with a hairline; selection is a soft brand-blue tint with a 3px bar. |
-| Download button on a row of its own (52px) | It shares a row with the breadcrumb (`.tcc-page-bar`). |
+| Navy top bar and navy rail | White bar and white rail with a hairline; selection is a soft brand-blue tint with a 3px bar. (The rail has since been replaced by a top navigation and a drill trail: D14.) |
+| Download button on a row of its own (52px) | It shares the client tabs row. |
 | Tight, uneven header block | Eyebrow muted at 600, title 600 navy, sub at 90ch, one 16px gap before the content. |
 | Tinted stripes and heavy borders on informational cards | Hairline `--border-subtle`; stripes kept only where they are a verdict. |
 | Grey KPI tiles with shouted uppercase labels | Number over a quiet caption on a light tile. |

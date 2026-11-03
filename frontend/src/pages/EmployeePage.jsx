@@ -14,7 +14,7 @@ import Breadcrumb from '../components/Breadcrumb.jsx';
  */
 export default function EmployeePage({
   clientId, token, year, method = 'min_max', clientName, unitId,
-  onOpenPortfolio, onOpenClient, onOpenUnit, onOpenWhatIf, onBack,
+  onOpenPortfolio, onOpenClient, onOpenUnit, onOpenWhatIf, onBack, showTrail = true,
 }) {
   // A token resolves only where the run that minted it is served. Passing the
   // client-year is what makes this the per-client drill rather than the sealed
@@ -37,7 +37,7 @@ export default function EmployeePage({
 
   return (
     <div>
-      <Breadcrumb trail={trail} />
+      {showTrail ? <Breadcrumb trail={trail} /> : null}
       <EmployeeDrill
         recordToken={token}
         context={context}

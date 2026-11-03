@@ -1,11 +1,10 @@
 /*
- * The modern shell skin: the calm, light, generously spaced look.
+ * The modern page skin: the calm, light, generously spaced look.
  *
  * Everything here is scoped to `html[data-theme="modern"]`, so the classic theme
- * renders as it always did. It re-skins the EXISTING shell and page chrome (top
- * bar, left rail, page header, panels, callouts, tables' header row); the
- * structural rebuild (top navigation, hero, task cards) is the next prompt, and
- * should delete this file's rail and top-bar sections as it replaces them.
+ * renders as it always did. It re-skins the EXISTING page chrome (page header,
+ * panels, callouts, tables' header row). The shell (top bar, navigation, drill
+ * trail) is components/shell/shell.css and is theme-neutral: it reads roles.
  *
  * What "calm" means here, measured against the reference renderings:
  *   - light surfaces and hairline borders instead of navy slabs: the top bar and
@@ -18,17 +17,13 @@
  * Data grids are deliberately not touched beyond their header row: they stay at
  * 12px / 28px rows (the data register).
  */
-html[data-theme="modern"] {
-  --rail-w: 248px;
-}
-
 /* ---- Canvas ---------------------------------------------------------- */
 html[data-theme="modern"] .tcc-app {
   background: var(--surface-page);
 }
 
 html[data-theme="modern"] .tcc-main {
-  padding: calc(var(--topbar-offset) + var(--space-8)) var(--space-13) var(--space-14);
+  padding: var(--space-8) var(--space-13) calc(var(--space-16) + var(--floating-offset));
 }
 
 html[data-theme="modern"] .tcc-main > * {
@@ -48,136 +43,6 @@ html[data-theme="modern"] .ui-kpi-row {
 
 html[data-theme="modern"] .ui-kpi {
   padding: var(--space-6) var(--space-8);
-}
-
-/* ---- Top bar: white, hairline, navy text ------------------------------ */
-html[data-theme="modern"] .tcc-topbar {
-  height: var(--topbar-offset);
-  padding: 0 var(--space-10);
-  color: var(--text-primary);
-  background: var(--surface-card);
-  border-bottom: 1px solid var(--border-subtle);
-  border-image: none;
-  box-shadow: none;
-}
-
-html[data-theme="modern"] .tcc-brand img {
-  width: auto;
-  height: 28px;
-  padding: 0;
-  background: transparent;
-}
-
-html[data-theme="modern"] .tcc-brand > span {
-  background: var(--border-default);
-}
-
-html[data-theme="modern"] .tcc-brand b {
-  font-size: var(--text-subhead);
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-html[data-theme="modern"] .tcc-top-axis,
-html[data-theme="modern"] .tcc-top-btn {
-  height: 36px;
-  padding: 0 var(--space-7);
-  color: var(--text-primary);
-  background: var(--surface-card);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-sm);
-  font-size: var(--text-small);
-  font-weight: 500;
-}
-
-html[data-theme="modern"] .tcc-top-axis select {
-  color: var(--text-primary);
-  font-weight: 500;
-}
-
-html[data-theme="modern"] .tcc-top-btn:hover {
-  background: var(--select-bg);
-  border-color: var(--select-line);
-}
-
-/* ---- Left rail: light, one selected row ------------------------------- */
-html[data-theme="modern"] .tcc-siderail {
-  padding-top: calc(var(--topbar-offset) + var(--space-4));
-  color: var(--text-secondary);
-  background: var(--surface-card);
-  border-right: 1px solid var(--border-subtle);
-}
-
-html[data-theme="modern"] .tcc-rail-section {
-  padding: var(--space-9) var(--space-10) var(--space-3);
-  color: var(--text-muted);
-  font-size: var(--text-caption);
-  font-weight: 600;
-  letter-spacing: 0.04em;
-}
-
-html[data-theme="modern"] .tcc-rung > button,
-html[data-theme="modern"] .tcc-rung > div {
-  min-height: 36px;
-  padding: var(--space-3) var(--space-10);
-  font-size: var(--text-small);
-  border-radius: 0;
-}
-
-html[data-theme="modern"] .tcc-rung.depth-1 > button,
-html[data-theme="modern"] .tcc-rung.depth-1 > div { padding-left: calc(var(--space-10) + var(--space-8)); }
-html[data-theme="modern"] .tcc-rung.depth-2 > button,
-html[data-theme="modern"] .tcc-rung.depth-2 > div,
-html[data-theme="modern"] .tcc-rung.depth-3 > button,
-html[data-theme="modern"] .tcc-rung.depth-3 > div { padding-left: calc(var(--space-10) + var(--space-8) * 2); }
-html[data-theme="modern"] .tcc-rung.depth-4 > button,
-html[data-theme="modern"] .tcc-rung.depth-4 > div { padding-left: calc(var(--space-10) + var(--space-8) * 3); }
-
-html[data-theme="modern"] .tcc-rung.reached > button,
-html[data-theme="modern"] .tcc-rung.reached > div { color: var(--text-default); }
-
-html[data-theme="modern"] .tcc-rung > button:hover,
-html[data-theme="modern"] .tcc-rail-gov button:hover {
-  color: var(--select-strong);
-  background: var(--select-bg);
-}
-
-html[data-theme="modern"] .tcc-rung.current > button,
-html[data-theme="modern"] .tcc-rung.current > div,
-html[data-theme="modern"] .tcc-rail-gov button.active {
-  color: var(--select-strong);
-  background: var(--select-bg);
-  font-weight: 600;
-  box-shadow: inset 3px 0 0 var(--select);
-  border-left-color: transparent;
-}
-
-html[data-theme="modern"] .tcc-rung.pending > div { color: var(--text-muted); }
-
-html[data-theme="modern"] .tcc-rung-hint {
-  padding: 0 var(--space-10) var(--space-3) calc(var(--space-10) + var(--space-8) * 2);
-  color: var(--text-muted);
-  font-size: var(--text-caption);
-  font-style: normal;
-}
-
-html[data-theme="modern"] .tcc-rail-gov button {
-  min-height: 36px;
-  padding: var(--space-3) var(--space-10);
-  color: var(--text-default);
-  font-size: var(--text-small);
-}
-
-html[data-theme="modern"] .tcc-rail-footer {
-  margin: auto var(--space-10) var(--space-8);
-  padding-top: var(--space-6);
-  color: var(--text-muted);
-  border-top: 1px solid var(--border-subtle);
-}
-
-html[data-theme="modern"] .tcc-rail-footer b {
-  color: var(--text-primary);
-  font-size: var(--text-caption);
 }
 
 /* ---- Page header: one rhythm ------------------------------------------ */

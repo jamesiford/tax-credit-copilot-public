@@ -1,9 +1,9 @@
 # UI status
 
-Prompt UI-01 (foundation) of the modern-theme revamp. Branch
-`jamesiford-ui-01-foundation` (cut from `feat/ui-modern-theme`); nothing pushed.
-Decisions and reasons: [UI-DECISIONS.md](UI-DECISIONS.md). Reference:
-[DESIGN-SYSTEM.md](DESIGN-SYSTEM.md).
+Prompts UI-01 (foundation) and UI-02/UI-03 (shell and home) of the modern-theme
+revamp. Branch `jamesiford-ui-01-foundation` (cut from `feat/ui-modern-theme`);
+nothing pushed. Decisions and reasons: [UI-DECISIONS.md](UI-DECISIONS.md).
+Reference: [DESIGN-SYSTEM.md](DESIGN-SYSTEM.md).
 
 ## Work packages
 
@@ -14,8 +14,55 @@ Decisions and reasons: [UI-DECISIONS.md](UI-DECISIONS.md). Reference:
 | UI-01c | Tooling: `check_tokens`, `check_contrast`, per-theme `check_brand`, extended `design_metrics`, `check_all`, theme-aware tools, `mock_api` | done |
 | UI-01d | Docs: `DESIGN-SYSTEM.md`, overlay docs, Frontend rules in `copilot-instructions.md` | done |
 | UI-01e | Layout audit and calm pass (owner-directed): icon-beside-label fix, light shell, rhythm, 1440×900 acceptance viewport | done |
+| UI-02 | Top bar, three dropdown nav groups, drill trail, account menu, floating Ask launcher, skip link; `SideRail` deleted | done |
+| UI-03 | Home hero, four task cards, persisted "Start here" | done |
 
 No work package is blocked.
+
+## UI-02 / UI-03
+
+Measured at 1440×900 against the offline stand-in (D10, D17). "Before" is the
+state at the end of UI-01 (rail shell).
+
+| Page | Visible rows before → after (modern) | First-row y before → after (modern) | Visible rows (classic) |
+| --- | --- | --- | --- |
+| Portfolio (7 rows in the book) | 7 → 7 | 280 → 398 expanded, 318 collapsed | 7 |
+| Client | 13 → 13 | 308 → 295 | 15 |
+| Unit | 17 → 17 | 424 → 415 | 17 |
+
+At 1024×768 (smoke only, no row gate; no horizontal overflow on any page):
+portfolio 7, client 11, unit 9. The unit page loses rows there because its tiles
+wrap; at the pre-revamp baseline it showed 12. Not gated, recorded.
+
+**Expanded "Start here" and the fold.** The book has seven rows and all seven are
+visible either way, so the gate passes expanded. With a longer book the cards
+would push rows below the fold: that is why the collapsed state is the one the
+gate is meant to defend, and why it is remembered once chosen.
+
+**Tests.** 739 → 798, no skips. Selectors that changed:
+`App.test.jsx` `goToView` (a rail button became "open the group, pick the
+`menuitem`"), and a `fetchMe` stub. New: `NavGroup` (keyboard and ARIA),
+`DrillTrail` (each level), `shell.test.jsx` (every `NAV` id reachable, disabled
+with a reason, skip link and focus order, landmarks, account menu), and
+`portfolioHome.test.jsx` (hero → cards → grid, routing, collapse persists).
+`tokens.test.js` ceilings lowered (`--exp-magenta` 8→6, `--exp-gold` 9→6,
+`--exp-violet` 1→0); deprecated aliases 226 → 220.
+
+**Selectors removed from the CSS:** `.tcc-topbar`, `.tcc-brand`, `.tcc-top-context`,
+`.tcc-top-btn`, `.tcc-mobile-menu`, `.tcc-nav-scrim`, `.tcc-siderail`,
+`.tcc-rail-*`, `.tcc-rung*`, `.tcc-has-rail`, `--rail-w`, and the matching
+`chrome-modern.css` sections. The tools' selectors were updated:
+`measure_ui.py` reports `.shell-header` height instead of the sidebar width, and
+`sweep.py` clicks the trail's "Portfolio".
+
+**Routes:** unchanged. `NAV` is still 3 sections and 8 items.
+
+**Known gate failure, not from this work.** `gitleaks detect` scans every ref in
+the repository and reports three `generic-api-key` hits in
+`channel_orchestrator/app/vendor/tcc_shared/MANIFEST.json`, introduced by
+`c6de10f` on another branch (not an ancestor of this one). It is almost
+certainly hashes in a manifest. `gitleaks detect --log-opts=HEAD` finds no leaks
+on this branch. The gate was left as is.
 
 ## Baseline (before any change; same offline stand-in, see D10)
 
@@ -119,5 +166,7 @@ Screenshots are in the gitignored `frontend/tools/sweep-output/`:
   verdict stripes were kept on purpose, everything else should be a hairline.
 - The employee and agents pages in the screenshots show errors because the
   offline stand-in does not serve them; they are not regressions.
-- The shell is still a rail, not a top navigation, hero or task cards: that is
-  the next prompt. `chrome-modern.css` is scaffolding for it.
+- The shell is a top navigation with a drill trail, a hero and task cards on
+  `/` (UI-02/UI-03). Look at the menus open, the trail at each level, and the
+  home page with "Start here" open and closed (`modern-*-1440.png`,
+  `home-expanded.png`, `home-collapsed.png`, `home-menu.png`).

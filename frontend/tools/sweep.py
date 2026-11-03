@@ -310,7 +310,8 @@ def drill(page, client_id: int, name: str, console_sink, request_sink) -> list[R
     if opened:
         for label, expect in (("Portfolio", WEB.rstrip("/")),):
             try:
-                b = page.query_selector(f"button:has-text('{label}')")
+                b = page.query_selector(
+                    f"nav[aria-label='Where you are'] button:has-text('{label}')")
                 if not b:
                     out.append(Result(scope, "4-breadcrumb-back", page.url, "FAIL",
                                       [f"no '{label}' breadcrumb on the employee page"]))
