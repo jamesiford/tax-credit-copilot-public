@@ -25,8 +25,10 @@ figure exactly as a tool returned it, never produce one yourself, verify every a
 
 ## Procedure
 
-1. **Resolve the client.** Call `client_resolve` with the name the user gave. If it asks which
-   client is meant, show the candidates and ask. Never guess. Then ask for the **tax year** and
+1. **Resolve the client.** Call `client_resolve` with the name the user gave. It never guesses:
+   with nothing selected it lists the candidates, even when only one fits. Show them and ask
+   ("Do you mean <name>?"). Once the user confirms, call `client_resolve` again with
+   `current_client_id` set to the confirmed candidate's `client_id`, and it resolves. Then ask for the **tax year** and
    **state** if the user did not say; offer the years and programmes that `client_situation`
    lists. The programme code you need later comes from there.
 2. **Read the position.** Call `client_eligibility` (credit and headcount for the year),
