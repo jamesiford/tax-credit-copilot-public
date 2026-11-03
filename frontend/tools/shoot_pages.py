@@ -24,12 +24,16 @@ OUT = Path(__file__).parent / "sweep-output"
 PAGES = {
     "portfolio": "/",
     "client": "/c/2001?year=2023",
+    "client-whatif": "/c/2001?year=2023&tab=whatif",
     "unit": "/c/2001/u/GA_GA-010?year=2023&method=min_max",
     "employee": "/c/2001/e/tok-0001?year=2023",
     "rules": "/rules",
-    "evidence": "/evidence",
+    "ingestion": "/c/1001/ingestion",
+    "agents": "/c/2001/agents",
+    "evidence": "/c/1001/evidence",
+    "eligibility": "/c/2001/eligibility",
 }
-VIEWPORTS = [(1024, 768), (1440, 900)]
+VIEWPORTS = [(1440, 900)]
 
 
 def main() -> int:

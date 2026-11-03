@@ -1,0 +1,24 @@
+/*
+ * Customer overlay hook. Intentionally empty in this repository.
+ *
+ * A customer re-skins the product by overriding SEMANTIC tokens here, and
+ * nowhere else; no component is edited. `overlays/<name>/theme.css` is copied
+ * over this file before the build (overlays/README.md), the same way the logo
+ * is. It is imported after every token layer, so it wins at equal specificity.
+ *
+ * Override roles, not primitives. For example:
+ *
+ *   :root,
+ *   html[data-theme="modern"] {
+ *     --font-sans: 'Roboto', sans-serif;      // the typeface is a token
+ *     --select: <colour>;                      // selection: active tab, focus
+ *     --select-strong: <colour>;
+ *     --identity-start: <colour>;              // header gradient, primary button
+ *     --identity-end-strong: <colour>;
+ *   }
+ *
+ * What must NOT be re-pointed: the --state-* families' meaning (a verdict is
+ * never the selection colour; check_brand.py fails if they collide) and the
+ * data-register tokens (--text-data, --row-height-data, --cell-pad-data), which
+ * hold the grids inside 1024px.
+ */

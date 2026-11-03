@@ -21,7 +21,8 @@ html[data-theme="classic"] {
   --text-faint: #6b6f82;
   --text-link: #406eb3;
   --text-inverse: #ffffff;
-  --text-inverse-muted: #dbe4f3;
+  --text-inverse-muted: #c7d1e9;
+  --text-inverse-faint: #8294bf;
 
   --surface-page: #f6f7fb;
   --surface-card: #ffffff;
@@ -131,6 +132,10 @@ html[data-theme="classic"] {
 
   /* Tailwind's preflight sets `html { line-height: 1.5 }`, so 1.5 IS the
      previous look, not an invention. */
+  --pill-pad-x: var(--space-5);
+
+  --topbar-offset: 58px;
+
   --leading-base: 1.5;
   --leading-heading: 1.5;
   --leading-dense: 1.5;

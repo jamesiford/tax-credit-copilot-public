@@ -35,10 +35,11 @@ html[data-theme="modern"] {
   --text-link: var(--brand-700);
   --text-inverse: var(--white);
   --text-inverse-muted: var(--brand-100);
+  --text-inverse-faint: var(--denim-200);
 
   /* Surfaces. `subtle` is the one step between a card and the page: table
      heads, inset blocks, tab strips. */
-  --surface-page: var(--brand-50);
+  --surface-page: var(--white);
   --surface-card: var(--white);
   --surface-subtle: var(--denim-50);
   --surface-raised: var(--grey-100);
@@ -90,9 +91,12 @@ html[data-theme="modern"] {
   --status-info: var(--sky-800);
   --status-info-bg: var(--sky-100);
 
-  --status-base-bg: var(--brand-75);
-  --status-base-ink: var(--brand-700);
-  --status-base-line: var(--brand-200);
+  /* Base year is a SKY blue, deliberately not the brand blue: the brand blue
+     means "selected", and a verdict that looks selected is the confusion the
+     two-job rule exists to prevent (check_brand.py asserts they differ). */
+  --status-base-bg: var(--sky-100);
+  --status-base-ink: var(--sky-800);
+  --status-base-line: var(--sky-300);
 
   --status-ok-bg: var(--green-50);
   --status-ok-ink: var(--green-700);
@@ -110,7 +114,7 @@ html[data-theme="modern"] {
   --status-neutral-ink: var(--grey-700);
   --status-neutral-line: var(--grey-300);
 
-  --badge-bg: var(--red-400);
+  --badge-bg: var(--red-500);
   --badge-ink: var(--white);
 
   /* Charts and the choropleth, derived from brand, teal, sky and status
@@ -150,6 +154,14 @@ html[data-theme="modern"] {
      box is ~28% taller than Roboto's, and an unset line-height would spend
      that on every line of every card. `base` is body copy; `heading` is a
      title; `dense` is a compact chrome row such as a tab or breadcrumb. */
+  /* The legacy .pill's horizontal padding. Pills in a 12px grid column are
+     wider in this theme (the data register holds them at 12px, not 11px), so
+     the padding gives back what the type took. */
+  --pill-pad-x: var(--space-4);
+
+  /* A taller, quieter top bar than the classic 58px. */
+  --topbar-offset: 64px;
+
   --leading-base: 1.35;
   --leading-heading: 1.1;
   --leading-dense: 1.25;

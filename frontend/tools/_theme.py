@@ -9,6 +9,12 @@ build default (modern) applies, so every tool still runs unchanged.
 from __future__ import annotations
 
 import os
+import sys
+
+# Several tools print glyphs (arrows, em dashes) read off the page; a Windows
+# console defaulting to cp1252 would otherwise crash them mid-report.
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 
 def theme() -> str | None:
@@ -16,7 +22,7 @@ def theme() -> str | None:
     return value if value in ("modern", "classic") else None
 
 
-def new_page(browser, width: int = 1024, height: int = 768):
+def new_page(browser, width: int = 1440, height: int = 900):
     context = browser.new_context(viewport={"width": width, "height": height})
     chosen = theme()
     if chosen:

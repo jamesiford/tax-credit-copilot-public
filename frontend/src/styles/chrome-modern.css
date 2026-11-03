@@ -1,0 +1,427 @@
+/*
+ * The modern shell skin: the calm, light, generously spaced look.
+ *
+ * Everything here is scoped to `html[data-theme="modern"]`, so the classic theme
+ * renders as it always did. It re-skins the EXISTING shell and page chrome (top
+ * bar, left rail, page header, panels, callouts, tables' header row); the
+ * structural rebuild (top navigation, hero, task cards) is the next prompt, and
+ * should delete this file's rail and top-bar sections as it replaces them.
+ *
+ * What "calm" means here, measured against the reference renderings:
+ *   - light surfaces and hairline borders instead of navy slabs: the top bar and
+ *     the rail are white, and selection is a soft blue tint, not an inverse fill;
+ *   - one gutter (--space-13) and one rhythm between blocks (--space-10);
+ *   - titles in sentence case at 600 weight, not 800-weight uppercase labels;
+ *   - no tinted left stripes, no grid-paper page, no shadow at rest;
+ *   - an icon sits BESIDE its label, always.
+ *
+ * Data grids are deliberately not touched beyond their header row: they stay at
+ * 12px / 28px rows (the data register).
+ */
+html[data-theme="modern"] {
+  --rail-w: 248px;
+}
+
+/* ---- Canvas ---------------------------------------------------------- */
+html[data-theme="modern"] .tcc-app {
+  background: var(--surface-page);
+}
+
+html[data-theme="modern"] .tcc-main {
+  padding: calc(var(--topbar-offset) + var(--space-8)) var(--space-13) var(--space-14);
+}
+
+html[data-theme="modern"] .tcc-main > * {
+  max-width: 1320px;
+}
+
+/* A panel that holds a data grid keeps its padding to the sides but gives the
+   grid its height back: the rows are the point of the page. */
+html[data-theme="modern"] .tcc-main .panel:has(> .tbl-scroll),
+html[data-theme="modern"] .tcc-main .panel:has(> table) {
+  padding-block: var(--space-7);
+}
+
+html[data-theme="modern"] .ui-kpi-row {
+  margin-bottom: var(--space-8);
+}
+
+html[data-theme="modern"] .ui-kpi {
+  padding: var(--space-6) var(--space-8);
+}
+
+/* ---- Top bar: white, hairline, navy text ------------------------------ */
+html[data-theme="modern"] .tcc-topbar {
+  height: var(--topbar-offset);
+  padding: 0 var(--space-10);
+  color: var(--text-primary);
+  background: var(--surface-card);
+  border-bottom: 1px solid var(--border-subtle);
+  border-image: none;
+  box-shadow: none;
+}
+
+html[data-theme="modern"] .tcc-brand img {
+  width: auto;
+  height: 28px;
+  padding: 0;
+  background: transparent;
+}
+
+html[data-theme="modern"] .tcc-brand > span {
+  background: var(--border-default);
+}
+
+html[data-theme="modern"] .tcc-brand b {
+  font-size: var(--text-subhead);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+html[data-theme="modern"] .tcc-top-axis,
+html[data-theme="modern"] .tcc-top-btn {
+  height: 36px;
+  padding: 0 var(--space-7);
+  color: var(--text-primary);
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-small);
+  font-weight: 500;
+}
+
+html[data-theme="modern"] .tcc-top-axis select {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+html[data-theme="modern"] .tcc-top-btn:hover {
+  background: var(--select-bg);
+  border-color: var(--select-line);
+}
+
+/* ---- Left rail: light, one selected row ------------------------------- */
+html[data-theme="modern"] .tcc-siderail {
+  padding-top: calc(var(--topbar-offset) + var(--space-4));
+  color: var(--text-secondary);
+  background: var(--surface-card);
+  border-right: 1px solid var(--border-subtle);
+}
+
+html[data-theme="modern"] .tcc-rail-section {
+  padding: var(--space-9) var(--space-10) var(--space-3);
+  color: var(--text-muted);
+  font-size: var(--text-caption);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+html[data-theme="modern"] .tcc-rung > button,
+html[data-theme="modern"] .tcc-rung > div {
+  min-height: 36px;
+  padding: var(--space-3) var(--space-10);
+  font-size: var(--text-small);
+  border-radius: 0;
+}
+
+html[data-theme="modern"] .tcc-rung.depth-1 > button,
+html[data-theme="modern"] .tcc-rung.depth-1 > div { padding-left: calc(var(--space-10) + var(--space-8)); }
+html[data-theme="modern"] .tcc-rung.depth-2 > button,
+html[data-theme="modern"] .tcc-rung.depth-2 > div,
+html[data-theme="modern"] .tcc-rung.depth-3 > button,
+html[data-theme="modern"] .tcc-rung.depth-3 > div { padding-left: calc(var(--space-10) + var(--space-8) * 2); }
+html[data-theme="modern"] .tcc-rung.depth-4 > button,
+html[data-theme="modern"] .tcc-rung.depth-4 > div { padding-left: calc(var(--space-10) + var(--space-8) * 3); }
+
+html[data-theme="modern"] .tcc-rung.reached > button,
+html[data-theme="modern"] .tcc-rung.reached > div { color: var(--text-default); }
+
+html[data-theme="modern"] .tcc-rung > button:hover,
+html[data-theme="modern"] .tcc-rail-gov button:hover {
+  color: var(--select-strong);
+  background: var(--select-bg);
+}
+
+html[data-theme="modern"] .tcc-rung.current > button,
+html[data-theme="modern"] .tcc-rung.current > div,
+html[data-theme="modern"] .tcc-rail-gov button.active {
+  color: var(--select-strong);
+  background: var(--select-bg);
+  font-weight: 600;
+  box-shadow: inset 3px 0 0 var(--select);
+  border-left-color: transparent;
+}
+
+html[data-theme="modern"] .tcc-rung.pending > div { color: var(--text-muted); }
+
+html[data-theme="modern"] .tcc-rung-hint {
+  padding: 0 var(--space-10) var(--space-3) calc(var(--space-10) + var(--space-8) * 2);
+  color: var(--text-muted);
+  font-size: var(--text-caption);
+  font-style: normal;
+}
+
+html[data-theme="modern"] .tcc-rail-gov button {
+  min-height: 36px;
+  padding: var(--space-3) var(--space-10);
+  color: var(--text-default);
+  font-size: var(--text-small);
+}
+
+html[data-theme="modern"] .tcc-rail-footer {
+  margin: auto var(--space-10) var(--space-8);
+  padding-top: var(--space-6);
+  color: var(--text-muted);
+  border-top: 1px solid var(--border-subtle);
+}
+
+html[data-theme="modern"] .tcc-rail-footer b {
+  color: var(--text-primary);
+  font-size: var(--text-caption);
+}
+
+/* ---- Page header: one rhythm ------------------------------------------ */
+html[data-theme="modern"] .tcc-header,
+html[data-theme="modern"] .tcc-page-header {
+  margin-bottom: var(--space-8);
+}
+
+html[data-theme="modern"] .tcc-eyebrow {
+  margin-bottom: var(--space-2);
+  color: var(--text-muted);
+  font-size: var(--text-caption);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+html[data-theme="modern"] .page-title {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+html[data-theme="modern"] .tcc-header .page-sub,
+html[data-theme="modern"] .tcc-page-header .page-sub {
+  margin: var(--space-4) 0 0;
+  max-width: 90ch;
+  font-size: var(--text-body);
+  color: var(--text-secondary);
+}
+
+html[data-theme="modern"] .tcc-breadcrumb {
+  margin-bottom: var(--space-8);
+}
+
+/* ---- Cards, callouts, panels ------------------------------------------ */
+html[data-theme="modern"] .panel,
+html[data-theme="modern"] .tcc-main .panel {
+  padding: var(--space-9) var(--space-10);
+  margin-bottom: var(--space-10);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  box-shadow: none;
+}
+
+html[data-theme="modern"] .panel-title,
+html[data-theme="modern"] .tcc-main .panel-title {
+  margin-bottom: var(--space-6);
+  font-size: var(--text-subhead);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+html[data-theme="modern"] .panel-title .right,
+html[data-theme="modern"] .tcc-main .panel-title .right {
+  font-size: var(--text-caption);
+  color: var(--text-muted);
+}
+
+html[data-theme="modern"] .panel-note,
+html[data-theme="modern"] .panel-sub {
+  max-width: 80ch;
+  color: var(--text-secondary);
+}
+
+html[data-theme="modern"] .callout,
+html[data-theme="modern"] .callout.info {
+  margin-bottom: var(--space-10);
+  padding: var(--space-7) var(--space-9);
+  color: var(--text-secondary);
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+}
+
+html[data-theme="modern"] .callout.warn {
+  color: var(--text-default);
+  background: var(--state-partial);
+  border-color: var(--state-partial-line);
+}
+
+html[data-theme="modern"] .callout.exposure {
+  border-left-width: 1px;
+}
+
+/* ---- Tables: the header row only; the cells are the data register ------ */
+html[data-theme="modern"] .tcc-main thead th {
+  color: var(--text-secondary);
+  background: var(--surface-subtle);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+html[data-theme="modern"] .tcc-main tbody tr:hover {
+  background: var(--surface-subtle);
+}
+
+/* ---- Buttons: the legacy classes wear the new look ---------------------- */
+html[data-theme="modern"] .btn {
+  padding: var(--space-4) var(--space-8);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-small);
+  font-weight: 600;
+}
+
+html[data-theme="modern"] .btn-primary {
+  color: var(--on-select);
+  background: linear-gradient(var(--identity-start), var(--identity-end-strong));
+}
+
+html[data-theme="modern"] .btn-primary:hover {
+  background: linear-gradient(var(--identity-start), var(--identity-start));
+  box-shadow: var(--shadow-2);
+}
+
+html[data-theme="modern"] .btn-secondary {
+  color: var(--text-primary);
+  background: var(--surface-card);
+  border-color: var(--border-default);
+}
+
+html[data-theme="modern"] .btn-secondary:hover {
+  background: var(--select-bg);
+  border-color: var(--select-line);
+}
+
+html[data-theme="modern"] .tcc-claim-package {
+  margin-bottom: var(--space-8);
+}
+
+html[data-theme="modern"] .tcc-ask {
+  padding: var(--space-2) var(--space-5);
+  font-size: var(--text-caption);
+}
+
+/* ---- Informational cards: a hairline, not a coloured stripe --------------
+   A stripe is a verdict (`.prog-verdict`, `.tcc-invariant`, `.finding`,
+   `.trend-block.attention` keep theirs). These carried one as decoration. */
+html[data-theme="modern"] :is(
+  .tcc-formula-pair > div, .tcc-method-card, .tcc-recon-grid > div, .tcc-history-strip > div,
+  .tcc-assumption-list article, .tcc-agent-grid article
+) {
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+}
+
+html[data-theme="modern"] :is(.scope-bar, .tcc-near-panel, .tcc-security-banner, .tcc-awaiting) {
+  border-width: 1px;
+  border-radius: var(--radius);
+  box-shadow: none;
+}
+
+/* ---- Pipeline stage cards: a figure and a caption, not a poster ---------- */
+html[data-theme="modern"] .ingest-stage {
+  padding: var(--space-8);
+  border-color: var(--border-subtle);
+  border-radius: var(--radius);
+}
+
+html[data-theme="modern"] .ingest-stage-count {
+  font-size: var(--text-title);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+html[data-theme="modern"] .ingest-stage-name {
+  margin-top: var(--space-2);
+  font-size: var(--text-small);
+  font-weight: 600;
+  color: var(--text-default);
+}
+
+html[data-theme="modern"] .ingest-stage-note {
+  font-size: var(--text-caption);
+  color: var(--text-secondary);
+}
+
+/* ---- Lists of label / chip / explanation: aligned columns --------------- */
+html[data-theme="modern"] .cov-engagements li {
+  display: grid;
+  grid-template-columns: 200px 140px 1fr;
+  gap: var(--space-8);
+  align-items: baseline;
+  padding: var(--space-5) 0;
+}
+
+html[data-theme="modern"] .cov-engagements li em {
+  color: var(--text-secondary);
+}
+
+/* ---- Page bar: the trail and the page's one action share a row --------- */
+html[data-theme="modern"] .tcc-page-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8);
+  margin-bottom: var(--space-6);
+}
+
+html[data-theme="modern"] .tcc-page-bar .tcc-breadcrumb,
+html[data-theme="modern"] .tcc-page-bar .tcc-claim-package {
+  margin: 0;
+}
+
+/* ---- Section tabs: an underline, not a grey strip ----------------------- */
+html[data-theme="modern"] .section-tabs {
+  padding-left: 0;
+  background: transparent;
+}
+
+html[data-theme="modern"] .tcc-client-tabs {
+  margin-bottom: var(--space-7);
+}
+
+/* ---- Insight line and the book's map: quieter ---------------------------- */
+html[data-theme="modern"] .tcc-insight {
+  margin-bottom: var(--space-6);
+}
+
+html[data-theme="modern"] .tcc-insight-caption {
+  color: var(--text-secondary);
+}
+
+/* The dot between figures was --line (a border colour) used as text. */
+html[data-theme="modern"] .figure-line span {
+  color: var(--text-muted);
+}
+
+html[data-theme="modern"] .tcc-footprint > summary {
+  margin-bottom: var(--space-6);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+html[data-theme="modern"] .tcc-footprint-row {
+  gap: var(--space-13);
+}
+
+html[data-theme="modern"] .tcc-footprint .footprint-map {
+  flex: 0 0 300px;
+  max-width: 300px;
+}
+
+html[data-theme="modern"] .tcc-footprint-list p {
+  max-width: 64ch;
+  font-size: var(--text-caption);
+  color: var(--text-muted);
+}

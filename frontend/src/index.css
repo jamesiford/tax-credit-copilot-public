@@ -373,7 +373,31 @@ body {
 
 .top-actions-local { display: flex; gap: var(--space-4); }
 
+/* Preflight makes every <svg> a block, so an icon placed before a label drops
+   onto its own line (the "Download claim package" and row "Ask" buttons). Any
+   control that holds an icon as a direct child lays it out BESIDE the label.
+   `:where` keeps this at element specificity, so a class that sets its own
+   display (a grid, a column) still wins. */
+:where(button, a, summary):has(> svg) {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* The same preflight rule drops an icon inside a heading's <span> onto its own
+   line. Icons are inline, sit on the text's baseline, and never shrink. */
+svg.lucide {
+  display: inline-block;
+  flex: none;
+  vertical-align: -0.2em;
+}
+
 .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  white-space: nowrap;
   padding: var(--space-4) var(--space-7);
   border-radius: var(--radius);
   font-size: var(--text-strong);
@@ -384,7 +408,7 @@ body {
 }
 
 .btn-primary { background: var(--exp-primary); color: var(--on-accent); }
-.btn-primary:hover { background: var(--state-base-year-ink); }
+.btn-primary:hover { background: var(--surface-inverse); }
 
 .btn-secondary { background: var(--panel); border-color: var(--line); color: var(--ink-2); }
 .btn-secondary:hover { background: var(--surface-2); }
@@ -427,7 +451,8 @@ body {
 
 .pill {
   display: inline-block;
-  padding: var(--space-1) var(--space-5);
+  white-space: nowrap;
+  padding: var(--space-1) var(--pill-pad-x);
   border-radius: var(--radius-xl);
   font-size: var(--text-small);
   font-weight: 600;
@@ -1509,7 +1534,7 @@ button.pill-action.pill-forecast-ok, button.pill-action.pill-forecast-bad { bord
   gap: var(--space-8);
   padding: 0 var(--space-8);
   color: var(--on-accent);
-  background: var(--state-base-year-ink);
+  background: var(--surface-inverse);
   border-bottom: 3px solid transparent;
   border-image: linear-gradient(90deg, var(--exp-gold), var(--exp-magenta) 45%, var(--exp-violet)) 1;
   box-shadow: 0 3px 16px rgba(20, 37, 78, 0.22);
@@ -1575,13 +1600,13 @@ button.pill-action.pill-forecast-ok, button.pill-action.pill-forecast-bad { bord
   height: 100vh;
   padding-top: calc(var(--topbar-offset) - var(--space-4));
   overflow-y: auto;
-  color: #c7d1e9;
-  background: var(--state-base-year-ink);
+  color: var(--text-inverse-muted);
+  background: var(--surface-inverse);
 }
 
 .tcc-rail-section {
   padding: var(--space-5) var(--space-6) var(--space-2);
-  color: #8294bf;
+  color: var(--text-inverse-faint);
   font-size: var(--text-micro);
   font-weight: 700;
   letter-spacing: .08em;
@@ -1633,7 +1658,7 @@ button.pill-action.pill-forecast-ok, button.pill-action.pill-forecast-bad { bord
 .tcc-rung-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .tcc-rung.reached > button,
-.tcc-rung.reached > div { color: #dfe6f8; }
+.tcc-rung.reached > div { color: var(--text-inverse-muted); }
 
 .tcc-rung.current > button,
 .tcc-rung.current > div {
@@ -1644,13 +1669,13 @@ button.pill-action.pill-forecast-ok, button.pill-action.pill-forecast-bad { bord
 }
 
 /* Not reached yet. Dimmed, and deliberately not a control. */
-.tcc-rung.pending > div { color: #6e7fa8; }
+.tcc-rung.pending > div { color: var(--text-inverse-faint); }
 .tcc-rung.pending svg { opacity: .55; }
 
 .tcc-rung-hint {
   display: block;
   padding: 0 var(--space-6) var(--space-2) calc(var(--space-5) + 33px);
-  color: #6e7fa8;
+  color: var(--text-inverse-faint);
   font-size: var(--text-micro);
   font-style: italic;
   line-height: 1.3;
@@ -1667,7 +1692,7 @@ button.pill-action.pill-forecast-ok, button.pill-action.pill-forecast-bad { bord
   gap: var(--space-3);
   min-height: 32px;
   padding: var(--space-2) var(--space-5);
-  color: #c7d1e9;
+  color: var(--text-inverse-muted);
   background: transparent;
   border: 0;
   border-left: 3px solid transparent;
@@ -1693,10 +1718,10 @@ button.pill-action.pill-forecast-ok, button.pill-action.pill-forecast-bad { bord
   margin: auto var(--space-5) var(--space-6);
   padding: var(--space-4) var(--space-2) 0;
   border-top: 1px solid rgba(255,255,255,.12);
-  color: #aebddd;
+  color: var(--text-inverse-muted);
 }
 .tcc-rail-footer span { display: flex; flex-direction: column; }
-.tcc-rail-footer b { color: #dfe6f8; font-size: var(--text-micro); }
+.tcc-rail-footer b { color: var(--text-inverse-muted); font-size: var(--text-micro); }
 .tcc-rail-footer small { margin-top: 1px; font-size: var(--text-caption); }
 
 /* The main column clears the rail. */
@@ -1963,7 +1988,7 @@ button.pill-action.pill-forecast-ok, button.pill-action.pill-forecast-bad { bord
 .cov-engagements li { display: flex; gap: var(--space-5); align-items: center; padding: var(--space-3) 0; border-bottom: 1px solid var(--line-2); font-size: var(--text-small); }
 .cov-engagements li b { min-width: 130px; }
 .cov-engagements li em { color: var(--muted); font-style: normal; }
-.cov-scope { padding: var(--space-1) var(--space-3); border-radius: var(--radius-sm); font-size: var(--text-micro); font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
+.cov-scope { padding: var(--space-1) var(--space-3); border-radius: var(--radius-sm); font-size: var(--text-micro); font-weight: 700; letter-spacing: .05em; text-transform: uppercase; white-space: nowrap; }
 .cov-scope-in_scope { color: var(--state-above-min-ink); background: var(--state-above-min); }
 .cov-scope-out_of_scope { color: var(--ink-3); background: var(--surface-3); }
 .cov-scope-prospective { color: var(--accent-2-strong); background: var(--accent-2-bg); }

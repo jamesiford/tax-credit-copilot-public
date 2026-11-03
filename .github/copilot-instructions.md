@@ -1081,42 +1081,82 @@ for a client whose Gold holds only TY2023. 964 rows had accumulated. Stub
 - **`src/components/` are views and reusable components**, one `.test.jsx` each.
 - **`src/api.js` is the only network layer.** Components never call `fetch`.
   A new endpoint gets a wrapper and an `api.test.js` case.
-- **1024×768 is the acceptance target.** Desktop only; mobile is out of scope.
-- **Blue reads, purple selects.** The two accents do different jobs and must
-  not be swapped.
-  - `--accent` / `--accent-strong` / `--accent-bg` — blue. Anything that
-    encodes a *reading*: a figure, a status, a statutory verdict.
-  - `--accent-2` / `--accent-2-strong` / `--accent-2-bg` — purple, aliasing
-    `--exp-violet` / `--exp-purple`. Chrome *selection* only: the active nav
-    entry, active tab, selected row, focus ring, open menu item.
+- **1440×900 is the acceptance target.** Desktop only; mobile is out of scope
+  (owner decision, UI-01: the frame that shows the full width is the one the
+  design is judged in). Nothing is measured below 1280px.
+- **Two jobs, two treatments, never swapped.** (Re-expressed in the UI-01
+  revamp; the principle is unchanged, only the hues moved.)
+  - **Selection** — the active nav entry, active tab, selected row, focus ring,
+    open menu item, current step — is the brand blue: `--select`,
+    `--select-strong`, `--select-bg`, `--select-line`, `--focus-ring`.
+  - **Readings** — a figure, a status, a statutory verdict — are navy figures
+    (`--reading*`, `--text-primary`) plus the `--state-*` pills and tints. A
+    verdict is **never** the selection blue.
 
-  Never reach past these to `--exp-purple` / `--exp-violet` directly. The
-  distinction is what stops a selected tab being mistaken for a verdict, and
-  the brand guide is explicit that purple and magenta "should be used
-  generously" — so purple is not decoration to be avoided, it is the
-  selection language.
+  Purple and violet are an optional overlay accent now
+  (`--overlay-accent*`), not a requirement; the classic theme still maps
+  selection to purple. The distinction is what stops a selected tab being
+  mistaken for a verdict, and `check_brand.py` enforces it: no selection colour
+  may equal a state colour. `--accent*`, `--accent-2*` and `--exp-*` are
+  **deprecated aliases** that still resolve; `src/lib/tokens.test.js` is a
+  ratchet that fails if their use grows. Read the role, not the alias.
+- **Tokens are layers: primitive → role → component** (`src/styles/tokens/`).
+  A component reads a semantic role, never a primitive such as `--brand-500`;
+  a theme assigns roles from primitives. `html[data-theme="modern"|"classic"]`
+  selects the theme (`VITE_THEME`, default modern; `classic` is the previous
+  look, kept so the revamp can be rolled back by configuration). A customer
+  re-skins by overriding roles in `src/styles/overlay.css`, never by editing a
+  component. [docs/design/DESIGN-SYSTEM.md](../docs/design/DESIGN-SYSTEM.md).
 - **A reading is named for what it means, not what it looks like.** State
   tokens are `--state-base-year`, `--state-above-min`, `--state-below-min`,
   `--state-partial`, `--state-neutral`, each with `-ink` and `-line`. A name
   that describes the hue invites reuse where it means nothing.
 
-  `--state-base-year` (blue) and `--state-below-min` (orange) mean different
-  things — "we hold no prior year to measure against" versus "they did not
-  grow enough". They must never converge.
-- **State tokens alias, they do not restate.** `--state-below-min: var(--bad-bg)`,
-  not a fresh literal. A literal is how a tint silently drifts during a
+  `--state-base-year` (sky blue in the modern theme) and `--state-below-min`
+  (red) mean different things — "we hold no prior year to measure against"
+  versus "they did not grow enough". They must never converge, and base year
+  must never be the selection blue (`check_brand.py` measures both).
+- **State tokens alias, they do not restate.** `--state-below-min:
+  var(--status-bad-bg)`, not a fresh literal (`tokens.test.js` fails on a
+  literal in `state.css`). A literal is how a tint silently drifts during a
   migration.
-- **Roboto, self-hosted.** The brand's specified web font, via `@fontsource`
-  imports in `main.jsx`. Never hotlink Google Fonts — a demo on a network that
+- **The typeface is a theme token, `--font-sans`, self-hosted.** Poppins in the
+  modern theme, Roboto in the classic one and in a customer overlay that points
+  it back, both via `@fontsource` imports in `main.jsx`. The data register uses
+  `--font-data` (Roboto): Poppins runs ~10% wider, which a 17-column grid
+  cannot afford. Never hotlink Google Fonts — a demo on a network that
   cannot reach `fonts.gstatic.com` falls back silently.
-- **Type is a scale of eight, named for the job.** `--text-micro`,
-  `--text-caption`, `--text-small`, `--text-body`, `--text-strong`,
-  `--text-subhead`, `--text-title`, `--text-display`. **A raw `px` in a
-  `font-size` is a bug, and a half-pixel size is always a bug.** There were 23
-  sizes across 321 uses, 105 of them at 9.5/10.5/11.5/12.5px — nobody designs a
-  half-pixel step, that is one person nudging one screen until it looked right.
-  A token named for its size invites the next 12.5px, which is why none of them
-  are.
+- **Type is a scale of eight, named for the job, and a theme token.**
+  `--text-micro`, `--text-caption`, `--text-small`, `--text-body`,
+  `--text-strong`, `--text-subhead`, `--text-title`, `--text-display`
+  (modern 12/12/13/14/15/16/24/32, classic 9/10/11/12/13/14/18/22).
+  **A raw `px` in a `font-size` is a bug, and a half-pixel size is always a
+  bug.** There were 23 sizes across 321 uses, 105 of them at
+  9.5/10.5/11.5/12.5px — nobody designs a half-pixel step, that is one person
+  nudging one screen until it looked right. A token named for its size invites
+  the next 12.5px, which is why none of them are. Line height is a token too
+  (`--leading-base|heading|dense`).
+- **Density has two registers.** *Chrome and composition* (header, hero, cards,
+  tiles, tabs, pills, stepper, workspace) use the comfortable scale; **data
+  grids stay dense**: `--text-data` (12px), `--row-height-data` (28px) and
+  `--cell-pad-data` (8px), which no theme changes. A table cell, header,
+  figure or verbatim engine output reads `--text-data`, and inside a `table`
+  or `.trend-block` the modern theme collapses the chrome steps onto it. The
+  visible-row gate at 1440×900 must not regress.
+- **Chrome is calm; the audit is a checklist.** The reference look is light
+  surfaces, hairline borders, one page gutter (`--space-13`) and one rhythm
+  between blocks (`--space-10`). Before a page ships, check it at 1440×900
+  against this list: (1) an icon sits BESIDE its label — never above it (the
+  Tailwind preflight makes every `<svg>` a block, which is why
+  `svg.lucide` and `:where(button, a, summary):has(> svg)` are inline in
+  `index.css`); (2) a chip, pill or button label never wraps (`nowrap`);
+  (3) no coloured stripe unless it is a verdict (`.prog-verdict`, `.finding`);
+  (4) titles are sentence case at 600 weight, not 800-weight uppercase;
+  (5) a page's one primary action shares a row with its breadcrumb
+  (`.tcc-page-bar`), not a row of its own; (6) text blocks stop at ~80ch. The
+  modern shell skin is `src/styles/chrome-modern.css`, scoped to
+  `html[data-theme="modern"]` so classic is untouched; the structural rebuild
+  (top navigation, hero, task cards) replaces its rail and top-bar sections.
 - **A half-pixel size is a density problem wearing a font-size.** Fix it with
   `line-height` or `letter-spacing`, which is what it was actually asking for.
   `.tcc-cell-btn` is the worked example: it bought its 28px row with 10px type
@@ -1125,19 +1165,21 @@ for a client whose Gold holds only TY2023. 964 rows had accumulated. Stub
   figures, verbatim engine output. Chrome (eyebrows, chip captions, pills,
   superscripts) may go smaller; data may not, and anything below the floor
   needs a stated reason in a comment. IBM Carbon puts data-table row text at
-  **14px**; we sit at 12 because the trend grid is 17 columns in a 1024px
+  **14px**; we sit at 12 because the trend grid is 17 columns in one
   viewport. Nothing ever CHOSE 9px — 9px is what was left when nobody owned
   the scale. Check it with `frontend/tools/check_type_floor.py`, which reads
   COMPUTED sizes off the rendered page; a selector audit over-reports, because
   `.th-sort sup` is a superscript, not a table header.
-- **Padding, margin and gap use `--space-1..10`; a raw `px` in one is a bug.**
-  Two-pixel steps to 16, then 20 and 24. The previous five-step scale was used
-  ELEVEN times against 381 raw declarations because the values people needed —
-  2, 4, 8, 12, 14 — were not on it: a scale nobody can hit is a scale nobody
-  uses. Odd values round DOWN, because rounding up costs rows.
-- **Radius is `--radius-sm|--radius|--radius-lg|--radius-xl|--radius-pill`.**
-  17 distinct radii were being written by hand; 4px beside 5px beside 6px is
-  drift, not a decision. `50%` stays raw — a circle is a shape, not a step.
+- **Padding, margin and gap use `--space-1..16`; a raw `px` in one is a bug.**
+  Two-pixel steps to 16, then 20 and 24 (the dense scale, `--space-1..10`), and
+  28/32/40/48/56/64 for chrome (`--space-11..16`). The previous five-step scale
+  was used ELEVEN times against 381 raw declarations because the values people
+  needed — 2, 4, 8, 12, 14 — were not on it: a scale nobody can hit is a scale
+  nobody uses. Odd values round DOWN, because rounding up costs rows.
+- **Radius is `--radius-sm|--radius|--radius-lg|--radius-xl|--radius-pill`**
+  (modern 8/12/16/20/pill, classic 3/5/8/12). 17 distinct radii were being
+  written by hand; 4px beside 5px beside 6px is drift, not a decision. `50%`
+  stays raw — a circle is a shape, not a step.
 - **No `style={{ }}`.** It steps around every token above, which makes the
   whole system a suggestion. Use a class; `.u-mt-*` / `.u-mb-*` / `.u-ml-*` are
   the sanctioned spacing utilities and are token-valued so a component cannot
@@ -1145,24 +1187,33 @@ for a client whose Gold holds only TY2023. 964 rows had accumulated. Stub
   COMPUTED per render (the tour progress bar), and `react-simple-maps`, whose
   `style` is a library **prop** taking default/hover/pressed objects that no
   class can express. Its fills are read from `--map-*` so the legend and the
-  map cannot disagree.
-- **Compose the shared components; do not hand-roll their job.** `PageHeader`
-  owns eyebrow/title/sub/actions, `StatCard` + `StatRow` the figure strip,
-  `Breadcrumb` the trail, `MethodTabs` the Min-Max/Pay Period choice,
-  `GridTabs` two peer grids over one scope, `InsightBar` the page-opening
-  caption, notes and Copilot summary, `ColumnFilter` + `FilterBar` the per-column narrowing. A second
+  map cannot disagree; no literal colour appears in chart or map code.
+  `frontend/tools/check_tokens.py` fails on a literal colour or raw-`px`
+  spacing in `src/components/ui/*.css` and on any other inline style.
+- **Compose the shared components; do not hand-roll their job.** The set is
+  `src/components/ui/` (`Button`, `Card`, `Pill`, `CountBadge`, `Tabs`,
+  `KpiTile`/`KpiRow`, `Callout`, `Stepper`, `TaskCard`, `HeroBand`,
+  `MetaLine`, `SectionHeading`, `FloatingAction`, `EmptyState`, `Skeleton`),
+  and there is ONE of each: `PageHeader` owns eyebrow/title/sub/meta/actions,
+  `KpiTile` + `KpiRow` the figure strip (they replaced `StatCard`/`StatRow` and
+  three hand-rolled `kpi-card` markups), `Tabs` every tab (`MethodTabs`,
+  `GridTabs` and `SectionTabs` are wrappers), `Breadcrumb` the trail,
+  `InsightBar` the page-opening caption, notes and Copilot summary,
+  `ColumnFilter` + `FilterBar` the per-column narrowing. The legacy `.pill-*`
+  classes still exist and migrate to `Pill` with the page work. A second
   `PageHeader` once lived in `ReferenceViews.jsx` with a different prop name and
   different classes, and eight call sites used it — two header treatments kept
   in step by hand. If a shared component genuinely cannot express what a view
   needs, say so and leave the duplicate: an abstraction bent to fit is worse
   than an honest one.
 - **Two peer grids over one scope are TABS, and the tab carries its count.**
-  `GridTabs` reuses the `MethodTabs` shape on purpose — a third tab style makes
-  "which of these is a tab" something a reader works out — but takes the purple
-  accent, because MethodTabs picks a statutory *reading* and this picks which
-  *population* is on screen. "Who to call" does not tell you whether to click;
-  "Who to call (4)" does. **Which tab opens first is a decision that gets
-  stated**: the complete population opens, never a ranked subset of it.
+  `GridTabs` and `MethodTabs` are both `ui/Tabs` on purpose — a third tab style
+  makes "which of these is a tab" something a reader works out. Both take the
+  selection colour; they differ in the question: MethodTabs picks a statutory
+  *reading* and this picks which *population* is on screen. "Who to call" does
+  not tell you whether to click; "Who to call (4)" does. **Which tab opens
+  first is a decision that gets stated**: the complete population opens, never
+  a ranked subset of it.
 - **If a sentence names a fact, the page must be able to show it.** The
   portfolio answer band names the client closest to qualifying and the evidence
   is in the other tab, so the name switches tab and lands on the row
@@ -1217,7 +1268,7 @@ for a client whose Gold holds only TY2023. 964 rows had accumulated. Stub
   everybody, and a constant column costs the same width as one that says
   something, which is the rule the client grid already applies to tier.
 - **Rows are 28px and the fold is measured, never eyeballed.**
-  `python frontend/tools/measure_ui.py` at 1024×768 reports visible rows and
+  `python frontend/tools/measure_ui.py` at 1440×900 reports visible rows and
   the first-row y per page. A layout change reports both before and after; the
   gate is that visible rows do not regress. `frontend/tools/design_metrics.py`
   counts the scale violations, and `check_brand.py` reads the computed font and

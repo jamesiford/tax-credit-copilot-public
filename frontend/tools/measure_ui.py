@@ -4,7 +4,7 @@ The gate is "can the partner see their data without scrolling", so this counts r
 BOTTOM edge is inside the viewport — not rows that merely exist. The chat
 browser tool has no viewport control, so this drives a real Chromium at size.
 
-    python frontend/tools/measure_ui.py            # 1024x768
+    python frontend/tools/measure_ui.py            # 1440x900, the acceptance viewport
     python frontend/tools/measure_ui.py 1440 900
 """
 from __future__ import annotations
@@ -53,8 +53,8 @@ PROBE = """
 
 
 def main() -> int:
-    width = int(sys.argv[1]) if len(sys.argv) > 2 else 1024
-    height = int(sys.argv[2]) if len(sys.argv) > 2 else 768
+    width = int(sys.argv[1]) if len(sys.argv) > 2 else 1440
+    height = int(sys.argv[2]) if len(sys.argv) > 2 else 900
     out = {}
     with sync_playwright() as p:
         browser = p.chromium.launch()

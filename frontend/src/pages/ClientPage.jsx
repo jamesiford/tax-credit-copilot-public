@@ -193,8 +193,10 @@ export default function ClientPage({
 
   return (
     <div>
-      <Breadcrumb trail={trail} />
-      <ClaimPackageButton clientId={scope?.clientId} taxYear={scope?.year} />
+      <div className="tcc-page-bar">
+        <Breadcrumb trail={trail} />
+        <ClaimPackageButton clientId={scope?.clientId} taxYear={scope?.year} />
+      </div>
       <div className="tcc-client-tabs">
         <SectionTabs tabs={TABS} active={active} onChange={onTab} label="Client sections" idPrefix="client" />
       </div>

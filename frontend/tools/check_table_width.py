@@ -1,4 +1,4 @@
-"""Does the widest data table still fit 1024px, or does it now scroll?
+"""Does the widest data table still fit the viewport, or does it now scroll?
 
 Carbon's 16px column padding assumes a table with a handful of columns. The
 trend grid is a tax year plus twelve months plus four summary columns.
@@ -37,7 +37,7 @@ PROBE = """
 def main() -> int:
     with sync_playwright() as p:
         browser = p.chromium.launch()
-        page = new_page(browser, 1024, 768)
+        page = new_page(browser, 1440, 900)
         for name, path in PAGES.items():
             page.goto(BASE + path, wait_until="networkidle", timeout=120_000)
             try:

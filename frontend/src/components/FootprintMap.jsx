@@ -42,20 +42,26 @@ export default function FootprintMap({ states = [], priced = [], selected = [], 
   // `react-simple-maps` takes its fills as a JS prop, so the tokens are read
   // rather than restated. Writing them here as literals is how the legend and
   // the map end up disagreeing about what "priced" looks like.
+  // The theme is a dependency: switching it changes every token below, and a
+  // map that kept the old fills would disagree with its own legend.
+  const theme = document.documentElement.getAttribute('data-theme');
   const fill = useMemo(() => {
     const style = getComputedStyle(document.documentElement);
-    const token = (name, fallback) => style.getPropertyValue(name).trim() || fallback;
+    // `currentColor` is only the answer when no stylesheet is loaded (a unit
+    // test); a real page always resolves the token.
+    const token = (name) => style.getPropertyValue(name).trim() || 'currentColor';
     return {
-      priced: token('--map-priced', '#26478d'),
-      held: token('--map-held', '#9db4d6'),
-      empty: token('--map-empty', '#eef0f4'),
-      pricedHover: token('--map-priced-hover', '#406eb3'),
-      emptyHover: token('--map-empty-hover', '#e4e7ec'),
-      // Selection is CHROME, not a reading, so it takes the purple accent
-      // rather than a fourth shade of blue that would read as a third state.
-      selected: token('--accent-2-strong', '#63197f'),
+      priced: token('--map-priced'),
+      held: token('--map-held'),
+      empty: token('--map-empty'),
+      pricedHover: token('--map-priced-hover'),
+      emptyHover: token('--map-empty-hover'),
+      // Selection is a SELECTION, not a reading, so it takes the selection
+      // colour rather than a shade that would read as a fourth state.
+      selected: token('--select-strong'),
+      outline: token('--surface-card'),
     };
-  }, []);
+  }, [theme]);
 
   if (!present.size) {
     return <p className="small muted">No payroll states for this selection.</p>;
@@ -102,14 +108,14 @@ export default function FootprintMap({ states = [], priced = [], selected = [], 
                     // it would overwrite the priced/held distinction, which is
                     // a statement about statutory coverage and the one thing
                     // this map exists to show.
-                    stroke: isSelected ? fill.selected : '#fff',
+                    stroke: isSelected ? fill.selected : fill.outline,
                     strokeWidth: isSelected ? 2.2 : 0.6,
                     outline: 'none',
                     cursor: clickable ? 'pointer' : 'default',
                   },
                   hover: {
                     fill: has ? fill.pricedHover : fill.emptyHover,
-                    stroke: isSelected ? fill.selected : '#fff',
+                    stroke: isSelected ? fill.selected : fill.outline,
                     strokeWidth: isSelected ? 2.2 : 0.6,
                     outline: 'none',
                     cursor: clickable ? 'pointer' : 'default',

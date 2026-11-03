@@ -42,7 +42,7 @@ PROBE = """
 def main() -> int:
     with sync_playwright() as p:
         browser = p.chromium.launch()
-        page = new_page(browser, 1024, 768)
+        page = new_page(browser, 1440, 900)
         page.goto(BASE + "/c/2001?year=2023", wait_until="networkidle", timeout=120_000)
         page.wait_for_selector(".trend-table tbody tr", timeout=45_000)
         page.wait_for_timeout(600)

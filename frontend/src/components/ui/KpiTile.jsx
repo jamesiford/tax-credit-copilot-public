@@ -20,8 +20,8 @@ export default function KpiTile({ label, value, sub, tone = 'neutral', empty = f
   const kind = empty ? 'empty' : (TONES.includes(tone) ? tone : 'neutral');
   return (
     <div className={`ui-kpi ui-kpi-${kind}`}>
-      <div className="ui-kpi-label">{label}</div>
       <div className="ui-kpi-value">{empty ? '—' : value}</div>
+      <div className="ui-kpi-label">{label}</div>
       {sub ? <div className="ui-kpi-sub">{sub}</div> : null}
     </div>
   );

@@ -36,7 +36,7 @@ def main() -> int:
     worst = 99.0
     with sync_playwright() as p:
         browser = p.chromium.launch()
-        page = new_page(browser, 1024, 768)
+        page = new_page(browser, 1440, 900)
         for name, path in PAGES.items():
             page.goto(BASE + path, wait_until="networkidle", timeout=120_000)
             try:

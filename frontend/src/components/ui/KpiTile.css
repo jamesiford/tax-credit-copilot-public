@@ -1,28 +1,30 @@
 .ui-kpi-row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: var(--space-5);
+  gap: var(--space-8);
   margin: 0 0 var(--space-10);
 }
 
+/* A number over a caption on a tinted tile; the tint and the figure carry the
+   reading, so there is no stripe, no heavy border and no shouted label. */
 .ui-kpi {
-  padding: var(--space-7) var(--space-8);
+  padding: var(--space-8) var(--space-8);
   text-align: center;
   color: var(--text-default);
-  background: var(--state-neutral);
-  border: 1px solid var(--state-neutral-line);
+  background: var(--surface-subtle);
+  border: 1px solid transparent;
   border-radius: var(--radius);
 }
 
-.ui-kpi-above-min { background: var(--state-above-min); border-color: var(--state-above-min-line); }
-.ui-kpi-below-min { background: var(--state-below-min); border-color: var(--state-below-min-line); }
-.ui-kpi-partial { background: var(--state-partial); border-color: var(--state-partial-line); }
-.ui-kpi-base-year { background: var(--state-base-year); border-color: var(--state-base-year-line); }
+.ui-kpi-above-min { background: var(--state-above-min); }
+.ui-kpi-below-min { background: var(--state-below-min); }
+.ui-kpi-partial { background: var(--state-partial); }
+.ui-kpi-base-year { background: var(--state-base-year); }
 
 .ui-kpi-value {
-  margin: var(--space-2) 0 0;
+  margin: 0;
   font-size: var(--text-display);
-  font-weight: 700;
+  font-weight: 600;
   line-height: var(--leading-heading);
   font-variant-numeric: tabular-nums;
   color: var(--text-primary);
@@ -34,15 +36,14 @@
 .ui-kpi-base-year .ui-kpi-value { color: var(--state-base-year-ink); }
 
 .ui-kpi-label {
+  margin-top: var(--space-2);
   font-size: var(--text-data);
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  font-weight: 500;
   color: var(--text-secondary);
 }
 
 .ui-kpi-sub {
-  margin-top: var(--space-1);
+  margin-top: var(--space-2);
   font-size: var(--text-data);
   color: var(--text-secondary);
 }
@@ -50,12 +51,10 @@
 /* Nothing to report recedes rather than competing with a real figure. */
 .ui-kpi-empty {
   background: transparent;
-  border-style: dashed;
-  border-color: var(--border-default);
+  border: 1px dashed var(--border-default);
 }
 
 .ui-kpi-empty .ui-kpi-value {
   font-size: var(--text-title);
-  font-weight: 600;
   color: var(--text-secondary);
 }
