@@ -9,6 +9,14 @@ confirmation. It is a new way in; the engine, the rules and the data are the one
 Customer-neutral and PoC-grade: the first deployment runs on synthetic data, with the limits in
 [KNOWN-LIMITATIONS.md](KNOWN-LIMITATIONS.md) and the posture in [SECURITY.md](../../SECURITY.md).
 
+![Tax Credit Copilot agent icon](../../channels/branding/agent-icon.svg)
+
+The agent icon is one SVG mark ([`channels/branding/agent-icon.svg`](../../channels/branding/agent-icon.svg),
+with the white [outline](../../channels/branding/agent-icon-outline.svg) for Teams). The Teams / Copilot
+listing (`scripts/publish-m365.ps1`) and the Cowork plugin use the same artwork, rendered to PNG at build
+time by `scripts/render-icons.py` into the gitignored `dist/branding/`; no raster is ever committed. The web
+app's neutral `frontend/public/brand-mark.svg` is unchanged.
+
 ## Architecture
 
 ```mermaid

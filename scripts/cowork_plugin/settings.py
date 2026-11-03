@@ -29,7 +29,7 @@ REQUIRED = (
     "gateway_mcp_url", "oauth_reference_id",
 )
 DEFAULTS = {
-    "version": "1.0.0", "manifest_version": "1.29", "accent_color": "#0F6CBD", "app_id_seed": DEFAULT_SEED, "app_id": "",
+    "version": "1.0.0", "manifest_version": "1.29", "accent_color": "#2A4FC2", "app_id_seed": DEFAULT_SEED, "app_id": "",
 }
 _PLACEHOLDER = re.compile(r"<[^>]+>|\bexample\.(com|org|net|invalid)\b|^0{8}-0{4}-0{4}-0{4}-0{12}$", re.IGNORECASE)
 

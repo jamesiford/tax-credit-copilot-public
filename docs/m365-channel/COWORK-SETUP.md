@@ -62,8 +62,12 @@ Copy-Item channels\cowork\config.example.json overlays\<name>\cowork.json   # ov
 .venv\Scripts\python.exe scripts\build-cowork-plugin.py --config overlays\<name>\cowork.json --strict
 ```
 
-`--strict` refuses any value that still looks like a placeholder. The script prints the package's
-SHA-256; record it with the review. Developer, privacy and terms URLs must be HTTPS pages you own.
+`--strict` refuses any value that still looks like a placeholder. The package carries the agent icon
+(`channels/branding/*.svg`, rendered to PNG in `dist/branding/`; the build renders them when absent,
+needing `pip install -r scripts\requirements-icons.txt` and Cairo or Chromium, see
+`channels/cowork/README.md`). Rebuild the zip whenever the icon changes: the icons are inside it. The
+script prints the package's SHA-256 and each icon's hash and writes `dist\tcc-cowork-plugin.build.json`;
+record them with the review. Developer, privacy and terms URLs must be HTTPS pages you own.
 For a hash that never changes between builds, the app id comes from `app_id_seed`; keep the seed
 stable so an update replaces the plugin instead of adding a second copy.
 

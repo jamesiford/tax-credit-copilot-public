@@ -29,6 +29,7 @@ from cowork_plugin.settings import ConfigError, app_id_for, load_settings  # noq
 from cowork_plugin.validate_content import tool_references, validate_neutrality, validate_tools  # noqa: E402
 from cowork_plugin.validate_manifest import validate_manifest  # noqa: E402
 from cowork_plugin.validate_skills import validate_skills  # noqa: E402
+from tests.png_fixtures import solid_png  # noqa: E402
 
 PLUGIN = REPO / "channels" / "cowork"
 PLACEHOLDERS = {
@@ -37,6 +38,16 @@ PLACEHOLDERS = {
     "gateway_mcp_url": "https://gateway.example.com/mcp", "oauth_reference_id": "00000000-0000-0000-0000-000000000000",
 }
 SKILLS = ("tcc-book-review", "tcc-client-review-pack", "tcc-figures-and-writes")
+
+
+@pytest.fixture(scope="module", autouse=True)
+def stand_in_icons():
+    """Hermetic icons: these tests are about the package, not the renderer (see test_agent_icon.py)."""
+    patch = pytest.MonkeyPatch()
+    files = {"color.png": solid_png(192, alpha=True), "outline.png": solid_png(32, alpha=True)}
+    patch.setattr(icons, "icon_files", lambda icon_dir=None: dict(files))
+    yield
+    patch.undo()
 
 
 def settings(tmp_path: Path, **overrides: str):
@@ -95,6 +106,7 @@ def test_a_changed_input_changes_the_hash(tmp_path):
 
 def test_line_endings_do_not_change_the_hash(tmp_path):
     crlf = tmp_path / "cowork"
+    crlf.mkdir()
     for source in PLUGIN.rglob("*"):
         target = crlf / source.relative_to(PLUGIN)
         if source.is_dir():
@@ -191,10 +203,8 @@ def test_the_manifest_validates_against_the_published_schema_when_it_is_availabl
     assert list(jsonschema.Draft7Validator(json.loads(schema.read_text(encoding="utf-8"))).iter_errors(real[1])) == []
 
 
-def test_the_icons_are_the_right_size_and_deterministic():
-    assert icons.png_size(icons.color_icon("#0F6CBD")) == (192, 192) and icons.png_size(icons.outline_icon()) == (32, 32)
-    assert icons.color_icon("#0F6CBD") == icons.color_icon("#0F6CBD") and icons.outline_icon() == icons.outline_icon()
-    assert icons.color_icon("#0F6CBD") != icons.color_icon("#B91C1C")
+def test_png_sizes_are_read_from_the_header_and_a_non_png_is_refused():
+    assert icons.png_size(solid_png(192, alpha=False)) == (192, 192) and icons.png_size(solid_png(32, alpha=True)) == (32, 32)
     with pytest.raises(ValueError):
         icons.png_size(b"GIF89a-not-a-png-at-all-xxxxxxxxxxxxxxxx")
 

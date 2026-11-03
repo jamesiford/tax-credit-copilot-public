@@ -9,6 +9,7 @@ admin who uploaded a package to the tenant can prove it is the one that was revi
 from __future__ import annotations
 
 import hashlib
+import json
 import zipfile
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -23,6 +24,7 @@ from cowork_plugin.validate_skills import validate_skills
 
 PLUGIN_ROOT = Path(__file__).resolve().parents[2] / "channels" / "cowork"
 ZIP_NAME = "tcc-cowork-plugin.zip"
+BUILD_MANIFEST = "tcc-cowork-plugin.build.json"
 _FIXED_TIME = (1980, 1, 1, 0, 0, 0)
 _TEXT_SUFFIXES = (".md", ".json", ".svg", ".txt")
 
@@ -59,13 +61,17 @@ def collect_skills(root: Path) -> dict[str, bytes]:
     return found
 
 
-def assemble(settings: PluginSettings, root: Path = PLUGIN_ROOT) -> tuple[dict[str, Any], dict[str, bytes]]:
-    """The manifest and every file in the package, before validation."""
+def assemble(settings: PluginSettings, root: Path = PLUGIN_ROOT,
+             icon_files: dict[str, bytes] | None = None) -> tuple[dict[str, Any], dict[str, bytes]]:
+    """The manifest and every file in the package, before validation.
+
+    `icon_files` is `{"color.png": ..., "outline.png": ...}`; left out, the rendered agent icons are
+    read from dist/branding (and rendered first when absent). `IconError` when they cannot be had.
+    """
     document = manifest_module.render_manifest(root / "manifest.template.json", settings)
     files = {
         "manifest.json": manifest_module.dumps(document),
-        "color.png": icons.color_icon(settings.values["accent_color"]),
-        "outline.png": icons.outline_icon(),
+        **(icon_files if icon_files is not None else icons.icon_files()),
         **collect_skills(root),
     }
     if settings.manifest_version == "1.28":
@@ -94,13 +100,35 @@ def write_zip(files: dict[str, bytes], target: Path) -> str:
     return hashlib.sha256(target.read_bytes()).hexdigest()
 
 
-def build(settings: PluginSettings, out_dir: Path, *, strict: bool = False, root: Path = PLUGIN_ROOT) -> Build:
-    """Assemble, validate and (when there are no errors) zip. `strict` turns placeholder warnings into errors."""
-    document, files = assemble(settings, root)
+def build_manifest(files: dict[str, bytes], sha256: str) -> dict[str, Any]:
+    """What a build produced, for the file written beside the zip: the package hash and each PNG's hash.
+
+    Kept out of the tracked tree on purpose: the icon bytes depend on the renderer, so the hashes
+    describe a build, not the sources.
+    """
+    return {
+        "zip": ZIP_NAME, "sha256": sha256,
+        "icons": {name: hashlib.sha256(files[name]).hexdigest() for name in ("color.png", "outline.png")},
+        "files": {name: hashlib.sha256(data).hexdigest() for name, data in sorted(files.items())},
+    }
+
+
+def build(settings: PluginSettings, out_dir: Path, *, strict: bool = False, root: Path = PLUGIN_ROOT,
+          icon_files: dict[str, bytes] | None = None) -> Build:
+    """Assemble, validate and (when there are no errors) zip. `strict` turns placeholder warnings into errors.
+
+    Also writes `tcc-cowork-plugin.build.json` (hashes of the zip, the icons and every file) beside the zip.
+    """
+    try:
+        document, files = assemble(settings, root, icon_files)
+    except icons.IconError as exc:
+        raise BuildError([Finding("TCC-I001", "icons", str(exc))]) from exc
     findings = validate(document, files, settings)
     if strict:
         findings = [Finding(f.code, f.path, f.message, "error") if f.code == "TCC-P001" else f for f in findings]
     if errors(findings):
         raise BuildError(findings)
     target = out_dir / ZIP_NAME
-    return Build(target, write_zip(files, target), files, findings)
+    digest = write_zip(files, target)
+    (out_dir / BUILD_MANIFEST).write_text(json.dumps(build_manifest(files, digest), indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return Build(target, digest, files, findings)
