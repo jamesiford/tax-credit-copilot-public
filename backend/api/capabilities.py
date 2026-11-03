@@ -44,7 +44,7 @@ def _refuse_unentitled_clients(principal: Principal, ids: set[int]) -> None:
     authorizer = get_client_authorizer()
     for client_id in sorted(ids):
         if not authorizer.is_authorized(principal, client_id):
-            raise CapabilityFailure(403, "not_authorized", f"not authorized for client {client_id}")
+            raise CapabilityFailure(403, "client_not_authorized", f"not authorized for client {client_id}")
 
 
 def _error(failure: CapabilityFailure) -> JSONResponse:

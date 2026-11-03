@@ -156,8 +156,39 @@ Accepted values: `warehouse` (durable; `fabric` is the v1 alias), `sqlite`,
 | `PORT` | `backend/startup.sh` | Bind port. Default `8000` | App Service platform | — | n/a (container) | Set by platform |
 | `TCC_WARM_ON_START` | `backend/application/warmup.py` | `0`/`false`/`no` disables the startup warm-up and Warehouse keepalive. Default `1`; skipped unless `DATA_SOURCE=lakehouse` | not set | — | not set | No |
 | `TCC_KEEPALIVE_SECONDS` | `backend/application/warmup.py` | Warehouse pool keepalive interval. Default `30`, minimum `5` | not set | — | not set | No |
+| `CAPABILITY_TIMEOUT_SECONDS` | `backend/application/capabilities/invoke.py` | How long one `POST /api/capabilities/{tool}` call may run before the caller gets a structured `504 timeout`. Default `25`; a bad value raises. The gateway's own `CHANNEL_REQUEST_TIMEOUT_SECONDS` (default 30) sits just above it | not set | — | new | No |
 | `SCM_DO_BUILD_DURING_DEPLOYMENT` | App Service build (platform) | Build on deploy | TF platform: `true`, both apps | — | n/a (container images) | Platform |
 | `WEBSITES_CONTAINER_START_TIME_LIMIT` | App Service (platform) | Start-up time limit, seconds | TF platform: `1800`, API | — | n/a | Platform |
+
+## 9a. Channel gateway (`backend/channel`, only when `enable_m365_channel`)
+
+The gateway is a third App Service app on the API's plan (`channel.main:app`, started by
+`backend/startup-channel.sh`). `channel/config.py` reads these at startup and raises
+`GatewayConfigurationError` naming every problem at once. It has **no unauthenticated
+mode**: `AUTH_MODE` is not a gateway setting, and one set to anything but `entra` is
+refused. Nothing below is a secret.
+
+| Variable | Read by | Purpose / default | Deployed value | TF output | Required (deployed) |
+|---|---|---|---|---|---|
+| `TENANT_ID` | `backend/channel/config.py` | The Entra tenant every caller and every acting user must belong to. A GUID. No default | TF channel: variable `tenant_id` | — | Enforced |
+| `GATEWAY_AUDIENCE` | `backend/channel/config.py` | The gateway's app registration: `api://<id>` or the bare client id (both accepted, like the API). Tokens for any other audience are a 401 | TF channel: variable `channel_gateway_audience` | `CHANNEL_GATEWAY_AUDIENCE` | Enforced |
+| `API_BASE_URL` | `backend/channel/config.py` | Where the gateway reaches the API. Same variable name the web app uses | TF channel: `https://<API default hostname>` | `API_BASE_URL` | Enforced |
+| `API_AUDIENCE` | `backend/channel/config.py` | The API registration the gateway's managed identity requests a token for (`<audience>/.default`) | TF channel: the API's own `API_AUDIENCE` | — | Enforced |
+| `CHANNEL_STORE` | `backend/application/deployment.py` | The audit trail's store, as for the API. A deployed gateway refuses anything but `warehouse` | TF channel: `warehouse` (literal) | — | Enforced |
+| `CHANNEL_ALLOWED_CALLER_APP_IDS` | `backend/channel/auth.py` | Comma-separated app ids that may call as the orchestrator **without** holding the `Channel.Invoke` role (a sandbox where the role cannot be assigned). Empty (default) is role-only. The path that authorised each call is logged | TF channel: variable `channel_allowed_caller_app_ids` | — | No |
+| `CHANNEL_WRITER_SOURCE` | `backend/application/deployment.py` | As for the API: `allowlist` (default), `entra_group` or `either`. The gateway checks it on every `*_commit` and the API checks again | TF channel: variable `channel_writer_source` | — | Enforced |
+| `CHANNEL_WRITER_GROUP_ID` | `backend/application/deployment.py` | The Entra group for `entra_group` / `either`; the gateway identity needs Graph `GroupMember.Read.All` | TF channel: variable `channel_writer_group_id` | — | Enforced when the source needs it |
+| `CHANNEL_RATE_LIMIT_PER_MINUTE` | `backend/channel/config.py` | Calls per minute per user (token bucket, `1`–`6000`). Default `60`. Per process | not set | — | No |
+| `CHANNEL_REQUEST_TIMEOUT_SECONDS` | `backend/channel/config.py` | How long the gateway waits for the API, `1`–`600`. Default `30`, above the API's own `CAPABILITY_TIMEOUT_SECONDS` | not set | — | No |
+| `CHANNEL_DEBUG_WHOAMI` | `backend/channel/config.py` | `true` offers the `channel_ping` diagnostic (who the platform believes is calling, by which rule, whether the API answers). Never returns a token. Default off | not set | — | No |
+| `WEB_CONCURRENCY` | `backend/startup-channel.sh` | Gunicorn workers. Default **`1`**: the fact ledger (`verify_figures`) and the rate limiter are per process | not set | — | No |
+| `ENVIRONMENT`, `DATA_CLASSIFICATION` | `backend/application/deployment.py` | As for the API (a non-`local` environment switches the durable-store checks on) | TF channel: `azure`, from the profile | — | Enforced |
+| `WAREHOUSE_SERVER`, `WAREHOUSE_DATABASE`, `FABRIC_WORKSPACE` | `backend/infrastructure/persistence/` | The Warehouse the audit trail is written to (the gateway holds `INSERT`/`SELECT` on `tcc_ops.channel_audit` only) | TF channel: the API's values | — | Enforced |
+| `APPLICATIONINSIGHTS_CONNECTION_STRING`, `AZURE_CLIENT_ID` | `backend/telemetry.py` | Telemetry over the gateway's own managed identity (`Monitoring Metrics Publisher`); no key | TF channel | — | No |
+
+The gateway authenticates to the API as itself: a managed-identity token (no secret) for
+`API_AUDIENCE`, holding the app role `TCC.Agent`, plus `X-TCC-Acting-User` naming the
+person it acts for.
 
 ## 10. Web app (Express BFF) and SPA build
 

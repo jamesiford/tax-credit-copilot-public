@@ -690,3 +690,76 @@ One short entry per decision: context, choice, why.
   built). Each asserted precisely the thing this work package changes.
 - `application/wiring.py` is a baselined offender in the standards ratchet (605 lines);
   the three new lines were paid for by removing three elsewhere in the same file.
+  (Superseded in CH-06b: the channel stores moved to `channel_wiring.py`, see D-66.)
+
+## D-65 CH-06b: the MCP facade is a hand-written Streamable-HTTP subset
+
+- **Context.** The brief prefers the official `mcp` SDK and allows a minimal JSON-RPC
+  subset when the SDK cannot share the auth/audit pipeline cleanly. PyPI's current stable
+  is `mcp 2.3.0` (Requires-Python >=3.10; it installs on 3.14 here, 3.12 is not
+  installed). Its Streamable-HTTP server runs handlers in session-scoped tasks under a
+  session manager with its own lifespan and a dual-era protocol loop, so the request's
+  bearer token and acting user are not in the handler's context without reaching into SDK
+  internals; it also pulls `httpx2`, `sse-starlette` and `mcp-types`.
+- **Choice.** `channel/mcp.py` implements `initialize`, `notifications/*`, `ping`,
+  `tools/list` and `tools/call` over `POST /mcp` (one JSON reply per request, session id
+  in `Mcp-Session-Id`, `GET` 405, `DELETE` ends a session). Every `tools/call` goes
+  through `ToolPipeline`, the same code as REST; a test compares the two trails event for
+  event. The SDK is not a dependency (it stays out of `requirements.txt`).
+- **Why.** An audited pipeline that a transport can bypass is not audited. The subset is
+  about 150 lines, fully tested, and swappable for the SDK if a later version exposes
+  per-request context.
+
+## D-66 CH-06b: `channel_wiring` is split out of `application.wiring`
+
+- **Choice.** The audit, writer, confirmation and entitlement getters moved to
+  `application/channel_wiring.py`; `wiring.py` re-exports them, so no import path changed.
+  `wiring.py` fell from 605 to 471 lines and the ratchet baseline was tightened.
+- **Why.** `wiring` imports every query and command. A gateway composing through it would
+  load the engine to write an audit row. `test_importing_the_gateway_does_not_load_the_engine`
+  proves the gateway's imports stay light.
+
+## D-67 CH-06b: what the gateway audits, and what it cannot
+
+- A **read** is a `begin` and an `end` event (the brief's wording). The API's own read
+  capabilities write nothing, so the gateway is the only record of a read.
+- A **write** success adds no gateway event; the capability's own begin/end pair is the
+  record. The gateway adds one `single` event only for failures the capability never saw
+  (`BEFORE_CAPABILITY` in `channel/pipeline.py`): rate limit, its own writer check, API
+  unreachable or timed out, an API-guard refusal, or a pre-dispatch rejection. To make
+  that decidable the API's client-entitlement refusal has its own code,
+  `client_not_authorized`, distinct from the capability's `not_authorized`.
+- **Not audited:** a request that fails before there is a person (no/invalid token, bad
+  acting headers) and a request for a tool that does not exist. There is no user to
+  attribute them to and an arbitrary tool name does not belong in a column; they are a
+  response and a log line without the token.
+- `verify_figures` is audited as a read and its `numeric_guard` column carries the
+  verdict (`pass` / `rejected`); every other tool records `n/a`, because the orchestrator
+  owns the guard on its own prose.
+- If the opening event of a read cannot be written, nothing is called (`503
+  audit_unavailable`). A refusal whose event cannot be written still refuses.
+
+## D-68 CH-06b: download tickets
+
+- The ticket is minted by the API (`claim_package_link`), spent by the API
+  (`claim_package_redeem`), and the gateway's `GET /channel/v1/downloads/{ticket}` does the
+  two-step. When it spends the ticket nobody has been identified, so the redeem call acts
+  for the nil GUID user `00000000-0000-0000-0000-000000000000`, named "download ticket";
+  the ticket row says whose it is, and the artifact fetch and the audit event are made as
+  that person, with the channel and conversation recorded at mint time.
+- A presented token is optional and, when present, is checked against the ticket's person
+  BEFORE the ticket is spent. Unauthenticated attempts are rate-limited per client address
+  (`download:<ip>` bucket in the same limiter).
+- Tickets are durable (the confirmation store), so a gateway restart does not strand a
+  link. The fact ledger and the rate limiter are not: they are per process, `WEB_CONCURRENCY`
+  defaults to 1, and a restart makes `verify_figures` answer "no" for earlier results.
+
+## D-69 CH-06b: the ledger records less than everything
+
+- Not recorded: `verify_figures` and `channel_ping` results (positions and counts are not
+  the engine's), `claim_package_link`/`redeem` (a ticket is a secret with digits in it),
+  and the `confirmation` object of a write preview (a token's digits are not a licence to
+  quote digits). The preview's own figures ARE recorded: they are what the user is
+  shown and the orchestrator narrates.
+- A delegated caller with no MCP session and no `X-Conversation-Id` is keyed by their
+  user id, so one person's calls without a conversation share a ledger entry.

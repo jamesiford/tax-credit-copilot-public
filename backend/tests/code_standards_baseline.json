@@ -461,7 +461,7 @@
   "module-lines|application/queries/list_findings.py": 318,
   "module-lines|application/queries/simulate_employee.py": 455,
   "module-lines|application/queries/simulate_unit.py": 432,
-  "module-lines|application/wiring.py": 605,
+  "module-lines|application/wiring.py": 471,
   "module-lines|domain/calculation/onezero.py": 1295,
   "module-lines|domain/calculation/proximity.py": 570,
   "module-lines|domain/channel.py": 254,

@@ -1,0 +1,10 @@
+[
+  "DELETE /mcp",
+  "GET /channel/health",
+  "GET /channel/ready",
+  "GET /channel/v1/downloads/{ticket}",
+  "GET /channel/v1/tools",
+  "GET /mcp",
+  "POST /channel/v1/tools/{tool}",
+  "POST /mcp"
+]
