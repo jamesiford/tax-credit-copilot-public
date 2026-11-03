@@ -37,7 +37,7 @@ ran on `jamesiford-m365-channel-live-deploy`, fast-forwarded to the tip of `feat
 | CH-11 | End-to-end workflow and exactness tests | done | `wp/CH-11-workflow-tests` | merge `f33ffa4` |
 | CH-12 | Documentation, ADR-009, runbook, demo script | done | `wp/CH-12-documentation` | merge `b470494` |
 | CH-12b | Demo network posture toggle and hardening plan | done | `wp/CH-12b-demo-posture` | merge `0bda7b9` |
-| CH-13 | Live deployment, spikes, smoke tests and hand-off (Prompt 6) | done with open items (see Blockers) | `wp/CH-13-live-deploy` | merge: see the CH-13 evidence below |
+| CH-13 | Live deployment, spikes, smoke tests and hand-off (Prompt 6) | done with open items (see Blockers) | `wp/CH-13-live-deploy` | merge `fec797d` |
 
 ## Evidence
 
@@ -292,7 +292,7 @@ and its `discovery` / `multi_state` scans read the configured default tenant.
 
 ### CH-13 merge
 
-Merged `--no-ff` into the session integration branch; the merge SHA is the first line of `git log` for this file's commit.
+Merged `--no-ff` into the session integration branch `jamesiford-m365-channel-live-deploy` as `fec797d`; `feat/m365-channel` itself is left for the owner to fast-forward.
 
 1. **Spikes S1, S2 and S5 need people.** Nothing can send a Teams message or sign into Cowork. The manual checklist is the appendix of [DEMO-SCRIPT](DEMO-SCRIPT.md); `scripts/channel-smoke.ps1 -Since <time>` prints what the platform received.
 2. **The hosted agent cannot reach the Foundry model endpoint** (spike S6, open). Replies are the engine's own, without commentary. See KNOWN-LIMITATIONS, "Found in the live sandbox".
