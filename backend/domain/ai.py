@@ -50,11 +50,35 @@ class AgentSpec:
 
 
 @dataclass(frozen=True)
+class ToolCall:
+    """A model asked for a tool. WE run it (tools live on the Azure side); the gateway only infers."""
+
+    id: str
+    name: str
+    arguments: str
+
+
+@dataclass(frozen=True)
+class ToolSpec:
+    """A tool offered to a model, as a JSON-schema function."""
+
+    name: str
+    description: str
+    parameters: Mapping[str, object] = field(default_factory=lambda: {"type": "object", "properties": {}})
+
+
+@dataclass(frozen=True)
 class ChatMessage:
-    """One message to a chat-completions style model."""
+    """One message to a chat-completions style model.
+
+    A `tool` message answers a `ToolCall` (`tool_call_id`); an `assistant` message
+    that asked for tools carries them in `tool_calls`.
+    """
 
     role: str
-    content: str
+    content: str = ""
+    tool_call_id: str | None = None
+    tool_calls: tuple[ToolCall, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -96,7 +120,7 @@ class StreamEnd:
         return len(self.hops) > 1
 
 
-ModelEvent = Union[TextDelta, ModelUsage, StreamEnd]
+ModelEvent = Union[TextDelta, ToolCall, ModelUsage, StreamEnd]
 
 PROVIDER_STATES = ("ready", "warming", "degraded", "unavailable", "disabled")
 
@@ -150,6 +174,10 @@ class ModelRateLimited(ModelError):
 
 class ModelBadRequest(ModelError):
     """The request itself was refused (4xx other than 429). Retrying cannot help."""
+
+
+class EgressRefused(ModelBadRequest):
+    """The egress policy would not let this prompt leave for this provider."""
 
 
 class ModelAuth(ModelError):

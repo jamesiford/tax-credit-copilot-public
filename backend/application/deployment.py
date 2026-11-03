@@ -209,6 +209,10 @@ def check_deployment_configuration(env: Mapping[str, str] | None = None) -> dict
             f"ARTIFACT_REPOSITORY={rows_store!r} is not durable; a deployed environment must use 'warehouse'"
         )
 
+    from application.ai.deployment_check import ai_problems
+
+    problems.extend(ai_problems(env, deployed))
+
     if problems:
         raise DeploymentConfigurationError(
             f"refusing to start (ENVIRONMENT={environment(env)!r}):\n  - " + "\n  - ".join(problems)

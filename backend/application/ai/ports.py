@@ -15,17 +15,22 @@ from typing import Any, Protocol
 
 from domain.ai import (
     AgentSpec, ChatMessage, EgressDecision, ModelEvent, ModelRole, ModelUsage, OutputVerdict,
-    Prompt, ProviderStatus,
+    Prompt, ProviderStatus, ToolSpec,
 )
 
 
 class ChatModel(Protocol):
-    """A chat-completions style model: messages in, a stream of events out."""
+    """A chat-completions style model: messages in, a stream of events out.
+
+    `tools` are offered to the model; a call it makes comes back as a `ToolCall`
+    event for the CALLER to run. No tool is ever attached to an agent.
+    """
 
     name: str
 
     def stream(
         self, messages: Sequence[ChatMessage], *, model: str, temperature: float | None = None,
+        tools: Sequence[ToolSpec] = (),
     ) -> AsyncIterator[ModelEvent]: ...
 
     def status(self) -> ProviderStatus: ...
