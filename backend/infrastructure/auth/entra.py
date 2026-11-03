@@ -11,6 +11,12 @@ The API trusts a token, never a network position. A token is accepted only if:
 Those failures are 401: the caller has not proven who they are. Proven but
 missing the delegated scope `user_impersonation` or the app role `TCC.User` is
 403: they are who they say, and still may not.
+
+Two token shapes are accepted and they never mix. A delegated token (a person)
+needs the scope and `TCC.User`. An app-only token (the channel gateway) has no
+scope and needs `TCC.Agent`; the person it acts for arrives in a header the
+API layer parses, because the token cannot carry them. A token with both shapes
+is refused.
 """
 from __future__ import annotations
 
@@ -20,10 +26,12 @@ from typing import Any, Iterable
 
 import jwt
 
-from application.identity import Principal
+from application.identity import PRINCIPAL_AGENT, PRINCIPAL_USER, Principal
 
 REQUIRED_SCOPE = "user_impersonation"
 REQUIRED_ROLE = "TCC.User"
+#: The app role the channel gateway's service principal holds. Never a person's.
+AGENT_ROLE = "TCC.Agent"
 
 #: Accept a token a few seconds either side of the clock it was minted by.
 _LEEWAY_S = 60
@@ -81,12 +89,32 @@ class EntraTokenValidator:
         return self.jwks_client
 
     def validate(self, token: str | None) -> Principal:
+        claims = self._claims(token)
+        scopes = tuple(str(claims.get("scp", "")).split())
+        roles = tuple(_strings(claims.get("roles")))
+        shape = _shape(claims, scopes)
+        if shape == "agent":
+            self._require_agent(scopes, roles)
+        else:
+            self._require_user(scopes, roles)
+        return Principal(
+            oid=claims.get("oid"),
+            upn=claims.get("preferred_username") or claims.get("upn"),
+            name=claims.get("name"),
+            tenant_id=claims.get("tid"),
+            roles=roles,
+            scopes=scopes,
+            authenticated=True,
+            principal_type=PRINCIPAL_AGENT if shape == "agent" else PRINCIPAL_USER,
+        )
+
+    def _claims(self, token: str | None) -> dict[str, Any]:
         if not token:
             raise AuthenticationFailed("no bearer token")
         try:
             signing_key = self._keys().get_signing_key_from_jwt(token)
             key = getattr(signing_key, "key", signing_key)
-            claims = jwt.decode(
+            return jwt.decode(
                 token,
                 key=key,
                 algorithms=["RS256"],
@@ -98,21 +126,40 @@ class EntraTokenValidator:
         except Exception as exc:  # noqa: BLE001 - any failure to prove identity is a 401
             raise AuthenticationFailed(f"invalid token: {type(exc).__name__}") from exc
 
-        scopes = tuple(str(claims.get("scp", "")).split())
-        roles = tuple(_strings(claims.get("roles")))
+    def _require_user(self, scopes: tuple[str, ...], roles: tuple[str, ...]) -> None:
+        if AGENT_ROLE in roles:
+            raise AuthorizationFailed(f"a delegated token must not carry the '{AGENT_ROLE}' role")
         if self.required_scope not in scopes:
             raise AuthorizationFailed(f"token lacks the '{self.required_scope}' scope")
         if self.required_role not in roles:
             raise AuthorizationFailed(f"token lacks the '{self.required_role}' app role")
-        return Principal(
-            oid=claims.get("oid"),
-            upn=claims.get("preferred_username") or claims.get("upn"),
-            name=claims.get("name"),
-            tenant_id=claims.get("tid"),
-            roles=roles,
-            scopes=scopes,
-            authenticated=True,
-        )
+
+    def _require_agent(self, scopes: tuple[str, ...], roles: tuple[str, ...]) -> None:
+        if scopes:
+            raise AuthorizationFailed("an app-only token must not carry delegated scopes")
+        if self.required_role in roles:
+            raise AuthorizationFailed(f"an app-only token must not carry the '{self.required_role}' role")
+        if AGENT_ROLE not in roles:
+            raise AuthorizationFailed(f"token lacks the '{AGENT_ROLE}' app role")
+
+
+def _shape(claims: dict[str, Any], scopes: tuple[str, ...]) -> str:
+    """`agent` for an app-only token, `user` for a delegated one.
+
+    An app-only v2 token has no `scp` and either `idtyp=app` or a subject equal
+    to its object id with no user name. A token that shows both shapes is
+    refused: guessing which a half-and-half token means is how a service
+    acquires a person's rights.
+    """
+    named = bool(claims.get("preferred_username") or claims.get("upn") or claims.get("name"))
+    app_like = claims.get("idtyp") == "app" or (
+        bool(claims.get("oid")) and claims.get("oid") == claims.get("sub") and not named
+    )
+    if app_like and scopes:
+        raise AuthorizationFailed("token mixes app-only and delegated claims")
+    if claims.get("idtyp") == "app" and named:
+        raise AuthorizationFailed("token mixes app-only and delegated claims")
+    return "agent" if app_like else "user"
 
 
 def _strings(value: Any) -> Iterable[str]:
