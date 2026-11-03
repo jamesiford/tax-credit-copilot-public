@@ -7,7 +7,7 @@ import { ENUM, NUMERIC, TEXT } from '../lib/gridFilter.js';
 import SortHeader from './SortHeader.jsx';
 import { FilterBar } from './ColumnFilter.jsx';
 import useTableControls from './useTableControls.js';
-import StatCard, { StatRow } from './StatCard.jsx';
+import KpiTile, { KpiRow } from './ui/KpiTile.jsx';
 
 /**
  * What-If — what would change the answer.
@@ -338,11 +338,11 @@ export function CreditGained({ year, closed, runRate, extra = null }) {
   const delta = closed ? closed.delta : runRate?.delta;
   const priced = closed || runRate;
   return (
-    <StatRow>
-      <StatCard
+    <KpiRow label="What-if result">
+      <KpiTile
         label={estimate ? `Credit gained · TY${year} run-rate` : `Credit gained · TY${year}`}
         value={signedUsd(delta)}
-        tone={num(delta) > 0 ? 'good' : num(delta) < 0 ? 'bad' : 'neutral'}
+        tone={num(delta) > 0 ? 'above-min' : num(delta) < 0 ? 'below-min' : 'neutral'}
         empty={!priced}
         sub={priced
           ? (estimate
@@ -351,7 +351,7 @@ export function CreditGained({ year, closed, runRate, extra = null }) {
           : NOT_PRICED_YET(year)}
       />
       {priced && priced.before != null ? (
-        <StatCard
+        <KpiTile
           label={estimate ? 'Run-rate before → after' : 'Annual credit before → after'}
           value={`${USD.format(num(priced.before))} → ${USD.format(num(priced.after))}`}
           sub={estimate
@@ -362,7 +362,7 @@ export function CreditGained({ year, closed, runRate, extra = null }) {
         />
       ) : null}
       {extra}
-    </StatRow>
+    </KpiRow>
   );
 }
 

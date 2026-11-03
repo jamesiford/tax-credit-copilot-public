@@ -8,7 +8,7 @@ import {
 } from '../api.js';
 import FootprintMap from './FootprintMap.jsx';
 import PageHeader from './PageHeader.jsx';
-import StatCard, { StatRow } from './StatCard.jsx';
+import KpiTile, { KpiRow } from './ui/KpiTile.jsx';
 import { PORTFOLIO } from '../lib/scopeDimension.js';
 import { TEXT, applyFilters } from '../lib/gridFilter.js';
 import { ColumnFilter, FilterBar } from './ColumnFilter.jsx';
@@ -37,35 +37,35 @@ function Totals({ summary, label }) {
   // computed while resting on something nobody verified.
   const restsOnAssertion = summary.unverified > 0;
   return (
-    <StatRow>
+    <KpiRow label="Position summary">
       {/* Tone carries the READING. Recoverable is money we can go and get, so
           it is good; exposure is a finding against us, so it is bad. Cells
           assessed is a denominator and has no reading at all — it used to be
           blue, the same blue as exposure, which made the colour meaningless. */}
-      <StatCard
+      <KpiTile
         label="Recoverable"
         value={USD.format(summary.opportunity)}
         sub={restsOnAssertion ? `${label} · vs an unverified claim` : label}
-        tone="good"
+        tone="above-min"
       />
-      <StatCard
+      <KpiTile
         label="Exposure"
         value={USD.format(summary.exposure)}
         sub={summary.hasExposure
           ? `${summary.exposureCells} cell${summary.exposureCells === 1 ? '' : 's'} over-claimed`
           : null}
-        tone="bad"
+        tone="below-min"
         empty={!summary.hasExposure}
       />
-      <StatCard label="Cells assessed" value={summary.cells} />
-      <StatCard
+      <KpiTile label="Cells assessed" value={summary.cells} />
+      <KpiTile
         label="Unverified"
         value={summary.unverified}
         sub={summary.unverified ? 'client-asserted, not computed' : null}
-        tone="warn"
+        tone="partial"
         empty={!summary.unverified}
       />
-    </StatRow>
+    </KpiRow>
   );
 }
 

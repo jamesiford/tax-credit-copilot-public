@@ -86,16 +86,6 @@ const UNIT_COLUMN = { key: 'unit', label: 'Location', type: TEXT, read: (block) 
  *   year qualifies, so they are banner-flagged rather than footnoted.
  */
 
-function Kpi({ label, value, sub, tone }) {
-  return (
-    <div className={`kpi-card${tone ? ` ${tone}` : ''}`}>
-      <div className="kpi-label">{label}</div>
-      <div className="kpi-value">{value}</div>
-      {sub ? <div className="kpi-sub">{sub}</div> : null}
-    </div>
-  );
-}
-
 function TierPill({ row }) {
   const code = designationCode(row);
   if (code === 'Unassigned') {

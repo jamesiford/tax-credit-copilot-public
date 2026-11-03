@@ -1,8 +1,9 @@
+import Tabs from './ui/Tabs.jsx';
+
 /**
  * Two peer grids answering different questions about one scope.
  *
- * The visual language is `MethodTabs` — deliberately the same control, because
- * a third tab style would make "which of these is a tab" a thing a reader has
+ * Same control as `MethodTabs` (both wrap `ui/Tabs`), deliberately: a third tab style would make "which of these is a tab" a thing a reader has
  * to work out. What differs is the job: MethodTabs picks a statutory READING of
  * the same population, this picks WHICH population is on screen.
  *
@@ -12,24 +13,16 @@
  */
 export default function GridTabs({ tabs, active, onChange, label = 'View' }) {
   return (
-    <div className="method-tabs grid-tabs" role="tablist" aria-label={label}>
-      <span className="method-tabs-label">{label}</span>
-      {tabs.map((tab) => (
-        <button
-          key={tab.id}
-          type="button"
-          role="tab"
-          id={`grid-tab-${tab.id}`}
-          aria-selected={active === tab.id}
-          aria-controls={`grid-panel-${tab.id}`}
-          className={active === tab.id ? 'active' : ''}
-          onClick={() => onChange(tab.id)}
-          title={tab.hint}
-        >
-          {tab.label}
-          {tab.count == null ? null : <span className="grid-tab-count">{tab.count}</span>}
-        </button>
-      ))}
+    <div className="method-tabs grid-tabs">
+      <span className="method-tabs-label" aria-hidden="true">{label}</span>
+      <Tabs
+        tabs={tabs}
+        active={active}
+        onChange={onChange}
+        label={label}
+        idPrefix="grid"
+        variant="segmented"
+      />
     </div>
   );
 }

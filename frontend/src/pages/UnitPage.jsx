@@ -10,7 +10,7 @@ import { MONEY } from '../lib/reference.js';
 import { NUMERIC, TEXT, formatFilters, parseFilters } from '../lib/gridFilter.js';
 import Breadcrumb from '../components/Breadcrumb.jsx';
 import PageHeader from '../components/PageHeader.jsx';
-import StatCard, { StatRow } from '../components/StatCard.jsx';
+import KpiTile, { KpiRow } from '../components/ui/KpiTile.jsx';
 import InsightBar, { provenanceLine } from '../components/InsightBar.jsx';
 import MethodTabs from '../components/MethodTabs.jsx';
 import GridTabs, { GridTabPanel } from '../components/GridTabs.jsx';
@@ -281,34 +281,33 @@ export default function UnitPage({
             }}
           />
 
-          <StatRow>
-            <StatCard
+          <KpiRow label="Location summary">
+            <KpiTile
               label={monthIndex == null ? 'Counted this year' : `Counted in ${MONTH_LABELS[monthIndex]}`}
               value={countedTotal}
-              tone="accent"
             />
-            {unit ? <StatCard label="Average headcount" value={fmtHeadcount(unit.average_headcount)} /> : null}
+            {unit ? <KpiTile label="Average headcount" value={fmtHeadcount(unit.average_headcount)} /> : null}
             {/* A labelled card with no value is worse than no card. */}
-            {unit?.base_year != null ? <StatCard label="Base year" value={`TY${unit.base_year}`} /> : null}
+            {unit?.base_year != null ? <KpiTile label="Base year" value={`TY${unit.base_year}`} /> : null}
             {unit?.status ? (
-              <StatCard
+              <KpiTile
                 label="Reading"
                 value={String(unit.status).replace(/_/g, ' ')}
-                tone={unit.qualified ? 'good' : 'warn'}
+                tone={unit.qualified ? 'above-min' : 'partial'}
               />
             ) : null}
             {/* Withheld rather than restated while that list is narrowed: a
                 filtered cusp count is a different figure in the same words. */}
-            <StatCard
+            <KpiTile
               label={`Within ${BAND} hrs of the floor`}
               value={nearWire ? '—' : inBand.length}
               sub={nearWire
                 ? 'a filter is narrowing that list'
                 : (nearTotal ? `${nearTotal} ineligible in all` : null)}
-              tone={!nearWire && inBand.length ? 'warn' : 'neutral'}
+              tone={!nearWire && inBand.length ? 'partial' : 'neutral'}
               empty={!nearTotal}
             />
-          </StatRow>
+          </KpiRow>
 
           <div className="tcc-grid-tabbar">
             <GridTabs

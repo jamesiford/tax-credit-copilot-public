@@ -1,0 +1,52 @@
+.ui-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.ui-skeleton-bar {
+  height: 16px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  background: linear-gradient(
+    90deg,
+    var(--surface-subtle) 25%,
+    var(--border-subtle) 50%,
+    var(--surface-subtle) 75%
+  );
+  background-size: 200% 100%;
+  animation: ui-skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+.ui-skeleton-bar:last-child {
+  width: 60%;
+}
+
+@keyframes ui-skeleton-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-skeleton-bar {
+    animation: none;
+    background: var(--surface-subtle);
+  }
+}
+
+.ui-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}

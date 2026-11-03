@@ -3,6 +3,7 @@ import { BookOpenCheck, Loader2, ShieldCheck } from 'lucide-react';
 import { fetchRules } from '../api.js';
 import { authoredYearsLabel } from '../lib/reference.js';
 import { PageHeader } from './ReferenceViews.jsx';
+import KpiTile, { KpiRow } from './ui/KpiTile.jsx';
 import SortHeader from './SortHeader.jsx';
 import { FilterBar } from './ColumnFilter.jsx';
 import useTableControls from './useTableControls.js';
@@ -93,26 +94,12 @@ export default function RuleLibraryView({ onAskCopilot, programs = null }) {
       declined by name rather than estimated from its neighbour.
     </div>
 
-    <div className="kpi-strip tcc-kpi-4">
-      <div className="kpi-card">
-        <div className="kpi-label">Programs codified</div>
-        <div className="kpi-value">{rules.length}</div>
-      </div>
-      <div className="kpi-card accent">
-        <div className="kpi-label">Calculable</div>
-        <div className="kpi-value">{yearScoped ?? '—'}</div>
-        <div className="kpi-sub">statute authored by tax year</div>
-      </div>
-      <div className="kpi-card green">
-        <div className="kpi-label">Signed off</div>
-        <div className="kpi-value">{verified}</div>
-        <div className="kpi-sub">by a practitioner</div>
-      </div>
-      <div className="kpi-card">
-        <div className="kpi-label">Awaiting review</div>
-        <div className="kpi-value">{rules.length - verified || '—'}</div>
-      </div>
-    </div>
+    <KpiRow label="Rule library summary">
+      <KpiTile label="Programs codified" value={rules.length} />
+      <KpiTile label="Calculable" value={yearScoped ?? '—'} sub="statute authored by tax year" />
+      <KpiTile label="Signed off" value={verified} sub="by a practitioner" tone="above-min" />
+      <KpiTile label="Awaiting review" value={rules.length - verified || '—'} />
+    </KpiRow>
 
     <section className="panel">
       <h3 className="panel-title">

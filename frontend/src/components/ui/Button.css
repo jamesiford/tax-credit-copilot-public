@@ -1,0 +1,106 @@
+.ui-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-8);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: var(--text-small);
+  font-weight: 600;
+  line-height: var(--leading-dense);
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--motion-fast) var(--ease), border-color var(--motion-fast) var(--ease),
+    box-shadow var(--motion-fast) var(--ease);
+}
+
+.ui-btn:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.ui-btn-sm {
+  padding: var(--space-2) var(--space-6);
+  font-size: var(--text-caption);
+}
+
+.ui-btn-primary {
+  color: var(--on-select);
+  background: linear-gradient(var(--identity-start), var(--identity-end-strong));
+}
+.ui-btn-primary:hover:not(:disabled):not([aria-disabled='true']) {
+  box-shadow: var(--shadow-2);
+}
+
+.ui-btn-secondary {
+  color: var(--text-primary);
+  background: var(--surface-card);
+  border-color: var(--border-default);
+}
+.ui-btn-secondary:hover:not(:disabled):not([aria-disabled='true']) {
+  background: var(--select-bg);
+  border-color: var(--select-line);
+}
+
+.ui-btn-ghost {
+  color: var(--text-primary);
+  background: transparent;
+}
+.ui-btn-ghost:hover:not(:disabled):not([aria-disabled='true']) {
+  background: var(--select-bg);
+}
+
+.ui-btn-link {
+  padding: 0;
+  color: var(--text-link);
+  background: none;
+  border-radius: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.ui-btn-link:hover:not(:disabled):not([aria-disabled='true']) {
+  color: var(--select-strong);
+}
+
+.ui-btn-danger {
+  color: var(--state-below-min-ink);
+  background: var(--state-below-min);
+  border-color: var(--state-below-min-line);
+}
+.ui-btn-danger:hover:not(:disabled):not([aria-disabled='true']) {
+  box-shadow: var(--shadow-1);
+}
+
+.ui-btn:disabled,
+.ui-btn[aria-disabled='true'] {
+  color: var(--text-muted);
+  background: var(--state-neutral);
+  background-image: none;
+  border-color: var(--state-neutral-line);
+  cursor: not-allowed;
+}
+
+.ui-btn-icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+.ui-btn-spinner {
+  width: 1em;
+  height: 1em;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: ui-spin 0.7s linear infinite;
+}
+
+@keyframes ui-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-btn-spinner { animation-duration: 2s; }
+}

@@ -15,6 +15,10 @@ import {
 import { assumptionEntries, eligibilityLabel, MONEY, monthLabel, NUM, shortHash, stageLabel, statusTone } from '../lib/reference.js';
 import { PORTFOLIO } from '../lib/scopeDimension.js';
 import PageHeader from './PageHeader.jsx';
+import KpiTile from './ui/KpiTile.jsx';
+import Tabs from './ui/Tabs.jsx';
+import MethodTabs from './MethodTabs.jsx';
+import { kpiTone } from '../lib/kpiTone.js';
 import SortHeader from './SortHeader.jsx';
 import { FilterBar } from './ColumnFilter.jsx';
 import useTableControls from './useTableControls.js';
@@ -56,11 +60,9 @@ function Status({ status, children }) {
   return <span className={`tcc-status ${statusTone(status)}`}>{children || stageLabel(status)}</span>;
 }
 
-function Kpi({ label, value, sub, tone = '', onClick }) {
-  const content = <><div className="kpi-label">{label}</div><div className="kpi-value">{value}</div><div className="kpi-sub">{sub}</div></>;
-  return onClick
-    ? <button type="button" className={`kpi-card tcc-kpi-button ${tone}`} onClick={onClick}>{content}</button>
-    : <div className={`kpi-card ${tone}`}>{content}</div>;
+// One tile implementation (ui/KpiTile); the `tone` spellings are the old colour names.
+function Kpi({ label, value, sub, tone = '' }) {
+  return <KpiTile label={label} value={value} sub={sub} tone={kpiTone(tone)} />;
 }
 
 function Pager({ total, offset, limit, onChange }) {
@@ -141,7 +143,7 @@ export function EligibilityView({ summary, openEmployee, scope }) {
     <section className={`tcc-invariant ${summary.boundary.boundary_complete ? 'ok' : 'warn'}`}><div><b>Fiscal boundary completeness</b><span>BA-02 / BA-10 · {stageLabel(summary.boundary.status)}</span></div><div><strong>{NUM.format(summary.boundary.prior_ppe_paid_in_fy_rows)}</strong><span>prior PPE paid in FY</span></div><div><strong>{NUM.format(summary.boundary.crossing_start_rows)}</strong><span>crossing-start rows</span></div><div><strong>{NUM.format(summary.boundary.current_ppe_paid_after_fy_rows)}</strong><span>trailing rows excluded</span></div></section>
     {!summary.boundary.boundary_complete && <div className="callout warn"><b>Leading payroll lookback is missing.</b> Earliest valid PPS is {summary.boundary.earliest_valid_pay_period_start}; no rows are synthesized and denominators are not forced to 52 weeks.</div>}
     </>}
-    {calculated && <section className="panel"><div className="tcc-panel-toolbar"><div className="tcc-filter-stack"><div className="tabs">{options.map(([id, label]) => <button className={`tab ${status === id ? 'active' : ''}`} key={id} onClick={() => { setStatus(id); setOffset(0); }}>{label}</button>)}</div><button className={`btn btn-secondary ${proximity === 'near_floor' ? 'active' : ''}`} onClick={() => { setProximity(proximity === 'near_floor' ? 'all' : 'near_floor'); setOffset(0); }}>Within 5% of a floor</button></div><label className="tcc-search"><Search size={16} /><input value={query} onChange={(event) => { setQuery(event.target.value); setOffset(0); }} placeholder="Search employee ID…" /></label></div><div className="tcc-table-wrap tcc-table-tall"><table className="tbl tcc-dense-table"><thead><tr>{ELIGIBILITY_HEADS.map(([key, label, cls]) => (key
+    {calculated && <section className="panel"><div className="tcc-panel-toolbar"><div className="tcc-filter-stack"><Tabs tabs={options.map(([id, label]) => ({ id, label }))} active={status} onChange={(id) => { setStatus(id); setOffset(0); }} label="Eligibility status" idPrefix="eligibility" variant="segmented" controls={false} /><button className={`btn btn-secondary ${proximity === 'near_floor' ? 'active' : ''}`} onClick={() => { setProximity(proximity === 'near_floor' ? 'all' : 'near_floor'); setOffset(0); }}>Within 5% of a floor</button></div><label className="tcc-search"><Search size={16} /><input value={query} onChange={(event) => { setQuery(event.target.value); setOffset(0); }} placeholder="Search employee ID…" /></label></div><div className="tcc-table-wrap tcc-table-tall"><table className="tbl tcc-dense-table"><thead><tr>{ELIGIBILITY_HEADS.map(([key, label, cls]) => (key
   ? <SortHeader key={key} label={label} sortKey={key} sort={sort} multi={false} className={cls} onSort={(k) => { setSort((cur) => [{ key: k, desc: cur[0]?.key === k ? !cur[0].desc : false }]); setOffset(0); }} />
   : <th key={label} className={cls}>{label}</th>))}</tr></thead><tbody>{(data?.rows || []).map((row) => <tr key={row.record_token}><td><button className="tcc-link" onClick={() => openEmployee(row.record_token, drillContext)}>{row.employee_id}</button></td><td><Status status={row.status}>{eligibilityLabel(row.status)}</Status></td><td>{row.near_floor ? <span className="pill pill-warn">within 5%</span> : <span className="muted">—</span>}</td><td className="num">{row.totals.hours}</td><td className="num">{MONEY.format(Number(row.totals.wages))}</td><td className="num">{row.min_max.weeks}</td><td className="num">{row.min_max.avg_hours} / {MONEY.format(Number(row.min_max.avg_wages))}</td><td><FlagPair method={row.min_max} /></td><td className="num">{row.pay_period.weeks}</td><td className="num">{row.pay_period.avg_hours} / {MONEY.format(Number(row.pay_period.avg_wages))}</td><td><FlagPair method={row.pay_period} /></td></tr>)}</tbody></table></div>{data && <Pager total={data.total} limit={limit} offset={offset} onChange={setOffset} />}</section>}
   </>;
@@ -190,7 +192,7 @@ export function OneZeroView({ openEmployee, scope }) {
   const overlaps = data?.overlap_flags || [];
   return <>
     <PageHeader eyebrow="What is it worth" title="Monthly employment" sub="Eligible employees allocated to location × legal entity × month (the one/zero matrix), with every overlap disposition visible" />
-    <div className="tabs tcc-method-tabs"><button className={`tab ${method === 'min_max' ? 'active' : ''}`} onClick={() => setMethod('min_max')}>Min-Max</button><button className={`tab ${method === 'pay_period' ? 'active' : ''}`} onClick={() => setMethod('pay_period')}>Pay Period</button></div>
+    <div className="tcc-method-tabs"><MethodTabs method={method} onChange={setMethod} label="Method" /></div>
     <div className="callout info"><b>{method === 'min_max' ? 'One eligible employee × unit × FEIN span.' : 'One eligible employee × major period × unit × FEIN.'}</b> A month is 1 when the method-specific PPS/PPE range covers its target. Month 12 uses the last PPE when it falls after day 15.</div>
     {isPortfolio ? <div className="callout info">Monthly employment allocates one client’s employees to their units and months. Select a client to see theirs.</div>
       : error ? <div className="callout warn">No monthly employment matrix for this selection: {error}</div>

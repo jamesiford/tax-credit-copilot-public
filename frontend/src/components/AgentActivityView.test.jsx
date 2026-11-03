@@ -165,7 +165,7 @@ describe('findings arrive at the grain a human decides at', () => {
 
     render(<AgentActivityView scope={scope()} scopeOptions={SCOPE_OPTIONS} />);
 
-    const card = (await screen.findByText('Decisions')).closest('.kpi-card');
+    const card = (await screen.findByText('Decisions')).closest('.ui-kpi');
     expect(card).toHaveTextContent('1');
     expect(card).toHaveTextContent('covering 32,219 instances');
   });
@@ -307,7 +307,7 @@ describe('open findings are distinguished from answered ones', () => {
     render(<AgentActivityView scope={scope()} scopeOptions={SCOPE_OPTIONS} />);
 
     const card = await screen.findByText('Awaiting a decision');
-    expect(card.closest('.kpi-card')).toHaveTextContent('1');
+    expect(card.closest('.ui-kpi')).toHaveTextContent('1');
     expect(screen.getByText(/unanswered findings affect the figures/)).toBeInTheDocument();
   });
 

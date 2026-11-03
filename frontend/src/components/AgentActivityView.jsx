@@ -3,6 +3,7 @@ import {
   CheckCircle2, Flag, Loader2, RotateCcw, ShieldQuestion, Undo2,
 } from 'lucide-react';
 import { fetchFindings, fetchMe, reopenFinding, resolveFinding } from '../api.js';
+import KpiTile, { KpiRow } from './ui/KpiTile.jsx';
 import { PORTFOLIO } from '../lib/scopeDimension.js';
 import { USD } from '../lib/coverage.js';
 
@@ -177,38 +178,34 @@ export default function AgentActivityView({ scope, scopeOptions }) {
     )}
 
     {summary && (
-      <div className="kpi-strip tcc-kpi-4">
-        <div className={`kpi-card ${summary.requires_decision ? 'amber' : ''}`}>
-          <div className="kpi-label">Awaiting a decision</div>
-          <div className="kpi-value">{summary.requires_decision || '—'}</div>
-          <div className="kpi-sub">nobody has answered these yet</div>
-        </div>
-        <div className="kpi-card">
-          <div className="kpi-label">Decisions</div>
-          <div className="kpi-value">{summary.total}</div>
-          <div className="kpi-sub">
-            covering {(summary.instances || summary.total).toLocaleString()} instances
-          </div>
-        </div>
-        <div className={`kpi-card ${summary.all_decided ? 'green' : ''}`}>
-          <div className="kpi-label">Status</div>
-          <div className="kpi-value">
-            {summary.none_found ? 'Nothing found' : summary.all_decided ? 'All answered' : 'Open'}
-          </div>
-          <div className="kpi-sub">
-            {summary.none_found
-              ? 'the agent looked and found nothing'
-              : summary.all_decided
-                ? 'every finding has a recorded decision'
-                : 'unanswered findings affect the figures'}
-          </div>
-        </div>
-        <div className="kpi-card">
-          <div className="kpi-label">Kinds</div>
-          <div className="kpi-value">{Object.keys(summary.by_kind || {}).length || '—'}</div>
-          <div className="kpi-sub">{Object.keys(summary.by_kind || {}).join(', ') || 'none'}</div>
-        </div>
-      </div>
+      <KpiRow label="Findings summary">
+        <KpiTile
+          label="Awaiting a decision"
+          value={summary.requires_decision || '—'}
+          sub="nobody has answered these yet"
+          tone={summary.requires_decision ? 'partial' : 'neutral'}
+        />
+        <KpiTile
+          label="Decisions"
+          value={summary.total}
+          sub={`covering ${(summary.instances || summary.total).toLocaleString()} instances`}
+        />
+        <KpiTile
+          label="Status"
+          value={summary.none_found ? 'Nothing found' : summary.all_decided ? 'All answered' : 'Open'}
+          sub={summary.none_found
+            ? 'the agent looked and found nothing'
+            : summary.all_decided
+              ? 'every finding has a recorded decision'
+              : 'unanswered findings affect the figures'}
+          tone={summary.all_decided ? 'above-min' : 'neutral'}
+        />
+        <KpiTile
+          label="Kinds"
+          value={Object.keys(summary.by_kind || {}).length || '—'}
+          sub={Object.keys(summary.by_kind || {}).join(', ') || 'none'}
+        />
+      </KpiRow>
     )}
 
     {data && data.findings.length === 0 && (

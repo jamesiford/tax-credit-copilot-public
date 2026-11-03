@@ -396,72 +396,6 @@ body {
   margin-bottom: var(--space-7);
 }
 
-.kpi-card {
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  padding: var(--space-5) var(--space-6);
-  position: relative;
-  overflow: hidden;
-  min-height: 0;
-}
-
-.kpi-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 4px;
-  height: 100%;
-  background: var(--exp-primary);
-}
-
-.kpi-card.green::before { background: var(--ok); }
-.kpi-card.amber::before { background: var(--warn); }
-.kpi-card.accent::before { background: var(--accent); }
-.kpi-card.magenta::before { background: var(--exp-magenta); }
-
-/* Tall KPI card built on top of .panel — used by Value & Billing top row.
-   Same colored left-border accent as .kpi-card but with the panel's larger
-   padding so an internal stat-list fits cleanly. */
-.kpi-card-panel {
-  position: relative;
-  overflow: hidden;
-  padding-left: var(--space-8);
-}
-.kpi-card-panel::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 4px;
-  height: 100%;
-  background: var(--exp-primary);
-}
-.kpi-card-panel.green::before { background: var(--ok); }
-.kpi-card-panel.amber::before { background: var(--warn); }
-.kpi-card-panel.accent::before { background: var(--accent); }
-.kpi-card-panel.magenta::before { background: var(--exp-magenta); }
-.kpi-card-panel .kpi-value { font-size: var(--text-display); margin-top: var(--space-2); }
-
-.kpi-label {
-  font-size: var(--text-caption);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--muted);
-  font-weight: 600;
-}
-
-.kpi-value {
-  font-size: var(--text-title);
-  font-weight: 700;
-  color: var(--ink);
-  margin-top: var(--space-1);
-  line-height: 1.15;
-}
-
-.kpi-sub { font-size: var(--text-caption); color: var(--muted); margin-top: var(--space-1); }
-
 .panel {
   background: var(--panel);
   border: 1px solid var(--line);
@@ -1834,8 +1768,6 @@ button.pill-action.pill-forecast-ok, button.pill-action.pill-forecast-bad { bord
    and local rather than a dropdown in the chrome. */
 .method-tabs { display: inline-flex; align-items: center; gap: var(--space-2); }
 .method-tabs-label { color: var(--muted); font-size: var(--text-caption); font-weight: 700; letter-spacing: .07em; text-transform: uppercase; }
-.method-tabs button { height: 22px; padding: 0 var(--space-4); color: var(--ink-2); background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); font: inherit; font-size: var(--text-small); cursor: pointer; }
-.method-tabs button.active { color: var(--on-accent); background: var(--accent-strong); border-color: var(--accent-strong); font-weight: 600; }
 .method-tabs-note { color: var(--muted); font-size: var(--text-caption); font-style: italic; }
 
 /* Two peer grids over one scope. The SHAPE is MethodTabs deliberately -- a
@@ -1844,9 +1776,6 @@ button.pill-action.pill-forecast-ok, button.pill-action.pill-forecast-bad { bord
    statutory reading, which is blue, and this picks which population is on
    screen, which is chrome selection and therefore purple. */
 .grid-tabs { margin-bottom: var(--space-4); }
-.grid-tabs button.active { background: var(--accent-2-strong); border-color: var(--accent-2-strong); }
-.grid-tab-count { margin-left: var(--space-2); padding: 0 var(--space-2); background: var(--state-neutral); border-radius: var(--radius-pill); color: var(--ink-2); font-size: var(--text-caption); font-weight: 600; }
-.grid-tabs button.active .grid-tab-count { background: rgb(255 255 255 / .24); color: var(--on-accent); }
 .tcc-grid-tabbar { display: flex; align-items: center; justify-content: space-between; gap: var(--space-5); flex-wrap: wrap; }
 
 /* Sortable headers. The arrow says direction; the superscript says which key
@@ -1963,27 +1892,7 @@ button.pill-action.pill-forecast-ok, button.pill-action.pill-forecast-bad { bord
 .tcc-header .page-sub { margin: var(--space-3) 0 0; max-width: 78ch; }
 .tcc-header-actions { display: flex; align-items: center; gap: var(--space-5); flex: 0 0 auto; }
 
-/* One stat card. `tone` encodes the reading; anything without one is neutral. */
-.tcc-stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: var(--space-5); margin: 0 0 var(--space-10); }
-.tcc-stat { padding: var(--space-8); background: var(--panel);
-  border: 1px solid var(--line); border-left: 3px solid var(--line); border-radius: var(--radius); }
-.tcc-stat-label { font-size: var(--text-body); font-weight: 600; text-transform: uppercase;
-  letter-spacing: 0.04em; color: var(--muted); }
-.tcc-stat-value { margin-top: var(--space-3); font-size: var(--text-display); font-weight: 700;
-  line-height: 1.15; color: var(--ink); }
-.tcc-stat-sub { margin-top: var(--space-1); font-size: var(--text-body); color: var(--muted); }
-
-.tcc-stat-neutral { border-left-color: var(--line); }
-.tcc-stat-good { border-left-color: var(--ok); }
-.tcc-stat-warn { border-left-color: var(--warn); }
-.tcc-stat-bad { border-left-color: var(--bad); }
-.tcc-stat-accent { border-left-color: var(--accent); }
-
-/* Nothing to report. Recedes rather than competing with a real figure. */
-.tcc-stat-empty { background: transparent; border-style: dashed;
-  border-left-color: var(--line); }
-.tcc-stat-empty .tcc-stat-value { font-size: var(--text-title); font-weight: 600; color: var(--muted); }
+/* The stat tile lives in components/ui/KpiTile.css. */
 
 /* The line above a page's data (29 Sep): a quiet caption, the notes behind an
    (i), and a collapsed Copilot summary. It replaced the answer banners, which
@@ -2131,14 +2040,6 @@ button.pill-action.pill-forecast-ok, button.pill-action.pill-forecast-bad { bord
 .tcc-status.neutral { color: var(--ink-3); background: var(--surface-4); }
 
 .kpi-strip.tcc-kpi-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); width: 100%; margin-bottom: var(--space-7); }
-.tcc-kpi-4 .kpi-card { min-height: 104px; border-radius: var(--radius); border-top: 3px solid var(--exp-primary); }
-.tcc-kpi-4 .kpi-card.accent { border-top-color: var(--accent-strong); }
-.tcc-kpi-4 .kpi-card.green { border-top-color: var(--ok); }
-.tcc-kpi-4 .kpi-card.amber { border-top-color: var(--exp-gold); }
-.tcc-kpi-4 .kpi-value { overflow-wrap: anywhere; font-size: var(--text-display); letter-spacing: 0; }
-.tcc-kpi-button { color: inherit; font: inherit; text-align: left; cursor: pointer; }
-.tcc-kpi-button:hover { border-color: var(--exp-accent); box-shadow: 0 3px 10px rgba(38,71,141,.1); }
-.tcc-kpi-button:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
 .tcc-overview-grid { align-items: stretch; }
 .tcc-main .panel { border-radius: var(--radius); box-shadow: 0 2px 8px rgba(35, 51, 91, .04); }
 .tcc-main .panel-title { display: flex; align-items: center; justify-content: space-between; gap: var(--space-5); }
@@ -2284,10 +2185,7 @@ button.pill-action.pill-forecast-ok, button.pill-action.pill-forecast-bad { bord
    employee walk's tab row; the client page uses the same control so the two
    cannot grow two tab styles. Purple, because choosing a section is chrome
    selection, not a reading. */
-.section-tabs { display: flex; overflow-x: auto; padding: 0 var(--space-7); background: var(--surface-3); border-bottom: 1px solid var(--line); }
-.section-tabs button { min-height: 42px; padding: 0 var(--space-6); color: var(--ink-2); background: transparent; border: 0; border-bottom: 2px solid transparent; font: inherit; font-size: var(--text-caption); white-space: nowrap; cursor: pointer; }
-.section-tabs button:hover { color: var(--accent-2-strong); }
-.section-tabs button.active { color: var(--accent-2-strong); border-bottom-color: var(--accent-2-strong); font-weight: 700; }
+.section-tabs { background: var(--surface-subtle); }
 .tcc-client-tabs { margin-bottom: var(--space-6); }
 .tcc-claim-package { display: flex; align-items: center; justify-content: flex-end; margin-bottom: var(--space-4); font-size: var(--text-small); }
 .tcc-drill-body { min-height: 0; overflow: auto; padding: var(--space-8); background: var(--surface-2); }
@@ -2386,7 +2284,6 @@ button.pill-action.pill-forecast-ok, button.pill-action.pill-forecast-bad { bord
   .tcc-stage-grid, .tcc-file-grid, .kpi-strip.tcc-kpi-4, .tcc-control-grid, .tcc-assumption-columns, .tcc-agent-grid, .tcc-method-grid, .tcc-provenance-grid { grid-template-columns: 1fr; }
   .tcc-formula-pair { grid-template-columns: 1fr; }
   .tcc-invariant, .tcc-history-strip { grid-template-columns: 1fr; }
-  .tcc-kpi-4 .kpi-card { min-height: 86px; }
   .tcc-main .grid-2 { grid-template-columns: 1fr; }
   .tcc-panel-toolbar { align-items: stretch; flex-direction: column; }
   .tcc-search { width: 100%; }
@@ -2702,7 +2599,7 @@ button.pill-action.pill-forecast-ok, button.pill-action.pill-forecast-bad { bord
   .main { padding: 0; max-width: none; }
   .app-shell { background: var(--panel); }
   .panel { box-shadow: none; border-color: #ccc; page-break-inside: avoid; }
-  .kpi-card { border-color: #ccc; }
+  .ui-kpi { border-color: var(--border-strong); }
   .evidence-walk { background: var(--surface-2) !important; color: #111 !important; border: 1px solid #ccc; }
   a { color: #000; text-decoration: none; }
   .page-header { border-bottom: 2px solid #000; padding-bottom: var(--space-3); margin-bottom: var(--space-6); }

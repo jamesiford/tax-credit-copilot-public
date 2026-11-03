@@ -1,4 +1,4 @@
-import { render as rawRender, screen, waitFor } from '@testing-library/react';
+import { render as rawRender, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 
@@ -92,7 +92,10 @@ describe('a client page carries the questions that need a single client', () => 
       />,
     );
 
-    const tabs = screen.getAllByRole('tab').map((t) => t.textContent);
+    // The section tabs only: the Min-Max / Pay Period reading and the grid
+    // population are tabs now too, and are a different question.
+    const tabs = within(screen.getByRole('tablist', { name: 'Client sections' }))
+      .getAllByRole('tab').map((t) => t.textContent);
     expect(tabs).toEqual(['Position by location', 'What was claimed', 'How am I doing', 'What-if']);
     expect(screen.getByRole('tab', { name: 'Position by location' })).toHaveAttribute('aria-selected', 'true');
     // Only the open section reads.

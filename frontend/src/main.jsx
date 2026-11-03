@@ -10,7 +10,7 @@
  * that has been shared. The path keeps its old spelling for the same reason the
  * assumption-set IDs do: it is an identifier that escaped, not a name we choose.
  */
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 // Typefaces are BUNDLED, not hotlinked: a demo on a hotel network that cannot
@@ -33,13 +33,20 @@ import { applyTheme } from './brand.config.js';
 import './styles/tokens/index.css';
 import './index.css';
 
-// Before the first render, so the page never paints in one theme and flips.
+// Applied before the first render, so the page never paints in one theme and flips.
 applyTheme();
+
+// The owner's visual review surface. `import.meta.env.DEV` is a build-time
+// constant, so the dynamic import (and the page) is dropped from production.
+const Styleguide = import.meta.env.DEV ? lazy(() => import('./pages/Styleguide.jsx')) : null;
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
       <Routes>
+        {Styleguide ? (
+          <Route path="/__styleguide" element={<Suspense fallback={null}><Styleguide /></Suspense>} />
+        ) : null}
         <Route path="/" element={<App />} />
         <Route path="/:view" element={<App />} />
         <Route path="/c/:clientId" element={<App />} />

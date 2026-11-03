@@ -1,0 +1,47 @@
+.ui-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-12);
+  padding: var(--space-16) var(--space-12);
+  background: linear-gradient(var(--surface-card), var(--surface-hero));
+  border-bottom: 1px solid var(--border-default);
+}
+
+.ui-hero--compact {
+  max-block-size: 96px;
+  padding: var(--space-6) var(--space-12);
+  overflow: hidden;
+}
+
+.ui-hero__main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.ui-hero__title {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: var(--text-display);
+  font-weight: 700;
+  line-height: var(--leading-heading);
+}
+
+.ui-hero--compact .ui-hero__title {
+  font-size: var(--text-title);
+}
+
+.ui-hero__sub {
+  color: var(--text-default);
+  font-size: var(--text-body);
+  line-height: var(--leading-base);
+}
+
+.ui-hero__aside {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: var(--space-6);
+}

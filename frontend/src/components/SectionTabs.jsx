@@ -1,3 +1,5 @@
+import Tabs from './ui/Tabs.jsx';
+
 /**
  * Sections of one page, one visible at a time.
  *
@@ -12,23 +14,14 @@
  */
 export default function SectionTabs({ tabs, active, onChange, label = 'Sections', idPrefix = 'section' }) {
   return (
-    <div className="section-tabs" role="tablist" aria-label={label}>
-      {tabs.map((tab) => (
-        <button
-          key={tab.id}
-          type="button"
-          role="tab"
-          id={`${idPrefix}-tab-${tab.id}`}
-          aria-selected={active === tab.id}
-          aria-controls={`${idPrefix}-panel-${tab.id}`}
-          className={active === tab.id ? 'active' : ''}
-          onClick={() => onChange(tab.id)}
-          title={tab.hint}
-        >
-          {tab.label}
-        </button>
-      ))}
-    </div>
+    <Tabs
+      className="section-tabs"
+      tabs={tabs}
+      active={active}
+      onChange={onChange}
+      label={label}
+      idPrefix={idPrefix}
+    />
   );
 }
 
