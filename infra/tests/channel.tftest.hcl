@@ -122,9 +122,9 @@ run "on_is_https_only_keyless_and_in_the_shared_subnet" {
     condition = (
       module.channel.app.app_command_line == "sh startup-channel.sh"
       && module.channel.app.python_version == "3.12"
-      && module.channel.app.tags["azd-service-name"] == "channel"
+      && !contains(keys(module.channel.app.tags), "azd-service-name")
     )
-    error_message = "Python 3.12, startup-channel.sh, and the tag azd deploys the `channel` service by"
+    error_message = "Python 3.12, startup-channel.sh, and no azd-service-name tag: azd has no channel service, the deploy-channel hook deploys it"
   }
 
   assert {

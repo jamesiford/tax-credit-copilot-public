@@ -209,9 +209,9 @@ jobs:
 
       - name: Zip deploy the channel gateway (only when the channel is enabled)
         if: env.CHANNEL_APP_NAME != '' && env.CHANNEL_APP_NAME != 'null'
-        run: |
-          python scripts/package-app.py backend "$RUNNER_TEMP/channel.zip"
-          az webapp deploy -g "$AZURE_RESOURCE_GROUP" -n "$CHANNEL_APP_NAME" --src-path "$RUNNER_TEMP/channel.zip" --type zip --async false
+        env:
+          TCC_ENABLE_M365_CHANNEL: 'true'
+        run: pwsh scripts/deploy-channel.ps1
 
       - name: Smoke test through the web app (public profile)
         if: inputs.profile == 'public'

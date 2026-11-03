@@ -812,3 +812,29 @@ One short entry per decision: context, choice, why.
   the same `backend/` zip; a test proves it carries `startup-channel.sh` and `channel/`.
 - `startup-channel.sh` is checked out with LF (`.gitattributes` `*.sh text eol=lf`) and a test
   fails on a carriage return: a CRLF `set -e` fails on App Service.
+
+
+## D-73 CH-07b: the gateway is deployed by a hook, not an azd service
+
+- **Context.** Prompt 3 (D-72) listed a `channel` service in `azure.yaml`. azd resolves a
+  service by its `azd-service-name` tag and cannot make one conditional, so with
+  `enable_m365_channel = false` every default `azd up` / `azd deploy` failed. A review
+  found it.
+- **Choice.** `azure.yaml` services are `api` and `web` again. `scripts/deploy-channel.ps1`
+  (`-WhatIf` supported) runs from a project-level `postdeploy` hook and from `deploy.yml`'s
+  conditional step. It exits 0 with one quiet line unless `TCC_ENABLE_M365_CHANNEL=true`;
+  otherwise it packages `backend/` with `scripts/package-app.py` and runs `az webapp deploy`
+  for `CHANNEL_APP_NAME`/`AZURE_RESOURCE_GROUP` (the Terraform outputs). The gateway app no
+  longer carries an `azd-service-name` tag, since azd has nothing to match it to.
+- **Why.** The default command must be what it was. The hook needs the toggle in the azd
+  environment as well as the Terraform variable; both are documented in the handover.
+- **Edited assertions.** `test_channel_infra.py`: `test_azd_knows_the_channel_service_and_the_others_are_unchanged`
+  became `test_azd_has_exactly_the_api_and_web_services_so_a_default_azd_up_is_unchanged`;
+  `test_the_azd_service_name_tag_the_module_sets_matches_the_service` became
+  `test_the_module_starts_the_gateway_with_its_own_script` plus a no-`channel`-tag/hook
+  check. `infra/tests/channel.tftest.hcl`: the `azd-service-name == "channel"` assertion now
+  asserts the tag is absent. `test_channel_deploy_hook.py` (new) runs the script against a
+  stubbed `az`.
+- **jsonschema.** `backend/requirements.txt` is the only requirements file and the only
+  install step (`deploy.yml`, `ci.yml` use it), and already pins `jsonschema`. The channel
+  zip is the `backend/` zip, which includes `channel/` and `startup-channel.sh` (tested).
