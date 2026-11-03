@@ -28,7 +28,8 @@ runs in a worktree, so `feat/m365-channel` is held by the main checkout).
 | CH-07 | Terraform `channel` module, packaging, grants, docs | done | `wp/CH-07-channel-infra` | merge `ed36927` |
 | CH-07b | Deploy the gateway from a hook (azd has no conditional service) | done | `wp/CH-07b-channel-deploy-hook` | merge `47a8741` |
 | CH-08 | Hosted orchestrator (`channel_orchestrator/`), narration audit | done | `wp/CH-08-orchestrator` | merge `063afec` |
-| CH-09 | `scripts/publish-m365.ps1` | in_progress | `wp/CH-09-publish-m365` | — |
+| CH-08b | Orchestrator gaps found re-reading the brief (D-85) | done | `wp/CH-08b-spec-gaps` | merge `4221270` |
+| CH-09 | `scripts/publish-m365.ps1` | done | `wp/CH-09-publish-m365` | merge `3285ade` |
 
 ## Evidence
 
@@ -228,6 +229,17 @@ and its `discovery` / `multi_state` scans read the configured default tenant.
 - `infra/` untouched, so no Terraform checks (D-79: no container registry). Whitelabel 0 enforced; audit-export 0; `gitleaks git` clean (one allow-list entry for the generated vendor manifest's SHA-256 digests); links 0 broken; coding-standards ratchet green with no baseline change.
 - The real Responses host (`azure-ai-agentserver-responses` 2.4.0) was driven in-process (`/readiness`, `POST /responses`, `/whoami`). Docker: stages up to `pip install` build and the later stages were checked without it; `pip install` in the build could not complete here (TLS interception on the egress), so the image was not built end to end (D-79).
 - Not verified live, by design (Prompt 6): which identity signal Teams and Copilot Chat carry; whether the hosted agent reaches the gateway and the model from the private project (D-78); `azd ai agent` accepting `channel_orchestrator/azure.yaml`; Foundry-account `/openai/v1` access for the agent's identity (D-75).
+
+### CH-08b (merged `4221270`)
+
+- Full backend suite: **2593 passed**, 136 skipped, 1 xfailed. A re-read of the brief found: numbered `1) Name` candidates, a stated drop of a superseded preview, the claim-package link after commit, a turn deadline, plain mappings for 401/403/429/timeout, a span per gateway call, `/whoami` fields, `conversation_id` in the report, a what-if's numbers and a base year being the reader's, and golden coverage for every write flow with a per-answer numeral check (D-85).
+
+### CH-09 (merged `3285ade`)
+
+- Full backend suite: **2615 passed**, 136 skipped, 1 xfailed (CH-08b: 2593). New: `tests/test_publish_m365.py` (22; needs `pwsh`, skipped without it) over `tests/publish_shim.py`, a programmable fake `az`. No skip or xfail added; pins untouched.
+- Asserted on the requests the script makes: the sequence, the bot and channel bodies, the merged PATCH (existing protocols and unknown schemes survive; nothing configured gets `responses` + `activity`), the publish and package bodies, scope → scheme, the tenant guard (no request at all without `-ConfirmTenantPublish`), the provider check (prints the command, calls nothing else, never registers), the version bump, "no titleId is not success", `-WhatIf` (reads, never writes), and that no token appears in any call.
+- `docs/m365-channel/evidence/publish-whatif.txt`: the `-WhatIf` transcript, placeholders only (a test pins that). `PUBLISHING.md` written. `infra/` untouched. Whitelabel 0 enforced; audit-export 0; `gitleaks git` clean; links 0 broken.
+- Not run against a live subscription (Prompt 6). Decisions: D-84.
 
 ## Blockers
 
