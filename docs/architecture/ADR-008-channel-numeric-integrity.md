@@ -1,6 +1,7 @@
 # ADR-008 — Numeric integrity for the Microsoft 365 channel
 
-**Date** 2026-11-02 · **Status** Accepted · **Partially implements** [ADR-004](ADR-004-agentic-workflows.md) §3
+**Date** 2026-11-02 · **Status** Accepted, **as built** (finalised in CH-12, 3 Nov 2026) ·
+**Partially implements** [ADR-004](ADR-004-agentic-workflows.md) §3 · Context for the whole channel: [ADR-009](ADR-009-m365-channel.md)
 
 ## Context
 
@@ -95,6 +96,7 @@ the blocks of every capability, so CH-01's rendering is held to CH-02's guard.
 | A narrator that is never shown a value | `TenantScopeMiddleware`, `CostGuardMiddleware` (the budget is built as a decorator: AI-04) |
 | Fallback to platform blocks on any rejection | Structured-output field-by-field comparison for authored artifacts |
 | A prompt-injection screen and an output policy (AI-07, below) | `PromptInjectionMiddleware` as MAF middleware — the same check runs today as a service-level screen |
+| `verify_figures` over the gateway's conversation ledger, and the provenance line in the MCP text (below) | A shared, durable ledger; binding each numeral to the fact it cites |
 
 The guard and composer are plain functions rather than `ChatMiddleware`. The
 hosted orchestrator (a later work package) calls them in code; wrapping them as
@@ -148,6 +150,34 @@ with the same key replays the first outcome. The preview blocks are rendered fro
 facts like every other capability and pass the same guard. The full flow is in
 `application/confirmations.py` and `application/capabilities/writes.py`.
 
+## Documents authored elsewhere: `verify_figures` (CH-06, CH-10, CH-11)
+
+The composer protects a reply the platform assembles. Cowork assembles its own, and a Word briefing cannot be
+built in code, so a second control exists for text the platform did not compose: **`verify_figures`**, a tool that
+runs the same numeric guard, at zero tolerance, over a draft.
+
+- **Against what.** Not facts the caller supplies (a caller choosing its own facts would be marking its own
+  homework) but the gateway's **conversation ledger**: every `facts` block it returned in this conversation, kept in
+  memory, bounded and expiring. What the caller *may* supply is `allowed_context`: the numerals the author or the
+  reader introduced (a date, a count of emails found, a slide number) and, for a footer, the identifiers it quotes.
+- **What it returns.** `pass` or `rejected`, with each offending token, its position and why, and the count checked.
+  A figure that cannot be traced is reported, never waved through: after a restart the ledger is empty and every
+  figure fails, which is the strict direction.
+- **What the model is handed.** The MCP text for a result is rendered by the platform from the envelope's blocks,
+  starts with `VERBATIM — quote figures exactly as written.`, carries a **provenance line** (run, rule pack,
+  assumption set, trail hash; the label says "trail hash", not "sha256", because the guard reads the digits of a
+  digest as numerals) and ends with the disclaimer. A footer is therefore copied, not composed, and an altered
+  digit in it fails the check once the four values are passed as `allowed_context`.
+- **Where it is proved.** `tests/channel/test_workflows*.py` drive whole workflows over REST and MCP: a document
+  built only from returned blocks passes, and every one-figure mutation of it is rejected; a capability whose words
+  disagree with its facts is caught by the envelope scan and by `verify_figures`; a forgotten ledger says no.
+
+**Two limits found while proving it, stated rather than fixed.** The guard matches **values**. A wrong figure that
+equals another real figure in the same conversation (`$1` beside a real count of 1) is not seen; the tests pin
+this and the mutation helper leaves such collisions out. And `client_resolve` asks even for one exact name when no
+client is selected, so a skill must confirm and call it again with `current_client_id`; the guard is not involved,
+but a workflow that guessed would have named the wrong client.
+
 ## Consequences
 
 **Good.** On the channel path a wrong figure cannot reach a reader: it is either
@@ -179,6 +209,7 @@ strict gate on the model's raw output is what keeps a model from using that door
   sentence ("your credit rose by {{facts.credit.annual_credit_usd}}") passes. The
   guard proves a figure is the engine's, not that the sentence is true. Narrator
   instructions and review, not this check, address that.
-- **Cowork composes its own answers.** A skill can tell it to quote verbatim and
-  `verify_figures` (declared, not yet built) lets it check a draft, but that is a
-  weaker guarantee than the hosted orchestrator's.
+- **Cowork composes its own answers.** A skill can tell it to quote verbatim, and `verify_figures` (built; see
+  above) lets it check a draft against the conversation's own results, but that is a weaker guarantee than the hosted
+  orchestrator's: the check is a step the model is told to run, a ledger that is per process forgets on restart,
+  and the guard compares values. The setup guide and the demo script say so in plain words.

@@ -32,7 +32,7 @@ runs in a worktree, so `feat/m365-channel` is held by the main checkout).
 | CH-09 | `scripts/publish-m365.ps1` | done | `wp/CH-09-publish-m365` | merge `3285ade` |
 | CH-10 | Cowork plugin (`channels/cowork/`), builder and offline validator | done | `wp/CH-10-cowork-plugin` | merge `e93ed3d` |
 | CH-11 | End-to-end workflow and exactness tests | done | `wp/CH-11-workflow-tests` | merge `f33ffa4` |
-| CH-12 | Documentation, ADR-009, runbook, demo script | todo | - | - |
+| CH-12 | Documentation, ADR-009, runbook, demo script | done | `wp/CH-12-documentation` | merge `PENDING` |
 | CH-12b | Demo network posture toggle and hardening plan | done | `wp/CH-12b-demo-posture` | merge `0bda7b9` |
 
 ## Evidence

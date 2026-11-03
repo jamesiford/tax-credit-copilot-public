@@ -410,3 +410,73 @@ is the posture working, not a fault. `demo-public-foundry` is the **demo-only** 
 warning. After the demo set it back to `false` and `azd provision`; the account returns to private and nothing the demo
 created is lost. The plan for the later hardened posture, and the spike that must prove it first, are
 [HARDENING-PLAN.md](HARDENING-PLAN.md) and [HARDENING-SPIKE.md](../m365-channel/HARDENING-SPIKE.md).
+
+### 13.6 Operating the channel
+
+**Add or remove a writer** (the default source is the allow-list table; an Entra group is the alternative and
+needs Graph consent, [KNOWN-LIMITATIONS](../m365-channel/KNOWN-LIMITATIONS.md)):
+
+```pwsh
+python scripts/channel-writers.py add <entra object id> --name "<display name>" --by <your name>
+python scripts/channel-writers.py remove <entra object id>
+python scripts/channel-writers.py list
+```
+
+An allow-list change takes effect at the **next call**: the table is read on every commit, so a writer removed in the
+middle of a conversation is refused at their next commit and the refusal is audited. A group source caches its answer
+for 60 seconds. A person who is not a writer can still read everything; their previews and commits come back
+`not_authorized`. There is nothing to rotate: the channel holds no secret (managed identities, `DefaultAzureCredential`,
+no keys), so a leaked log or app setting contains no credential to roll.
+
+**Read one person's trail** is §13.2. **Read what changed for a client** with `GET /api/claims/cell/<client>/<programme>/<year>`
+(the cell's append-only history, each row naming who decided it).
+
+### 13.7 Fabric capacity paused
+
+The same fact as §3, with channel-specific symptoms. The gateway writes its audit to the Warehouse **before** it makes a
+call, and refuses the call if it cannot (`503 audit_unavailable`: "nothing was done"). With the capacity paused, expect:
+
+| What people see | Why |
+| --- | --- |
+| Every tool answers `audit_unavailable` or `api_unreachable` / `timeout` | The audit write, or the API's own Gold read, cannot reach the Warehouse |
+| Teams or Copilot Chat replies "the platform did not answer" in a sentence | The orchestrator says, in a sentence, that the platform could not answer, and changes nothing |
+| `/channel/health` is `ok` | It checks liveness only. `/channel/ready` does not check the Warehouse either |
+
+Resume the capacity, wait for a warm read (the first call after a pause can take a minute), and ask again. **A commit
+that timed out may have landed**: do not repeat it blind. Read the record back (`claim_cell_history`, `findings_list`),
+or retry with the **same idempotency key**, which replays the first outcome instead of writing twice. A `pending`
+audit row with no `end` (§13.2) marks a call whose outcome is unknown.
+
+### 13.8 A publish failed
+
+`scripts/publish-m365.ps1` prints the step that failed and never claims success without a `titleId`
+([PUBLISHING](../m365-channel/PUBLISHING.md) has the table of causes). First checks: is `Microsoft.BotService` registered
+(an operator's step; the script prints the command and never registers one); does the caller hold Foundry User and can it
+**reach the Foundry data plane**. If the posture is `private` (§13.5) a workstation cannot, and that is the posture
+working: use the demo toggle for the demo, or run from inside the network. A failed publish changes nothing a person
+sees: the previous published version keeps serving. Re-run it; the bot, channel and endpoint steps are idempotent, and a
+published version number is never reused. For the Cowork plugin, a failed upload names the manifest field it refused:
+rebuild with `scripts/build-cowork-plugin.py --strict` rather than editing the manifest.
+
+### 13.9 A spike in guard rejections
+
+The numeric guard drops a narration whole when it carries a figure the engine did not produce, so the person still gets
+the engine's blocks, only without the sentence. A **spike** in those drops means something upstream changed: a model
+deployment or version, the narrator's prompt, or a formatter. The answers stay correct; the commentary disappears.
+
+```sql
+SELECT CAST(occurred_at AS date) AS day, numeric_guard, COUNT(*) AS n
+FROM tcc_ops.channel_audit
+WHERE action_kind = 'narrate' AND occurred_at > DATEADD(day, -7, SYSUTCDATETIME())
+GROUP BY CAST(occurred_at AS date), numeric_guard
+ORDER BY day DESC, numeric_guard;
+```
+
+Then: `python scripts/prompt-manifest.py` (exit 1 if a prompt no longer matches the recorded version) and the model
+deployment's version in the Foundry portal; `python scripts/ai-eval.py` runs the offline evaluation (routing, narration
+and refusal sets). A **single** rejection is the guard working. A rejection of the **blocks themselves** (the platform's
+own rendering fails the guard, so "no figure is shown at all, with a notice") is not a model problem: it is a formatter
+defect, and it is a bug to raise, never a setting to loosen. Do not raise the tolerance; there is none to raise.
+
+A related, quieter signal: `verify_figures` saying a figure is wrong right after a restart is the per-process ledger
+(§13.1), not a defect.

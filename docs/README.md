@@ -24,7 +24,8 @@ precisely rather than in general.
 | [ADR-004](architecture/ADR-004-agentic-workflows.md) | Where agents are allowed to act, and where they may only narrate |
 | [ADR-005](architecture/ADR-005-year-versioned-rules.md) | Statute frozen per tax year, so a historical run replays exactly. This is what makes a retroactive audit defensible |
 | [ADR-007](architecture/ADR-007-warehouse-operational-store.md) | The Fabric Warehouse is the only operational store; the document store is retired. Every statement is tenant-bound on `client_id` |
-| [ADR-008](architecture/ADR-008-channel-numeric-integrity.md) | Numeric integrity for the Microsoft 365 channel: facts, placeholders and a zero-tolerance guard. **Partially implements** ADR-004 §3 — the portal chat path is unchanged |
+| [ADR-008](architecture/ADR-008-channel-numeric-integrity.md) | Numeric integrity for the Microsoft 365 channel: facts, placeholders and a zero-tolerance guard, and `verify_figures` for documents authored elsewhere. **As built.** **Partially implements** ADR-004 §3 — the portal chat path is unchanged |
+| [ADR-009](architecture/ADR-009-m365-channel.md) | The Microsoft 365 channel: Bot Service and a hosted orchestrator, a channel gateway, trusted-agent identity with channel-asserted assurance, two-step writes, per-user audit. Alternatives, consequences, risks |
 | [HARDENING-PLAN.md](architecture/HARDENING-PLAN.md) | The demo network posture (one Terraform toggle) and the planned hardened posture: requirements, verification, work packages HD-01 to HD-08. The hardened Foundry path is per the documentation and **unproven until spike S6**; Cosmos DB is ruled out |
 | [HARDENING-SPIKE.md](m365-channel/HARDENING-SPIKE.md) | Spike S6 as a runnable checklist with acceptance criteria and a results template |
 | [CALCULATION-PROVENANCE.md](architecture/CALCULATION-PROVENANCE.md) | How every figure traces back to its inputs, formula and citation |
@@ -44,6 +45,17 @@ How the system is hosted, connected and run. Read the C4 model first.
 | [ENV-VARS.md](architecture/ENV-VARS.md) | Every setting the app reads, where it is set, and the Terraform output that carries it |
 | [RUNBOOK.md](architecture/RUNBOOK.md) | Health checks, KQL for the common failures, and routine operations |
 | [Schema migrations](data/schema/migrations/README.md) | How the Warehouse DDL is versioned and applied |
+
+## Microsoft 365 channel
+
+| | |
+| --- | --- |
+| [m365-channel/README.md](m365-channel/README.md) | The Microsoft 365 channel (Teams, Copilot Chat, Cowork): architecture, who can do what, data flow of a question and of a write, the audit model, and what the orchestrator controls versus what Cowork's model controls |
+| [m365-channel/DEMO-SCRIPT.md](m365-channel/DEMO-SCRIPT.md) | A demo for all three surfaces using the synthetic clients, and the manual test checklist |
+| [m365-channel/COWORK-SETUP.md](m365-channel/COWORK-SETUP.md) · [`channels/cowork/`](../channels/cowork/README.md) | The Cowork plugin: registering the OAuth client, building and installing it, and its known gaps |
+| [m365-channel/KNOWN-LIMITATIONS.md](m365-channel/KNOWN-LIMITATIONS.md) | What the channel does not do |
+| [m365-channel/ORCHESTRATOR.md](m365-channel/ORCHESTRATOR.md) · [PUBLISHING.md](m365-channel/PUBLISHING.md) | The hosted orchestrator, and publishing it to Teams and Copilot |
+| [m365-channel/DECISIONS.md](m365-channel/DECISIONS.md) · [STATUS.md](m365-channel/STATUS.md) | Every decision taken building the channel, and what is done |
 
 ## Data and calculation
 

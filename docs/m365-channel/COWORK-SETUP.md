@@ -9,7 +9,7 @@ token store, and the package carries only a registration id.
 
 | Need | Why |
 | --- | --- |
-| The channel gateway deployed and reachable over HTTPS at `https://<gateway-host>/mcp` | Cowork calls it from Microsoft's cloud, so it needs a public HTTPS address. In the demo posture the gateway is public and Entra-only; in the hardened posture Cowork is off. See `docs/architecture/HARDENING-PLAN.md`. |
+| The channel gateway deployed and reachable over HTTPS at `https://<gateway-host>/mcp` | Cowork calls it from Microsoft's cloud, so it needs a public HTTPS address. In the demo posture the gateway is public and Entra-only; in the hardened posture Cowork is off. See [HARDENING-PLAN](../architecture/HARDENING-PLAN.md). |
 | The gateway's Entra app registration, with the delegated scope `Channel.Access` | The scope Cowork's sign-in asks for. The gateway accepts a delegated token only when it carries it. |
 | A person with the Cowork licence and access in the tenant | A Copilot licence and Cowork enabled for them. |
 | People who may **write** on the writer list | Anyone can read; only a writer's commit is accepted. See [Who can write](#who-can-write). |
@@ -128,7 +128,7 @@ out, so the skills do not rely on them: the confirmation is the skill's rule and
   Chat), not here. Say so in any demo.
 - **The figure check is per process.** It knows only the results this gateway process returned to this
   conversation. A restart or a second instance forgets them, and a figure that cannot be traced is
-  reported, never waved through. See `KNOWN-LIMITATIONS.md`.
+  reported, never waved through. See [KNOWN-LIMITATIONS](KNOWN-LIMITATIONS.md).
 - **The author supplies the reader's own numbers.** Dates, counts of emails found and slide numbers
   are not engine facts, so the skills pass them as `allowed_context`. A model that omits one gets a
   failed check and fixes the draft; it cannot talk its way past it.

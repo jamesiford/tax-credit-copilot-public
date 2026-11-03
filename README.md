@@ -215,6 +215,16 @@ description of the present:
 [TARGET-ARCHITECTURE.md](docs/architecture/TARGET-ARCHITECTURE.md) is the
 destination and the gap analysis.
 
+### Channels
+
+Besides the web app, the platform can be used from **Teams**, **Microsoft 365 Copilot Chat** and **Copilot
+Cowork**. A hosted orchestrator behind Azure Bot Service serves Teams and Copilot Chat and assembles each reply
+in code; a channel gateway in front of the API serves it and the Cowork plugin (`channels/cowork/`), authenticates
+every caller, checks who may write, and audits every call per user. Every figure shown is the engine's, and every
+change is a two-step, confirmed, attributed write. Off by default (`enable_m365_channel`); synthetic data only for
+now. Start with [docs/m365-channel/README.md](docs/m365-channel/README.md), then
+[ADR-009](docs/architecture/ADR-009-m365-channel.md) and [KNOWN-LIMITATIONS](docs/m365-channel/KNOWN-LIMITATIONS.md).
+
 ---
 
 ## Repository layout
