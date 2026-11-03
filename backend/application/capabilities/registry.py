@@ -10,7 +10,9 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any
 
-from application.capabilities import book, catalog, claims, client, findings, simulate, walkthrough, writes
+from application.capabilities import (
+    book, catalog, claims, client, findings, package, simulate, verify, walkthrough, writes,
+)
 from application.capabilities.envelope import ToolResult
 
 FUNCTIONS: dict[str, Callable[..., ToolResult]] = {
@@ -26,6 +28,10 @@ FUNCTIONS: dict[str, Callable[..., ToolResult]] = {
     "employee_drill": walkthrough.employee_drill,
     "findings_list": findings.findings_list,
     "claim_cell_history": claims.claim_cell_history,
+    "verify_figures": verify.verify_figures,
+    # Downloads are bound to a person, so these take `principal` first as well.
+    "claim_package_link": package.claim_package_link,
+    "claim_package_redeem": package.claim_package_redeem,
     # Writes take `principal` first: who is asking, not part of the question.
     **{name: getattr(writes, name) for name in (
         "finding_resolve_prepare", "finding_resolve_commit",
@@ -34,8 +40,16 @@ FUNCTIONS: dict[str, Callable[..., ToolResult]] = {
         "claim_record_prepare", "claim_record_commit",
         "engagement_set_prepare", "engagement_set_commit",
         "base_year_set_prepare", "base_year_set_commit",
+        "claim_package_create_prepare", "claim_package_create_commit",
     )},
 }
+
+#: The tools whose first argument is the caller. Named, not inferred from a
+#: signature: what a function is handed is part of its contract.
+NEEDS_PRINCIPAL = frozenset(
+    {"claim_package_link", "claim_package_redeem"}
+    | {n for n in FUNCTIONS if n.endswith(("_prepare", "_commit"))}
+)
 
 
 def get(name: str) -> Callable[..., ToolResult]:

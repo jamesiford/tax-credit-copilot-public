@@ -205,6 +205,33 @@ def _preview_base_year(c: Any) -> dict[str, Any]:
     }
 
 
+# ------------------------------------------------------------- claim package
+
+
+def _build_package(principal: Principal, a: Mapping[str, Any]) -> Command:
+    from application.commands.create_claim_package import CreateClaimPackageCommand
+
+    return CreateClaimPackageCommand(
+        actor=principal.actor, client_id=_need(a, "client_id", int), tax_year=_need(a, "tax_year", int),
+    )
+
+
+def _preview_package(c: Any) -> dict[str, Any]:
+    from application.capabilities.errors import NotCalculated
+    from application.claim_package import SHEETS
+    from application.claim_package_service import latest_package
+    from application.wiring import get_claim_package_source
+
+    run = get_claim_package_source().latest_run(c.client_id)
+    if run is None:
+        raise NotCalculated(f"client {c.client_id} has no completed calculation run to package")
+    earlier = latest_package(c.client_id, c.tax_year)
+    return {
+        "before": None if earlier is None else {"file_name": earlier.file_name, "run_id": earlier.run_id},
+        "after": {"run_id": str(run["run_id"]), "tax_year": c.tax_year, "sheets": ", ".join(SHEETS)},
+    }
+
+
 SPECS: dict[str, WriteSpec] = {spec.base: spec for spec in (
     WriteSpec("finding_resolve", "Record a decision about a finding.", _build_resolve, _preview_resolve),
     WriteSpec("finding_reopen", "Withdraw a decision on a finding.", _build_reopen, _preview_reopen),
@@ -212,4 +239,5 @@ SPECS: dict[str, WriteSpec] = {spec.base: spec for spec in (
     WriteSpec("claim_record", "Record an unverified claim.", _build_record, _preview_record),
     WriteSpec("engagement_set", "Set the engagement for a programme.", _build_engagement, _preview_engagement),
     WriteSpec("base_year_set", "Set a location's base year.", _build_base_year, _preview_base_year),
+    WriteSpec("claim_package_create", "Build the claim package.", _build_package, _preview_package),
 )}

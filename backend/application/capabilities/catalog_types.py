@@ -44,6 +44,14 @@ class CapabilitySpec:
         if self.schema.get("type") != "object":
             raise ValueError(f"{self.name}: schema must be a JSON-Schema object")
 
+    def to_dict(self) -> dict[str, Any]:
+        """What a caller is told about the tool: the contract, not the code behind it."""
+        return {
+            "name": self.name, "description": self.description, "kind": self.kind,
+            "needs_client": self.needs_client, "needs_year": self.needs_year, "sensitive": self.sensitive,
+            "implemented": self.implemented, "schema": self.schema, "tags": list(self.tags),
+        }
+
 
 def _object(properties: dict[str, Any], required: tuple[str, ...] = ()) -> dict[str, Any]:
     return {

@@ -100,7 +100,7 @@ def test_every_write_capability_has_a_prepare_and_a_commit_in_the_registry():
         assert registry.get(f"{base}_prepare") and registry.get(f"{base}_commit")
     from application.capabilities.write_specs import SPECS
 
-    assert set(SPECS) == set(WRITES)
+    assert set(SPECS) == set(WRITES) | {"claim_package_create"}
 
 
 def test_the_commit_schema_carries_the_arguments_it_must_match():
@@ -109,9 +109,9 @@ def test_the_commit_schema_carries_the_arguments_it_must_match():
     assert schema["properties"]["arguments"]["required"] == catalog.get("claim_record_prepare").schema["required"]
 
 
-def test_the_package_build_is_still_unbuilt():
-    with pytest.raises(NotImplementedError):
-        registry.get("claim_package_create_prepare")
+def test_the_package_build_is_built_and_takes_a_principal():
+    assert registry.get("claim_package_create_prepare") and registry.get("claim_package_create_commit")
+    assert {"claim_package_create_prepare", "claim_package_create_commit"} <= registry.NEEDS_PRINCIPAL
 
 
 # --------------------------------------------------------------------- prepare

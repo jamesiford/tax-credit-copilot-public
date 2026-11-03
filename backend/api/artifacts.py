@@ -7,7 +7,6 @@ returned; the API streams the file.
 """
 from __future__ import annotations
 
-import uuid
 from typing import Any
 
 from fastapi import APIRouter, HTTPException, Query, Request
@@ -21,33 +20,16 @@ router = APIRouter(prefix="/api/clients", tags=["artifacts"])
 @router.post("/{client_id}/packages", status_code=201)
 def create_claim_package(client_id: int, request: Request, tax_year: int = Query(...)) -> dict[str, Any]:
     """Build one client-year's claim package, store it, and return its id."""
-    from application.artifacts import OUTPUTS
-    from application.claim_package import XLSX, NoRunForClient, build_claim_package
-    from application.wiring import get_artifact_service, get_claim_package_source
+    from application.claim_package import NoRunForClient
+    from application.claim_package_service import store_claim_package
 
     author = attributed(request, None, default="system:claim-package")
     try:
-        package = build_claim_package(client_id, tax_year, get_claim_package_source(), generated_by=author)
+        stored = store_claim_package(client_id, tax_year, author)
     except NoRunForClient as exc:
         # "Not calculated" is a state, not an empty workbook.
         raise HTTPException(status_code=409, detail=str(exc)) from exc
-
-    # Blob paths are never reused, so each generation gets its own segment.
-    generation = uuid.uuid4().hex[:12]
-    artifact = get_artifact_service().put(
-        package.data,
-        kind="claim_package",
-        client_id=client_id,
-        program_code=package.program_code,
-        tax_year=tax_year,
-        run_id=package.run_id,
-        container_name=OUTPUTS,
-        blob_path=f"{client_id}/{package.run_id}/{generation}/{package.file_name}",
-        file_name=package.file_name,
-        content_type=XLSX,
-        created_by=author,
-    )
-    return {**artifact.to_dict(), "rows": package.rows}
+    return {**stored.artifact.to_dict(), "rows": stored.rows}
 
 
 @router.get("/{client_id}/artifacts/{artifact_id}")

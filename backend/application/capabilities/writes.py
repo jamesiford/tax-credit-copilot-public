@@ -186,3 +186,16 @@ def base_year_set_commit(
     principal: Principal, confirmation_token: str, idempotency_key: str, arguments: Mapping[str, Any],
 ) -> ToolResult:
     return _commit("base_year_set", principal, arguments, confirmation_token, idempotency_key)
+
+
+# --------------------------------------------------------------- claim package
+
+
+def claim_package_create_prepare(principal: Principal, client_id: int, tax_year: int) -> ToolResult:
+    return _prepare("claim_package_create", principal, dict(client_id=client_id, tax_year=tax_year))
+
+
+def claim_package_create_commit(
+    principal: Principal, confirmation_token: str, idempotency_key: str, arguments: Mapping[str, Any],
+) -> ToolResult:
+    return _commit("claim_package_create", principal, arguments, confirmation_token, idempotency_key)
