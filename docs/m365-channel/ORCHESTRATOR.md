@@ -188,7 +188,7 @@ To run the host itself against the mock gateway, export the variables in
 Recommended: the **source-code (zip) path**: `python scripts/vendor-orchestrator.py`, then `azd up` in
 `channel_orchestrator/` (`azure.yaml`, `codeConfiguration`, `remote_build`). It needs no container registry
 and Terraform adds none. A `Dockerfile` is kept for a local build and for the container path. See
-PUBLISHING.md (CH-09) for putting the agent in Teams and Copilot, and D-74 to D-84 in
+[PUBLISHING.md](PUBLISHING.md) for putting the agent in Teams and Copilot, and D-74 to D-85 in
 [DECISIONS.md](DECISIONS.md) for the choices and the facts they rest on.
 
 Vendored code is not committed (`channel_orchestrator/app/vendor/` is gitignored): the script copies it
