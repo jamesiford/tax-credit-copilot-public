@@ -1,18 +1,16 @@
-"""Every agent module must be buildable before the app tries to build it.
+"""Every agent module must export what the roster reads.
 
-`build_all` loops `list_agent_modules()` with no per-module guard, so one
-malformed module does not degrade one capability — it takes the whole registry
-down, and `chat()` then falls through to the scripted stub for every question.
-That failure only shows at startup, against live Foundry, which is the slowest
-possible place to find a typo in a keyword argument.
+`all_specs` reads every module with no per-module guard, so one malformed module
+does not degrade one capability — it takes the whole roster down, and `chat()`
+then falls through to the scripted stub for every question. That failure only
+shows at startup, against live Foundry, which is the slowest possible place to
+find a typo.
 """
 from __future__ import annotations
 
-import inspect
-
 import pytest
 
-from agents.factory import build_all, list_agent_modules
+from agents.factory import all_specs, list_agent_modules
 
 MODULES = list_agent_modules()
 
@@ -27,17 +25,20 @@ def test_an_agent_module_exports_what_the_factory_reads(module):
 
 
 @pytest.mark.parametrize("module", MODULES, ids=lambda m: m.__name__.rsplit(".", 1)[-1])
-def test_build_takes_exactly_what_build_all_passes(module):
-    """A signature mismatch is a TypeError at startup, not an import error.
+def test_an_agent_module_exports_a_spec_that_matches_its_constants(module):
+    """The spec is what the catalog publishes, so it must say what the module says.
 
-    Tests import these modules freely, so nothing else catches it.
+    Replaces the old `build()` signature check: modules no longer build anything
+    (AI-02), they declare an `AgentSpec`, and a spec that drifted from NAME or
+    INSTRUCTIONS would publish a different agent than the one the page describes.
     """
-    expected = {"project_client", "project_endpoint", "credential", "model"}
-    params = inspect.signature(module.build).parameters
-    assert set(params) == expected, f"{module.NAME}.build takes {set(params)}"
-    assert all(p.kind is inspect.Parameter.KEYWORD_ONLY for p in params.values()), (
-        f"{module.NAME}.build must take keyword-only arguments; build_all passes them by name"
-    )
+    from domain.ai import AgentSpec
+
+    assert isinstance(module.SPEC, AgentSpec)
+    assert module.SPEC.name == module.NAME
+    assert module.SPEC.instructions == module.INSTRUCTIONS
+    assert module.SPEC.profile == module.AGENT_PROFILE
+    assert not hasattr(module, "build"), "agents declare a spec; publishing is the provider's job"
 
 
 def test_agent_names_are_unique():
@@ -46,13 +47,14 @@ def test_agent_names_are_unique():
     assert len(names) == len(set(names)), f"duplicate agent name in {names}"
 
 
-def test_build_all_declines_without_a_project_rather_than_half_registering(monkeypatch):
-    """A partial registry is worse than none: `chat()` checks for a set of
-    agents and would stub out anyway, but a half-built one hides which.
+def test_the_roster_as_data_is_the_module_roster():
+    assert [s.name for s in all_specs()] == [m.NAME for m in MODULES]
 
-    `KeyError` rather than a tidier error on purpose — it names the variable
-    that is missing, which is the whole content of the message.
-    """
-    monkeypatch.delenv("FOUNDRY_PROJECT_ENDPOINT", raising=False)
-    with pytest.raises(KeyError, match="FOUNDRY_PROJECT_ENDPOINT"):
-        build_all()
+
+def test_the_agents_package_imports_no_sdk():
+    """The roster is data; the SDKs live under infrastructure/ai only."""
+    import pathlib
+
+    for path in pathlib.Path(__file__).resolve().parents[1].joinpath("agents").glob("*.py"):
+        text = path.read_text(encoding="utf-8")
+        assert "agent_framework" not in text and "azure.ai" not in text, path.name

@@ -68,6 +68,13 @@ from application.commands.set_base_year import SetBaseYearCommand, handle_set_ba
 from application.commands.record_claim import RecordClaimCommand, handle_record_claim
 from application.commands.set_engagement import SetEngagementCommand, handle_set_engagement
 from application.commands.transition_claim import TransitionClaimCommand, handle_transition_claim
+from application.ai.handlers import handle_channel_narration, handle_narrate_brief, handle_route_question
+from application.ai.requests import ChannelNarrationQuery, NarrateBriefQuery, RouteQuestionQuery
+from application.ai_wiring import (  # noqa: F401 - re-exported: one import for every composition getter
+    ai_health, get_agent_catalog, get_ai_settings, get_model_router, get_narration_service,
+    get_provider_registry, get_spec_registry, reset_ai, set_ai_settings, set_model_router,
+    set_narration_service, set_provider_registry, set_spec_registry,
+)
 
 _mediator: Mediator | None = None
 
@@ -563,6 +570,11 @@ def build_mediator() -> Mediator:
     mediator.register(GetClientSituationQuery, handle_get_client_situation)
     mediator.register(ListFindingsQuery, handle_list_findings)
     mediator.register(GetChannelAuditQuery, handle_get_channel_audit)
+
+    # --- Streaming queries: model narration, through the same pipeline ---
+    mediator.register(NarrateBriefQuery, handle_narrate_brief)
+    mediator.register(RouteQuestionQuery, handle_route_question)
+    mediator.register(ChannelNarrationQuery, handle_channel_narration)
 
     # --- Commands: change what the business believes ---
     mediator.register(AssessClientCommand, handle_assess_client)

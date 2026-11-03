@@ -30,7 +30,7 @@ def test_it_follows_the_agent_module_contract():
     profile = channel_narrator.AGENT_PROFILE
     for key in ("tab_label", "summary", "responsibility", "inputs", "outputs", "tools", "determinism"):
         assert profile[key], key
-    assert callable(channel_narrator.build)
+    assert channel_narrator.SPEC.name == channel_narrator.NAME and channel_narrator.SPEC.role.value == "narrator"
 
 
 def test_its_profile_is_json_for_the_workbench_to_serve():

@@ -1,22 +1,13 @@
 """PayrollIngestAgent — confirms which payroll snapshot is in scope."""
 from __future__ import annotations
 
-from .factory import AgentRecord, register_agent
+from domain.ai import AgentSpec, ModelRole
+
+from ._prompts import load_instructions
+
 
 NAME = "PayrollIngestAgent"
-INSTRUCTIONS = """\
-You are the Payroll Ingest specialist for the Tax Credit Copilot.
-
-The host application will hand you a JSON brief describing what the client's
-calculation run concluded — the client, the tax year, the fiscal window, and
-the average headcount the run recorded. In ONE short sentence, restate it so
-the user knows exactly whose figures are in scope. Use the exact numbers from
-the JSON. Never invent rows.
-
-If `calculated` is false, say that this client-year has not been calculated and
-report NO figure. It is not a zero, and calling it one would be a statement
-about the client's payroll that nobody has made.
-"""
+INSTRUCTIONS = load_instructions("payroll_ingest")
 
 AGENT_PROFILE = {
     "tab_label": "Payroll Ingest",
@@ -41,14 +32,7 @@ AGENT_PROFILE = {
 }
 
 
-def build(*, project_client, project_endpoint, credential, model) -> AgentRecord:
-    return register_agent(
-        project_client=project_client,
-        project_endpoint=project_endpoint,
-        credential=credential,
-        model=model,
-        name=NAME,
-        instructions=INSTRUCTIONS,
-        temperature=0.2,
-        profile=AGENT_PROFILE,
-    )
+SPEC = AgentSpec(
+    name=NAME, instructions=INSTRUCTIONS, role=ModelRole.NARRATOR,
+    temperature=0.2, profile=AGENT_PROFILE,
+)

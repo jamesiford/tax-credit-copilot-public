@@ -103,6 +103,21 @@ def restore_assumption_registries():
         registry.update(snapshot)
 
 
+@pytest.fixture(autouse=True)
+def reset_ai_wiring():
+    """Model access is composed lazily and cached; a test must not inherit another's.
+
+    Without this a test that installed a fake provider would answer the next
+    test's chat request, and one that changed `AI_*` variables would be ignored
+    because settings were read once.
+    """
+    from application import wiring
+
+    wiring.reset_ai()
+    yield
+    wiring.reset_ai()
+
+
 @pytest.fixture
 def client():
     """FastAPI TestClient bound to the production app.

@@ -367,3 +367,64 @@ One short entry per decision: context, choice, why.
 - **Guard.** `tests/test_ai_sdk_surface.py` pins the symbols the adapters use;
   `scripts/check-sdk-versions.py` prints pinned vs latest (offline-safe).
 - **Why.** A bump should fail on a named symbol in CI, not at runtime.
+
+## D-37 AI-02: the provider unit is an `AgentRuntime`; `ChatModel` sits beneath it
+
+- **Choice.** Providers implement `AgentRuntime` ("stream this agent's answer to this
+  prompt", plus `ready_for`, `version_of`, `status`). A Foundry prompt agent is one;
+  an OpenAI-compatible endpoint is wrapped by a `ChatModelAgentRuntime` (AI-03).
+  `ChatModel` is the port under that wrapper. Resilience decorators (AI-04) wrap
+  `AgentRuntime`, which covers both — the prompt says "over `ChatModel`/`AgentRuntime`".
+- **Why.** The pipelines need agent semantics (instructions, versions), not raw
+  completions; one decorated type avoids writing every decorator twice.
+- **Provider chain.** `ProviderChain` skips a provider that is not ready, falls through
+  on a failure BEFORE output, and does not splice after output; it records every hop in
+  the final `StreamEnd`. Providers are added with `ProviderRegistry.register(name, factory)`.
+
+## D-38 AI-02: `StreamingQuery` and `Mediator.stream`
+
+- **Choice.** `StreamingQuery(Query)` dispatches through `Mediator.stream()`, sharing
+  `_prepare` (lookup, authorization, validation) with `send`. `send` on a streaming
+  query and `stream` on anything else raise `TypeError`. `AuditLog` and `AuditRecord`
+  moved to `application/mediator_audit.py` and are re-exported, so `mediator.py` stays
+  under the module-size limit and every import path still works.
+- **Why.** A streaming read must not be a side door around the pipeline.
+
+## D-39 AI-02: `api/chat.py` became the `api/chat/` package (1094 → ten modules ≤ 191 lines)
+
+- **Choice.** By responsibility: `models`, `sse`, `scope`, `routing`, `narration`,
+  `pipelines_core`, `pipelines_briefs`, `pipelines_whatif`, `dispatch`, `__init__`
+  (router, endpoint, re-exports). Every name tests imported is re-exported.
+  Pipelines no longer carry a `registry` argument; they call `_stream_agent(name, prompt)`.
+- **Existing tests edited (module layout, not behaviour):** `test_chat_scope.py` patches
+  `api.chat.scope` (where `_chat_clients`/`_candidate_year` are looked up);
+  `test_channel_audit.py` drives `_stream_agent` through a real `FoundryAgentRuntime`
+  over a fake agent and patches `api.chat.narration`;
+  `test_architecture.py::test_chat_pipelines_call_capabilities_not_tools` now reads every
+  module of the package (stricter, not weaker); `test_page_summary.py` installs a fake
+  provider instead of an `app.state.registry`.
+- **Behaviour note.** The scripted-stream status note now reads "No model is available;
+  scripted stream." (was "Foundry not configured; …"): a gateway-only deployment is not a
+  Foundry deployment. No test or frontend reads it.
+
+## D-40 AI-02: agents declare an `AgentSpec`; prompts are files
+
+- **Choice.** Each agent module exports `NAME`, `INSTRUCTIONS`, `AGENT_PROFILE`, `SPEC`
+  and no `build()`. `agents/factory.py` yields `all_specs()` and imports no SDK. The
+  instruction text moved byte for byte to `agents/prompts/<module>.md` (front matter:
+  version, owner, changelog), loaded by `FilePromptStore`, so existing published Foundry
+  versions are still reused (identical definition). Roles: Orchestrator = router;
+  RulesIngestion, LegislativeMonitor, ExceptionReport = analysis; the rest = narrator.
+- **Existing tests edited:** `test_agent_modules.py` (the `build()` signature and
+  `build_all` KeyError tests pinned SDK wiring; replaced by spec/roster checks) and
+  `test_channel_narrator.py` (`SPEC` instead of `callable(build)`).
+
+## D-41 AI-02: warm in the background; health reports AI, readiness never fails on it
+
+- **Choice.** `FoundryAgentCatalog.warm()` publishes on a daemon thread with backoff
+  (2, 4, 8 … ≤ 30 s). Startup validates settings (a bad configuration stops startup)
+  but never waits on Foundry. `/api/health` keeps `foundry_configured` and
+  `agents_registered` and adds an `ai` object (provider states, no secrets);
+  `/api/ready` adds `ai` and its `ready` value is unchanged by a model being down.
+- **Why.** The engine answers without a model. A `conftest` autouse fixture
+  (`reset_ai_wiring`) clears the cached composition between tests.

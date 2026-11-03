@@ -455,7 +455,9 @@ def test_chat_pipelines_call_capabilities_not_tools():
     cannot reuse that. The pipelines now ask a capability for their brief, so a
     call into `tools.*` from this module is compute that has crept back.
     """
-    source = (BACKEND / "api" / "chat.py").read_text(encoding="utf-8")
+    source = "\n".join(
+        path.read_text(encoding="utf-8") for path in sorted((BACKEND / "api" / "chat").glob("*.py"))
+    )
     assert _forbidden_imports(source, ("tools",)) == []
 
 
