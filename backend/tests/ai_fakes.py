@@ -86,6 +86,43 @@ class ScriptedRuntime:
         yield StreamEnd(provider=self.name, model="m-" + self.name)
 
 
+class FlakyRuntime(ScriptedRuntime):
+    """Plays one outcome per call: an exception to raise, or text to answer with.
+
+    `after` lets an outcome produce some text first and then fail, which is what a
+    connection dropped mid-sentence looks like.
+    """
+
+    def __init__(self, name: str, outcomes: Sequence[Exception | str], *, after: str = ""):
+        super().__init__(name)
+        self.outcomes, self.after = list(outcomes), after
+
+    async def stream(self, spec: AgentSpec, prompt: str) -> AsyncIterator[ModelEvent]:
+        self.calls += 1
+        outcome = self.outcomes.pop(0) if len(self.outcomes) > 1 else self.outcomes[0]
+        if isinstance(outcome, Exception):
+            if self.after:
+                yield TextDelta(self.after)
+            raise outcome
+        yield TextDelta(outcome)
+        yield StreamEnd(provider=self.name, model="m-" + self.name)
+
+
+class HangingRuntime(ScriptedRuntime):
+    """Takes `delays` seconds (on the given clock) before each event."""
+
+    def __init__(self, name: str, clock, delays: Sequence[float]):
+        super().__init__(name)
+        self.clock, self.delays = clock, tuple(delays)
+
+    async def stream(self, spec: AgentSpec, prompt: str) -> AsyncIterator[ModelEvent]:
+        self.calls += 1
+        for delay in self.delays:
+            await self.clock.sleep(delay)
+            yield TextDelta("x")
+        yield StreamEnd(provider=self.name)
+
+
 def install_providers(*runtimes, chain: Sequence[str] | None = None, **settings) -> None:
     """Make `runtimes` the app's providers, in `chain` order (default: the order given)."""
     wiring.reset_ai()

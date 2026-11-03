@@ -69,16 +69,45 @@ def test_foundry_down_falls_through_to_the_gateway_and_the_hops_say_so():
     assert isinstance(end, StreamEnd) and end.hops == ("foundry", "gateway") and end.fallback_used
 
 
+def test_a_single_gateway_blip_is_retried_and_the_chain_never_leaves_the_gateway():
+    state = compose("gateway,foundry", foundry := ScriptedRuntime("foundry", ["foundry covered"]))
+    state.faults.append({"kind": "status", "code": 503})
+    state.responses.append({"text": "from gateway"})
+    events = narrate()
+    assert text(events) == "from gateway" and events[-1].hops == ("gateway",)
+    assert foundry.calls == 0
+
+
+def test_a_retry_after_header_is_waited_out_on_the_clock_not_the_wall():
+    from infrastructure.ai.resilience.clock import FakeClock
+
+    state = compose("gateway,foundry", ScriptedRuntime("foundry", ["covered"]))
+    clock = FakeClock()
+    wiring.set_ai_clock(clock)
+    state.faults.append({"kind": "status", "code": 429, "retry_after": 2})
+    state.responses.append({"text": "from gateway"})
+    assert text(narrate()) == "from gateway" and clock.sleeps == [2.0]
+
+
+def test_a_gateway_that_keeps_failing_opens_its_breaker_and_stops_being_called():
+    foundry = ScriptedRuntime("foundry", ["covered"])
+    state = compose("gateway,foundry", foundry, AI_BREAKER_FAILURE_THRESHOLD="2", AI_RETRY_MAX_ATTEMPTS="1")
+    state.faults.extend([{"kind": "status", "code": 503}] * 50)
+    for _ in range(4):
+        assert text(narrate()) == "covered"
+    assert len(state.faults) == 48, "two calls reached the gateway; the open breaker kept the other two away"
+
+
 def test_the_gateway_down_falls_through_to_foundry():
     state = compose("gateway,foundry", ScriptedRuntime("foundry", ["foundry covered"]))
-    state.faults.append({"kind": "status", "code": 503})
+    state.faults.extend([{"kind": "status", "code": 503}] * 3)  # every retry attempt
     events = narrate()
     assert text(events) == "foundry covered" and events[-1].hops == ("gateway", "foundry")
 
 
 def test_a_rate_limited_gateway_falls_through_too():
     state = compose("gateway,foundry", ScriptedRuntime("foundry", ["covered"]))
-    state.faults.append({"kind": "status", "code": 429, "retry_after": 2})
+    state.faults.extend([{"kind": "status", "code": 429, "retry_after": 2}] * 3)
     assert text(narrate()) == "covered"
 
 

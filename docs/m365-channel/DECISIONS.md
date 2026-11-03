@@ -463,3 +463,50 @@ One short entry per decision: context, choice, why.
   and the script has not been run against Azure.
 - **Why.** No cloud-changing commands are permitted in this run; flagged as an open
   owner question.
+
+## D-46 AI-04: one resilience stack for every provider, in a fixed order
+
+- **Choice.** `ai_wiring._decorate` wraps each provider as egress → budget →
+  bulkhead → breaker → retry → timeout → call. The decorators are in
+  `infrastructure/ai/resilience/`, share a `RuntimeDecorator` base and take a `Clock`.
+- **Why.** The order carries the semantics: bulkhead outside the breaker so shedding
+  load is not a provider failure; breaker outside retry so one retried request is one
+  failure. Adding a provider adds no resilience code. Timeouts are a gap between
+  events, not a cap on the call, so a long healthy narration is not cut off.
+  Retry happens only before text and only for retryable errors.
+
+## D-47 AI-04: an open breaker does not change readiness or the stub rule
+
+- **Choice.** An open breaker makes `stream` fail at once and reports the provider
+  `unavailable` in `/api/health`; `ready_for` is unchanged and `/api/ready` never
+  depends on AI.
+- **Why.** Making an open breaker "not ready" would send the chat to the scripted
+  stub stream mid-outage, which shows invented figures. The chain moves on or the
+  reader gets the engine's figures.
+
+## D-48 AI-04: degradation is the engine's figures, once-per-request sentence
+
+- **Choice.** `_stream_agent(degrade=True)` turns `NarrationUnavailable` into
+  "The assistant is unavailable; here are the engine's figures." plus the brief's JSON
+  flattened to `name: value` lines (≤30). After text, a failure appends the
+  interrupted sentence and the figures. The sentence is said once per request
+  (flag in `_TELEMETRY_CONTEXT`). A cancelled stream is audited as not-ok and the
+  cancellation re-raised. The page summary passes `degrade=False` and keeps its
+  `[Agent failed` marker and facts fallback.
+- **Why.** Nothing is computed by the fallback; it restates what the engine produced.
+
+## D-49 AI-04: in-memory token budget, per process
+
+- **Choice.** `InMemoryTokenBudget`: daily UTC buckets, overall and per principal
+  (object id, or `anonymous`), checked before and charged after the call, estimated
+  at 4 chars/token and marked estimated when the provider reports no usage. One
+  instance is shared by all providers. Not shared across workers.
+- **Why.** A guard rail needs no store. A shared store is the follow-up if a
+  customer needs exact accounting.
+
+## D-50 AI-04: tests run on an instant clock
+
+- **Choice.** `conftest` installs `InstantClock` (real timeouts, instant sleep) via
+  `wiring.set_ai_clock`. The two `test_ai_fallthrough` cases that injected a single
+  fault now inject three, because a single 503/429 is now retried and recovers —
+  which is new, tested behaviour.

@@ -112,10 +112,13 @@ def reset_ai_wiring():
     because settings were read once.
     """
     from application import wiring
+    from infrastructure.ai.resilience.clock import InstantClock
 
     wiring.reset_ai()
+    wiring.set_ai_clock(InstantClock())
     yield
     wiring.reset_ai()
+    wiring.set_ai_clock(None)
 
 
 @pytest.fixture

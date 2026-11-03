@@ -26,6 +26,9 @@ _registry: ProviderRegistry | None = None
 _router: ModelRouter | None = None
 _service: NarrationService | None = None
 _catalog: CompositeCatalog = CompositeCatalog()
+_telemetry: Any = None
+_budget: Any = None
+_clock: Any = None
 
 
 def get_ai_settings() -> AiSettings:
@@ -85,12 +88,52 @@ def _register_builtin_providers(registry: ProviderRegistry) -> None:
     registry.register("gateway", gateway)
 
 
+def get_ai_telemetry() -> Any:
+    global _telemetry
+    if _telemetry is None:
+        from application.ai.telemetry_null import NullTelemetry
+
+        _telemetry = NullTelemetry()
+    return _telemetry
+
+
+def set_ai_telemetry(telemetry: Any) -> None:
+    global _telemetry
+    _telemetry = telemetry
+
+
+def get_token_budget() -> Any:
+    """One budget for every provider, so a refusal on one is a refusal on all."""
+    global _budget
+    if _budget is None:
+        from application.ai.budget import InMemoryTokenBudget
+
+        settings = get_ai_settings()
+        _budget = InMemoryTokenBudget(settings.budget_global_daily, settings.budget_principal_daily)
+    return _budget
+
+
+def set_ai_clock(clock: Any) -> None:
+    """Swap the clock the resilience layer uses. For tests: virtual time, no real sleeps."""
+    global _clock
+    _clock = clock
+
+
 def _decorate(runtime: Any, _provider: str) -> Any:
-    """Layer the guards over a provider. Outermost first; AI-04 adds resilience here."""
+    """Layer the guards over a provider, outermost first.
+
+    egress → budget → bulkhead → breaker → retry → timeout → the call. Every provider
+    gets the same stack from here, so a new one is resilient without writing any.
+    """
     from application.ai.egress import build_egress_policy
     from application.ai.guarded import GuardedRuntime
+    from infrastructure.ai.resilience import build_resilient_runtime
 
-    return GuardedRuntime(runtime, build_egress_policy(get_ai_settings().egress_policy))
+    settings, telemetry = get_ai_settings(), get_ai_telemetry()
+    resilient = build_resilient_runtime(runtime, settings.resilience, clock=_clock, telemetry=telemetry)
+    return GuardedRuntime(
+        resilient, build_egress_policy(settings.egress_policy), get_token_budget(), telemetry,
+    )
 
 
 def get_provider_registry() -> ProviderRegistry:
@@ -152,6 +195,6 @@ def ai_health() -> dict[str, Any]:
 
 def reset_ai() -> None:
     """Forget everything built, so the next use reads settings afresh. For tests."""
-    global _settings, _specs, _registry, _router, _service, _catalog
-    _settings = _specs = _registry = _router = _service = None
+    global _settings, _specs, _registry, _router, _service, _catalog, _telemetry, _budget
+    _settings = _specs = _registry = _router = _service = _telemetry = _budget = None
     _catalog = CompositeCatalog()
