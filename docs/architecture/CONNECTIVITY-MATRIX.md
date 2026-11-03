@@ -28,7 +28,7 @@ is a third app on the same subnet and the same rule.
 | R5 | API app | Lakehouse SQL analytics endpoint (`[<lakehouse>].[<schema>].[<table>]` on the Warehouse connection; aggregate reads) | TDS 1433 | VNet integration → public | API identity | Same workspace role as R4 | `https://database.windows.net/.default` | as R4 |
 | R6 | API app | Warehouse (`WAREHOUSE_SERVER` / `WAREHOUSE_DATABASE`), schemas `tcc_gold`, `tcc_ops` | TDS 1433 | VNet integration → public | API identity | Workspace role (as R4) **and** T-SQL `GRANT SELECT, INSERT, UPDATE, DELETE ON SCHEMA::tcc_gold` and `::tcc_ops` `TO [<API_IDENTITY_NAME>]` | `https://database.windows.net/.default` | Terraform `fabric` (role, toggle). Script `scripts/grant-warehouse-sql.py` (grants) |
 | R7 | API app | Blob Storage `sttcc<s>`, containers `artifacts`, `outputs` | HTTPS 443 | VNet integration → **PE** `pe-blob-<s>` (`privatelink.blob.core.windows.net`). Public network access off; shared key off | API identity | **Storage Blob Data Contributor, once per container** (two assignments; none at account scope) | `https://storage.azure.com/.default` | Terraform `storage` |
-| R8 | API app | Foundry project `https://aif-tcc-<s>.services.ai.azure.com/api/projects/proj-tcc` | HTTPS 443 | VNet integration → **PE** `pe-aif-<s>` (zones `cognitiveservices`, `openai`, `services.ai`). Public network access off; local auth off | API identity | **Foundry User** (role GUID `53ca6127-db72-4b80-b1b0-d745d6d5456d`, formerly "Azure AI User") at **account** scope | `https://ai.azure.com/.default` | Terraform `foundry` |
+| R8 | API app | Foundry project `https://aif-tcc-<s>.services.ai.azure.com/api/projects/proj-tcc` | HTTPS 443 | VNet integration → **PE** `pe-aif-<s>` (zones `cognitiveservices`, `openai`, `services.ai`). Public network access off (default; the demo posture in §4a turns the public endpoint on for operators, this private path unchanged); local auth off | API identity | **Foundry User** (role GUID `53ca6127-db72-4b80-b1b0-d745d6d5456d`, formerly "Azure AI User") at **account** scope | `https://ai.azure.com/.default` | Terraform `foundry` |
 | R9 | API app (platform Key Vault references) | Key Vault `kv-tcc-<s>` (only if `enable_key_vault`) | HTTPS 443 | VNet integration → **PE** `pe-kv-<s>` (`privatelink.vaultcore.azure.net`). Public access off | API identity, as `key_vault_reference_identity_id`. No application code calls Key Vault | Key Vault Secrets User, vault scope | Key Vault (resolved by App Service) | Terraform `keyvault` |
 | R10 | API app | Application Insights ingestion (endpoint in the connection string) | HTTPS 443 | VNet integration → public (no Azure Monitor private link) | API identity (`APPLICATIONINSIGHTS_AUTHENTICATION_STRING`) | Monitoring Metrics Publisher on App Insights. Local auth is off, so the connection string alone can't write | `https://monitor.azure.com/.default` | Terraform `monitoring` |
 | R11 | Web app | Application Insights ingestion | HTTPS 443 | VNet integration → public | web identity `id-tcc-web-<s>` | Monitoring Metrics Publisher on App Insights. The web server ships no telemetry SDK, so no application code uses this grant today | `https://monitor.azure.com/.default` | Terraform `monitoring` |
@@ -158,6 +158,20 @@ flowchart LR
     op -- "ARM, SCM" --> api
     op -- "ARM, SCM" --> web
 ```
+
+### 4a. Network posture: demo and hardened
+
+Two named postures, reported by the Terraform output `network_posture`. The plan to get from the first to the second
+is [HARDENING-PLAN](HARDENING-PLAN.md); the unproven parts are the spike in
+[HARDENING-SPIKE](../m365-channel/HARDENING-SPIKE.md).
+
+| Path | `private` (default) | `demo-public-foundry` (`foundry_public_network_access = true`, **demo only**) |
+| --- | --- | --- |
+| R8 API to Foundry | PE, public access off (unchanged) | **Unchanged**: still through the private endpoint |
+| Operator workstation to the Foundry data plane (`azd ai agent`, publish, model connection, smoke tests) | Fails: no route, 403 | Allowed: the account's public endpoint is on, **Entra-only**, local auth off; optionally firewalled to `foundry_allowed_ip_ranges` (default action then Deny) |
+| Anything else | | Unchanged. The two properties `publicNetworkAccess` and `networkAcls` are the only difference |
+| Channel gateway (CH2, CH4) | Public, Entra-only | Same: public, Entra-only |
+| Refused for | n/a | The enterprise profile; `data_classification = customer` |
 
 ## 5. What is NOT trusted
 

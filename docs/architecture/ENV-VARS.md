@@ -300,6 +300,8 @@ into the settings above. Full guidance is in [DEPLOYMENT-HANDOVER.md](DEPLOYMENT
 | `FOUNDRY_MODEL` | `foundry_model` | `gpt-4.1-mini` | both | `FOUNDRY_MODEL`, deployment name |
 | `FOUNDRY_MODEL_VERSION` | `foundry_model_version` | `2025-04-14` | both | Model version (not an app setting) |
 | `TCC_APP_SERVICE_SKU` | `app_service_sku` | `P1v3` | both | Plan SKU (not an app setting) |
+| `TCC_FOUNDRY_PUBLIC_NETWORK_ACCESS` | `foundry_public_network_access` | `false` | public | **Demo only.** Not an app setting: it changes two properties of the Foundry account (`publicNetworkAccess`, `networkAcls`). `true` enables the account's public endpoint (Entra-only, local auth off, private endpoint kept). Refused with the enterprise profile and customer data. Output `network_posture` |
+| `TCC_FOUNDRY_ALLOWED_IP_RANGES` | `foundry_allowed_ip_ranges` | empty | public | **Demo only.** Comma-separated IPv4 CIDRs allowed through the account firewall when the toggle is on; empty allows any address |
 
 Terraform variables with no azd mapping, settable only through a tfvars
 overlay (`*.auto.tfvars`, `infra/profiles/*.tfvars`, or `TF_VARS_JSON` in

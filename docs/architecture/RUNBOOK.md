@@ -395,3 +395,18 @@ postprovision when the channel is on) grants the gateway identity `INSERT, SELEC
 OBJECT::tcc_ops.channel_audit` and nothing else. A Fabric workspace role to connect, the
 `TCC.Agent` assignment and, for a group-based writer source, Graph `GroupMember.Read.All`
 are operator steps ([CONNECTIVITY-MATRIX.md §1a](CONNECTIVITY-MATRIX.md)).
+
+### 13.5 Which network posture is this environment in?
+
+```pwsh
+terraform -chdir=infra output network_posture      # or: azd env get-values | Select-String network_posture
+```
+
+`private` is the default: the Foundry data plane has public access off, so `azd ai agent`, `scripts/publish-m365.ps1`,
+`scripts/create-model-connection.ps1` and a workstation smoke test **fail** (403 or no route) from outside the VNet. That
+is the posture working, not a fault. `demo-public-foundry` is the **demo-only** posture
+(`TCC_FOUNDRY_PUBLIC_NETWORK_ACCESS=true`): the account's public endpoint is on, Entra-only, optionally firewalled to
+`TCC_FOUNDRY_ALLOWED_IP_RANGES`. It is refused with the enterprise profile and with customer data, and the plan prints a
+warning. After the demo set it back to `false` and `azd provision`; the account returns to private and nothing the demo
+created is lost. The plan for the later hardened posture, and the spike that must prove it first, are
+[HARDENING-PLAN.md](HARDENING-PLAN.md) and [HARDENING-SPIKE.md](../m365-channel/HARDENING-SPIKE.md).

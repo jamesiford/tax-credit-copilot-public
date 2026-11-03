@@ -199,9 +199,12 @@ that the closure stays inside the allowed layers, and that the copy runs without
 
 1. Which identity signal a Teams and a Copilot Chat message actually carries, and whether it is the Entra
    object id (spike S3). Until then the default sources fail closed.
-2. Whether a hosted agent in the private project can reach the gateway and the model endpoint (network
-   isolation for hosted agents needs the standard agent setup, which this repository's Foundry module does not
-   provide: D-78).
+2. Whether a hosted agent in a network-isolated project can reach the gateway and the model endpoint. **Per
+   the Foundry documentation, unproven until spike S6** ([HARDENING-SPIKE](HARDENING-SPIKE.md)): the hosted-agent
+   path uses a customer-delegated agent subnet and private endpoints, with no Cosmos DB, AI Search or capability
+   host. The "standard agent setup" this note once named is the classic path that needs them, and the customer
+   has ruled Cosmos out (D-92). For the demo the Foundry data plane is opened by one toggle instead
+   ([HARDENING-PLAN](../architecture/HARDENING-PLAN.md) §2).
 3. Whether the Activity-to-Responses bridge carries the sender's display name (without it the audit row says
    `(name not provided)`; the object id is still recorded).
 4. Whether `azd ai agent` accepts `channel_orchestrator/azure.yaml` as written, and the hosted-agent region
