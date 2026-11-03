@@ -9,7 +9,7 @@ from __future__ import annotations
 import uuid
 from typing import Any, AsyncIterator
 
-from api.chat.narration import _brief, _stream_agent
+from api.chat.narration import _brief, _question, _stream_agent
 from api.chat.sse import _TELEMETRY_CONTEXT, _sse
 from application.capabilities.book import book_rank
 from application.capabilities.client import client_at_risk, client_situation, client_trend
@@ -41,7 +41,7 @@ async def _pipeline_situation(app, message: str, *, scope: dict[str, Any]) -> As
             key: value for key, value in client_situation(account_id, tax_year).facts.items()
             if key != "client_name"
         }
-        async for f in _stream_agent("ClientSituationAgent", _brief(f"User question: {message}", brief)):
+        async for f in _stream_agent("ClientSituationAgent", _brief(f"User question:\n{_question(message)}", brief)):
             yield f
         yield _sse("done", {})
     finally:

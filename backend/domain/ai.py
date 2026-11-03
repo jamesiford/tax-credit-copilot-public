@@ -232,3 +232,30 @@ class BudgetExceeded(Exception):
     def __init__(self, scope: str, limit: int) -> None:
         super().__init__(f"the {scope} token budget of {limit} for today is used up")
         self.scope, self.limit = scope, limit
+
+
+class SafetyRefusal(Exception):
+    """A safety rule stopped model text from going out or coming in. [AI-07]
+
+    `codes` name the rules that fired and never echo the offending text: the text
+    is exactly what must not be repeated. `reader_sentence` is what the reader is
+    told in place of the prose; the engine's figures follow it.
+    """
+
+    reader_sentence = "The assistant's reply was withheld; here are the engine's figures."
+
+    def __init__(self, codes: tuple[str, ...]) -> None:
+        super().__init__("blocked by a safety rule: " + ", ".join(codes))
+        self.codes = codes
+
+
+class PromptInjectionBlocked(SafetyRefusal):
+    """The prompt carried text that tries to instruct the model. It was not sent."""
+
+    reader_sentence = "This request was not sent to the assistant; here are the engine's figures."
+
+
+class OutputWithheld(SafetyRefusal):
+    """The model's reply broke an output rule. What was already shown was clean; the rest was dropped."""
+
+    reader_sentence = "The rest of the assistant's reply was withheld by the output policy; here are the engine's figures."

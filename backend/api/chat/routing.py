@@ -95,14 +95,18 @@ def _validate_plan(raw: Any, message: str) -> list[str]:
 
 
 def _routing_prompt(message: str, history: list[ChatTurn], scope: dict[str, Any]) -> str:
-    turns = "\n".join(f"{t.role}: {t.text}" for t in history[-6:])
+    from application.ai.safety.untrusted import UntrustedText
+
+    # "copilot", not "assistant": a line starting `assistant:` is how a forged turn looks.
+    labels = {"assistant": "copilot"}
+    turns = "\n".join(f"{labels.get(t.role, t.role)}: {t.text}" for t in history[-6:])
     return (
         "Route this question to one or more capabilities.\n\n"
         f"CAPABILITIES:\n{json.dumps(CAPABILITIES, indent=2)}\n\n"
-        f"CONVERSATION SO FAR:\n{turns or '(none)'}\n\n"
+        f"CONVERSATION SO FAR:\n{UntrustedText(turns, 'conversation').fenced() if turns else '(none)'}\n\n"
         f"SELECTED SCOPE: client_id={scope.get('account_id')}, "
         f"tax_year={scope.get('tax_year')}, state={scope.get('state')}\n\n"
-        f"QUESTION: {message}\n\n"
+        f"QUESTION:\n{UntrustedText(message, 'reader question').fenced()}\n\n"
         'Reply with JSON ONLY: {"intents": ["name", ...]}. Use the exact names '
         "above. Include every capability the question needs, in the order they "
         "should be answered. Do not invent names. Do not explain."

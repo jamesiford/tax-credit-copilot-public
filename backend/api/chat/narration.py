@@ -18,7 +18,7 @@ from api.chat.sse import (
 )
 from application.ai.requests import NarrateBriefQuery
 from application.capabilities.catalog import CHAT_INTENT_TOOL
-from domain.ai import StreamEnd, TextDelta
+from domain.ai import OutputWithheld, SafetyRefusal, StreamEnd, TextDelta
 
 log = logging.getLogger(__name__)
 
@@ -65,21 +65,73 @@ def _observe(agent_name: str, started: float, char_count: int, ok: bool, error_t
     })
 
 
-def _degraded_token(prompt: str, char_count: int) -> str | None:
+def _degraded_token(prompt: str, char_count: int, failure: Exception) -> str | None:
     """The engine's figures in place of prose, or None when there is nothing to show.
 
-    The explanatory sentence is said once per request: a pipeline that narrates
-    five times against a dead model should not apologise five times.
+    A safety refusal says why in its own words. Otherwise the explanatory sentence is
+    said once per request: a pipeline that narrates five times against a dead model
+    should not apologise five times.
     """
-    from api.chat.degraded import degraded_message
+    from api.chat.degraded import INTERRUPTED_SENTENCE, UNAVAILABLE_SENTENCE, degraded_message
 
     ctx = _TELEMETRY_CONTEXT.get()
     said = bool(ctx and ctx.get("degraded_said"))
-    interrupted = char_count > 0
-    text = degraded_message(prompt, interrupted=interrupted, with_sentence=not said or interrupted)
+    refusal = isinstance(failure, SafetyRefusal)
+    sentence = failure.reader_sentence if refusal else (INTERRUPTED_SENTENCE if char_count else UNAVAILABLE_SENTENCE)
+    text = degraded_message(
+        prompt, sentence=sentence, with_sentence=refusal or char_count > 0 or not said, after_text=char_count > 0,
+    )
     if ctx is not None:
         ctx["degraded_said"] = True
     return text or None
+
+
+class _Run:
+    """What one narration has shown so far; read by the bookkeeping after the stream ends."""
+
+    def __init__(self) -> None:
+        self.chars, self.end = 0, None
+
+
+def _output_gate():
+    """A gate that holds back prose breaking an output rule, or None when the policy is off."""
+    from application.ai.safety.stream_gate import OutputGate
+    from application.wiring import get_output_policy
+
+    policy = get_output_policy()
+    return OutputGate(policy) if policy is not None else None
+
+
+def _withheld(gate) -> None:
+    from application.wiring import get_ai_telemetry
+
+    get_ai_telemetry().count("ai.output_withheld")
+    log.warning("model prose withheld by output policy: %s", ",".join(gate.blocked))
+    raise OutputWithheld(gate.blocked)
+
+
+async def _frames(agent_name: str, prompt: str, run: _Run) -> AsyncIterator[str]:
+    """Token frames for one narration, each released only once the output policy accepts it."""
+    from application.wiring import get_mediator
+
+    gate = _output_gate()
+    async for event in get_mediator().stream(NarrateBriefQuery(agent_name=agent_name, prompt=prompt)):
+        if isinstance(event, StreamEnd):
+            run.end = event
+        if not (isinstance(event, TextDelta) and event.text):
+            continue
+        text = gate.feed(event.text) if gate else event.text
+        if gate and gate.blocked:
+            _withheld(gate)
+        if text:
+            run.chars += len(text)
+            yield _sse("token", {"agent": agent_name, "content": text})
+    tail = gate.finish() if gate else ""
+    if gate and gate.blocked:
+        _withheld(gate)
+    if tail:
+        run.chars += len(tail)
+        yield _sse("token", {"agent": agent_name, "content": tail})
 
 
 async def _stream_agent(agent_name: str, prompt: str, *, degrade: bool = True) -> AsyncIterator[str]:
@@ -89,32 +141,33 @@ async def _stream_agent(agent_name: str, prompt: str, *, degrade: bool = True) -
     figures instead of an error. A caller with its own fallback — the page summary —
     passes False and keeps the `[Agent failed: …]` marker it looks for.
     """
-    from application.wiring import get_mediator
-
     yield _sse("agent_start", {"agent": agent_name})
-    started, char_count, ok, error_text, end = time.perf_counter(), 0, True, None, None
+    started, ok, error_text, run = time.perf_counter(), True, None, _Run()
     try:
-        async for event in get_mediator().stream(NarrateBriefQuery(agent_name=agent_name, prompt=prompt)):
-            if isinstance(event, TextDelta) and event.text:
-                char_count += len(event.text)
-                yield _sse("token", {"agent": agent_name, "content": event.text})
-            elif isinstance(event, StreamEnd):
-                end = event
+        async for frame in _frames(agent_name, prompt, run):
+            yield frame
     except asyncio.CancelledError:
         # The reader went away. Record what was written, then let the cancellation through.
-        _record_agent_action(agent_name, end, prompt, char_count, False)
-        _observe(agent_name, started, char_count, False, "cancelled by the client")
+        _record_agent_action(agent_name, run.end, prompt, run.chars, False)
+        _observe(agent_name, started, run.chars, False, "cancelled by the client")
         raise
     except Exception as e:  # noqa: BLE001
         log.exception("Agent %s failed", agent_name)
         ok, error_text = False, str(e)
-        shown = _degraded_token(prompt, char_count) if degrade else None
+        shown = _degraded_token(prompt, run.chars, e) if degrade else None
         yield _sse("token", {"agent": agent_name, "content": shown or f"[{agent_name} failed: {e}]"})
 
-    _record_agent_action(agent_name, end, prompt, char_count, ok)
-    _observe(agent_name, started, char_count, ok, error_text)
+    _record_agent_action(agent_name, run.end, prompt, run.chars, ok)
+    _observe(agent_name, started, run.chars, ok, error_text)
     yield _sse("agent_end", {"agent": agent_name})
 
 
 def _brief(label: str, payload: dict[str, Any]) -> str:
     return f"{label}\n\nJSON:\n{json.dumps(payload, indent=2)}"
+
+
+def _question(message: str) -> str:
+    """What the reader typed, fenced as data. It goes to a model; it is not an instruction to it."""
+    from application.ai.safety.untrusted import UntrustedText
+
+    return UntrustedText(message, "reader question").fenced()

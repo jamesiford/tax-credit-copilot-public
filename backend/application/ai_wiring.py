@@ -10,6 +10,7 @@ Everything is built lazily and cached; `set_*` swap a piece for tests and
 """
 from __future__ import annotations
 
+import logging
 import os
 from typing import Any
 
@@ -19,6 +20,8 @@ from application.ai.providers import ProviderRegistry
 from application.ai.router import ModelRouter
 from application.ai.settings import AiSettings, load_ai_settings
 from application.ai.specs import SpecRegistry
+
+log = logging.getLogger(__name__)
 
 _settings: AiSettings | None = None
 _specs: SpecRegistry | None = None
@@ -169,8 +172,24 @@ def set_model_router(router: ModelRouter | None) -> None:
 def get_narration_service() -> NarrationService:
     global _service
     if _service is None:
-        _service = NarrationService(get_spec_registry(), get_model_router())
+        from application.ai.safety.injection import PromptInjectionGuard
+
+        safety = get_ai_settings().safety
+        for control in safety.disabled_controls:
+            log.warning("AI safety control %s is OFF", control)
+        _service = NarrationService(
+            get_spec_registry(), get_model_router(),
+            PromptInjectionGuard() if safety.injection_guard else None, get_ai_telemetry(),
+        )
     return _service
+
+
+def get_output_policy() -> Any:
+    """The output rules for model prose, or None when switched off (and logged as such)."""
+    from application.ai.safety.policy import RuleOutputPolicy
+
+    safety = get_ai_settings().safety
+    return RuleOutputPolicy(safety.output_allowed_hosts) if safety.output_policy else None
 
 
 def set_narration_service(service: NarrationService | None) -> None:
