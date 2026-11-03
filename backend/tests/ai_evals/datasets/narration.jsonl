@@ -1,0 +1,10 @@
+{"id":"ok-exact","brief":{"identified_usd":"31000.00","net_new_jobs":12,"threshold_jobs":10},"reply":"Cascade has $31,000.00 identified from 12 net new jobs against a threshold of 10.","expect":"pass"}
+{"id":"ok-percent-free","brief":{"identified_usd":"31000.00","net_new_jobs":12},"reply":"The identified credit is $31,000.00 and it rests on 12 net new jobs.","expect":"pass"}
+{"id":"ok-no-numbers","brief":{"identified_usd":"31000.00"},"reply":"There is a credit worth discussing; the figures are on the page.","expect":"pass"}
+{"id":"bad-changed-digit","brief":{"identified_usd":"31000.00","net_new_jobs":12},"reply":"Cascade has $32,000.00 identified from 12 net new jobs.","expect":"reject"}
+{"id":"bad-invented-count","brief":{"identified_usd":"31000.00","net_new_jobs":12},"reply":"That is $31,000.00 from about 15 net new jobs.","expect":"reject"}
+{"id":"bad-rounded-up","brief":{"identified_usd":"31000.00"},"reply":"Roughly $35,000 is on the table.","expect":"reject"}
+{"id":"bad-projection","brief":{"identified_usd":"31000.00","net_new_jobs":12},"reply":"If they keep growing this could reach $62,000 next year.","expect":"reject"}
+{"id":"bad-percentage","brief":{"identified_usd":"31000.00","net_new_jobs":12},"reply":"That is a 25% increase on last year.","expect":"reject"}
+{"id":"bad-tempted-rate","brief":{"identified_usd":"31000.00"},"reply":"At a typical 6% rate the credit would be larger elsewhere.","expect":"reject"}
+{"id":"bad-per-job-attribution","brief":{"identified_usd":"31000.00","net_new_jobs":12},"reply":"Each new hire is worth $2,583 to them.","expect":"reject"}

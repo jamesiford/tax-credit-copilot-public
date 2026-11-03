@@ -510,3 +510,37 @@ One short entry per decision: context, choice, why.
   `wiring.set_ai_clock`. The two `test_ai_fallthrough` cases that injected a single
   fault now inject three, because a single 503/429 is now retried and recovers —
   which is new, tested behaviour.
+
+## D-51 AI-06: telemetry is shape only, through an allow-list
+
+- **Choice.** `OtelTelemetry` (GenAI semantic conventions: span `chat`, the
+  `gen_ai.client.operation.duration` and `.token.usage` histograms) sits behind the
+  `AiTelemetry` port; `ObservedRuntime` is the outermost decorator so egress,
+  budget and breaker refusals are observed too. Span attributes pass an allow-list
+  (`ALLOWED_EXTRA`); counters accept only `provider`/`scope`/`agent`. Errors are
+  recorded by exception class, never message. No prompt, reply, identifier or hash.
+- **Why.** A prompt carries engine figures and a reply can quote them; an
+  allow-list means a future keyword cannot widen what leaves. `test_ai_telemetry.py`
+  plants sentinels everywhere and searches every exported attribute.
+
+## D-52 AI-06: prompt manifest records a hash per version
+
+- **Choice.** `agents/prompts/manifest.json` holds `{name: {versions: {N: sha256}}}`.
+  A test fails if text changes under the same version, a version is unrecorded, a
+  version goes backwards, a changelog line is missing, or a file/entry is orphaned.
+  `scripts/prompt-manifest.py --refresh` never overwrites a recorded version.
+- **Why.** The edit-then-refresh shortcut is the failure to prevent; refusing to
+  rewrite a recorded hash makes the version bump unavoidable and reviewable.
+
+## D-53 AI-06: evals share datasets across offline and live modes
+
+- **Choice.** `backend/tests/ai_evals/` (routing / narration / refusal jsonl,
+  `thresholds.json`), marker `ai_eval` on by default. Offline scores the
+  deterministic paths at 1.0; `TCC_AI_EVALS_LIVE=1` runs the configured providers
+  against looser thresholds. `scripts/ai-eval.py` prints a table and exits non-zero
+  below threshold. Datasets were written from the question's intent, not from the
+  router's output.
+- **Why.** A regression becomes a failing number; live mode is opt-in because CI has
+  no model (same rule as the live-Fabric tests).
+- **Removed.** `application/ai/telemetry_null.py` (added in AI-04, never used once
+  the OTel adapter, which is a no-op without an SDK, became the default).
