@@ -21,6 +21,7 @@ from channel.downloads import DownloadService
 from channel.ledger import FactLedger
 from channel.limiter import RateLimiter
 from channel.mcp import McpServer
+from channel.narration import NarrationAudit
 from channel.pipeline import ToolPipeline
 from infrastructure.auth.entra import EntraTokenValidator
 
@@ -42,6 +43,13 @@ class _LazyAuditor:
         return getattr(channel_wiring.get_channel_auditor(), name)
 
 
+class _LazyRecorder:
+    """The agent-action recorder, resolved per call for the same reason."""
+
+    def record(self, invocation: Any) -> Any:
+        return channel_wiring.get_agent_action_recorder().record(invocation)
+
+
 @dataclass
 class Services:
     """Everything a route needs, composed."""
@@ -52,6 +60,7 @@ class Services:
     downloads: DownloadService
     mcp: McpServer
     api: ApiClient
+    narration: NarrationAudit
 
 
 def build_services(
@@ -70,4 +79,5 @@ def build_services(
     )
     downloads = DownloadService(settings=settings, auditor=auditor, api=api, limiter=limiter)
     mcp = McpServer(authenticator, pipeline, settings, NAME, VERSION)
-    return Services(settings, authenticator, pipeline, downloads, mcp, api)
+    return Services(settings, authenticator, pipeline, downloads, mcp, api,
+                    NarrationAudit(auditor, _LazyRecorder()))

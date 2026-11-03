@@ -22,6 +22,7 @@ INVENTORY = BACKEND / "tests" / "channel_route_inventory.json"
 #: The `application` modules the gateway may use, each for a stated reason.
 ALLOWED_APPLICATION = frozenset({
     "application.acting_user",                 # the header the API parses
+    "application.agent_audit",                 # the narrator-agent audit row (standard library + domain only)
     "application.capabilities.catalog",        # the tool contract
     "application.capabilities.envelope",       # the result shape
     "application.capabilities.verify",         # verify_figures, over the ledger

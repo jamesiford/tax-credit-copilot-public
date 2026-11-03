@@ -45,6 +45,9 @@ class AgentInvocation:
     intent: str | None = None
     ok: bool = True
     is_deterministic_path: bool = False
+    #: Set when the caller holds only the hash (the channel orchestrator hashes the prompt where it was built).
+    prompt_sha256: str | None = None
+    output_note: str | None = None
 
 
 def prompt_hash(prompt: str) -> str:
@@ -62,10 +65,11 @@ def to_action(invocation: AgentInvocation) -> AgentActionAudit:
         client_id=invocation.client_id,
         agent_version=invocation.agent_version,
         model_deployment=invocation.model_deployment,
-        prompt_hash=prompt_hash(invocation.prompt),
+        prompt_hash=invocation.prompt_sha256 or prompt_hash(invocation.prompt),
         tool_calls=json.dumps(sorted(set(invocation.tool_calls))),
         input_summary=f"intent={invocation.intent or 'n/a'}; prompt_chars={len(invocation.prompt)}"[:_SUMMARY_LIMIT],
-        output_summary=f"status={status}; output_chars={invocation.output_chars}"[:_SUMMARY_LIMIT],
+        output_summary=(f"status={status}; output_chars={invocation.output_chars}"
+                        + (f"; {invocation.output_note}" if invocation.output_note else ""))[:_SUMMARY_LIMIT],
         user_upn=invocation.actor,
         is_deterministic_path=invocation.is_deterministic_path,
     )

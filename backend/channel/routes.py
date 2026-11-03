@@ -8,6 +8,7 @@ pins the list), so the public surface is exactly what is registered here.
     GET    /channel/ready             readiness, no credentials
     GET    /channel/v1/tools          the tools this caller may use
     POST   /channel/v1/tools/{tool}   run one tool
+    POST   /channel/v1/audit/narration  file one narration report (orchestrator only)
     GET    /channel/v1/downloads/{t}  a claim package, by ticket (a token is optional)
     POST   /mcp                       the MCP facade (Cowork)
     GET    /mcp                       405: this server never opens a stream to the client
@@ -15,6 +16,8 @@ pins the list), so the public surface is exactly what is registered here.
 """
 from __future__ import annotations
 
+import asyncio
+import logging
 from typing import Any
 
 from fastapi import APIRouter, Request
@@ -23,9 +26,12 @@ from pydantic import BaseModel, Field, ValidationError
 
 from channel.auth import AuthFailure, Caller
 from channel.config import MAX_REQUEST_BYTES
+from channel.narration import NarrationReport
 from channel.pipeline import ToolCall, error_outcome
 from channel.tools import offered_tools
 from channel.wiring import Services
+
+log = logging.getLogger("tcc.channel.routes")
 
 
 class ToolRequest(BaseModel):
@@ -118,6 +124,36 @@ class GatewayRoutes:
         )
         return _json(outcome.status, outcome.body, outcome.headers)
 
+    async def audit_narration(self, request: Request) -> JSONResponse:
+        """File one narration report for the calling orchestrator's user (agent callers only)."""
+        try:
+            caller = self._authenticate(request)
+        except AuthFailure as exc:
+            return _refusal(exc)
+        cid = caller.acting.correlation_id or ""
+        if caller.kind != "agent":
+            out = error_outcome(403, "not_authorized", "only the orchestrator reports narrations", cid)
+            return _json(out.status, out.body)
+        raw = await _bounded_body(request)
+        if raw is None:
+            return _too_large()
+        try:
+            report = NarrationReport.model_validate_json(raw or b"{}")
+        except ValidationError:
+            out = error_outcome(422, "invalid_request", "the body is not a narration report", cid)
+            return _json(out.status, out.body)
+        problem = report.problem()
+        if problem:
+            out = error_outcome(422, "invalid_request", problem, cid)
+            return _json(out.status, out.body)
+        try:
+            filed = await asyncio.to_thread(self._s.narration.record, caller, report)
+        except Exception:  # noqa: BLE001 - the orchestrator logs and surfaces it; the answer is not hidden
+            log.exception("could not write the narration audit event")
+            out = error_outcome(503, "audit_unavailable", "the audit trail is unavailable", cid, retryable=True)
+            return _json(out.status, out.body)
+        return _json(200, {**filed, "correlation_id": cid})
+
     async def download(self, ticket: str, request: Request) -> Response:
         """A claim package by ticket; a token, when given, must be the ticket's person's."""
         caller = None
@@ -156,6 +192,7 @@ def build_router(services: Services) -> APIRouter:
     router.add_api_route("/channel/ready", routes.ready, methods=["GET"])
     router.add_api_route("/channel/v1/tools", routes.tools, methods=["GET"])
     router.add_api_route("/channel/v1/tools/{tool}", routes.run_tool, methods=["POST"])
+    router.add_api_route("/channel/v1/audit/narration", routes.audit_narration, methods=["POST"])
     router.add_api_route("/channel/v1/downloads/{ticket}", routes.download, methods=["GET"])
     router.add_api_route("/mcp", routes.mcp_post, methods=["POST"])
     router.add_api_route("/mcp", routes.mcp_get, methods=["GET"])
