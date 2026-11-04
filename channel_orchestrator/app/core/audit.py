@@ -14,7 +14,7 @@ from typing import Any
 
 from app.core.gateway_client import GatewayClient
 from app.core.identity import ActingIdentity
-from app.core.planner import Planned
+from app.core.planned import Planned
 from app.core.prompts import narrator_instructions
 from app.core.settings import OrchestratorSettings
 from app.core.tools import ToolRunner

@@ -20,10 +20,12 @@ from collections.abc import Sequence
 from dataclasses import replace
 from typing import Any
 
+from app.core.placeholders import with_placeholders
 from app.core.tools import ToolRun
+from application.ai.safety.untrusted import UntrustedText
 from application.capabilities import catalog
 from application.capabilities.envelope import AUDIENCE_USER, AUDIENCES, Block
-from application.composer import Composed, compose, placeholders
+from application.composer import Composed, compose, narrator_brief, placeholders
 from application.numeric_guard import REJECTED, AllowedContext, FactIndex, GuardResult, Numeral, Violation
 
 METHOD_LABEL = {"min_max": "Min-Max method", "pay_period": "Pay Period method"}
@@ -104,6 +106,22 @@ def compose_reply(question: str, runs: Sequence[ToolRun], narration: str | None,
         return composed
     violation = Violation(Numeral(OUTSIDE_VIEW, 0, 0, "placeholder"), OUTSIDE_VIEW, stage="narration")
     return replace(composed, guard=GuardResult(REJECTED, (violation, *composed.guard.violations)))
+
+
+def narration_brief(question: str, runs: Sequence[ToolRun], *, fenced: bool = False) -> dict[str, Any]:
+    """What a model is told of `runs`: the NAMES of the facts it may refer to, each with its placeholder, and the notes.
+
+    One brief for every path that hands a narrator something: a tool's reply inside the agent's loop
+    (`fenced` False: the loop already holds the question) and the degraded planner's single call (`fenced` True:
+    the question travels in the brief, so it is marked as the reader's words). It holds no value, only the
+    lane-projected names a model may use.
+    """
+    asked = UntrustedText(question, "reader question").fenced() if fenced else question
+    brief = narrator_brief(
+        asked, [run.name for run in runs], model_facts_of(runs), notes=[w for run in runs for w in run.envelope.get("warnings") or []],
+    )
+    brief["fact_paths"] = with_placeholders(brief["fact_paths"])
+    return brief
 
 
 def provenance_footer(runs: Sequence[ToolRun]) -> str:

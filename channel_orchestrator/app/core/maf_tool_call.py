@@ -22,11 +22,11 @@ from typing import Any
 from agent_framework import FunctionInvocationContext, FunctionMiddleware
 
 from app.core.gateway_client import GatewayReply
+from app.core.compose import narration_brief
 from app.core.maf_catalog_tools import TURN
 from app.core.maf_tool_rules import answer_with
 from app.core.toolset import Problem, ToolRun, lane_diagnostic, method_argument, model_answer
 from application.capabilities import catalog
-from application.composer import narrator_brief
 
 log = logging.getLogger("tcc.orchestrator.tools")
 Next = Callable[[], Awaitable[None]]
@@ -53,7 +53,7 @@ def capture(turn: Any, spec: catalog.CapabilitySpec, args: dict[str, Any], reply
         turn.state.tax_year = args[catalog.TAX_YEAR]
     if spec.kind == catalog.WRITE_PREPARE:
         turn.hold(run)
-    brief = narrator_brief(turn.question, [spec.name], {run.label: run.model_facts}, notes=list(reply.body.get("warnings") or []))
+    brief = narration_brief(turn.question, [run])
     answer = model_answer(spec, run, brief)
     log.info("model payload: %s", lane_diagnostic(run, answer))
     return answer

@@ -63,9 +63,9 @@ class PortChatClient(FunctionInvocationLayer, ChatMiddlewareLayer, BaseChatClien
     async def _respond(self, messages: Any, options: Any) -> ChatResponse:
         tools = [ToolSpec(t.name, t.description, t.parameters()) for t in (options.get("tools") or [])]
         chat = as_chat_messages(messages, options.get("instructions"))
-        self._trace.prompt_parts.append("\n".join(m.content for m in chat))
+        self._trace.sent(chat)
         turn = await self._chain.complete(chat, tools, prefer=self._trace.last.provider if self._trace.last else None)
-        self._trace.turns.append(turn)
+        self._trace.took(turn)
         return _as_response(turn)
 
 

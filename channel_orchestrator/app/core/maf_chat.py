@@ -25,6 +25,14 @@ class ModelTrace:
         """The most recent model turn, or None when no model was called: the audit reports the model that answered last."""
         return self.turns[-1] if self.turns else None
 
+    def sent(self, messages: Any) -> None:
+        """Note what is about to be sent to a model (the audit hashes it), whether or not the model answers."""
+        self.prompt_parts.append("\n".join(m.content for m in messages))
+
+    def took(self, turn: ModelTurn) -> None:
+        """Note a turn a model took."""
+        self.turns.append(turn)
+
 
 def loop_limits(max_calls: int) -> dict[str, Any]:
     """The framework's tool-loop limits for a turn budget of `max_calls`: a backstop, since the budget middleware refuses first.
