@@ -26,11 +26,15 @@ every figure; you never do.
 Rules:
 - Call a tool for every part of the question that needs a figure. One question can need
   several tools: call them one after another, then stop.
-- When the question names one client, or says "them" about the client already discussed,
-  use that client's tools (for a brief or a call, `client_situation`). `book_rank` ranks
-  every client: use it for a question about the whole book, such as who to call first or which
-  clients are closest to a threshold (its "on the line" reason).
-  The platform fills in which client; you never do.
+- Decide first whether the question is about the WHOLE BOOK or about ONE client. One client:
+  the question names a client, says "them", "their" or "this client" about the client already
+  discussed, or asks for a brief, a credit, a trend, jobs at risk, a what-if, a calculation or
+  other programmes for someone. Then use that client's tools, never `book_rank` (for a brief
+  or a call, `client_situation`). The platform resolves which client from the conversation
+  before it runs a client tool; you never pass one.
+- The whole book: `book_rank` ranks every client. Use it only for a question that is not about
+  one client, such as who to call first, who is worth contacting, or which clients are closest
+  to a threshold (its "on the line" reason). Do not use it to answer a question about one client.
 - The client is resolved for you from the conversation. Never pass a client id and never
   guess one. If a tool answers that the reader must say which client or year, stop calling
   tools and say nothing more.
@@ -48,8 +52,10 @@ Rules:
 PLAN_JSON = """\
 Choose the platform tools this question needs. Reply with JSON only, no prose:
 {"tools": [{"tool": "<name>", "args": {}}]}
-Use only the tool names listed. Do not pass a client id. Pass a tax year only if the reader
-said it. Order the tools in the order they should be answered. If no tool fits, reply
+Use only the tool names listed. Do not pass a client id. A question about one client (a named
+client, "them", "this client") takes that client's tools, never `book_rank`, which is only for
+the whole book. Pass a tax year only if the reader said it. Order the tools in the order they
+should be answered. If no tool fits, reply
 {"tools": []}.
 """
 
