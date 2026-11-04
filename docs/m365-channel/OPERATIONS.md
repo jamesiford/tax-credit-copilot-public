@@ -45,6 +45,11 @@ Failure signatures are in [RUNBOOK](../architecture/RUNBOOK.md). Two PoC-specifi
 
 * Every data path fails while `/api/health` stays 200: the shared Fabric capacity is paused or
   the workspace was moved. Ask the owner; do not resume or assign a capacity from here.
+  Signature seen on 4 November (RM-16): every tool call `503`, the orchestrator replying "I couldn't answer that: the audit trail is
+  unavailable; nothing was done.", and `az resource show` on the capacity saying `Paused`. The activity log shows a suspend about 08:36 UTC each
+  night from a caller outside this repository. Check it before debugging anything else:
+  `az resource show --ids <capacity id> --query properties.state -o tsv`. The Fabric REST API also answers `500` to a workspace lookup while it is
+  suspended, so `apply-migrations.py` fails at the guard rather than at a migration.
 * The gateway answers 502 `api_unavailable`: the gateway identity lost its `TCC.Agent` role, or the
   API is stopped. `pwsh scripts/assign-channel-roles.ps1 ...` is idempotent and prints what is missing.
 * A person in the writers **group** but not on the allow-list is refused by the API with `GroupMember.Read.All` granted

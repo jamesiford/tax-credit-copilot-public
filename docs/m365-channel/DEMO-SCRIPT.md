@@ -312,11 +312,25 @@ audit, the data tools answer nuanced questions, and the Cowork package is **v2**
    remove `offline_access` from the registration's scope.
 9. When finished, switch the diagnostics off ([DEMO-CLEANUP](DEMO-CLEANUP.md)).
 
+### Retry after RM-16 (agent version 21): before anything else
+
+The remediation work (small-group suppression, the fail-closed Cowork rule, MAF tools and middleware, the write and review-pack Workflows, the
+framework's chat client) is deployed as agent **version 21**, but its data checks have not run live (the shared Fabric capacity was suspended;
+[evidence/live-remediation-2026-11-04.md](evidence/live-remediation-2026-11-04.md)). In this order:
+
+1. **Resume the shared Fabric capacity** (owner action) and wait a few minutes for the API to warm.
+2. Run the checklist at the end of the evidence file: invariants, `/whoami` (expect `version: 21`), the gateway smoke, then the twelve questions
+   (the ten of the CH-17 retest, plus a client review pack and a prepared write you do not confirm).
+3. Compare with [evidence/live-final-2026-11-03.md](evidence/live-final-2026-11-03.md). Any regression: `agent-endpoint.ps1 -Action Pin -Version 20`.
+4. Then the retest above (CH-17) in Teams and Cowork. Small groups: a non-writer asking for an average over fewer than five people gets the group left out and
+   counted; a writer (you) is exempt, so the demo shows the exempt view.
+
 ### Troubleshooting: the agent does not answer
 
 | What you see | What it means | What to do |
 | --- | --- | --- |
 | Delivered, no reply; Bot Service shows only 200 | The platform could not hand the message to the container. Seen once: `activity` declared as a container protocol, so Teams messages went to `/activity/messages` (404) | `pwsh` the agent definition (`GET /agents/<name>`): `definition.protocol_versions` must be `responses` only, `agent_endpoint.protocols` `activity, responses`, schemes `Entra, BotServiceRbac`. Then `azd ai agent monitor <name> --session-id <id> --type console` and look for `POST /activity/messages ... 404` |
+| "I couldn't answer that: the audit trail is unavailable; nothing was done." to every question | The Warehouse is unreachable. Seen on 4 November: the shared Fabric capacity was suspended (every tool call 503) | `az resource show` on the capacity (`Paused`?); the owner resumes it ([OPERATIONS](OPERATIONS.md)) |
 | "I can't tell who you are" | No identity signal carried an object id | `/whoami`: read `signals` and `agent_user_id`; see ORCHESTRATOR.md, Identity |
 | A reply with tables but "the language model is unavailable" | The model call failed (it was M-01) | `/netcheck` then `/modelprobe`: a name that does not resolve is the DNS finding in D-101 |
 | "You cannot send messages to this bot", or delivered but nothing reaches it | Teams-side install state | Re-upload as a new version, refresh, check Allowed in the admin center ([KNOWN-LIMITATIONS](KNOWN-LIMITATIONS.md)) |
