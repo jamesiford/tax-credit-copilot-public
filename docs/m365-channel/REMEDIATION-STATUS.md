@@ -41,6 +41,10 @@ check_all 21 of 22 (the all-tree gitleaks row); hosted agent version 20 is the r
 
 Backend after Tier 1: **5305 passed / 136 skipped / 1 xfailed** (baseline 4957 passed; +348 over the run; the only cases removed are three quote-only parametrised ones in `test_data_validate.py`, moved to a new test, see D-122). `terraform test` 70 passed on a clean copy after RM-03 (the only infra change).
 
+## RM-09 and RM-12 gate run
+
+`python frontend/tools/check_all.py` ran on `feat/m365-channel` after the RM-12 merge (mock API :8000, CSV backend :8001 with `ENVIRONMENT=local AUTH_MODE=none DATA_SOURCE=csv`, Vite :5173): **21 of 22 passed**; the one failure is the known baseline row (`gitleaks (HEAD + working tree)`: HEAD scans clean, the working-tree scan reports the gitignored local files). Frontend suite 929 tests (not changed). Servers were stopped by PID (the OS still lists the three ports as listening with no owning process, as before). Backend after RM-12: **5551 passed / 136 skipped / 1 xfailed**.
+
 ## Blockers
 
 None.
