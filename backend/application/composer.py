@@ -90,8 +90,13 @@ def _policy_violations(narration: str, allowed_hosts: Sequence[str]) -> list[Vio
 def _hedge_violations(masked: str) -> list[Violation]:
     """One violation per figure the wording hedges; the code, never the words, is what is recorded."""
     message = "narration style: an approximation qualifier next to a figure"
-    return [Violation(Numeral(message, 0, 0, "approximation"), message, stage="narration")
-            for _ in range(composer_hedging.hedged_figures(masked))]
+    rounding = "narration style: the wording says a figure was rounded or approximated"
+    return [
+        *(Violation(Numeral(message, 0, 0, "approximation"), message, stage="narration")
+          for _ in range(composer_hedging.hedged_figures(masked))),
+        *(Violation(Numeral(rounding, 0, 0, "approximation"), rounding, stage="narration")
+          for _ in range(composer_hedging.states_rounding(masked))),
+    ]
 
 
 def _narrate(

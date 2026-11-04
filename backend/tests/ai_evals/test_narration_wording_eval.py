@@ -29,6 +29,7 @@ def test_the_new_narration_rows_cover_the_six_answers_and_both_verdicts():
 
 def test_the_hedge_rows_fail_if_the_composer_stops_rejecting_hedges(monkeypatch):
     monkeypatch.setattr(composer_hedging, "hedged_figures", lambda masked: 0)
+    monkeypatch.setattr(composer_hedging, "states_rounding", lambda masked: 0)
     result = harness.score_narration(rows("narration", "nar-hedge"), harness.recorded_reply, "offline")
     assert result.passed == 0 and len(result.failures) == len(rows("narration", "nar-hedge"))
 

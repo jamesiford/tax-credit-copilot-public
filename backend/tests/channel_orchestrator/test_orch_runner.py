@@ -125,3 +125,19 @@ def test_the_settings_reject_values_that_would_weaken_a_control():
     ok = load_settings({**ENV, "CHANNEL_DEBUG_WHOAMI": "true"})
     assert ok.debug_whoami and ok.max_tool_calls == 6 and ok.confirm_ttl_seconds == 300
     assert ok.gateway_scope == "api://gateway-test/.default" and USER_OID
+
+
+def test_a_repeated_identical_call_returns_the_earlier_answer_and_runs_once():
+    r, gateway, _ = runner("What is Cascade's credit for 2023?")
+    first = run(r, "client_eligibility", {"tax_year": 2023})
+    second = run(r, "client_eligibility", {"tax_year": 2023})
+    assert first == second and first["ok"]
+    assert [run_.name for run_ in r.runs] == ["client_eligibility", "client_eligibility"]  # both methods, once
+    assert [c.tool for c in gateway.calls].count("client_eligibility") == 2
+
+
+def test_a_different_call_is_not_mistaken_for_a_repeat():
+    r, gateway, _ = runner("What is Cascade's credit for 2023 and for 2022?")
+    run(r, "client_eligibility", {"tax_year": 2023})
+    run(r, "client_eligibility", {"tax_year": 2022})
+    assert [c.tool for c in gateway.calls].count("client_eligibility") == 4
