@@ -268,3 +268,8 @@ questions the structured specification cannot express (arbitrary joins, ad hoc e
 
 Until a per-person token is carried end to end (the condition that also retires the channel assertion in
 ADR-009), the structured path in this page is the way the agent reads data.
+
+**Checked again on 2026-11-04 (RM-15).** The Foundry tool for a Fabric data agent is scheduled for deprecation on 6 November 2026 and replaced by the Fabric IQ
+(OneLake Catalog) tool, which is preview; the ontology (preview) MCP server cannot currently be reached with a service principal and needs a paid F2 or higher
+capacity. Neither changes the recommendation. The knowledge tier, which is about cited reference text and not tenant rows, is a separate design:
+[KNOWLEDGE-AND-IQ.md](../architecture/KNOWLEDGE-AND-IQ.md) and [ADR-010](../architecture/ADR-010-knowledge-tier.md).

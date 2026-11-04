@@ -13,6 +13,7 @@ from app.core.compose import compose_reply
 from app.core.maf_chat import ModelTrace
 from app.core.tools import ToolRunner
 from application.composer import Composed
+from application.knowledge import Passage
 
 
 @dataclass
@@ -25,6 +26,7 @@ class Planned:
     model_used: bool = False
     degraded: bool = False
     hosts: tuple[str, ...] = ()
+    reference: tuple[Passage, ...] = ()
     trace: ModelTrace = field(default_factory=ModelTrace)
 
     def narrate(self, raw: str | None) -> None:
@@ -39,4 +41,4 @@ class Planned:
 
     def fall_back(self) -> None:
         """The model layer failed: forget what it said and mark the answer as the platform's own."""
-        self.degraded, self.narration, self.composed = True, None, None
+        self.degraded, self.narration, self.composed, self.reference = True, None, None, ()

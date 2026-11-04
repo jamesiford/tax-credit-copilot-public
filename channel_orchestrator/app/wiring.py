@@ -13,9 +13,10 @@ from dataclasses import dataclass
 from app.core.gateway_client import GatewayClient, managed_identity_token
 from app.core.model_access import ModelAccess, select_model_access
 from app.core.planner import Planner
-from app.core.settings import OrchestratorSettings, load_settings
+from app.core.settings import OrchestratorConfigError, OrchestratorSettings, load_settings
 from app.core.state import StateStore
 from app.core.turn import TurnPipeline
+from application.knowledge_settings import KnowledgeConfigError, build_knowledge, load_knowledge_settings
 
 log = logging.getLogger("tcc.orchestrator")
 
@@ -42,7 +43,12 @@ def build_orchestrator(
     env: Mapping[str, str] | None = None, *, gateway: GatewayClient | None = None, chain: ModelAccess | None = None,
 ) -> Orchestrator:
     """Build from the environment. Raises `OrchestratorConfigError` naming every problem."""
-    settings = load_settings(effective_environment(os.environ if env is None else env))
+    merged = effective_environment(os.environ if env is None else env)
+    settings = load_settings(merged)
+    try:
+        knowledge = load_knowledge_settings(merged)
+    except KnowledgeConfigError as exc:
+        raise OrchestratorConfigError(str(exc)) from exc
     if settings.debug_whoami:
         log.warning(
             "CHANNEL_DEBUG_WHOAMI is ON: /whoami, /netcheck and /modelprobe answer anyone who can message this agent. "
@@ -52,6 +58,8 @@ def build_orchestrator(
         settings.gateway_url, managed_identity_token(settings.gateway_scope), timeout_seconds=settings.request_timeout_seconds,
     )
     chain = chain or select_model_access(settings)
-    planner = Planner(chain, allowed_hosts=settings.ai.safety.output_allowed_hosts)
+    planner = Planner(
+        chain, allowed_hosts=settings.ai.safety.output_allowed_hosts, knowledge=build_knowledge(knowledge), knowledge_top=knowledge.top,
+    )
     pipeline = TurnPipeline(settings, gateway, planner, StateStore(settings.state_ttl_seconds))
     return Orchestrator(settings, pipeline, chain, gateway)
