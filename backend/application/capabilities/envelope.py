@@ -26,6 +26,13 @@ DISCLAIMER = (
 
 BLOCK_KINDS = ("heading", "paragraph", "bullets", "table", "callout")
 
+#: Who may read a block. `both`: the person and any model that narrates around the result.
+#: `user`: the person only. A lane is a property of the envelope, not a convention a caller
+#: remembers, so a consumer that does not know the word treats the block as `user` [ADR-009].
+AUDIENCE_BOTH = "both"
+AUDIENCE_USER = "user"
+AUDIENCES = (AUDIENCE_BOTH, AUDIENCE_USER)
+
 
 @dataclass(frozen=True)
 class Block:
@@ -33,16 +40,19 @@ class Block:
 
     `heading`, `paragraph` and `callout` carry `text`. `bullets` carries one
     single-cell row per item. `table` carries `rows`, header first, every row the
-    same width.
+    same width. `audience` is `both` unless the block holds person-level values.
     """
 
     kind: str
     text: str = ""
     rows: tuple[tuple[str, ...], ...] = ()
+    audience: str = AUDIENCE_BOTH
 
     def __post_init__(self) -> None:
         if self.kind not in BLOCK_KINDS:
             raise ValueError(f"block kind must be one of {BLOCK_KINDS}, got {self.kind!r}")
+        if self.audience not in AUDIENCES:
+            raise ValueError(f"block audience must be one of {AUDIENCES}, got {self.audience!r}")
         if self.kind == "table":
             widths = {len(row) for row in self.rows}
             if len(widths) > 1:
@@ -51,7 +61,12 @@ class Block:
             raise ValueError("bullet rows must have exactly one cell")
 
     def to_dict(self) -> dict[str, Any]:
-        return {"kind": self.kind, "rows": [list(r) for r in self.rows], "text": self.text}
+        """The wire form. `audience` is written only when it is not the default, so every
+        existing envelope serialises byte-for-byte as before."""
+        wire: dict[str, Any] = {"kind": self.kind, "rows": [list(r) for r in self.rows], "text": self.text}
+        if self.audience != AUDIENCE_BOTH:
+            wire["audience"] = self.audience
+        return wire
 
 
 @dataclass(frozen=True)
@@ -107,6 +122,9 @@ class ToolResult:
     `facts` keeps the producer's own key order, because the portal narrator is
     handed `json.dumps(facts, indent=2)` and its prompt must not change.
     `to_dict()` is the stable wire form: sorted keys, JSON types only.
+
+    `user_only_facts` names top-level `facts` keys derived from person-level values. They
+    are delivered to the person and are never part of what a model is shown (`lanes.py`).
     """
 
     tool: str
@@ -115,9 +133,15 @@ class ToolResult:
     provenance: Provenance = field(default_factory=Provenance)
     disclaimer: str = DISCLAIMER
     warnings: tuple[str, ...] = ()
+    user_only_facts: tuple[str, ...] = ()
+
+    def __post_init__(self) -> None:
+        unknown = set(self.user_only_facts) - set(self.facts)
+        if unknown:
+            raise ValueError(f"user_only_facts names keys the facts do not have: {sorted(unknown)}")
 
     def to_dict(self) -> dict[str, Any]:
-        return {
+        wire: dict[str, Any] = {
             "blocks": [b.to_dict() for b in self.blocks],
             "disclaimer": self.disclaimer,
             "facts": json_safe(self.facts),
@@ -125,6 +149,9 @@ class ToolResult:
             "tool": self.tool,
             "warnings": list(self.warnings),
         }
+        if self.user_only_facts:
+            wire["user_only_facts"] = sorted(self.user_only_facts)
+        return wire
 
     def to_json(self) -> str:
         return json.dumps(self.to_dict(), sort_keys=True, separators=(",", ":"))
