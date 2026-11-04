@@ -1,9 +1,15 @@
 # ADR-001 — SQLite for decision state; the engine stays pure
 
 **Date** 2026-08-25 · **Status** **Superseded in part by
-[ADR-002](ADR-002-production-persistence.md)** · **Supersedes** the "No databases"
+[ADR-002](ADR-002-production-persistence.md), and in turn by
+[ADR-007](ADR-007-warehouse-operational-store.md)** · **Supersedes** the "No databases"
 rule in `.github/copilot-instructions.md`
 
+> **Superseded by, in order.** ADR-002 replaced the default store below the same day
+> (production, not prototype); ADR-007 (2026-10-08) then made the Fabric Warehouse the only
+> operational store and retired the document store ADR-002 chose. SQLite survives only as
+> the local-development and CI adapter. Read ADR-007 for what holds today.
+>
 > **Superseded the same day.** This ADR was decided while the project was
 > explicitly a prototype. Hours later the goal changed to a production build, and
 > the *default store* decision below no longer holds: the operational store is

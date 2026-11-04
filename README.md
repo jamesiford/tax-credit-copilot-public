@@ -101,7 +101,8 @@ over four routed pages, designed for a 1440×900 desktop. The type is self-hoste
 and nothing loads from another origin. A customer re-skins it by overriding
 colour roles in `frontend/src/styles/overlay.css`, never by editing a
 component. See [docs/design/DESIGN-SYSTEM.md](docs/design/DESIGN-SYSTEM.md) and
-[docs/design/UI-REVAMP-RESULT.md](docs/design/UI-REVAMP-RESULT.md); the
+[docs/design/UI-STATUS.md](docs/design/UI-STATUS.md) (the revamp's result is archived
+at [docs/archive/design/UI-REVAMP-RESULT.md](docs/archive/design/UI-REVAMP-RESULT.md)); the
 checks (`python frontend/tools/check_all.py`) are in
 [frontend/tools/README.md](frontend/tools/README.md).
 

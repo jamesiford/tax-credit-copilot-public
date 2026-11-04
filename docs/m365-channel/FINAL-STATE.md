@@ -14,7 +14,7 @@ Customer-neutral. Nothing in this file is an identifier; the private deployment 
 | 0 Preflight | done: location rules, azure.yaml protocol shape, baseline 2817 backend / 923 frontend tests |
 | 1 CH-15 demo polish | done (offline): Graph display names, agent icon (SVG sources, rendered at build), narration quality and hedging guard, portal chat evidence stream, known issues |
 | 2 CH-16 governed data access | done (offline): semantic model, structured query spec, SQL builders, executors, three capabilities, lanes, planner and skills, equivalence tests, docs and grants |
-| 3 CH-17 live redeploy | done: API, web, gateway and hosted agent redeployed; agent version 20; published app 1.0.3; Cowork zip v2 built; live verification recorded in [evidence/live-final-2026-11-03.md](evidence/live-final-2026-11-03.md) |
+| 3 CH-17 live redeploy | done: API, web, gateway and hosted agent redeployed; agent version 20; published app 1.0.3; Cowork zip v2 built; live verification recorded in [evidence/live-final-2026-11-03.md](../archive/evidence/live-final-2026-11-03.md) |
 | 4 CH-18 consolidation | ran in **keep-main-untouched** mode: no branch deleted, `main` not moved, worktrees removed only after proof |
 
 ## What is built

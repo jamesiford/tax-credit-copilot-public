@@ -29,7 +29,7 @@ No work package is blocked.
 ## UI-07 / UI-08
 
 Summary and the owner's review list are in
-[UI-REVAMP-RESULT.md](UI-REVAMP-RESULT.md); decisions D27 to D34. Same stand-in
+[UI-REVAMP-RESULT.md](../archive/design/UI-REVAMP-RESULT.md) (archived); decisions D27 to D34. Same stand-in
 as below. "Before" is the end of UI-06.
 
 | Metric | Before | After |

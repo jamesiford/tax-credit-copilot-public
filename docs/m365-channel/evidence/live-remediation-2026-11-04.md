@@ -105,7 +105,7 @@ at validation (422, no year found), so **nothing was written**; the restore step
    `. load-api-env.ps1 ; python scripts/channel-live-smoke.py --only catalog,reads,writes,verify,audit --compare-local`
    (expect all pass, the honest skip `finding_resolve`); then the twelve questions (`run-rm16-qs.ps1`: the ten of CH-17 plus
    "Give me a review pack for Northwind Care Systems for tax year 2025." and a prepared, uncommitted write "Move Northwind Care Systems tax year 2025 to proposed.").
-3. Compare against [live-final-2026-11-03.md](live-final-2026-11-03.md), then add the result here.
+3. Compare against [live-final-2026-11-03.md](../../archive/evidence/live-final-2026-11-03.md), then add the result here.
 4. **If anything regresses:** `pwsh agent-endpoint.ps1 -Action Pin -Version 20`, then `pwsh agent-invariants.ps1` (13 of 13; `-Action Restore` if an endpoint was overwritten).
    For the API or gateway: package `git archive m365-channel-poc-2026-11-03 backend` with `scripts/package-app.py` and `az webapp deploy` it to the app.
 
