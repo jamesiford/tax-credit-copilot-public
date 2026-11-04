@@ -26,6 +26,7 @@ from pydantic import BaseModel, Field, ValidationError
 
 from channel.auth import AuthFailure, Caller
 from channel.config import MAX_REQUEST_BYTES
+from channel.mcp import McpReply
 from channel.narration import NarrationReport
 from channel.pipeline import ToolCall, error_outcome
 from channel.tools import offered_tools
@@ -178,9 +179,9 @@ class GatewayRoutes:
             return _too_large()
         return _mcp_response(await self._s.mcp.handle(_headers(request), raw, str(request.base_url)))
 
-    def mcp_get(self) -> Response:
+    def mcp_get(self, request: Request) -> Response:
         """No server-to-client stream is offered."""
-        return Response(status_code=405, headers={"Allow": "POST, DELETE"})
+        return _mcp_response(self._s.mcp.refuse_origin(_headers(request)) or McpReply(405, None, {"Allow": "POST, DELETE"}))
 
     def mcp_delete(self, request: Request) -> Response:
         """End the caller's own MCP session."""

@@ -159,5 +159,6 @@ out, so the skills do not rely on them: the confirmation is the skill's rule and
 | Sign-in fails after the Microsoft page | The redirect URI above is missing from the Entra client registration, or admin consent for `Channel.Access` was not granted. |
 | Tools list but every call says the token lacks the scope | The registration's scope omits `Channel.Access`, or the token was issued for the wrong audience. |
 | "unknown session; initialise again" | The gateway restarted. Start a new request; Cowork re-initialises. |
+| A call is refused with 400 "Mcp-Session-Id header is required" or 403 `origin_not_allowed` | The client sent no session id after initialising, or the request carried an `Origin` header (a browser does; an MCP client does not). See the runbook (`CHANNEL_MCP_ALLOWED_ORIGINS`). |
 | A commit is refused as `not_authorized` | The person is not on the writer list. |
 | Upload refused with an error naming a field | The manifest holds a field the schema does not allow. Rebuild with the script; do not edit the manifest by hand. |
