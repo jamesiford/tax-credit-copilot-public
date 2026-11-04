@@ -38,7 +38,7 @@ from api.chat.scope import (
     _candidate_year, _chat_clients, _clarify_only, _detect_state, _missing_scope_stream, _referent,
     _request_scope,
 )
-from api.chat.sse import _ACTOR, _TELEMETRY_CONTEXT, _sse
+from api.chat.sse import _ACTOR, _AUTHENTICATED, _TELEMETRY_CONTEXT, _sse
 from application.capabilities.catalog import CAPABILITIES, CHAT_INTENT_TOOL, NEEDS_CLIENT as _NEEDS_CLIENT
 
 __all__ = [
@@ -60,6 +60,7 @@ async def chat(req: ChatRequest, request: Request) -> StreamingResponse:
 
     principal = current_principal(request)
     _ACTOR.set(principal.actor if principal.authenticated else None)
+    _AUTHENTICATED.set(bool(principal.authenticated))
     app = request.app
 
     # The scope refusal survives, and must not depend on a model being configured —

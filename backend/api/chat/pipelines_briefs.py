@@ -10,6 +10,7 @@ import uuid
 from typing import Any, AsyncIterator
 
 from api.chat.narration import _brief, _question, _stream_agent
+from api.chat.evidence_tap import tap
 from api.chat.sse import _TELEMETRY_CONTEXT, _sse
 from application.capabilities.book import book_rank
 from application.capabilities.client import client_at_risk, client_situation, client_trend
@@ -38,7 +39,7 @@ async def _pipeline_situation(app, message: str, *, scope: dict[str, Any]) -> As
         # The narrator was never handed the display name, and must not be now:
         # its prompt is byte-for-byte what it was before the extraction.
         brief = {
-            key: value for key, value in client_situation(account_id, tax_year).facts.items()
+            key: value for key, value in tap(client_situation(account_id, tax_year)).facts.items()
             if key != "client_name"
         }
         async for f in _stream_agent("ClientSituationAgent", _brief(f"User question:\n{_question(message)}", brief)):
@@ -63,7 +64,7 @@ async def _pipeline_explain(app, message: str) -> AsyncIterator[str]:
             yield _sse("done", {})
             return
 
-        brief = calc_walkthrough(trail=cached).facts
+        brief = tap(calc_walkthrough(trail=cached)).facts
         async for f in _stream_agent("ReportingAgent", _brief(
                                          "Walk an exec through this calculation step by step in 3-5 sentences. "
                                          "Cite the statute. End by reminding them every number above is sourced from a JSON rule pack, not from the model.",
@@ -85,7 +86,7 @@ def _book_brief(limit: int = 8) -> dict[str, Any]:
     """
     from api.claims import portfolio_v2
 
-    return book_rank(limit, page_reader=portfolio_v2).facts
+    return tap(book_rank(limit, page_reader=portfolio_v2)).facts
 
 
 async def _pipeline_book(app, message: str, *, scope: dict[str, Any]) -> AsyncIterator[str]:
@@ -131,7 +132,7 @@ async def _pipeline_at_risk(app, message: str, *, scope: dict[str, Any]) -> Asyn
         })
 
         try:
-            brief = client_at_risk(account_id, tax_year, state, method).facts
+            brief = tap(client_at_risk(account_id, tax_year, state, method)).facts
         except YearNotAuthored as exc:
             # The narrator is told the year is declined, by name, and says so.
             brief = {"calculated": False, "declined": str(exc)}
@@ -158,7 +159,7 @@ async def _pipeline_trend(app, message: str, *, scope: dict[str, Any]) -> AsyncI
         account_id = scope.get("account_id")
         yield _sse("status", {"phase": 3, "intent": "trend", "client_id": account_id})
 
-        brief = client_trend(account_id).facts
+        brief = tap(client_trend(account_id)).facts
         async for f in _stream_agent("ClientSituationAgent", _brief(
                                          "Describe how this client has moved across tax years, and say "
                                          "plainly whether they have been eligible every year since their "

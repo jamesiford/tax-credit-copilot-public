@@ -5,6 +5,7 @@ import asyncio
 import logging
 from typing import Any, AsyncIterator
 
+from api.chat.evidence_tap import with_evidence
 from api.chat.models import ChatRequest
 from api.chat.pipelines_briefs import (
     _pipeline_at_risk, _pipeline_book, _pipeline_explain, _pipeline_situation, _pipeline_trend,
@@ -37,7 +38,7 @@ async def _stub_stream(message: str) -> AsyncIterator[str]:
     yield _sse("done", {})
 
 
-def _run_intent(app, intent: str, message: str, scope: dict[str, Any]):
+def _pipeline_for(app, intent: str, message: str, scope: dict[str, Any]):
     """One intent to one pipeline. The only place that mapping exists."""
     if intent == "discovery":
         return _pipeline_discovery(app, message)
@@ -56,6 +57,15 @@ def _run_intent(app, intent: str, message: str, scope: dict[str, Any]):
     if intent == "simulate":
         return _pipeline_simulate(app, message)
     return _pipeline_eligibility(app, message, scope=scope)
+
+
+def _run_intent(app, intent: str, message: str, scope: dict[str, Any]):
+    """The intent's pipeline, with an `evidence` event for each capability it runs.
+
+    Additive: every frame the pipeline yields comes out unchanged and in order;
+    the evidence frames are interleaved ahead of the narration of what they show.
+    """
+    return with_evidence(intent, _pipeline_for(app, intent, message, scope))
 
 
 async def _dispatch(app, req: ChatRequest, *, scope: dict[str, Any] | None = None) -> AsyncIterator[str]:
