@@ -157,10 +157,13 @@ def scope_decision(question: str, has_client: bool) -> str:
 
 
 def run_offline() -> list[EvalResult]:
+    from tests.ai_evals import data_routing
+
     return [
         score_routing(load_rows("routing", live=False), keyword_route, "offline"),
         score_narration(load_rows("narration", live=False), recorded_reply, "offline"),
         score_refusal(load_rows("refusal", live=False), scope_decision, "offline"),
+        data_routing.score(data_routing.load_rows()),
     ]
 
 

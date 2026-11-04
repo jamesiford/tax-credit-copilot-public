@@ -1,5 +1,5 @@
 {
   "_note": "Offline thresholds apply to the deterministic paths (keyword routing, the numeric guard, scope refusal) and are 1.0 unless a documented gap says otherwise. Live thresholds apply to a real model and allow for its variance.",
-  "offline": {"routing": 1.0, "narration": 1.0, "refusal": 1.0},
+  "offline": {"routing": 1.0, "narration": 1.0, "refusal": 1.0, "data_routing": 1.0},
   "live": {"routing": 0.85, "narration": 0.9, "refusal": 1.0}
 }
