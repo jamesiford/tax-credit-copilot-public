@@ -116,7 +116,7 @@ def _segments(rows: list[dict[str, Any]], method: str) -> list[dict[str, Any]]:
 def handle_get_employee_drill(query: GetEmployeeDrillQuery) -> dict[str, Any]:
     """Resolve an opaque handle against the run that minted it, from Gold."""
     from application.queries._client_run import resolve_statute
-    from application.wiring import get_gold_reader
+    from application.services import get_gold_reader
     from tools.fabric_source import active_data_source
 
     if query.account_id is None:

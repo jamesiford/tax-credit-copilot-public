@@ -29,7 +29,7 @@ def _offline(monkeypatch, **env):
 
 def test_startup_and_readiness_survive_an_unreachable_gateway(monkeypatch):
     import main
-    from application import wiring
+    from bootstrap import wiring
 
     _offline(monkeypatch, AI_PROVIDER_CHAIN="gateway", AI_GATEWAY_ENDPOINT="https://127.0.0.1:9",
              AI_GATEWAY_AUTH="none", AI_MODEL_NARRATOR__GATEWAY="m", AI_MODEL_ROUTER__GATEWAY="m",
@@ -43,7 +43,7 @@ def test_startup_and_readiness_survive_an_unreachable_gateway(monkeypatch):
 
 def test_startup_and_readiness_survive_foundry_failing_to_publish(monkeypatch):
     import main
-    from application import wiring
+    from bootstrap import wiring
     from infrastructure.ai.foundry_prompt_agents import FoundryAgentCatalog
 
     def failing_warm(self):
@@ -59,7 +59,7 @@ def test_startup_and_readiness_survive_foundry_failing_to_publish(monkeypatch):
 
 
 def test_an_unreachable_gateway_still_gets_the_reader_the_engines_figures(monkeypatch):
-    from application import wiring
+    from bootstrap import wiring
 
     for name, value in {"AI_PROVIDER_CHAIN": "gateway", "AI_GATEWAY_ENDPOINT": "https://127.0.0.1:9",
                         "AI_GATEWAY_AUTH": "none", "AI_MODEL_NARRATOR__GATEWAY": "m",

@@ -152,7 +152,7 @@ GOLD = [
 
 @pytest.fixture
 def wired(monkeypatch):
-    import application.wiring as wiring
+    import bootstrap.wiring as wiring
 
     repo = InMemoryManualOverrideRepository()
     monkeypatch.setattr(wiring, "get_gold_reader", lambda: _Reader(GOLD))
@@ -201,7 +201,7 @@ def test_a_partial_or_absent_year_cannot_be_saved(wired):
 
 
 def test_it_goes_through_the_mediator_and_is_audited(wired):
-    from application.wiring import get_mediator
+    from bootstrap.wiring import get_mediator
 
     get_mediator().send(sb.SetBaseYearCommand(client_id=2001, worksite_id="GA_GA-010", base_year=2022,
                                               recalculate=False, actor="james"))
@@ -212,7 +212,7 @@ def test_it_goes_through_the_mediator_and_is_audited(wired):
 
 
 def test_saves_during_a_run_queue_one_more_run_not_one_each(monkeypatch):
-    import application.wiring as wiring
+    import bootstrap.wiring as wiring
 
     runs = []
     gate = threading.Event()

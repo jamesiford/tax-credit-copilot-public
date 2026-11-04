@@ -62,7 +62,7 @@ class GetCellHistoryQuery(Query):
 
 
 def handle_get_client_coverage(query: GetClientCoverageQuery) -> dict[str, Any]:
-    from application.wiring import get_claim_repository as get_repository
+    from application.services import get_claim_repository as get_repository
 
     repo = get_repository()
     years = list(query.tax_years) or None
@@ -86,7 +86,7 @@ def handle_get_client_coverage(query: GetClientCoverageQuery) -> dict[str, Any]:
 
 
 def handle_get_portfolio_coverage(query: GetPortfolioCoverageQuery) -> dict[str, Any]:
-    from application.wiring import get_claim_repository as get_repository
+    from application.services import get_claim_repository as get_repository
 
     repo = get_repository()
     claims = repo.portfolio_coverage(
@@ -108,7 +108,7 @@ def handle_get_portfolio_coverage(query: GetPortfolioCoverageQuery) -> dict[str,
 
 
 def handle_get_cell_history(query: GetCellHistoryQuery) -> dict[str, Any]:
-    from application.wiring import get_claim_repository as get_repository
+    from application.services import get_claim_repository as get_repository
 
     repo = get_repository()
     current = repo.current(query.client_id, query.program_code, query.tax_year)

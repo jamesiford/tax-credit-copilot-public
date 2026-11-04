@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from collections.abc import AsyncIterator, Sequence
 
-from application import wiring
+from bootstrap import wiring
 from application.ai.providers import ProviderRegistry
 from application.ai.settings import AiSettings
 from domain.ai import AgentSpec, ModelEvent, ProviderStatus, StreamEnd, TextDelta

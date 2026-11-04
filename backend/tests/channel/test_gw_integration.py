@@ -17,7 +17,7 @@ import httpx
 import pytest
 from openpyxl import load_workbook
 
-from application import wiring
+from bootstrap import wiring
 from domain.channel import utcnow
 from gateway_harness import OTHER_OID, USER_OID, agent_headers, build_gateway, user_headers, user_token
 from tests.test_agent_principal import entra, mint_app  # noqa: F401 - fixtures

@@ -33,9 +33,10 @@ from app.core.gateway_client import GatewayClient  # noqa: E402
 from app.core.maf_catalog_tools import TURN, catalog_tool  # noqa: E402
 from app.core.state import ConversationState  # noqa: E402
 from app.core.tools import ToolRunner  # noqa: E402
-from application import client_book, wiring  # noqa: E402
+from application import client_book
+from bootstrap import wiring  # noqa: E402
 from application.capabilities import catalog  # noqa: E402
-from application.data_wiring import set_data_query_service  # noqa: E402
+from bootstrap.data_wiring import set_data_query_service  # noqa: E402
 from domain.channel import WriterGrant  # noqa: E402
 from gateway_harness import USER_OID, agent_headers, agent_token, build_gateway, user_headers, user_token  # noqa: E402
 from infrastructure.persistence.sqlite_claims import SqliteClaimRepository  # noqa: E402

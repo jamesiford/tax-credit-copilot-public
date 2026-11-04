@@ -19,7 +19,7 @@ def findings_list(client_id: int, tax_year: int, state: str | None = None) -> To
     against a finding id.
     """
     from application.queries.list_findings import FindingsNotAvailable, ListFindingsQuery
-    from application.wiring import get_mediator
+    from application.services import get_mediator
 
     try:
         facts = get_mediator().send(

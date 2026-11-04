@@ -15,7 +15,7 @@ hides:** a router that calls `mediator.send(...)` cannot accumulate business
 rules by accident.
 
 Deliberately not a framework. No auto-discovery, no decorators, no container —
-registration is explicit and lives in one file (`application/wiring.py`).
+registration is explicit and lives in one file (`bootstrap/wiring.py`).
 
     result = mediator.send(GetProximityQuery(tax_year=2023, state="GA"))
     async for event in mediator.stream(NarrateBriefQuery(...)): ...
@@ -144,7 +144,7 @@ class Mediator:
         handler = self._handlers.get(type(request))
         if handler is None:
             raise HandlerNotRegistered(
-                f"No handler for {type(request).__name__}. Register it in application/wiring.py."
+                f"No handler for {type(request).__name__}. Register it in bootstrap/wiring.py."
             )
         is_command = isinstance(request, Command)
         self._authorize(request, principal or ambient_principal() or ANONYMOUS, is_command)

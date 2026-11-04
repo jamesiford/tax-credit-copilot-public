@@ -46,7 +46,7 @@ def _population(client_id: int, tax_year: int, state: str) -> dict[str, Any]:
     """Certified headcount counts for the client-year, without the employee rows."""
     from application.queries._client_run import ClientRunNotAvailable
     from application.queries.get_eligibility import GetEligibilityQuery
-    from application.wiring import get_mediator
+    from application.services import get_mediator
 
     try:
         body = get_mediator().send(

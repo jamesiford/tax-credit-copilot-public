@@ -65,7 +65,7 @@ def test_the_channel_package_is_the_backend_package_and_carries_the_gateway(tmp_
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     included = set(module.package(BACKEND, tmp_path / "channel.zip"))
-    assert {"startup-channel.sh", "channel/main.py", "channel/app.py", "application/channel_wiring.py",
+    assert {"startup-channel.sh", "channel/main.py", "channel/app.py", "bootstrap/channel_wiring.py",
             "application/capabilities/catalog.py", "startup.sh"} <= included
     assert not any(name.startswith(("tests/", ".env")) for name in included)
     with zipfile.ZipFile(tmp_path / "channel.zip") as archive:

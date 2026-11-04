@@ -119,7 +119,7 @@ def test_the_location_whatif_renders_only_its_facts(wired):
 
 def test_the_employee_drill_renders_only_its_facts():
     from application.capabilities import walkthrough
-    from application.wiring import set_gold_reader
+    from bootstrap.wiring import set_gold_reader
 
     set_gold_reader(_DrillReader())
     try:

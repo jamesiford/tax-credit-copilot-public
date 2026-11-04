@@ -29,6 +29,31 @@ from typing import Protocol
 #: with no completion stamp rather than claiming success it never reached.
 RUN_STATUSES = frozenset({"running", "success", "failed", "superseded"})
 
+#: `tcc_ops.run_manifest` column order, the DDL's. The insert, the row mapper and the
+#: write use case all read it, so none of them can disagree about position.
+RUN_MANIFEST_COLUMNS = (
+    "run_id",
+    "client_id",
+    "entity_id",
+    "program_code",
+    "tax_year",
+    "fiscal_year_begin",
+    "fiscal_year_end",
+    "source_snapshot_id",
+    "step1_assumption_set_id",
+    "step1_assumption_sha256",
+    "onezero_assumption_set_id",
+    "onezero_assumption_sha256",
+    "rule_pack_version",
+    "code_commit",
+    "calculation_id",
+    "run_started_at",
+    "run_completed_at",
+    "run_status",
+    "superseded_by_run_id",
+    "triggered_by",
+)
+
 
 @dataclass(frozen=True)
 class RunManifest:

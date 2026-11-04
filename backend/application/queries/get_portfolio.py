@@ -200,12 +200,12 @@ def footprint() -> dict[int, list[str]]:
     with nothing on it is a visibly weaker answer rather than a wrong one.
     """
     try:
-        from infrastructure.persistence.source_sql import SourceSqlReader
+        from application.source_ports import new_source_reader
         from tools.fabric_source import active_data_source
 
         if active_data_source() != "lakehouse":
             return {}
-        reader = SourceSqlReader()
+        reader = new_source_reader()
         if not reader.is_configured():
             return {}
         return reader.footprint()
@@ -284,7 +284,7 @@ def portfolio_page(
     anyone scrolls. That counter is a DIAGNOSTIC: under the pipeline model a
     client sitting unassessed is a gap to close, not a bucket it belongs in.
     """
-    from application.wiring import get_claim_repository
+    from application.services import get_claim_repository
 
     order_name = (order or "asc").lower()
     if order_name not in {"asc", "desc"}:

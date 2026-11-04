@@ -55,16 +55,16 @@ def touch_warehouse() -> int:
     """
     if not should_warm():
         return 0
-    from application.wiring import get_gold_reader
+    from application.services import get_gold_reader
 
     return get_gold_reader().connection.keepalive()
 
 
 def _reap_stranded_runs() -> int:
     """Mark runs that died with their process failed, so they stop reading live."""
-    from infrastructure.persistence.warehouse_gold import GoldWriter
+    from application.gold_ports import reap_stranded_runs
 
-    return GoldWriter().reap_stranded_runs()
+    return reap_stranded_runs()
 
 
 def _timed(report: list[dict[str, Any]], step: str, work) -> Any:
@@ -97,9 +97,9 @@ def warm_read_paths(*, warm_workspace=None) -> dict[str, Any]:
     the router that serves it, and the application layer does not import
     routers [ADR-003].
     """
-    from application.wiring import get_gold_reader
+    from application.services import get_gold_reader
     from data.source.from_fabric import FabricLakehouseReader
-    from infrastructure.payroll.pay_period_source import configured_account_id
+    from application.source_ports import configured_account_id
 
     report: list[dict[str, Any]] = []
     started = time.monotonic()

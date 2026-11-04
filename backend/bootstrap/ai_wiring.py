@@ -1,6 +1,6 @@
 """Composition of model access. [AI-02]
 
-The one place that knows which adapter backs which port. `application/wiring.py`
+The one place that knows which adapter backs which port. `bootstrap/wiring.py`
 re-exports these getters, so callers keep one import for everything while the AI
 half of the composition stays a readable size.
 

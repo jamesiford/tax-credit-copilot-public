@@ -1,6 +1,6 @@
 """The channel's stores, composed: audit, writers, confirmations, entitlement. [CH-03, CH-06, ADR-008]
 
-Split out of `application.wiring`, which re-exports every name here, for one reason:
+Split out of `bootstrap.wiring`, which re-exports every name here, for one reason:
 the channel gateway needs exactly these and nothing else. `wiring` imports every
 query and command in the product, so a gateway that composed itself through it
 would load the whole engine to write an audit row. This module imports no handler,
@@ -15,6 +15,7 @@ from __future__ import annotations
 from typing import Any
 
 from application.deployment import store_choice
+from bootstrap.binding import bind
 
 _channel_audit_repo: Any | None = None
 _agent_action_repo: Any | None = None
@@ -167,3 +168,12 @@ def get_agent_action_recorder() -> Any:
     from application.agent_audit import AgentActionRecorder
 
     return AgentActionRecorder(get_agent_action_audit_repository())
+
+
+bind(
+    __name__,
+    channel_auditor="get_channel_auditor",
+    channel_audit_repository="get_channel_audit_repository",
+    confirmation_repository="get_confirmation_repository",
+    writer_entitlement="get_writer_entitlement",
+)

@@ -30,7 +30,6 @@ ALLOWED_APPLICATION = frozenset({
     "application.capabilities.verify",         # verify_figures, over the ledger
     "application.capabilities.catalog_types",  # via catalog
     "application.channel_audit",               # the auditor and its port
-    "application.channel_wiring",              # the audit trail and writer entitlement, without the engine
     "application.composer_render",             # the platform's own block renderer
     "application.data.audit_summary",          # what a data call's audit line may say, from the semantic model (standard library only) [CH-16d]
     "application.deployment",                  # is_deployed, store_choice
@@ -39,7 +38,12 @@ ALLOWED_APPLICATION = frozenset({
     "application.rate_limit",                  # the per-user token bucket (standard library only), shared with the API's data-query budget [CH-16c]
     "application.writer_alert",                # the `writer_check_failed` event a failing entitlement source raises (standard library only) [RM-03]
 })
-FORBIDDEN_PREFIXES = ("api.", "agents.", "tools.", "infrastructure.persistence", "application.wiring",
+#: The one composition module the gateway may use, for a stated reason. `bootstrap/` is the outermost ring and
+#: `bootstrap.wiring` composes the whole engine, so everything else under it is forbidden. [RM-17]
+ALLOWED_BOOTSTRAP = frozenset({
+    "bootstrap.channel_wiring",                # the audit trail and writer entitlement, without the engine
+})
+FORBIDDEN_PREFIXES = ("api.", "agents.", "tools.", "infrastructure.persistence", "bootstrap.wiring",
                       "application.queries", "application.commands", "application.mediator", "domain.calculation")
 LOG_METHODS = {"debug", "info", "warning", "error", "exception", "critical", "log"}
 SECRET_WORDS = re.compile(r"token|authorization|bearer|password|secret", re.IGNORECASE)
@@ -77,6 +81,25 @@ def application_modules(source: str) -> set[str]:
     return used
 
 
+def bootstrap_modules(source: str) -> set[str]:
+    """Every `bootstrap` module the source imports; `from bootstrap import x` means `bootstrap.x`."""
+    used: set[str] = set()
+    for node in ast.walk(ast.parse(source)):
+        if isinstance(node, ast.Import):
+            used.update(a.name for a in node.names if a.name.split(".")[0] == "bootstrap")
+        elif isinstance(node, ast.ImportFrom) and node.module and node.level == 0 and node.module.split(".")[0] == "bootstrap":
+            if node.module == "bootstrap":
+                used.update(f"bootstrap.{a.name}" for a in node.names)
+            else:
+                used.add(node.module)
+    return used
+
+
+def unlisted_bootstrap_imports(source: str) -> list[str]:
+    """`bootstrap.*` modules the gateway has no stated reason to use."""
+    return sorted(bootstrap_modules(source) - ALLOWED_BOOTSTRAP)
+
+
 def unlisted_application_imports(source: str) -> list[str]:
     """`application.*` modules the gateway has no stated reason to use."""
     return sorted(application_modules(source) - ALLOWED_APPLICATION)
@@ -108,6 +131,11 @@ def test_the_gateway_uses_only_the_application_modules_on_the_list(name):
 
 
 @pytest.mark.parametrize("name", sorted(channel_sources()))
+def test_the_gateway_uses_only_the_composition_modules_on_the_list(name):
+    assert unlisted_bootstrap_imports(channel_sources()[name]) == []
+
+
+@pytest.mark.parametrize("name", sorted(channel_sources()))
 def test_the_gateway_never_logs_a_token(name):
     assert logged_secrets(channel_sources()[name]) == []
 
@@ -119,7 +147,7 @@ def test_importing_the_gateway_does_not_load_the_engine():
     code = (
         "import sys, channel.app\n"
         "heavy = [m for m in sys.modules if m.startswith(('application.queries', 'application.commands', "
-        "'application.wiring', 'application.mediator', 'api.', 'agents', 'tools.', 'infrastructure.persistence'))]\n"
+        "'bootstrap.wiring', 'application.mediator', 'api.', 'agents', 'tools.', 'infrastructure.persistence'))]\n"
         "print(','.join(heavy))"
     )
     done = subprocess.run([sys.executable, "-c", code], cwd=BACKEND, capture_output=True, text=True, check=True)
@@ -149,10 +177,13 @@ def test_the_rules_catch_crafted_violations():
     assert forbidden_imports("from api.capabilities import router") == ["api.capabilities", "api.capabilities.router"]
     assert forbidden_imports("import agents.factory") == ["agents.factory"]
     assert forbidden_imports("from infrastructure.persistence.sqlite_channel import X")
-    assert forbidden_imports("from application.wiring import get_mediator")
+    assert forbidden_imports("from bootstrap.wiring import get_mediator")
     assert unlisted_application_imports("from application.queries.get_proximity import X") == ["application.queries.get_proximity"]
     assert unlisted_application_imports("from application.capabilities import registry") == ["application.capabilities.registry"]
     assert unlisted_application_imports("from application.channel_audit import AuditCall") == []
+    assert unlisted_bootstrap_imports("from bootstrap import wiring") == ["bootstrap.wiring"]
+    assert unlisted_bootstrap_imports("from bootstrap.data_wiring import get_data_query_service") == ["bootstrap.data_wiring"]
+    assert unlisted_bootstrap_imports("from bootstrap import channel_wiring") == []
     assert logged_secrets("import logging\nlog = logging.getLogger('x')\nlog.info('got %s', token)") == [3]
     assert logged_secrets("log.warning(f'bad {request.headers[\"authorization\"]}')") == [1]
     assert logged_secrets("log.info('caller authorised: kind=%s', caller.kind)") == []

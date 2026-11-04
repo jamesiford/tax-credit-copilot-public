@@ -16,7 +16,7 @@ from datetime import timedelta
 import pytest
 from openpyxl import load_workbook
 
-from application import wiring
+from bootstrap import wiring
 from application.capabilities import catalog, registry
 from application.identity import AllowListAuthorizer
 from domain.channel import utcnow

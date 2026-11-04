@@ -17,7 +17,7 @@ from typing import Any
 import httpx
 import pytest
 
-from application import wiring
+from bootstrap import wiring
 from application.capabilities import registry
 from application.capabilities.envelope import Block, Provenance, ToolResult
 from domain.channel import WriterGrant

@@ -6,14 +6,22 @@ arrives?" from — you have to find the handler before you can read it. Here the
 whole dispatch table is one screen.
 
 Import this module once at startup. `get_mediator()` returns the wired instance.
+
+The application asks for its collaborators through `application.services`; the
+binding at the foot of this module is what answers. [RM-17]
 """
 from __future__ import annotations
 
-import os
 from typing import Any
 
 from application.deployment import store_choice
-from application.channel_wiring import (  # noqa: F401 - re-exported: the channel stores are composed in their own module
+from bootstrap import source_binding  # noqa: F401 - binds the payroll and Gold-store ports
+from bootstrap.artifact_wiring import get_artifact_service, set_artifact_service  # noqa: F401 - re-exported
+from bootstrap.auth_wiring import (  # noqa: F401 - re-exported: identity is composed in its own module
+    get_client_authorizer, get_token_validator, set_client_authorizer, set_token_validator,
+)
+from bootstrap.binding import bind
+from bootstrap.channel_wiring import (  # noqa: F401 - re-exported: the channel stores are composed in their own module
     get_agent_action_audit_repository, get_agent_action_recorder, get_channel_audit_repository,
     get_channel_auditor, get_confirmation_repository, get_display_name_resolver, get_writer_entitlement,
     get_writer_repository, set_agent_action_audit_repository, set_channel_audit_repository,
@@ -77,7 +85,7 @@ from application.commands.create_claim_package import CreateClaimPackageCommand,
 from application.commands.transition_claim import TransitionClaimCommand, handle_transition_claim
 from application.ai.handlers import handle_channel_narration, handle_narrate_brief, handle_route_question
 from application.ai.requests import ChannelNarrationQuery, NarrateBriefQuery, RouteQuestionQuery
-from application.ai_wiring import (  # noqa: F401 - re-exported: one import for every composition getter
+from bootstrap.ai_wiring import (  # noqa: F401 - re-exported: one import for every composition getter
     ai_health, get_agent_catalog, get_ai_settings, get_ai_telemetry, get_model_router, get_narration_service,
     get_output_policy, get_provider_registry, get_spec_registry, get_token_budget, reset_ai, set_ai_clock,
     set_ai_settings, set_ai_telemetry, set_model_router, set_narration_service, set_provider_registry,
@@ -292,85 +300,6 @@ def set_gold_reader(reader: Any) -> None:
     _gold_reader = reader
 
 
-# --- Identity [AUTH-3, D24] --------------------------------------------------
-
-_client_authorizer: Any | None = None
-_token_validator: Any | None = None
-
-
-def get_client_authorizer() -> Any:
-    """The `ClientAuthorizer` port. v2: every `TCC.User` sees every client (D24)."""
-    global _client_authorizer
-    if _client_authorizer is None:
-        from application.identity import AllClientsAuthorizer
-
-        _client_authorizer = AllClientsAuthorizer()
-    return _client_authorizer
-
-
-def set_client_authorizer(authorizer: Any) -> None:
-    """Swap the entitlement policy. Used by tests to prove the deny path."""
-    global _client_authorizer
-    _client_authorizer = authorizer
-
-
-def get_token_validator() -> Any:
-    """The Entra token validator, built from AUTH_TENANT_ID and API_AUDIENCE."""
-    global _token_validator
-    if _token_validator is None:
-        from application.deployment import auth_tenant_id
-        from infrastructure.auth.entra import EntraTokenValidator
-
-        _token_validator = EntraTokenValidator(
-            tenant_id=auth_tenant_id(), api_audience=os.getenv("API_AUDIENCE", "").strip()
-        )
-    return _token_validator
-
-
-def set_token_validator(validator: Any) -> None:
-    global _token_validator
-    _token_validator = validator
-
-# --- Artifacts [BLOB-3, BLOB-6] -----------------------------------------------
-
-_artifact_service: Any | None = None
-
-
-def get_artifact_service() -> Any:
-    """Bytes (ARTIFACT_STORE local|blob) + rows (ARTIFACT_REPOSITORY sqlite|warehouse)."""
-    global _artifact_service
-    if _artifact_service is None:
-        from application.artifacts import ArtifactService
-        from application.deployment import artifact_repository, artifact_store
-
-        if artifact_store() == "blob":
-            from infrastructure.storage.blob_store import BlobArtifactStore
-
-            store: Any = BlobArtifactStore()
-        else:
-            from infrastructure.storage.local_store import LocalArtifactStore
-
-            store = LocalArtifactStore()
-        if artifact_repository() == "warehouse":
-            from infrastructure.persistence.warehouse_artifacts import WarehouseArtifactRepository
-
-            repository: Any = WarehouseArtifactRepository()
-        else:
-            from infrastructure.persistence.sqlite_artifacts import SqliteArtifactRepository
-
-            repository = SqliteArtifactRepository()
-        _artifact_service = ArtifactService(
-            store, repository, get_client_authorizer(),
-            retention_days=int(os.getenv("OUTPUTS_RETENTION_DAYS", "2555")),
-        )
-    return _artifact_service
-
-
-def set_artifact_service(service: Any) -> None:
-    global _artifact_service
-    _artifact_service = service
-
-
 _claim_package_source: Any | None = None
 
 
@@ -469,3 +398,23 @@ def reset_mediator() -> None:
     """Drop the cached instance. For tests that register their own handlers."""
     global _mediator
     _mediator = None
+
+
+bind(
+    __name__,
+    mediator="get_mediator",
+    claim_repository="get_claim_repository",
+    finding_repository="get_finding_repository",
+    run_manifest_repository="get_run_manifest_repository",
+    override_repository="get_override_repository",
+    gold_reader="get_gold_reader",
+    gold_writer="get_gold_writer",
+    artifact_service="get_artifact_service",
+    claim_package_source="get_claim_package_source",
+    narration_service="get_narration_service",
+    confirmation_repository="get_confirmation_repository",
+    confirmation_service="get_confirmation_service",
+    channel_auditor="get_channel_auditor",
+    channel_audit_repository="get_channel_audit_repository",
+    writer_entitlement="get_writer_entitlement",
+)

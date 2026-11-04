@@ -325,7 +325,7 @@ def test_a_capability_that_raises_emits_no_evidence_and_the_stream_still_ends(mo
 
 
 def test_the_endpoint_streams_evidence_for_an_anonymous_reader(monkeypatch, stub_narrator, book_page, client):
-    import application.wiring as wiring
+    import bootstrap.wiring as wiring
 
     monkeypatch.setattr(wiring, "get_narration_service", lambda: SimpleNamespace(available=lambda _agents: True))
     response = client.post("/api/chat", json={"message": "Who should we reach out to first?"})

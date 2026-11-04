@@ -13,7 +13,7 @@ import pytest
 from cryptography.hazmat.primitives.asymmetric import rsa
 from fastapi.testclient import TestClient
 
-from application import wiring
+from bootstrap import wiring
 from application.identity import ANONYMOUS, AllClientsAuthorizer, AllowListAuthorizer, Principal
 from infrastructure.auth.entra import (
     AuthenticationFailed,

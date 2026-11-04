@@ -26,7 +26,7 @@ from application.commands.resolve_finding import (
 )
 from application.queries import list_findings
 from application.queries.list_findings import FindingsNotAvailable, ListFindingsQuery
-from application.wiring import get_finding_repository, get_mediator, set_finding_repository
+from bootstrap.wiring import get_finding_repository, get_mediator, set_finding_repository
 from infrastructure.persistence.sqlite_findings import (
     FindingResolution,
     SqliteFindingRepository,
@@ -38,7 +38,7 @@ _REPO: SqliteFindingRepository | None = None
 
 
 def get_repository() -> SqliteFindingRepository:
-    """The finding store. Composition lives in `application.wiring`. [ADR-002]"""
+    """The finding store. Composition lives in `bootstrap.wiring`. [ADR-002]"""
     return get_finding_repository()
 
 

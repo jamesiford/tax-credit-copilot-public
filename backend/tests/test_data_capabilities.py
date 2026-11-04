@@ -17,7 +17,7 @@ from application.capabilities.invoke import CapabilityFailure, invoke
 from application.data.exec_errors import QueryBudgetExceeded
 from application.data.limits import QueryLimits
 from application.data.semantic_model import Source
-from application.data_wiring import set_data_query_service
+from bootstrap.data_wiring import set_data_query_service
 from application.rate_limit import RateLimiter
 from tests.data_caps_fixture import CLIENT, MODEL, READER_OID, WRITER_OID, data_service, make_service, person  # noqa: F401
 

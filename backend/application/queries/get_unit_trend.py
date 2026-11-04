@@ -189,7 +189,7 @@ def reset_replay_cache() -> None:
 def handle_get_unit_trend(query: GetUnitTrendQuery) -> dict[str, Any]:
     """Replay every priceable year for one client at unit grain."""
     from data.sites import SITES_BY_ID, worksite_name
-    from infrastructure.payroll.pay_period_source import load_pay_periods
+    from application.source_ports import load_pay_periods
     from tools.unit_trend import (
         build_unit_series,
         infer_base_year,

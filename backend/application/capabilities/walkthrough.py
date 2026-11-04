@@ -121,7 +121,7 @@ def employee_drill(
     """
     from application.queries._client_run import ClientRunNotAvailable
     from application.queries.get_employee_drill import GetEmployeeDrillQuery
-    from application.wiring import get_mediator
+    from application.services import get_mediator
 
     try:
         query = GetEmployeeDrillQuery(

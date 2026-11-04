@@ -118,7 +118,7 @@ def reset_ai_wiring():
     test's chat request, and one that changed `AI_*` variables would be ignored
     because settings were read once.
     """
-    from application import wiring
+    from bootstrap import wiring
     from infrastructure.ai.resilience.clock import InstantClock
 
     wiring.reset_ai()

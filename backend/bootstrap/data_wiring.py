@@ -2,7 +2,7 @@
 
 Its own composition module, like `channel_wiring`, because the capabilities that call it
 (CH-16d) run in the API process and the gateway must never load it: composing through
-`application.wiring` would pull every query and command into whatever imports it. The
+`bootstrap.wiring` would pull every query and command into whatever imports it. The
 persistence adapters are imported inside the builder, only for the sources that are configured.
 
 Settings (all non-secret; none required — absent means the defaults below):
@@ -39,6 +39,7 @@ from application.data.service import DataQueryService
 from application.data.small_groups import DEFAULT_MIN_GROUP_SIZE, MIN_GROUP_SIZE_FLOOR
 from application.data.spec import MAX_LIMIT
 from application.rate_limit import RateLimiter
+from bootstrap.binding import bind
 
 _TRUE = frozenset({"1", "true", "yes", "on"})
 _service: DataQueryService | None = None
@@ -121,3 +122,6 @@ def set_data_query_service(service: DataQueryService | None) -> None:
     """Replace (or, with None, clear) the service: for tests and for a different composition."""
     global _service
     _service = service
+
+
+bind(__name__, data_query_service="get_data_query_service")

@@ -27,10 +27,11 @@ from __future__ import annotations
 import json
 import sqlite3
 import threading
-from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
+
+from domain.findings import FindingResolution
 
 _SCHEMA = """
 CREATE TABLE IF NOT EXISTS agent_finding_resolution (
@@ -58,34 +59,6 @@ CREATE UNIQUE INDEX IF NOT EXISTS ux_finding_one_live
 
 def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
-
-
-@dataclass(frozen=True)
-class FindingResolution:
-    """A human's answer to something an agent found."""
-
-    finding_id: str
-    client_id: int
-    tax_year: int
-    resolution: str          # accept | assign | drop | flag
-    decided_by: str
-    decided_at: str
-    detail: dict[str, Any] | None = None   # e.g. which worksite to keep
-    note: str | None = None
-    superseded_at: str | None = None
-
-    def to_dict(self) -> dict[str, Any]:
-        return {
-            "finding_id": self.finding_id,
-            "client_id": self.client_id,
-            "tax_year": self.tax_year,
-            "resolution": self.resolution,
-            "detail": self.detail,
-            "note": self.note,
-            "decided_by": self.decided_by,
-            "decided_at": self.decided_at,
-            "superseded_at": self.superseded_at,
-        }
 
 
 class SqliteFindingRepository:

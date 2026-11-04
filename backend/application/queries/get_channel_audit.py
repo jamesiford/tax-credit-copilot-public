@@ -32,7 +32,7 @@ class GetChannelAuditQuery(Query):
 
 
 def handle_get_channel_audit(query: GetChannelAuditQuery) -> dict[str, Any]:
-    from application.wiring import get_channel_audit_repository
+    from application.services import get_channel_audit_repository
 
     events = get_channel_audit_repository().for_user(
         query.user_oid, since=query.since, until=query.until, tool=query.tool, limit=query.limit,

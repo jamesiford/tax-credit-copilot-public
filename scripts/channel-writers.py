@@ -46,7 +46,7 @@ def main(argv: list[str] | None = None, *, writers=None) -> int:
 
     common.load_env()
     if writers is None:
-        from application.wiring import get_writer_repository
+        from bootstrap.wiring import get_writer_repository
 
         writers = get_writer_repository()
     from domain.channel import WriterGrant

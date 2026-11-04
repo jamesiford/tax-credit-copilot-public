@@ -225,7 +225,7 @@ def test_method_must_be_one_the_engine_actually_runs():
 
 def test_a_state_with_no_authored_statute_is_declined_not_trended():
     """[ADR-005] A trend needs a statute to test each year against."""
-    from application.wiring import get_mediator
+    from bootstrap.wiring import get_mediator
 
     with pytest.raises(ClientRunNotAvailable):
         get_mediator().send(GetUnitTrendQuery(state="ZZ"))
@@ -235,7 +235,7 @@ def test_a_state_with_no_authored_statute_is_declined_not_trended():
 
 
 def test_the_trend_reports_a_base_year_and_a_reading_for_every_row():
-    from application.wiring import get_mediator
+    from bootstrap.wiring import get_mediator
 
     body = get_mediator().send(GetUnitTrendQuery(state="GA"))
 
@@ -253,7 +253,7 @@ def test_the_trend_reports_a_base_year_and_a_reading_for_every_row():
 
 def test_an_unregistered_unit_is_unassigned_rather_than_guessed_a_tier():
     """A guessed tier moves the threshold, and therefore whether a year qualifies."""
-    from application.wiring import get_mediator
+    from bootstrap.wiring import get_mediator
 
     body = get_mediator().send(GetUnitTrendQuery(state="GA"))
 
@@ -265,7 +265,7 @@ def test_an_unregistered_unit_is_unassigned_rather_than_guessed_a_tier():
 
 
 def test_the_screen_says_what_it_cannot_stand_behind():
-    from application.wiring import get_mediator
+    from bootstrap.wiring import get_mediator
 
     body = get_mediator().send(GetUnitTrendQuery(state="GA"))
     codes = {d["code"] for d in body["disclosures"]}
@@ -284,7 +284,7 @@ def test_the_grid_and_the_drill_index_the_same_months(lakehouse_source):
     engine, so this now checks that what a run WROTE indexes the same months the
     engine produces.
     """
-    from application.wiring import get_mediator
+    from bootstrap.wiring import get_mediator
 
     mediator = get_mediator()
     trend = mediator.send(GetUnitTrendQuery(state="GA", account_id=1001))
@@ -308,7 +308,7 @@ def test_the_grid_and_the_drill_index_the_same_months(lakehouse_source):
 def test_a_second_read_is_served_without_replaying_the_engine():
     """The landing screen is opened for every client; the replay is not cheap."""
     from application.queries.get_unit_trend import _REPLAY_CACHE, reset_replay_cache
-    from application.wiring import get_mediator
+    from bootstrap.wiring import get_mediator
 
     reset_replay_cache()
     mediator = get_mediator()
@@ -326,7 +326,7 @@ def test_a_second_read_is_served_without_replaying_the_engine():
 @pytest.mark.parametrize("method", ["min_max", "pay_period"])
 def test_a_units_monthly_columns_match_the_single_year_matrix(lakehouse_source, method):
     """The landing grid and the drill-in must describe the same location."""
-    from application.wiring import get_mediator
+    from bootstrap.wiring import get_mediator
 
     mediator = get_mediator()
     trend = mediator.send(
@@ -356,7 +356,7 @@ def test_a_units_monthly_columns_match_the_single_year_matrix(lakehouse_source, 
 
 
 def test_a_year_the_statute_cannot_price_is_named_not_dropped(lakehouse_source):
-    from application.wiring import get_mediator
+    from bootstrap.wiring import get_mediator
 
     body = get_mediator().send(GetUnitTrendQuery(state="GA", account_id=1001))
 

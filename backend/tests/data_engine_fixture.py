@@ -161,7 +161,7 @@ def run_engine(warehouse: SqliteWarehouse, tmp_dir: Any, claims: Any = None) -> 
     (see `test_run_client_calculation`): nothing here may reach the operational database. A caller that
     wants the claim the run recorded passes its own `claims` repository and keeps it open.
     """
-    from application import wiring
+    from bootstrap import wiring
     from application.commands.run_client_calculation import RunClientCalculationCommand
     from infrastructure.persistence.memory_overrides import InMemoryManualOverrideRepository
     from infrastructure.persistence.sqlite_claims import SqliteClaimRepository

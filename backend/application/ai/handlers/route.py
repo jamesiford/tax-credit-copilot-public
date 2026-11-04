@@ -11,7 +11,7 @@ ROUTER_AGENT = "OrchestratorAgent"
 
 
 async def handle_route_question(query: RouteQuestionQuery) -> AsyncIterator[ModelEvent]:
-    from application.wiring import get_narration_service
+    from application.services import get_narration_service
 
     async for event in get_narration_service().stream(ROUTER_AGENT, query.prompt, role=ModelRole.ROUTER):
         yield event

@@ -100,7 +100,7 @@ async def _client_ids(request: Request) -> set[int]:
 def authenticate(request: Request) -> Principal:
     if auth_mode() != "entra":
         return ANONYMOUS
-    from application.wiring import get_token_validator
+    from bootstrap.wiring import get_token_validator
     from infrastructure.auth.entra import AuthenticationFailed, AuthorizationFailed
 
     try:
@@ -131,7 +131,7 @@ def bind_acting_user(principal: Principal, header: str | None) -> Principal:
 
 
 def authorize_clients(principal: Principal, client_ids: Iterable[int]) -> None:
-    from application.wiring import get_client_authorizer
+    from bootstrap.wiring import get_client_authorizer
 
     authorizer = get_client_authorizer()
     for client_id in sorted(client_ids):

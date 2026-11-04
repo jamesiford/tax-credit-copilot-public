@@ -13,7 +13,7 @@ from fastapi import APIRouter, HTTPException, Query, Request
 
 from api.auth import current_principal
 from application.queries.get_channel_audit import MAX_LIMIT, GetChannelAuditQuery
-from application.wiring import get_mediator
+from bootstrap.wiring import get_mediator
 
 router = APIRouter(prefix="/api/audit", tags=["audit"])
 

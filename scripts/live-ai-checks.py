@@ -5,7 +5,7 @@
 Run where the deployed mock model gateway is reachable (its inbound rule admits only the integration
 subnet), for example from the API app's Kudu command API, with the backend's `application/`, `domain/`,
 `infrastructure/` and `agents/` on the path and httpx, opentelemetry-api, azure-identity and
-azure-ai-projects installed. It drives the REAL chain (`application.ai_wiring.get_narration_service`): the
+azure-ai-projects installed. It drives the REAL chain (`bootstrap.ai_wiring.get_narration_service`): the
 settings are the usual `AI_*` / `FOUNDRY_*` environment variables, so the scenario is chosen by the
 environment the command is run with, never by code in this file.
 
@@ -72,7 +72,7 @@ def emit(**fields) -> None:
 
 async def narrate(prompt: str, agent: str) -> dict:
     """Run one narration through the real service; the result says who answered, never what was said."""
-    from application.ai_wiring import get_narration_service
+    from bootstrap.ai_wiring import get_narration_service
     from domain.ai import StreamEnd, TextDelta
 
     started, text, end = time.monotonic(), "", None

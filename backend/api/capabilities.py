@@ -39,7 +39,7 @@ class CapabilityCall(BaseModel):
 
 
 def _refuse_unentitled_clients(principal: Principal, ids: set[int]) -> None:
-    from application.wiring import get_client_authorizer
+    from bootstrap.wiring import get_client_authorizer
 
     authorizer = get_client_authorizer()
     for client_id in sorted(ids):

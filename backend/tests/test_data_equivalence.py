@@ -16,11 +16,11 @@ from decimal import Decimal
 
 import pytest
 
-from application import wiring
+from bootstrap import wiring
 from application.capabilities.client_analysis import client_trend
 from application.capabilities.client_eligibility import client_eligibility
 from application.capabilities.invoke import invoke
-from application.data_wiring import set_data_query_service
+from bootstrap.data_wiring import set_data_query_service
 from tests.data_caps_fixture import person
 from tests.data_engine_fixture import CLIENT, YEAR, SqliteGoldReader, SqliteWarehouse, data_service, run_engine
 

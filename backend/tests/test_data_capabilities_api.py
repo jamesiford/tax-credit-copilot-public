@@ -12,12 +12,12 @@ from pathlib import Path
 
 import pytest
 
-from application import wiring
+from bootstrap import wiring
 from application.capabilities import catalog
 from application.capabilities.data_catalog import data_catalog
-from application.channel_wiring import set_writer_entitlement
+from bootstrap.channel_wiring import set_writer_entitlement
 from application.data.executor import Rows
-from application.data_wiring import set_data_query_service
+from bootstrap.data_wiring import set_data_query_service
 from application.identity import AllowListAuthorizer
 from application.rate_limit import RateLimiter
 from tests.data_caps_fixture import Writers, person

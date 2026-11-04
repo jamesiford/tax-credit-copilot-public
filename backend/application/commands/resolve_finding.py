@@ -64,8 +64,8 @@ class ReopenFindingCommand(Command):
 
 
 def handle_resolve_finding(command: ResolveFindingCommand) -> dict[str, Any]:
-    from application.wiring import get_finding_repository as get_repository
-    from infrastructure.persistence.sqlite_findings import FindingResolution
+    from application.services import get_finding_repository as get_repository
+    from domain.findings import FindingResolution
 
     entry = FindingResolution(
         finding_id=command.finding_id,
@@ -81,7 +81,7 @@ def handle_resolve_finding(command: ResolveFindingCommand) -> dict[str, Any]:
 
 
 def handle_reopen_finding(command: ReopenFindingCommand) -> dict[str, Any]:
-    from application.wiring import get_finding_repository as get_repository
+    from application.services import get_finding_repository as get_repository
 
     get_repository().reopen(
         finding_id=command.finding_id,

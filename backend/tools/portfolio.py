@@ -365,7 +365,7 @@ def chat_jobs_at_risk(
     handed.
     """
     from application.queries._client_run import ClientRunNotAvailable, resolve_statute
-    from application.wiring import get_gold_reader
+    from application.services import get_gold_reader
     from domain.calculation.proximity import fragile_cohort
 
     try:
@@ -439,7 +439,7 @@ def chat_client_trend(
 
     `on_run` receives the run the series was read from; see `chat_jobs_at_risk`.
     """
-    from application.wiring import get_gold_reader
+    from application.services import get_gold_reader
 
     series = get_gold_reader().client_year_series(account_id, method=method)
     if series.get("run") is not None and on_run is not None:
@@ -498,7 +498,7 @@ def chat_client_context(
     client-year. A chat answer of "$0" and "we have not looked" are different
     statements and only one of them is safe to say to a client.
     """
-    from application.wiring import get_gold_reader
+    from application.services import get_gold_reader
 
     reader = get_gold_reader()
     current = reader.headcount_series(account_id, tax_year=tax_year, method=method)

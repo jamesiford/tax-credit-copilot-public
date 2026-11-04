@@ -13,7 +13,7 @@ from datetime import timedelta
 
 import pytest
 
-from application import wiring
+from bootstrap import wiring
 from application.capabilities import catalog, registry
 from application.capabilities.write_specs import InvalidWrite
 from application.confirmations import (

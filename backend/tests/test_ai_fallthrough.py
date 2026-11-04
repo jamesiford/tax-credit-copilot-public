@@ -12,7 +12,7 @@ import asyncio
 
 import pytest
 
-from application import wiring
+from bootstrap import wiring
 from application.ai.providers import ProviderRegistry
 from application.ai.requests import NarrateBriefQuery, RouteQuestionQuery
 from application.ai.settings import load_ai_settings

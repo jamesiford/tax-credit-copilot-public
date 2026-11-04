@@ -26,7 +26,7 @@ class StoredPackage:
 
 def store_claim_package(client_id: int, tax_year: int, author: str) -> StoredPackage:
     """Build one client-year's package and register it. Raises `NoRunForClient` with no run."""
-    from application.wiring import get_artifact_service, get_claim_package_source
+    from application.services import get_artifact_service, get_claim_package_source
 
     package: ClaimPackage = build_claim_package(
         client_id, tax_year, get_claim_package_source(), generated_by=author,
@@ -51,7 +51,7 @@ def store_claim_package(client_id: int, tax_year: int, author: str) -> StoredPac
 
 def latest_package(client_id: int, tax_year: int) -> Artifact | None:
     """The newest live claim package for a client-year, or None if none was built."""
-    from application.wiring import get_artifact_service
+    from application.services import get_artifact_service
 
     found = get_artifact_service().repository.live(client_id, kind="claim_package", tax_year=tax_year)
     return max(found, key=lambda a: a.created_at, default=None)

@@ -99,7 +99,7 @@ def wired(monkeypatch, cascade):
     by_year, shared = cascade
     gold = copy.deepcopy(shared)
     import application.queries._client_run as client_run
-    import application.wiring as wiring
+    import bootstrap.wiring as wiring
 
     monkeypatch.setattr(wiring, "get_gold_reader", lambda: _Reader(gold))
     monkeypatch.setattr(

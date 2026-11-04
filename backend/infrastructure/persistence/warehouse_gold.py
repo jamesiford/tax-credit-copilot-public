@@ -32,6 +32,7 @@ import threading
 import time
 from typing import Any, Callable, Sequence
 
+from application.gold_ports import GoldWriteFailed
 from infrastructure.persistence.fabric_warehouse import (
     GOLD_SCHEMA,
     OPS_SCHEMA,
@@ -69,10 +70,6 @@ def _is_transient(exc: Exception) -> bool:
 
 def _batch_size(column_count: int) -> int:
     return max(1, min(500, (_MAX_PARAMETERS - 10) // max(1, column_count)))
-
-
-class GoldWriteFailed(RuntimeError):
-    """A write or its validation did not hold. The run is not usable."""
 
 
 class GoldWriter:

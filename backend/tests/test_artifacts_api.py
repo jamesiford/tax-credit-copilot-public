@@ -14,7 +14,7 @@ import pytest
 from fastapi.testclient import TestClient
 from openpyxl import load_workbook
 
-from application import wiring
+from bootstrap import wiring
 from application.artifacts import ArtifactService
 from application.claim_package import SHEETS, build_claim_package
 from application.identity import AllClientsAuthorizer, AllowListAuthorizer, ANONYMOUS
