@@ -37,7 +37,7 @@ Live redeploy (Stage 3) must: set `TCC_CHANNEL_RESOLVE_DISPLAY_NAMES=true` and p
 | CH-16e planner, narrator, skills, goldens, equivalence | done | e85afd4 | backend 4918 passed; 29 goldens; 11 equivalence tests |
 | CH-16f docs, security, grants, Fabric-agent evaluation | done | ed2fbb6 | backend 4942 passed; terraform test 70 passed |
 
-## Stage 3 — CH-17 live redeploy and verification: part A (3.1 to 3.3) done; 3.4 to 3.7 belong to other agents
+## Stage 3 — CH-17 live redeploy and verification: parts A and B (3.1 to 3.5) done; 3.6 and 3.7 belong to other agents
 
 Rollback tag for code: `pre-final-run-2026-11-03` (tip of `feat/m365-channel` at the start of part A). Note the tag holds the NEW code; the
 code that is live now (known-good) is the one stamped `GIT_COMMIT` in the azd environment (an older commit on this branch's history).
@@ -92,6 +92,25 @@ Global Administrator was not needed in part A. Admin actions outstanding: none.
 Agent: `pwsh agent-endpoint.ps1 -Action Pin -Version 16`, then `agent-invariants.ps1`. API/gateway: package the previously live commit
 (`git archive <GIT_COMMIT recorded in the azd env before this run> backend`, `scripts/package-app.py`) and `az webapp deploy` it to that app.
 Settings: `azd env set` the three new values back (`false`/empty) and `azd provision`.
+
+### 3.4 Icon and publish 1.0.3: done
+
+- `scripts/render-icons.py` rendered `dist/branding/color-192.png` (192x192) and `outline-32.png` (32x32), gitignored build output.
+- `publish-m365.ps1 -PublishScope Shared` (never Tenant), `-WhatIf` first (icon lengths only), then for real: **version 1.0.3 published**
+  and a `titleId` returned. The package the service generates for download carries manifest version string `1.0.4` (the service
+  stamps the download one patch above the published version); everything else matches: `copilotAgents.customEngineAgents` with one
+  bot id equal to the single `bots[0].botId`, scopes include `copilot`, one app id, and the two PNGs inside are the newly rendered
+  ones (byte-identical hashes, 192x192 and 32x32 only). That one package is the one to install; older packages are superseded.
+- **Agent invariants immediately after publishing: 13 of 13 PASS.** Agent still version 17, `instance_identity` unchanged, so no
+  role re-grant and no endpoint repair were needed.
+
+### 3.5 Cowork package: built, upload is the owner's step
+
+- Rebuilt with the overlay config and `--strict` (plugin version raised to 1.0.1 so it installs over a 1.0.0 install); 14 files:
+  the manifest, `color.png`, `outline.png` (the same bytes as the listing icons) and the three skills, whose current text names
+  the data tools (`data_catalog`, `data_distinct_values`, `data_query`). SHA-256 of the zip:
+  `1f2f569da6ab8ea0d96a46c3beee95e49dd4160184fac549a506c9b009148d9b`. Uploading it to Cowork needs the owner's sign-in.
+
 ## Stage 4 — CH-18: runs in "keep main untouched" mode (owner change of plan, 3 Nov)
 
 `main` stays at `029b9ad2d2c002c09167375748120c7a8af3bc03`; it is never fast-forwarded, merged into, reset or rebased, and
