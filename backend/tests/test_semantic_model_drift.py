@@ -84,9 +84,19 @@ def test_the_drift_check_fails_on_a_column_added_without_a_decision():
     assert invented_columns(dataset, [c for c in _physical(dataset) if c != "weight"]) == {"weight"}
 
 
+def test_the_columns_the_builder_hardcodes_for_currency_exist_in_the_ddl():
+    """The live-run subquery and the is_current predicate name physical columns the model does not."""
+    tables = warehouse_tables()
+    manifest = {"run_id", "run_status", "superseded_by_run_id", "run_completed_at", "run_started_at", "client_id"}
+    assert manifest <= set(tables["tcc_ops.run_manifest"])
+    for table in ("unit_year_master", "unit_credit_installment"):
+        assert "is_current" in tables[f"tcc_gold.{table}"]
+
+
 def test_the_ddl_parser_reads_columns_alters_and_ignores_comments_and_constraints():
     sql = (
         "CREATE TABLE s.t\n(\n  a INT NOT NULL, -- c, d\n  b DECIMAL(18,2) NULL,\n"
         "  /* e INT, */ CONSTRAINT pk PRIMARY KEY (a, b)\n);\nALTER TABLE s.t ADD f INT NULL;\n"
     )
     assert parse_ddl(sql) == {"s.t": ["a", "b", "f"]}
+
