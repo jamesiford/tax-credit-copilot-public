@@ -43,6 +43,13 @@
     Default $true: turn on the source-IP-filtered public Activity Protocol route, which a project with
     Pass -EnablePrivateNetworkRoute:$false for a public project (the colon form is needed: a bare
     `-EnablePrivateNetworkRoute $false` is rejected when the script is started with `pwsh -File`).
+.PARAMETER ColorIconPath
+    The 192x192 PNG colour icon, sent as colorIconBase64. Default: dist/branding/color-192.png when it exists
+    (render it with scripts/render-icons.py). An explicit path that is missing, not a PNG, or the wrong size
+    is an error; -ColorIconPath '' publishes without a custom colour icon.
+.PARAMETER OutlineIconPath
+    The 32x32 PNG outline icon (white on transparent, RGBA), sent as outlineIconBase64. Default:
+    dist/branding/outline-32.png when it exists. -OutlineIconPath '' publishes without one.
 .PARAMETER ConfirmTenantPublish
     Required with -PublishScope Tenant. A tenant-wide publish is submitted for admin approval.
 .PARAMETER WhatIf
@@ -65,7 +72,9 @@ param(
     [string]$OutputDir = (Join-Path (Get-Location) 'publish-output'),
     [switch]$ConfirmTenantPublish,
     [string]$SubscriptionId = '',
-    [string]$DeveloperName = 'Tax Credit Copilot (PoC)',
+    [ValidateLength(1, 32)][string]$DeveloperName = 'Tax Credit Copilot (PoC)',
+    [string]$ColorIconPath = (Join-Path $PSScriptRoot '..\dist\branding\color-192.png'),
+    [string]$OutlineIconPath = (Join-Path $PSScriptRoot '..\dist\branding\outline-32.png'),
     [string]$DeveloperWebsiteUrl = 'https://github.com/jamesiford/tax-credit-copilot-public',
     [string]$PrivacyUrl = 'https://github.com/jamesiford/tax-credit-copilot-public/blob/main/SECURITY.md',
     [string]$TermsOfUseUrl = 'https://github.com/jamesiford/tax-credit-copilot-public/blob/main/DISCLAIMER.md'
@@ -79,6 +88,9 @@ $script:BotApi = '2022-09-15'
 $script:ChannelApi = '2021-03-01'
 $script:MaxVersionAttempts = 50
 $script:Temp = New-Object System.Collections.Generic.List[string]
+$script:Bound = $PSBoundParameters
+$script:Icons = [ordered]@{}
+$script:IconFields = @{ Color = 'colorIconBase64'; Outline = 'outlineIconBase64' }
 
 # ------------------------------------------------------------------------------ az
 
@@ -124,9 +136,19 @@ function Invoke-Rest {
     return Invoke-Az -Arguments $arguments
 }
 
+function Get-PrintableBody($Body) {
+    <# A copy of the body that is safe to print: an icon becomes its length, never its content. #>
+    if ($Body -isnot [System.Collections.IDictionary]) { return $Body }
+    $copy = [ordered]@{}
+    foreach ($key in $Body.Keys) {
+        $copy[$key] = if ($key -in $script:IconFields.Values) { "<$($Body[$key].Length) base64 characters>" } else { $Body[$key] }
+    }
+    return $copy
+}
+
 function Write-Request([string]$Method, [string]$Url, $Body) {
     Write-Host "  $($Method.ToUpper()) $Url"
-    if ($null -ne $Body) { ($Body | ConvertTo-Json -Depth 20) -split '\r?\n' | ForEach-Object { Write-Host "    $_" } }
+    if ($null -ne $Body) { (Get-PrintableBody $Body | ConvertTo-Json -Depth 20) -split '\r?\n' | ForEach-Object { Write-Host "    $_" } }
 }
 
 function Send-Change {
@@ -163,6 +185,38 @@ function Assert-Parameters {
     if ($AppVersion -notmatch '^\d+\.\d+\.\d+$') { throw "-AppVersion must be a semantic version such as 1.0.0" }
     foreach ($url in @($DeveloperWebsiteUrl, $PrivacyUrl, $TermsOfUseUrl)) {
         if ($url -notmatch '^https://') { throw "developer, privacy and terms URLs must be https:// ($url)" }
+    }
+}
+
+function Read-IconPng([string]$Label, [string]$Path, [int]$Size, [bool]$NeedsAlpha) {
+    <# Validated before anything is sent: a wrong icon is refused here, not by the service after a version is spent. #>
+    if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) { throw "The $Label icon '$Path' does not exist. Render it with: python scripts/render-icons.py" }
+    $bytes = [IO.File]::ReadAllBytes($Path)
+    $signature = [byte[]](0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A)
+    if ($bytes.Length -lt 33 -or (Compare-Object $signature $bytes[0..7] -SyncWindow 0)) { throw "The $Label icon '$Path' is not a PNG file." }
+    $width = ([int]$bytes[16] -shl 24) -bor ([int]$bytes[17] -shl 16) -bor ([int]$bytes[18] -shl 8) -bor [int]$bytes[19]
+    $height = ([int]$bytes[20] -shl 24) -bor ([int]$bytes[21] -shl 16) -bor ([int]$bytes[22] -shl 8) -bor [int]$bytes[23]
+    if ($width -ne $Size -or $height -ne $Size) { throw "The $Label icon must be ${Size}x${Size} pixels; '$Path' is ${width}x${height}." }
+    if ($NeedsAlpha -and $bytes[25] -ne 6) { throw "The $Label icon must be an RGBA PNG (a transparent background); '$Path' has colour type $($bytes[25])." }
+    return [pscustomobject]@{ Label = $Label; Path = $Path; Bytes = $bytes.Length; Base64 = [Convert]::ToBase64String($bytes) }
+}
+
+function Resolve-Icons {
+    <# An explicit path must be usable; an unset one is used when the rendered file exists; '' means none. #>
+    $wanted = @(
+        @{ Key = 'Color'; Param = 'ColorIconPath'; Path = $ColorIconPath; Size = 192; Alpha = $false },
+        @{ Key = 'Outline'; Param = 'OutlineIconPath'; Path = $OutlineIconPath; Size = 32; Alpha = $true }
+    )
+    foreach ($icon in $wanted) {
+        $explicit = $script:Bound.ContainsKey($icon.Param)
+        if ([string]::IsNullOrWhiteSpace($icon.Path)) { continue }
+        if (-not $explicit -and -not (Test-Path -LiteralPath $icon.Path -PathType Leaf)) { continue }
+        $script:Icons[$icon.Key] = Read-IconPng -Label $icon.Key.ToLower() -Path $icon.Path -Size $icon.Size -NeedsAlpha $icon.Alpha
+    }
+    if ($script:Icons.Count -eq 0) { Write-Host 'No custom icons: the listing uses the platform default. Render them with scripts/render-icons.py.' }
+    foreach ($key in $script:Icons.Keys) {
+        $icon = $script:Icons[$key]
+        Write-Host "Icon ($($icon.Label)): $($icon.Path) ($($icon.Bytes) bytes, $($icon.Base64.Length) base64 characters)"
     }
 }
 
@@ -242,11 +296,13 @@ function Set-BotService([string]$Subscription, [string]$ClientId, [string]$Tenan
 }
 
 function New-PublishBody([string]$BotArmId, [string]$Version) {
-    return [ordered]@{
+    $body = [ordered]@{
         agentDisplayName = $DisplayName; botServiceArmId = $BotArmId; publishScope = $PublishScope; publishAsAutopilot = $false
         appVersion = $Version; shortDescription = $ShortDescription; fullDescription = $FullDescription
         developerName = $DeveloperName; developerWebsiteUrl = $DeveloperWebsiteUrl; privacyUrl = $PrivacyUrl; termsOfUseUrl = $TermsOfUseUrl
     }
+    foreach ($key in $script:Icons.Keys) { $body[$script:IconFields[$key]] = $script:Icons[$key].Base64 }
+    return $body
 }
 
 function Publish-Agent([string]$BotArmId) {
@@ -318,6 +374,7 @@ function Write-NextSteps($Published) {
 try {
     Assert-TenantPublishConfirmed
     Assert-Parameters
+    Resolve-Icons
     Assert-BotServiceProvider
     $tenant = Invoke-AzChecked -Arguments @('account', 'show', '--query', 'tenantId', '-o', 'tsv') -What 'Reading the tenant id'
     $subscription = if ($SubscriptionId) { $SubscriptionId } else { Invoke-AzChecked -Arguments @('account', 'show', '--query', 'id', '-o', 'tsv') -What 'Reading the subscription id' }

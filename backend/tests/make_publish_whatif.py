@@ -14,6 +14,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from tests import publish_shim as shim  # noqa: E402
+from tests.png_fixtures import solid_png  # noqa: E402
 
 REPO = Path(__file__).resolve().parents[2]
 TARGET = REPO / "docs" / "m365-channel" / "evidence" / "publish-whatif.txt"
@@ -22,7 +23,11 @@ TARGET = REPO / "docs" / "m365-channel" / "evidence" / "publish-whatif.txt"
 def main() -> None:
     with tempfile.TemporaryDirectory() as folder:
         fake = shim.install(Path(folder))
-        arguments = [*shim.required_arguments(), "-AppVersion", "1.0.0", "-PublishScope", "Shared", "-OutputDir", "./publish-output", "-WhatIf"]
+        (Path(folder) / "color.png").write_bytes(solid_png(192, alpha=False))
+        (Path(folder) / "outline.png").write_bytes(solid_png(32, alpha=True))
+        icon_arguments = ["-ColorIconPath", "./color.png", "-OutlineIconPath", "./outline.png"]
+        arguments = [*shim.required_arguments(), "-AppVersion", "1.0.3", "-PublishScope", "Shared", "-OutputDir", "./publish-output",
+                     *icon_arguments, "-WhatIf"]
         done = subprocess.run(
             [shim.PWSH, "-NoProfile", "-NonInteractive", "-File", str(REPO / "scripts" / "publish-m365.ps1"), *arguments],
             capture_output=True, text=True, env=fake.environment(), cwd=folder, timeout=180,

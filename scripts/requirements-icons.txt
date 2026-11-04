@@ -1,0 +1,8 @@
+# Dev-only: renders channels/branding/*.svg to PNG for the Teams / Copilot listing and the
+# Cowork plugin (scripts/render-icons.py). NOT part of backend/requirements.txt: nothing that
+# is deployed needs an SVG renderer. Either one is enough; the script prefers cairosvg.
+#
+# cairosvg needs the Cairo C library (Linux/macOS usually have it; Windows usually does not).
+# Where it is missing, Chromium works: `python -m playwright install chromium`.
+cairosvg==2.9.1
+playwright==1.64.1

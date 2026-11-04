@@ -12,8 +12,9 @@ channels/cowork/
     tcc-figures-and-writes/   the standing rules: verbatim figures, verify, two-step writes, errors, scope
     tcc-book-review/          W1  Monday book review and call plan (account and sales teams)
     tcc-client-review-pack/   W2  client credit review pack (tax consultants)
-  assets/                  SVG sources of the icon mark (PNGs are drawn at build time, never committed)
-scripts/build-cowork-plugin.py   render, validate, zip -> dist/tcc-cowork-plugin.zip
+scripts/build-cowork-plugin.py   render, validate, zip -> dist/tcc-cowork-plugin.zip (+ .build.json with the hashes)
+scripts/render-icons.py          channels/branding/*.svg -> dist/branding/color-192.png + outline-32.png
+channels/branding/               the agent icon, SVG only (shared with the Teams / Copilot listing)
 ```
 
 Setup, registration and install steps are in
@@ -21,6 +22,17 @@ Setup, registration and install steps are in
 before a demo.
 
 ## Build
+
+The package carries the **same agent icon** as the Teams / Copilot listing. The artwork is SVG only
+(`channels/branding/agent-icon.svg` colour 192x192, `agent-icon-outline.svg` outline 32x32); the two
+PNGs the manifest needs are rendered into the gitignored `dist/branding/` and never committed.
+Render them once (the build also renders them when they are missing):
+
+```pwsh
+pip install -r scripts\requirements-icons.txt      # dev-only; cairosvg needs Cairo, otherwise Chromium
+python -m playwright install chromium              # only where Cairo is not available (typical on Windows)
+.venv\Scripts\python.exe scripts\render-icons.py   # dist\branding\color-192.png, outline-32.png
+```
 
 ```pwsh
 .venv\Scripts\python.exe scripts\build-cowork-plugin.py --config overlays\<name>\cowork.json
@@ -34,13 +46,17 @@ before a demo.
 | `gateway_mcp_url` | `https://<gateway-host>/mcp`, the channel gateway's MCP endpoint. |
 | `oauth_reference_id` | The OAuth client registration id created in the Teams Developer Portal (see the setup guide). It becomes `authorization.referenceId`; the secret never enters the package. |
 | `app_id_seed` | Seed for the app id, a UUID v5. Same seed, same id, for every version: an update installs over the old one. Change it only to get a second, separate plugin. `app_id` overrides it with an explicit id. |
-| `version`, `manifest_version`, `accent_color` | Package version (`1.0.0`), manifest `1.29` (default) or `1.28`, and `#RRGGBB`. |
+| `version`, `manifest_version`, `accent_color` | Package version (`1.0.0`), manifest `1.29` (default) or `1.28`, and `#RRGGBB` (the default matches the icon tile). |
 
 Every key can also come from an environment variable `TCC_COWORK_<KEY>`, which wins over the file.
 
 The build is reproducible: sorted entries, fixed timestamps and permissions, LF line endings, and
-icons drawn deterministically. Two builds of the same inputs have the same SHA-256, which the script
-prints. Keep the hash with the review record; an admin can recompute it from the sources.
+the icons read as bytes from `dist/branding/`. Two builds of the same inputs and the same rendered
+icons have the same SHA-256, which the script prints. Icon bytes come from the renderer (Chromium's
+anti-aliasing can differ between versions), so the build also writes `dist/tcc-cowork-plugin.build.json`
+with the zip hash, the hash of each icon PNG and of every file in the package; keep it with the review
+record. It is build output, never a tracked file. A build with no icons and no renderer stops with
+`TCC-I001` and says what to install.
 
 `manifest_version` `1.28` adds `tools/tcc-channel-tools.json`, generated from the live catalog by the
 same code that answers `tools/list`. Cowork discovers tools from the server and ignores the file; it

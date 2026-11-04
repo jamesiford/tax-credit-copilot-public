@@ -4,21 +4,24 @@
     python scripts/build-cowork-plugin.py --config channels/cowork/config.example.json   # placeholders: a dry run
     python scripts/build-cowork-plugin.py --config ... --strict                           # refuse placeholders
 
-Renders `manifest.json` from `channels/cowork/manifest.template.json`, draws the two PNG
-icons, copies the skills, validates everything offline, and writes `dist/tcc-cowork-plugin.zip`
-reproducibly. Prints the SHA-256 so the file that was reviewed is provably the file uploaded.
+Renders `manifest.json` from `channels/cowork/manifest.template.json`, takes the two PNG icons
+rendered from `channels/branding/*.svg` (`scripts/render-icons.py`; rendered first when absent),
+copies the skills, validates everything offline, and writes `dist/tcc-cowork-plugin.zip`
+reproducibly plus `dist/tcc-cowork-plugin.build.json` (the zip and icon hashes). Prints the SHA-256
+so the file that was reviewed is provably the file uploaded.
 
-Exit codes: 0 built · 1 validation errors (nothing is written) · 2 bad configuration.
+Exit codes: 0 built · 1 validation errors, including no icons (nothing is written) · 2 bad configuration.
 """
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from cowork_plugin.package import BuildError, build  # noqa: E402
+from cowork_plugin.package import BUILD_MANIFEST, BuildError, build  # noqa: E402
 from cowork_plugin.settings import ConfigError, load_settings  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -43,6 +46,8 @@ def main(argv: list[str]) -> int:
         print(finding)
     print(f"app id    {settings.app_id}\nmanifest  {settings.manifest_version}\nfiles     {len(result.files)}")
     print(f"wrote     {result.zip_path}\nsha256    {result.sha256}")
+    for name, digest in json.loads((args.out / BUILD_MANIFEST).read_text(encoding="utf-8"))["icons"].items():
+        print(f"icon      {name} sha256 {digest}")
     return 0
 
 
