@@ -30,6 +30,26 @@ class PendingWrite:
     expires_at: float
     summary: str = ""
 
+    @classmethod
+    def from_preview(cls, tool: str, args: dict[str, Any], envelope: dict[str, Any], expires_at: float) -> "PendingWrite | None":
+        """The change a preview's envelope asks to have confirmed, or None when it carried no confirmation token."""
+        token = ((envelope.get("facts") or {}).get("confirmation") or {}).get("token")
+        return cls(tool, dict(args), str(token), expires_at) if token else None
+
+
+@dataclass
+class PausedWrite:
+    """A write workflow waiting for its owner's reply: where its checkpoint is and which request it paused on.
+
+    The prepared change and its single-use token are inside the checkpoint, which is in this process's memory
+    and nowhere else, so a restart loses it exactly as it loses the rest of the conversation: it cannot be
+    confirmed, and the person asks again. `storage` is the framework's `InMemoryCheckpointStorage`.
+    """
+
+    storage: Any
+    checkpoint_id: str
+    request_id: str
+
 
 @dataclass
 class ConversationState:
@@ -37,7 +57,7 @@ class ConversationState:
 
     client_id: int | None = None
     tax_year: int | None = None
-    pending: PendingWrite | None = None
+    write: PausedWrite | None = None
     candidates: list[dict[str, Any]] = field(default_factory=list)
     question: str = ""
     history: list[dict[str, str]] = field(default_factory=list)

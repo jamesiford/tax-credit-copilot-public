@@ -3,9 +3,9 @@
     identity → (confirm / cancel?) → (numbered reply?) → tools → compose → reply → audit
 
 - **No identity, no turn.** An unresolved person gets one sentence and nothing runs.
-- **Writes.** A model can only prepare; `confirm` is handled here, before any model sees
-  the message, and is the only path to `writes.commit_pending`. Any other message drops a
-  pending change, and the reply says so.
+- **Writes.** A model can only prepare (the write workflow, `maf_write_flow`, pauses on the preview); `confirm`
+  is handled here, before any model sees the message, and is the only path to `maf_write_flow.commit_pending`,
+  which resumes the workflow. Any other message drops a pending change, and the reply says so.
 - **Clarify, never guess.** An ambiguous client or a missing year is a question back, with
   the candidates numbered `1) Name`; the next turn's bare number selects one.
 - **The reply is composed.** The engine's own blocks, the model's sentence only if the
@@ -28,12 +28,13 @@ from app.core.audit import NarrationAuditor
 from app.core.compose import provenance_footer
 from app.core.gateway_client import GatewayClient
 from app.core.identity import ActingIdentity
+from app.core.maf_write_flow import cancel_pending, commit_pending, drop_pending
 from app.core.planned import Planned
 from app.core.planner import Planner
 from app.core.settings import OrchestratorSettings
 from app.core.state import ConversationState, StateStore
 from app.core.tools import Clarification, ToolRunner
-from app.core.writes import CommitOutcome, commit_pending, parse_command
+from app.core.writes import CommitOutcome, parse_command
 from application.composer import Composed
 
 log = logging.getLogger("tcc.orchestrator.turn")
@@ -79,7 +80,7 @@ class TurnPipeline:
         command = parse_command(text)
         if command:
             return await self._command(command, who, state)
-        dropped, state.pending = state.pending is not None, None
+        dropped = await drop_pending(self._gateway, who, state, self._clock)
         reply = await self._respond(text, who, state)
         return replace(reply, text=f"{reply.text}\n\n{replies.DROPPED}") if dropped else reply
 
@@ -87,7 +88,7 @@ class TurnPipeline:
 
     async def _command(self, command: str, who: ActingIdentity, state: ConversationState) -> TurnReply:
         if command == "cancel":
-            had, state.pending = state.pending is not None, None
+            had = await cancel_pending(self._gateway, who, state, self._clock)
             return TurnReply(replies.CANCELLED if had else replies.NOTHING_PENDING, "cancel")
         try:
             outcome = await asyncio.wait_for(commit_pending(self._gateway, who, state, self._clock), self._s.turn_timeout_seconds)
@@ -143,7 +144,7 @@ class TurnPipeline:
             return TurnReply(text, "failure" if runner.problems else "help", planned.mode, refused=tuple(runner.refused), audit=audit)
         composed = planned.composed_for(runner)
         text = self._assemble(runner, planned, composed)
-        state.pending = runner.pending
+        state.write = runner.flow
         state.remember("assistant", text)
         audit = await self._auditor.report(who, planned, runner, composed, text)
         return TurnReply(
@@ -159,7 +160,7 @@ class TurnPipeline:
             parts.append(replies.MODEL_DOWN)
         if runner.problems:
             parts.append(replies.failure(runner.problems))
-        if runner.pending is not None:
+        if runner.flow is not None:
             parts.append(replies.CONFIRM_HINT)
         return "\n\n".join(p for p in parts if p)
 

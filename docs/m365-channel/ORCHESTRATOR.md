@@ -14,14 +14,14 @@ flowchart TD
     M[message + platform signals] --> I{identity resolved?}
     I -- no --> R1[one-sentence refusal: nothing runs, no model]
     I -- yes --> C{exact confirm / cancel?}
-    C -- confirm --> W[writes.commit_pending: the ONLY commit path]
-    C -- cancel --> R2[pending change dropped]
-    C -- no --> D[drop any pending change]
+    C -- confirm --> W[maf_write_flow.commit_pending: resumes the write Workflow, the ONLY commit path]
+    C -- cancel --> R2[write Workflow ends: pending change dropped]
+    C -- no --> D[cancel the Workflow's pending request]
     D --> N{numbered reply to a client question?}
     N -- yes --> S[client chosen by code; earlier question resumes]
     N -- no --> P
     S --> P[planner]
-    P --> T["tools mode: MAF Agent drives the model's tool calls\njson mode: model returns a plan, one-shot MAF agent runs each tool\nkeywords mode: platform keyword table, no model"]
+    P --> T["tools mode (the planner): MAF Agent drives the model's tool calls\ndegraded, no tool-calling model: json mode (model returns a plan) or keywords (platform table, no model)"]
     T --> TR["MAF function middleware: budget, refusal, client, year and method, schema; then the call and the fact ledger"]
     TR --> G[(channel gateway: authenticate, entitle, audit, forward)]
     G --> TR
@@ -52,7 +52,7 @@ framework layer: `maf_agent`, `maf_catalog_tools`, `maf_tool_rules`, `maf_tool_c
 | Whether a model sentence survives | The numeric guard and output policy, on the model's raw words and on the finished reply | `composer.compose` |
 | How many tools run, how long a turn takes | `CHANNEL_MAX_TOOL_CALLS`, `CHANNEL_TURN_TIMEOUT_SECONDS` | `maf_tool_rules.Budget`, `turn.TurnPipeline` |
 | Whether a model may name a tool | Not a commit, not plumbing: refused and recorded | `maf_tool_rules.RefuseUnlisted`, `RecordUnregisteredCalls` |
-| Whether a change is made | The same person, typing `confirm`, within `CHANNEL_CONFIRM_TTL_SECONDS` | `writes.commit_pending` |
+| Whether a change is made | The same person, typing `confirm`, within `CHANNEL_CONFIRM_TTL_SECONDS` | `maf_write_flow.commit_pending` resumes the write Workflow; its commit executor is the only caller of `writes.send_commit` |
 
 What the model sees of a tool result is the **names** of the facts (`narrator_brief`), never their
 values, so it cannot copy a figure as a digit. It writes `{{facts.path|format}}` placeholders and the
@@ -83,8 +83,21 @@ present a token of their own. That is stated in the audit row, not inferred.
 
 ## Confirming a change
 
-A model may only **prepare**. The preview is shown with *Reply **confirm** to apply this change, or
-**cancel** to drop it.* The token stays in the orchestrator's memory and never in text. Then:
+A model may only **prepare**. A prepare tool starts the **write Workflow** (`maf_write_flow`, `maf_write_steps`; MAF `WorkflowBuilder`, three executors):
+
+```mermaid
+flowchart LR
+    M[model: a *_prepare tool] --> P[Prepare executor: asks the gateway for the preview, writes nothing]
+    P --> A["AwaitConfirmation: request_info, the workflow waits (in-memory checkpoint)"]
+    R[the reader's exact word, our gate] -- Confirmation --> A
+    A -- "confirmed and in time: Approved" --> C[Commit executor: one commit, once]
+    A -- cancel or expired --> O[outcome]
+    C --> O
+```
+
+The model can start the workflow only at Prepare (its one start input is `PrepareRequest`); `Commit` accepts only `Approved`, which only the request step creates; and the reply that resumes the request step is produced by the orchestrator's exact-word gate, never by a model. The graph is built fresh on every run and resumes from the framework's `InMemoryCheckpointStorage` (one per paused write); the checkpoint holds the single-use token, so it is never on a disk or in a store another replica reads, and a restart loses a pending confirmation exactly as before ([D-81](DECISIONS.md), [D-130](DECISIONS.md)).
+
+The preview is shown with *Reply **confirm** to apply this change, or **cancel** to drop it.* The token stays in the orchestrator's memory and never in text. Then:
 
 - **exact words only**: `confirm`, `yes, apply`, `cancel` (case and trailing punctuation ignored);
   "please go ahead" is a new question;
@@ -99,7 +112,8 @@ A model may only **prepare**. The preview is shown with *Reply **confirm** to ap
 
 `*_commit` is not a tool a model can name: `tools.model_tools()` excludes it, no MAF tool is registered
 for it, an attempt is refused and recorded (`TurnReply.refused`), and `test_orch_structure.py` fails the
-build if a commit name or `commit_pending` call appears outside `writes.py` / `turn.py`.
+build if a commit name or `commit_pending` call appears outside `writes.py` / `turn.py`, and
+`test_architecture_patterns.py` fails it if the commit executor or `send_commit` is reached from anywhere but the workflow.
 
 ## When the guard rejects the narration
 
