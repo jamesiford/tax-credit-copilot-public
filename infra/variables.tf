@@ -539,6 +539,68 @@ variable "channel_resolve_display_names" {
   default     = false
 }
 
+# --- governed data access (the agent's structured data queries) ----------------------
+# Every value is a non-secret API app setting, emitted only when set, so a default plan
+# is unchanged. docs/m365-channel/DATA-ACCESS.md says what each one does.
+
+variable "data_query_source_enabled" {
+  description = "Switch ON the lakehouse source (raw payroll) datasets of the governed data query (DATA_QUERY_SOURCE_ENABLED). The Gold and ops datasets are not behind it. Off by default; when true the API also needs read access to the lakehouse SQL analytics endpoint (scripts/grant-warehouse-sql.py --profile lakehouse, run by postprovision)."
+  type        = bool
+  default     = false
+}
+
+variable "data_query_timeout_seconds" {
+  description = "Statement time limit for a data query, seconds (DATA_QUERY_TIMEOUT_SECONDS, 1-120). A string so empty means unset (application default 20)."
+  type        = string
+  default     = ""
+  validation {
+    condition     = trimspace(var.data_query_timeout_seconds) == "" || can(regex("^([1-9]|[1-9][0-9]|1[01][0-9]|120)$", trimspace(var.data_query_timeout_seconds)))
+    error_message = "data_query_timeout_seconds must be empty or a whole number of seconds from 1 to 120."
+  }
+}
+
+variable "data_query_max_rows" {
+  description = "Server row cap for a data query (DATA_QUERY_MAX_ROWS, 1-500). Empty means unset (application default 500)."
+  type        = string
+  default     = ""
+  validation {
+    condition     = trimspace(var.data_query_max_rows) == "" || can(regex("^([1-9]|[1-9][0-9]|[1-4][0-9][0-9]|500)$", trimspace(var.data_query_max_rows)))
+    error_message = "data_query_max_rows must be empty or a whole number from 1 to 500."
+  }
+}
+
+variable "data_query_rate_per_minute" {
+  description = "Data queries per person per minute (DATA_QUERY_RATE_PER_MINUTE, 1-600). Empty means unset (application default 30)."
+  type        = string
+  default     = ""
+  validation {
+    condition     = trimspace(var.data_query_rate_per_minute) == "" || can(regex("^([1-9]|[1-9][0-9]|[1-5][0-9][0-9]|600)$", trimspace(var.data_query_rate_per_minute)))
+    error_message = "data_query_rate_per_minute must be empty or a whole number from 1 to 600."
+  }
+}
+
+variable "data_query_max_concurrency" {
+  description = "Data queries in flight at once across all people (DATA_QUERY_MAX_CONCURRENCY, 1-16). Empty means unset (application default 4). Keep it low: the Fabric capacity is shared."
+  type        = string
+  default     = ""
+  validation {
+    condition     = trimspace(var.data_query_max_concurrency) == "" || can(regex("^([1-9]|1[0-6])$", trimspace(var.data_query_max_concurrency)))
+    error_message = "data_query_max_concurrency must be empty or a whole number from 1 to 16."
+  }
+}
+
+variable "lakehouse_sql_server" {
+  description = "Lakehouse SQL analytics endpoint host (LAKEHOUSE_SQL_SERVER). Empty means the application uses the Warehouse host, which is the same for every item in one Fabric workspace."
+  type        = string
+  default     = ""
+}
+
+variable "lakehouse_sql_database" {
+  description = "Lakehouse SQL analytics endpoint database (LAKEHOUSE_SQL_DATABASE). Empty means the application uses the lakehouse name (FABRIC_LAKEHOUSE)."
+  type        = string
+  default     = ""
+}
+
 # --- mock AI gateway (proof of concept only) --------------------------------------
 
 variable "enable_mock_ai_gateway" {
