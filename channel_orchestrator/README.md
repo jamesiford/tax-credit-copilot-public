@@ -9,10 +9,12 @@ main.py              entry point at the zip root (python main.py)
 app/main.py          the Responses host: one handler (the only module that imports the hosting package)
 app/host.py          what the handler decides: identity, /whoami, hand-off to the turn pipeline
 app/wiring.py        settings in, a TurnPipeline out
+app/core/model_access.py  which model path serves a turn: the framework's client for a foundry-only AI_PROVIDER_CHAIN, ModelChain otherwise
 app/core/            framework-free logic: identity, state, tools (the turn), reader_arguments, planner, composer, writes, replies
 app/core/maf_*.py    the Microsoft Agent Framework layer, the only modules that import it: maf_agent (the Agent and its
                      client), maf_catalog_tools (a FunctionTool per catalog capability), maf_tool_rules and
-                     maf_tool_call (the turn's tool rules as function middleware), maf_tool_run (one tool through them)
+                     maf_tool_call (the turn's tool rules as function middleware), maf_tool_run (one tool through them),
+                     maf_foundry_client (the framework's OpenAI client for a foundry-only chain) and maf_chat (the trace and loop limits both clients share)
 app/vendor/tcc_shared/ the platform's shared modules, copied verbatim (generated; gitignored)
 Dockerfile, azure.yaml, requirements.txt
 ```
