@@ -85,6 +85,22 @@ person-only lane for a non-writer, so neither check is the only one. An aggregat
 count of people by location, an average by month) carries no person and is allowed everywhere. Not decided here:
 suppressing small groups (see [KNOWN-LIMITATIONS](../m365-channel/KNOWN-LIMITATIONS.md#data-queries)).
 
+The data path is bounded and audited like every other capability: a statement timeout (20 s), a 500-row cap, a
+per-person budget and a concurrency bulkhead, each of which **refuses rather than queues** so the shared Fabric
+capacity is not degraded; the audit line records the dataset, columns, aggregations and filter operators and shows a
+filter value only for a public-aggregate column; the provenance hashes the statement's structure, never its values.
+It executes only in the API process: the Warehouse datasets under the API's existing grants, and the lakehouse source
+datasets (off until `DATA_QUERY_SOURCE_ENABLED`) through the lakehouse SQL analytics endpoint under a read-only,
+object-level `SELECT` on the three source tables, for the API identity alone. **The gateway identity holds no grant
+and has no path to the data**; it reaches it only through the API. How to extend it, the limits, the grants and the
+operational notes are in [DATA-ACCESS](../m365-channel/DATA-ACCESS.md).
+
+**A Microsoft Fabric data agent was evaluated and is not used.** It would add free-form questions, but it runs as a
+service identity here (no on-behalf-of for Bot Service integrations, above), lets a model write the query, which
+conflicts with *tools calculate* and with the numeric guard, gives no control of the model it uses, and cannot carry
+our lanes or our per-client predicate. The conditions under which a sandbox-only exploratory lane could be enabled
+are in [DATA-ACCESS §9](../m365-channel/DATA-ACCESS.md#9-evaluation-a-microsoft-fabric-data-agent-as-an-optional-provider-not-built).
+
 ## Alternatives considered
 
 | Alternative | Why not |
