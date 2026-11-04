@@ -89,6 +89,11 @@ azd provision --no-prompt
 Check: a call from the agent still succeeds; the gateway log line "caller authorised" shows the role
 path, not the allow-list.
 
+Related, and also an owner action (RM-16, D-120, D-137): `CHANNEL_CALLER_CHANNELS` is **unset** on the live gateway, so every registered caller keeps
+enum-level channel trust and the gateway warns at startup. To bind callers to the channels they may assert, set it to
+`<agent app id>=teams|m365-copilot` (the agent's app id is in the private notes; **never set it without the orchestrator's own entry**, the
+gateway would then refuse the orchestrator), run `azd provision` (or set the app setting), then send `/whoami` and one question.
+
 ## 4. The mock model gateway
 
 The mock OpenAI-compatible gateway is a proof-of-concept tool that validates token shape, not
