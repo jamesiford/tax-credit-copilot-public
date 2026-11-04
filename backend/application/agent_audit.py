@@ -10,8 +10,8 @@ against the facts — the channel's composer does that. The portal chat streams 
 model's prose unvalidated, so its rows say FALSE, because anything else would be
 a claim the code cannot back.
 
-Recording never changes or interrupts the answer: a failure is logged and the
-stream carries on.
+Recording never changes or interrupts the answer: a failure is logged, raises the
+`audit_write_failed` alert (`application.audit_alert`) and the stream carries on.
 """
 from __future__ import annotations
 
@@ -22,6 +22,7 @@ import uuid
 from collections.abc import Sequence
 from dataclasses import dataclass
 
+from application.audit_alert import audit_write_failed
 from domain.channel import AgentActionAuditRepository, AgentActionAudit, utcnow
 
 log = logging.getLogger("tcc.agent_audit")
@@ -85,6 +86,7 @@ class AgentActionRecorder:
             action = to_action(invocation)
             self._repository.append(action)
             return action
-        except Exception:  # noqa: BLE001 - an audit failure must not break an answer
+        except Exception as exc:  # noqa: BLE001 - an audit failure must not break an answer, and must not be silent
             log.exception("could not record agent action for %s", invocation.agent_name)
+            audit_write_failed("agent_audit", "record", exc, fatal=False)
             return None

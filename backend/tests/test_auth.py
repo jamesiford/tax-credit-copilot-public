@@ -202,7 +202,7 @@ def test_writes_are_attributed_to_the_token_not_the_body(entra, api, tmp_path):
 
 
 def test_none_mode_is_anonymous_and_keeps_the_request_attribution(monkeypatch, api, tmp_path):
-    monkeypatch.delenv("AUTH_MODE", raising=False)
+    monkeypatch.setenv("AUTH_MODE", "none")
     body = api.get("/api/me").json()
     assert body["auth_mode"] == "none" and body["authenticated"] is False and body["upn"] is None
 
@@ -233,8 +233,10 @@ def test_the_default_authorizer_allows_every_client():
     "env, refused",
     [
         ({"ENVIRONMENT": "azure", "DATA_CLASSIFICATION": "customer", "AUTH_MODE": "none"}, True),
-        ({"ENVIRONMENT": "azure", "DATA_CLASSIFICATION": "customer"}, True),   # none is the default
-        ({"ENVIRONMENT": "azure", "DATA_CLASSIFICATION": "synthetic", "AUTH_MODE": "none"}, False),
+        ({"ENVIRONMENT": "azure", "DATA_CLASSIFICATION": "customer", "AUTH_MODE": "none",
+          "ALLOW_ANONYMOUS_SYNTHETIC": "1"}, True),   # the demo flag never covers customer data
+        ({"ENVIRONMENT": "azure", "DATA_CLASSIFICATION": "synthetic", "AUTH_MODE": "none",
+          "ALLOW_ANONYMOUS_SYNTHETIC": "1"}, False),
         ({"ENVIRONMENT": "local", "DATA_CLASSIFICATION": "customer", "AUTH_MODE": "none"}, False),
         ({"ENVIRONMENT": "azure", "DATA_CLASSIFICATION": "customer", "AUTH_MODE": "entra",
           "AUTH_TENANT_ID": TENANT, "API_AUDIENCE": AUDIENCE}, False),

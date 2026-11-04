@@ -21,6 +21,7 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field
 
 from application.agent_audit import AgentInvocation
+from application.audit_alert import audit_write_failed
 from application.channel_audit import AuditCall
 from channel.auth import Caller
 
@@ -73,10 +74,14 @@ class NarrationAudit:
             },
             is_deterministic_path=passed,
         )
-        audit_id = self._auditor.record_read(
-            call, "ok" if passed else "rejected_by_guard", numeric_guard=report.guard_status,
-            error=None if passed else f"{report.violations_count} figure(s) not in the tool facts",
-        )
+        try:
+            audit_id = self._auditor.record_read(
+                call, "ok" if passed else "rejected_by_guard", numeric_guard=report.guard_status,
+                error=None if passed else f"{report.violations_count} figure(s) not in the tool facts",
+            )
+        except Exception as exc:
+            audit_write_failed("narration", "report", exc, fatal=True)
+            raise
         return {"audit_id": audit_id, "agent_action_recorded": self._agent_row(caller, report, passed)}
 
     def _agent_row(self, caller: Caller, report: NarrationReport, passed: bool) -> bool:
@@ -87,4 +92,7 @@ class NarrationAudit:
             prompt_sha256=report.prompt_sha256, intent="channel narration",
             output_note=f"guard={report.guard_status}; violations={report.violations_count}; {report.output_summary}",
         )
-        return self._recorder.record(invocation) is not None
+        recorded = self._recorder.record(invocation) is not None
+        if not recorded:
+            audit_write_failed("narration", "agent_action_row", "agent_row_not_recorded", fatal=False)
+        return recorded

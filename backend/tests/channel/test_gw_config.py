@@ -103,6 +103,7 @@ def test_the_entry_point_does_not_bind_when_misconfigured(monkeypatch):
 def test_the_entry_point_builds_when_configured(monkeypatch):
     for name, value in ENV.items():
         monkeypatch.setenv(name, value)
+    monkeypatch.delenv("AUTH_MODE")  # the suite opts the API into `none`; the gateway has no such mode
     monkeypatch.delitem(sys.modules, "channel.main", raising=False)
     module = importlib.import_module("channel.main")
     assert module.app.title == "Tax Credit Copilot channel gateway"

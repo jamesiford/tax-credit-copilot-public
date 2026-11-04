@@ -658,6 +658,7 @@ def test_a_deployed_process_refuses_a_non_durable_channel_store(value):
     from application.deployment import DeploymentConfigurationError, check_deployment_configuration
 
     env = {"ENVIRONMENT": "azure", "DATA_CLASSIFICATION": "synthetic", "CLAIM_STORE": "warehouse",
+           "AUTH_MODE": "none", "ALLOW_ANONYMOUS_SYNTHETIC": "1",
            "FINDING_STORE": "warehouse", "RUN_MANIFEST_STORE": "warehouse", "ARTIFACT_STORE": "blob",
            "ARTIFACT_REPOSITORY": "warehouse", "CHANNEL_STORE": value}
     with pytest.raises(DeploymentConfigurationError, match="CHANNEL_STORE"):

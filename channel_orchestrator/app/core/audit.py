@@ -61,5 +61,5 @@ class NarrationAuditor:
             return "ok"
         self.failures += 1
         self.last_error = reply.error_code
-        log.error("narration audit failed: %s", reply.error_code)
+        log.error("audit_write_failed source=narration operation=report error_code=%s", reply.error_code)
         return "failed"

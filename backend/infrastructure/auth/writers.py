@@ -8,9 +8,11 @@ what the business believes — and three sources can answer it:
 - membership of one Entra group, asked of Microsoft Graph,
 - either.
 
-Every adapter FAILS CLOSED. A Graph outage, a 403 for a missing permission or a
-malformed reply means "not a writer": denying a legitimate writer for a minute is
-an inconvenience, granting a non-writer is a change on a filed return.
+Every adapter FAILS CLOSED. A Graph outage, a 403 for a missing permission, a
+malformed reply or a database error means "not a writer": denying a legitimate
+writer for a minute is an inconvenience, granting a non-writer is a change on a
+filed return. Each failure is logged as `writer_check_failed` naming the source
+(`application.writer_alert`), so a broken source cannot hide behind ordinary refusals.
 
 The Graph call itself goes through `graph_client.GraphClient`, which refreshes a
 token that predates a permission grant and retries once [CH-15e]; a refusal that
@@ -18,7 +20,6 @@ survives the retry is still a denial.
 """
 from __future__ import annotations
 
-import logging
 import threading
 import time
 from dataclasses import dataclass, field
@@ -27,9 +28,8 @@ from typing import Callable
 import httpx
 
 from application.identity import WriterEntitlement
+from application.writer_alert import writer_check_failed
 from infrastructure.auth.graph_client import GRAPH_BASE, GRAPH_SCOPE, GraphClient, GraphTokenProvider  # noqa: F401 - GRAPH_SCOPE re-exported
-
-logger = logging.getLogger(__name__)
 
 GRAPH_URL = GRAPH_BASE + "/users/{oid}/checkMemberGroups"
 
@@ -82,22 +82,41 @@ class EntraGroupEntitlement:
             if not isinstance(groups, list):
                 raise ValueError("Graph reply has no value list")
             return self.group_id.lower() in {str(g).lower() for g in groups}
-        except Exception as exc:  # noqa: BLE001 - every failure denies
-            logger.warning("writer group check failed, denying: %s", type(exc).__name__)
+        except Exception as exc:  # noqa: BLE001 - every failure denies, and says so
+            writer_check_failed("entra_group", exc)
             return None
+
+
+@dataclass(frozen=True)
+class DenyOnFailure:
+    """Wraps one source so that a failure to answer is a logged denial, never an exception or a grant.
+
+    The allow-list is a database read: an outage raises. Left bare, that exception would surface as a
+    500 in one path and as an unhandled error in another; wrapped, every path reads the same "no".
+    """
+
+    source: WriterEntitlement
+    name: str
+
+    def is_writer(self, user_oid: str) -> bool:
+        try:
+            return bool(self.source.is_writer(user_oid))
+        except Exception as exc:  # noqa: BLE001 - a source that cannot answer denies
+            writer_check_failed(self.name, exc)
+            return False
 
 
 @dataclass
 class EitherEntitlement:
-    """A writer if ANY source says so. Order is cost: the cheap local list first."""
+    """A writer if ANY source says so. Order is cost: the cheap local list first.
+
+    Each source is wrapped, so a broken one denies (and is logged by name) without granting and
+    without hiding the others.
+    """
 
     sources: tuple[WriterEntitlement, ...]
 
     def is_writer(self, user_oid: str) -> bool:
-        for source in self.sources:
-            try:
-                if source.is_writer(user_oid):
-                    return True
-            except Exception as exc:  # noqa: BLE001 - a broken source must not grant, nor hide the others
-                logger.warning("writer source failed, treating as no: %s", type(exc).__name__)
-        return False
+        return any(
+            DenyOnFailure(source, type(source).__name__).is_writer(user_oid) for source in self.sources
+        )
