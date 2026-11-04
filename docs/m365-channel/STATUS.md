@@ -3,9 +3,7 @@
 Customer-neutral. This file is the only memory a resumed session has; keep it
 truthful. Decisions live in [DECISIONS.md](DECISIONS.md).
 
-Integration branch: `jamesiford-m365-capability-layer` (see D-01 — this session
-runs in a worktree, so `feat/m365-channel` is held by the main checkout). Prompt 6 (CH-13)
-ran on `jamesiford-m365-channel-live-deploy`, fast-forwarded to the tip of `feat/m365-channel` first (D-95).
+Branch of record: `feat/m365-channel` (tag `m365-channel-poc-2026-11-03`); every `wp/*` branch is merged into it. `main` is deliberately untouched at `029b9ad` and a branch split is planned separately ([FINAL-STATE.md](FINAL-STATE.md), [PUSH-CHECKLIST.md](PUSH-CHECKLIST.md)). Earlier work packages ran on session branches (D-01, D-95).
 
 **Blocked-soft work packages from Prompts 1–5: none.** AI-05 (conversation continuity) remains the deliberate stretch deferral (D-60); nothing deployed depends on it.
 
@@ -14,9 +12,7 @@ ran on `jamesiford-m365-channel-live-deploy`, fast-forwarded to the tip of `feat
 known-issue fixes — and **Stage 2 (CH-16, governed data access)** — the semantic model, validated specifications and SQL building,
 the three execution adapters with their limits, the `data_catalog` / `data_query` / `data_distinct_values` tools with the two output
 lanes, the planner, narrator and Cowork changes, the goldens and equivalence tests, and (CH-16f) the documentation, the Terraform/azd
-mapping and the lakehouse-endpoint grants. No work package is blocked. All of it is verified **offline only**; the live redeploy
-(Stage 3, CH-17) is the first time any of it meets Fabric, a real model, Teams or Cowork, and the "unverified offline" lines under
-each work package below are its checklist. Nothing has been pushed.
+mapping and the lakehouse-endpoint grants. No work package is blocked. It was then redeployed and verified live (Stage 3, CH-17; see the CH-17 rows below and [evidence/live-final-2026-11-03.md](evidence/live-final-2026-11-03.md)): hosted agent version 20, app 1.0.3 published, Cowork package v2 built, agent invariants 13 of 13. Stage 4 (CH-18) consolidated in keep-main-untouched mode ([FINAL-STATE.md](FINAL-STATE.md)). Nothing has been pushed.
 
 ## Work packages
 

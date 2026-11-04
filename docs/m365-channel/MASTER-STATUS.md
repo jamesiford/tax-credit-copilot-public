@@ -132,15 +132,15 @@ capacity was raised from 20 to 100 thousand tokens a minute (one in-place Terraf
 published app (1.0.3) and Cowork package (v2) are as built in part B. Final agent version **20**; invariants **13 of 13**.
 Backend gate **4957 passed, 136 skipped, 1 xfailed**. Admin actions outstanding: none (Global Administrator was not needed).
 
-## Stage 4 — CH-18: runs in "keep main untouched" mode (owner change of plan, 3 Nov)
+## Stage 4 — CH-18: done, run in "keep main untouched" mode (owner change of plan, 3 Nov)
 
-`main` stays at `029b9ad2d2c002c09167375748120c7a8af3bc03`; it is never fast-forwarded, merged into, reset or rebased, and
-neither is `origin/main`. No branch is deleted (wp/*, feat/ui-modern-theme, feat/m365-channel, jamesiford-*), and the tag
-`pre-master-2026-11-03` stays. Branch of record: `feat/m365-channel`, tagged `m365-channel-poc-2026-11-03` at its final tip (tags
-only, no push). Worktrees are removed only after proving them clean and fully merged and the live-state folders intact
-(`.azure/tcc-poc-channel/`, `channel_orchestrator/.azure/tcc-orch/`, `overlays/m365-poc/`); otherwise they are left and listed.
-FINAL-STATE.md gets a "Planned branch split (not done)" section and PUSH-CHECKLIST.md records it as an owner decision.
-Status: todo
+- `main` is unchanged at `029b9ad2d2c002c09167375748120c7a8af3bc03`; neither it nor `origin/main` was fast-forwarded, merged into, reset or rebased. No branch was deleted (52 before, 52 after), and no tag was deleted or moved.
+- Branch of record: `feat/m365-channel`, tagged `m365-channel-poc-2026-11-03` at its final tip (local tag only). `git branch --no-merged feat/m365-channel` is empty, tree clean.
+- Safety tags: `pre-master-2026-11-03`, `pre-final-run-2026-11-03`, `pre-consolidation-2026-11-03`.
+- Final gates: backend 4957 passed / 136 skipped / 1 xfailed; frontend 929 passed, build ok; terraform fmt/validate/tflint clean, `terraform test` 70 passed on a clean copy of `infra/` (it fails in the live checkout only because the live overlay file overrides test variables); `check_all` 21/22 (only the working-tree gitleaks row fails, on ignored live state and `.venv`); whitelabel and export audits 0 enforced; tracked-history gitleaks clean; ratchet green; no raster tracked; no private identifier in tracked files.
+- Worktrees: all six others were proven clean and fully merged, and the main checkout's live-state copies were newer than the one worktree that held copies, so they were removed (`git worktree remove`; branches kept). `git worktree list` shows this checkout only. Unregistered leftover folders under the worktree root were left alone.
+- Live state intact in the main checkout: `.azure/tcc-poc-channel/` (with state), `channel_orchestrator/.azure/tcc-orch/`, `overlays/m365-poc/`; `azd env list` shows `tcc-poc-channel` here and `tcc-orch` in `channel_orchestrator/`.
+- Hand-off written: [FINAL-STATE.md](FINAL-STATE.md) (with "Planned branch split (not done)") and [PUSH-CHECKLIST.md](PUSH-CHECKLIST.md). Nothing was pushed.
 
 ## Blockers
 

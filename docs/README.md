@@ -55,6 +55,8 @@ How the system is hosted, connected and run. Read the C4 model first.
 | [m365-channel/COWORK-SETUP.md](m365-channel/COWORK-SETUP.md) · [`channels/cowork/`](../channels/cowork/README.md) | The Cowork plugin: registering the OAuth client, building and installing it, and its known gaps |
 | [m365-channel/KNOWN-LIMITATIONS.md](m365-channel/KNOWN-LIMITATIONS.md) | What the channel does not do |
 | [m365-channel/ORCHESTRATOR.md](m365-channel/ORCHESTRATOR.md) · [PUBLISHING.md](m365-channel/PUBLISHING.md) | The hosted orchestrator, and publishing it to Teams and Copilot |
+| [m365-channel/DATA-ACCESS.md](m365-channel/DATA-ACCESS.md) | Governed data access for the agent: semantic model, structured query, output lanes, limits, and the Fabric Data Agent evaluation |
+| [m365-channel/FINAL-STATE.md](m365-channel/FINAL-STATE.md) · [PUSH-CHECKLIST.md](m365-channel/PUSH-CHECKLIST.md) | What is built and deployed, the branch/tag inventory, the planned branch split, and the owner's checklist before any push |
 | [m365-channel/DECISIONS.md](m365-channel/DECISIONS.md) · [STATUS.md](m365-channel/STATUS.md) | Every decision taken building the channel, and what is done |
 
 ## Data and calculation

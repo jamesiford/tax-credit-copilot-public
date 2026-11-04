@@ -235,7 +235,7 @@ in code; a channel gateway in front of the API serves it and the Cowork plugin (
 every caller, checks who may write, and audits every call per user. Every figure shown is the engine's, and every
 change is a two-step, confirmed, attributed write. Off by default (`enable_m365_channel`); synthetic data only for
 now. Start with [docs/m365-channel/README.md](docs/m365-channel/README.md), then
-[ADR-009](docs/architecture/ADR-009-m365-channel.md) and [KNOWN-LIMITATIONS](docs/m365-channel/KNOWN-LIMITATIONS.md).
+[ADR-009](docs/architecture/ADR-009-m365-channel.md) and [KNOWN-LIMITATIONS](docs/m365-channel/KNOWN-LIMITATIONS.md). The agent can also answer descriptive questions from the Fabric lakehouse and warehouse through a governed, read-only, structured query layer (no model-written SQL): [DATA-ACCESS](docs/m365-channel/DATA-ACCESS.md). Where it stands and what to decide next: [FINAL-STATE](docs/m365-channel/FINAL-STATE.md).
 
 ---
 
