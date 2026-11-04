@@ -81,6 +81,16 @@ with `CHANNEL_DEBUG_WHOAMI`) reports the signals received so the live spike can 
 Whatever the source, the gateway records the assurance as `channel-asserted`: the person did not
 present a token of their own. That is stated in the audit row, not inferred.
 
+## Which framework pattern, where
+
+| Pattern | Used for | Where | Not for |
+| --- | --- | --- | --- |
+| **Agent** (`maf_agent`) | An open-ended question: a model chooses which catalog tools to call | `planner.Planner` (and, as the framework's way to run function middleware without a model, `maf_tool_run`) | A fixed sequence, a confirmation |
+| **Workflow** (`maf_write_flow`, `maf_review_pack`) | A confirmation (prepare, wait for the reader, commit) and a fixed sequence (the review pack) | Started by the pipeline, or by the generated prepare tool | Open Q&A; nothing in a workflow imports a model |
+| **Tool or executor body** | Forward one call as the acting person; move a message | `maf_catalog_tools`, `maf_write_steps`, `maf_review_pack` | Computing, rounding, ranking, summing or formatting a number |
+
+`tests/test_architecture_patterns.py` states each row as a rule over the source, with a registry (and a reason) per exception, and a figure detector proved on seeded violations ([D-132](DECISIONS.md)).
+
 ## Confirming a change
 
 A model may only **prepare**. A prepare tool starts the **write Workflow** (`maf_write_flow`, `maf_write_steps`; MAF `WorkflowBuilder`, three executors):
