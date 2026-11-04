@@ -17,6 +17,11 @@ from application.capabilities.client import client_discovery, client_eligibility
 from domain.calculation.trail import TrailRecorder, reset_recorder, set_recorder
 
 
+def _without_totals(facts: dict[str, Any]) -> dict[str, Any]:
+    """The discovery facts as the scan's narrator has always been handed them: the totals travel to the closing summary only."""
+    return {key: value for key, value in facts.items() if key != "totals"}
+
+
 async def _pipeline_eligibility(app, message: str, *, scope: dict[str, Any] | None = None) -> AsyncIterator[str]:
     request_id = str(uuid.uuid4())
     ctx_token = _TELEMETRY_CONTEXT.set({"app": app, "request_id": request_id, "intent": "eligibility"})
@@ -131,17 +136,16 @@ async def _pipeline_portfolio(app, message: str) -> AsyncIterator[str]:
                                          "List EVERY hit as a short bullet (jurisdiction, credit name, lifetime credit, citation). "
                                          "This is the full portfolio — do NOT exclude Georgia. "
                                          "Then call out which packs were considered but produced no hit, and why.",
-                                         result,
+                                         _without_totals(result),
                                      )):
             yield f
 
-        total_lifetime = sum(h["lifetime_credit_usd"] for h in result["hits"])
-        total_annual = sum(h["annual_credit_usd"] for h in result["hits"])
+        totals = result["totals"]
         async for f in _stream_agent("ReportingAgent", _brief(
                                          f"Summarize the full multi-state portfolio for an exec. Original question:\n{_question(message)}",
-                                         {"portfolio_total_annual_usd": total_annual,
-                                          "portfolio_total_lifetime_usd": total_lifetime,
-                                          "hit_count": len(result["hits"]),
+                                         {"portfolio_total_annual_usd": totals["annual_credit_usd"],
+                                          "portfolio_total_lifetime_usd": totals["lifetime_credit_usd"],
+                                          "hit_count": totals["hit_count"],
                                           "hits": result["hits"]},
                                      )):
             yield f
@@ -171,15 +175,15 @@ async def _pipeline_discovery(app, message: str) -> AsyncIterator[str]:
         async for f in _stream_agent("CreditDiscoveryAgent", _brief(
                                          "List each hit as a short bullet (jurisdiction, credit name, "
                                          "rough lifetime credit, citation). Mention which packs were considered.",
-                                         result,
+                                         _without_totals(result),
                                      )):
             yield f
 
         # Reporting closes with an exec line about the discovery total.
-        total_lifetime = sum(h["lifetime_credit_usd"] for h in result["hits"])
+        totals = result["totals"]
         async for f in _stream_agent("ReportingAgent", _brief(
                                          f"Summarize the discovery scan for an exec. Original question:\n{_question(message)}",
-                                         {"total_other_credits_lifetime_usd": total_lifetime, "hit_count": len(result["hits"]), "hits": result["hits"]},
+                                         {"total_other_credits_lifetime_usd": totals["lifetime_credit_usd"], "hit_count": totals["hit_count"], "hits": result["hits"]},
                                      )):
             yield f
 

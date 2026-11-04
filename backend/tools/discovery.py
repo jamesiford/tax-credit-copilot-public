@@ -80,5 +80,14 @@ def discover_credits(
                 citation=h["citation"],
             )
 
-    return {"hits": hits, "packs_considered": considered, "excluded": sorted(exclude)}
+    return {"hits": hits, "packs_considered": considered, "excluded": sorted(exclude), "totals": _totals(hits)}
+
+
+def _totals(hits: list[dict[str, Any]]) -> dict[str, Any]:
+    """The sums of the hits, taken here so that no adapter has to add figures of its own [RM-13]."""
+    return {
+        "hit_count": len(hits),
+        "annual_credit_usd": sum(h["annual_credit_usd"] for h in hits),
+        "lifetime_credit_usd": sum(h["lifetime_credit_usd"] for h in hits),
+    }
 
