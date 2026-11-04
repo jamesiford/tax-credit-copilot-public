@@ -28,12 +28,14 @@ from app.core.audit import NarrationAuditor
 from app.core.compose import provenance_footer
 from app.core.gateway_client import GatewayClient
 from app.core.identity import ActingIdentity
+from app.core.maf_review_pack import run_review_pack
 from app.core.maf_write_flow import cancel_pending, commit_pending, drop_pending
 from app.core.planned import Planned
 from app.core.planner import Planner
+from app.core.review_pack import CALL_LIMIT, MODE, wants_review_pack
 from app.core.settings import OrchestratorSettings
 from app.core.state import ConversationState, StateStore
-from app.core.tools import Clarification, ToolRunner
+from app.core.tools import Clarification, ToolRunner, years_in
 from app.core.writes import CommitOutcome, parse_command
 from application.composer import Composed
 
@@ -117,6 +119,8 @@ class TurnPipeline:
         """
         choices, asked = state.candidates, state.question
         state.candidates, state.question = [], ""
+        if not choices and wants_review_pack(asked) and len(text.split()) == 1 and years_in(text):
+            return f"{asked} {text.strip()}", None  # the year a pack was waiting for
         if not choices or not text.strip().isdigit():
             return text, None
         index = int(text.strip())
@@ -130,11 +134,12 @@ class TurnPipeline:
     # --------------------------------------------------------------------- answer
 
     async def _answer(self, question: str, who: ActingIdentity, state: ConversationState, chosen: int | None) -> TurnReply:
+        pack = wants_review_pack(question)
         runner = ToolRunner(
-            self._gateway, who, state, question, self._s.max_tool_calls, self._s.confirm_ttl_seconds, self._clock,
-            client_id=chosen,
+            self._gateway, who, state, question, CALL_LIMIT if pack else self._s.max_tool_calls, self._s.confirm_ttl_seconds,
+            self._clock, client_id=chosen,
         )
-        planned = await self._planner.plan(runner)
+        planned = await (run_review_pack(runner, self._s.ai.safety.output_allowed_hosts) if pack else self._planner.plan(runner))
         state.remember("user", question)
         if runner.clarify:
             return await self._ask(runner, planned, who, state, question)
@@ -162,12 +167,16 @@ class TurnPipeline:
             parts.append(replies.failure(runner.problems))
         if runner.flow is not None:
             parts.append(replies.CONFIRM_HINT)
+        if planned.mode == MODE:
+            parts.append(replies.REVIEW_PACK_NEXT)
         return "\n\n".join(p for p in parts if p)
 
     async def _ask(self, runner: ToolRunner, planned: Planned, who: ActingIdentity, state: ConversationState, question: str) -> TurnReply:
         clarify = runner.clarify
         if clarify.kind == "client":
             state.candidates, state.question = [dict(c) for c in clarify.candidates], question
+        elif clarify.kind == "year" and wants_review_pack(question):
+            state.question = question  # the next message may be just the year
         text = replies.clarification(clarify)
         audit = await self._auditor.report(who, planned, runner, None, text)
         return TurnReply(text, "clarify", planned.mode, tuple(runner.tool_names), audit=audit)

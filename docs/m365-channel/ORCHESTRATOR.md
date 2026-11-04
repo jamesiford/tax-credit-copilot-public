@@ -20,7 +20,7 @@ flowchart TD
     D --> N{numbered reply to a client question?}
     N -- yes --> S[client chosen by code; earlier question resumes]
     N -- no --> P
-    S --> P[planner]
+    S --> P["planner (the Agent), or the review pack Workflow when it is asked for by name"]
     P --> T["tools mode (the planner): MAF Agent drives the model's tool calls\ndegraded, no tool-calling model: json mode (model returns a plan) or keywords (platform table, no model)"]
     T --> TR["MAF function middleware: budget, refusal, client, year and method, schema; then the call and the fact ledger"]
     TR --> G[(channel gateway: authenticate, entitle, audit, forward)]
@@ -34,8 +34,8 @@ flowchart TD
 ```
 
 `TurnPipeline.handle` (`app/core/turn.py`) is that diagram. The pieces are in `app/core/`:
-`identity`, `state`, `toolset`/`tools` (the turn's state), `reader_arguments`, `planner`, the `maf_*` modules (the
-framework layer: `maf_agent`, `maf_catalog_tools`, `maf_tool_rules`, `maf_tool_call`, `maf_tool_run`), `models`,
+`identity`, `state`, `toolset`/`tools` (the turn's state), `reader_arguments`, `planner` (the Agent planner) and `degraded` (the two degraded planners), `planned` (the one compose path), `review_pack` (what the pack asks for and runs), the `maf_*` modules (the
+framework layer: `maf_agent`, `maf_catalog_tools`, `maf_tool_rules`, `maf_tool_call`, `maf_tool_run`, `maf_write_steps`, `maf_write_flow`, `maf_review_pack`), `models`,
 `compose`, `writes`, `replies`, `gateway_client`, `settings`; `app/host.py` and `app/main.py` are the hosting shell.
 
 ## What no model controls
@@ -114,6 +114,19 @@ The preview is shown with *Reply **confirm** to apply this change, or **cancel**
 for it, an attempt is refused and recorded (`TurnReply.refused`), and `test_orch_structure.py` fails the
 build if a commit name or `commit_pending` call appears outside `writes.py` / `turn.py`, and
 `test_architecture_patterns.py` fails it if the commit executor or `send_commit` is reached from anywhere but the workflow.
+
+## The client review pack
+
+The second MAF Workflow ([D-131](DECISIONS.md)) is a fixed, read-only sequence the reader asks for by name ("client review pack for X", "client briefing", "credit review"). It runs with no model: the Agent is for open questions, a Workflow for a sequence that is always the same.
+
+```mermaid
+flowchart LR
+    Q["'client review pack for X'"] --> R[ResolveClient: by code or a question back]
+    R --> S1[situation] --> S2["eligibility: both certified methods"] --> S3[trend] --> S4[at risk] --> S5[other programmes]
+    S5 --> CK[Check: something answered] --> CO["Compose: engine blocks, verbatim composer, numeric guard"]
+```
+
+Each step is `ToolRunner.run` on one catalog capability, so it passes through the same budget, client, year, method and schema rules as an Agent's call and ends in the same gateway call; no executor computes a figure, and the reply is the platform's blocks through the composer and the numeric guard. It has no what-if, data or write step: those are the Agent's and the write Workflow's ([F-14](REMEDIATION-FINDINGS.md)), and the reply says so in one fixed sentence. A missing year or an ambiguous client is asked for, and the next message resumes the pack.
 
 ## When the guard rejects the narration
 

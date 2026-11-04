@@ -14,6 +14,10 @@ from app.core.tools import Clarification, Problem
 CONFIRM_WORDS = ("confirm", "yes, apply", "yes apply")
 CANCEL_WORDS = ("cancel",)
 CONFIRM_HINT = "Reply **confirm** to apply this change, or **cancel** to drop it."
+REVIEW_PACK_NEXT = (
+    "_This is the review pack's read-only position. Ask for a what-if (a location and a size), a question about the data, "
+    "or to walk through the calculation to go deeper; any change is previewed and needs your confirmation._"
+)
 
 UNATTRIBUTED = (
     "I can't tell who you are in this conversation, so I won't run anything. "
