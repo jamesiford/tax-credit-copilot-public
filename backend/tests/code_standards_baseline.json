@@ -294,7 +294,7 @@
   "function-lines|api/_payperiods.py::iter_state_packs": 44,
   "function-lines|api/chat/dispatch.py::_dispatch": 86,
   "function-lines|api/chat/pipelines_core.py::_pipeline_eligibility": 92,
-  "function-lines|api/chat/pipelines_core.py::_pipeline_portfolio": 42,
+  "function-lines|api/chat/pipelines_core.py::_pipeline_portfolio": 41,
   "function-lines|api/chat/pipelines_whatif.py::_pipeline_simulate": 54,
   "function-lines|api/eligibility.py::eligibility": 41,
   "function-lines|api/forecast.py::forecast": 47,

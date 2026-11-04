@@ -154,18 +154,20 @@ class SqliteGoldReader(GoldReader):
         return [self._run(s) for s in statements]
 
 
-def run_engine(warehouse: SqliteWarehouse, tmp_dir: Any) -> None:
+def run_engine(warehouse: SqliteWarehouse, tmp_dir: Any, claims: Any = None) -> None:
     """Replay the synthetic payroll through the real command, writing to `warehouse` with the real writer.
 
     The command also records a claim and reads saved base years, so both stores are private to the call
-    (see `test_run_client_calculation`): nothing here may reach the operational database.
+    (see `test_run_client_calculation`): nothing here may reach the operational database. A caller that
+    wants the claim the run recorded passes its own `claims` repository and keeps it open.
     """
     from application import wiring
     from application.commands.run_client_calculation import RunClientCalculationCommand
     from infrastructure.persistence.memory_overrides import InMemoryManualOverrideRepository
     from infrastructure.persistence.sqlite_claims import SqliteClaimRepository
 
-    claims, original = SqliteClaimRepository(tmp_dir / "claims.db"), wiring.get_claim_repository()
+    kept = claims is not None
+    claims, original = claims if kept else SqliteClaimRepository(tmp_dir / "claims.db"), wiring.get_claim_repository()
     wiring.set_gold_writer(OfflineGoldWriter(warehouse))  # type: ignore[arg-type]
     wiring.set_claim_repository(claims)
     wiring.set_override_repository(InMemoryManualOverrideRepository())
@@ -175,7 +177,8 @@ def run_engine(warehouse: SqliteWarehouse, tmp_dir: Any) -> None:
         wiring.set_gold_writer(None)
         wiring.set_claim_repository(original)
         wiring.set_override_repository(None)
-        claims.close()
+        if not kept:
+            claims.close()
 
 
 def data_service(warehouse: SqliteWarehouse) -> DataQueryService:
