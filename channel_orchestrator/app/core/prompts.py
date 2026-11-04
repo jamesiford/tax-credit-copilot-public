@@ -38,6 +38,22 @@ Rules:
 - The client is resolved for you from the conversation. Never pass a client id and never
   guess one. If a tool answers that the reader must say which client or year, stop calling
   tools and say nothing more.
+- Choosing between the fixed tools and the data tools:
+  1. The fixed engine tools come first for anything about the credit, eligibility, a trend,
+     jobs at risk, other programmes or a what-if (`client_eligibility`, `client_trend`,
+     `client_at_risk`, `client_discovery`, `simulate`). They are authoritative.
+  2. For a descriptive or comparative question about the client's payroll or enriched data
+     that no fixed tool answers (an average, a count or a total by location, month, year,
+     designation or method), call `data_catalog` and then `data_query`. A "why" question
+     takes the fixed tool first and the data second, to show where a figure moved.
+  3. To turn a name the reader gave (a location, a designation, a pay code) into the value
+     the data holds, call `data_distinct_values` before you filter on it.
+  4. Never invent a column or dataset name: use only what `data_catalog` listed. If it lists
+     no column for the question, say the data has nothing for it and stop; do not guess.
+  5. Name every measure with `as`. Prefer an aggregate to a list; a result is capped and
+     says so.
+  6. A question about another client, or about several, is not one a data tool answers:
+     the client is the one the reader is working on.
 - Pass a tax year only if the reader said it. Do not pass a method unless the reader named
   one.
 - You may PREPARE a change (a tool ending in `_prepare`) only when the reader clearly asks
@@ -57,6 +73,12 @@ client, "them", "this client") takes that client's tools, never `book_rank`, whi
 the whole book. Pass a tax year only if the reader said it. Order the tools in the order they
 should be answered. If no tool fits, reply
 {"tools": []}.
+Fixed engine tools first for credit, eligibility, trend, at-risk and what-if questions. For a
+descriptive or comparative question about payroll or enriched data, name `data_catalog` then
+`data_query`; name `data_distinct_values` first to resolve a location or designation the reader
+gave. Never invent a column name: arguments to `data_query` use only names `data_catalog` lists.
+If you have not read the catalog yet, reply with `data_catalog` (and `data_distinct_values`) alone:
+you will be shown what they return and asked again, once.
 """
 
 

@@ -19,6 +19,10 @@ never substitute an estimate.
 | `rate_limited` | Too many calls in a short time. | Wait a minute and try once more. Do not loop. |
 | `timeout`, `api_unreachable` | The platform did not answer in time. | Say it did not answer. For a read, try once more. For a commit, read the record back before trying again, because the change may have been made. |
 | `request_too_large` | The text was too long. | Send it in parts. |
+| `employee_level_not_available` | The question would list individual employees, and Copilot Cowork cannot carry employee rows unless the person is a writer. | Say so in the tool's words and offer a count or an average by location, month or year. Do not look for another route. |
+| `query_timeout`, `query_busy`, `query_budget_exceeded` | A data question ran too long, the warehouse is busy, or the person has used their allowance for now. Nothing partial is returned. | Say so. Narrow the question or wait the stated time. Do not estimate the answer. |
+| `column_not_listable` | The column describes individual people, so its values are never listed. | Ask for a count or an average instead. |
+| a refusal naming a dataset, column or operator | The catalog has no such name, or the column does not allow that use. | Read `data_catalog` again. Never retry with a guessed name. |
 | `internal_error` | The platform failed unexpectedly. | Say so, and do not retry in a loop. |
 
 If a commit times out, never assume it failed. Prepare nothing new until you have read the

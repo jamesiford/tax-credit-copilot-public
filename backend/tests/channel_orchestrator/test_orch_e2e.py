@@ -60,7 +60,9 @@ def test_a_read_is_judged_by_the_real_guard_and_leaves_a_narration_row_under_the
     assert (event.numeric_guard, event.outcome, event.is_deterministic_path, event.conversation_id) == ("pass", "ok", True, "conv-1")
     assert event.identity_assurance == "channel-asserted" and event.tool_name == "narration"
     (action,) = gw.actions.recent()
-    assert action.is_deterministic_path is True and action.agent_version == "7+prompt2" and "client_trend" in action.tool_calls
+    from app.core.prompts import narrator_instructions
+
+    assert action.is_deterministic_path is True and action.agent_version == f"7+prompt{narrator_instructions()[1]}" and "client_trend" in action.tool_calls
     reads = [e for e in gateway_audit.for_user(USER_OID) if e.tool_name == "client_trend"]
     assert {e.user_oid for e in reads} == {USER_OID} and reads
 

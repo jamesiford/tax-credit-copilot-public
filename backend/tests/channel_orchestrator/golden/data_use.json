@@ -1,0 +1,295 @@
+[
+  {
+    "name": "use_descriptive_by_location",
+    "turns": [{
+      "say": "For Northwind, what is the average headcount at each location?",
+      "model": [{"tools": [{"tool": "data_catalog", "args": {"dataset": "unit_month_summary"}},
+                           {"tool": "data_query", "args": {"dataset": "unit_month_summary", "select": ["worksite_id"], "measures": [{"column": "average_headcount", "agg": "avg", "as": "avg_headcount"}]}}]},
+                {"text": "{{facts.data_query.rows.0.worksite_id}} leads the table with an average headcount of {{facts.data_query.rows.0.avg_headcount|headcount}}."}],
+      "expect": {"kind": "answer", "mode": "tools", "gateway": ["data_catalog", "client_resolve", "data_query"], "guard": "pass", "narration_used": true,
+                 "args": {"data_query": {"client_id": 2002, "dataset": "unit_month_summary"}},
+                 "contains": ["worksite_id-2002-0 leads the table with an average headcount of 3.5", "Source: warehouse tcc_gold.unit_month_summary"],
+                 "absent": ["Queryable data"]}
+    }]
+  },
+  {
+    "name": "use_descriptive_by_month",
+    "turns": [{
+      "say": "For Northwind, what was the total headcount in the first month, by year?",
+      "model": [{"tools": [{"tool": "data_query", "args": {"dataset": "unit_month_summary", "select": ["tax_year"], "measures": [{"column": "month_01", "agg": "sum", "as": "first_month"}], "order_by": [{"column": "tax_year", "direction": "asc"}]}}]},
+                {"text": "The table gives the first month's headcount for each year, {{facts.data_query.row_count}} rows in all."}],
+      "expect": {"kind": "answer", "gateway": ["client_resolve", "data_query"], "guard": "pass", "narration_used": true,
+                 "contains": ["Query result · unit_month_summary", "first_month"], "absent": ["Queryable data"]}
+    }]
+  },
+  {
+    "name": "use_descriptive_by_designation",
+    "turns": [{
+      "say": "For Northwind, how many eligible jobs sit under each designation?",
+      "model": [{"tools": [{"tool": "data_query", "args": {"dataset": "unit_year_master", "select": ["designation"], "measures": [{"column": "eligible_jobs", "agg": "sum", "as": "jobs"}]}}]},
+                {"text": "{{facts.data_query.rows.0.designation}} carries {{facts.data_query.rows.0.jobs|headcount}} eligible jobs."}],
+      "expect": {"kind": "answer", "gateway": ["client_resolve", "data_query"], "guard": "pass", "narration_used": true,
+                 "contains": ["designation-2002-0 carries 7", "Current rows only; superseded rows are excluded."]}
+    }]
+  },
+  {
+    "name": "use_a_name_is_resolved_to_the_data_value_before_filtering",
+    "turns": [{
+      "say": "For Northwind, what is the average headcount at the first worksite?",
+      "model": [{"tools": [{"tool": "data_distinct_values", "args": {"dataset": "unit_month_summary", "column": "worksite_id"}}]},
+                {"tools": [{"tool": "data_query", "args": {"dataset": "unit_month_summary", "select": ["worksite_id"],
+                            "filters": [{"column": "worksite_id", "op": "eq", "value": "worksite_id-2002-0"}],
+                            "measures": [{"column": "average_headcount", "agg": "avg", "as": "avg_headcount"}]}}]},
+                {"text": "At {{facts.data_query.rows.0.worksite_id}} the average headcount is {{facts.data_query.rows.0.avg_headcount|headcount}}."}],
+      "expect": {"kind": "answer", "gateway": ["client_resolve", "data_distinct_values", "data_query"], "guard": "pass", "narration_used": true,
+                 "args": {"data_distinct_values": {"client_id": 2002}, "data_query": {"client_id": 2002}},
+                 "contains": ["At worksite_id-2002-0 the average headcount is 3.5"], "absent": ["Distinct values"]}
+    }]
+  },
+  {
+    "name": "use_compares_the_two_methods_from_the_run_summary",
+    "turns": [{
+      "say": "For Northwind, how many employees did each method find eligible, by year?",
+      "model": [{"tools": [{"tool": "data_query", "args": {"dataset": "run_method_summary", "select": ["method", "tax_year"], "measures": [{"column": "eligible_employees", "agg": "max", "as": "eligible"}]}}]},
+                {"text": "The table sets the two methods side by side; {{facts.data_query.rows.0.method}} found {{facts.data_query.rows.0.eligible}} eligible."}],
+      "expect": {"kind": "answer", "gateway": ["client_resolve", "data_query"], "guard": "pass", "narration_used": true,
+                 "contains": ["Method: both Min-Max and Pay Period, each row labelled.", "min_max", "pay_period"]}
+    }]
+  },
+  {
+    "name": "use_counts_over_person_level_data_reach_the_model_as_aggregates",
+    "turns": [{
+      "say": "For Northwind, how many employees did each method find eligible?",
+      "model": [{"tools": [{"tool": "data_query", "args": {"dataset": "employee_eligibility", "select": ["method"],
+                            "filters": [{"column": "eligible", "op": "eq", "value": true}], "measures": [{"column": "*", "agg": "count", "as": "eligible_employees"}]}}]},
+                {"text": "{{facts.data_query.rows.0.method}} found {{facts.data_query.rows.0.eligible_employees}} eligible employees."}],
+      "expect": {"kind": "answer", "gateway": ["client_resolve", "data_query"], "guard": "pass", "narration_used": true,
+                 "contains": ["min_max found 2 eligible employees."], "model_never_sees": ["record_token-2002"]}
+    }]
+  },
+  {
+    "name": "use_a_method_the_reader_named_is_kept",
+    "turns": [{
+      "say": "For Northwind, under the Pay Period method only, which worksites are there?",
+      "model": [{"tools": [{"tool": "data_query", "args": {"dataset": "unit_month_summary", "select": ["worksite_id"], "method": "pay_period"}}]},
+                {"text": "These are the worksites the Pay Period rows cover, {{facts.data_query_pay_period.row_count}} rows in all."}],
+      "expect": {"kind": "answer", "gateway": ["client_resolve", "data_query"], "guard": "pass", "narration_used": true,
+                 "args": {"data_query": {"method": "pay_period"}}, "contains": ["Method: pay_period only."]}
+    }]
+  },
+  {
+    "name": "use_why_question_takes_the_fixed_tool_then_the_data",
+    "turns": [{
+      "say": "Why did Northwind's headcount move over the years?",
+      "model": [{"tools": [{"tool": "client_trend", "args": {}}]},
+                {"tools": [{"tool": "data_query", "args": {"dataset": "unit_month_summary", "select": ["tax_year"], "measures": [{"column": "total", "agg": "sum", "as": "year_total"}]}}]},
+                {"text": "The engine's trend is the first table; the second shows the monthly totals under it. The data shows when it moved, not why."}],
+      "expect": {"kind": "answer", "gateway": ["client_resolve", "client_trend", "data_query"], "guard": "pass", "narration_used": true,
+                 "contains": ["Trend", "Query result · unit_month_summary", "not why"]}
+    }]
+  },
+  {
+    "name": "use_why_question_keeps_the_engine_figure_and_the_data_apart",
+    "turns": [{
+      "say": "Why is Northwind's annual credit what it is for 2023?",
+      "model": [{"tools": [{"tool": "client_eligibility", "args": {"tax_year": 2023}}]},
+                {"tools": [{"tool": "data_query", "args": {"dataset": "unit_year_master", "select": ["worksite_id"], "measures": [{"column": "annual_credit_usd", "agg": "sum", "as": "credit"}]}}]},
+                {"text": "The engine's credit for the year is {{facts.client_eligibility_min_max.credit.annual_credit_usd|money}} under Min-Max and {{facts.client_eligibility_pay_period.credit.annual_credit_usd|money}} under Pay Period. The data table shows no rows for that year, so it adds nothing to it."}],
+      "expect": {"kind": "answer", "gateway": ["client_resolve", "client_eligibility", "client_eligibility", "data_query"], "guard": "pass", "narration_used": true,
+                 "args": {"data_query": {"tax_years": [2023]}}, "contains": ["$227,605", "$643,125", "No rows matched."]}
+    }]
+  },
+  {
+    "name": "refuse_a_column_the_catalog_does_not_list_is_a_catalog_miss",
+    "turns": [{
+      "say": "For Northwind, what was each employee's commute distance?",
+      "model": [{"tools": [{"tool": "data_catalog", "args": {"search": "commute"}}]},
+                {"text": "The data has nothing for that, so I can't answer it from here, and I haven't guessed a column."}],
+      "expect": {"kind": "answer", "gateway": ["data_catalog"], "guard": "pass", "narration_used": true,
+                 "contains": ["The data has nothing for that", "No dataset or column matches that search"]}
+    }]
+  },
+  {
+    "name": "refuse_an_invented_column_is_refused_by_the_validator",
+    "turns": [{
+      "say": "For Northwind, what is the commute distance by location?",
+      "model": [{"tools": [{"tool": "data_query", "args": {"dataset": "unit_month_summary", "select": ["worksite_id", "commute_distance"]}}]},
+                {"text": "Here is the commute distance."}],
+      "expect": {"kind": "failure", "gateway": ["client_resolve", "data_query"], "absent": ["Query result"], "contains": ["no such column in this dataset"]}
+    }]
+  },
+  {
+    "name": "refuse_a_blocked_identifier_is_never_selectable",
+    "turns": [{
+      "say": "For Northwind, list the employee ids.",
+      "model": [{"tools": [{"tool": "data_query", "args": {"dataset": "employee_eligibility", "select": ["employee_id"]}}]},
+                {"text": "Here are the ids."}],
+      "expect": {"kind": "failure", "gateway": ["client_resolve", "data_query"], "absent": ["Query result"], "contains": ["employee_id is blocked"]}
+    }]
+  },
+  {
+    "name": "refuse_sql_in_a_filter_value",
+    "turns": [{
+      "say": "For Northwind, show the worksite called x'; DROP TABLE t;--",
+      "model": [{"tools": [{"tool": "data_query", "args": {"dataset": "unit_month_summary", "select": ["worksite_id"],
+                            "filters": [{"column": "worksite_id", "op": "eq", "value": "x'; DROP TABLE t;--"}]}}]},
+                {"text": "Here it is."}],
+      "expect": {"kind": "failure", "gateway": ["client_resolve", "data_query"], "absent": ["Query result"], "contains": ["looks like SQL"]}
+    }]
+  },
+  {
+    "name": "refuse_free_form_sql_has_no_tool",
+    "turns": [{
+      "say": "For Northwind, run this: select * from payroll",
+      "model": [{"tools": [{"tool": "sql_query", "args": {"sql": "select * from payroll"}}]},
+                {"text": "I can't run SQL."}],
+      "expect": {"kind": "help", "gateway": [], "refused": ["sql_query"], "absent": ["Query result"], "contains": ["I couldn't answer that."]}
+    }]
+  },
+  {
+    "name": "lane_employee_rows_go_to_the_person_and_not_the_model",
+    "turns": [{
+      "say": "For Northwind, list the eligible employees with their weekly hours.",
+      "model": [{"tools": [{"tool": "data_query", "args": {"dataset": "employee_eligibility", "select": ["record_token", "avg_weekly_hours"],
+                            "filters": [{"column": "eligible", "op": "eq", "value": true}]}}]},
+                {"text": "The {{facts.data_query.row_count}} employees are listed in the table for you. They describe individual people, so I have not been shown them."}],
+      "expect": {"kind": "answer", "gateway": ["client_resolve", "data_query"], "guard": "pass", "narration_used": true,
+                 "contains": ["record_token-2002-1", "These rows describe individual employees. They are shown to you and are not given to any AI model."],
+                 "model_never_sees": ["record_token-2002"]}
+    }]
+  },
+  {
+    "name": "lane_payroll_hours_by_job_title_is_an_aggregate_the_model_may_see",
+    "turns": [{
+      "say": "For Northwind, what is the average hours by job title?",
+      "model": [{"tools": [{"tool": "data_query", "args": {"dataset": "employee_period_fact", "select": ["job_title"], "measures": [{"column": "hours", "agg": "avg", "as": "avg_hours"}]}}]},
+                {"text": "{{facts.data_query.rows.0.job_title}} averages {{facts.data_query.rows.0.avg_hours|headcount}} hours."}],
+      "expect": {"kind": "answer", "gateway": ["client_resolve", "data_query"], "guard": "pass", "narration_used": true, "contains": ["job_title-2002-0 averages 3.50 hours."]}
+    }]
+  },
+  {
+    "name": "lane_a_person_level_dimension_is_never_listed_even_as_distinct_values",
+    "turns": [{
+      "say": "For Northwind, list every employee token.",
+      "model": [{"tools": [{"tool": "data_distinct_values", "args": {"dataset": "employee_eligibility", "column": "record_token"}}]},
+                {"text": "Here are the tokens."}],
+      "expect": {"kind": "failure", "gateway": ["client_resolve", "data_distinct_values"], "absent": ["Distinct values"], "contains": ["individual people"],
+                 "model_never_sees": ["record_token-2002"]}
+    }]
+  },
+  {
+    "name": "scope_two_named_clients_is_a_question_back",
+    "turns": [{
+      "say": "Compare the monthly headcount of Northwind and Cascade.",
+      "model": [{"tools": [{"tool": "data_query", "args": {"dataset": "unit_month_summary", "select": ["worksite_id"]}}]}],
+      "expect": {"kind": "clarify", "gateway": ["client_resolve"], "absent": ["Query result"]}
+    }]
+  },
+  {
+    "name": "scope_a_filter_on_the_client_column_is_refused",
+    "turns": [{
+      "say": "For Northwind, show the worksites for client 1001 as well.",
+      "model": [{"tools": [{"tool": "data_query", "args": {"dataset": "unit_month_summary", "select": ["worksite_id"], "filters": [{"column": "client_id", "op": "eq", "value": 1001}]}}]},
+                {"text": "Here they are."}],
+      "expect": {"kind": "failure", "gateway": ["client_resolve", "data_query"], "absent": ["Query result"], "contains": ["no such column in this dataset"]}
+    }]
+  },
+  {
+    "name": "scope_another_client_in_the_arguments_is_overwritten_with_the_one_in_the_conversation",
+    "turns": [{
+      "say": "For Northwind, which worksites are there?",
+      "model": [{"tools": [{"tool": "data_distinct_values", "args": {"client_id": 1001, "dataset": "unit_month_summary", "column": "worksite_id"}}]},
+                {"text": "These are the worksites."}],
+      "expect": {"kind": "answer", "gateway": ["client_resolve", "data_distinct_values"], "args": {"data_distinct_values": {"client_id": 2002}},
+                 "contains": ["worksite_id-2002-0"], "absent": ["worksite_id-1001"]}
+    }]
+  },
+  {
+    "name": "result_capped_says_so",
+    "turns": [{
+      "say": "For Northwind, list every worksite by year.",
+      "model": [{"tools": [{"tool": "data_query", "args": {"dataset": "unit_month_summary", "select": ["worksite_id", "tax_year"], "limit": 2}}]},
+                {"text": "The result was capped at {{facts.data_query.row_limit}} rows, so more rows matched than the table shows. Narrow it to one year, or ask for a total."}],
+      "expect": {"kind": "answer", "gateway": ["client_resolve", "data_query"], "guard": "pass", "narration_used": true,
+                 "contains": ["capped at 2 rows", "Showing the first 2 rows; more rows matched and were not returned."]}
+    }]
+  },
+  {
+    "name": "result_no_rows_is_a_result_not_an_error",
+    "turns": [{
+      "say": "For Cascade, which worksites are there?",
+      "model": [{"tools": [{"tool": "data_query", "args": {"dataset": "unit_month_summary", "select": ["worksite_id"]}}]},
+                {"text": "No rows matched for that client."}],
+      "expect": {"kind": "answer", "gateway": ["client_resolve", "data_query"], "args": {"data_query": {"client_id": 2001}},
+                 "contains": ["No rows matched. That is a result about the data, not an error."]}
+    }]
+  },
+  {
+    "name": "failure_a_timeout_says_nothing_partial_was_returned",
+    "overrides": {"data_query": {"status": 504, "error": {"code": "query_timeout", "message": "the query ran past its limit and was cancelled", "retryable": true}}},
+    "turns": [{
+      "say": "For Northwind, what is the average headcount at each location?",
+      "model": [{"tools": [{"tool": "data_query", "args": {"dataset": "unit_month_summary", "select": ["worksite_id"], "measures": [{"column": "average_headcount", "agg": "avg", "as": "avg_headcount"}]}}]},
+                {"text": "Here are the averages."}],
+      "expect": {"kind": "failure", "gateway": ["client_resolve", "data_query"], "absent": ["Query result", "average headcount of"],
+                 "contains": ["the query ran past its limit and was cancelled"]}
+    }]
+  },
+  {
+    "name": "failure_the_query_allowance_is_used_up",
+    "overrides": {"data_query": {"status": 429, "error": {"code": "query_budget_exceeded", "message": "you have used your data question allowance for now; try again shortly", "retryable": true}}},
+    "turns": [{
+      "say": "For Northwind, what is the average headcount at each location?",
+      "model": [{"tools": [{"tool": "data_query", "args": {"dataset": "unit_month_summary", "select": ["worksite_id"]}}]}, {"text": "Here they are."}],
+      "expect": {"kind": "failure", "gateway": ["client_resolve", "data_query"], "absent": ["Query result"], "contains": ["allowance for now"]}
+    }]
+  },
+  {
+    "name": "failure_the_warehouse_is_busy",
+    "overrides": {"data_query": {"status": 503, "error": {"code": "query_busy", "message": "too many data questions are running; try again in a moment", "retryable": true}}},
+    "turns": [{
+      "say": "For Northwind, what is the average headcount at each location?",
+      "model": [{"tools": [{"tool": "data_query", "args": {"dataset": "unit_month_summary", "select": ["worksite_id"]}}]}, {"text": "Here they are."}],
+      "expect": {"kind": "failure", "gateway": ["client_resolve", "data_query"], "absent": ["Query result"], "contains": ["too many data questions are running"]}
+    }]
+  },
+  {
+    "name": "route_a_whole_book_question_never_uses_the_data_tools",
+    "turns": [{
+      "say": "Which of our clients should we call first?",
+      "model": [{"tools": [{"tool": "book_rank", "args": {}}]}, {"text": "Start with {{facts.book_rank.rows.0.name}}."}],
+      "expect": {"kind": "answer", "gateway": ["book_rank"], "guard": "pass", "narration_used": true, "absent": ["Query result", "Queryable data"]}
+    }]
+  },
+  {
+    "name": "route_a_credit_question_uses_the_fixed_tool_only",
+    "turns": [{
+      "say": "What is Northwind's annual credit for 2023?",
+      "model": [{"tools": [{"tool": "client_eligibility", "args": {"tax_year": 2023}}]},
+                {"text": "Under Min-Max the annual credit is {{facts.client_eligibility_min_max.credit.annual_credit_usd|money}}."}],
+      "expect": {"kind": "answer", "gateway": ["client_resolve", "client_eligibility", "client_eligibility"], "guard": "pass", "narration_used": true,
+                 "absent": ["Query result"], "contains": ["$227,605"]}
+    }]
+  },
+  {
+    "name": "route_json_mode_reads_the_catalog_then_plans_the_query",
+    "supports_tools": false,
+    "turns": [{
+      "say": "For Northwind, how many rows does each method have in the unit month summary?",
+      "model": [{"text": "{\"tools\": [{\"tool\": \"data_catalog\", \"args\": {\"dataset\": \"unit_month_summary\"}}]}"},
+                {"text": "{\"tools\": [{\"tool\": \"data_query\", \"args\": {\"dataset\": \"unit_month_summary\", \"select\": [\"method\"], \"measures\": [{\"column\": \"*\", \"agg\": \"count\", \"as\": \"rows_per_method\"}]}}]}"},
+                {"text": "The first method has {{facts.data_query.rows.0.rows_per_method|count}} rows."}],
+      "expect": {"kind": "answer", "mode": "json", "gateway": ["data_catalog", "client_resolve", "data_query"], "guard": "pass", "narration_used": true,
+                 "model_calls": 3, "contains": ["Query result · unit_month_summary", "The first method has 2 rows."]}
+    }]
+  },
+  {
+    "name": "route_no_model_answers_a_data_question_without_a_data_tool",
+    "configured": false,
+    "turns": [{
+      "say": "For Northwind, what is the average headcount at each location?",
+      "model": [],
+      "expect": {"kind": "clarify", "mode": "keywords", "gateway": ["client_resolve"], "absent": ["Query result", "Queryable data"], "model_calls": 0}
+    }]
+  }
+]

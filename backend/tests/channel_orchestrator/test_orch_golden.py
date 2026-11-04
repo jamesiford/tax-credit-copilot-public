@@ -89,6 +89,10 @@ async def play(case: dict) -> None:
             assert text in reply.text, f"missing {text!r} — {where}"
         for text in expect.get("absent", []):
             assert text not in reply.text, f"unexpected {text!r} — {where}"
+        if "model_never_sees" in expect:
+            sent = json.dumps([[m.content for m in call["messages"]] for call in rig.chat.seen[model_turns:]])
+            for secret in expect["model_never_sees"]:
+                assert secret not in sent, f"a model was shown {secret!r} — {where}"
         said.append(turn["say"])
         if reply.kind in ("answer", "commit") and reply.runs:
             verdict = check(

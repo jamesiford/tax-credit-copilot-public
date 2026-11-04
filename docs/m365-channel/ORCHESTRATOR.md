@@ -109,7 +109,22 @@ Besides a bad digit, an unresolvable placeholder or a policy break, a narration 
 
 ## Narration and planning quality (CH-15c)
 
-The narrator prompt (`backend/agents/prompts/channel_narrator.md`, vendored unchanged, version 2) asks for a senior colleague's voice: one to four sentences, the answer first, the engine's own labels, no rank prose, no hedging, the exact `placeholder` copied from `fact_paths`, and six worked examples. The planner's instructions and the tools' descriptions are the model's only guide to choosing a tool: `book_rank` says it is for the whole book only and every client tool begins "ONE client (needs a client)". Which client is still code (`ToolRunner.ensure_client`, run before any client tool). `golden/planning.json` and `test_orch_planning.py` pin the sequences and the wording; `tests/ai_evals` carries the routing and narration items. See [D-109](DECISIONS.md).
+The narrator prompt (`backend/agents/prompts/channel_narrator.md`, vendored unchanged, version 3) asks for a senior colleague's voice: one to four sentences, the answer first, the engine's own labels, no rank prose, no hedging, the exact `placeholder` copied from `fact_paths`, and twelve worked examples (six added in CH-16e for data results). The planner's instructions and the tools' descriptions are the model's only guide to choosing a tool: `book_rank` says it is for the whole book only and every client tool begins "ONE client (needs a client)". Which client is still code (`ToolRunner.ensure_client`, run before any client tool). `golden/planning.json` and `test_orch_planning.py` pin the sequences and the wording; `tests/ai_evals` carries the routing and narration items. See [D-109](DECISIONS.md).
+
+## Using the data tools (CH-16e)
+
+The planner's instructions carry one decision rule, and the descriptions of `data_catalog`, `data_query` and `data_distinct_values` say the same thing, so a model reads it twice:
+
+1. The **fixed engine tools** (`client_eligibility`, `client_trend`, `client_at_risk`, `client_discovery`, `simulate`) come first for the credit, eligibility, a trend, jobs at risk and a what-if. They are authoritative.
+2. For a **descriptive or comparative** question about payroll or enriched data (an average, a count or a total by location, month, year, designation or method), `data_catalog` then `data_query`. A "why" question takes the fixed tool first and the data second: the data shows when a figure moved, not why.
+3. `data_distinct_values` turns a name the reader gave into the value the data holds, before a filter.
+4. **Never an invented column.** A catalog search with no match now says the data has nothing for it; say so and stop.
+5. Name every measure with `as`; the narration refers to a result column by it. Prefer an aggregate to a list; a result is capped and says so.
+6. The client is the one in the conversation; another client, or several, is a question back (`client_resolve`), never a data query.
+
+Tool mode follows this naturally (the model reads the catalog result, then plans the query). **JSON mode** (`AI_GATEWAY_SUPPORTS_TOOLS=false`) has no tool loop, so a plan made only of lookup tools is run and the model is shown their results (the same lane projection) and asked once more; a plan that already holds a query is unchanged, and there is never a third planning call. What a model is shown never includes a person-level value: employee-level rows go to the reader and are dropped from `model_facts` ([ADR-009](../architecture/ADR-009-m365-channel.md)).
+
+The narrator (prompt version 3) describes a data result by placeholder, says when it was capped (the limit by placeholder), says plainly when no rows matched or the data has no column for the question, never interprets ("unusual", "explains"), and never describes rows that went to the reader alone. `golden/data_use.json` (29 conversations), the `data_routing` AI eval (34 plans) and `test_data_equivalence.py` (the generic query equals the fixed tools on the real engine's Gold output) hold all of it; see [D-115](DECISIONS.md).
 
 ## Audit
 
