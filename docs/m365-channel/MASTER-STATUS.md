@@ -28,7 +28,26 @@ Live redeploy (Stage 3) must: set `TCC_CHANNEL_RESOLVE_DISPLAY_NAMES=true` and p
 `python scripts/vendor-orchestrator.py` before the orchestrator `azd deploy`.
 ## Stage 2 — CH-16 governed Fabric data access: todo
 ## Stage 3 — CH-17 live redeploy and verification: todo
-## Stage 4 — CH-18 branch of record, cleanup, hand-off: todo
+## Stage 2 — CH-16 governed Fabric data access: in progress
+
+| WP | Status | Merge SHA | Evidence |
+| --- | --- | --- | --- |
+| CH-16a semantic model | done | 9992238 | backend 3996 passed (with 16b) |
+| CH-16b spec, validation, SQL builders | done | 3149b1f | |
+| CH-16c executors, limits, provenance | done | 0a63846 | backend 4675 passed |
+| CH-16d capabilities, lanes | todo | | |
+| CH-16e planner, narrator, skills, goldens, equivalence | todo | | |
+| CH-16f docs, security, grants, Fabric-agent evaluation | todo | | |
+
+## Stage 4 — CH-18: runs in "keep main untouched" mode (owner change of plan, 3 Nov)
+
+`main` stays at `029b9ad2d2c002c09167375748120c7a8af3bc03`; it is never fast-forwarded, merged into, reset or rebased, and
+neither is `origin/main`. No branch is deleted (wp/*, feat/ui-modern-theme, feat/m365-channel, jamesiford-*), and the tag
+`pre-master-2026-11-03` stays. Branch of record: `feat/m365-channel`, tagged `m365-channel-poc-2026-11-03` at its final tip (tags
+only, no push). Worktrees are removed only after proving them clean and fully merged and the live-state folders intact
+(`.azure/tcc-poc-channel/`, `channel_orchestrator/.azure/tcc-orch/`, `overlays/m365-poc/`); otherwise they are left and listed.
+FINAL-STATE.md gets a "Planned branch split (not done)" section and PUSH-CHECKLIST.md records it as an owner decision.
+Status: todo
 
 ## Blockers
 
