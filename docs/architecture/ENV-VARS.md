@@ -72,6 +72,14 @@ see [RUNBOOK.md §8](RUNBOOK.md#8-deployment-configuration-refused-at-startup).
 | `WAREHOUSE_DATABASE` | same as above | Warehouse database (item display name). No default | TF api: `module.fabric.warehouse_database` (created, or azd `TCC_WAREHOUSE_DATABASE`) | `WAREHOUSE_DATABASE` | Setting from param `warehouseDatabase`; not an output | Functional |
 | `WAREHOUSE_ODBC_DRIVER` | `backend/infrastructure/persistence/fabric_warehouse.py` | ODBC driver name. Default `ODBC Driver 18 for SQL Server` | not set | — | not set | No |
 | `WAREHOUSE_CONNECT_TIMEOUT` | `backend/infrastructure/persistence/fabric_warehouse.py` | Connect timeout, seconds. Default `90` | not set | — | not set | No |
+| `DATA_QUERY_TIMEOUT_SECONDS` | `backend/application/data_wiring.py` | Governed data-query statement time limit, seconds (clamped 1-120). Default `20`. A query past it is a typed `query_timeout`, never a partial result [CH-16c] | not set (Terraform mapping: CH-16f) | — | not set | No |
+| `DATA_QUERY_MAX_ROWS` | same | Server row cap for a data query (1-500); can only lower a specification's own limit. Default `500` | not set | — | not set | No |
+| `DATA_QUERY_RATE_PER_MINUTE` | same | Data queries per person per minute (token bucket, 1-600), refused beyond it. Per process. Default `30` | not set | — | not set | No |
+| `DATA_QUERY_MAX_CONCURRENCY` | same | Data queries in flight at once across all people (1-16); the next is refused as `query_busy`. Default `4` | not set | — | not set | No |
+| `DATA_QUERY_SOURCE_ENABLED` | same | Switches ON the lakehouse source (raw payroll) datasets. Default `false`; the Gold and ops datasets are not behind it | not set (enabled by deployment, CH-16f) | — | not set | No |
+| `LAKEHOUSE_SQL_SERVER` | `backend/infrastructure/persistence/lakehouse_sql_connection.py` | Lakehouse SQL analytics endpoint host. Defaults to `WAREHOUSE_SERVER` | not set | — | not set | No (needs `DATA_QUERY_SOURCE_ENABLED`) |
+| `LAKEHOUSE_SQL_DATABASE` | same | The lakehouse's endpoint database. Defaults to `FABRIC_LAKEHOUSE` | not set | — | not set | No (needs `DATA_QUERY_SOURCE_ENABLED`) |
+| `DATA_QUERY_SQLITE_DIR` | `backend/application/data_wiring.py` | Local runs only: a folder of `<schema>.db` files the SQLite data-query adapter attaches | not set | — | not set | No |
 | `GOLD_SCHEMA` | `backend/config.py` (also every SQL script through it) | Read schema. Default `tcc_gold`. A non-identifier is refused at import | not set | — | not set (v1 schemas were `flex_*`) | No. If set, set it identically for the API and the scripts |
 | `OPS_SCHEMA` | `backend/config.py` | Operational schema. Default `tcc_ops`. Same rule | not set | — | not set | No. Same rule |
 

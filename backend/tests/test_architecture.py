@@ -610,10 +610,14 @@ def test_telemetry_authenticates_with_the_managed_identity():
 _PERSISTENCE = BACKEND / "infrastructure" / "persistence"
 _HELPER_FACTORIES = {"TenantScopedQuery", "tenant_exempt"}
 _EXECUTE_METHODS = {"execute", "executemany"}
+#: The data-query executors [CH-16c]. The Warehouse one matches `warehouse_*.py` already; the
+#: lakehouse and SQLite ones do not, and they run caller-shaped statements, so they are named here.
+_DATA_QUERY_ADAPTERS = ("warehouse_data_query.py", "lakehouse_data_query.py", "sqlite_data_query.py")
 
 
 def _tenant_scoped_modules() -> list[Path]:
-    return sorted(_PERSISTENCE.glob("warehouse_*.py")) + [_PERSISTENCE / "fabric_warehouse.py"]
+    extra = [_PERSISTENCE / name for name in ("fabric_warehouse.py", *_DATA_QUERY_ADAPTERS)]
+    return sorted(set(_PERSISTENCE.glob("warehouse_*.py")) | set(extra))
 
 
 def _callee(node: ast.AST) -> str | None:
