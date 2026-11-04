@@ -70,6 +70,11 @@ before moving code. The essentials:
   `domain` imports only the standard library and itself. A handler asks for its
   collaborators through `application/services.py` (and the payroll and Gold ports in
   `source_ports.py` / `gold_ports.py`); `bootstrap` binds the adapters to those names.
+  The Gold read side is `application/gold_read_port.py` (`GoldReadPort`, 25 members);
+  `infrastructure/persistence/gold_reader/` implements it and only `bootstrap`, the
+  adapters and two named operator scripts import that package
+  (`tests/test_gold_read_port.py`). A read is added to the port and the reader together or
+  the contract test fails.
   `tests/test_architecture_layers.py` fails on a breach, SDKs included. There is no
   longer an exception for `api/`: the assessment service is `application/assessment.py`,
   and the payroll reader (`application/payroll_rows.py`) raises ordinary errors that
@@ -855,7 +860,7 @@ instead of failing.
 `/c/:clientId`. At portfolio scope the grid only ever rendered a client picker —
 there is deliberately no portfolio view of it — so `/` renders the coverage
 matrix, whose client column is that picker. `GET /api/v2/clients/{id}/units` +
-`infrastructure/persistence/gold_reader.py` + `components/TrendGridView.jsx`. It
+`infrastructure/persistence/gold_reader/` (a package; callers use the `GoldReadPort`) + `components/TrendGridView.jsx`. It
 is the shape the partner already reads the credit in: a block per location, a row
 per tax year, twelve monthly headcount columns, TOT, AVG, and the YR1..YRn
 credit stream that location's base year opened. **Every figure is READ from
@@ -933,7 +938,7 @@ book from `/api/scope` back in and appends the unassessed **without ranking them
 against the assessed — a real $0 opportunity has been looked at and an unassessed
 one has not, and sorting them together puts both in the same bucket.
 
-**Summed money is still money.** `_MONEY_COLUMNS` in `gold_reader.py` must carry
+**Summed money is still money.** `_MONEY_COLUMNS` in `gold_reader/columns.py` must carry
 the SQL aggregate *aliases*, not only the base columns. `SUM(annual_credit_usd)`
 returns a `Decimal` under the name `total_annual_credit_usd`, and a name that set
 does not know falls through to the float branch — so every row feeding the total
@@ -1370,7 +1375,7 @@ for a client whose Gold holds only TY2023. 964 rows had accumulated. Stub
     filter in SQL. Both narrow through the same expression.
   - **The column name is never interpolated unless it matched a whitelist**,
     and every value is bound. `EMPLOYEE_FILTERS` / `NEAR_FILTERS` in
-    `gold_reader.py` are that whitelist; the two alias the same column
+    `gold_reader/stmt_unit_people.py` are that whitelist; the two alias the same column
     differently, so one shared map would emit an unknown alias.
   - **An enum offers the values PRESENT in the data.** A hardcoded list goes
     stale the first time a status is renamed and then offers a filter matching

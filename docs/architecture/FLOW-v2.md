@@ -65,7 +65,7 @@ flowchart LR
     end
 
     subgraph S5["5 · Serve"]
-        RD["Reads: gold_reader.py<br/>/api/v2/portfolio · /api/v2/clients/{id}/units"]
+        RD["Reads: gold_reader/<br/>/api/v2/portfolio · /api/v2/clients/{id}/units"]
         DEC["Decisions: mediator commands<br/>tcc_ops claims, findings, overrides"]
         PKG["Claim package<br/>/api/clients/{id}/packages"]
         BLOB[("Blob Storage<br/>outputs container")]
@@ -143,7 +143,7 @@ sequenceDiagram
         G->>G: principal = ANONYMOUS
     end
     G->>G: ClientAuthorizer.is_authorized for every client id<br/>in path, query or JSON body (403 if refused)
-    API->>WH: SELECT from tcc_gold via gold_reader.py<br/>(API MI, client_id first in predicate)
+    API->>WH: SELECT from tcc_gold via gold_reader/<br/>(API MI, client_id first in predicate)
     WH-->>API: rows the last run wrote
     API-->>WEB: JSON (no engine ran)
     WEB-->>U: JSON

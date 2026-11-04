@@ -32,7 +32,7 @@ def test_the_fake_reader_answers_everything_the_real_one_does():
     from infrastructure.persistence.gold_reader import GoldReader
 
     real = {
-        name for name in vars(GoldReader)
+        name for name in dir(GoldReader)
         if not name.startswith("_") and callable(getattr(GoldReader, name))
     }
     missing = sorted(name for name in real if not hasattr(_FakeReader, name))
@@ -56,7 +56,13 @@ def test_no_aggregate_is_aliased_to_a_bit_column_name():
 
     from infrastructure.persistence import gold_reader as gr
 
-    module_text = Path(gr.__file__).read_text(encoding="utf-8")
+    package = Path(gr.__file__).parent
+    module_text = "\n".join(
+        path.read_text(encoding="utf-8") for path in sorted(package.glob("*.py"))
+    )
+    # The reader is a package of modules, and a scan of `__init__.py` alone would pass
+    # vacuously: it must see the statements, not only the re-exports.
+    assert "_stmt_eligibility_summary" in module_text and "GROUP BY" in module_text
     # Same line only. A negated class matches newlines, which pairs one
     # statement's aggregate with another's alias — and matches prose in a
     # docstring that happens to describe the trap.

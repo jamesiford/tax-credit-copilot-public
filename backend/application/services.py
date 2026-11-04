@@ -23,6 +23,7 @@ from collections.abc import Callable
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
+    from application.gold_read_port import GoldReadPort
     from application.mediator import Mediator
 
 _providers: dict[str, Callable[[], Any]] = {}
@@ -73,7 +74,7 @@ def get_override_repository() -> Any:
     return resolve("override_repository")
 
 
-def get_gold_reader() -> Any:
+def get_gold_reader() -> GoldReadPort:
     return resolve("gold_reader")
 
 

@@ -22,6 +22,8 @@ from datetime import date, datetime, timezone
 from decimal import Decimal
 from typing import Any, Iterable, Protocol
 
+from application.gold_read_port import GoldReadPort
+
 SHEETS = ("Coverage", "Locations", "Installments", "Provenance", "Disclaimer")
 
 COVERAGE_COLUMNS = (
@@ -167,7 +169,7 @@ class GoldClaimPackageSource:
 
     METHODS = ("min_max", "pay_period")
 
-    def __init__(self, reader: Any, claims: Any) -> None:
+    def __init__(self, reader: GoldReadPort, claims: Any) -> None:
         self.reader = reader
         self.claims = claims
 

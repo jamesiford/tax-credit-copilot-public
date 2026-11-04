@@ -15,6 +15,7 @@ from __future__ import annotations
 from typing import Any
 
 from application.deployment import store_choice
+from application.gold_read_port import GoldReadPort
 from bootstrap import source_binding  # noqa: F401 - binds the payroll and Gold-store ports
 from bootstrap.artifact_wiring import get_artifact_service, set_artifact_service  # noqa: F401 - re-exported
 from bootstrap.auth_wiring import (  # noqa: F401 - re-exported: identity is composed in its own module
@@ -37,12 +38,11 @@ from bootstrap.ai_wiring import (  # noqa: F401 - re-exported: one import for ev
 )
 
 _mediator: Mediator | None = None
-
 _claim_repo: Any | None = None
 _finding_repo: Any | None = None
 _run_manifest_repo: Any | None = None
 _gold_writer: Any | None = None
-_gold_reader: Any | None = None
+_gold_reader: GoldReadPort | None = None
 
 
 def get_claim_repository() -> Any:
@@ -223,7 +223,7 @@ def set_gold_writer(writer: Any) -> None:
     _gold_writer = writer
 
 
-def get_gold_reader() -> Any:
+def get_gold_reader() -> GoldReadPort:
     """Composition root for the Gold read path. [ADR-002]
 
     Every screen's figures come from here. There is no in-memory counterpart, for
@@ -238,7 +238,7 @@ def get_gold_reader() -> Any:
     return _gold_reader
 
 
-def set_gold_reader(reader: Any) -> None:
+def set_gold_reader(reader: GoldReadPort | None) -> None:
     """Point the application at another Gold reader. Used by tests."""
     global _gold_reader
     _gold_reader = reader

@@ -120,8 +120,12 @@ class OfflineGoldWriter(GoldWriter):
         return []
 
 
+_DATEADD_MINUTES = "DATEADD(minute, ?, SYSUTCDATETIME())"
+
+
 def _translate(sql: str, values: list[Any]) -> tuple[str, list[Any]]:
-    """T-SQL row limits to SQLite's: the one change the reader's own statements need."""
+    """T-SQL row limits and the stranded-run age guard to SQLite's: the changes the reader's own statements need."""
+    sql = sql.replace(_DATEADD_MINUTES, "datetime('now', (? || ' minutes'))")
     top = _TOP.search(sql)
     if top:
         sql = f"{_TOP.sub('SELECT ', sql, count=1).rstrip()} LIMIT {int(top.group(1))}"
