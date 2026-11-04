@@ -3,9 +3,9 @@
 `extract_numerals` is the one place that decides what counts as a numeral and what
 it claims to be (money, percent, abbreviation, ordinal, year, date, structural, or a
 non-ASCII digit that no formatter emits). The guard judges what this finds; it does
-not re-read the text. Split out of `numeric_guard`, which re-exports everything here.
+not re-read the text. Split out of `guard`, which re-exports everything here.
 
-Standard library only (plus the sibling `numeric_types`): vendored with the guard.
+Standard library only (plus the sibling `types`): vendored with the guard.
 """
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ import re
 import unicodedata
 from decimal import Decimal
 
-from application.numeric_types import Numeral
+from application.numeric.types import Numeral
 
 #: The structural allow-list, deliberately narrow. These digits organise text and
 #: carry no figure: a list marker at the start of a line (`1.` / `2)`), a step

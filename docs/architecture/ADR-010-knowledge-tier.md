@@ -23,7 +23,7 @@ passage is never a figure" cannot be left to the guard. It has to be a structura
 
 ## Decision
 
-**1. Reference text goes through one port, `KnowledgePort`.** `application/knowledge.py` defines `Passage(text, source, citation, retrieved_at)`
+**1. Reference text goes through one port, `KnowledgePort`.** `application/knowledge/port.py` defines `Passage(text, source, citation, retrieved_at)`
 and `KnowledgePort.search(query, *, top) -> list[Passage]`. Standard library only, so it is vendored into the orchestrator. A passage with no
 citation cannot be constructed. Whatever answers (a fake today; Foundry IQ later) sits behind it.
 

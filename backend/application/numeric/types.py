@@ -1,7 +1,7 @@
 """What the numeric guard returns. [ADR-008]
 
 A `Numeral` is one figure found in text; a `Violation` is one the guard refused and
-why; a `GuardResult` is the verdict. Split out of `numeric_guard` (which re-exports
+why; a `GuardResult` is the verdict. Split out of `guard` (which re-exports
 them, so every import path is unchanged) so the guard reads as the rule and not as
 the bookkeeping. Standard library only: vendored with the guard into the
 orchestrator container.

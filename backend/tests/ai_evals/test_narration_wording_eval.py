@@ -10,7 +10,7 @@ import re
 
 import pytest
 
-from application import composer_hedging
+from application.composer import hedging as composer_hedging
 from tests.ai_evals import harness
 
 pytestmark = pytest.mark.ai_eval

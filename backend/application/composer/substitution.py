@@ -15,7 +15,7 @@ from collections.abc import Mapping, Sequence
 from typing import Any
 
 from application.capabilities import format as fmt
-from application.numeric_guard import FactIndex
+from application.numeric.guard import FactIndex
 
 _PLACEHOLDER = re.compile(r"\{\{\s*facts\.([^{}|\s]+?)\s*(?:\|\s*([A-Za-z_]+)\s*)?\}\}")
 _ANY_BRACES = re.compile(r"\{\{|\}\}")

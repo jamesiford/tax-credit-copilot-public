@@ -16,7 +16,7 @@ module substitutes through the one formatter, and every reply is checked twice:
 Between them the narration is also reviewed by `output_policy` [AI-07]: a link, an
 address, an identifier shape, a code block, or the narrator presenting itself as
 counsel drops the narration exactly as a bad figure does. So does hedging a figure:
-`composer_hedging` rejects an approximation qualifier ("about", "roughly", "rounded",
+`hedging` rejects an approximation qualifier ("about", "roughly", "rounded",
 "up to"...) within three tokens of a figure, because every figure shown is exact [CH-15c].
 
 If any fails, the reply is the platform's own blocks and the standing
@@ -24,13 +24,14 @@ disclaimer, nothing else. The composer never softens, rounds or patches a
 sentence: a rejected narration is dropped whole and the reader sees the engine's
 words instead, with the violations returned so the caller can audit them.
 
-**Where the pieces live.** The assembly is here; placeholders (`composer_placeholders`)
-and block rendering (`composer_render`) were split out by size and are re-exported
-below, so every import path is unchanged.
+**Where the pieces live.** The assembly is here; placeholders (`substitution`), block
+rendering (`render`) and hedging (`hedging`) are siblings in the `application.composer`
+package, whose `__init__` re-exports the public names, so `from application.composer
+import compose` is the import path.
 
 Standard library only, plus the guard, the formatter, the envelope and the sibling
-`composer_*` modules — all standard-library only themselves, and all vendored into
-the orchestrator container.
+modules — all standard-library only themselves, and all vendored into the
+orchestrator container.
 """
 from __future__ import annotations
 
@@ -38,13 +39,13 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any
 
-from application import composer_hedging, numeric_guard, output_policy
+from application import output_policy
 from application.capabilities.envelope import DISCLAIMER, Block
-from application.composer_placeholders import (  # noqa: F401 - re-exported
-    PlaceholderError, _mask_placeholders, narrator_brief, placeholders, substitute,
-)
-from application.composer_render import cards_payload, render_markdown  # noqa: F401 - re-exported
-from application.numeric_guard import AllowedContext, FactIndex, GuardResult, Numeral, Violation
+from application.composer import hedging as composer_hedging
+from application.composer.render import cards_payload, render_markdown
+from application.composer.substitution import PlaceholderError, _mask_placeholders, substitute
+from application.numeric import guard as numeric_guard
+from application.numeric.guard import AllowedContext, FactIndex, GuardResult, Numeral, Violation
 
 
 @dataclass(frozen=True)

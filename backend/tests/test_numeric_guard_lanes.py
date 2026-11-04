@@ -16,11 +16,11 @@ from decimal import Decimal
 
 import pytest
 
-from application import numeric_guard
+from application.numeric import guard as numeric_guard
 from application.capabilities import lanes
 from application.capabilities.envelope import Block, Provenance, ToolResult
 from application.composer import compose
-from application.numeric_guard import AllowedContext, FactIndex
+from application.numeric.guard import AllowedContext, FactIndex
 
 WAGE = "612.45"
 HOURS = "37.25"

@@ -2,7 +2,7 @@
 
 `FactIndex` flattens the facts and records every spelling a formatter may print for
 them. The guard asks it one question — "is this value a fact?" — and the composer
-asks it another — "what is at this path?". Split out of `numeric_guard`, which
+asks it another — "what is at this path?". Split out of `guard`, which
 re-exports `FactIndex` and `_flatten`.
 
 Standard library only, plus the formatter and the sibling extractor: vendored.
@@ -15,7 +15,7 @@ from decimal import Decimal
 from typing import Any
 
 from application.capabilities import format as fmt
-from application.numeric_extract import extract_numerals
+from application.numeric.extract import extract_numerals
 
 
 def _flatten(prefix: str, value: Any, out: dict[str, Any]) -> None:

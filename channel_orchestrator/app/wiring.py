@@ -16,7 +16,7 @@ from app.core.planner import Planner
 from app.core.settings import OrchestratorConfigError, OrchestratorSettings, load_settings
 from app.core.state import StateStore
 from app.core.turn import TurnPipeline
-from application.knowledge_settings import KnowledgeConfigError, build_knowledge, load_knowledge_settings
+from application.knowledge.settings import KnowledgeConfigError, build_knowledge, load_knowledge_settings
 
 log = logging.getLogger("tcc.orchestrator")
 

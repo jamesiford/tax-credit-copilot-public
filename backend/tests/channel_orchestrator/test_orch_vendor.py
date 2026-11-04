@@ -48,13 +48,13 @@ def test_write_then_check_agree_and_writing_twice_changes_nothing(vendor, tmp_pa
 def test_check_reports_a_changed_a_missing_and_an_unneeded_file(vendor, tmp_path, monkeypatch):
     monkeypatch.setattr(vendor, "TARGET", tmp_path / "tcc_shared")
     vendor.write()
-    (vendor.TARGET / "application" / "composer.py").write_text("# tampered\n", encoding="utf-8")
-    (vendor.TARGET / "application" / "numeric_guard.py").unlink()
+    (vendor.TARGET / "application" / "composer" / "assemble.py").write_text("# tampered\n", encoding="utf-8")
+    (vendor.TARGET / "application" / "numeric" / "guard.py").unlink()
     manifest = json.loads((vendor.TARGET / "MANIFEST.json").read_text(encoding="utf-8"))
     manifest["application/not_needed.py"] = "0" * 64
     (vendor.TARGET / "MANIFEST.json").write_text(json.dumps(manifest), encoding="utf-8")
     problems = "\n".join(vendor.check())
-    assert "application/composer.py differs" in problems and "application/numeric_guard.py differs" in problems
+    assert "application/composer/assemble.py differs" in problems and "application/numeric/guard.py differs" in problems
     assert "application/not_needed.py is in the copy but no longer needed" in problems
 
 

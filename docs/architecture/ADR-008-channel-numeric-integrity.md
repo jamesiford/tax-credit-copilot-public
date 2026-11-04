@@ -44,7 +44,7 @@ model obeying an instruction.
 
 ### 3. The guard runs twice, with zero tolerance
 
-`application/numeric_guard.py` extracts every numeral from a piece of text —
+`application/numeric/guard.py` extracts every numeral from a piece of text —
 plain, grouped, decimal, negative (`-3`, `(3)`), money, percentage, abbreviation
 (`$3.5K`, `1.2 million`), the two ends of a range, a number beside a unit, an ISO
 date, a `TY2023` token — and accepts it only if it is one of:
@@ -64,7 +64,7 @@ Characters that look like digits but are not ASCII digits (full-width, Arabic-In
 vulgar fractions) are **rejected, not normalised**, as is a figure split by a thin or
 no-break space (`3 500`): no formatter emits them, so their only use is evasion.
 
-`application/composer.py` applies the guard at two points:
+`application/composer/assemble.py` applies the guard at two points:
 
 1. **Before substitution**, to the narrator's raw words (`check_raw`). Any digit
    outside a placeholder that the reader did not supply rejects the narration —
@@ -127,7 +127,7 @@ both rule-based and both explainable in a sentence:
   released is reviewed whole first, so a link or address is never shown, in whole or
   in part; what a reader has already seen has always passed.
 
-**Hedging a figure (CH-15c).** The numeric guard proves a numeral is the engine's, not that a sentence leaves it alone: a narrator once called an exact credit "rounded". `application/composer_hedging.py` rejects, structurally, any narration with an approximation qualifier (about, roughly, approximately, around, nearly, almost, rounded, up to, close to, or so, more or less) within three tokens of a figure, where a placeholder counts as a figure. It rejects rather than reads, so "not rounded" is rejected too, and a rejection degrades like every other: the engine's own answer without the commentary. It does not catch rank prose ("position 1" is a substituted value the guard accepts); the narrator prompt forbids it and `tests/ai_evals` flags it.
+**Hedging a figure (CH-15c).** The numeric guard proves a numeral is the engine's, not that a sentence leaves it alone: a narrator once called an exact credit "rounded". `application/composer/hedging.py` rejects, structurally, any narration with an approximation qualifier (about, roughly, approximately, around, nearly, almost, rounded, up to, close to, or so, more or less) within three tokens of a figure, where a placeholder counts as a figure. It rejects rather than reads, so "not rounded" is rejected too, and a rejection degrades like every other: the engine's own answer without the commentary. It does not catch rank prose ("position 1" is a substituted value the guard accepts); the narrator prompt forbids it and `tests/ai_evals` flags it.
 
 Violations are recorded as rule codes. The offending text is never repeated into a
 log, a span or an error, because it is exactly what must not be repeated.
@@ -187,7 +187,7 @@ returns `resolved: true` for exactly one exact name or alias and still asks abou
 the engine's rendering or the reply degrades to the engine's own blocks. The
 guarantee is testable offline, and the same files run unchanged in the orchestrator
 container (`application/capabilities/format.py`, `envelope.py`, `catalog.py`,
-`application/numeric_guard.py`, `application/composer.py` import only the standard
+`application/numeric/guard.py`, `application/composer/assemble.py` import only the standard
 library and each other).
 
 **Costs.** Strictness has a price. A narrator that writes "the 11th hire", or any

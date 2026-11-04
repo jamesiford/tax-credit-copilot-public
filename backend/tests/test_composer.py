@@ -17,11 +17,12 @@ from pathlib import Path
 
 import pytest
 
-from application import composer, numeric_guard
+from application import composer
+from application.numeric import guard as numeric_guard
 from application.capabilities import format as fmt
 from application.capabilities.envelope import DISCLAIMER, Block
 from application.composer import PlaceholderError, compose, render_markdown, substitute
-from application.numeric_guard import AllowedContext, FactIndex, GuardResult, PASS, REJECTED
+from application.numeric.guard import AllowedContext, FactIndex, GuardResult, PASS, REJECTED
 
 FACTS = {
     "credit": {
@@ -282,16 +283,16 @@ def test_a_composed_reply_serialises_for_the_audit_row():
 
 
 def test_the_composer_imports_only_the_standard_library_and_its_vendored_siblings():
-    """The composer was split into `composer_*` siblings by size; the vendored set is all of them."""
+    """The composer package is split by concern; the vendored set is all of it."""
     import sys
 
     stdlib = set(sys.stdlib_module_names) | {"__future__"}
     local_prefixes = (
-        "application.numeric_", "application.composer_", "application.output_policy",
+        "application.numeric", "application.composer", "application.output_policy",
         "application.capabilities.format", "application.capabilities.envelope",
     )
     root = Path(composer.__file__).parent
-    for name in ("composer", "composer_placeholders", "composer_render"):
+    for name in ("__init__", "assemble", "substitution", "render", "hedging"):
         found: set[str] = set()
         for node in ast.walk(ast.parse((root / f"{name}.py").read_text(encoding="utf-8"))):
             if isinstance(node, ast.Import):
@@ -299,5 +300,5 @@ def test_the_composer_imports_only_the_standard_library_and_its_vendored_sibling
             elif isinstance(node, ast.ImportFrom) and node.module and node.level == 0:
                 found.update(f"{node.module}.{a.name}" for a in node.names)
         bad = {m for m in found if m.split(".")[0] not in stdlib and not m.startswith(local_prefixes)
-               and m != "application.numeric_guard" and not m.startswith("application.numeric_guard.")}
+               and m != "application.numeric.guard" and not m.startswith("application.numeric.guard.")}
         assert not bad, f"{name} imports {sorted(bad)}"

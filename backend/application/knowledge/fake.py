@@ -18,7 +18,7 @@ import re
 from collections.abc import Iterable, Sequence
 from datetime import datetime, timezone
 
-from application.knowledge import Passage
+from application.knowledge.port import Passage
 
 _WORDS = re.compile(r"[a-z]{3,}")
 RETRIEVED = datetime(2026, 1, 1, tzinfo=timezone.utc)

@@ -27,7 +27,7 @@ from app.core.compose import OUTSIDE_VIEW, allowed_for, compose_reply, facts_of,
 from app.core.tools import ToolRun
 from application.capabilities import catalog
 from application.capabilities.lanes import MODEL_ROW_LIMIT
-from application.numeric_guard import FactIndex
+from application.numeric.guard import FactIndex
 from data_harness import data_reply
 from orch_harness import USER_OID, build_rig
 

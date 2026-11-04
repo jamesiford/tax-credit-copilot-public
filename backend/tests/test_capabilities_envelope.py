@@ -162,8 +162,9 @@ def test_the_scan_can_fail(every_result):
 def test_every_capability_reply_passes_the_real_guard_and_no_flipped_digit_does(every_result):
     """CH-01's blocks, held to CH-02's guard (ADR-008): the platform's own text
     must be acceptable, and one corrupted digit anywhere in it must not be."""
-    from application import composer, numeric_guard
-    from application.numeric_guard import AllowedContext, FactIndex
+    from application import composer
+    from application.numeric import guard as numeric_guard
+    from application.numeric.guard import AllowedContext, FactIndex
     from test_numeric_guard import _mutations
 
     flipped = 0

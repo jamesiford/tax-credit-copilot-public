@@ -7,10 +7,10 @@ from __future__ import annotations
 
 import pytest
 
-from application import composer_hedging
+from application.composer import hedging as composer_hedging
 from application.capabilities.envelope import DISCLAIMER, Block
 from application.composer import compose, render_markdown
-from application.numeric_guard import REJECTED
+from application.numeric.guard import REJECTED
 
 FACTS = {"credit": {"annual_credit_usd": 3500, "average_headcount": 12.67}, "client": {"reason": "On the line"}}
 BLOCKS = [Block("table", rows=(("Measure", "Value"), ("Annual credit", "$3,500")))]
@@ -19,7 +19,7 @@ FIG = "{{facts.credit.annual_credit_usd|money}}"
 
 
 def hedged(narration: str) -> int:
-    from application.composer_placeholders import _mask_placeholders
+    from application.composer.substitution import _mask_placeholders
 
     return composer_hedging.hedged_figures(_mask_placeholders(narration))
 

@@ -30,7 +30,7 @@ from app.core.turn import TurnPipeline
 from app.wiring import build_orchestrator
 from application import knowledge as k
 from application.ai.safety.injection import PromptInjectionGuard
-from application.knowledge_fake import FakeKnowledge
+from application.knowledge.fake import FakeKnowledge
 from orch_harness import ENV, FakeClock, FakeGateway, Rig, ScriptedChat, identity
 
 QUESTION = "What is Cascade's credit for 2023 under Min-Max, and what is a credit per job for a designation?"

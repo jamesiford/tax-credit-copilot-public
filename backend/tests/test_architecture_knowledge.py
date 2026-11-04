@@ -20,13 +20,13 @@ import pytest
 ROOT = Path(__file__).resolve().parents[2]
 BACKEND = ROOT / "backend"
 APP = ROOT / "channel_orchestrator" / "app"
-KNOWLEDGE = [BACKEND / "application" / f"{name}.py" for name in ("knowledge", "knowledge_settings", "knowledge_fake")]
+KNOWLEDGE = [BACKEND / "application" / "knowledge" / f"{name}.py" for name in ("__init__", "port", "settings", "fake")]
 PROVIDER = APP / "core" / "maf_knowledge.py"
 TIER = [*KNOWLEDGE, PROVIDER]
 
 #: What the knowledge tier may import, and nothing else (standard library aside): its own modules, the fence for
 #: untrusted text, and for the provider the framework's context-provider types.
-ALLOWED = {"application.knowledge", "application.knowledge_fake", "application.knowledge_settings", "application.ai.safety.untrusted"}
+ALLOWED = {"application.knowledge", "application.knowledge.port", "application.knowledge.fake", "application.knowledge.settings", "application.ai.safety.untrusted"}
 ALLOWED_THIRD_PARTY = {PROVIDER: {"agent_framework"}}
 #: Names that mean "a fact" or "the ledger"; the tier uses none of them as a name, attribute or keyword.
 FACT_NAMES = {"FactLedger", "FactIndex", "ToolRun", "ToolResult", "Envelope", "facts", "model_facts", "user_only_facts", "record",
@@ -130,7 +130,7 @@ def test_the_ledger_is_written_by_the_gateway_pipeline_alone_and_built_by_the_ga
 
 
 def test_the_settings_default_to_off():
-    from application.knowledge_settings import KnowledgeSettings
+    from application.knowledge.settings import KnowledgeSettings
 
     assert KnowledgeSettings().enabled is False and KnowledgeSettings().provider == "none"
 
@@ -164,12 +164,12 @@ def test_no_azure_resource_for_knowledge_is_declared_and_the_switch_is_not_set_b
 
 @pytest.mark.parametrize("source, expected", [
     ("from channel.ledger import FactLedger\n", "imports channel.ledger"),
-    ("from application.numeric_guard import check\n", "imports application.numeric_guard"),
+    ("from application.numeric.guard import check\n", "imports application.numeric.guard"),
     ("from application.composer import compose\n", "imports application.composer"),
     ("import httpx\n", "imports httpx"),
     ("def f(ledger):\n    ledger.record('c', 't', {})\n", "uses the name record"),
     ("x = dict(facts={})\n", "uses the name facts"),
-    ("from application.numeric_facts import FactIndex\n", "imports application.numeric_facts"),
+    ("from application.numeric.facts import FactIndex\n", "imports application.numeric.facts"),
 ])
 def test_the_scanner_finds_each_way_the_tier_could_reach_a_fact(tmp_path, source, expected):
     path = tmp_path / "knowledge_extra.py"

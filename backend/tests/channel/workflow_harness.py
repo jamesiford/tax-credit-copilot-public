@@ -23,7 +23,7 @@ import httpx
 import pytest
 
 from application import client_book
-from application.composer_render import render_markdown
+from application.composer.render import render_markdown
 from channel.render import blocks_from, render_tool_text
 from gateway_harness import OTHER_OID, USER_OID, Gateway, agent_headers, build_gateway, user_headers, user_token
 from tests.test_agent_principal import entra, mint_app  # noqa: F401 - fixtures

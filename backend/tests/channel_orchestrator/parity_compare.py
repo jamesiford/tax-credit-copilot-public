@@ -33,7 +33,7 @@ from decimal import Decimal, InvalidOperation
 from typing import Any
 
 from application.capabilities.data_catalog import _COWORK_NOTE
-from application.composer_render import render_markdown
+from application.composer.render import render_markdown
 from channel.render import blocks_from
 
 MASK = "<volatile>"

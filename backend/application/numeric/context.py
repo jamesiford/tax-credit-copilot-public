@@ -3,7 +3,7 @@
 "5 hires" in the question may be said back; a tax year the page is scoped to may be
 named. Nothing here is a figure the engine produced, so it is the narrowest door in
 the guard — the caller passes it explicitly and it is never inferred from the
-narration. Split out of `numeric_guard`, which re-exports it.
+narration. Split out of `guard`, which re-exports it.
 
 Standard library only, plus the formatter and the sibling extractor: vendored.
 """
@@ -15,7 +15,7 @@ from decimal import Decimal
 from typing import Any
 
 from application.capabilities import format as fmt
-from application.numeric_extract import extract_numerals
+from application.numeric.extract import extract_numerals
 
 
 @dataclass(frozen=True)

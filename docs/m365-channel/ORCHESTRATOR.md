@@ -145,7 +145,7 @@ withheld because it could not be verified, then the provenance footer. The narra
 (never patched), the guard status is `rejected`, and the report filed with the gateway says so and how
 many figures failed. A model that is down gets the same reply with a line saying so.
 
-Besides a bad digit, an unresolvable placeholder or a policy break, a narration is dropped when an approximation qualifier ("about", "roughly", "rounded", "up to"...) sits within three tokens of a figure (`composer_hedging`, CH-15c): every figure shown is exact, and "not rounded" is rejected as well.
+Besides a bad digit, an unresolvable placeholder or a policy break, a narration is dropped when an approximation qualifier ("about", "roughly", "rounded", "up to"...) sits within three tokens of a figure (`application/composer/hedging.py`, CH-15c): every figure shown is exact, and "not rounded" is rejected as well.
 
 A narration is also dropped when a placeholder points at a fact the model was never shown: the person's lane (employee-level `rows`) or a row past the model's cut of fifty (`compose.paths_outside_model_view`, RM-05, [D-123](DECISIONS.md)). A figure only the person's rows hold is not allowed context for the narrator: not in its brief, not in the reader's allowed numerals, not a placeholder target. The reader's reply still shows the rows, and the audit records the refusal as a code that does not name the path.
 

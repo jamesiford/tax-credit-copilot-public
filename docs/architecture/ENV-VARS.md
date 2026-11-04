@@ -33,7 +33,7 @@ replaces Cosmos).
   It re-reads the environment on every call, so a test that sets a variable sees it, as it did when
   each module read its own; `override_settings({...})` fixes the values for a block.
 - **A mapping, for the parsers the orchestrator shares.** The AI, knowledge and safety settings
-  (`application/ai/settings.py`, `knowledge_settings.py`), the sign-in and deployment checks
+  (`application/ai/settings.py`, `knowledge/settings.py`), the sign-in and deployment checks
   (`application/auth_policy.py`, `deployment.py`), the gateway (`channel/config.py`) and the
   data-query limits (`bootstrap/data_wiring.py`) parse a mapping they are given. The orchestrator
   vendors some of them and cannot import `config`, so the composition root passes
@@ -254,7 +254,7 @@ the same `load_ai_settings`. The platform injects the reserved `FOUNDRY_*` names
 | `FOUNDRY_PROJECT_ENDPOINT`, `FOUNDRY_AGENT_NAME`, `FOUNDRY_AGENT_VERSION`, `AZURE_AI_MODEL_DEPLOYMENT_NAME`, `APPLICATIONINSIGHTS_CONNECTION_STRING` | platform | **Injected by the Foundry runtime; reserved.** The orchestrator reads the endpoint (to derive the account's model URL), the agent name and version (recorded on every narration audit row) and the model name | platform | — | Platform |
 | `PYTHONNOUSERSITE` | the runtime | `1`. Dependencies are installed in the runtime environment, never with `pip install --user` | `1` in `azure.yaml` and the Dockerfile | — | Yes |
 | `LOG_LEVEL` | `app/main.py` | Default `INFO`. Nothing logged carries a token, a header value or a message | not set | — | No |
-| `KNOWLEDGE_ENABLED` | `application/knowledge_settings.py` (vendored), `app/wiring.py` | The knowledge tier's master switch (ADR-010). **Default `false`**: nothing is built or retrieved. Only `true`, `1`, `yes` or `on` enable it. Not set by Terraform, `azure.yaml` or any profile (a test fails if one sets it). Read by the orchestrator only; the API does not read it | not set | — | No |
+| `KNOWLEDGE_ENABLED` | `application/knowledge/settings.py` (vendored), `app/wiring.py` | The knowledge tier's master switch (ADR-010). **Default `false`**: nothing is built or retrieved. Only `true`, `1`, `yes` or `on` enable it. Not set by Terraform, `azure.yaml` or any profile (a test fails if one sets it). Read by the orchestrator only; the API does not read it | not set | — | No |
 | `KNOWLEDGE_PROVIDER` | same | `none` (default), `fake` (a built-in synthetic corpus, for tests and local runs) or `foundry-iq` (designed, **not implemented**: with the switch on it stops the start). Enabled with `none` also stops the start | not set | — | No |
 | `KNOWLEDGE_TOP` | same | Passages retrieved per question, `1`–`10`. Default `3` | not set | — | No |
 
