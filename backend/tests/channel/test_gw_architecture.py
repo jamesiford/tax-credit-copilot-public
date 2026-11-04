@@ -33,6 +33,7 @@ ALLOWED_APPLICATION = frozenset({
     "application.deployment",                  # is_deployed, store_choice
     "application.display_names",               # the display-name port and the placeholder rule (standard library only)
     "application.identity",                    # ActingUser
+    "application.rate_limit",                  # the per-user token bucket (standard library only), shared with the API's data-query budget [CH-16c]
 })
 FORBIDDEN_PREFIXES = ("api.", "agents.", "tools.", "infrastructure.persistence", "application.wiring",
                       "application.queries", "application.commands", "application.mediator", "domain.calculation")
