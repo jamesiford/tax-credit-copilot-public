@@ -20,6 +20,7 @@ from application.deployment import DURABLE_STORES, is_deployed, store_choice
 from domain.channel_trust import FIRST_PARTY_CHANNELS
 
 GUID = re.compile(r"^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$")
+_ORIGIN = re.compile(r"^https?://[a-z0-9.-]+(:\d{1,5})?$")
 
 DEFAULT_RATE_LIMIT_PER_MINUTE = 60
 #: Slightly above the API's own call timeout (25 s), so the API's structured
@@ -50,6 +51,8 @@ class GatewaySettings:
     request_timeout_seconds: float = DEFAULT_REQUEST_TIMEOUT_SECONDS
     debug_whoami: bool = False
     resolve_display_names: bool = False
+    #: Origins a browser-originated MCP request may carry (`CHANNEL_MCP_ALLOWED_ORIGINS`); none by default
+    mcp_allowed_origins: tuple[str, ...] = ()
     deployed: bool = False
     channel_store: str = "sqlite"
 
@@ -100,6 +103,14 @@ def _caller_channels(env: Mapping[str, str]) -> tuple[dict[str, tuple[str, ...]]
     return bound, sorted(set(problems))
 
 
+def _origins(env: Mapping[str, str]) -> tuple[tuple[str, ...], list[str]]:
+    """`CHANNEL_MCP_ALLOWED_ORIGINS`: comma-separated `scheme://host[:port]`, lower-cased, and every problem found."""
+    listed = [o.strip().lower().rstrip("/") for o in _text(env, "CHANNEL_MCP_ALLOWED_ORIGINS").split(",") if o.strip()]
+    bad = [o for o in listed if not _ORIGIN.match(o)]
+    problems = ["CHANNEL_MCP_ALLOWED_ORIGINS entries are scheme://host[:port], with no path and no wildcard"] if bad else []
+    return tuple(dict.fromkeys(listed)), problems
+
+
 def _problems(env: Mapping[str, str], deployed: bool, store: str) -> list[str]:
     problems = [f"{name} is required" for name in ("TENANT_ID", "GATEWAY_AUDIENCE", "API_BASE_URL", "API_AUDIENCE")
                 if not _text(env, name)]
@@ -120,7 +131,8 @@ def load_settings(env: Mapping[str, str] | None = None) -> GatewaySettings:
     env = os.environ if env is None else env
     deployed, store = is_deployed(env), store_choice("CHANNEL_STORE", env)
     bound, bad_bindings = _caller_channels(env)
-    problems = _problems(env, deployed, store) + bad_bindings
+    origins, bad_origins = _origins(env)
+    problems = _problems(env, deployed, store) + bad_bindings + bad_origins
     if problems:
         raise GatewayConfigurationError("refusing to start:\n  - " + "\n  - ".join(problems))
     apps = tuple(a.strip().lower() for a in _text(env, "CHANNEL_ALLOWED_CALLER_APP_IDS").split(",") if a.strip())
@@ -135,6 +147,7 @@ def load_settings(env: Mapping[str, str] | None = None) -> GatewaySettings:
         request_timeout_seconds=_number(env, "CHANNEL_REQUEST_TIMEOUT_SECONDS", DEFAULT_REQUEST_TIMEOUT_SECONDS, 1, 600),
         debug_whoami=_flag(env, "CHANNEL_DEBUG_WHOAMI"),
         resolve_display_names=_flag(env, "CHANNEL_RESOLVE_DISPLAY_NAMES"),
+        mcp_allowed_origins=origins,
         deployed=deployed,
         channel_store=store,
     )

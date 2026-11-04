@@ -79,7 +79,7 @@ def test_the_session_is_the_conversation_and_belongs_to_one_user(gateway):
     other = {**user_headers(user_token(oid=OTHER_OID)), "Mcp-Session-Id": session}
     assert gateway.client.post(MCP, json=rpc("tools/list"), headers=other).status_code == 404
     assert gateway.client.post(MCP, json=rpc("tools/list"), headers={**user_headers(), "Mcp-Session-Id": "nope"}).status_code == 404
-    assert gateway.client.post(MCP, json=rpc("tools/list"), headers=user_headers()).status_code == 404
+    assert gateway.client.post(MCP, json=rpc("tools/list"), headers=user_headers()).status_code == 400, "no session id at all is a 400 (RM-14); an unknown one is a 404"
 
 
 def test_a_session_can_be_ended_by_its_owner_only(gateway):

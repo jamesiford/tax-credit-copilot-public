@@ -1,0 +1,8 @@
+# Dependencies the TESTS need and the deployed API and gateway do not. CI installs this file after requirements.txt;
+# the deployment packages (backend/.webappignore, azure.yaml) install requirements.txt only.
+#
+# mcp is the Model Context Protocol SDK. The gateway's MCP facade (backend/channel/mcp.py) is hand-written (D-65, D-136),
+# so the SDK is not part of it; tests/channel/test_gw_mcp_conformance.py uses the SDK's own CLIENT to prove the facade
+# is a standard server. Pinned to the version RM-14 measured the SDK's server on. It brings httpx2, sse-starlette and
+# mcp-types, which is why it is kept out of requirements.txt.
+mcp==2.3.0
