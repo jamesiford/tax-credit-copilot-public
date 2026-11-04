@@ -21,13 +21,21 @@ deterministic. See ``backend/.env.example``.
 from __future__ import annotations
 
 import json
-import os
 from dataclasses import dataclass
 from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
-_BASE_URL = os.getenv("WEBIQ_BASE_URL", "https://api.microsoft.ai/v3")
+from config import get_settings
+from config_sections import DEFAULT_WEBIQ_BASE_URL
+
+def _base_url() -> str:
+    """`WEBIQ_BASE_URL` when set (even empty, as `os.getenv` had it), else the public endpoint."""
+    configured = get_settings().webiq.base_url
+    return DEFAULT_WEBIQ_BASE_URL if configured is None else configured
+
+
+_BASE_URL = _base_url()
 
 
 class WebIQError(RuntimeError):
@@ -46,10 +54,11 @@ class WebIQConfig:
 
     @classmethod
     def from_env(cls) -> "WebIQConfig":
+        settings = get_settings().webiq
         return cls(
-            base_url=os.getenv("WEBIQ_BASE_URL", _BASE_URL),
-            api_key=os.getenv("WEBIQ_API_KEY") or None,
-            bearer_token=os.getenv("WEBIQ_BEARER_TOKEN") or None,
+            base_url=_BASE_URL if settings.base_url is None else settings.base_url,
+            api_key=settings.api_key,
+            bearer_token=settings.bearer_token,
         )
 
     @property

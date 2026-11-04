@@ -6,7 +6,7 @@ Terraform replaced Bicep.
 
 Sources:
 
-- Runtime reads: `backend/` (`os.getenv`, `os.environ`), `backend/startup.sh`,
+- Runtime reads: `backend/config.py` (the one reader, see "The rule" below), `backend/startup.sh`,
   `frontend/server/` (`process.env`), `frontend/src/api.js` (`import.meta.env`).
 - Deployed values: [`infra/main.tf`](../../infra/main.tf) (`api_app_settings`),
   [`infra/modules/app_service/main.tf`](../../infra/modules/app_service/main.tf)
@@ -22,11 +22,37 @@ Related: [RUNBOOK.md](RUNBOOK.md) (support), [DEPLOYMENT-HANDOVER.md](DEPLOYMENT
 (operator inputs), [ADR-007](ADR-007-warehouse-operational-store.md) (Warehouse
 replaces Cosmos).
 
+## The rule: one reader of the environment [RM-20, D-142]
+
+`backend/config.py` is the only module under `backend/` that touches the process environment
+(`os.environ`, `os.getenv`). Everything else is handed a value:
+
+- **A typed section of `Settings`.** `get_settings()` returns a frozen snapshot of the environment
+  with sections parsed on first use (`runtime`, `observability`, `data_source`, `warehouse`, `stores`,
+  `webiq`; the parsers are `backend/config_sections.py`, which take a mapping and read no process).
+  It re-reads the environment on every call, so a test that sets a variable sees it, as it did when
+  each module read its own; `override_settings({...})` fixes the values for a block.
+- **A mapping, for the parsers the orchestrator shares.** The AI, knowledge and safety settings
+  (`application/ai/settings.py`, `knowledge_settings.py`), the sign-in and deployment checks
+  (`application/auth_policy.py`, `deployment.py`), the gateway (`channel/config.py`) and the
+  data-query limits (`bootstrap/data_wiring.py`) parse a mapping they are given. The orchestrator
+  vendors some of them and cannot import `config`, so the composition root passes
+  `get_settings().environ`, and each function defaults to `config.resolve_environ()`.
+- **An explicit argument.** An adapter takes its value as a parameter (`server=`, `path=`, `root=`);
+  `bootstrap/` passes what it has, and a direct construction falls back to the settings.
+
+Adding a variable means adding a typed field to a section and a row below. The orchestrator
+(`channel_orchestrator/`) is a separate deployable with its own `app/core/settings.py`, which reads
+a mapping; only its entry points (`app/main.py`, `app/host.py`, `app/wiring.py`) touch the
+environment. `backend/tests/test_architecture_settings.py` fails on a process-environment read
+anywhere else in `backend/`; its allow-list is exact and holds one reader, the independent
+reference check, which is written without reference to the implementation on purpose.
+
 ## How to read the tables
 
 | Column | Meaning |
 |---|---|
-| Read by | File that reads the variable. Paths are relative to the repo root |
+| Read by | File that uses the variable, through `backend/config.py` (the only reader of the environment). Paths are relative to the repo root |
 | Default | Value the code uses when the variable is unset |
 | Deployed value | Where a deployed environment gets it. "TF api" = an API app setting in `infra/main.tf`; "TF platform" = a setting in `infra/modules/app_service/main.tf` |
 | TF output | The `infra/outputs.tf` output carrying the same value into the azd environment, or `—` |

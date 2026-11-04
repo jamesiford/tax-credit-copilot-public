@@ -21,7 +21,6 @@ the day you filed?" and an overwritten row cannot answer it.
 """
 from __future__ import annotations
 
-import os
 import sqlite3
 import threading
 from datetime import date, datetime
@@ -29,6 +28,7 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any, Iterable
 
+from config import get_settings
 from domain.claims import (
     ClaimStatus,
     EngagementScope,
@@ -198,7 +198,7 @@ class SqliteClaimRepository:
     """
 
     def __init__(self, path: str | Path | None = None) -> None:
-        self.path = Path(path) if path else Path(os.getenv("OPERATIONAL_DB", _DEFAULT_PATH))
+        self.path = Path(path) if path else Path(get_settings().stores.operational_db_or(_DEFAULT_PATH))
         self._local = threading.local()
         if str(self.path) != ":memory:":
             self.path.parent.mkdir(parents=True, exist_ok=True)

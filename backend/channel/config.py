@@ -11,12 +11,12 @@ would look like it worked, and this process holds the only record of who did wha
 """
 from __future__ import annotations
 
-import os
 import re
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 
 from application.deployment import DURABLE_STORES, is_deployed, store_choice
+from config import resolve_environ
 from domain.channel_trust import FIRST_PARTY_CHANNELS
 
 GUID = re.compile(r"^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$")
@@ -128,7 +128,7 @@ def _problems(env: Mapping[str, str], deployed: bool, store: str) -> list[str]:
 
 def load_settings(env: Mapping[str, str] | None = None) -> GatewaySettings:
     """The settings, or `GatewayConfigurationError` naming every problem at once."""
-    env = os.environ if env is None else env
+    env = resolve_environ(env)
     deployed, store = is_deployed(env), store_choice("CHANNEL_STORE", env)
     bound, bad_bindings = _caller_channels(env)
     origins, bad_origins = _origins(env)

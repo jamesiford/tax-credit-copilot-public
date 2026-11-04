@@ -16,16 +16,17 @@ into a 404 or a 503, which is a presentation decision and belongs in `api/`.
 from __future__ import annotations
 
 import csv
-import os
 from pathlib import Path
 from typing import Any
+
+from config import get_settings
 
 _PAY_PERIODS_CSV = Path(__file__).resolve().parents[2] / "data" / "payroll_pay_periods.csv"
 
 
 def configured_account_id() -> int:
     """The tenant a single-tenant data source represents."""
-    return int(os.getenv("FLEX_ACCOUNT_ID", "1001"))
+    return get_settings().data_source.flex_account_id
 
 
 def load_pay_periods(account_id: int | None = None) -> list[dict[str, Any]]:

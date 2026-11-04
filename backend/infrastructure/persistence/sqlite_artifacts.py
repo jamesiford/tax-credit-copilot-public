@@ -6,7 +6,6 @@ same transaction; access rows are only ever inserted.
 """
 from __future__ import annotations
 
-import os
 import sqlite3
 import threading
 from datetime import date, datetime
@@ -14,6 +13,7 @@ from pathlib import Path
 from typing import Any
 
 from application.artifacts import Artifact, ArtifactAccess
+from config import get_settings
 
 _SCHEMA = """
 CREATE TABLE IF NOT EXISTS artifact (
@@ -101,7 +101,7 @@ class SqliteArtifactRepository:
     is_durable = False
 
     def __init__(self, path: str | Path | None = None) -> None:
-        self.path = Path(path) if path else Path(os.getenv("OPERATIONAL_DB", _DEFAULT_PATH))
+        self.path = Path(path) if path else Path(get_settings().stores.operational_db_or(_DEFAULT_PATH))
         self._local = threading.local()
         if str(self.path) != ":memory:":
             self.path.parent.mkdir(parents=True, exist_ok=True)

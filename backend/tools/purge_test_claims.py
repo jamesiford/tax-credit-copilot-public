@@ -16,10 +16,11 @@ for the sake of dev junk.
 from __future__ import annotations
 
 import argparse
-import os
 import sqlite3
 import sys
 from pathlib import Path
+
+from config import get_settings
 
 LEAKED_ACTOR = "tests"
 
@@ -29,7 +30,7 @@ def main() -> int:
     parser.add_argument("--run", action="store_true", help="delete rather than report")
     args = parser.parse_args()
 
-    store = os.getenv("CLAIM_STORE", "sqlite").strip().lower()
+    store = get_settings().stores.claim_store.strip().lower()
     if store != "sqlite":
         print(
             f"CLAIM_STORE={store!r}. This only touches the local SQLite store; a "
@@ -40,7 +41,7 @@ def main() -> int:
 
     from infrastructure.persistence.sqlite_claims import _DEFAULT_PATH
 
-    path = Path(os.getenv("OPERATIONAL_DB", _DEFAULT_PATH))
+    path = Path(get_settings().stores.operational_db_or(_DEFAULT_PATH))
     if not path.exists():
         print(f"No operational store at {path}. Nothing to do.")
         return 0

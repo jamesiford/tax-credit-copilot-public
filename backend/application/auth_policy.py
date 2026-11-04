@@ -11,13 +11,14 @@ The one other route to `none` is a deployed demo of synthetic data (the public
 profile): it needs `ALLOW_ANONYMOUS_SYNTHETIC=1` AND `DATA_CLASSIFICATION=synthetic`.
 Customer classification never honours it.
 
-This module reads only the environment it is handed and imports nothing else, so
+This module reads only the mapping it is handed (by default the current settings' environment) and imports only `config`, so
 `deployment` can depend on it and re-export the readers other modules use.
 """
 from __future__ import annotations
 
-import os
 from typing import Mapping
+
+from config import resolve_environ
 
 LOCAL = "local"
 AUTH_MODES = ("none", "entra")
@@ -31,18 +32,23 @@ def _get(env: Mapping[str, str], name: str) -> str:
 
 def auth_mode(env: Mapping[str, str] | None = None) -> str:
     """`entra` unless `none` is chosen on purpose. An unknown value is reported by `auth_problems`."""
-    env = os.environ if env is None else env
+    env = resolve_environ(env)
     return (_get(env, "AUTH_MODE") or "entra").lower()
 
 
 def auth_tenant_id(env: Mapping[str, str] | None = None) -> str:
-    env = os.environ if env is None else env
+    env = resolve_environ(env)
     return _get(env, "AUTH_TENANT_ID") or _get(env, "AZURE_TENANT_ID")
+
+
+def api_audience(env: Mapping[str, str] | None = None) -> str:
+    """The API app registration the token validator checks the audience against."""
+    return _get(resolve_environ(env), "API_AUDIENCE")
 
 
 def explicit_local_dev(env: Mapping[str, str] | None = None) -> bool:
     """`ENVIRONMENT=local` was SET, not merely absent."""
-    env = os.environ if env is None else env
+    env = resolve_environ(env)
     return _get(env, "ENVIRONMENT").lower() == LOCAL
 
 

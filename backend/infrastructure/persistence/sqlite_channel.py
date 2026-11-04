@@ -6,13 +6,13 @@ property of the code and not a convention.
 """
 from __future__ import annotations
 
-import os
 import sqlite3
 import threading
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from config import get_settings
 from domain.channel import AgentActionAudit, ChannelAuditEvent
 
 _SCHEMA = """
@@ -97,7 +97,7 @@ class SqliteBase:
     schema = _SCHEMA
 
     def __init__(self, path: str | Path | None = None) -> None:
-        self.path = Path(path) if path else Path(os.getenv("OPERATIONAL_DB", _DEFAULT_PATH))
+        self.path = Path(path) if path else Path(get_settings().stores.operational_db_or(_DEFAULT_PATH))
         self._local = threading.local()
         if str(self.path) != ":memory:":
             self.path.parent.mkdir(parents=True, exist_ok=True)

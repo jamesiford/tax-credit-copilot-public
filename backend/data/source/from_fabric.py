@@ -20,13 +20,12 @@ an offline demo stays deterministic — the same posture as
 """
 from __future__ import annotations
 
-import os
 from dataclasses import dataclass
 from datetime import date, datetime
 from decimal import Decimal
 from typing import Any
 
-from config import SOURCE_SCHEMA
+from config import SOURCE_SCHEMA, get_settings
 
 from .schema import (
     Account,
@@ -162,8 +161,9 @@ class FabricLakehouseReader:
     schema: str = SOURCE_SCHEMA
 
     def __post_init__(self) -> None:
-        self.workspace = self.workspace or os.getenv("FABRIC_WORKSPACE")
-        self.lakehouse = self.lakehouse or os.getenv("FABRIC_LAKEHOUSE")
+        configured = get_settings().data_source
+        self.workspace = self.workspace or configured.fabric_workspace
+        self.lakehouse = self.lakehouse or configured.fabric_lakehouse
 
     def is_configured(self) -> bool:
         return bool(self.workspace) and bool(self.lakehouse)

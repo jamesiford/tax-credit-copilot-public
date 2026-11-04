@@ -5,10 +5,10 @@ bindings the mediator needs.
 """
 from __future__ import annotations
 
-import os
 from typing import Any
 
 from bootstrap.auth_wiring import get_client_authorizer
+from config import get_settings
 
 _artifact_service: Any | None = None
 
@@ -20,14 +20,15 @@ def get_artifact_service() -> Any:
         from application.artifacts import ArtifactService
         from application.deployment import artifact_repository, artifact_store
 
+        stores = get_settings().stores
         if artifact_store() == "blob":
             from infrastructure.storage.blob_store import BlobArtifactStore
 
-            store: Any = BlobArtifactStore()
+            store: Any = BlobArtifactStore(account_url=stores.artifact_blob_account_url)
         else:
             from infrastructure.storage.local_store import LocalArtifactStore
 
-            store = LocalArtifactStore()
+            store = LocalArtifactStore(root=stores.artifact_local_root)
         if artifact_repository() == "warehouse":
             from infrastructure.persistence.warehouse_artifacts import WarehouseArtifactRepository
 
@@ -38,7 +39,7 @@ def get_artifact_service() -> Any:
             repository = SqliteArtifactRepository()
         _artifact_service = ArtifactService(
             store, repository, get_client_authorizer(),
-            retention_days=int(os.getenv("OUTPUTS_RETENTION_DAYS", "2555")),
+            retention_days=stores.outputs_retention_days,
         )
     return _artifact_service
 
