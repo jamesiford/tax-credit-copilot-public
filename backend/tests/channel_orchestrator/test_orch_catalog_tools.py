@@ -48,7 +48,7 @@ def _agent(tools, script):
     chain = ModelChain([Provider("gateway", ScriptedChat(script), "m", True)], egress_policy="allow_all", timeout_seconds=5.0)
     from app.core.maf_agent import PortChatClient, ModelTrace
 
-    return Agent(PortChatClient(chain, ModelTrace(), max_calls=4, on_unknown=lambda _n: None), "be good", tools=tools)
+    return Agent(PortChatClient(chain, ModelTrace(), max_calls=4), "be good", tools=tools)
 
 
 def test_the_body_forwards_as_the_person_the_request_names_and_the_same_tools_serve_two_people():

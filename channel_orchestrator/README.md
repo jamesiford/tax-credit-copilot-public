@@ -9,8 +9,10 @@ main.py              entry point at the zip root (python main.py)
 app/main.py          the Responses host: one handler (the only module that imports the hosting package)
 app/host.py          what the handler decides: identity, /whoami, hand-off to the turn pipeline
 app/wiring.py        settings in, a TurnPipeline out
-app/core/            framework-free logic: identity, state, tools, planner, composer, writes, replies
-app/core/maf_agent.py  the Microsoft Agent Framework layer (the only module that imports it)
+app/core/            framework-free logic: identity, state, tools (the turn), reader_arguments, planner, composer, writes, replies
+app/core/maf_*.py    the Microsoft Agent Framework layer, the only modules that import it: maf_agent (the Agent and its
+                     client), maf_catalog_tools (a FunctionTool per catalog capability), maf_tool_rules and
+                     maf_tool_call (the turn's tool rules as function middleware), maf_tool_run (one tool through them)
 app/vendor/tcc_shared/ the platform's shared modules, copied verbatim (generated; gitignored)
 Dockerfile, azure.yaml, requirements.txt
 ```
@@ -26,15 +28,18 @@ docker build --platform linux/amd64 -t tcc-channel-orchestrator channel_orchestr
 
 Rules that fail the build (`test_orch_structure.py`): imports stay inside `app`, `application`, `domain`,
 `infrastructure.ai` and four named third-party packages; only `main.py` imports the hosting package and only
-`maf_agent.py` the agent framework; a commit is built in one module and called from one place; nothing logs a
-token, a header or a secret; modules stay under 250 lines and functions under 40.
+the `maf_*` modules the agent framework; a commit is built in one module and called from one place; nothing logs a
+token, a header or a secret; modules stay under 250 lines and functions under 40. Elsewhere,
+`test_architecture_catalog_only.py` fails if anything outside the catalog defines a tool.
 
 ## Adding a tool
 
-Nothing to add here: the orchestrator reads the platform's catalog. A new read tool in
-`backend/application/capabilities/catalog.py` is offered to the model after `scripts/vendor-orchestrator.py`
-runs again, and the gateway must offer it too. Add a golden case in `backend/tests/channel_orchestrator/golden/`.
-A tool that needs the client or year follows the runner's rules by having `client_id` / `tax_year` in its schema.
+Nothing to add here: the orchestrator reads the platform's catalog and generates the framework tools from it
+(`maf_catalog_tools`). A new read tool in `backend/application/capabilities/catalog.py` is offered to the model after
+`scripts/vendor-orchestrator.py` runs again, and the gateway must offer it too. Add a golden case in
+`backend/tests/channel_orchestrator/golden/`. A tool whose client, year or method are the reader's declares them by
+having `client_id` / `tax_year` / `method` in its schema (`CapabilitySpec.reader_owned` is derived from it); the middleware
+in `maf_tool_rules` settles them.
 
 ## Never
 

@@ -21,11 +21,13 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from agent_framework import (
-    Agent, AgentContext, AgentMiddleware, AgentResponse, BaseChatClient, ChatResponse, Content, FunctionInvocationLayer,
-    FunctionTool, Message,
+    Agent, AgentContext, AgentMiddleware, AgentResponse, BaseChatClient, ChatMiddlewareLayer, ChatResponse, Content,
+    FunctionInvocationLayer, FunctionTool, Message,
 )
 
-from app.core.maf_catalog_tools import catalog_tools
+from app.core.maf_catalog_tools import TURN, catalog_tools
+from app.core.maf_tool_call import CallAndCapture
+from app.core.maf_tool_rules import RecordUnregisteredCalls, tool_rules
 from app.core.models import ModelChain, ModelTurn
 from app.core.tools import ToolRunner
 from domain.ai import ChatMessage, ToolCall, ToolSpec
@@ -72,14 +74,14 @@ def _as_response(turn: ModelTurn) -> ChatResponse:
     return ChatResponse(messages=[Message("assistant", contents or [""])])
 
 
-class PortChatClient(FunctionInvocationLayer, BaseChatClient):
+class PortChatClient(FunctionInvocationLayer, ChatMiddlewareLayer, BaseChatClient):
     """MAF's chat-client contract over `ModelChain`: messages and tools in, one whole answer out."""
 
-    def __init__(self, chain: ModelChain, trace: ModelTrace, *, max_calls: int, on_unknown: Callable[[str], None]) -> None:
+    def __init__(self, chain: ModelChain, trace: ModelTrace, *, max_calls: int) -> None:
         super().__init__(function_invocation_configuration={
             "max_iterations": max_calls + 2, "max_function_calls": max_calls + 1, "allow_concurrent_invocation": False,
         })
-        self._chain, self._trace, self._on_unknown = chain, trace, on_unknown
+        self._chain, self._trace = chain, trace
 
     def _inner_get_response(self, *, messages: Any, stream: bool, options: Any, **kwargs: Any) -> Awaitable[ChatResponse]:
         if stream:
@@ -92,10 +94,6 @@ class PortChatClient(FunctionInvocationLayer, BaseChatClient):
         self._trace.prompt_parts.append("\n".join(m.content for m in chat))
         turn = await self._chain.complete(chat, tools, prefer=self._trace.last.provider if self._trace.last else None)
         self._trace.turns.append(turn)
-        known = {t.name for t in tools}
-        for call in turn.tool_calls:
-            if call.name not in known:  # MAF answers an unknown call with an error; this records the attempt
-                self._on_unknown(call.name)
         return _as_response(turn)
 
 
@@ -113,15 +111,22 @@ class ComposeMiddleware(AgentMiddleware):
         context.result = AgentResponse(messages=[Message("assistant", [self._compose(raw)])])
 
 
-def function_tools(runner: ToolRunner) -> list[FunctionTool]:
-    """The catalog's tools for a model, each routed through this turn's runner (which holds the turn's rules)."""
-    async def through_the_runner(_ctx: Any, spec: Any, args: dict[str, Any]) -> str:
-        return json.dumps(await runner.run(spec.name, args), default=str)
-
-    return catalog_tools(through_the_runner)
+def function_tools(_turn: object | None = None) -> list[FunctionTool]:
+    """The tools a model may name, generated from the catalog. They carry no turn: `_turn` is accepted so callers may
+    pass it, and the turn itself reaches the tools and the rules through `function_invocation_kwargs`."""
+    return catalog_tools()
 
 
 def build_agent(chain: ModelChain, runner: ToolRunner, trace: ModelTrace, instructions: str, compose: Callable[[str], str]) -> Agent:
-    """The turn's Agent: tools bound to this turn's runner, output bound to the composer."""
-    client = PortChatClient(chain, trace, max_calls=runner.max_calls, on_unknown=runner.refused.append)
-    return Agent(client, instructions, tools=function_tools(runner), middleware=[ComposeMiddleware(compose)])
+    """The turn's Agent: the generated tools, the turn's rules as middleware, and an output bound to the composer.
+
+    Function middleware runs in the order `maf_tool_rules` lists it, then `CallAndCapture`; the chat middleware
+    records a tool name the model asked for that is not registered (a commit, an invented one). The turn is the
+    agent's default `additional_function_arguments`, which is what `function_invocation_kwargs` is per run.
+    """
+    client = PortChatClient(chain, trace, max_calls=runner.max_calls)
+    return Agent(
+        client, instructions, tools=function_tools(),
+        middleware=[ComposeMiddleware(compose), *tool_rules(), CallAndCapture(), RecordUnregisteredCalls(runner)],
+        default_options={"additional_function_arguments": {TURN: runner}},
+    )
