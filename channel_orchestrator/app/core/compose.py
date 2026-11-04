@@ -5,7 +5,8 @@ facts. This module gathers the pieces; `composer.compose` (vendored from the pla
 unchanged) decides what survives:
 
 - the model's narration may hold only `{{facts.path|format}}` placeholders; a digit it typed,
-  a figure it rewrote, a path that does not exist or a link it invented drops the narration
+  a figure it rewrote, a path that does not exist, a path the model was never shown (the person's
+  lane, or rows past the model's cut) or a link it invented drops the narration
   and the reader gets the platform's blocks and the disclaimer;
 - the finished reply is checked a second time against the facts.
 
@@ -16,15 +17,18 @@ and no model touches them.
 from __future__ import annotations
 
 from collections.abc import Sequence
+from dataclasses import replace
 from typing import Any
 
 from app.core.tools import ToolRun
 from application.capabilities import catalog
 from application.capabilities.envelope import AUDIENCE_USER, AUDIENCES, Block
-from application.composer import Composed, compose
-from application.numeric_guard import AllowedContext
+from application.composer import Composed, compose, placeholders
+from application.numeric_guard import REJECTED, AllowedContext, FactIndex, GuardResult, Numeral, Violation
 
 METHOD_LABEL = {"min_max": "Min-Max method", "pay_period": "Pay Period method"}
+#: What the audit records, as a code: never the path, which names the person's lane.
+OUTSIDE_VIEW = "narration named a fact outside the model's view"
 LOOKUP_TOOLS = frozenset(spec.name for spec in catalog.CATALOG if catalog.LOOKUP in spec.tags)
 _YEAR_KEYS = ("tax_year", "year")
 
@@ -71,11 +75,35 @@ def allowed_for(question: str, runs: Sequence[ToolRun]) -> AllowedContext:
     return AllowedContext.build(question, years=sorted(years), numbers=sorted(clients))
 
 
+def paths_outside_model_view(narration: str | None, runs: Sequence[ToolRun]) -> list[str]:
+    """Placeholder paths in `narration` that are the reader's facts but not what a model may see.
+
+    A narrator is only ever told the NAMES of `model_facts_of`; the person's lane (employee-level rows)
+    and the rows past `MODEL_ROW_LIMIT` are not among them. A placeholder pointing there is a path the
+    model guessed, so it is not a figure the engine vouched for to the narrator, whatever it would render.
+    """
+    found = placeholders(narration) if narration else []
+    if not found:
+        return []
+    shown = FactIndex.coerce(model_facts_of(runs)).leaves
+    held = FactIndex.coerce(facts_of(runs)).leaves
+    return [m.group(1) for m in found if m.group(1) in held and m.group(1) not in shown]
+
+
 def compose_reply(question: str, runs: Sequence[ToolRun], narration: str | None, allowed_hosts: Sequence[str] = ()) -> Composed:
-    """The composed reply for these results; `narration` None gives the platform's blocks alone."""
-    return compose(
-        blocks_of(runs), narration, facts_of(runs), allowed_for(question, runs), allowed_hosts=tuple(allowed_hosts),
+    """The composed reply for these results; `narration` None gives the platform's blocks alone.
+
+    The narration is dropped whole, and the guard says so, if it names a fact outside the model's view.
+    """
+    outside = paths_outside_model_view(narration, runs)
+    composed = compose(
+        blocks_of(runs), None if outside else narration, facts_of(runs), allowed_for(question, runs),
+        allowed_hosts=tuple(allowed_hosts),
     )
+    if not outside:
+        return composed
+    violation = Violation(Numeral(OUTSIDE_VIEW, 0, 0, "placeholder"), OUTSIDE_VIEW, stage="narration")
+    return replace(composed, guard=GuardResult(REJECTED, (violation, *composed.guard.violations)))
 
 
 def provenance_footer(runs: Sequence[ToolRun]) -> str:
