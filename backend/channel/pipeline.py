@@ -28,6 +28,8 @@ from typing import Any
 from application.capabilities import catalog
 from application.capabilities.envelope import ToolResult
 from application.channel_audit import AuditCall, ChannelAuditor
+from application.data.audit_summary import summarise_data_call
+from channel import lane_guard
 from channel.api_client import ApiClient, ApiResult, ApiUnavailable
 from channel.auth import Caller
 from channel.config import GatewaySettings
@@ -92,6 +94,7 @@ class ToolPipeline:
             return error_outcome(404, "unknown_tool", f"no such tool: {tool}", acting.correlation_id or "")
         audit_call = AuditCall(
             tool_name=tool, action_kind=spec.kind, actor=acting, args=_audited_args(call),
+            summary=summarise_data_call(tool, call.args),
             **dict(zip(("client_id", "tax_year"), client_and_year(call.args))),
         )
         refused = await self._refuse_early(spec, audit_call)
@@ -138,6 +141,8 @@ class ToolPipeline:
             log.exception("could not open the audit record; the call is not made")
             return error_outcome(503, "audit_unavailable", "the audit trail is unavailable; nothing was done", cid, retryable=True)
         status, body, local = await self._execute(spec, caller, call)
+        if status == 200 and await lane_guard.blocks_employee_level(caller, body, self._is_writer):
+            status, body = lane_guard.refusal()
         outcome, error = _judge(status, body)
         result = _provenance(body)
         if local and spec.name == "verify_figures" and status == 200:
