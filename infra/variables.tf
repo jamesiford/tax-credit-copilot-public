@@ -1,8 +1,20 @@
 # Inputs. Empty strings (what azd substitutes for an unset environment value)
 # are treated as "not set" throughout. Defaults that differ by profile are null
 # here and resolved in locals.tf from the D25 profile matrix.
+#
+# Variables are grouped by section, not alphabetised; put a new one in the section it
+# belongs to. Order inside this file has no effect on Terraform, and a variable is never
+# renamed here (azd maps values to these names in main.tfvars.json).
+#
+#    1. environment                      8. Foundry network posture (demo only)
+#    2. profile overrides                9. Microsoft 365 channel gateway
+#    3. app service                     10. governed data access
+#    4. identity                        11. mock AI gateway (proof of concept)
+#    5. network                         12. storage
+#    6. fabric
+#    7. AI (deployment, gateway, models, Key Vault references)
 
-# --- environment ---------------------------------------------------------------
+# ==== 1. environment ===========================================================
 
 variable "profile" {
   description = "Deployment profile (D25): public (creates everything, synthetic data, no auth) or enterprise (BYO network and Fabric, Entra)."
@@ -58,7 +70,7 @@ variable "git_commit" {
   default     = ""
 }
 
-# --- profile overrides (null = take the profile default) ------------------------
+# ==== 2. profile overrides (null = take the profile default) ===================
 
 variable "auth_mode" {
   description = "API auth: none | entra. Null takes the profile default (public none, enterprise entra)."
@@ -114,7 +126,7 @@ variable "enable_key_vault" {
   default     = false
 }
 
-# --- app service -----------------------------------------------------------------
+# ==== 3. app service ===========================================================
 
 variable "app_service_sku" {
   description = "Linux App Service plan SKU shared by both apps (D4)."
@@ -134,7 +146,7 @@ variable "web_allowed_ip_ranges" {
   default     = []
 }
 
-# --- identity (enterprise: app registrations are created by the customer, D12) --
+# ==== 4. identity (enterprise: customer-created app registrations, D12) ======
 
 variable "web_client_id" {
   description = "Client id of the web app registration (Easy Auth). Required for enterprise."
@@ -162,7 +174,7 @@ variable "api_audience" {
   default     = ""
 }
 
-# --- network (enterprise: bring your own) --------------------------------------
+# ==== 5. network (enterprise: bring your own) ==================================
 
 variable "vnet_address_space" {
   description = "Address space of the VNet the public profile creates."
@@ -200,7 +212,9 @@ variable "private_dns_zone_ids" {
   }
 }
 
-# --- fabric --------------------------------------------------------------------
+# ==== 6. fabric ================================================================
+
+# -- capacity --
 
 variable "fabric_capacity_admin" {
   description = "UPN made administrator of the F2 capacity. Required when create_fabric = true (TF-7); the preflight sets it to the deploying user."
@@ -217,6 +231,8 @@ variable "fabric_capacity_sku" {
   type        = string
   default     = "F2"
 }
+
+# -- workspace and items (BYO values are required when create_fabric = false) --
 
 variable "fabric_workspace_role" {
   description = "Workspace role the API identity receives when manage_fabric_access = true. Contributor covers OneLake ReadAll and Warehouse writes; item-level ReadAll is not expressible in the provider."
@@ -245,6 +261,8 @@ variable "fabric_lakehouse_name" {
   type        = string
   default     = ""
 }
+
+# -- Warehouse and source schema --
 
 variable "fabric_warehouse_id" {
   description = "BYO Warehouse item id."
@@ -282,7 +300,9 @@ variable "source_schema" {
   default     = "tcc_source"
 }
 
-# --- AI --------------------------------------------------------------------------
+# ==== 7. AI ====================================================================
+
+# -- Foundry model deployment --
 
 variable "foundry_model" {
   description = "Model deployed for the narrating agents (AI-1)."
@@ -305,6 +325,8 @@ variable "foundry_capacity" {
   type        = number
   default     = 20
 }
+
+# -- model gateway and provider chain --
 
 variable "ai_gateway_endpoint" {
   description = "Optional model gateway (AI-2, AI-03): an https:// base URL without a path. It must expose an OpenAI-compatible chat-completions API with streaming and tool calling (not the Foundry Agents protocol). Empty calls Foundry directly."
@@ -379,6 +401,8 @@ variable "ai_gateway_timeout_seconds" {
   }
 }
 
+# -- egress policy and model roles --
+
 variable "ai_egress_policy" {
   description = "What may leave Microsoft's boundary in a prompt (AI_EGRESS_POLICY): allow_all | aggregates_only | block. Empty leaves the application default."
   type        = string
@@ -413,6 +437,7 @@ variable "ai_foundry_connection_name" {
   default     = ""
 }
 
+# -- Key Vault references --
 # Key Vault REFERENCE inputs: the NAME of a secret that already exists in the
 # vault. Terraform never sees the value; App Service resolves it at runtime
 # through the API identity, which the keyvault module grants Key Vault Secrets User.
@@ -445,7 +470,7 @@ variable "ai_gateway_oauth_secret_name" {
   }
 }
 
-# --- Foundry network posture (DEMO ONLY) -------------------------------------------
+# ==== 8. Foundry network posture (DEMO ONLY) ===================================
 
 variable "foundry_public_network_access" {
   description = "DEMO ONLY. false (default) keeps the Foundry data plane private. true enables its public endpoint (Entra-only; local auth stays off; the private endpoint and DNS stay) so an operator's workstation can deploy and smoke-test the hosted agent. Synthetic data only: refused with the enterprise profile and with data_classification = customer. See docs/architecture/HARDENING-PLAN.md."
@@ -473,7 +498,7 @@ variable "foundry_allow_any_ip" {
   default     = false
 }
 
-# --- Microsoft 365 channel gateway (proof of concept) -------------------------------
+# ==== 9. Microsoft 365 channel gateway (proof of concept) ======================
 
 variable "enable_m365_channel" {
   description = "Create the channel gateway: a third App Service on the existing plan, its identity and its settings. Off by default; with it off the plan is unchanged. Public profile only (PoC): the gateway is the one new public surface."
@@ -539,7 +564,7 @@ variable "channel_resolve_display_names" {
   default     = false
 }
 
-# --- governed data access (the agent's structured data queries) ----------------------
+# ==== 10. governed data access (the agent's structured data queries) ===========
 # Every value is a non-secret API app setting, emitted only when set, so a default plan
 # is unchanged. docs/m365-channel/DATA-ACCESS.md says what each one does.
 
@@ -601,7 +626,7 @@ variable "lakehouse_sql_database" {
   default     = ""
 }
 
-# --- mock AI gateway (proof of concept only) --------------------------------------
+# ==== 11. mock AI gateway (proof of concept only) ==============================
 
 variable "enable_mock_ai_gateway" {
   description = "Create a mock OpenAI-compatible gateway App Service on the existing plan (scripts/mock-ai-gateway.py) for a proof of concept. Never in the enterprise profile."
@@ -629,7 +654,7 @@ variable "mock_ai_gateway_entra_audience" {
   default     = "api://mock-gateway"
 }
 
-# --- storage ---------------------------------------------------------------------
+# ==== 12. storage ==============================================================
 
 variable "outputs_retention_days" {
   description = "Lifecycle retention on the outputs container (D9)."
