@@ -11,6 +11,9 @@ Settings (all non-secret; none required — absent means the defaults below):
 - `DATA_QUERY_MAX_ROWS` (500) — the server's row cap; it can only lower a specification's own limit.
 - `DATA_QUERY_RATE_PER_MINUTE` (30) — per-person budget, refused (not queued) beyond it.
 - `DATA_QUERY_MAX_CONCURRENCY` (4) — data queries in flight at once, across all people.
+- `DATA_MIN_GROUP_SIZE` (5, never below 2) — the smallest group of people an aggregate over employee-level
+  data may show; smaller groups are left out and counted (`small_groups.py`). Not mapped in Terraform: it is a
+  privacy floor, so the code default is the deployed value unless an operator raises it by hand.
 - `DATA_QUERY_SOURCE_ENABLED` (false) — switches ON the lakehouse source datasets (raw payroll);
   the Gold and ops datasets in the Warehouse are not behind it. Enabled by deployment, not by code.
 - `LAKEHOUSE_SQL_SERVER` / `LAKEHOUSE_SQL_DATABASE` — the lakehouse SQL analytics endpoint
@@ -33,6 +36,7 @@ from application.data.limits import (
 )
 from application.data.semantic_model import Source, default_model
 from application.data.service import DataQueryService
+from application.data.small_groups import DEFAULT_MIN_GROUP_SIZE, MIN_GROUP_SIZE_FLOOR
 from application.data.spec import MAX_LIMIT
 from application.rate_limit import RateLimiter
 
@@ -54,11 +58,16 @@ def source_enabled(environ: Mapping[str, str] = os.environ) -> bool:
 
 
 def limits_from_env(environ: Mapping[str, str] = os.environ) -> QueryLimits:
-    """The timeout, row cap and concurrency from settings, each clamped into its allowed range."""
+    """The timeout, row cap, concurrency and group floor from settings, each clamped into its allowed range.
+
+    `DATA_MIN_GROUP_SIZE` (5) can raise the smallest group a result may show but never lower it below 2:
+    a smaller value is read as 2, not as "off".
+    """
     return QueryLimits(
         timeout_s=_number(environ, "DATA_QUERY_TIMEOUT_SECONDS", DEFAULT_TIMEOUT_S, 1, 120),
         hard_max_rows=int(_number(environ, "DATA_QUERY_MAX_ROWS", MAX_LIMIT, 1, MAX_LIMIT)),
         max_concurrency=int(_number(environ, "DATA_QUERY_MAX_CONCURRENCY", DEFAULT_MAX_CONCURRENCY, 1, 16)),
+        min_group_size=int(_number(environ, "DATA_MIN_GROUP_SIZE", DEFAULT_MIN_GROUP_SIZE, MIN_GROUP_SIZE_FLOOR, 1000)),
     )
 
 

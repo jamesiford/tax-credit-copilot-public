@@ -72,6 +72,7 @@ def _facts(result: QueryResult) -> dict[str, Any]:
         "select": list(p.select), "group_by": list(p.group_by),
         "measures": [dict(m) for m in p.measures], "filters": [dict(f) for f in p.filters],
         "notes": list(p.notes),
+        **({"small_groups": dict(p.small_groups)} if p.small_groups else {}),
     }
 
 

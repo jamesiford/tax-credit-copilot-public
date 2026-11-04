@@ -10,7 +10,9 @@ In order, and each step refuses rather than degrades:
 3. **Spend the person's budget**, then **take a bulkhead slot**, so a loop of queries cannot
    crowd out the portal.
 4. **Execute** under the timeout and row cap, then read the run behind a live-run dataset.
-5. **Return** rows, the lane they belong to (`audience`), the employee-level labels CH-16d must
+5. **Withhold small groups** of an aggregate over people (`small_groups.py`), unless the caller is
+   exempt, before any lane is projected from the rows.
+6. **Return** rows, the lane they belong to (`audience`), the employee-level labels CH-16d must
    keep out of model-visible facts, and the provenance.
 
 Nothing here formats a number or writes prose.
@@ -32,6 +34,7 @@ from application.data.plan import ResultColumn
 from application.data.provenance import QueryProvenance, build_provenance
 from application.data.run_context import read_live_run
 from application.data.semantic_model import Currency, Source, SemanticModel
+from application.data.small_groups import SmallGroupReport, WRITER, counts_people, require_person_keys, withhold
 from application.data.spec import QuerySpec
 from application.data.validate import validate
 
@@ -63,6 +66,7 @@ class DataQueryService:
         schemas: SchemaNames = DEFAULT_SCHEMAS, disabled: Collection[Source] = (),
         years_for: YearsFor | None = None,
     ) -> None:
+        require_person_keys(model)
         self._model, self._executors, self._schemas = model, dict(executors), schemas
         self._limits = limits or QueryLimits()
         self._bulkhead = Bulkhead(self._limits.max_concurrency, self._limits.busy_wait_s)
@@ -77,6 +81,11 @@ class DataQueryService:
         """The semantic model this service validates against: what the catalog tool describes."""
         return self._model
 
+    @property
+    def min_group_size(self) -> int:
+        """The smallest group of people an aggregate may show to a caller the rule applies to."""
+        return self._limits.min_group_size
+
     def audience_of(self, spec: QuerySpec) -> str:
         """The lane a result for `spec` would travel in, decided before anything runs.
 
@@ -85,18 +94,34 @@ class DataQueryService:
         """
         return result_audience(validate(spec, self._model))
 
-    def run(self, spec: QuerySpec, *, principal: str) -> QueryResult:
-        """Validate, budget, execute and describe. Raises a typed `QueryError`; never a partial result."""
+    def run(self, spec: QuerySpec, *, principal: str, suppress_small_groups: bool = True) -> QueryResult:
+        """Validate, budget, execute and describe. Raises a typed `QueryError`; never a partial result.
+
+        `suppress_small_groups` is True unless the caller is entitled to the client's employee rows
+        (a writer): the capability decides that, this only applies it, before any lane is projected.
+        """
         source = self._source_of(spec)
         executor = self._executor(source)
         known = self._years_for(spec.client_id) if self._years_for and isinstance(spec.client_id, int) else None
-        built = build_query(spec, self._model, executor.dialect, self._schemas, known_years=known)
+        built = build_query(spec, self._model, executor.dialect, self._schemas, known_years=known,
+                            count_people=suppress_small_groups)
         self._spend(principal)
         row_limit = self._limits.rows_for(built.plan.limit)
         with self._bulkhead.slot():
             rows = self._execute(executor, built, row_limit)
             run = self._live_run(executor, built)
-        return self._result(built, rows, row_limit, run)
+        rows, report = self._small_groups(built, rows, suppress_small_groups)
+        return self._result(built, rows, row_limit, run, report)
+
+    def _small_groups(self, built: BuiltQuery, rows: Rows, suppress: bool) -> tuple[Rows, SmallGroupReport | None]:
+        """Apply the minimum group size to rows that came with their group sizes; say what it did."""
+        k = self._limits.min_group_size
+        if not counts_people(built.plan):
+            return rows, None
+        if not suppress:
+            return rows, SmallGroupReport(k, applied=False, exempt=WRITER)
+        kept, left_out = withhold(rows, k, grouped=bool(built.plan.group_by))
+        return kept, SmallGroupReport(k, applied=True, suppressed_groups=left_out)
 
     def _source_of(self, spec: QuerySpec) -> Source:
         dataset = self._model.dataset(spec.dataset) if isinstance(spec.dataset, str) else None
@@ -133,10 +158,11 @@ class DataQueryService:
             lambda lookup, rows: self._execute(executor, lookup, rows),
         )
 
-    def _result(self, built: BuiltQuery, rows: Rows, row_limit: int, run) -> QueryResult:
+    def _result(self, built: BuiltQuery, rows: Rows, row_limit: int, run, report: SmallGroupReport | None) -> QueryResult:
         plan = built.plan
         provenance = build_provenance(
             built, self._schemas, rows, row_limit=row_limit, run=run, executed_at=datetime.now(timezone.utc),
+            small_groups=report,
         )
         return QueryResult(
             columns=plan.result_columns, rows=rows.rows, audience=result_audience(plan),

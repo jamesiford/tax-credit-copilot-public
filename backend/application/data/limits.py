@@ -7,7 +7,8 @@ each REFUSES rather than queues, because a queued query is exactly the load bein
 - **A per-person budget** (`allow(key) -> (bool, wait_seconds)`, the gateway's token bucket).
 - **A concurrency bulkhead**: at most N data queries in flight across all people; the next one
   is refused as `query_busy` after a short wait, not held.
-- **Timeout and row caps** carried in `QueryLimits` and applied by the adapters and the service.
+- **Timeout and row caps** carried in `QueryLimits` and applied by the adapters and the service,
+  with the minimum group size (`small_groups.py`), which the service applies to every result.
 
 All per process: with several workers the effective ceiling is the figure times the worker
 count, which the runbook states rather than hides.
@@ -21,6 +22,7 @@ from dataclasses import dataclass
 from typing import Protocol
 
 from application.data.exec_errors import QueryBusy
+from application.data.small_groups import DEFAULT_MIN_GROUP_SIZE, MIN_GROUP_SIZE_FLOOR
 from application.data.spec import MAX_LIMIT
 
 DEFAULT_TIMEOUT_S = 20.0
@@ -37,10 +39,13 @@ class QueryLimits:
     hard_max_rows: int = MAX_LIMIT
     max_concurrency: int = DEFAULT_MAX_CONCURRENCY
     busy_wait_s: float = DEFAULT_BUSY_WAIT_S
+    min_group_size: int = DEFAULT_MIN_GROUP_SIZE
 
     def __post_init__(self) -> None:
         if self.timeout_s <= 0 or self.max_concurrency < 1 or not 1 <= self.hard_max_rows <= MAX_LIMIT:
             raise ValueError("data query limits out of range")
+        if self.min_group_size < MIN_GROUP_SIZE_FLOOR:
+            raise ValueError(f"the minimum group size can never be below {MIN_GROUP_SIZE_FLOOR}")
 
     def rows_for(self, requested: int) -> int:
         """The rows this query may return: its own limit, never above the server cap."""

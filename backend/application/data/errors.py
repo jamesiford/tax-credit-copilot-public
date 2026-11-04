@@ -147,3 +147,9 @@ class DuplicateName(QueryError):
     """Two output columns would carry the same name."""
 
     code = "duplicate_name"
+
+
+class GroupsAreIndividuals(QueryError):
+    """Every group in the result holds one person, so the grouping lists individuals rather than describing a group."""
+
+    code = "groups_are_individuals"

@@ -27,7 +27,7 @@ _MONTHS = tuple(f"month_{n:02d}" for n in range(1, 13))
 PERIOD_FACT = Dataset(
     name="employee_period_fact", source=Source.WAREHOUSE, schema=SchemaKey.GOLD,
     table="employee_period_fact", tenant_column="client_id", currency=Currency.LIVE_RUN,
-    employee_level=True, year_column="tax_year", period_columns=("pay_period_start", "pay_period_end", "pay_date"),
+    employee_level=True, person_key="employee_id", year_column="tax_year", period_columns=("pay_period_start", "pay_period_end", "pay_date"),
     grain="One row per employee per pay period, after the payroll was normalised. The only table that scales with payroll.",
     description="The denominator grain: every pay period the run consumed, with its hours, wages and why it counted or not.",
     columns=(
@@ -59,7 +59,7 @@ PERIOD_FACT = Dataset(
 ELIGIBILITY = Dataset(
     name="employee_eligibility", source=Source.WAREHOUSE, schema=SchemaKey.GOLD,
     table="employee_eligibility", tenant_column="client_id", currency=Currency.LIVE_RUN,
-    employee_level=True, year_column="tax_year", method_column="method",
+    employee_level=True, person_key="employee_id", year_column="tax_year", method_column="method",
     grain="One row per employee per method per tax year, eligible or not.",
     description="The engine's verdict on every employee, with the hours and wages behind it. Near misses are rows too.",
     columns=(
@@ -88,7 +88,7 @@ ELIGIBILITY = Dataset(
 ONEZERO = Dataset(
     name="onezero_matrix", source=Source.WAREHOUSE, schema=SchemaKey.GOLD,
     table="onezero_matrix", tenant_column="client_id", currency=Currency.LIVE_RUN,
-    employee_level=True, year_column="tax_year", method_column="method", month_columns=_MONTHS,
+    employee_level=True, person_key="employee_id", year_column="tax_year", method_column="method", month_columns=_MONTHS,
     period_columns=("first_pps", "last_ppe"),
     grain="One row per eligible employee per worksite per method per tax year; twelve monthly One/Zero cells.",
     description="The One/Zero decision for each employee who qualified: counted (1 or the part-time weight) or not (0) in each month.",

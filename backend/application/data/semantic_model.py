@@ -176,6 +176,7 @@ class Dataset:
     joins: tuple[JoinDecl, ...] = ()
     engine_notes: tuple[tuple[str, str], ...] = ()
     excluded_columns: tuple[tuple[str, str], ...] = ()
+    person_key: str | None = None  # the column that counts people, for small-group suppression
 
     def column(self, logical: str) -> Column | None:
         """The modelled column with this logical name, blocked ones included."""

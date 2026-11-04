@@ -74,3 +74,14 @@ def refuse_employee_level_for_cowork(principal: Principal, audience: str) -> Non
     """Raise the plain refusal when Cowork asked for person-level rows and the caller is not a writer."""
     if audience == USER and is_cowork(principal) and not _is_writer(principal):
         raise DataQueryRefused(EMPLOYEE_LEVEL_MESSAGE, code=EMPLOYEE_LEVEL_CODE, status=403)
+
+
+def suppress_small_groups(principal: Principal) -> bool:
+    """Whether the minimum group size applies: to everybody except a writer, in every channel and both lanes.
+
+    A writer is entitled to the client's employee rows, so a small group tells them nothing they may not
+    read. The client check ran at the API edge (`authorize_clients`) before any capability, and this build
+    has no per-client ownership beyond it, so "a writer viewing their own client" is a writer on an
+    authorised client. An unknown or anonymous caller is not a writer: suppressed. [RM-01, ADR-009]
+    """
+    return not _is_writer(principal)

@@ -27,6 +27,10 @@ def _value(column: Column | None, physical: str, client: int, i: int, dataset: D
         return f"run-{client}"
     if column is None:
         return 1
+    if physical == "employee_id":
+        return f"employee-{client}-{i}"  # one person per row, so a group's size is the count of its rows
+    if physical == "LocationId" and dataset.name == "payroll":
+        return i % 2 + 1  # two payroll sites with two people each: a group by location is not all singletons
     if column.choices:
         return column.choices[i % len(column.choices)] if column.logical == dataset.method_column else column.choices[0]
     return {

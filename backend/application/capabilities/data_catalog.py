@@ -29,6 +29,10 @@ _COWORK_NOTE = (
     "entitled to make changes; counts, sums and averages over employees are."
 )
 _NEXT_STEP = "Pass dataset=<name> to see a dataset's columns, then call data_query with those names exactly."
+_SMALL_GROUPS_NOTE = (
+    "An aggregate over employee-level data leaves out any group of fewer than {k} people and says how many it left "
+    "out; that is the platform's privacy rule, so do not try to get around it with a finer grouping or a narrower filter."
+)
 _NO_MATCH = (
     "No dataset or column matches that search, so the data has nothing for it. Say so; do not guess a "
     "column name. Try a different word, or call with no search to list every dataset."
@@ -105,7 +109,10 @@ def _facts(principal: Principal, dataset: str | None, search: str | None) -> dic
     needle = search.strip().lower() if search else None
     entries, omitted = _entries(dataset, needle)
     missed = bool(needle) and not entries and not omitted
-    return {"dataset_count": len(entries), "datasets": entries, "notes": _notes(principal, dataset, omitted, missed=missed)}
+    notes = _notes(principal, dataset, omitted, missed=missed)
+    if any(e["employee_level"] for e in entries):
+        notes.append(_SMALL_GROUPS_NOTE.format(k=service().min_group_size))
+    return {"dataset_count": len(entries), "datasets": entries, "notes": notes}
 
 
 def _column_row(c: dict[str, Any]) -> tuple[str, ...]:

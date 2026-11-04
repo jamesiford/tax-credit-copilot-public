@@ -29,7 +29,7 @@ _DEPENDS = ("PayDate", "PayPeriodEnd")
 
 PAYROLL = Dataset(
     name="payroll", source=Source.LAKEHOUSE, schema=SchemaKey.SOURCE, table="Payroll",
-    tenant_column="AccountId", employee_level=True,
+    tenant_column="AccountId", employee_level=True, person_key="employee_id",
     period_columns=("pay_period_start", "pay_period_end", "pay_date"),
     grain="One row per employee per pay period per pay code, exactly as received.",
     description="The payroll rows before any engine rule: hours, wages, rate, pay code and location for every pay period.",
