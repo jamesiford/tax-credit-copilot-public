@@ -1,0 +1,31 @@
+{"id":"book-1","question":"Who should we reach out to this quarter?","expected":["book"]}
+{"id":"book-2","question":"Which clients are worth contacting first?","expected":["book"]}
+{"id":"explain-1","question":"Walk me through how you calculated the credit","expected":["explain"]}
+{"id":"explain-2","question":"Show the calculation for this client","expected":["explain"]}
+{"id":"simulate-1","question":"What if we hired five more people next month?","expected":["simulate"]}
+{"id":"simulate-2","question":"Simulate hiring ten people at the Atlanta location","expected":["simulate"]}
+{"id":"at-risk-1","question":"Which of the counted jobs could fall off the credit?","expected":["at_risk"]}
+{"id":"at-risk-2","question":"Who is close to the threshold and might lose eligibility?","expected":["at_risk"]}
+{"id":"trend-1","question":"What is their trend since the base year?","expected":["trend"]}
+{"id":"trend-2","question":"How has headcount moved year over year?","expected":["trend"]}
+{"id":"situation-1","question":"Brief me on this client before my call","expected":["situation"]}
+{"id":"situation-2","question":"Why would I call them this week?","expected":["situation"]}
+{"id":"discovery-1","question":"What other credits might they qualify for?","expected":["discovery"]}
+{"id":"discovery-2","question":"Are there additional credits we have not looked at?","expected":["discovery"]}
+{"id":"multi-state-1","question":"Show me the full credit picture across every state","expected":["multi_state"]}
+{"id":"eligibility-1","question":"What is the credit for this client?","expected":["eligibility"]}
+{"id":"eligibility-2","question":"How many qualifying jobs did they have in 2023?","expected":["eligibility"]}
+{"id":"two-intents-1","question":"Brief me on them and what else might they qualify for","expected":["situation","discovery"]}
+{"id":"two-intents-2","question":"What is their trend, and walk me through how you got the credit","expected":["explain","trend"]}
+{"id":"live-only-1","mode":"live","question":"Is anyone we counted in danger of dropping out, and what would it take to keep them?","expected":["at_risk"]}
+{"id":"live-only-2","mode":"live","question":"I only care about the ones we could still win this year","expected":["book"]}
+{"id":"book-3","question":"Which of our clients should we call first and why?","expected":["book"]}
+{"id":"book-4","question":"Across all our clients, who is worth contacting this week?","expected":["book"]}
+{"id":"client-brief-named","question":"Brief me on Northwind Care Systems before my call","expected":["situation"],"forbidden":["book"]}
+{"id":"client-their-trend","question":"And what is their trend?","expected":["trend"],"forbidden":["book"]}
+{"id":"client-their-credit","question":"What is their credit for 2023?","expected":["eligibility"],"forbidden":["book"]}
+{"id":"client-what-if","question":"What if Cascade Retail Partners hired three more people at site A-1 in 2023?","expected":["simulate"],"forbidden":["book"]}
+{"id":"client-at-risk","question":"Which counted jobs at Ironbridge Logistics could fall out of the credit in 2023?","expected":["at_risk"],"forbidden":["book"]}
+{"id":"client-at-risk-their","question":"Which of their counted jobs could fall out?","expected":["at_risk"],"forbidden":["book"]}
+{"id":"live-only-3","mode":"live","question":"Give me a brief on Northwind Care Systems before my call","expected":["situation"],"forbidden":["book"]}
+{"id":"live-only-4","mode":"live","question":"Where does Ironbridge stand this year?","expected":["situation"],"forbidden":["book"]}

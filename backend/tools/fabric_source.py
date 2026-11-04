@@ -42,12 +42,13 @@ DESIGN NOTES / SCOPE:
 from __future__ import annotations
 
 import csv
-import os
 import warnings
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
 from typing import Any, Iterable
+
+from config import get_settings
 
 _SEED_EMPLOYEES = Path(__file__).resolve().parent.parent / "data" / "fabric_seed" / "Employees.csv"
 
@@ -186,7 +187,7 @@ def active_data_source() -> str:
       it so the suite stays offline and deterministic; nothing that ships
       selects it. See `backend/data/payroll_pay_periods.csv`.
     """
-    value = resolve_data_source_alias(os.getenv("DATA_SOURCE", "lakehouse").strip().lower())
+    value = resolve_data_source_alias(get_settings().data_source.data_source)
     return value if value in {"fabric", "csv"} else "lakehouse"
 
 
@@ -237,11 +238,10 @@ class FabricEmployeesAdapter:
     employees_table: str | None = None
 
     def __post_init__(self) -> None:
-        self.workspace = self.workspace or os.getenv("FABRIC_WORKSPACE")
-        self.lakehouse = self.lakehouse or os.getenv("FABRIC_LAKEHOUSE")
-        self.employees_table = self.employees_table or os.getenv(
-            "FABRIC_EMPLOYEES_TABLE", "dbo/employees"
-        )
+        configured = get_settings().data_source
+        self.workspace = self.workspace or configured.fabric_workspace
+        self.lakehouse = self.lakehouse or configured.fabric_lakehouse
+        self.employees_table = self.employees_table or configured.fabric_employees_table
 
     def is_configured(self) -> bool:
         return active_data_source() == "fabric" and bool(self.lakehouse)

@@ -1,14 +1,11 @@
-"""Foundry agent registry.
+"""Agent modules: one display profile per agent; the declaration is `agents.json`.
 
-Each specialist agent module exports `build(ctx)` which:
-  1. Constructs a local AF `Agent` with the Foundry chat client + tools + instructions.
-  2. Calls `to_prompt_agent()` then `project_client.agents.create_version()` to publish.
-  3. Returns a `FoundryAgent` bound to the published version, ready for `.run_stream()`.
-
-`backend.agents.factory.build_all()` wires the project client + model, calls each
-agent's `build()` in order, and returns the populated registry + a list of
-(name, agent_id, version, portal_url) tuples for the boot-log deep links.
+Each module exports `NAME`, `INSTRUCTIONS`, `AGENT_PROFILE` and `SPEC`, the last built by
+`roster.build_spec` from the one list in `agents/agents.json` (name, prompt file, model
+role, temperature, tools). `agents.factory.all_specs()` yields the roster as data; the
+provider that serves an agent publishes and runs it (`infrastructure/ai/`). No agent holds
+a tool: tools calculate, agents narrate.
 """
-from .factory import AgentRecord, AgentRegistry, build_all
+from .factory import all_specs, list_agent_modules
 
-__all__ = ["AgentRecord", "AgentRegistry", "build_all"]
+__all__ = ["all_specs", "list_agent_modules"]

@@ -27,7 +27,7 @@ def test_ingestion_pay_code_split_present(client):
 
 
 def test_ingestion_resolve_and_reopen(client):
-    from api.ingestion import reset_qc_resolutions
+    from application.qc_resolutions import reset_qc_resolutions
 
     reset_qc_resolutions()
     eid = "t2:E00042:2025-06"
@@ -86,7 +86,7 @@ def test_ingestion_rows_sort_the_whole_list_before_paging(client):
 def test_qc_assign_corrects_the_engine(client):
     """Resolving a test-of-twos (assign the head to one unit) removes the
     double-count, so the One/Zero average headcount drops."""
-    from api.ingestion import reset_qc_resolutions
+    from application.qc_resolutions import reset_qc_resolutions
 
     reset_qc_resolutions()
 
@@ -142,7 +142,7 @@ def test_every_exception_id_is_unique(client):
 
 def test_a_scraggly_id_carries_no_employee_id():
     # The id travels in the resolve URL's PATH, where an employee id must not go.
-    from api.ingestion import _exception_id
+    from application.qc_resolutions import exception_id as _exception_id
     from tools.qc import detect_scraggly_pay_periods
 
     [anomaly] = detect_scraggly_pay_periods(
@@ -178,7 +178,7 @@ def test_a_line_key_does_not_depend_on_read_order():
 
 
 def test_dropping_one_line_keeps_the_real_wages_paid_the_same_day():
-    from api.ingestion import _QC_RESOLUTIONS, apply_calc_drops, reset_qc_resolutions
+    from application.qc_resolutions import QC_RESOLUTIONS as _QC_RESOLUTIONS, apply_calc_drops, reset_qc_resolutions
     from tools.qc import pay_line_keys
 
     real, stray = _line(), _line(Gross_Wages=-0.24, Hours_Worked=0.0)
@@ -192,7 +192,7 @@ def test_dropping_one_line_keeps_the_real_wages_paid_the_same_day():
 
 
 def test_dropping_one_of_two_identical_lines_keeps_the_other():
-    from api.ingestion import _QC_RESOLUTIONS, apply_calc_drops, reset_qc_resolutions
+    from application.qc_resolutions import QC_RESOLUTIONS as _QC_RESOLUTIONS, apply_calc_drops, reset_qc_resolutions
     from tools.qc import pay_line_keys
 
     rows = [_line(Gross_Wages=-0.24), _line(Gross_Wages=-0.24)]

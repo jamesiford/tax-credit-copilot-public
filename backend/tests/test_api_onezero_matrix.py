@@ -40,7 +40,7 @@ def test_method_must_be_one_the_engine_actually_runs():
 
 def test_an_unauthored_year_is_declined_not_priced_from_a_neighbour():
     """[ADR-005] A missing rule pack is a gap in coverage, not a rounding error."""
-    from application.wiring import get_mediator
+    from bootstrap.wiring import get_mediator
 
     with pytest.raises(ClientRunNotAvailable):
         get_mediator().send(GetOneZeroMatrixQuery(tax_year=2015, state="GA"))
@@ -51,7 +51,7 @@ def test_an_unauthored_year_is_declined_not_priced_from_a_neighbour():
 
 @pytest.mark.parametrize("method", ["min_max", "pay_period"])
 def test_the_matrix_allocates_eligible_employees_to_unit_and_entity(lakehouse_source, method):
-    from application.wiring import get_mediator
+    from bootstrap.wiring import get_mediator
 
     body = get_mediator().send(
         GetOneZeroMatrixQuery(tax_year=2023, state="GA", account_id=1001, method=method)
@@ -75,7 +75,7 @@ def test_no_employee_is_counted_twice_in_the_same_month(lakehouse_source):
     `_dedupe_one_per_month` enforces this inside the engine and does not record
     the decision anywhere, so this test is the only evidence the rule held.
     """
-    from application.wiring import get_mediator
+    from bootstrap.wiring import get_mediator
 
     body = get_mediator().send(
         GetOneZeroMatrixQuery(tax_year=2023, state="GA", account_id=1001)
@@ -96,7 +96,7 @@ def test_the_matrix_and_the_population_agree_on_the_window(lakehouse_source):
     If these ever diverge, Who qualifies and One/Zero will show different
     answers for the same client and both will look defensible on their own.
     """
-    from application.wiring import get_mediator
+    from bootstrap.wiring import get_mediator
 
     mediator = get_mediator()
     population = mediator.send(
@@ -114,7 +114,7 @@ def test_the_matrix_and_the_population_agree_on_the_window(lakehouse_source):
 
 
 def test_two_clients_get_different_matrices(lakehouse_source):
-    from application.wiring import get_mediator
+    from bootstrap.wiring import get_mediator
 
     mediator = get_mediator()
     reference = mediator.send(

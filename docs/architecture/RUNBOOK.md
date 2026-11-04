@@ -286,6 +286,11 @@ The messages it can raise, verbatim fragments to search for:
   `"...must use 'warehouse'"` — `ARTIFACT_STORE` / `ARTIFACT_REPOSITORY`.
 - `"AUTH_MODE=entra needs AUTH_TENANT_ID"` / `"...needs API_AUDIENCE"` —
   enterprise profile misconfigured.
+- `"AUTH_MODE=none is only for local development"` — RM-03: `AUTH_MODE` defaults
+  to `entra`, and `none` needs `ENVIRONMENT=local` set explicitly, or (a deployed
+  synthetic demo) `ALLOW_ANONYMOUS_SYNTHETIC=1` with
+  `DATA_CLASSIFICATION=synthetic`. The Terraform public profile sets the flag; a
+  hand-built environment that forgot `AUTH_MODE` must be given entra settings.
 - `"AUTH_MODE=none is refused with DATA_CLASSIFICATION=customer"` — D26: the
   public profile's defaults (`AUTH_MODE=none`) must never be paired with real
   payroll.
@@ -308,7 +313,7 @@ azd env get-values | ForEach-Object { if ($_ -match '^([^=]+)="?(.*?)"?$') { Set
 
 | Operation | Command | Notes |
 |---|---|---|
-| Redeploy code only (no infra change) | `azd deploy` (local azd environment) or dispatch `.github/workflows/deploy.yml` (`workflow_dispatch` only — there is no push trigger, D23) | `azd deploy` packages and zip-deploys both apps without re-running `terraform apply`; the postprovision hooks do not re-run |
+| Redeploy code only (no infra change) | `azd deploy` (local azd environment) or dispatch `.github/workflows/deploy.yml` (`workflow_dispatch` only — there is no push trigger, D23) | `azd deploy` packages and zip-deploys both apps without re-running `terraform apply`; the postprovision hooks do not re-run. The `postdeploy` hook then runs `scripts/deploy-channel.ps1`, which deploys the channel gateway only when `TCC_ENABLE_M365_CHANNEL=true` and otherwise exits 0 (`pwsh scripts/deploy-channel.ps1 -WhatIf` shows what it would do) |
 | Full provision + deploy | `azd up --no-prompt` | Idempotent: a second `azd provision --preview` reports no changes |
 | Run pending migrations | `python scripts/apply-migrations.py --target deployed` | Never pass `--bootstrap` against a Warehouse that already has `tcc_ops.schema_migration` — bootstrap is destructive and is gated to run only once, on a Warehouse Terraform just created (D22) |
 | Re-grant Warehouse SQL | `python scripts/grant-warehouse-sql.py --target deployed` | `GRANT` is idempotent; re-run after rotating or recreating the API identity |
@@ -330,3 +335,171 @@ event from a different table and none alone is enough to reproduce it:
 | Request path and `ResultCode` | `AppRequests.Url`, `AppRequests.ResultCode` |
 | `artifact_id` / `access_id` | `tcc_ops.artifact_access`, for a download issue (§8) |
 | Time window (UTC) and approximate `client_id` | Needed to bound every query above |
+
+## 13. Channel gateway (Microsoft 365)
+
+Only when `enable_m365_channel` is on. The gateway is `app-tcc-channel-<suffix>`
+(`channel.main:app`). Its health is `GET /channel/health` and `/channel/ready`, which
+need no credentials. Every error it returns has the same body,
+`{"error": {"code", "message", "retryable"}, "correlation_id"}`: quote the correlation id.
+
+**One correlation id follows a call.** The gateway puts it in the acting-user header it
+sends the API (and in `X-Correlation-Id`), so the capability's own audit rows carry the
+same id as the gateway's: `tcc_ops.channel_audit` joins on it.
+
+### 13.1 Symptoms
+
+| Symptom | Meaning | Check |
+|---|---|---|
+| **401** `unauthenticated` | No proof of identity: no bearer token, a malformed or expired one, a wrong audience (it must be `GATEWAY_AUDIENCE`, as `api://<id>` or the bare id) or a wrong issuer (a token from another tenant) | The caller's token claims (`aud`, `iss`, `exp`). Never paste a token into a ticket |
+| **403** `caller_not_allowed` | The token is valid but the app holds neither the role `Channel.Invoke` nor an app id on `CHANNEL_ALLOWED_CALLER_APP_IDS` | Assign the role to the orchestrator's agent identity, or (sandbox only) add its app id. `channel_ping` (below) names which rule admitted a caller |
+| **403** `missing_scope` / `mixed_token` / `tenant_mismatch` | A delegated token without `Channel.Access`; a token that mixes app-only and delegated claims; an acting user from another tenant | The registration's exposed scope and consent; the `X-Acting-Tenant` header |
+| **400** `invalid_acting_user` | An agent call must name the user on every request: `X-Acting-User-Oid` (GUID), `X-Acting-User-Name`, `X-Acting-Tenant`, `X-Channel` (`teams` or `m365-copilot`), `X-Conversation-Id` | The headers the orchestrator actually sends (`channel_ping` echoes them as received) |
+| **502** `api_error` | **The API refused the gateway**, not the user: its token lacks the `TCC.Agent` role, or the API's access restriction did not admit the gateway. The user-facing 403 from the API is a different shape (`{"error": ...}`) and is passed through | Is the gateway still in the API's integration subnet (`api_access_restriction`, `terraform output`)? Was `TCC.Agent` assigned to `GATEWAY_IDENTITY_PRINCIPAL_ID`? `channel_ping` reports `api_reachable` |
+| **502** `api_unreachable` / `bad_response`, **504** `timeout` | The API did not answer, or answered with a body over 1 MB, or took longer than `CHANNEL_REQUEST_TIMEOUT_SECONDS` (30; the API's own limit is `CAPABILITY_TIMEOUT_SECONDS`, 25) | API health (§1). A timed-out **commit** may still have landed: retry with the same idempotency key, which replays rather than repeats |
+| **503** `audit_unavailable` | The opening audit event could not be written, so the call was **not made**: an action the platform cannot account for is not performed | The Warehouse grants for the gateway identity (below); Warehouse reachability |
+| **429** `rate_limited` | More than `CHANNEL_RATE_LIMIT_PER_MINUTE` (60) calls a minute for one user. `retry_after_seconds` and `Retry-After` say when. The refusal is itself audited | Raise the setting only knowing the limiter is **per process** |
+| `verify_figures` says every figure is wrong after a restart or a scale-out | **The fact ledger is lost on restart and is per process.** The gateway only remembers what a conversation was told while it was running, in one worker; with `WEB_CONCURRENCY` above 1 a conversation's facts may live in another worker. The strict answer is "no", never "yes" | Keep `WEB_CONCURRENCY=1` (the default). Re-fetch the figures in the conversation, then verify again |
+| A download link says 410 or 404 | A ticket works once, for 15 minutes, for one person. `confirmation_replayed` / `confirmation_expired` mean it was used or timed out; `confirmation_wrong_user` that a different person's token was presented (the owner's link is **not** burned by that) | Mint a new link with `claim_package_link` |
+| Cowork says "unknown session" (404 on `/mcp`) | MCP sessions are in memory and bound to one user: a restart or another user's session id is unknown, and the protocol's answer is to initialise again | None: the client re-initialises |
+| `/mcp` answers 400 "the Mcp-Session-Id header is required" or 400 "unsupported MCP-Protocol-Version" | The client sent a request with no session id after `initialize` (or a protocol version this server does not speak: 2025-11-25, 2025-06-18, 2025-03-26) | A client bug; the specification asks for the header on every later request. Check the client's version |
+| `/mcp` answers 403 `origin_not_allowed` | The request carried an `Origin` header and it is not on `CHANNEL_MCP_ALLOWED_ORIGINS` (the default admits none). A real MCP client sends no Origin; a web page does | If the real Cowork client is found to send one, add exactly that origin to the setting; never a wildcard |
+
+### 13.2 What the person did: the per-user audit
+
+```pwsh
+python scripts/channel-audit.py --user <entra object id> --since 2026-11-01
+python scripts/channel-audit.py --user "<display name from the writer list>" --tool engagement_set_commit
+```
+
+A request with a `begin` and no `end` is shown `PENDING` (a crash, or one still
+running). To follow one call, query the trail by its correlation id; the gateway and
+the capability inside the API write to the same table with the same id:
+
+```sql
+SELECT occurred_at, phase, tool_name, action_kind, outcome, error, elapsed_ms
+FROM tcc_ops.channel_audit
+WHERE correlation_id = '<correlation id from the error body>'
+ORDER BY occurred_at, event_seq;
+```
+
+Reads are audited by the gateway (a `begin` and an `end`). A write is audited by the
+capability inside the API; the gateway adds one event only for what the capability could
+not see: the rate limit, its own writer check, the API unreachable, a timeout, or a
+request refused before dispatch.
+
+### 13.3 Identity spike diagnostics
+
+Set `CHANNEL_DEBUG_WHOAMI=true` (then redeploy or restart) and call the tool
+`channel_ping`: it returns the gateway version, the caller's shape, **which rule admitted
+it** (`role` or `allow-list`), the acting-user headers exactly as received, and whether
+the API answers. It never returns a token. Turn it off afterwards.
+
+### 13.4 Grants the gateway needs that Terraform does not make
+
+`scripts/grant-warehouse-sql.py --target deployed --profile gateway` (run by
+postprovision when the channel is on) grants the gateway identity `INSERT, SELECT ON
+OBJECT::tcc_ops.channel_audit` and nothing else. A Fabric workspace role to connect, the
+`TCC.Agent` assignment and, for a group-based writer source, Graph `GroupMember.Read.All`
+are operator steps ([CONNECTIVITY-MATRIX.md §1a](CONNECTIVITY-MATRIX.md)).
+
+### 13.5 Which network posture is this environment in?
+
+```pwsh
+terraform -chdir=infra output network_posture      # or: azd env get-values | Select-String network_posture
+```
+
+`private` is the default: the Foundry data plane has public access off, so `azd ai agent`, `scripts/publish-m365.ps1`,
+`scripts/create-model-connection.ps1` and a workstation smoke test **fail** (403 or no route) from outside the VNet. That
+is the posture working, not a fault. `demo-public-foundry` is the **demo-only** posture
+(`TCC_FOUNDRY_PUBLIC_NETWORK_ACCESS=true`): the account's public endpoint is on, Entra-only, optionally firewalled to
+`TCC_FOUNDRY_ALLOWED_IP_RANGES`. It is refused with the enterprise profile and with customer data, and the plan prints a
+warning. After the demo set it back to `false` and `azd provision`; the account returns to private and nothing the demo
+created is lost. The plan for the later hardened posture, and the spike that must prove it first, are
+[HARDENING-PLAN.md](HARDENING-PLAN.md) and [HARDENING-SPIKE.md](../m365-channel/HARDENING-SPIKE.md).
+
+### 13.6 Operating the channel
+
+**Add or remove a writer** (the default source is the allow-list table; an Entra group is the alternative and
+needs Graph consent, [KNOWN-LIMITATIONS](../m365-channel/KNOWN-LIMITATIONS.md)):
+
+```pwsh
+python scripts/channel-writers.py add <entra object id> --name "<display name>" --by <your name>
+python scripts/channel-writers.py remove <entra object id>
+python scripts/channel-writers.py list
+```
+
+An allow-list change takes effect at the **next call**: the table is read on every commit, so a writer removed in the
+middle of a conversation is refused at their next commit and the refusal is audited. A group source caches its answer
+for 60 seconds. A person who is not a writer can still read everything; their previews and commits come back
+`not_authorized`. There is nothing to rotate: the channel holds no secret (managed identities, `DefaultAzureCredential`,
+no keys), so a leaked log or app setting contains no credential to roll.
+
+**Read one person's trail** is §13.2. **Read what changed for a client** with `GET /api/claims/cell/<client>/<programme>/<year>`
+(the cell's append-only history, each row naming who decided it).
+
+### 13.7 Fabric capacity paused
+
+The same fact as §3, with channel-specific symptoms. The gateway writes its audit to the Warehouse **before** it makes a
+call, and refuses the call if it cannot (`503 audit_unavailable`: "nothing was done"). With the capacity paused, expect:
+
+| What people see | Why |
+| --- | --- |
+| Every tool answers `audit_unavailable` or `api_unreachable` / `timeout` | The audit write, or the API's own Gold read, cannot reach the Warehouse |
+| Teams or Copilot Chat replies "the platform did not answer" in a sentence | The orchestrator says, in a sentence, that the platform could not answer, and changes nothing |
+| `/channel/health` is `ok` | It checks liveness only. `/channel/ready` does not check the Warehouse either |
+
+Resume the capacity, wait for a warm read (the first call after a pause can take a minute), and ask again. **A commit
+that timed out may have landed**: do not repeat it blind. Read the record back (`claim_cell_history`, `findings_list`),
+or retry with the **same idempotency key**, which replays the first outcome instead of writing twice. A `pending`
+audit row with no `end` (§13.2) marks a call whose outcome is unknown.
+
+### 13.8 A publish failed
+
+`scripts/publish-m365.ps1` prints the step that failed and never claims success without a `titleId`
+([PUBLISHING](../m365-channel/PUBLISHING.md) has the table of causes). First checks: is `Microsoft.BotService` registered
+(an operator's step; the script prints the command and never registers one); does the caller hold Foundry User and can it
+**reach the Foundry data plane**. If the posture is `private` (§13.5) a workstation cannot, and that is the posture
+working: use the demo toggle for the demo, or run from inside the network. A failed publish changes nothing a person
+sees: the previous published version keeps serving. Re-run it; the bot, channel and endpoint steps are idempotent, and a
+published version number is never reused. For the Cowork plugin, a failed upload names the manifest field it refused:
+rebuild with `scripts/build-cowork-plugin.py --strict` rather than editing the manifest.
+
+### 13.9 A spike in guard rejections
+
+The numeric guard drops a narration whole when it carries a figure the engine did not produce, so the person still gets
+the engine's blocks, only without the sentence. A **spike** in those drops means something upstream changed: a model
+deployment or version, the narrator's prompt, or a formatter. The answers stay correct; the commentary disappears.
+
+```sql
+SELECT CAST(occurred_at AS date) AS day, numeric_guard, COUNT(*) AS n
+FROM tcc_ops.channel_audit
+WHERE action_kind = 'narrate' AND occurred_at > DATEADD(day, -7, SYSUTCDATETIME())
+GROUP BY CAST(occurred_at AS date), numeric_guard
+ORDER BY day DESC, numeric_guard;
+```
+
+Then: `python scripts/prompt-manifest.py` (exit 1 if a prompt no longer matches the recorded version) and the model
+deployment's version in the Foundry portal; `python scripts/ai-eval.py` runs the offline evaluation (routing, narration
+and refusal sets). A **single** rejection is the guard working. A rejection of the **blocks themselves** (the platform's
+own rendering fails the guard, so "no figure is shown at all, with a notice") is not a model problem: it is a formatter
+defect, and it is a bug to raise, never a setting to loosen. Do not raise the tolerance; there is none to raise.
+
+A related, quieter signal: `verify_figures` saying a figure is wrong right after a restart is the per-process ledger
+(§13.1), not a defect.
+
+### 13.10 An audit write failed (`audit_write_failed`)
+
+A trail that fails quietly is the worst failure it can have, so every failed audit write raises one event: an ERROR on
+the logger `tcc.audit_alert` whose message starts `audit_write_failed` and carries `source=`
+(`channel_audit`, `agent_audit` or `narration`), `operation=` (`begin`, `end`, `read`, `single`, `record`, `report`,
+`agent_action_row`, `portal_chat_record`), `error_type=` and `fatal=`. It holds no payload and no exception message. Alert
+on the message prefix (Log Analytics, `AppTraces | where Message startswith "audit_write_failed"`); any occurrence is
+worth a page, because it means the warehouse trail is missing a row.
+
+`fatal=True` means the work was refused because of it (a read whose opening event cannot be written is not made, and
+the caller sees `503 audit_unavailable`); `fatal=False` means the answer stood but its closing event or agent row is
+missing. The orchestrator logs the same prefix (`source=narration`) when the gateway refuses its narration report. A
+related event, `writer_check_failed` on `tcc.writer_check`, says an entitlement source (`allowlist`, `entra_group`,
+`gateway_check`) could not answer and the person was denied: a run of those with no other change means the allow-list
+table or Graph is down, and legitimate writers are being refused, never the reverse.

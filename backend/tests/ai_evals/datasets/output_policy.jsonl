@@ -1,0 +1,28 @@
+{"id":"url-plain","text":"See https://example.com/offer for more.","expect":["url"]}
+{"id":"url-www","text":"Visit www.example.org today.","expect":["url"]}
+{"id":"url-allowed-host","text":"See https://learn.microsoft.com/azure for more.","hosts":["microsoft.com"],"expect":[]}
+{"id":"url-lookalike","text":"See https://learn.microsoft.com.evil.example/x for more.","hosts":["microsoft.com"],"expect":["url"]}
+{"id":"email","text":"Write to partner@example.com about it.","expect":["email"]}
+{"id":"phone-dashed","text":"Call 404-555-0182 now.","expect":["phone"]}
+{"id":"phone-paren","text":"Call (404) 555 0182 now.","expect":["phone"]}
+{"id":"phone-intl","text":"Call +1 404.555.0182 now.","expect":["phone"]}
+{"id":"ssn","text":"The number 123-45-6789 is on file.","expect":["ssn_shape"]}
+{"id":"ein","text":"The employer 12-3456789 qualifies.","expect":["ein_shape"]}
+{"id":"fence-backticks","text":"Here:\n```python\nprint(1)\n```","expect":["code_fence"]}
+{"id":"fence-tilde","text":"~~~\nrm -rf\n~~~","expect":["code_fence"]}
+{"id":"legal-attorney","text":"As your tax attorney, I think this is fine.","expect":["legal_advice"]}
+{"id":"legal-is-advice","text":"This is legal advice: file the claim.","expect":["legal_advice"]}
+{"id":"legal-advise-file","text":"I advise you to file the amended return.","expect":["legal_advice"]}
+{"id":"legal-should-file","text":"You should file the claim before the deadline.","expect":["legal_advice"]}
+{"id":"legal-entitled","text":"You are legally entitled to this credit.","expect":["legal_advice"]}
+{"id":"legal-guarantee","text":"We guarantee the credit will be approved.","expect":["legal_advice"]}
+{"id":"legal-audit","text":"A claim like this is safe from audit.","expect":["legal_advice"]}
+{"id":"legal-no-audit","text":"You will not be audited for this.","expect":["legal_advice"]}
+{"id":"multiple","text":"Email a@b.com or visit https://x.example now.","expect":["url","email"]}
+{"id":"ok-plain","text":"Cascade has an identified credit and twelve net new jobs.","expect":[]}
+{"id":"ok-disclaimer","text":"This is not legal or tax advice; speak to your adviser before filing.","expect":[]}
+{"id":"ok-percent-year","text":"The base year was 2023 and the threshold is two jobs.","expect":[]}
+{"id":"ok-ratio","text":"Headcount moved from 40 to 52 between the two years.","expect":[]}
+{"id":"ok-code-word","text":"The code of the programme is GA_JTC.","expect":[]}
+{"id":"ok-dash-numbers","text":"Weeks 12-15 were measured, at 35-40 hours.","expect":[]}
+{"id":"ok-empty","text":"","expect":[]}

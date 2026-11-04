@@ -299,7 +299,7 @@ def stack_wired(monkeypatch, cascade_2025):
     from types import SimpleNamespace
 
     import application.queries._client_run as client_run
-    import application.wiring as wiring
+    import bootstrap.wiring as wiring
 
     rows, kwargs, floors, _emp = cascade_2025
     run = SimpleNamespace(
@@ -411,7 +411,7 @@ def test_one_function_gives_every_list_the_same_rest_of_year(monkeypatch):
     the stack from `attach_rest_of_year`, so the three cannot disagree."""
     from types import SimpleNamespace
 
-    import application.wiring as wiring
+    import bootstrap.wiring as wiring
     from application.queries.get_proximity import attach_rest_of_year
 
     periods = {"tok": [

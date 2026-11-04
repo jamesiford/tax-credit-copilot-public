@@ -121,7 +121,7 @@ def test_a_client_year_answers_with_both_methods(lakehouse_source, account_id):
     answered with `not_calculated` rather than an engine pass — which is the
     honest answer and the same one the trend grid gives.
     """
-    from application.wiring import get_mediator
+    from bootstrap.wiring import get_mediator
 
     tax_year = 2023 if account_id == 1001 else 2025
     body = get_mediator().send(
@@ -148,7 +148,7 @@ def test_a_year_no_run_reached_is_a_statement_not_a_zero(lakehouse_source):
     to say so. An UNAUTHORED year declines earlier and by name — this is about
     an authored year with no run behind it.
     """
-    from application.wiring import get_mediator
+    from bootstrap.wiring import get_mediator
 
     body = get_mediator().send(
         GetEligibilityQuery(tax_year=2020, state="GA", account_id=1001)
@@ -165,7 +165,7 @@ def test_two_clients_in_one_process_stay_independent(lakehouse_source):
     one client's population into another's answer — which is precisely what the
     single sealed workspace did.
     """
-    from application.wiring import get_mediator
+    from bootstrap.wiring import get_mediator
 
     mediator = get_mediator()
     first = mediator.send(GetEligibilityQuery(tax_year=2023, state="GA", account_id=1001))
@@ -190,7 +190,7 @@ def test_the_per_client_read_agrees_with_the_certified_figures(lakehouse_source)
     because it took its denominator from the two average sets instead of from
     everyone with payroll in the window.
     """
-    from application.wiring import get_mediator
+    from bootstrap.wiring import get_mediator
     from tests.certified import (
         CERTIFIED_EMPLOYEES,
         CERTIFIED_MIN_MAX_ELIGIBLE,
@@ -210,7 +210,7 @@ def test_the_per_client_read_agrees_with_the_certified_figures(lakehouse_source)
 
 def test_record_tokens_do_not_leak_the_employee_id(lakehouse_source):
     """Employee IDs must not enter a URL path. The drill-in is keyed by token."""
-    from application.wiring import get_mediator
+    from bootstrap.wiring import get_mediator
 
     body = get_mediator().send(
         GetEligibilityQuery(tax_year=2023, state="GA", account_id=1001, limit=5)
@@ -227,7 +227,7 @@ def test_the_window_comes_from_the_client_not_a_global_setting(lakehouse_source)
     The synthetic clients run calendar years. Both are read from each client's
     own `EntityFiscalYearRules`, so the difference is a fact, not a setting.
     """
-    from application.wiring import get_mediator
+    from bootstrap.wiring import get_mediator
 
     reference = get_mediator().send(
         GetEligibilityQuery(tax_year=2023, state="GA", account_id=1001)

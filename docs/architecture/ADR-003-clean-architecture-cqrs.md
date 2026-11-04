@@ -13,8 +13,8 @@
 > | `domain/` — entities, ports, pure calculation | **Built.** `domain/claims.py` plus `domain/calculation/` (the One/Zero engine, headcount, proximity, the derivation trail) |
 > | `infrastructure/` — adapters behind ports | **Built.** SQLite claim and finding repositories; payroll source adapters |
 > | `application/` — use cases, commands, queries | **Built.** Mediator, wiring, first vertical slice |
-> | CQRS mediator | **Built.** `application/mediator.py`; explicit registration in `application/wiring.py` |
-> | Composition root | **Built.** `application/wiring.py` owns `get_claim_repository` and `get_finding_repository`. They lived in `api/claims.py` and `api/findings.py` until 30 Aug, which meant every handler imported a router to find its own store |
+> | CQRS mediator | **Built.** `application/mediator.py`; explicit registration in `bootstrap/wiring.py` |
+> | Composition root | **Built.** `bootstrap/` (RM-17; it was `application/wiring.py`) owns `get_claim_repository` and `get_finding_repository`, and is the only package that names an adapter: `application` asks through `application/services.py` and imports nothing from `infrastructure`. They lived in `api/claims.py` and `api/findings.py` until 30 Aug, which meant every handler imported a router to find its own store |
 > | Thin routers | **One done** (`api/proximity.py`). The other twelve routers still call compute directly |
 > | Warehouse adapters (ADR-007) | **Built.** `warehouse_claims.py` and `warehouse_findings.py` write to `tcc_ops` in the Fabric Warehouse, the only operational store; every statement goes through `tenant_sql.py` |
 >
@@ -27,10 +27,13 @@
 > Two rules were added on 30 Aug after the audit found violations neither
 > covered: `test_domain_does_not_import_tools` (the domain was reaching into
 > `tools/` for `StatutoryFloors`, now in `domain/calculation/floors.py`) and
-> `test_application_does_not_import_a_router`. The second carries a single
-> named allowance, `api/_assess.py` — an application service still filed under
-> `api/` because it depends on `api/_payperiods.py`, a payroll reader that
-> raises `HTTPException`. Moving that pair is the next step of this migration.
+> `test_application_does_not_import_a_router`. The second carried a single
+> named allowance, `api/_assess.py`, an application service filed under `api/`
+> because it depended on a payroll reader that raised `HTTPException`. RM-18
+> moved both into `application/` (`assessment.py`, `payroll_rows.py`; the router
+> edge `api/_payperiods.py` maps the reader's errors to 404/503) and removed the
+> allowance; `tests/test_architecture_routers.py` now also keeps `infrastructure`
+> and `bootstrap` out of every router and the long route functions out of `api/`.
 >
 > Migration is deliberately incremental. Each router moves behind the mediator
 > only with the parity gate green — the certified figures (10,236 / 539 / 656)
@@ -160,6 +163,12 @@ Python would be ceremony.
 
 Queries skip `TransactionBehaviour` and `AuditBehaviour` — reads are not
 decisions.
+
+> **Status (CH-04).** What is built is `Authorization → Validation → Handler →
+> Audit`, timed. `AuthorizationBehaviour` exists in a narrower form than drawn:
+> it asks whether the caller's person is entitled to run a command that declares
+> `Policy.WRITER` (`application/authorization.py`), not about tenant membership
+> or site scope. `TenantScopeBehaviour` and `TransactionBehaviour` are not built.
 
 ### Testing consequence
 

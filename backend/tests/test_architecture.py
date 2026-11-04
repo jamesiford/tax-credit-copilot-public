@@ -24,6 +24,7 @@ Three rules, in order of how much damage breaking them does:
 from __future__ import annotations
 
 import ast
+import re
 from pathlib import Path
 
 import pytest
@@ -173,22 +174,13 @@ def test_domain_does_not_import_tools():
     )
 
 
-#: The one place `application/` may still name something under `api/`.
-#: `api/_assess.py` holds no routing — it is an application service that was
-#: filed under the router package, and it depends on `api/_payperiods.py`,
-#: which is a payroll reader that raises `HTTPException`. Relocating both is a
-#: real refactor that touches every router, tracked separately. The allowance
-#: is explicit so it stays one exception and does not become a pattern.
-_APPLICATION_IMPORT_ALLOWANCE = {"api._assess"}
-
-
 def test_application_does_not_import_a_router():
     """Use cases must not reach into presentation to find their dependencies.
 
     Every handler used to do `from api.claims import get_repository` — the
     composition root lived in a router, so driving a use case from anything but
     HTTP dragged FastAPI in with it. Composition now lives in
-    `application/wiring.py`, which is where [ADR-003] says it belongs.
+    `bootstrap/wiring.py`, which is where [ADR-003] says it belongs.
     """
     violations = []
     for path in _python_files("application"):
@@ -198,12 +190,10 @@ def test_application_does_not_import_a_router():
             if not stripped.startswith("from api."):
                 continue
             module = stripped.split()[1]
-            if module in _APPLICATION_IMPORT_ALLOWANCE:
-                continue
             violations.append(f"{path.relative_to(BACKEND).as_posix()} -> {module}")
     assert not violations, (
         "application/ imports from api/:\n  " + "\n  ".join(violations)
-        + "\n\nPut the dependency in application/wiring.py and import it from "
+        + "\n\nPut the dependency in application/services.py (bound in bootstrap/) and import it from "
         "there. A use case that needs a router is not a use case."
     )
 
@@ -384,6 +374,100 @@ def test_commands_live_in_commands_and_queries_in_queries():
     assert not misplaced, "requests in the wrong package:\n  " + "\n  ".join(misplaced)
 
 
+# --- The capability layer is transport-neutral [CH-01] ---------------------
+#
+# A capability is driven by the portal chat, the channel gateway and (later) a
+# notebook, so it may not know which. These rules are what keep "plain function"
+# true: the first import that points at a router, a framework or an agent is
+# invisible until a gateway cannot start.
+
+_CAPABILITY_FORBIDDEN = (
+    "fastapi", "starlette", "api", "agents", "agent_framework", "azure.ai",
+)
+
+
+def _import_modules(source: str) -> set[str]:
+    """Every absolute module a source file imports, as its full dotted name."""
+    found: set[str] = set()
+    for node in ast.walk(ast.parse(source)):
+        if isinstance(node, ast.Import):
+            found.update(alias.name for alias in node.names)
+        elif isinstance(node, ast.ImportFrom) and node.module and node.level == 0:
+            found.add(node.module)
+    return found
+
+
+def _is_forbidden(module: str, forbidden: tuple[str, ...]) -> bool:
+    return any(module == name or module.startswith(f"{name}.") or module.startswith(f"{name}_")
+               for name in forbidden)
+
+
+def _forbidden_imports(source: str, forbidden: tuple[str, ...]) -> list[str]:
+    return sorted(m for m in _import_modules(source) if _is_forbidden(m, forbidden))
+
+
+def _non_stdlib_imports(source: str) -> list[str]:
+    import sys
+
+    stdlib = set(sys.stdlib_module_names) | {"__future__"}
+    return sorted(m for m in _import_modules(source) if m.split(".")[0] not in stdlib)
+
+
+def test_capabilities_import_no_framework_router_or_agent():
+    violations = []
+    for path in _python_files("application/capabilities"):
+        bad = _forbidden_imports(path.read_text(encoding="utf-8"), _CAPABILITY_FORBIDDEN)
+        if bad:
+            violations.append(f"{path.relative_to(BACKEND).as_posix()} -> {bad}")
+    assert not violations, (
+        "application/capabilities/ imports outward:\n  " + "\n  ".join(violations)
+        + "\n\nA capability must be callable from a gateway that has no web framework, "
+        "no router and no Foundry client."
+    )
+
+
+_VENDORED_CAPABILITY_MODULES = (
+    "catalog", "catalog_types", "catalog_intents", "catalog_data", "channel_view", "format", "format_core", "format_renderers",
+    "envelope", "lanes",
+)
+
+
+@pytest.mark.parametrize("relative", [f"application/capabilities/{n}.py" for n in _VENDORED_CAPABILITY_MODULES])
+def test_vendored_capability_modules_import_only_the_standard_library(relative):
+    """These are copied into the orchestrator container, together, unchanged.
+
+    `catalog` and `format` were split into siblings by size (AI-08); a vendored file
+    may import the standard library and the other vendored files, nothing else.
+    """
+    siblings = {f"application.capabilities.{n}" for n in _VENDORED_CAPABILITY_MODULES}
+    bad = [m for m in _non_stdlib_imports((BACKEND / relative).read_text(encoding="utf-8")) if m not in siblings]
+    assert not bad, f"{relative} imports {bad}; it is vendored and may use the stdlib and its vendored siblings only"
+
+
+def test_chat_pipelines_call_capabilities_not_tools():
+    """The chat's compute lives in `application/capabilities/`.
+
+    `api/chat.py` interleaved computing, prompting and SSE framing; a gateway
+    cannot reuse that. The pipelines now ask a capability for their brief, so a
+    call into `tools.*` from this module is compute that has crept back.
+    """
+    source = "\n".join(
+        path.read_text(encoding="utf-8") for path in sorted((BACKEND / "api" / "chat").glob("*.py"))
+    )
+    assert _forbidden_imports(source, ("tools",)) == []
+
+
+def test_the_capability_rules_catch_a_crafted_violation():
+    """A rule nobody has seen fail is a rule nobody knows works."""
+    assert _forbidden_imports("from api.claims import portfolio_v2", _CAPABILITY_FORBIDDEN) == ["api.claims"]
+    assert _forbidden_imports("import agent_framework_foundry", _CAPABILITY_FORBIDDEN) == ["agent_framework_foundry"]
+    assert _forbidden_imports("from azure.ai.projects import AIProjectClient", _CAPABILITY_FORBIDDEN)
+    assert _forbidden_imports("from bootstrap import wiring", _CAPABILITY_FORBIDDEN) == []
+    assert _non_stdlib_imports("import re\nfrom decimal import Decimal") == []
+    assert _non_stdlib_imports("from application.capabilities import format") == ["application.capabilities"]
+    assert _forbidden_imports("def f():\n    from tools.portfolio import chat_state_credit", ("tools",)) == ["tools.portfolio"]
+
+
 # --- 3. One definition of a statutory quantity -----------------------------
 
 
@@ -516,10 +600,14 @@ def test_telemetry_authenticates_with_the_managed_identity():
 _PERSISTENCE = BACKEND / "infrastructure" / "persistence"
 _HELPER_FACTORIES = {"TenantScopedQuery", "tenant_exempt"}
 _EXECUTE_METHODS = {"execute", "executemany"}
+#: The data-query executors [CH-16c]. The Warehouse one matches `warehouse_*.py` already; the
+#: lakehouse and SQLite ones do not, and they run caller-shaped statements, so they are named here.
+_DATA_QUERY_ADAPTERS = ("warehouse_data_query.py", "lakehouse_data_query.py", "sqlite_data_query.py")
 
 
 def _tenant_scoped_modules() -> list[Path]:
-    return sorted(_PERSISTENCE.glob("warehouse_*.py")) + [_PERSISTENCE / "fabric_warehouse.py"]
+    extra = [_PERSISTENCE / name for name in ("fabric_warehouse.py", *_DATA_QUERY_ADAPTERS)]
+    return sorted(set(_PERSISTENCE.glob("warehouse_*.py")) | set(extra))
 
 
 def _callee(node: ast.AST) -> str | None:
@@ -618,3 +706,83 @@ def test_the_tenant_rule_catches_a_mutated_real_adapter(module, original, mutate
     assert original in source, f"{module} changed; update this mutation"
     assert direct_executions(source) == []
     assert direct_executions(source.replace(original, mutated, 1)), f"mutating {module} went undetected"
+
+
+# --- The channel's exemptions name exactly what they exempt [CH-03] ----------
+#
+# The channel tables are not per-client for the questions asked of them (what did
+# this person do; may this person write; which token was issued), so their
+# statements are tenant-exempt. That is a door, and a door needs to be the width
+# of what goes through it: these tests pin the reasons, the tables, and the fact
+# that nothing else shares them.
+
+_CHANNEL_MODULES = ("warehouse_channel.py", "warehouse_channel_state.py")
+_CHANNEL_TABLES = frozenset({"channel_audit", "channel_user", "channel_confirmation", "agent_action_audit"})
+_CHANNEL_EXEMPTIONS = frozenset({
+    "channel audit event that names no client has no tenant to bind",
+    "channel audit by user: an operator's timeline spans clients by design",
+    "channel audit by correlation id: one turn can touch several clients",
+    "agent action that names no client has no tenant to bind",
+    "agent action trail read: the narrator's activity spans clients by design",
+    "channel_user allow-list is not per client",
+    "channel_confirmation tokens are not per client",
+})
+_OPS_TABLE = re.compile(r"\{OPS_SCHEMA\}\.([A-Za-z_][A-Za-z0-9_]*)")
+
+
+def exemption_reasons(source: str) -> set[str]:
+    """The reason string of every `tenant_exempt("…")` call in a module."""
+    return {
+        node.args[0].value
+        for node in ast.walk(ast.parse(source))
+        if isinstance(node, ast.Call) and _callee(node) == "tenant_exempt"
+        and node.args and isinstance(node.args[0], ast.Constant) and isinstance(node.args[0].value, str)
+    }
+
+
+def ops_tables(source: str) -> set[str]:
+    return set(_OPS_TABLE.findall(source))
+
+
+def _channel_sources() -> dict[str, str]:
+    return {name: (_PERSISTENCE / name).read_text(encoding="utf-8") for name in _CHANNEL_MODULES}
+
+
+def test_the_channel_exemptions_are_exactly_the_documented_ones():
+    found: set[str] = set()
+    for name, source in _channel_sources().items():
+        found |= exemption_reasons(source)
+    assert found == _CHANNEL_EXEMPTIONS, (
+        f"unexpected: {sorted(found - _CHANNEL_EXEMPTIONS)}; missing: {sorted(_CHANNEL_EXEMPTIONS - found)}"
+    )
+
+
+def test_the_channel_adapters_touch_only_the_channel_tables():
+    for name, source in _channel_sources().items():
+        assert ops_tables(source) and ops_tables(source) <= _CHANNEL_TABLES, (name, ops_tables(source))
+
+
+def test_the_channel_exemption_does_not_extend_to_any_other_adapter():
+    """No other warehouse module may borrow a channel reason, or the door widens."""
+    for path in _tenant_scoped_modules():
+        if path.name in _CHANNEL_MODULES:
+            continue
+        shared = exemption_reasons(path.read_text(encoding="utf-8")) & _CHANNEL_EXEMPTIONS
+        assert not shared, f"{path.name} reuses a channel exemption: {sorted(shared)}"
+
+
+def test_the_channel_modules_are_under_the_tenant_rule():
+    names = {p.name for p in _tenant_scoped_modules()}
+    assert set(_CHANNEL_MODULES) <= names
+
+
+def test_the_channel_exemption_rules_catch_a_crafted_violation():
+    widened = (
+        "_X = tenant_exempt('channel_user allow-list is not per client')\n"
+        "_Y = tenant_exempt('read every claim')\n"
+        "def f(cursor):\n"
+        "    _X.execute(cursor, f'SELECT * FROM {OPS_SCHEMA}.program_claim')\n"
+    )
+    assert exemption_reasons(widened) - _CHANNEL_EXEMPTIONS == {"read every claim"}
+    assert not ops_tables(widened) <= _CHANNEL_TABLES
+    assert ops_tables("f'SELECT 1 FROM {OPS_SCHEMA}.channel_audit'") <= _CHANNEL_TABLES

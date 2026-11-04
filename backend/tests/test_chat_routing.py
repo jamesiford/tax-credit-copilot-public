@@ -212,7 +212,7 @@ def _year(tax_year, eligible, *, base=False):
 
 
 def _trend(monkeypatch, years):
-    import application.wiring as wiring
+    import bootstrap.wiring as wiring
     from tools.portfolio import chat_client_trend
 
     monkeypatch.setattr(wiring, "get_gold_reader", lambda: _Reader(years))

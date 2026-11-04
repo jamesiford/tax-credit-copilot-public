@@ -75,7 +75,7 @@ class _Reader:
 
 @pytest.fixture
 def wired(monkeypatch, gold):
-    import application.wiring as wiring
+    import bootstrap.wiring as wiring
 
     rows = copy.deepcopy(gold)
     monkeypatch.setattr(wiring, "get_gold_reader", lambda: _Reader(rows))

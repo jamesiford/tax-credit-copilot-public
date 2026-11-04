@@ -1,0 +1,10 @@
+{"id":"book-no-client","question":"Who should we reach out to?","has_client":false,"expect":"answer"}
+{"id":"book-with-client","question":"Which clients should we call first?","has_client":true,"expect":"answer"}
+{"id":"trend-no-client","question":"What is their trend since the base year?","has_client":false,"expect":"ask_client"}
+{"id":"trend-with-client","question":"What is their trend since the base year?","has_client":true,"expect":"answer"}
+{"id":"explain-no-client","question":"Walk me through how you calculated it","has_client":false,"expect":"ask_client"}
+{"id":"simulate-no-client","question":"What if we hired ten more people?","has_client":false,"expect":"ask_client"}
+{"id":"at-risk-no-client","question":"Which jobs could fall off the credit?","has_client":false,"expect":"ask_client"}
+{"id":"discovery-no-client","question":"What other credits might they qualify for?","has_client":false,"expect":"ask_client"}
+{"id":"split-turn","question":"Who should we call first, and what is the trend for them?","has_client":false,"expect":"partial"}
+{"id":"eligibility-no-client","question":"What is the credit for them?","has_client":false,"expect":"ask_client"}

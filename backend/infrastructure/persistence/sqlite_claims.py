@@ -21,7 +21,6 @@ the day you filed?" and an overwritten row cannot answer it.
 """
 from __future__ import annotations
 
-import os
 import sqlite3
 import threading
 from datetime import date, datetime
@@ -29,6 +28,7 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any, Iterable
 
+from config import get_settings
 from domain.claims import (
     ClaimStatus,
     EngagementScope,
@@ -95,7 +95,9 @@ CREATE TABLE IF NOT EXISTS program_engagement (
     scope          TEXT    NOT NULL,
     effective_from TEXT    NOT NULL,
     effective_to   TEXT,
-    note           TEXT
+    note           TEXT,
+    set_by         TEXT,
+    set_at         TEXT
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS ux_engagement_one_live
@@ -117,6 +119,9 @@ _COLUMNS = (
 _ADDED_COLUMNS = (
     ("is_base_year", "INTEGER NOT NULL DEFAULT 0"),
 )
+
+#: The same, for `program_engagement` (CH-04: who set it and when).
+_ADDED_ENGAGEMENT_COLUMNS = (("set_by", "TEXT"), ("set_at", "TEXT"))
 
 
 def _parse_dt(value: str | None) -> datetime | None:
@@ -193,7 +198,7 @@ class SqliteClaimRepository:
     """
 
     def __init__(self, path: str | Path | None = None) -> None:
-        self.path = Path(path) if path else Path(os.getenv("OPERATIONAL_DB", _DEFAULT_PATH))
+        self.path = Path(path) if path else Path(get_settings().stores.operational_db_or(_DEFAULT_PATH))
         self._local = threading.local()
         if str(self.path) != ":memory:":
             self.path.parent.mkdir(parents=True, exist_ok=True)
@@ -219,6 +224,10 @@ class SqliteClaimRepository:
             for column, declaration in _ADDED_COLUMNS:
                 if column not in existing:
                     conn.execute(f"ALTER TABLE program_claim ADD COLUMN {column} {declaration}")
+            engaged = {r["name"] for r in conn.execute("PRAGMA table_info(program_engagement)")}
+            for column, declaration in _ADDED_ENGAGEMENT_COLUMNS:
+                if column not in engaged:
+                    conn.execute(f"ALTER TABLE program_engagement ADD COLUMN {column} {declaration}")
 
     def close(self) -> None:
         conn = getattr(self._local, "conn", None)
@@ -342,6 +351,8 @@ class SqliteClaimRepository:
                 effective_from=_parse_dt(r["effective_from"]),
                 effective_to=_parse_dt(r["effective_to"]),
                 note=r["note"],
+                set_by=r["set_by"],
+                set_at=_parse_dt(r["set_at"]),
             )
             for r in rows
         ]
@@ -360,8 +371,8 @@ class SqliteClaimRepository:
             )
             conn.execute(
                 "INSERT INTO program_engagement "
-                "(client_id, program_code, scope, effective_from, effective_to, note) "
-                "VALUES (?, ?, ?, ?, ?, ?)",
+                "(client_id, program_code, scope, effective_from, effective_to, note, set_by, set_at) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                 (
                     engagement.client_id,
                     engagement.program_code,
@@ -369,6 +380,8 @@ class SqliteClaimRepository:
                     engagement.effective_from.isoformat(),
                     engagement.effective_to.isoformat() if engagement.effective_to else None,
                     engagement.note,
+                    engagement.set_by,
+                    engagement.set_at.isoformat() if engagement.set_at else None,
                 ),
             )
         return engagement

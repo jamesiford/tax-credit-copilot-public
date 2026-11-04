@@ -7,15 +7,16 @@ anywhere: the API streams bytes itself, so a browser never holds a blob URL.
 """
 from __future__ import annotations
 
-import os
 from typing import Any
+
+from config import get_settings
 
 
 class BlobArtifactStore:
     is_durable = True
 
     def __init__(self, account_url: str | None = None, credential: Any = None) -> None:
-        self.account_url = (account_url or os.getenv("ARTIFACT_BLOB_ACCOUNT_URL") or "").strip()
+        self.account_url = (account_url or get_settings().stores.artifact_blob_account_url).strip()
         if not self.account_url:
             raise ValueError(
                 "ARTIFACT_BLOB_ACCOUNT_URL is not set; the blob store refuses to guess an account"

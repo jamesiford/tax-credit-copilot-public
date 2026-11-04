@@ -16,10 +16,17 @@ in-memory store forgets every decision on the next restart.
 """
 from __future__ import annotations
 
-import os
 from typing import Mapping
 
-LOCAL = "local"
+from config import resolve_environ
+
+# The sign-in rules live in `auth_policy`; these are re-exported because every
+# caller already reads them from here.
+from application.auth_policy import (  # noqa: F401
+    ANONYMOUS_SYNTHETIC_FLAG, AUTH_MODES, LOCAL, anonymous_synthetic_allowed, api_audience, auth_mode,
+    auth_problems, auth_tenant_id, explicit_local_dev,
+)
+
 CLASSIFICATIONS = ("synthetic", "customer")
 
 #: Store names that persist beyond the process.
@@ -27,11 +34,14 @@ DURABLE_STORES = frozenset({"warehouse"})
 #: Accepted spellings, normalised. `fabric` is the v1 name for the Warehouse.
 _ALIASES = {"fabric": "warehouse"}
 
-#: The four operational stores and their LOCAL defaults.
+#: The operational stores and their LOCAL defaults.
 STORE_DEFAULTS = {
     "CLAIM_STORE": "sqlite",
     "FINDING_STORE": "sqlite",
     "RUN_MANIFEST_STORE": "memory",
+    #: The channel audit trail, writer allow-list, confirmations and the
+    #: agent-action trail. A deployed process refuses anything but `warehouse`.
+    "CHANNEL_STORE": "sqlite",
 }
 
 
@@ -44,7 +54,7 @@ def _get(env: Mapping[str, str], name: str) -> str:
 
 
 def environment(env: Mapping[str, str] | None = None) -> str:
-    env = os.environ if env is None else env
+    env = resolve_environ(env)
     return (_get(env, "ENVIRONMENT") or LOCAL).lower()
 
 
@@ -53,23 +63,45 @@ def is_deployed(env: Mapping[str, str] | None = None) -> bool:
 
 
 def data_classification(env: Mapping[str, str] | None = None) -> str | None:
-    env = os.environ if env is None else env
+    env = resolve_environ(env)
     value = _get(env, "DATA_CLASSIFICATION").lower()
     return value or None
 
 
-AUTH_MODES = ("none", "entra")
+WRITER_SOURCES = ("allowlist", "entra_group", "either")
+DEFAULT_CONFIRM_TTL_SECONDS = 600
 
 
-def auth_mode(env: Mapping[str, str] | None = None) -> str:
-    """`none` (default) or `entra`. Unknown values are reported by the startup check."""
-    env = os.environ if env is None else env
-    return (_get(env, "AUTH_MODE") or "none").lower()
+def writer_source(env: Mapping[str, str] | None = None) -> str:
+    """Where writer entitlement comes from. An unknown value raises: guessing a
+    source for a permission check is how a typo grants everyone."""
+    env = resolve_environ(env)
+    value = (_get(env, "CHANNEL_WRITER_SOURCE") or "allowlist").lower()
+    if value not in WRITER_SOURCES:
+        raise ValueError(f"CHANNEL_WRITER_SOURCE must be one of {', '.join(WRITER_SOURCES)}; got {value!r}")
+    return value
 
 
-def auth_tenant_id(env: Mapping[str, str] | None = None) -> str:
-    env = os.environ if env is None else env
-    return _get(env, "AUTH_TENANT_ID") or _get(env, "AZURE_TENANT_ID")
+def writer_group_id(env: Mapping[str, str] | None = None) -> str:
+    env = resolve_environ(env)
+    return _get(env, "CHANNEL_WRITER_GROUP_ID")
+
+
+def enforce_writer_for_users(env: Mapping[str, str] | None = None) -> bool:
+    env = resolve_environ(env)
+    return _get(env, "CHANNEL_ENFORCE_WRITER_FOR_USERS").lower() in ("1", "true", "yes", "on")
+
+
+def confirm_ttl_seconds(env: Mapping[str, str] | None = None) -> int:
+    env = resolve_environ(env)
+    raw = _get(env, "CHANNEL_CONFIRM_TTL_SECONDS")
+    try:
+        seconds = int(raw) if raw else DEFAULT_CONFIRM_TTL_SECONDS
+    except ValueError as exc:
+        raise ValueError(f"CHANNEL_CONFIRM_TTL_SECONDS must be an integer; got {raw!r}") from exc
+    if not 30 <= seconds <= 3600:
+        raise ValueError("CHANNEL_CONFIRM_TTL_SECONDS must be between 30 and 3600")
+    return seconds
 
 
 def normalise_store(value: str) -> str:
@@ -83,9 +115,15 @@ def store_choice(name: str, env: Mapping[str, str] | None = None) -> str:
     `OVERRIDE_STORE` follows `RUN_MANIFEST_STORE` unless set: an override is run
     provenance and lives where the run it changes is recorded.
     """
-    env = os.environ if env is None else env
+    env = resolve_environ(env)
     if name == "OVERRIDE_STORE":
         default = store_choice("RUN_MANIFEST_STORE", env)
+    elif name == "CHANNEL_STORE":
+        # Durable by default once deployed. The channel trail is the only record
+        # of who did what from Teams, so an unset value must not mean "SQLite on a
+        # filesystem the platform may discard"; an explicit non-durable value is
+        # still refused by `check_deployment_configuration`.
+        default = "warehouse" if is_deployed(env) else STORE_DEFAULTS[name]
     else:
         default = STORE_DEFAULTS[name]
     return normalise_store(_get(env, name) or default)
@@ -101,12 +139,12 @@ ARTIFACT_REPOSITORIES = ("sqlite", "warehouse")
 
 
 def artifact_store(env: Mapping[str, str] | None = None) -> str:
-    env = os.environ if env is None else env
+    env = resolve_environ(env)
     return (_get(env, "ARTIFACT_STORE") or "local").lower()
 
 
 def artifact_repository(env: Mapping[str, str] | None = None) -> str:
-    env = os.environ if env is None else env
+    env = resolve_environ(env)
     return normalise_store(_get(env, "ARTIFACT_REPOSITORY") or "sqlite")
 
 
@@ -115,7 +153,7 @@ def check_deployment_configuration(env: Mapping[str, str] | None = None) -> dict
 
     Returns the resolved settings, for logging and `/api/health`.
     """
-    env = os.environ if env is None else env
+    env = resolve_environ(env)
     problems: list[str] = []
 
     classification = data_classification(env)
@@ -125,21 +163,10 @@ def check_deployment_configuration(env: Mapping[str, str] | None = None) -> dict
         )
 
     mode = auth_mode(env)
-    if mode not in AUTH_MODES:
-        problems.append(f"AUTH_MODE={mode!r} is not one of {', '.join(AUTH_MODES)}")
-    elif mode == "entra":
-        if not auth_tenant_id(env):
-            problems.append("AUTH_MODE=entra needs AUTH_TENANT_ID (or AZURE_TENANT_ID)")
-        if not _get(env, "API_AUDIENCE"):
-            problems.append("AUTH_MODE=entra needs API_AUDIENCE (the API app registration)")
+    deployed = is_deployed(env)
+    problems.extend(auth_problems(env, deployed=deployed, classification=classification))
 
     stores = {name: store_choice(name, env) for name in store_names()}
-    deployed = is_deployed(env)
-    if deployed and mode == "none" and classification == "customer":
-        problems.append(
-            "AUTH_MODE=none is refused with DATA_CLASSIFICATION=customer outside a local "
-            "environment (D26): customer payroll is never served without authentication"
-        )
     if deployed:
         if classification is None:
             problems.append(
@@ -163,6 +190,10 @@ def check_deployment_configuration(env: Mapping[str, str] | None = None) -> dict
         problems.append(
             f"ARTIFACT_REPOSITORY={rows_store!r} is not durable; a deployed environment must use 'warehouse'"
         )
+
+    from application.ai.deployment_check import ai_problems
+
+    problems.extend(ai_problems(env, deployed))
 
     if problems:
         raise DeploymentConfigurationError(

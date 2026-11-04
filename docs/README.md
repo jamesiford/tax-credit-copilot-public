@@ -9,6 +9,32 @@ run it.
 
 ---
 
+## Start here
+
+| If you want to | Read |
+| --- | --- |
+| Understand what the system does and run it | [Root README](../README.md) |
+| See where it is going and how far along it is | [TARGET-ARCHITECTURE.md](architecture/TARGET-ARCHITECTURE.md) |
+| Understand how one calculation reaches the portal, Teams, Copilot Chat and Cowork | [ONE-ANSWER-EVERYWHERE.md](architecture/ONE-ANSWER-EVERYWHERE.md) |
+| Know the rules the code must obey (layering, standards, parity) | [Coding standards](architecture/CODE-STANDARDS.md), [backend/README.md](../backend/README.md), [`.github/copilot-instructions.md`](../.github/copilot-instructions.md) |
+| Deploy it | [DEPLOYMENT-HANDOVER.md](architecture/DEPLOYMENT-HANDOVER.md) |
+| Run it day to day | [RUNBOOK.md](architecture/RUNBOOK.md) and, for the Microsoft 365 channel, [OPERATIONS.md](m365-channel/OPERATIONS.md) |
+| Review a decision | the [ADR index](#architecture) below; the [build log](m365-channel/DECISIONS.md) for the Microsoft 365 channel |
+| See what the last remediation run fixed, skipped and needs from the owner | [REMEDIATION-FINDINGS.md](m365-channel/REMEDIATION-FINDINGS.md) (Summary) |
+
+## Every docs folder
+
+| Folder | What it holds |
+| --- | --- |
+| [`architecture/`](architecture/) | ADRs, the target architecture, the platform (C4, flow, infrastructure, connectivity, environment, runbook), the AI layer, the Microsoft 365 channel's design records, code standards and the knowledge tier. Indexed in the next two sections |
+| [`m365-channel/`](m365-channel/README.md) | The Microsoft 365 channel: how it works, operating and demoing it, publishing it, its limits, the build log of decisions, the status of the two runs that built and remediated it. Indexed under [Microsoft 365 channel](#microsoft-365-channel) |
+| [`design/`](design/) | The portal's design system and the Ask evidence contract. Indexed under [Design](#design) |
+| [`data/`](data/) | What the calculation consumes and how: requirements, schemas, the methods, the reference dataset, the Gold layer and the semantic model, plus the Warehouse DDL and its migrations. Indexed under [Data and calculation](#data-and-calculation) |
+| [`product/`](product/PERSONAS.md) | Who uses the product and what each role may see |
+| [`archive/`](archive/README.md) | Superseded briefs, reports and dated evidence, kept as the record. Nothing in it is current |
+
+---
+
 ## Architecture
 
 Decisions that constrain the code. Each ADR records what was decided, what was
@@ -18,12 +44,20 @@ precisely rather than in general.
 | | |
 | --- | --- |
 | [TARGET-ARCHITECTURE.md](architecture/TARGET-ARCHITECTURE.md) | Where the system is going, and how far along it is. **Read this before the ADRs** — it is honest about what is built versus specified. |
-| [ADR-001](architecture/ADR-001-persistence.md) | Original persistence choice |
+| [ONE-ANSWER-EVERYWHERE.md](architecture/ONE-ANSWER-EVERYWHERE.md) | What was added so the AI gateway and other AI clients consume the agents, and why: one calculation, many adapters. The surfaces, the flags, what is unchanged against `main`, the parity proof, the hand-rolled inventory |
+| [CODE-STANDARDS.md](architecture/CODE-STANDARDS.md) | The coding standards and the ratchet that enforces them |
+| [ADR-001](architecture/ADR-001-persistence.md) | Original persistence choice. **Superseded**: by ADR-002 the same day, and by ADR-007 for the operational store |
 | [ADR-002](architecture/ADR-002-production-persistence.md) | Ports with interchangeable adapters, SQLite for dev and CI, one contract suite over all. **Superseded in part** (§1, the production store) by ADR-007 |
 | [ADR-003](architecture/ADR-003-clean-architecture-cqrs.md) | Clean Architecture and CQRS. **Partially applied** — see TARGET-ARCHITECTURE for the current state |
 | [ADR-004](architecture/ADR-004-agentic-workflows.md) | Where agents are allowed to act, and where they may only narrate |
 | [ADR-005](architecture/ADR-005-year-versioned-rules.md) | Statute frozen per tax year, so a historical run replays exactly. This is what makes a retroactive audit defensible |
+| [ADR-006](architecture/ADR-006-calculation-trail.md) | The calculation trail is regenerated on demand for one employee and checked against the recorded verdict, not warehoused. **Proposed** — the status the ADR itself gives |
 | [ADR-007](architecture/ADR-007-warehouse-operational-store.md) | The Fabric Warehouse is the only operational store; the document store is retired. Every statement is tenant-bound on `client_id` |
+| [ADR-008](architecture/ADR-008-channel-numeric-integrity.md) | Numeric integrity for the Microsoft 365 channel: facts, placeholders and a zero-tolerance guard, and `verify_figures` for documents authored elsewhere. **As built.** **Partially implements** ADR-004 §3 — the portal chat path is unchanged |
+| [ADR-009](architecture/ADR-009-m365-channel.md) | The Microsoft 365 channel: Bot Service and a hosted orchestrator, a channel gateway, trusted-agent identity with channel-asserted assurance, two-step writes, per-user audit. Alternatives, consequences, risks |
+| [ADR-010](architecture/ADR-010-knowledge-tier.md) · [KNOWLEDGE-AND-IQ.md](architecture/KNOWLEDGE-AND-IQ.md) | The knowledge tier: cited reference text (statute, guidance) through a `KnowledgePort`, never a figure; Foundry IQ as the designed first source, off by default and not built; why Fabric IQ, a Fabric data agent and an ontology MCP stay evaluate-only; the owner's provisioning steps |
+| [HARDENING-PLAN.md](architecture/HARDENING-PLAN.md) | The demo network posture (one Terraform toggle) and the planned hardened posture: requirements, verification, work packages HD-01 to HD-08. The hardened Foundry path is per the documentation and **unproven until spike S6**; Cosmos DB is ruled out |
+| [HARDENING-SPIKE.md](m365-channel/HARDENING-SPIKE.md) | Spike S6 as a runnable checklist with acceptance criteria and a results template |
 | [CALCULATION-PROVENANCE.md](architecture/CALCULATION-PROVENANCE.md) | How every figure traces back to its inputs, formula and citation |
 | [DEPLOYMENT-HANDOVER.md](architecture/DEPLOYMENT-HANDOVER.md) | How to deploy: prerequisites, the two profiles, `azd up`, the CI path, verification and teardown |
 | [ENGINE-CONVERGENCE.md](architecture/ENGINE-CONVERGENCE.md) | How two independent implementations were reconciled to the same figures |
@@ -40,7 +74,34 @@ How the system is hosted, connected and run. Read the C4 model first.
 | [CONNECTIVITY-MATRIX.md](architecture/CONNECTIVITY-MATRIX.md) | Who calls what, over which path, as which identity, with which permission |
 | [ENV-VARS.md](architecture/ENV-VARS.md) | Every setting the app reads, where it is set, and the Terraform output that carries it |
 | [RUNBOOK.md](architecture/RUNBOOK.md) | Health checks, KQL for the common failures, and routine operations |
+| [OIDC-SETUP.md](architecture/OIDC-SETUP.md) | Deploying from GitHub Actions with OIDC and no stored credential |
+| [AI-GATEWAY.md](architecture/AI-GATEWAY.md) · [AI-PLATFORM-VALUE.md](architecture/AI-PLATFORM-VALUE.md) | How model access reaches a customer's own models, and what the Foundry path gives that a gateway does not |
+| [AI-RESILIENCE.md](architecture/AI-RESILIENCE.md) · [AI-OPERATIONS.md](architecture/AI-OPERATIONS.md) | How a failing, slow or costly model is kept from becoming the reader's problem, and how to run the model side |
 | [Schema migrations](data/schema/migrations/README.md) | How the Warehouse DDL is versioned and applied |
+
+## Microsoft 365 channel
+
+| | |
+| --- | --- |
+| [m365-channel/README.md](m365-channel/README.md) | The Microsoft 365 channel (Teams, Copilot Chat, Cowork): architecture, who can do what, data flow of a question and of a write, the audit model, and what the orchestrator controls versus what Cowork's model controls |
+| [m365-channel/DEMO-SCRIPT.md](m365-channel/DEMO-SCRIPT.md) | A demo for all three surfaces using the synthetic clients, and the manual test checklist |
+| [m365-channel/COWORK-SETUP.md](m365-channel/COWORK-SETUP.md) · [`channels/cowork/`](../channels/cowork/README.md) | The Cowork plugin: registering the OAuth client, building and installing it, and its known gaps |
+| [m365-channel/KNOWN-LIMITATIONS.md](m365-channel/KNOWN-LIMITATIONS.md) | What the channel does not do |
+| [m365-channel/ORCHESTRATOR.md](m365-channel/ORCHESTRATOR.md) · [PUBLISHING.md](m365-channel/PUBLISHING.md) | The hosted orchestrator, and publishing it to Teams and Copilot |
+| [m365-channel/MAF-ALIGNMENT.md](m365-channel/MAF-ALIGNMENT.md) · [REMEDIATION-FINDINGS.md](m365-channel/REMEDIATION-FINDINGS.md) · [REMEDIATION-STATUS.md](m365-channel/REMEDIATION-STATUS.md) | What the installed Microsoft Agent Framework provides, the hand-rolled inventory with a verdict per component, the go/no-go for the migration, and the remediation run's findings and status |
+| [m365-channel/DATA-ACCESS.md](m365-channel/DATA-ACCESS.md) | Governed data access for the agent: semantic model, structured query, output lanes, limits, and the Fabric Data Agent evaluation |
+| [m365-channel/FINAL-STATE.md](m365-channel/FINAL-STATE.md) · [PUSH-CHECKLIST.md](m365-channel/PUSH-CHECKLIST.md) | What is built and deployed, the branch/tag inventory, the planned branch split, and the owner's checklist before any push |
+| [m365-channel/OPERATIONS.md](m365-channel/OPERATIONS.md) · [DEMO-CLEANUP.md](m365-channel/DEMO-CLEANUP.md) | Operating the sandbox (see, pause, resume, take down) and what to switch off after a demo |
+| [m365-channel/DECISIONS.md](m365-channel/DECISIONS.md) | The **build log**: every decision taken building the channel (D-01 onward), newest last. Durable decisions are indexed at the top, with the ADR or document that now holds each |
+| [m365-channel/REMEDIATION-STATUS.md](m365-channel/REMEDIATION-STATUS.md) · [MASTER-STATUS.md](m365-channel/MASTER-STATUS.md) | What is done, per work package. The first run's table is archived: [archive/m365-channel/STATUS.md](archive/m365-channel/STATUS.md) |
+
+## Design
+
+| | |
+| --- | --- |
+| [design/DESIGN-SYSTEM.md](design/DESIGN-SYSTEM.md) | The token layers, the component set, density, accessibility and the gates that defend them |
+| [design/ASK-EVIDENCE-CONTRACT.md](design/ASK-EVIDENCE-CONTRACT.md) | The typed evidence stream between the chat backend and the Ask workspace (read by backend tests) |
+| [design/UI-DECISIONS.md](design/UI-DECISIONS.md) · [design/UI-STATUS.md](design/UI-STATUS.md) | The revamp's decisions and measured progress. The revamp's brief, report and result are archived under [archive/design/](archive/README.md) |
 
 ## Data and calculation
 
@@ -53,6 +114,10 @@ How the system is hosted, connected and run. Read the C4 model first.
 | [CALCULATION-RULES-V7.md](data/CALCULATION-RULES-V7.md) | The calculation in prose, with worked examples |
 | [ONEZERO-CALCULATION-MAP.md](data/ONEZERO-CALCULATION-MAP.md) | The One/Zero method step by step |
 | [REFERENCE-DATASET.md](data/REFERENCE-DATASET.md) | The reference dataset and how parity is proven against it |
+| [GOLD-LAYER-SPEC.md](data/GOLD-LAYER-SPEC.md) | The application's read schema (Gold) |
+| [SEMANTIC-MODEL.md](data/SEMANTIC-MODEL.md) | The governed data model the agent queries. **Generated** by `scripts/generate-semantic-model-doc.py`; do not edit by hand |
+| [data/schema/](data/schema/migrations/README.md) | The Warehouse DDL (`tcc-schema.fabric.sql`, and the SQL Server variant generated from it) and the forward-only migrations |
+| [portable-rules/README.md](data/portable-rules/README.md) | The business rules in portable form; the code that checks them is in `scripts/portable-rules/` |
 
 ### Methodology sets
 

@@ -130,9 +130,30 @@
      "y": 520,
      "w": 260,
      "h": 100
+    },
+    {
+     "id": "x-m365",
+     "title": "Microsoft 365",
+     "sub": "Teams · Copilot Chat · Cowork",
+     "icon": "users",
+     "status": "built",
+     "detail": {
+      "what": "Where tax consultants and account teams use the platform without the web app: through Azure Bot Service and a Foundry-hosted orchestrator (Teams, Copilot Chat) and an MCP connector (Cowork).",
+      "notes": "Optional (enable_m365_channel), proof of concept, synthetic data. The channel gateway is the only new public surface; the orchestrator and the Cowork plugin are later work packages. Not live-deployed."
+     },
+     "x": 420,
+     "y": 30,
+     "w": 260,
+     "h": 100
     }
    ],
    "edges": [
+    {
+     "from": "x-m365",
+     "to": "x-sys",
+     "layer": "user",
+     "label": "Tools over HTTPS: app-only token (orchestrator) or the user's token (Cowork)"
+    },
     {
      "from": "x-analyst",
      "to": "x-sys",
@@ -379,7 +400,7 @@
      "icon": "azure/integration/api-management-services",
      "status": "off",
      "detail": {
-      "what": "Optional route for model traffic. Must speak the Foundry Agents protocol, not only chat completions."
+      "what": "Optional route for model traffic. Needs only an OpenAI-compatible chat-completions API with streaming and tool calling; the Foundry Agents protocol is not required."
      },
      "x": 960,
      "y": 140,
@@ -399,9 +420,91 @@
      "y": 580,
      "w": 230,
      "h": 90
+    },
+    {
+     "id": "c-m365",
+     "title": "Microsoft 365",
+     "sub": "Teams · Copilot Chat · Cowork",
+     "icon": "users",
+     "status": "built",
+     "detail": {
+      "what": "External. Consultants and account teams reach the platform from Teams and Copilot Chat (through Azure Bot Service) and from Cowork (an MCP connector).",
+      "notes": "Publishing is a later work package; nothing here is live-deployed."
+     },
+     "x": 40,
+     "y": 420,
+     "w": 230,
+     "h": 90
+    },
+    {
+     "id": "c-orch",
+     "title": "Hosted orchestrator",
+     "sub": "Foundry · MAF · external to this repo's infra",
+     "icon": "azure/ai-machine-learning/foundry-application",
+     "status": "gated",
+     "detail": {
+      "what": "A code-driven agent that routes a question to tools, composes the reply from platform-rendered blocks and guards every numeral. Calls the gateway with an app-only token holding the role Channel.Invoke and names the user it acts for.",
+      "notes": "Foundry-managed and out of scope for Terraform here. Its Entra agent identity needs Channel.Invoke on the gateway registration (an operator step)."
+     },
+     "x": 330,
+     "y": 420,
+     "w": 230,
+     "h": 90
+    },
+    {
+     "id": "c-gateway",
+     "title": "Channel gateway",
+     "sub": "third App Service · Python 3.12 · public, token-authenticated",
+     "icon": "azure/app-services/app-services",
+     "status": "built",
+     "detail": {
+      "what": "Authenticates agent and delegated callers, audits every call per user (tcc_ops.channel_audit), rate-limits, checks writer entitlement and forwards tool calls to the API as itself. Also serves the MCP facade for Cowork and ticketed claim-package downloads.",
+      "notes": "Count 0 unless enable_m365_channel. Shares the API's integration subnet, so the API's access restriction is not widened. Holds no role on data beyond INSERT and SELECT on the audit table; the API stays the authority.",
+      "spikes": "Role assignments (TCC.Agent, Channel.Invoke), the Fabric workspace role and the Bot Service registration are operator steps, not Terraform."
+     },
+     "x": 650,
+     "y": 420,
+     "w": 270,
+     "h": 90
     }
    ],
    "edges": [
+    {
+     "from": "c-m365",
+     "to": "c-orch",
+     "layer": "user",
+     "label": "Teams / Copilot Chat via Azure Bot Service"
+    },
+    {
+     "from": "c-orch",
+     "to": "c-gateway",
+     "layer": "user",
+     "label": "App-only token · Channel.Invoke · acting user"
+    },
+    {
+     "from": "c-m365",
+     "to": "c-gateway",
+     "layer": "user",
+     "label": "Cowork MCP · delegated token · Channel.Access"
+    },
+    {
+     "from": "c-gateway",
+     "to": "c-api",
+     "layer": "service",
+     "label": "TCC.Agent token · /api/capabilities (same subnet)"
+    },
+    {
+     "from": "c-gateway",
+     "to": "c-wh",
+     "layer": "service",
+     "label": "Audit trail: INSERT, SELECT on channel_audit"
+    },
+    {
+     "from": "c-gateway",
+     "to": "c-entra",
+     "layer": "service",
+     "label": "JWKS · token validation"
+    },
     {
      "from": "c-people",
      "to": "c-entra",
@@ -1048,7 +1151,7 @@
      "icon": "azure/integration/api-management-services",
      "status": "off",
      "detail": {
-      "what": "If model traffic must route through the customer's gateway, it has to pass the Foundry Agents protocol, not only chat completions. Default is direct to Foundry.",
+      "what": "If model traffic must route through the customer's gateway, the gateway needs an OpenAI-compatible chat-completions API with streaming and tool calling (not the Foundry Agents protocol). Default is direct to Foundry.",
       "spikes": "Contract and auth to agree with the gateway owner."
      },
      "x": 325,
@@ -1362,7 +1465,7 @@
       },
       {
        "t": "Optional gateway",
-       "x": "If the customer requires it, agent traffic routes through their AI gateway. It must carry the Foundry Agents protocol.",
+       "x": "If the customer requires it, model traffic routes through their AI gateway. It needs an OpenAI-compatible chat-completions API with streaming and tool calling.",
        "n": [
         "gw",
         "f-proj"

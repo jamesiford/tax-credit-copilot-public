@@ -67,7 +67,7 @@ its own Terraform variable.
 
 | Setting | `public` (default) | `enterprise` |
 |---|---|---|
-| `AUTH_MODE` / Easy Auth | `none` / off | `entra` / on |
+| `AUTH_MODE` / Easy Auth | `none` (with `ALLOW_ANONYMOUS_SYNTHETIC=1`, set by Terraform) / off | `entra` / on |
 | `DATA_CLASSIFICATION` | `synthetic` | `customer` |
 | Fabric | `create_fabric = true`: F2 capacity, workspace, Lakehouse and Warehouse, DDL bootstrap, synthetic load | `create_fabric = false`: existing workspace, Lakehouse and Warehouse |
 | `manage_fabric_access` (workspace role by Terraform) | `true` | `false` |
@@ -223,6 +223,16 @@ variable.
 | `GIT_COMMIT` | `git_commit` | both | Recorded on every run manifest. Unset, runs record `working-tree` |
 | `FOUNDRY_MODEL`, `FOUNDRY_MODEL_VERSION` | `foundry_model`, `foundry_model_version` | both | Model the narrating agents use (default `gpt-4.1-mini` / `2025-04-14`). Check regional availability and quota |
 | `TCC_APP_SERVICE_SKU` | `app_service_sku` | both | Plan SKU shared by both apps (default `P1v3`) |
+| `TCC_FOUNDRY_PUBLIC_NETWORK_ACCESS` | `foundry_public_network_access` | public | **DEMO ONLY.** `false` (default) keeps the Foundry data plane private, exactly as before. `true` enables its public endpoint (Entra-only, local auth off; the private endpoint and DNS stay) so an operator's workstation can run `azd ai agent`, `scripts/publish-m365.ps1` and smoke tests. Refused with the enterprise profile and with `data_classification = customer`. The plan prints a warning and the output `network_posture` reads `demo-public-foundry`. Set it back to `false` after the demo. See [HARDENING-PLAN](HARDENING-PLAN.md) |
+| `TCC_FOUNDRY_ALLOWED_IP_RANGES` | `foundry_allowed_ip_ranges` | public | **DEMO ONLY.** With the toggle above, the IPv4 CIDR ranges allowed through the account firewall, comma-separated (for example `203.0.113.0/24,198.51.100.7/32`). Empty allows any address (still Entra-only). Ranges without the toggle, a malformed range, a `/31`, or `0.0.0.0/0` without `foundry_allow_any_ip` make the plan fail |
+| `TCC_ENABLE_M365_CHANNEL` | `enable_m365_channel` | public | `false` (default) creates nothing. `true` adds the Microsoft 365 channel gateway: a third App Service on the same plan, in the same subnet, with its own identity ([component spec §4.7a](INFRASTRUCTURE-COMPONENT-SPEC.md)). It needs the API to validate tokens, so set `auth_mode = "entra"` and `api_client_id` in an overlay too; the plan fails with that message otherwise. The enterprise profile refuses it. With it off, a default `azd up` / `azd deploy` is exactly what it was: the gateway is not an azd service. With it on, the `postdeploy` hook runs `scripts/deploy-channel.ps1` (needs `TCC_ENABLE_M365_CHANNEL=true` in the azd environment as well as the Terraform variable) |
+| `TCC_CHANNEL_GATEWAY_AUDIENCE` | `channel_gateway_audience` | public | The gateway's app registration (`api://<id>` or the bare id). Required with the toggle |
+| `TCC_CHANNEL_WRITER_SOURCE` | `channel_writer_source` | public | Who may make changes through the channel: `allowlist` (default), `entra_group` or `either`. A group source needs Graph `GroupMember.Read.All` on the gateway identity |
+| `TCC_CHANNEL_WRITER_GROUP_ID` | `channel_writer_group_id` | public | The Entra group for `entra_group` / `either`. Required for those |
+| `TCC_CHANNEL_RESOLVE_DISPLAY_NAMES` | `channel_resolve_display_names` | public | `true` resolves a Teams user's name and UPN from Graph (default `false`). Needs `User.ReadBasic.All` on the gateway identity first (`assign-channel-roles.ps1 -GrantUserReadBasic`, an admin action) |
+| `TCC_DATA_QUERY_SOURCE_ENABLED` | `data_query_source_enabled` | both | `false` (default) leaves the agent's governed data query on the Gold and ops datasets only. `true` also switches on the lakehouse source (raw payroll) datasets (`DATA_QUERY_SOURCE_ENABLED`, API only) **and** makes postprovision grant the API identity read-only `SELECT` on `Payroll`, `Location` and `PayCode` through the lakehouse SQL analytics endpoint (`grant-warehouse-sql.py --profile lakehouse`; never the gateway identity). See [DATA-ACCESS](../m365-channel/DATA-ACCESS.md) |
+| `TCC_DATA_QUERY_TIMEOUT_SECONDS`, `TCC_DATA_QUERY_MAX_ROWS`, `TCC_DATA_QUERY_RATE_PER_MINUTE`, `TCC_DATA_QUERY_MAX_CONCURRENCY` | `data_query_timeout_seconds`, `data_query_max_rows`, `data_query_rate_per_minute`, `data_query_max_concurrency` | both | Optional limits of the data query (defaults 20 s, 500 rows, 30 a minute per person, 4 at once). Empty keeps the default; a value outside 1-120, 1-500, 1-600, 1-16 respectively fails the plan |
+| `TCC_LAKEHOUSE_SQL_SERVER`, `TCC_LAKEHOUSE_SQL_DATABASE` | `lakehouse_sql_server`, `lakehouse_sql_database` | both | Optional: the lakehouse SQL analytics endpoint host and database. Empty uses the Warehouse host and the lakehouse name, which is right for one Fabric workspace |
 | `TCC_TENANT_ID` | `tenant_id` | enterprise | Entra tenant for Easy Auth and token validation; empty uses the deployer's tenant |
 | `TCC_WEB_CLIENT_ID` | `web_client_id` | enterprise | Web app registration (Easy Auth). Required: the plan fails without it |
 | `TCC_API_CLIENT_ID` | `api_client_id` | enterprise | API app registration (`user_impersonation`, role `TCC.User`). Required |
@@ -243,7 +253,8 @@ CI, `TF_VARS_JSON`): `auth_mode`, `data_classification`, `create_fabric`,
 `web_allowed_ip_ranges`, `enable_key_vault`, `api_worker_count`,
 `vnet_address_space`, `private_dns_zone_ids`, `fabric_capacity_sku`,
 `fabric_workspace_role`, `foundry_deployment_sku`, `foundry_capacity`,
-`ai_gateway_endpoint`, `outputs_retention_days`, `tags`. See
+`ai_gateway_endpoint`, `channel_allowed_caller_app_ids`,
+`channel_allowed_ip_ranges`, `channel_debug_whoami`, `foundry_allow_any_ip`, `outputs_retention_days`, `tags`. See
 `infra/variables.tf` for each default.
 
 ### 3. Run it
@@ -274,7 +285,10 @@ azd up --no-prompt
    `npm run build`. `.webappignore` files keep `.env` and payroll out of both
    packages.
 4. **Deploy.** Zip deploy of both apps (matched by the `azd-service-name` tags
-   `api` and `web`). App Service builds on deploy
+   `api` and `web`). With the channel enabled, the `postdeploy` hook
+   (`scripts/deploy-channel.ps1`) then zip-deploys the gateway from the same `backend/`
+   package; with it off the hook exits 0 at once. azd has no conditional service, so the
+   gateway is deliberately not a service in `azure.yaml`. App Service builds on deploy
    (`SCM_DO_BUILD_DURING_DEPLOYMENT=true`); the API starts with
    `backend/startup.sh` (gunicorn with uvicorn workers, `--timeout 600`).
 

@@ -6,7 +6,7 @@ Terraform replaced Bicep.
 
 Sources:
 
-- Runtime reads: `backend/` (`os.getenv`, `os.environ`), `backend/startup.sh`,
+- Runtime reads: `backend/config.py` (the one reader, see "The rule" below), `backend/startup.sh`,
   `frontend/server/` (`process.env`), `frontend/src/api.js` (`import.meta.env`).
 - Deployed values: [`infra/main.tf`](../../infra/main.tf) (`api_app_settings`),
   [`infra/modules/app_service/main.tf`](../../infra/modules/app_service/main.tf)
@@ -22,11 +22,37 @@ Related: [RUNBOOK.md](RUNBOOK.md) (support), [DEPLOYMENT-HANDOVER.md](DEPLOYMENT
 (operator inputs), [ADR-007](ADR-007-warehouse-operational-store.md) (Warehouse
 replaces Cosmos).
 
+## The rule: one reader of the environment [RM-20, D-142]
+
+`backend/config.py` is the only module under `backend/` that touches the process environment
+(`os.environ`, `os.getenv`). Everything else is handed a value:
+
+- **A typed section of `Settings`.** `get_settings()` returns a frozen snapshot of the environment
+  with sections parsed on first use (`runtime`, `observability`, `data_source`, `warehouse`, `stores`,
+  `webiq`; the parsers are `backend/config_sections.py`, which take a mapping and read no process).
+  It re-reads the environment on every call, so a test that sets a variable sees it, as it did when
+  each module read its own; `override_settings({...})` fixes the values for a block.
+- **A mapping, for the parsers the orchestrator shares.** The AI, knowledge and safety settings
+  (`application/ai/settings.py`, `knowledge/settings.py`), the sign-in and deployment checks
+  (`application/auth_policy.py`, `deployment.py`), the gateway (`channel/config.py`) and the
+  data-query limits (`bootstrap/data_wiring.py`) parse a mapping they are given. The orchestrator
+  vendors some of them and cannot import `config`, so the composition root passes
+  `get_settings().environ`, and each function defaults to `config.resolve_environ()`.
+- **An explicit argument.** An adapter takes its value as a parameter (`server=`, `path=`, `root=`);
+  `bootstrap/` passes what it has, and a direct construction falls back to the settings.
+
+Adding a variable means adding a typed field to a section and a row below. The orchestrator
+(`channel_orchestrator/`) is a separate deployable with its own `app/core/settings.py`, which reads
+a mapping; only its entry points (`app/main.py`, `app/host.py`, `app/wiring.py`) touch the
+environment. `backend/tests/test_architecture_settings.py` fails on a process-environment read
+anywhere else in `backend/`; its allow-list is exact and holds one reader, the independent
+reference check, which is written without reference to the implementation on purpose.
+
 ## How to read the tables
 
 | Column | Meaning |
 |---|---|
-| Read by | File that reads the variable. Paths are relative to the repo root |
+| Read by | File that uses the variable, through `backend/config.py` (the only reader of the environment). Paths are relative to the repo root |
 | Default | Value the code uses when the variable is unset |
 | Deployed value | Where a deployed environment gets it. "TF api" = an API app setting in `infra/main.tf`; "TF platform" = a setting in `infra/modules/app_service/main.tf` |
 | TF output | The `infra/outputs.tf` output carrying the same value into the azd environment, or `—` |
@@ -47,7 +73,8 @@ see [RUNBOOK.md §8](RUNBOOK.md#8-deployment-configuration-refused-at-startup).
 |---|---|---|---|---|---|---|
 | `ENVIRONMENT` | `backend/application/deployment.py` | `local` (default) or anything else, which means deployed and switches on the durable-store, classification and auth checks | TF api: `azure` | — | new in v2 | Enforced (its value turns enforcement on) |
 | `DATA_CLASSIFICATION` | `backend/application/deployment.py` | `synthetic` or `customer`. No default; never inferred | TF api: profile matrix in `infra/locals.tf` (public `synthetic`, enterprise `customer`); override with Terraform variable `data_classification` | `DATA_CLASSIFICATION` | new in v2 | Enforced |
-| `AUTH_MODE` | `backend/application/deployment.py`, `backend/api/auth.py` | `none` (default) or `entra`. `none` with `customer` is refused when deployed | TF api: profile matrix (public `none`, enterprise `entra`); override with `auth_mode` | `AUTH_MODE` | new in v2 | Enforced |
+| `AUTH_MODE` | `backend/application/auth_policy.py` (re-exported by `deployment.py`), `backend/api/auth.py` | `entra` (default) or `none`. `none` is a local-development opt-in: it needs `ENVIRONMENT=local` set explicitly (an unset `ENVIRONMENT` does not count), or, for a deployed synthetic demo, `ALLOW_ANONYMOUS_SYNTHETIC=1` with `DATA_CLASSIFICATION=synthetic`. Anything else with `none` refuses to start; `none` with `customer` is refused when deployed [RM-03] | TF api: profile matrix (public `none`, enterprise `entra`); override with `auth_mode` | `AUTH_MODE` | new in v2 | Enforced |
+| `ALLOW_ANONYMOUS_SYNTHETIC` | `backend/application/auth_policy.py` | `1`/`true`/`yes`/`on` lets a deployed process run `AUTH_MODE=none`, and only with `DATA_CLASSIFICATION=synthetic` (the public profile's demo). Never honoured for `customer` [RM-03] | TF api: `1`, only when `auth_mode = "none"` | — | new in RM-03 | Enforced |
 | `GIT_COMMIT` | `backend/application/commands/run_client_calculation.py`, `backend/tools/reference_runner.py` | Commit stamped on every run (`run_manifest.code_commit`). Unset: `git rev-parse HEAD`, else `working-tree` | TF api: variable `git_commit` from azd `GIT_COMMIT`; `deploy.yml` sets `TF_VAR_git_commit` to the workflow commit | — | Same: param `gitCommit` from azd `GIT_COMMIT` | No (runs record `working-tree`) |
 | `LOG_LEVEL` | `backend/main.py` | Python root log level. Default `INFO` | not set | — | not set | No |
 | `TCC_STRANDED_RUN_MINUTES` | `backend/infrastructure/persistence/fabric_warehouse.py` | Minutes a run may stay `running` before the startup reaper marks it failed. Default `60` | not set | — | not set | No |
@@ -72,6 +99,15 @@ see [RUNBOOK.md §8](RUNBOOK.md#8-deployment-configuration-refused-at-startup).
 | `WAREHOUSE_DATABASE` | same as above | Warehouse database (item display name). No default | TF api: `module.fabric.warehouse_database` (created, or azd `TCC_WAREHOUSE_DATABASE`) | `WAREHOUSE_DATABASE` | Setting from param `warehouseDatabase`; not an output | Functional |
 | `WAREHOUSE_ODBC_DRIVER` | `backend/infrastructure/persistence/fabric_warehouse.py` | ODBC driver name. Default `ODBC Driver 18 for SQL Server` | not set | — | not set | No |
 | `WAREHOUSE_CONNECT_TIMEOUT` | `backend/infrastructure/persistence/fabric_warehouse.py` | Connect timeout, seconds. Default `90` | not set | — | not set | No |
+| `DATA_QUERY_TIMEOUT_SECONDS` | `backend/bootstrap/data_wiring.py` | Governed data-query statement time limit, seconds (clamped 1-120). Default `20`. A query past it is a typed `query_timeout`, never a partial result [CH-16c] | TF api: variable `data_query_timeout_seconds` (azd `TCC_DATA_QUERY_TIMEOUT_SECONDS`), only when set | — | not set | No |
+| `DATA_QUERY_MAX_ROWS` | same | Server row cap for a data query (1-500); can only lower a specification's own limit. Default `500` | TF api: `data_query_max_rows` (azd `TCC_DATA_QUERY_MAX_ROWS`), only when set | — | not set | No |
+| `DATA_QUERY_RATE_PER_MINUTE` | same | Data queries per person per minute (token bucket, 1-600), refused beyond it. Per process. Default `30` | TF api: `data_query_rate_per_minute` (azd `TCC_DATA_QUERY_RATE_PER_MINUTE`), only when set | — | not set | No |
+| `DATA_QUERY_MAX_CONCURRENCY` | same | Data queries in flight at once across all people (1-16); the next is refused as `query_busy`. Default `4` | TF api: `data_query_max_concurrency` (azd `TCC_DATA_QUERY_MAX_CONCURRENCY`), only when set | — | not set | No |
+| `DATA_MIN_GROUP_SIZE` | same | The smallest group of people an aggregate over employee-level data may show (**K**); smaller groups are left out and counted. Default `5`; a value below `2` is read as `2`, never as off; a writer is exempt. A privacy floor, so **not** mapped in Terraform: the code default is the deployed value | none (set by hand to raise it) | — | not set | No |
+| `DATA_QUERY_SOURCE_ENABLED` | same | Switches ON the lakehouse source (raw payroll) datasets. Default `false`; the Gold and ops datasets are not behind it. Needs the lakehouse endpoint grants (`scripts/grant-warehouse-sql.py --profile lakehouse`, run by postprovision on the same azd value) | TF api: `data_query_source_enabled` (azd `TCC_DATA_QUERY_SOURCE_ENABLED`, default `false`), emitted only when true | — | not set | No |
+| `LAKEHOUSE_SQL_SERVER` | `backend/infrastructure/persistence/lakehouse_sql_connection.py`, `scripts/sql_common.py` | Lakehouse SQL analytics endpoint host. Defaults to `WAREHOUSE_SERVER` (one host per Fabric workspace); the grant script refuses a host that is not the guarded workspace's | TF api: `lakehouse_sql_server` (azd `TCC_LAKEHOUSE_SQL_SERVER`), only when set | — | not set | No (needs `DATA_QUERY_SOURCE_ENABLED`) |
+| `LAKEHOUSE_SQL_DATABASE` | same | The lakehouse's endpoint database. Defaults to `FABRIC_LAKEHOUSE` | TF api: `lakehouse_sql_database` (azd `TCC_LAKEHOUSE_SQL_DATABASE`), only when set | — | not set | No (needs `DATA_QUERY_SOURCE_ENABLED`) |
+| `DATA_QUERY_SQLITE_DIR` | `backend/bootstrap/data_wiring.py` | Local runs only: a folder of `<schema>.db` files the SQLite data-query adapter attaches | not set | — | not set | No |
 | `GOLD_SCHEMA` | `backend/config.py` (also every SQL script through it) | Read schema. Default `tcc_gold`. A non-identifier is refused at import | not set | — | not set (v1 schemas were `flex_*`) | No. If set, set it identically for the API and the scripts |
 | `OPS_SCHEMA` | `backend/config.py` | Operational schema. Default `tcc_ops`. Same rule | not set | — | not set | No. Same rule |
 
@@ -82,8 +118,13 @@ Accepted values: `warehouse` (durable; `fabric` is the v1 alias), `sqlite`,
 
 | Variable | Read by | Purpose / default | Deployed value | TF output | v1 Bicep | Required (deployed) |
 |---|---|---|---|---|---|---|
-| `CLAIM_STORE` | `backend/application/deployment.py` (`store_choice`, used by `backend/application/wiring.py`), `backend/tools/purge_test_claims.py`; set by `scripts/seed-operational-store.ps1` | Claims and engagements. Default `sqlite` | TF api: `warehouse` | — | `cosmos` until A05, then `warehouse` | Enforced |
+| `CLAIM_STORE` | `backend/application/deployment.py` (`store_choice`, used by `backend/bootstrap/wiring.py`), `backend/tools/purge_test_claims.py`; set by `scripts/seed-operational-store.ps1` | Claims and engagements. Default `sqlite` | TF api: `warehouse` | — | `cosmos` until A05, then `warehouse` | Enforced |
 | `FINDING_STORE` | `backend/application/deployment.py`; set by `scripts/seed-operational-store.ps1` | Finding resolutions. Default `sqlite` | TF api: `warehouse` | — | `cosmos` until A05, then `warehouse` | Enforced |
+| `CHANNEL_STORE` | `backend/application/deployment.py` (`store_choice`, used by `backend/bootstrap/wiring.py`) | The Microsoft 365 channel's audit trail (`tcc_ops.channel_audit`), writer allow-list (`channel_user`), confirmation tokens (`channel_confirmation`) and the narrator-agent trail (`agent_action_audit`). Default `sqlite` locally and `warehouse` once `ENVIRONMENT` is not `local`; a deployed process refuses an explicit `sqlite` or `memory`. Needs migrations `0001` and `0002` applied | unset (defaults to `warehouse` when deployed) | — | — | Enforced |
+| `CHANNEL_WRITER_SOURCE` | `backend/application/deployment.py` (`writer_source`, used by `wiring.get_writer_entitlement`) | Who may make changes through the channel: `allowlist` (`tcc_ops.channel_user`, the default), `entra_group` (membership of `CHANNEL_WRITER_GROUP_ID`, via Graph `checkMemberGroups`) or `either`. An unknown value raises. Every source fails closed | unset (`allowlist`) | — | — | Enforced |
+| `CHANNEL_WRITER_GROUP_ID` | `backend/application/deployment.py` | Object id of the Entra group whose members are writers. Needed for `entra_group` / `either`; the API's identity needs Graph `GroupMember.Read.All` (application) | unset | — | — | Enforced |
+| `CHANNEL_ENFORCE_WRITER_FOR_USERS` | `backend/application/deployment.py` | `true` makes signed-in people (`TCC.User`) subject to the writer check too. Default off: the channel gateway is always checked, portal users keep writing as before | unset (off) | — | — | Enforced |
+| `CHANNEL_CONFIRM_TTL_SECONDS` | `backend/application/deployment.py` | Lifetime of a prepare/commit confirmation token, 30–3600. Default 600 | unset (600) | — | — | Enforced |
 | `RUN_MANIFEST_STORE` | `backend/application/deployment.py` | Run manifests. Default `memory` | TF api: `warehouse` | — | param `runManifestStore`, default `fabric` (the v1 alias) | Enforced |
 | `OVERRIDE_STORE` | `backend/application/deployment.py` | Overrides. Default: follows `RUN_MANIFEST_STORE` | TF api: `warehouse` | — | not set (followed `RUN_MANIFEST_STORE`) | Enforced |
 | `OPERATIONAL_DB` *(local)* | `backend/infrastructure/persistence/sqlite_claims.py`, `sqlite_findings.py`, `sqlite_artifacts.py`, `backend/tools/purge_test_claims.py` | SQLite file for the `sqlite` adapters. Default `backend/data/operational.db` | not set | — | not set | No |
@@ -95,16 +136,16 @@ Accepted values: `warehouse` (durable; `fabric` is the v1 alias), `sqlite`,
 | `ARTIFACT_STORE` | `backend/application/deployment.py` | Artifact bytes: `local` (default) or `blob` | TF api: `blob` | — | new in v2 | Enforced (`blob`) |
 | `ARTIFACT_REPOSITORY` | `backend/application/deployment.py` | Artifact rows (`tcc_ops.artifact`, `artifact_access`): `sqlite` (default) or `warehouse` | TF api: `warehouse` | — | new in v2 | Enforced (`warehouse`) |
 | `ARTIFACT_BLOB_ACCOUNT_URL` | `backend/infrastructure/storage/blob_store.py`; `backend/tests/contracts/conftest.py` | Blob endpoint. No default | TF api: `module.storage.blob_endpoint` | `ARTIFACT_BLOB_ACCOUNT_URL` | new in v2 | Functional (claim packages, downloads) |
-| `OUTPUTS_RETENTION_DAYS` | `backend/application/wiring.py` | `retain_until` stamped on new artifacts. Default `2555` | TF api: variable `outputs_retention_days` (default `2555`; the same variable sets the `outputs` lifecycle policy) | — | new in v2 | No |
+| `OUTPUTS_RETENTION_DAYS` | `backend/bootstrap/artifact_wiring.py` | `retain_until` stamped on new artifacts. Default `2555` | TF api: variable `outputs_retention_days` (default `2555`; the same variable sets the `outputs` lifecycle policy) | — | new in v2 | No |
 | `ARTIFACT_LOCAL_ROOT` *(local)* | `backend/infrastructure/storage/local_store.py` | Root for `local` artifact bytes. Default `backend/data/artifacts` | not set | — | not set | No |
 
 ## 6. Authentication (API) and Easy Auth (web)
 
 | Variable | Read by | Purpose / default | Deployed value | TF output | v1 Bicep | Required (deployed) |
 |---|---|---|---|---|---|---|
-| `AUTH_TENANT_ID` | `backend/application/deployment.py` (`auth_tenant_id`, used by the token validator in `backend/application/wiring.py`) | Tenant whose tokens the API accepts. Falls back to `AZURE_TENANT_ID` | TF api, only when `AUTH_MODE=entra`: azd `TCC_TENANT_ID`, else the deploying principal's tenant | — | new in v2 | Enforced when `AUTH_MODE=entra` |
+| `AUTH_TENANT_ID` | `backend/application/deployment.py` (`auth_tenant_id`, used by the token validator in `backend/bootstrap/auth_wiring.py`) | Tenant whose tokens the API accepts. Falls back to `AZURE_TENANT_ID` | TF api, only when `AUTH_MODE=entra`: azd `TCC_TENANT_ID`, else the deploying principal's tenant | — | new in v2 | Enforced when `AUTH_MODE=entra` |
 | `AZURE_TENANT_ID` | `backend/application/deployment.py` | Fallback for `AUTH_TENANT_ID` only | not set on the apps | — | not set | No |
-| `API_AUDIENCE` | `backend/application/deployment.py`, `backend/application/wiring.py` | Audience the API validates | TF api, only when `entra`: azd `TCC_API_AUDIENCE`, else `api://<TCC_API_CLIENT_ID>` | — | new in v2 | Enforced when `AUTH_MODE=entra` |
+| `API_AUDIENCE` | `backend/application/deployment.py`, `backend/bootstrap/auth_wiring.py` | Audience the API validates | TF api, only when `entra`: azd `TCC_API_AUDIENCE`, else `api://<TCC_API_CLIENT_ID>` | — | new in v2 | Enforced when `AUTH_MODE=entra` |
 | `OVERRIDE_USE_MI_FIC_ASSERTION_CLIENTID` | App Service Easy Auth (platform), web app | Web identity's client id; Easy Auth uses a managed-identity federated credential instead of a client secret | TF platform (web), only when Easy Auth is on (enterprise) | — | new in v2 | Functional when Easy Auth is on |
 
 ## 7. Identity and telemetry
@@ -119,9 +160,28 @@ Accepted values: `warehouse` (durable; `fabric` is the v1 alias), `sqlite`,
 
 | Variable | Read by | Purpose / default | Deployed value | TF output | v1 Bicep | Required (deployed) |
 |---|---|---|---|---|---|---|
-| `FOUNDRY_PROJECT_ENDPOINT` | `backend/main.py`, `backend/agents/factory.py` | Foundry project endpoint. Unset: agents are not registered and chat falls back to the scripted stream | TF api: `module.foundry.project_endpoint` | `FOUNDRY_PROJECT_ENDPOINT` | Same name, setting and output | No (chat degrades) |
-| `FOUNDRY_MODEL` | `backend/main.py`, `backend/agents/factory.py` | Model deployment name. Code default `gpt-5.4-mini` | TF api: `module.foundry.model` = variable `foundry_model` from azd `FOUNDRY_MODEL` (default `gpt-4.1-mini`). The deployment is named after the model | — | Setting from param `foundryModel` (default `gpt-5.4-mini`) | No |
-| `AI_GATEWAY_ENDPOINT` | not read by backend code | Optional AI gateway (AI-2); must carry the Foundry Agents protocol | TF api, only when variable `ai_gateway_endpoint` is non-empty (tfvars overlay only) | — | new in v2 | No |
+| `FOUNDRY_PROJECT_ENDPOINT` | `backend/application/ai/settings.py`, `backend/infrastructure/ai/foundry_prompt_agents.py` | Foundry project endpoint. Unset: no agents are published and chat falls back to the scripted stream | TF api: `module.foundry.project_endpoint` | `FOUNDRY_PROJECT_ENDPOINT` | Same name, setting and output | No (chat degrades) |
+| `FOUNDRY_MODEL` | `backend/application/ai/settings.py` | Model deployment name the `foundry` provider publishes agents with. Code default `gpt-5.4-mini` | TF api: `module.foundry.model` = variable `foundry_model` from azd `FOUNDRY_MODEL` (default `gpt-4.1-mini`). The deployment is named after the model | — | Setting from param `foundryModel` (default `gpt-5.4-mini`) | No |
+| `AI_PROVIDER_CHAIN` | `settings.py` | Ordered providers; the first that answers wins, a failure before output falls to the next. `foundry` (default), `foundry_connection` (Foundry prompt agents on a BYOM connection), `gateway` (direct OpenAI-compatible calls). E.g. `foundry,gateway` or `gateway,foundry` | TF api: `ai_provider_chain` when set | — | new | No |
+| `AI_PROVIDER_CHAIN__ROUTER`, `AI_PROVIDER_CHAIN__NARRATOR`, `AI_PROVIDER_CHAIN__ANALYSIS` | `settings.py` | Per-role override of the chain, e.g. narrator on the gateway and router on Foundry | not set | — | new | No |
+| `AI_MODEL_ROUTER`, `AI_MODEL_NARRATOR`, `AI_MODEL_ANALYSIS` | `settings.py` | Model for a role on every provider. A provider-specific form wins: `AI_MODEL_NARRATOR__GATEWAY`, `__FOUNDRY`, `__FOUNDRY_CONNECTION`. Foundry falls back to `FOUNDRY_MODEL`; the gateway has no default and a missing name is an error | TF api: `ai_model_*` when set | — | new | Gateway: yes |
+| `AI_FOUNDRY_CONNECTION_NAME` | `settings.py` | The Foundry model connection for `foundry_connection`; agents' models become `<connection>/<model>`. Prompt agents only — no Responses API, not with the Copilot harness | TF api: `ai_foundry_connection_name` when set | — | new | With that provider |
+| `AI_EGRESS_POLICY` | `application/ai/egress.py` | `allow_all` (default) · `aggregates_only` · `block`, applied to providers outside Microsoft's boundary. An employee identifier or record token never enters a prompt, under any policy | TF api: `ai_egress_policy` | — | new | No |
+| `AI_AGENT_VERSION_PINS` | `foundry_prompt_agents.py` | `AgentName=version,…` runs a published version instead of the latest: rollback is a setting | not set | — | new | No |
+| `AI_TOKEN_BUDGET_DAILY`, `AI_TOKEN_BUDGET_PER_PRINCIPAL_DAILY` | `settings.py` | Daily token ceilings (global, per person). Unset = none. A call that would cross one is refused, not run | not set | — | new | No |
+| `AI_INJECTION_GUARD`, `AI_OUTPUT_POLICY` | `safety/settings.py` | `on` (default) or `off`. The guard refuses to send a prompt carrying an instruction-override attempt; the policy withholds prose that links, gives addresses or identifier shapes, opens a code block or claims to be counsel. Both default ON and an `off` is logged at startup | `on` | — | new | No |
+| `AI_OUTPUT_ALLOWED_HOSTS` | `safety/settings.py` | Comma-separated host suffixes the model's prose may link to (default none: the engine's blocks carry every link) | not set | — | new | No |
+| `AI_CALL_TIMEOUT_SECONDS`, `AI_RETRY_MAX_ATTEMPTS`, `AI_RETRY_BASE_SECONDS`, `AI_RETRY_MAX_SECONDS`, `AI_TOTAL_DEADLINE_SECONDS`, `AI_BREAKER_FAILURE_THRESHOLD`, `AI_BREAKER_RESET_SECONDS`, `AI_BULKHEAD_MAX_CONCURRENT` | `settings.py` | Resilience: per-call timeout (30), attempts (3), backoff base/cap (0.5/8 s), total deadline across retries (45 s), breaker threshold (5) and reset (30 s), concurrent calls per provider (8) | not set | — | new | No |
+| `AI_GATEWAY_ENDPOINT` | `gateway_settings.py` | The customer's model gateway, an `https://` base URL **without a path**. It needs the OpenAI-compatible chat-completions API with streaming and tool calling — **not** the Foundry Agents protocol | TF api, only when variable `ai_gateway_endpoint` is non-empty | — | new in v2 | With the `gateway` provider |
+| `AI_GATEWAY_AUTH` | `gateway_settings.py` | `none` (mock/local only) · `api_key` · `oauth_client_credentials` · `entra_token`. **No default**: a gateway in the chain without it stops startup | TF api: `ai_gateway_auth` | — | new | With the `gateway` provider |
+| `AI_GATEWAY_API_STYLE`, `AI_GATEWAY_API_VERSION` | `gateway_settings.py` | `openai_v1` (default; `/v1/chat/completions`, model in the body) or `azure_deployments` (`/openai/deployments/{model}/chat/completions?api-version=`) | TF api: `ai_gateway_api_style` | — | new | No |
+| `AI_GATEWAY_API_KEY`, `AI_GATEWAY_API_KEY_HEADER`, `AI_GATEWAY_API_KEY_PREFIX` | `gateway_settings.py` | For `api_key`. The key is a **Key Vault reference only**; header default `Authorization`, prefix default `Bearer ` | key: TF api, only with `enable_key_vault` and `ai_gateway_api_key_secret_name` | — | new | Yes (secret) |
+| `AI_GATEWAY_OAUTH_TOKEN_URL`, `AI_GATEWAY_OAUTH_CLIENT_ID`, `AI_GATEWAY_OAUTH_CLIENT_SECRET`, `AI_GATEWAY_OAUTH_SCOPE` | `gateway_settings.py` | For `oauth_client_credentials`. The secret is a **Key Vault reference only** | secret: only with `enable_key_vault` and `ai_gateway_oauth_secret_name` | — | new | Yes (secret) |
+| `AI_GATEWAY_ENTRA_AUDIENCE` | `gateway_settings.py` | For `entra_token`: the audience the app's managed identity requests a token for. The preferred scheme — no secret anywhere | TF api: `ai_gateway_entra_audience` | — | new | With that scheme |
+| `AI_GATEWAY_EXTRA_HEADERS` | `gateway_settings.py` | Non-secret headers as a JSON object | not set | — | new | No |
+| `AI_GATEWAY_TIMEOUT_SECONDS`, `AI_GATEWAY_CONNECT_TIMEOUT_SECONDS` | `gateway_settings.py` | Read and connect timeouts (30 s, 5 s) | not set | — | new | No |
+| `AI_GATEWAY_TLS_VERIFY` | `gateway_settings.py`, `deployment_check.py` | Default `true`. **`false` is refused when `ENVIRONMENT` is not `local`** | not set | — | new | No |
+| `AI_GATEWAY_STREAMING`, `AI_GATEWAY_SUPPORTS_TOOLS` | `gateway_settings.py` | Default `true`. Streaming off reads one JSON body; tools off makes a planner use JSON-plan mode | not set | — | new | No |
 | `WEBIQ_API_KEY`, `WEBIQ_BEARER_TOKEN`, `WEBIQ_BASE_URL` *(local)* | `backend/tools/webiq.py` | Live rule retrieval for the rules-ingestion agent. Base URL default `https://api.microsoft.ai/v3`. Without a key or token, live retrieval is unavailable | not set (a key is a secret and does not belong in app settings) | — | not set | No |
 
 ## 9. API host process
@@ -132,8 +192,71 @@ Accepted values: `warehouse` (durable; `fabric` is the v1 alias), `sqlite`,
 | `PORT` | `backend/startup.sh` | Bind port. Default `8000` | App Service platform | — | n/a (container) | Set by platform |
 | `TCC_WARM_ON_START` | `backend/application/warmup.py` | `0`/`false`/`no` disables the startup warm-up and Warehouse keepalive. Default `1`; skipped unless `DATA_SOURCE=lakehouse` | not set | — | not set | No |
 | `TCC_KEEPALIVE_SECONDS` | `backend/application/warmup.py` | Warehouse pool keepalive interval. Default `30`, minimum `5` | not set | — | not set | No |
+| `CAPABILITY_TIMEOUT_SECONDS` | `backend/application/capabilities/invoke.py` | How long one `POST /api/capabilities/{tool}` call may run before the caller gets a structured `504 timeout`. Default `25`; a bad value raises. The gateway's own `CHANNEL_REQUEST_TIMEOUT_SECONDS` (default 30) sits just above it | not set | — | new | No |
 | `SCM_DO_BUILD_DURING_DEPLOYMENT` | App Service build (platform) | Build on deploy | TF platform: `true`, both apps | — | n/a (container images) | Platform |
 | `WEBSITES_CONTAINER_START_TIME_LIMIT` | App Service (platform) | Start-up time limit, seconds | TF platform: `1800`, API | — | n/a | Platform |
+
+## 9a. Channel gateway (`backend/channel`, only when `enable_m365_channel`)
+
+The gateway is a third App Service app on the API's plan (`channel.main:app`, started by
+`backend/startup-channel.sh`). `channel/config.py` reads these at startup and raises
+`GatewayConfigurationError` naming every problem at once. It has **no unauthenticated
+mode**: `AUTH_MODE` is not a gateway setting, and one set to anything but `entra` is
+refused. Nothing below is a secret.
+
+| Variable | Read by | Purpose / default | Deployed value | TF output | Required (deployed) |
+|---|---|---|---|---|---|
+| `TENANT_ID` | `backend/channel/config.py` | The Entra tenant every caller and every acting user must belong to. A GUID. No default | TF channel: variable `tenant_id` | — | Enforced |
+| `GATEWAY_AUDIENCE` | `backend/channel/config.py` | The gateway's app registration: `api://<id>` or the bare client id (both accepted, like the API). Tokens for any other audience are a 401 | TF channel: variable `channel_gateway_audience` | `CHANNEL_GATEWAY_AUDIENCE` | Enforced |
+| `API_BASE_URL` | `backend/channel/config.py` | Where the gateway reaches the API. Same variable name the web app uses | TF channel: `https://<API default hostname>` | `API_BASE_URL` | Enforced |
+| `API_AUDIENCE` | `backend/channel/config.py` | The API registration the gateway's managed identity requests a token for (`<audience>/.default`) | TF channel: the API's own `API_AUDIENCE` | — | Enforced |
+| `CHANNEL_STORE` | `backend/application/deployment.py` | The audit trail's store, as for the API. A deployed gateway refuses anything but `warehouse` | TF channel: `warehouse` (literal) | — | Enforced |
+| `CHANNEL_CALLER_CHANNELS` | `backend/channel/auth.py`, `backend/channel/config.py` | Binds each trusted caller to the channels it may assert in `X-Channel`: comma-separated `<app id>=<channel>\|<channel>` over `teams` and `m365-copilot` only (an agent can never be bound to `cowork`). With any entry set, a caller the list does not name asserts nothing (`403 channel_not_allowed`); with none set, every registered caller keeps enum-level trust and the gateway logs a warning at startup. Set it by hand to the orchestrator's app id and its channel; **not** mapped in Terraform (an overlay-only hardening setting) | none | — | No |
+| `CHANNEL_ALLOWED_CALLER_APP_IDS` | `backend/channel/auth.py` | Comma-separated app ids that may call as the orchestrator **without** holding the `Channel.Invoke` role (a sandbox where the role cannot be assigned). Empty (default) is role-only. The path that authorised each call is logged | TF channel: variable `channel_allowed_caller_app_ids` | — | No |
+| `CHANNEL_WRITER_SOURCE` | `backend/application/deployment.py` | As for the API: `allowlist` (default), `entra_group` or `either`. The gateway checks it on every `*_commit` and the API checks again | TF channel: variable `channel_writer_source` | — | Enforced |
+| `CHANNEL_WRITER_GROUP_ID` | `backend/application/deployment.py` | The Entra group for `entra_group` / `either`; the gateway identity needs Graph `GroupMember.Read.All` | TF channel: variable `channel_writer_group_id` | — | Enforced when the source needs it |
+| `CHANNEL_RATE_LIMIT_PER_MINUTE` | `backend/channel/config.py` | Calls per minute per user (token bucket, `1`–`6000`). Default `60`. Per process | not set | — | No |
+| `CHANNEL_REQUEST_TIMEOUT_SECONDS` | `backend/channel/config.py` | How long the gateway waits for the API, `1`–`600`. Default `30`, above the API's own `CAPABILITY_TIMEOUT_SECONDS` | not set | — | No |
+| `CHANNEL_DEBUG_WHOAMI` | `backend/channel/config.py` | `true` offers the `channel_ping` diagnostic (who the platform believes is calling, by which rule, whether the API answers). Never returns a token. Default off; logs a WARNING at startup when on ([DEMO-CLEANUP](../m365-channel/DEMO-CLEANUP.md)) | not set | — | No |
+| `CHANNEL_MCP_ALLOWED_ORIGINS` | `backend/channel/config.py`, `backend/channel/mcp.py` | Comma-separated `scheme://host[:port]` origins a browser-originated request to `/mcp` may carry (no path, no wildcard; a malformed entry stops the start). The MCP specification requires Origin validation (DNS rebinding); a real MCP client is not a browser and sends none, so the default, empty, admits **no** request that carries an `Origin` (`403 origin_not_allowed`, checked before the token is read). Add an origin only if the Cowork client is found to send one (RM-14, D-136, unverified against the real client) | not set | — | No |
+| `CHANNEL_RESOLVE_DISPLAY_NAMES` | `backend/channel/config.py` | `true` makes the gateway look up the display name and UPN of a Teams or Copilot Chat user (an object id and the placeholder `(name not provided)` from the orchestrator) in Microsoft Graph (`GET /users/{oid}?$select=displayName,userPrincipalName`, 2 s timeout, 24 h cache, 5 min negative cache, fail-soft), so audit rows and the author of a write name a person. Needs the Graph application role `User.ReadBasic.All` on the gateway identity (admin action: `scripts/assign-channel-roles.ps1 -GrantUserReadBasic`). A Cowork caller already carries its name and never reaches Graph. Default off, so tests and local runs never reach Graph | TF channel: variable `channel_resolve_display_names` (azd `TCC_CHANNEL_RESOLVE_DISPLAY_NAMES`) | — | No |
+| `WEB_CONCURRENCY` | `backend/startup-channel.sh` | Gunicorn workers. Default **`1`**: the fact ledger (`verify_figures`) and the rate limiter are per process | not set | — | No |
+| `ENVIRONMENT`, `DATA_CLASSIFICATION` | `backend/application/deployment.py` | As for the API (a non-`local` environment switches the durable-store checks on) | TF channel: `azure`, from the profile | — | Enforced |
+| `WAREHOUSE_SERVER`, `WAREHOUSE_DATABASE`, `FABRIC_WORKSPACE` | `backend/infrastructure/persistence/` | The Warehouse the audit trail is written to (the gateway holds `INSERT`/`SELECT` on `tcc_ops.channel_audit` only) | TF channel: the API's values | — | Enforced |
+| `APPLICATIONINSIGHTS_CONNECTION_STRING`, `AZURE_CLIENT_ID` | `backend/telemetry.py` | Telemetry over the gateway's own managed identity (`Monitoring Metrics Publisher`); no key | TF channel | — | No |
+
+The gateway authenticates to the API as itself: a managed-identity token (no secret) for
+`API_AUDIENCE`, holding the app role `TCC.Agent`, plus `X-TCC-Acting-User` naming the
+person it acts for.
+
+## 9b. Channel orchestrator (`channel_orchestrator/`, a Foundry hosted agent)
+
+A separate deployable: it is NOT an App Service app and Terraform does not set its variables.
+They are supplied at deploy time (`azd env set`, or the `environment_variables` of the hosted-agent
+version). The model-access settings are the **same `AI_*` variables as the API** (section 8), read by
+the same `load_ai_settings`. The platform injects the reserved `FOUNDRY_*` names; never set those.
+
+| Variable | Read by | Purpose / default | Deployed value | TF output | Required (deployed) |
+|---|---|---|---|---|---|
+| `CHANNEL_GATEWAY_URL` | `app/core/settings.py` | The gateway's `https://` base URL. The orchestrator calls `/channel/v1/tools/{tool}` and `/channel/v1/audit/narration` there. No default | `CHANNEL_BASE_URL` output | `CHANNEL_BASE_URL` | Enforced |
+| `CHANNEL_GATEWAY_AUDIENCE` | `app/core/settings.py` | The gateway's app registration (`api://<id>`); the orchestrator's managed identity requests `<audience>/.default` and must hold `Channel.Invoke`. No default | same value as the gateway's `GATEWAY_AUDIENCE` | `CHANNEL_GATEWAY_AUDIENCE` | Enforced |
+| `TENANT_ID` | `app/core/settings.py` | The Entra tenant (a GUID). A person from another tenant is refused before any call. No default | same as the gateway's | — | Enforced |
+| `CHANNEL_NAME` | `app/core/settings.py` | `teams` (default) or `m365-copilot`: the `X-Channel` the gateway records | not set | — | No |
+| `CHANNEL_MAX_TOOL_CALLS` | `app/core/settings.py` | Tools one turn may run, `1`–`20`. Default `8` (raised from `6`: a data question is a catalog read plus one or two queries). Eligibility under both methods counts as two | not set | — | No |
+| `CHANNEL_CONFIRM_TTL_SECONDS` | `app/core/settings.py` | How long a prepared change waits for its owner's `confirm`, `30`–`3600`. Default `300` | not set | — | No |
+| `CHANNEL_STATE_TTL_SECONDS` | `app/core/settings.py` | Idle time before a conversation's state (last client and year, pending change) is forgotten, `60`–`86400`. Default `3600`. In memory, per replica | not set | — | No |
+| `CHANNEL_REQUEST_TIMEOUT_SECONDS` | `app/core/settings.py` | How long one gateway call may take, `5`–`300`. Default `40`, above the gateway's own `30` | not set | — | No |
+| `CHANNEL_TURN_TIMEOUT_SECONDS` | `app/core/settings.py` | The deadline for a whole turn (tools, model, composition, audit), `10`–`600`. Default `90`. On expiry the person is told it took too long and nothing was changed; a confirm that times out is reported as unknown, never retried | not set | — | No |
+| `CHANNEL_IDENTITY_SOURCES` | `app/core/settings.py` | Where the acting person's Entra object id may come from: `original-subject` (the platform's `x-ms-original-subject`), `platform` (`x-ms-user-identity`), `agent-user-id` (the platform's `x-agent-user-id`, used only when it is a GUID; observed live to equal the caller's object id, CH-14), `client-headers` (caller-supplied `x-client-*`; **opt-in**). Default `original-subject,platform,agent-user-id`. With none resolvable the turn runs nothing | not set | — | No |
+| `CHANNEL_DEBUG_WHOAMI` | `app/core/settings.py`, `app/host.py` | `true` answers the message `/whoami` with the identity signals received (header names, and values only for the identity fields) and what was resolved. Never a credential. Default off; logs a WARNING at startup when on ([DEMO-CLEANUP](../m365-channel/DEMO-CLEANUP.md)) | not set | — | No |
+| `AI_PROVIDER_CHAIN`, `AI_GATEWAY_*`, `AI_EGRESS_POLICY`, `AI_MODEL_*`, … | `application/ai/settings.py` (vendored) | Section 8, unchanged. `foundry` calls the agent's own Foundry account over its Azure OpenAI v1 surface with the agent's identity; `gateway` calls the customer's gateway. `foundry_connection` is refused (prompt agents only) | per customer | — | Per provider |
+| `FOUNDRY_MODEL` | `app/wiring.py` | The `foundry` provider's model. Defaults to the platform-injected `AZURE_AI_MODEL_DEPLOYMENT_NAME` when unset | not set | — | No |
+| `FOUNDRY_PROJECT_ENDPOINT`, `FOUNDRY_AGENT_NAME`, `FOUNDRY_AGENT_VERSION`, `AZURE_AI_MODEL_DEPLOYMENT_NAME`, `APPLICATIONINSIGHTS_CONNECTION_STRING` | platform | **Injected by the Foundry runtime; reserved.** The orchestrator reads the endpoint (to derive the account's model URL), the agent name and version (recorded on every narration audit row) and the model name | platform | — | Platform |
+| `PYTHONNOUSERSITE` | the runtime | `1`. Dependencies are installed in the runtime environment, never with `pip install --user` | `1` in `azure.yaml` and the Dockerfile | — | Yes |
+| `LOG_LEVEL` | `app/main.py` | Default `INFO`. Nothing logged carries a token, a header value or a message | not set | — | No |
+| `KNOWLEDGE_ENABLED` | `application/knowledge/settings.py` (vendored), `app/wiring.py` | The knowledge tier's master switch (ADR-010). **Default `false`**: nothing is built or retrieved. Only `true`, `1`, `yes` or `on` enable it. Not set by Terraform, `azure.yaml` or any profile (a test fails if one sets it). Read by the orchestrator only; the API does not read it | not set | — | No |
+| `KNOWLEDGE_PROVIDER` | same | `none` (default), `fake` (a built-in synthetic corpus, for tests and local runs) or `foundry-iq` (designed, **not implemented**: with the switch on it stops the start). Enabled with `none` also stops the start | not set | — | No |
+| `KNOWLEDGE_TOP` | same | Passages retrieved per question, `1`–`10`. Default `3` | not set | — | No |
 
 ## 10. Web app (Express BFF) and SPA build
 
@@ -164,6 +287,7 @@ outputs it needs into `$GITHUB_ENV` after `terraform apply`.
 | `FABRIC_WORKSPACE_ID`, `FABRIC_WAREHOUSE_ID` | `scripts/sql_common.py`, `scripts/postprovision.ps1` | Target `deployed`: the guard resolves these through the Fabric API before any SQL runs | TF outputs (new in v2) |
 | `TCC_FABRIC_CREATED` | `scripts/sql_common.py`, `scripts/postprovision.ps1`, `deploy.yml` | `true` only when this apply created the Warehouse; the only case the destructive bootstrap may run (D22) | TF output (new in v2) |
 | `API_IDENTITY_NAME` | `scripts/grant-warehouse-sql.py` | Principal for the T-SQL grants | TF output (new in v2) |
+| `TCC_DATA_QUERY_SOURCE_ENABLED` | `scripts/postprovision.ps1` | `true` adds the read-only lakehouse-endpoint grant step (`grant-warehouse-sql.py --profile lakehouse`, API identity only) | azd value, the same one Terraform maps to `DATA_QUERY_SOURCE_ENABLED` |
 | `TCC_PROFILE` | `scripts/postprovision.ps1` | `public` runs the synthetic load | azd input, echoed as TF output |
 | `SOURCE_SCHEMA`, `FABRIC_WORKSPACE`, `FABRIC_LAKEHOUSE` | `scripts/postprovision.ps1`, `backend/data/source/load_fabric.py` | Synthetic load target | TF outputs |
 | `GOLD_SCHEMA`, `OPS_SCHEMA` | every SQL script via `backend/config.py` | Schema names | unset (defaults) |
@@ -193,6 +317,14 @@ into the settings above. Full guidance is in [DEPLOYMENT-HANDOVER.md](DEPLOYMENT
 | azd value | Terraform variable | Default | Profile | Becomes |
 |---|---|---|---|---|
 | `TCC_PROFILE` | `profile` | `public` | both | Every profile default in `infra/locals.tf`; output `TCC_PROFILE` |
+| `TCC_ENABLE_M365_CHANNEL` | `enable_m365_channel` | `false` | public | The channel gateway app, its identity, telemetry role and diagnostic setting; outputs `CHANNEL_APP_NAME`, `CHANNEL_BASE_URL`, `GATEWAY_IDENTITY_NAME`. Needs `auth_mode = "entra"` and `api_client_id` |
+| `TCC_CHANNEL_GATEWAY_AUDIENCE` | `channel_gateway_audience` | none | public (required with the toggle) | `GATEWAY_AUDIENCE` |
+| `TCC_CHANNEL_WRITER_SOURCE` | `channel_writer_source` | `allowlist` | public | `CHANNEL_WRITER_SOURCE` |
+| `TCC_CHANNEL_WRITER_GROUP_ID` | `channel_writer_group_id` | none | public (required unless `allowlist`) | `CHANNEL_WRITER_GROUP_ID` |
+| `TCC_CHANNEL_RESOLVE_DISPLAY_NAMES` | `channel_resolve_display_names` | `false` | public | `CHANNEL_RESOLVE_DISPLAY_NAMES` (only when true; needs Graph `User.ReadBasic.All` on the gateway identity) |
+| `TCC_DATA_QUERY_SOURCE_ENABLED` | `data_query_source_enabled` | `false` | both | `DATA_QUERY_SOURCE_ENABLED` on the API (only when true). postprovision also reads this value and, when `true`, grants the API identity read-only `SELECT` on the source payroll tables through the lakehouse endpoint |
+| `TCC_DATA_QUERY_TIMEOUT_SECONDS`, `TCC_DATA_QUERY_MAX_ROWS`, `TCC_DATA_QUERY_RATE_PER_MINUTE`, `TCC_DATA_QUERY_MAX_CONCURRENCY` | `data_query_timeout_seconds`, `data_query_max_rows`, `data_query_rate_per_minute`, `data_query_max_concurrency` | unset | both | `DATA_QUERY_TIMEOUT_SECONDS` (1-120), `DATA_QUERY_MAX_ROWS` (1-500), `DATA_QUERY_RATE_PER_MINUTE` (1-600), `DATA_QUERY_MAX_CONCURRENCY` (1-16), each only when set; an out-of-range value fails the plan |
+| `TCC_LAKEHOUSE_SQL_SERVER`, `TCC_LAKEHOUSE_SQL_DATABASE` | `lakehouse_sql_server`, `lakehouse_sql_database` | unset | both | `LAKEHOUSE_SQL_SERVER`, `LAKEHOUSE_SQL_DATABASE`, only when set; the application falls back to the Warehouse host and the lakehouse name |
 | `AZURE_ENV_NAME` | `environment_name` | written by azd | both | Resource names, `azd-env-name` tag |
 | `AZURE_LOCATION` | `location` | none | both | Region; output `AZURE_LOCATION` |
 | `AZURE_RESOURCE_GROUP` | `resource_group_name` | `rg-<env>` | both | Output `AZURE_RESOURCE_GROUP` |
@@ -215,6 +347,8 @@ into the settings above. Full guidance is in [DEPLOYMENT-HANDOVER.md](DEPLOYMENT
 | `FOUNDRY_MODEL` | `foundry_model` | `gpt-4.1-mini` | both | `FOUNDRY_MODEL`, deployment name |
 | `FOUNDRY_MODEL_VERSION` | `foundry_model_version` | `2025-04-14` | both | Model version (not an app setting) |
 | `TCC_APP_SERVICE_SKU` | `app_service_sku` | `P1v3` | both | Plan SKU (not an app setting) |
+| `TCC_FOUNDRY_PUBLIC_NETWORK_ACCESS` | `foundry_public_network_access` | `false` | public | **Demo only.** Not an app setting: it changes two properties of the Foundry account (`publicNetworkAccess`, `networkAcls`). `true` enables the account's public endpoint (Entra-only, local auth off, private endpoint kept). Refused with the enterprise profile and customer data. Output `network_posture` |
+| `TCC_FOUNDRY_ALLOWED_IP_RANGES` | `foundry_allowed_ip_ranges` | empty | public | **Demo only.** Comma-separated IPv4 CIDRs allowed through the account firewall when the toggle is on; empty allows any address |
 
 Terraform variables with no azd mapping, settable only through a tfvars
 overlay (`*.auto.tfvars`, `infra/profiles/*.tfvars`, or `TF_VARS_JSON` in
@@ -223,6 +357,7 @@ overlay (`*.auto.tfvars`, `infra/profiles/*.tfvars`, or `TF_VARS_JSON` in
 `enable_key_vault`, `api_worker_count`, `vnet_address_space`,
 `private_dns_zone_ids`, `fabric_capacity_sku`, `fabric_workspace_role`,
 `foundry_deployment_sku`, `foundry_capacity`, `ai_gateway_endpoint`,
+`channel_allowed_caller_app_ids`, `channel_allowed_ip_ranges`, `channel_debug_whoami`,
 `outputs_retention_days`, `tags`.
 
 ### v1 azd values that no longer exist

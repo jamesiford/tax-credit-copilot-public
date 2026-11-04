@@ -53,7 +53,7 @@ class _RecordingWriter:
 @pytest.fixture()
 def written(monkeypatch, tmp_path):
     """Run the command over the CSV fixture and return what it produced."""
-    from application import wiring
+    from bootstrap import wiring
     from infrastructure.persistence.sqlite_claims import SqliteClaimRepository
 
     # The command does not only write Gold — it dispatches AssessClientCommand,

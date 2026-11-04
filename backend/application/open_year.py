@@ -25,6 +25,7 @@ MIN_OPEN_MONTHS = 3
 
 
 def today() -> date:
+    """The one clock read in this module, so a test can pin the date."""
     return date.today()
 
 

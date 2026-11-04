@@ -1,0 +1,46 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/teams/v{{manifest_version}}/MicrosoftTeams.schema.json",
+  "manifestVersion": "{{manifest_version}}",
+  "version": "{{version}}",
+  "id": "{{app_id}}",
+  "developer": {
+    "name": "{{developer_name}}",
+    "websiteUrl": "{{developer_website_url}}",
+    "privacyUrl": "{{developer_privacy_url}}",
+    "termsOfUseUrl": "{{developer_terms_url}}"
+  },
+  "name": {
+    "short": "Tax Credit Copilot",
+    "full": "Tax Credit Copilot for Copilot Cowork"
+  },
+  "description": {
+    "short": "Engine-exact tax credit positions, review packs and confirmed updates.",
+    "full": "Book reviews and client credit review packs built from the Tax Credit Copilot calculation engine. Every dollar amount, count and percentage is quoted exactly as the engine returned it, every change is previewed and confirmed before it is made, and every action is recorded against the person who took it. This is not tax advice."
+  },
+  "icons": {
+    "color": "color.png",
+    "outline": "outline.png"
+  },
+  "accentColor": "{{accent_color}}",
+  "agentSkills": [
+    { "folder": "./skills/tcc-figures-and-writes" },
+    { "folder": "./skills/tcc-book-review" },
+    { "folder": "./skills/tcc-client-review-pack" }
+  ],
+  "agentConnectors": [
+    {
+      "id": "tcc-channel",
+      "displayName": "Tax Credit Copilot",
+      "description": "Reads and confirmed writes against the Tax Credit Copilot platform: book ranking, client situation, eligibility, trend, at-risk jobs, discovery, what-ifs, findings, claim lifecycle, engagement scope, claim packages, a figure check for drafts, and governed read-only questions about a client's payroll and calculation data (a catalog, a structured query and distinct values; no SQL).",
+      "toolSource": {
+        "remoteMcpServer": {
+          "mcpServerUrl": "{{gateway_mcp_url}}",
+          "authorization": {
+            "type": "OAuthPluginVault",
+            "referenceId": "{{oauth_reference_id}}"
+          }
+        }
+      }
+    }
+  ]
+}

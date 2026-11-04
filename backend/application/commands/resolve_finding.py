@@ -12,6 +12,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any
 
+from application.identity import Policy
 from application.mediator import Command
 
 
@@ -38,6 +39,7 @@ class ResolveFindingCommand(Command):
     resolution: str = ""
     keep_worksite: str | None = None
     note: str | None = None
+    policy = Policy.WRITER
 
     def __post_init__(self) -> None:
         if not self.finding_id:
@@ -54,6 +56,7 @@ class ReopenFindingCommand(Command):
 
     finding_id: str = ""
     client_id: int = 0
+    policy = Policy.WRITER
 
     def __post_init__(self) -> None:
         if not self.finding_id:
@@ -61,8 +64,8 @@ class ReopenFindingCommand(Command):
 
 
 def handle_resolve_finding(command: ResolveFindingCommand) -> dict[str, Any]:
-    from application.wiring import get_finding_repository as get_repository
-    from infrastructure.persistence.sqlite_findings import FindingResolution
+    from application.services import get_finding_repository as get_repository
+    from domain.findings import FindingResolution
 
     entry = FindingResolution(
         finding_id=command.finding_id,
@@ -78,7 +81,7 @@ def handle_resolve_finding(command: ResolveFindingCommand) -> dict[str, Any]:
 
 
 def handle_reopen_finding(command: ReopenFindingCommand) -> dict[str, Any]:
-    from application.wiring import get_finding_repository as get_repository
+    from application.services import get_finding_repository as get_repository
 
     get_repository().reopen(
         finding_id=command.finding_id,

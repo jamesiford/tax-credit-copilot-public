@@ -103,3 +103,31 @@ def guarded_connection(target_name: str, *, resolve_only: bool = False):
     connection = FabricWarehouseConnection(server=server, database=database).open()
     connection.autocommit = True
     return allowed, resolved, connection
+
+
+def check_lakehouse_endpoint(resolved, lakehouse_server: str, *, target: str = "deployed") -> None:
+    """Refuse a lakehouse endpoint that is not on the guarded Warehouse's host.
+
+    The guard proves the Warehouse is the allowed one; every item in a Fabric workspace shares
+    one SQL endpoint host, so the same host proves the lakehouse is in the same workspace.
+    """
+    from infrastructure.persistence.schema_admin import TargetMismatch, _host
+
+    if _host(lakehouse_server) != _host(resolved.endpoint):
+        raise TargetMismatch(
+            f"target '{target}' refused: LAKEHOUSE_SQL_SERVER {lakehouse_server!r} is not on the "
+            f"guarded workspace's endpoint host {resolved.endpoint}"
+        )
+
+
+def guarded_lakehouse_connection(target_name: str):
+    """Guard the Warehouse as usual, then open the lakehouse SQL analytics endpoint beside it."""
+    from infrastructure.persistence.lakehouse_sql_connection import LakehouseSqlConnection
+
+    allowed, resolved, _ = guarded_connection(target_name, resolve_only=True)
+    lakehouse = LakehouseSqlConnection()
+    lakehouse.require_configuration()
+    check_lakehouse_endpoint(resolved, lakehouse.server, target=target_name)
+    connection = lakehouse.open()
+    connection.autocommit = True
+    return allowed, resolved, connection

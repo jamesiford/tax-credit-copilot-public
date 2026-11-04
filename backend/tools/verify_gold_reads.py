@@ -20,7 +20,7 @@ YEAR = 2023
 def main() -> None:
     from application.queries.get_eligibility import GetEligibilityQuery
     from application.queries.get_onezero_matrix import GetOneZeroMatrixQuery
-    from application.wiring import get_mediator
+    from bootstrap.wiring import get_mediator
     from tests.certified import (
         CERTIFIED_EMPLOYEES,
         CERTIFIED_MIN_MAX_ELIGIBLE,

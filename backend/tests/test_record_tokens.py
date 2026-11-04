@@ -45,7 +45,7 @@ def test_the_token_is_derived_from_the_client_year_not_the_run():
 def test_the_sealed_drill_resolves_a_token_the_per_client_view_minted(lakehouse_source):
     from tools.reference_workspace import ReferenceWorkspaceService
 
-    from application.wiring import get_mediator
+    from bootstrap.wiring import get_mediator
 
     body = get_mediator().send(
         GetEligibilityQuery(
@@ -62,7 +62,7 @@ def test_the_sealed_drill_resolves_a_token_the_per_client_view_minted(lakehouse_
 
 
 def test_the_matrix_mints_the_same_token_as_the_population(lakehouse_source):
-    from application.wiring import get_mediator
+    from bootstrap.wiring import get_mediator
 
     mediator = get_mediator()
     population = mediator.send(

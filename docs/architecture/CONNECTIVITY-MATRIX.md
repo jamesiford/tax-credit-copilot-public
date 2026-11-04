@@ -14,7 +14,8 @@ Each row is one caller reaching one target. **Network path** is one of:
 Both apps set `vnet_route_all_enabled = true`. Every outbound call from
 either app therefore leaves through the integration subnet, including calls
 to public endpoints, and follows that subnet's routing. In the enterprise
-profile, the customer owns that routing.
+profile, the customer owns that routing. The channel gateway (§1a), when enabled,
+is a third app on the same subnet and the same rule.
 
 ## 1. Runtime paths
 
@@ -25,9 +26,10 @@ profile, the customer owns that routing.
 | R3 | API app | Entra ID (`login.microsoftonline.com`), JWKS | HTTPS 443 | VNet integration → public | none | public keys | n/a | `AUTH_MODE = entra` only |
 | R4 | API app | Lakehouse via OneLake (`onelake.dfs.fabric.microsoft.com`, Delta over `abfss://`) | HTTPS 443 | VNet integration → public (Fabric private link not provisioned, NET-4) | API identity `id-tcc-api-<s>` | Fabric workspace role `fabric_workspace_role`, **default `Contributor`** | `https://storage.azure.com/.default` | Terraform `fabric` when `manage_fabric_access` (public default). Otherwise the customer's Fabric admin |
 | R5 | API app | Lakehouse SQL analytics endpoint (`[<lakehouse>].[<schema>].[<table>]` on the Warehouse connection; aggregate reads) | TDS 1433 | VNet integration → public | API identity | Same workspace role as R4 | `https://database.windows.net/.default` | as R4 |
+| R5a | API app (the governed data query, [DATA-ACCESS](../m365-channel/DATA-ACCESS.md); only when `DATA_QUERY_SOURCE_ENABLED`) | Lakehouse SQL analytics endpoint (`LAKEHOUSE_SQL_SERVER` / `LAKEHOUSE_SQL_DATABASE`; own small connection pool), source payroll tables `Payroll`, `Location`, `PayCode` under `SOURCE_SCHEMA` | TDS 1433 | VNet integration → public | API identity | Workspace role (as R4) **and** object-level T-SQL `GRANT SELECT ON OBJECT::<SOURCE_SCHEMA>.<table> TO [<API_IDENTITY_NAME>]` for exactly those three tables: read-only, no schema grant, no write. The channel gateway has **no** path to this endpoint | `https://database.windows.net/.default` | Script `scripts/grant-warehouse-sql.py --profile lakehouse` (postprovision, when `TCC_DATA_QUERY_SOURCE_ENABLED=true`) |
 | R6 | API app | Warehouse (`WAREHOUSE_SERVER` / `WAREHOUSE_DATABASE`), schemas `tcc_gold`, `tcc_ops` | TDS 1433 | VNet integration → public | API identity | Workspace role (as R4) **and** T-SQL `GRANT SELECT, INSERT, UPDATE, DELETE ON SCHEMA::tcc_gold` and `::tcc_ops` `TO [<API_IDENTITY_NAME>]` | `https://database.windows.net/.default` | Terraform `fabric` (role, toggle). Script `scripts/grant-warehouse-sql.py` (grants) |
 | R7 | API app | Blob Storage `sttcc<s>`, containers `artifacts`, `outputs` | HTTPS 443 | VNet integration → **PE** `pe-blob-<s>` (`privatelink.blob.core.windows.net`). Public network access off; shared key off | API identity | **Storage Blob Data Contributor, once per container** (two assignments; none at account scope) | `https://storage.azure.com/.default` | Terraform `storage` |
-| R8 | API app | Foundry project `https://aif-tcc-<s>.services.ai.azure.com/api/projects/proj-tcc` | HTTPS 443 | VNet integration → **PE** `pe-aif-<s>` (zones `cognitiveservices`, `openai`, `services.ai`). Public network access off; local auth off | API identity | **Foundry User** (role GUID `53ca6127-db72-4b80-b1b0-d745d6d5456d`, formerly "Azure AI User") at **account** scope | `https://ai.azure.com/.default` | Terraform `foundry` |
+| R8 | API app | Foundry project `https://aif-tcc-<s>.services.ai.azure.com/api/projects/proj-tcc` | HTTPS 443 | VNet integration → **PE** `pe-aif-<s>` (zones `cognitiveservices`, `openai`, `services.ai`). Public network access off (default; the demo posture in §4a turns the public endpoint on for operators, this private path unchanged); local auth off | API identity | **Foundry User** (role GUID `53ca6127-db72-4b80-b1b0-d745d6d5456d`, formerly "Azure AI User") at **account** scope | `https://ai.azure.com/.default` | Terraform `foundry` |
 | R9 | API app (platform Key Vault references) | Key Vault `kv-tcc-<s>` (only if `enable_key_vault`) | HTTPS 443 | VNet integration → **PE** `pe-kv-<s>` (`privatelink.vaultcore.azure.net`). Public access off | API identity, as `key_vault_reference_identity_id`. No application code calls Key Vault | Key Vault Secrets User, vault scope | Key Vault (resolved by App Service) | Terraform `keyvault` |
 | R10 | API app | Application Insights ingestion (endpoint in the connection string) | HTTPS 443 | VNet integration → public (no Azure Monitor private link) | API identity (`APPLICATIONINSIGHTS_AUTHENTICATION_STRING`) | Monitoring Metrics Publisher on App Insights. Local auth is off, so the connection string alone can't write | `https://monitor.azure.com/.default` | Terraform `monitoring` |
 | R11 | Web app | Application Insights ingestion | HTTPS 443 | VNet integration → public | web identity `id-tcc-web-<s>` | Monitoring Metrics Publisher on App Insights. The web server ships no telemetry SDK, so no application code uses this grant today | `https://monitor.azure.com/.default` | Terraform `monitoring` |
@@ -39,6 +41,46 @@ The API has **no** grant on the Fabric REST API, the Azure Resource Manager
 API, or another app.
 
 The web identity has **only** R11 and R12. It holds no data permission.
+
+### 1a. Microsoft 365 channel paths (only when `enable_m365_channel = true`)
+
+The channel gateway is a third App Service app on the same plan, in the **same
+integration subnet** as the API and web apps (`vnet_route_all_enabled = true`). It
+is the only new public surface. The API's restriction `web-app-subnet` already
+admits it, because it shares that subnet; **the restriction is not widened** (a
+Terraform test asserts it). The API remains the authority: the gateway reaches
+Gold, claims and artifacts only through `POST /api/capabilities/{tool}`.
+
+| # | From | To | Protocol / port | Network path | Identity | Permission | Token audience | Granted by |
+|---|---|---|---|---|---|---|---|---|
+| CH1 | Microsoft 365 (Teams, Copilot Chat) via Azure Bot Service | The hosted orchestrator in Foundry | Activity protocol | Foundry-managed; **out of scope here** (Prompts 4 and 6) | Entra, validated by the channel | n/a | n/a | Operator (publish) |
+| CH2 | Orchestrator (its agent identity) | Gateway `CHANNEL_BASE_URL`: `/channel/v1/*` | HTTPS 443 | **public**, optionally narrowed by `channel_allowed_ip_ranges` | App-only token | App role **`Channel.Invoke`** on the gateway registration, or the caller's app id on `CHANNEL_ALLOWED_CALLER_APP_IDS` (the PoC fallback; the path used is logged). The person it acts for arrives in `X-Acting-*` headers and is a **channel assertion**, audited `channel-asserted` | `GATEWAY_AUDIENCE` | Operator (role assignment; Prompt 6) |
+| CH3 | Cowork (the user's own session) | Gateway `/mcp` | HTTPS 443 | **public** | The user's delegated token | Scope **`Channel.Access`**. The user IS the acting user; any acting header is ignored. Audited `delegated` | `GATEWAY_AUDIENCE` | Customer (consent; Prompt 6) |
+| CH4 | A browser opening a Teams card link | Gateway `/channel/v1/downloads/{ticket}` | HTTPS 443 | **public** | None: the **ticket** is the credential (256-bit, single use, 15 minutes, bound to one person). A presented token must be that person's | Streams one claim package. No SAS and no storage URL exists | n/a | Application (`claim_package_link`) |
+| CH5 | Gateway | API `POST /api/capabilities/{tool}`, `GET /api/health`, `GET /api/clients/{id}/artifacts/{id}` | HTTPS 443 to `API_BASE_URL` | VNet integration → **service endpoint** → API restriction `web-app-subnet` (the gateway shares the subnet) | Gateway identity `id-tcc-channel-<s>`, app-only token | App role **`TCC.Agent`** on the API registration, plus `X-TCC-Acting-User`. The API enforces the writer entitlement itself, and refuses an agent token with no acting user (400) | `API_AUDIENCE` | Operator (`TCC.Agent` assignment; Terraform cannot) |
+| CH6 | Gateway | Entra ID (JWKS) | HTTPS 443 | VNet integration → public | none | public keys | n/a | n/a |
+| CH7 | Gateway | Warehouse, **only** `tcc_ops.channel_audit` | TDS 1433 | VNet integration → public | Gateway identity | A Fabric workspace role (enough to connect) **and** object-level T-SQL `GRANT INSERT, SELECT ON OBJECT::tcc_ops.channel_audit` (no schema grant, no `UPDATE`/`DELETE`). The gateway reads and changes business data only through the API | `https://database.windows.net/.default` | Script `scripts/grant-warehouse-sql.py --profile gateway` (postprovision). The workspace role is the operator's: `manage_fabric_access` grants the API identity only |
+| CH8 | Gateway | Microsoft Graph `checkMemberGroups` (only if `CHANNEL_WRITER_SOURCE` is `entra_group` or `either`) | HTTPS 443 | VNet integration → public | Gateway identity | Graph application role `GroupMember.Read.All`. Fails closed: no answer is "not a writer" | `https://graph.microsoft.com/.default` | Operator (needs a privileged role; Prompt 6) |
+| CH9 | Gateway | Application Insights ingestion | HTTPS 443 | VNet integration → public | Gateway identity (`APPLICATIONINSIGHTS_AUTHENTICATION_STRING`) | Monitoring Metrics Publisher on App Insights | `https://monitor.azure.com/.default` | Terraform `channel` |
+| CH10 | Gateway | Lakehouse SQL analytics endpoint, and the Gold tables | none, by design | n/a | n/a | **No path and no grant.** The data tools (`data_catalog`, `data_query`, `data_distinct_values`) run in the API process (R5a, R6); the gateway reaches them only through CH5. `test_lakehouse_grants.py` asserts the lakehouse grant step never names the gateway identity | n/a | n/a |
+
+Identities and roles the channel adds, in one place:
+
+| Principal | Holds | Where it is granted | Who grants it |
+|---|---|---|---|
+| Orchestrator's agent identity | `Channel.Invoke` (app role on the gateway registration) | Entra | Operator (Prompt 6) |
+| Cowork users | `Channel.Access` (delegated scope on the gateway registration) | Entra consent | Customer |
+| Gateway identity `id-tcc-channel-<s>` | `TCC.Agent` (app role on the API registration) | Entra | Operator (Prompt 6) |
+| Gateway identity | Monitoring Metrics Publisher on App Insights | Azure RBAC | Terraform |
+| Gateway identity | Fabric workspace role to connect, and `INSERT`, `SELECT` on `tcc_ops.channel_audit` | Fabric; T-SQL | Operator; `grant-warehouse-sql.py --profile gateway` |
+| Gateway identity | Graph `GroupMember.Read.All` (optional) | Entra | Operator, only for a group-based writer source |
+
+The gateway holds **no** role on Blob Storage, Foundry, Key Vault or Fabric data
+beyond the audit table. The API still has no grant on another app.
+
+Terraform never registers resource providers: Azure Bot Service
+(`Microsoft.BotService`) must be registered by the operator before the channel is
+published (Prompts 4 and 6).
 
 ## 2. Operator and CI paths
 
@@ -118,6 +160,20 @@ flowchart LR
     op -- "ARM, SCM" --> api
     op -- "ARM, SCM" --> web
 ```
+
+### 4a. Network posture: demo and hardened
+
+Two named postures, reported by the Terraform output `network_posture`. The plan to get from the first to the second
+is [HARDENING-PLAN](HARDENING-PLAN.md); the unproven parts are the spike in
+[HARDENING-SPIKE](../m365-channel/HARDENING-SPIKE.md).
+
+| Path | `private` (default) | `demo-public-foundry` (`foundry_public_network_access = true`, **demo only**) |
+| --- | --- | --- |
+| R8 API to Foundry | PE, public access off (unchanged) | **Unchanged**: still through the private endpoint |
+| Operator workstation to the Foundry data plane (`azd ai agent`, publish, model connection, smoke tests) | Fails: no route, 403 | Allowed: the account's public endpoint is on, **Entra-only**, local auth off; optionally firewalled to `foundry_allowed_ip_ranges` (default action then Deny) |
+| Anything else | | Unchanged. The two properties `publicNetworkAccess` and `networkAcls` are the only difference |
+| Channel gateway (CH2, CH4) | Public, Entra-only | Same: public, Entra-only |
+| Refused for | n/a | The enterprise profile; `data_classification = customer` |
 
 ## 5. What is NOT trusted
 

@@ -93,6 +93,19 @@ Dockerfiles and `nginx.conf` are optional, for local containers only.
 The application is at `/`. First load builds the calculation workspace,
 which takes 60–75 seconds against local data and longer on a cold Fabric read.
 
+The interface is a token-driven design system with two themes: **modern** (the
+default) and **classic** (the previous look, kept so the revamp can be rolled
+back by configuration — `VITE_THEME=classic`). It is one shell (top bar, drill
+trail, an Ask Copilot workspace that shows its evidence beside the conversation)
+over four routed pages, designed for a 1440×900 desktop. The type is self-hosted,
+and nothing loads from another origin. A customer re-skins it by overriding
+colour roles in `frontend/src/styles/overlay.css`, never by editing a
+component. See [docs/design/DESIGN-SYSTEM.md](docs/design/DESIGN-SYSTEM.md) and
+[docs/design/UI-STATUS.md](docs/design/UI-STATUS.md) (the revamp's result is archived
+at [docs/archive/design/UI-REVAMP-RESULT.md](docs/archive/design/UI-REVAMP-RESULT.md)); the
+checks (`python frontend/tools/check_all.py`) are in
+[frontend/tools/README.md](frontend/tools/README.md).
+
 ### Data sources
 
 Set `DATA_SOURCE` in `backend/.env`. The choice matters more than it looks:
@@ -215,6 +228,16 @@ description of the present:
 [TARGET-ARCHITECTURE.md](docs/architecture/TARGET-ARCHITECTURE.md) is the
 destination and the gap analysis.
 
+### Channels
+
+Besides the web app, the platform can be used from **Teams**, **Microsoft 365 Copilot Chat** and **Copilot
+Cowork**. A hosted orchestrator behind Azure Bot Service serves Teams and Copilot Chat and assembles each reply
+in code; a channel gateway in front of the API serves it and the Cowork plugin (`channels/cowork/`), authenticates
+every caller, checks who may write, and audits every call per user. Every figure shown is the engine's, and every
+change is a two-step, confirmed, attributed write. Off by default (`enable_m365_channel`); synthetic data only for
+now. Start with [docs/m365-channel/README.md](docs/m365-channel/README.md), then
+[ADR-009](docs/architecture/ADR-009-m365-channel.md) and [KNOWN-LIMITATIONS](docs/m365-channel/KNOWN-LIMITATIONS.md). The agent can also answer descriptive questions from the Fabric lakehouse and warehouse through a governed, read-only, structured query layer (no model-written SQL): [DATA-ACCESS](docs/m365-channel/DATA-ACCESS.md). Where it stands and what to decide next: [FINAL-STATE](docs/m365-channel/FINAL-STATE.md).
+
 ---
 
 ## Repository layout
@@ -223,7 +246,8 @@ destination and the gap analysis.
 backend/
   api/              FastAPI routers — thin, orchestrate only
   application/      Use cases: commands, queries, the mediator that routes them,
-                    and the composition root that selects repository adapters
+                    and the ports they ask for (`services.py`)
+  bootstrap/        The composition root: selects the adapters behind those ports
   domain/           Entities, value objects, ports, and the pure calculation
   infrastructure/   Adapters behind those ports — payroll sources, repositories
   tools/            Services around the core: rule-pack loading, runners, portfolio
@@ -233,8 +257,11 @@ backend/
   data/             Source readers, synthetic generators, lakehouse projection
   tests/            Parity gate, architecture rules, endpoint contracts
 frontend/src/
-  components/       One file per view, each with a .test.jsx
-  lib/              Pure logic — scope, coverage, derivation
+  pages/            The four routed drill pages, one read each
+  components/       One file per view, each with a .test.jsx; shell/ (top bar,
+                    drill trail), ui/ (the shared components), ask/ (the Ask workspace)
+  lib/              Pure logic — scope, coverage, derivation, evidence contract
+  styles/           Token layers, the two themes, fonts, page patterns
   api.js            Single network layer
 frontend/server/    Express BFF (Node 24) — serves the SPA, proxies /api
 infra/              Terraform — root + modules/ (network, monitoring, identity,
@@ -257,7 +284,7 @@ python backend/tools/verify_reference_independent.py
 
 **1,279 backend** (104 skipped — live-Fabric/live-Azure opt-ins plus the two
 retired methodology source files, 1 expected failure documented below) ·
-**600 frontend** · **17/17** independent verification.
+**923 frontend** · **17/17** independent verification.
 
 Three kinds of test carry most of the weight:
 

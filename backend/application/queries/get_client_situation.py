@@ -8,16 +8,18 @@ rather than an engine pass.
 The output is a brief. `ClientSituationAgent` narrates it and can add no figure
 to it, because it is handed the object and nothing else [ADR-004].
 
-The client's display NAME is not resolved here. The book lives behind the scope
-router, and reaching into `api/` from the application layer is the dependency
-`test_application_does_not_import_a_router` exists to stop — so the caller
-decorates the brief with it.
+The client's display NAME is not part of the query result. It is a fact about the
+book rather than about recorded coverage, so `with_client_name` decorates the
+brief for callers that want it (the REST endpoint and the channel capability).
+The chat narrator is deliberately handed the undecorated brief.
 """
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any
 
+from application.client_book import clients_or_empty
 from application.mediator import Query
 
 
@@ -33,8 +35,21 @@ class SituationNotAvailable(LookupError):
     """No client, or no book to read it from."""
 
 
+def with_client_name(
+    body: dict[str, Any],
+    client_id: int,
+    book: Callable[[], list[dict[str, Any]]] = clients_or_empty,
+) -> dict[str, Any]:
+    """The brief plus the client's display name, or None when the book lacks it."""
+    name = next(
+        (c.get("name") for c in book() if int(c["account_id"]) == int(client_id)),
+        None,
+    )
+    return {**body, "client_name": name}
+
+
 def handle_get_client_situation(query: GetClientSituationQuery) -> dict[str, Any]:
-    from application.wiring import get_claim_repository
+    from application.services import get_claim_repository
     from domain.coverage import situation
 
     repo = get_claim_repository()

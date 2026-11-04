@@ -4,7 +4,7 @@
 prototype posture throughout
 
 The project moved from prototype to production build on 25 August 2026. This
-document is the target state. Five ADRs carry the reasoning:
+document is the target state. These ADRs carry the reasoning:
 
 | ADR | Decision |
 | --- | --- |
@@ -13,6 +13,8 @@ document is the target state. Five ADRs carry the reasoning:
 | [ADR-003](ADR-003-clean-architecture-cqrs.md) | Clean Architecture, CQRS, mediator pipeline |
 | [ADR-004](ADR-004-agentic-workflows.md) | MAF workflows, checkpointed HITL, numeric-integrity middleware |
 | [ADR-007](ADR-007-warehouse-operational-store.md) | Fabric Warehouse as the only operational store; the document store retired |
+| [ADR-008](ADR-008-channel-numeric-integrity.md) | Numeric integrity for the Microsoft 365 channel *(as built)* |
+| [ADR-009](ADR-009-m365-channel.md) | The Microsoft 365 channel: Bot Service, a hosted orchestrator, a gateway, per-user audit |
 
 ---
 
@@ -189,6 +191,23 @@ silently drift from the production one.
 Workflows replace the keyword router, with it retained as a fallback.
 `NumericIntegrityMiddleware` first — it gates F5.6 and is the one that turns a
 claim into a mechanism.
+
+### Gap analysis: the Microsoft 365 channel (November 2026)
+
+The channel is the first place Stage 5's promise was built, partly, and the first place Stage 3's
+Authorization stage became real. Where it stands against this document:
+
+| Target | State |
+| --- | --- |
+| Capability logic out of routers (Stage 2) | **Built for the channel.** `application/capabilities/` holds the tool catalog; the portal chat and the channel call the same functions. Other routers remain to move |
+| Mediator with Authorization (Stage 3) | **Built.** Authorization is now a real stage (the writer policy); `TenantScope` is still not, because there is no employer binding to scope to ([ADR-003](ADR-003-clean-architecture-cqrs.md)) |
+| Durable audit | **Built for the channel.** `tcc_ops.channel_audit` (migration 0001) and `agent_action_audit` are written; the mediator's own `AuditLog` is still an in-memory support aid |
+| `NumericIntegrityMiddleware` (Stage 5) | **Built as a service**, not as MAF middleware: the guard and composer run in code on the channel path ([ADR-008](ADR-008-channel-numeric-integrity.md)). The portal chat stream is not number-checked |
+| MAF workflows, checkpointing, human-gated resume | **Not built.** The hosted orchestrator is a MAF agent with a code-driven turn; its pending confirmation is in-memory state with a TTL, not a checkpoint |
+| Per-user identity end to end | **Not built.** Teams and Copilot Chat are `channel-asserted`; Cowork is `delegated`. Per-client entitlement is still an all-clients authorizer ([SECURITY.md](../../SECURITY.md)) |
+| Private network for the agent path | **Planned, unproven.** A demo toggle exists; the hardened posture is [HARDENING-PLAN](HARDENING-PLAN.md), with Cosmos DB ruled out and spike S6 to prove it |
+
+See [ADR-009](ADR-009-m365-channel.md) for the decision and its risks.
 
 ---
 

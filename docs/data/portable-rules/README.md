@@ -11,20 +11,22 @@ dependencies beyond the standard library.
 
 | File | What it is |
 | --- | --- |
-| `flex_rules.py` | The rules. Stdlib only. Drop it in a notebook and import it. |
-| `crosscheck.py` | Proof it matches the engine. Run it after any change to either side. |
+| [`flex_rules.py`](../../../scripts/portable-rules/flex_rules.py) | The rules. Stdlib only. Drop it in a notebook and import it. |
+| [`crosscheck.py`](../../../scripts/portable-rules/crosscheck.py) | Proof it matches the engine. Run it after any change to either side. |
+
+The code lives in `scripts/portable-rules/` (it is code, not documentation); this folder keeps the explanation.
 
 ## Start here
 
 ```bash
-python flex_rules.py
+python scripts/portable-rules/flex_rules.py
 ```
 
 Runs sixteen assertions covering every rule, and prints pass/fail per rule. No
 data or configuration needed. If this passes, the module is intact.
 
 ```bash
-cd backend && ../.venv/Scripts/python.exe ../docs/data/portable-rules/crosscheck.py
+cd backend && ../.venv/Scripts/python.exe ../scripts/portable-rules/crosscheck.py
 ```
 
 Runs both implementations over the same rows and reports any disagreement.

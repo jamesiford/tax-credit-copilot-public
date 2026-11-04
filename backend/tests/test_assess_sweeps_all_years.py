@@ -15,7 +15,7 @@ from datetime import date, timedelta
 
 import pytest
 
-from api import _assess
+from application import assessment as _assess
 from application.commands.run_client_calculation import RunClientCalculationCommand
 
 
@@ -120,7 +120,7 @@ def test_the_run_command_still_accepts_a_single_year():
 
 def test_the_run_endpoint_sweeps_unless_it_is_told_otherwise(monkeypatch):
     """The endpoint is where the narrowing happened, so pin the mapping."""
-    from application import wiring
+    from bootstrap import wiring
     from api.trend import ClientRunRequest, create_client_run
 
     sent = []

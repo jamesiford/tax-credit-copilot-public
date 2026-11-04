@@ -1,0 +1,56 @@
+[
+  {
+    "name": "one_exact_full_name_is_answered_without_asking_which_client",
+    "turns": [{
+      "say": "How has Northwind Care Systems trended?",
+      "model": [{"tools": [{"tool": "client_trend", "args": {}}]}, {"text": "The table shows each year."}],
+      "expect": {"kind": "answer", "gateway": ["client_resolve", "client_trend"], "args": {"client_trend": {"client_id": 2002}}, "absent": ["Which client do you mean?"]}
+    }]
+  },
+  {
+    "name": "an_exact_name_and_then_their_stays_on_the_same_client",
+    "turns": [
+      {"say": "How has Cascade Retail Partners trended?",
+       "model": [{"tools": [{"tool": "client_trend", "args": {}}]}, {"text": "The table shows each year."}],
+       "expect": {"kind": "answer", "args": {"client_trend": {"client_id": 2001}}}},
+      {"say": "What about their headcount for 2023?",
+       "model": [{"tools": [{"tool": "client_eligibility", "args": {"tax_year": 2023}}]}, {"text": "Both methods are shown."}],
+       "expect": {"kind": "answer", "gateway": ["client_resolve", "client_eligibility", "client_eligibility"], "args": {"client_eligibility": {"client_id": 2001}}, "absent": ["Which client do you mean?"]}}
+    ]
+  },
+  {
+    "name": "their_with_no_client_in_the_conversation_asks_and_never_guesses",
+    "turns": [{
+      "say": "What is their trend?",
+      "model": [{"tools": [{"tool": "client_trend", "args": {}}]}, {"text": "I need to know more first."}],
+      "expect": {"kind": "clarify", "gateway": ["client_resolve"], "contains": ["Which client do you mean?", "1) Cascade Retail Partners"]}
+    }]
+  },
+  {
+    "name": "a_claim_with_no_calculation_is_explained_in_plain_words",
+    "overrides": {"claim_transition_prepare": {"status": 409, "error": {"code": "not_calculated", "message": "no calculation has reached this client and year yet, which is not the same as nothing found", "retryable": false}}},
+    "turns": [{
+      "say": "Mark Cascade's GA_JTC claim for 2023 as assessed",
+      "model": [{"tools": [{"tool": "claim_transition_prepare", "args": {"program_code": "GA_JTC", "tax_year": 2023, "status": "assessed"}}]}, {"text": "Here is the preview."}],
+      "expect": {"kind": "failure", "contains": ["no calculation has reached this client and year yet"], "absent": ["not_calculated", "409", "Traceback", "$", "Reply **confirm**"]}
+    }]
+  },
+  {
+    "name": "a_claim_that_does_not_exist_is_said_plainly_and_nothing_is_offered_to_confirm",
+    "overrides": {"claim_transition_prepare": {"status": 404, "error": {"code": "claim_not_found", "message": "no claim is recorded for that programme and year", "retryable": false}}},
+    "turns": [{
+      "say": "Mark Cascade's GA_JTC claim for 2023 as assessed",
+      "model": [{"tools": [{"tool": "claim_transition_prepare", "args": {"program_code": "GA_JTC", "tax_year": 2023, "status": "assessed"}}]}, {"text": "Here is the preview."}],
+      "expect": {"kind": "failure", "contains": ["no claim is recorded for that programme and year"], "absent": ["claim_not_found", "404", "Traceback", "Reply **confirm**"]}
+    }]
+  },
+  {
+    "name": "a_refused_status_change_is_said_in_the_platforms_own_words",
+    "overrides": {"claim_transition_prepare": {"status": 422, "error": {"code": "rejected", "message": "a claim cannot move from claimed back to assessed", "retryable": false}}},
+    "turns": [{
+      "say": "Mark Cascade's GA_JTC claim for 2023 as assessed",
+      "model": [{"tools": [{"tool": "claim_transition_prepare", "args": {"program_code": "GA_JTC", "tax_year": 2023, "status": "assessed"}}]}, {"text": "Here is the preview."}],
+      "expect": {"kind": "failure", "contains": ["a claim cannot move from claimed back to assessed"], "absent": ["rejected", "422", "Traceback", "Reply **confirm**"]}
+    }]
+  }
+]

@@ -123,11 +123,11 @@ def _frames(body: str) -> list[tuple[str, dict]]:
 
 @pytest.fixture
 def client(monkeypatch):
-    import api.chat as chat
+    import api.chat.scope as scope
     from main import app
 
-    monkeypatch.setattr(chat, "_chat_clients", lambda: list(BOOK))
-    monkeypatch.setattr(chat, "_candidate_year", lambda cid, req: req.tax_year if cid == req.client_id else 2025)
+    monkeypatch.setattr(scope, "_chat_clients", lambda: list(BOOK))
+    monkeypatch.setattr(scope, "_candidate_year", lambda cid, req: req.tax_year if cid == req.client_id else 2025)
     return TestClient(app)
 
 

@@ -27,10 +27,12 @@ from __future__ import annotations
 import json
 import sqlite3
 import threading
-from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
+
+from config import get_settings
+from domain.findings import FindingResolution
 
 _SCHEMA = """
 CREATE TABLE IF NOT EXISTS agent_finding_resolution (
@@ -60,34 +62,6 @@ def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
-@dataclass(frozen=True)
-class FindingResolution:
-    """A human's answer to something an agent found."""
-
-    finding_id: str
-    client_id: int
-    tax_year: int
-    resolution: str          # accept | assign | drop | flag
-    decided_by: str
-    decided_at: str
-    detail: dict[str, Any] | None = None   # e.g. which worksite to keep
-    note: str | None = None
-    superseded_at: str | None = None
-
-    def to_dict(self) -> dict[str, Any]:
-        return {
-            "finding_id": self.finding_id,
-            "client_id": self.client_id,
-            "tax_year": self.tax_year,
-            "resolution": self.resolution,
-            "detail": self.detail,
-            "note": self.note,
-            "decided_by": self.decided_by,
-            "decided_at": self.decided_at,
-            "superseded_at": self.superseded_at,
-        }
-
-
 class SqliteFindingRepository:
     """Durable resolutions, alongside the claim store. [ADR-002]
 
@@ -97,9 +71,8 @@ class SqliteFindingRepository:
 
     def __init__(self, path: str | Path | None = None) -> None:
         from infrastructure.persistence.sqlite_claims import _DEFAULT_PATH
-        import os
 
-        self.path = Path(path) if path else Path(os.getenv("OPERATIONAL_DB", _DEFAULT_PATH))
+        self.path = Path(path) if path else Path(get_settings().stores.operational_db_or(_DEFAULT_PATH))
         self._local = threading.local()
         if str(self.path) != ":memory:":
             self.path.parent.mkdir(parents=True, exist_ok=True)

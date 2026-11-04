@@ -25,7 +25,6 @@ place, because a superseded figure may already be on a filed return.
 from __future__ import annotations
 
 import logging
-import os
 import subprocess
 import uuid
 from dataclasses import dataclass
@@ -33,6 +32,7 @@ from pathlib import Path
 from typing import Any
 
 from application.mediator import Command
+from config import get_settings
 
 logger = logging.getLogger(__name__)
 
@@ -77,7 +77,7 @@ class RunFailed(RuntimeError):
 
 def _code_commit() -> str:
     """The commit the engine ran at. `char(40)`, so it must not exceed 40."""
-    configured = os.getenv("GIT_COMMIT")
+    configured = get_settings().runtime.git_commit
     if configured:
         return configured.strip()[:40]
     try:
@@ -203,7 +203,7 @@ def _replay_unit_series(
     installment_rows: list[tuple] = []
     # WI-21. Base years a human chose, read ONCE for the run. A read failure
     # fails the run: silently falling back would drop a decision on the floor.
-    from application.wiring import get_override_repository
+    from application.services import get_override_repository
 
     overrides = get_override_repository().base_years(client_id, program_code)
     month_rows: list[tuple] = []
@@ -413,13 +413,12 @@ def _replay_unit_series(
 def handle_run_client_calculation(command: RunClientCalculationCommand) -> dict[str, Any]:
     """Execute the engine and persist every Gold and provenance row it implies."""
     from application.queries._client_run import resolve_client_run
-    from application.wiring import get_gold_writer, get_mediator
+    from application.services import get_gold_writer, get_mediator
     from domain.calculation.onezero import (
         run_min_max_method, run_pay_period_method, unreachable_months,
     )
-    from domain.warehouse import RunManifest
-    from infrastructure.persistence.fabric_warehouse import _MANIFEST_COLUMNS
-    from infrastructure.persistence.warehouse_gold import GoldWriteFailed
+    from domain.warehouse import RUN_MANIFEST_COLUMNS as _MANIFEST_COLUMNS, RunManifest
+    from application.gold_ports import GoldWriteFailed
     from tools import gold_projection as gp
 
     state = command.state.upper()
@@ -577,7 +576,7 @@ def handle_run_client_calculation(command: RunClientCalculationCommand) -> dict[
         "calculation_id": manifest.calculation_id,
         "code_commit": manifest.code_commit,
         "rows_written": counts,
-        "validation": {"queries_run": len(_section_9_count()), "violations": []},
+        "validation": {"queries_run": _section_9_count(), "violations": []},
         "summary": {
             "employees_evaluated": len(results["min_max"].total_hours_and_wages),
             "min_max_eligible": len(results["min_max"].eligible_employees),
@@ -592,12 +591,12 @@ def handle_run_client_calculation(command: RunClientCalculationCommand) -> dict[
 
 def _all_payroll(client_id: int) -> list[dict[str, Any]]:
     """Every year of this client's payroll, loaded once for the unit replay."""
-    from infrastructure.payroll.pay_period_source import load_pay_periods
+    from application.source_ports import load_pay_periods
 
     return load_pay_periods(client_id)
 
 
 def _section_9_count():
-    from infrastructure.persistence.warehouse_gold import SECTION_9_QUERIES
+    from application.gold_ports import section_9_query_count
 
-    return SECTION_9_QUERIES
+    return section_9_query_count()

@@ -85,7 +85,7 @@ def _span(years: set[int]) -> str:
 def backfill(client_ids: list[int]) -> None:
     from application.queries._client_run import ClientRunNotAvailable
     from application.commands.run_client_calculation import RunClientCalculationCommand
-    from application.wiring import get_mediator
+    from bootstrap.wiring import get_mediator
 
     mediator = get_mediator()
     for client_id in client_ids:

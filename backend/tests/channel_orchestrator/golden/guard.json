@@ -1,0 +1,59 @@
+[
+  {
+    "name": "a_model_that_types_a_digit_is_dropped_whole",
+    "turns": [{
+      "say": "What is Cascade's credit for 2023 under Min-Max?",
+      "model": [{"tools": [{"tool": "client_eligibility", "args": {"tax_year": 2023}}]}, {"text": "Their annual credit is about 227,605 dollars."}],
+      "expect": {"kind": "answer", "guard": "rejected", "narration_used": false, "audit": "ok", "contains": ["$227,605", "commentary was withheld"], "absent": ["about 227,605"]}
+    }]
+  },
+  {
+    "name": "a_model_that_rewrites_a_figure_is_dropped_whole",
+    "turns": [{
+      "say": "What is Cascade's credit for 2023 under Min-Max?",
+      "model": [{"tools": [{"tool": "client_eligibility", "args": {"tax_year": 2023}}]}, {"text": "The credit is {{facts.client_eligibility_min_max.credit.annual_credit_usd|money}}, roughly $230,000."}],
+      "expect": {"kind": "answer", "guard": "rejected", "narration_used": false, "contains": ["$227,605"], "absent": ["230,000"]}
+    }]
+  },
+  {
+    "name": "a_model_that_invents_a_figure_is_dropped_whole",
+    "turns": [{
+      "say": "What is Cascade's credit for 2023 under Min-Max?",
+      "model": [{"tools": [{"tool": "client_eligibility", "args": {"tax_year": 2023}}]}, {"text": "That comes from twelve locations and 40 new hires."}],
+      "expect": {"kind": "answer", "guard": "rejected", "narration_used": false, "absent": ["40 new hires"]}
+    }]
+  },
+  {
+    "name": "a_link_the_model_adds_is_dropped_whole",
+    "turns": [{
+      "say": "What is Cascade's credit for 2023 under Min-Max?",
+      "model": [{"tools": [{"tool": "client_eligibility", "args": {"tax_year": 2023}}]}, {"text": "See https://evil.example.test/credit for details."}],
+      "expect": {"kind": "answer", "guard": "rejected", "narration_used": false, "absent": ["evil.example"]}
+    }]
+  },
+  {
+    "name": "a_placeholder_for_a_path_that_does_not_exist_is_dropped_whole",
+    "turns": [{
+      "say": "What is Cascade's credit for 2023 under Min-Max?",
+      "model": [{"tools": [{"tool": "client_eligibility", "args": {"tax_year": 2023}}]}, {"text": "The credit is {{facts.credit.annual_credit_usd|money}}."}],
+      "expect": {"kind": "answer", "guard": "rejected", "narration_used": false, "contains": ["$227,605"]}
+    }]
+  },
+  {
+    "name": "a_model_with_nothing_to_say_still_gets_the_engines_answer",
+    "turns": [{
+      "say": "What is Cascade's credit for 2023 under Min-Max?",
+      "model": [{"tools": [{"tool": "client_eligibility", "args": {"tax_year": 2023}}]}, {"text": ""}],
+      "expect": {"kind": "answer", "guard": "pass", "narration_used": false, "contains": ["$227,605", "Not tax advice"]}
+    }]
+  },
+  {
+    "name": "an_audit_that_cannot_be_filed_never_hides_the_answer",
+    "narration_status": 503,
+    "turns": [{
+      "say": "What is Cascade's credit for 2023 under Min-Max?",
+      "model": [{"tools": [{"tool": "client_eligibility", "args": {"tax_year": 2023}}]}, {"text": "The credit is {{facts.client_eligibility_min_max.credit.annual_credit_usd|money}}."}],
+      "expect": {"kind": "answer", "guard": "pass", "audit": "failed", "contains": ["$227,605"]}
+    }]
+  }
+]

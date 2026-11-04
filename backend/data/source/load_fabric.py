@@ -23,7 +23,6 @@ Writes under the configured source schema (`SOURCE_SCHEMA`, default
 from __future__ import annotations
 
 import argparse
-import os
 import sys
 from pathlib import Path
 
@@ -31,7 +30,7 @@ from pathlib import Path
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
-from config import SOURCE_SCHEMA
+from config import SOURCE_SCHEMA, get_settings
 from data.source.from_reference import build_reference_source_dataset
 from data.source.synth import build_all_synthetic
 from data.source.to_bcs import source_to_bcs_rows, projection_controls
@@ -51,8 +50,9 @@ def main() -> int:
                         help=f"lakehouse schema to write under (default: {SOURCE_SCHEMA})")
     parser.add_argument("--tables", nargs="+", metavar="TABLE",
                         help="write only these tables (default: all)")
-    parser.add_argument("--workspace", default=os.getenv("FABRIC_WORKSPACE"))
-    parser.add_argument("--lakehouse", default=os.getenv("FABRIC_LAKEHOUSE"))
+    source = get_settings().data_source
+    parser.add_argument("--workspace", default=source.fabric_workspace)
+    parser.add_argument("--lakehouse", default=source.fabric_lakehouse)
     args = parser.parse_args()
 
     datasets = []

@@ -1,0 +1,101 @@
+[
+  {
+    "name": "record_a_claim_prepare_then_confirm",
+    "turns": [
+      {"say": "Record that Cascade's GA_JTC credit for 2023 was claimed",
+       "model": [{"tools": [{"tool": "claim_record_prepare", "args": {"program_code": "GA_JTC", "tax_year": 2023, "status": "claimed"}}]}, {"text": "Here is the preview."}],
+       "expect": {"kind": "answer", "gateway": ["client_resolve", "claim_record_prepare"], "args": {"claim_record_prepare": {"client_id": 2001, "tax_year": 2023, "status": "claimed"}}, "contains": ["Reply **confirm**"]}},
+      {"say": "confirm", "expect": {"kind": "commit", "gateway": ["claim_record_commit"], "contains": ["Done."]}}
+    ]
+  },
+  {
+    "name": "transition_a_claim_prepare_then_confirm",
+    "turns": [
+      {"say": "Mark Cascade's GA_JTC claim for 2023 as assessed",
+       "model": [{"tools": [{"tool": "claim_transition_prepare", "args": {"program_code": "GA_JTC", "tax_year": 2023, "status": "assessed"}}]}, {"text": "Here is the preview."}],
+       "expect": {"kind": "answer", "gateway": ["client_resolve", "claim_transition_prepare"]}},
+      {"say": "yes, apply", "expect": {"kind": "commit", "gateway": ["claim_transition_commit"]}}
+    ]
+  },
+  {
+    "name": "resolve_a_finding_prepare_then_confirm",
+    "turns": [
+      {"say": "Accept finding f-17 for Cascade in 2023",
+       "model": [{"tools": [{"tool": "finding_resolve_prepare", "args": {"tax_year": 2023, "finding_id": "f-17", "resolution": "accept"}}]}, {"text": "Here is the preview."}],
+       "expect": {"kind": "answer", "gateway": ["client_resolve", "finding_resolve_prepare"], "args": {"finding_resolve_prepare": {"finding_id": "f-17", "resolution": "accept"}}}},
+      {"say": "confirm", "expect": {"kind": "commit", "gateway": ["finding_resolve_commit"]}}
+    ]
+  },
+  {
+    "name": "set_a_base_year_prepare_then_confirm",
+    "turns": [
+      {"say": "Set the base year for Cascade's location A-1 to 2021",
+       "model": [{"tools": [{"tool": "base_year_set_prepare", "args": {"unit_id": "A-1", "base_year": 2021}}]}, {"text": "Here is the preview."}],
+       "expect": {"kind": "answer", "gateway": ["client_resolve", "base_year_set_prepare"], "args": {"base_year_set_prepare": {"unit_id": "A-1", "base_year": 2021}}}},
+      {"say": "confirm", "expect": {"kind": "commit", "gateway": ["base_year_set_commit"]}}
+    ]
+  },
+  {
+    "name": "a_base_year_the_reader_did_not_say_is_asked_not_chosen",
+    "turns": [{
+      "say": "Set the base year for Cascade's location A-1",
+      "model": [{"tools": [{"tool": "base_year_set_prepare", "args": {"unit_id": "A-1", "base_year": 2020}}]}, {"text": "Which year?"}],
+      "expect": {"kind": "clarify", "gateway": ["client_resolve"], "contains": ["Which tax year do you mean?"], "absent": ["Reply **confirm**"]}
+    }]
+  },
+  {
+    "name": "the_claim_package_is_built_then_its_link_comes_from_the_gateway",
+    "turns": [
+      {"say": "Send me the claim package for Cascade 2023",
+       "model": [{"tools": [{"tool": "claim_package_create_prepare", "args": {"tax_year": 2023}}]}, {"text": "Here is the preview."}],
+       "expect": {"kind": "answer", "gateway": ["client_resolve", "claim_package_create_prepare"], "contains": ["Reply **confirm**"]}},
+      {"say": "confirm",
+       "expect": {"kind": "commit", "gateway": ["claim_package_create_commit", "claim_package_link"], "model_calls": 0,
+                  "contains": ["Done.", "Claim Package Link"], "absent": ["blob.core", "tok-"]}}
+    ]
+  },
+  {
+    "name": "a_package_whose_link_cannot_be_had_says_so_after_the_change_was_made",
+    "overrides": {"claim_package_link": {"status": 502, "error": {"code": "api_unreachable", "message": "the API could not be reached", "retryable": true}}},
+    "turns": [
+      {"say": "Send me the claim package for Cascade 2023",
+       "model": [{"tools": [{"tool": "claim_package_create_prepare", "args": {"tax_year": 2023}}]}, {"text": "Here is the preview."}],
+       "expect": {"kind": "answer"}},
+      {"say": "confirm", "expect": {"kind": "commit", "contains": ["Done.", "could not get its link"]}}
+    ]
+  },
+  {
+    "name": "a_what_if_without_a_size_asks_for_one_instead_of_choosing",
+    "turns": [{
+      "say": "What if Cascade hired some people at site A-1 in 2023?",
+      "model": [{"tools": [{"tool": "simulate", "args": {"worksite_id": "A-1", "action": "add_headcount", "magnitude": 3}}]}, {"text": "How many?"}],
+      "expect": {"kind": "clarify", "gateway": ["client_resolve"], "contains": ["How many, or by how much?"]}
+    }]
+  },
+  {
+    "name": "no_identity_no_tool_no_model",
+    "turns": [{
+      "who": "none", "say": "Who should we call first?",
+      "model": [{"text": "never asked"}],
+      "expect": {"kind": "refusal", "gateway": [], "model_calls": 0, "narrations": 0, "contains": ["can't tell who you are"]}
+    }]
+  },
+  {
+    "name": "being_asked_to_slow_down_is_said_in_a_sentence",
+    "overrides": {"client_trend": {"status": 429, "error": {"code": "rate_limited", "message": "too many calls; slow down", "retryable": true}}},
+    "turns": [{
+      "say": "How has Cascade trended?",
+      "model": [{"tools": [{"tool": "client_trend", "args": {}}]}, {"text": "I could not get that."}],
+      "expect": {"kind": "failure", "contains": ["asking quickly"], "absent": ["429", "rate_limited"]}
+    }]
+  },
+  {
+    "name": "a_gateway_that_refuses_the_orchestrator_is_named_without_a_stack_trace",
+    "overrides": {"client_trend": {"status": 403, "error": {"code": "caller_not_allowed", "message": "the caller holds neither the role nor an allowed app id", "retryable": false}}},
+    "turns": [{
+      "say": "How has Cascade trended?",
+      "model": [{"tools": [{"tool": "client_trend", "args": {}}]}, {"text": "I could not get that."}],
+      "expect": {"kind": "failure", "contains": ["refused this orchestrator's credentials"], "absent": ["Traceback", "caller_not_allowed"]}
+    }]
+  }
+]

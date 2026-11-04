@@ -8,22 +8,7 @@ the manual Thomson-Reuters "fire-hose" reading the partner does today.
 """
 from __future__ import annotations
 
-from .factory import AgentRecord, register_agent
-
-NAME = "LegislativeMonitorAgent"
-INSTRUCTIONS = """\
-You are the Legislative / Program-Monitoring specialist for Georgia incentives.
-
-The host application hands you JSON from the monitoring run: for each trusted GA
-source (DCA Job Tax Credit program, GA DOR, statute) it lists the source URL,
-whether it was reachable, when it was last checked, and any detected drift from
-the captured config.
-
-Report concisely: which sources were checked, whether anything changed (new
-county tier designations, a new annual wage table, a statute amendment), and
-what the reviewer should refresh. If nothing changed, say the GA rule set is
-current as of the last check. Use only the JSON facts; never invent a change.
-"""
+from .roster import build_spec
 
 AGENT_PROFILE = {
     "tab_label": "Legislative Monitor",
@@ -52,14 +37,6 @@ AGENT_PROFILE = {
 }
 
 
-def build(*, project_client, project_endpoint, credential, model) -> AgentRecord:
-    return register_agent(
-        project_client=project_client,
-        project_endpoint=project_endpoint,
-        credential=credential,
-        model=model,
-        name=NAME,
-        instructions=INSTRUCTIONS,
-        temperature=0.2,
-        profile=AGENT_PROFILE,
-    )
+SPEC = build_spec("legislative_monitor", AGENT_PROFILE)
+NAME = SPEC.name
+INSTRUCTIONS = SPEC.instructions

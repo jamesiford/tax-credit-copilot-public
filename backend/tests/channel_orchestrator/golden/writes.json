@@ -1,0 +1,125 @@
+[
+  {
+    "name": "prepare_then_confirm_makes_the_change_once",
+    "turns": [
+      {"say": "Mark Cascade's GA_JTC engagement as in scope",
+       "model": [{"tools": [{"tool": "engagement_set_prepare", "args": {"program_code": "GA_JTC", "scope": "in_scope"}}]}, {"text": "Here is the preview."}],
+       "expect": {"kind": "answer", "gateway": ["client_resolve", "engagement_set_prepare"], "contains": ["Nothing has changed yet", "Reply **confirm**"], "absent": ["tok-"]}},
+      {"say": "confirm",
+       "expect": {"kind": "commit", "gateway": ["engagement_set_commit"], "model_calls": 0, "contains": ["Done. The change is recorded under your name."], "absent": ["tok-"]}}
+    ]
+  },
+  {
+    "name": "yes_apply_is_also_a_confirmation",
+    "turns": [
+      {"say": "Mark Cascade's GA_JTC engagement as in scope",
+       "model": [{"tools": [{"tool": "engagement_set_prepare", "args": {"program_code": "GA_JTC", "scope": "in_scope"}}]}, {"text": "Here is the preview."}],
+       "expect": {"kind": "answer"}},
+      {"say": "Yes, apply.", "expect": {"kind": "commit", "gateway": ["engagement_set_commit"]}}
+    ]
+  },
+  {
+    "name": "cancel_drops_the_change",
+    "turns": [
+      {"say": "Mark Cascade's GA_JTC engagement as in scope",
+       "model": [{"tools": [{"tool": "engagement_set_prepare", "args": {"program_code": "GA_JTC", "scope": "in_scope"}}]}, {"text": "Here is the preview."}],
+       "expect": {"kind": "answer"}},
+      {"say": "cancel", "expect": {"kind": "cancel", "gateway": [], "contains": ["Nothing was changed"]}},
+      {"say": "confirm", "expect": {"kind": "commit_refused", "gateway": [], "contains": ["nothing waiting"]}}
+    ]
+  },
+  {
+    "name": "an_expired_preview_cannot_be_confirmed",
+    "turns": [
+      {"say": "Mark Cascade's GA_JTC engagement as in scope",
+       "model": [{"tools": [{"tool": "engagement_set_prepare", "args": {"program_code": "GA_JTC", "scope": "in_scope"}}]}, {"text": "Here is the preview."}],
+       "expect": {"kind": "answer"}},
+      {"say": "confirm", "advance": 301, "expect": {"kind": "commit_refused", "gateway": [], "contains": ["expired"]}}
+    ]
+  },
+  {
+    "name": "a_second_confirm_finds_nothing_to_repeat",
+    "turns": [
+      {"say": "Mark Cascade's GA_JTC engagement as in scope",
+       "model": [{"tools": [{"tool": "engagement_set_prepare", "args": {"program_code": "GA_JTC", "scope": "in_scope"}}]}, {"text": "Here is the preview."}],
+       "expect": {"kind": "answer"}},
+      {"say": "confirm", "expect": {"kind": "commit"}},
+      {"say": "confirm", "expect": {"kind": "commit_refused", "gateway": []}}
+    ]
+  },
+  {
+    "name": "somebody_elses_confirm_finds_nothing",
+    "writers": ["user", "other"],
+    "turns": [
+      {"say": "Mark Cascade's GA_JTC engagement as in scope",
+       "model": [{"tools": [{"tool": "engagement_set_prepare", "args": {"program_code": "GA_JTC", "scope": "in_scope"}}]}, {"text": "Here is the preview."}],
+       "expect": {"kind": "answer"}},
+      {"who": "other", "say": "confirm", "expect": {"kind": "commit_refused", "gateway": [], "contains": ["nothing waiting"]}},
+      {"say": "confirm", "expect": {"kind": "commit", "gateway": ["engagement_set_commit"]}}
+    ]
+  },
+  {
+    "name": "any_other_message_drops_the_pending_change",
+    "turns": [
+      {"say": "Mark Cascade's GA_JTC engagement as in scope",
+       "model": [{"tools": [{"tool": "engagement_set_prepare", "args": {"program_code": "GA_JTC", "scope": "in_scope"}}]}, {"text": "Here is the preview."}],
+       "expect": {"kind": "answer"}},
+      {"say": "Actually, how has Cascade trended?",
+       "model": [{"tools": [{"tool": "client_trend", "args": {}}]}, {"text": "The table shows each year."}],
+       "expect": {"kind": "answer", "contains": ["earlier was dropped"]}},
+      {"say": "confirm", "expect": {"kind": "commit_refused", "gateway": []}}
+    ]
+  },
+  {
+    "name": "please_go_ahead_is_a_new_question_not_a_confirmation",
+    "turns": [
+      {"say": "Mark Cascade's GA_JTC engagement as in scope",
+       "model": [{"tools": [{"tool": "engagement_set_prepare", "args": {"program_code": "GA_JTC", "scope": "in_scope"}}]}, {"text": "Here is the preview."}],
+       "expect": {"kind": "answer"}},
+      {"say": "please go ahead and confirm it",
+       "model": [{"text": "I am not sure what to run."}],
+       "expect": {"kind": "help", "gateway": [], "absent": ["Done."]}}
+    ]
+  },
+  {
+    "name": "a_model_that_tries_to_commit_is_refused_and_nothing_is_sent",
+    "turns": [{
+      "say": "Mark Cascade's GA_JTC engagement as in scope and apply it now",
+      "model": [{"tools": [{"tool": "engagement_set_commit", "args": {"confirmation_token": "tok-1", "idempotency_key": "k", "arguments": {"client_id": 2001, "program_code": "GA_JTC", "scope": "in_scope"}}},
+                           {"tool": "engagement_set_prepare", "args": {"program_code": "GA_JTC", "scope": "in_scope"}}]},
+                {"text": "I prepared the change."}],
+      "expect": {"gateway": ["client_resolve", "engagement_set_prepare"], "refused": ["engagement_set_commit"], "contains": ["Reply **confirm**"]}
+    }]
+  },
+  {
+    "name": "someone_not_entitled_to_write_is_told_so_at_the_preview",
+    "writers": [],
+    "turns": [{
+      "say": "Mark Cascade's GA_JTC engagement as in scope",
+      "model": [{"tools": [{"tool": "engagement_set_prepare", "args": {"program_code": "GA_JTC", "scope": "in_scope"}}]}, {"text": "I could not prepare that."}],
+      "expect": {"kind": "failure", "contains": ["not entitled"], "absent": ["Reply **confirm**"]}
+    }]
+  },
+  {
+    "name": "a_commit_whose_answer_is_lost_is_not_retried",
+    "overrides": {"engagement_set_commit": {"status": 502, "error": {"code": "api_unreachable", "message": "the API could not be reached", "retryable": true}}},
+    "turns": [
+      {"say": "Mark Cascade's GA_JTC engagement as in scope",
+       "model": [{"tools": [{"tool": "engagement_set_prepare", "args": {"program_code": "GA_JTC", "scope": "in_scope"}}]}, {"text": "Here is the preview."}],
+       "expect": {"kind": "answer"}},
+      {"say": "confirm", "expect": {"kind": "commit_refused", "gateway": ["engagement_set_commit"], "contains": ["can't say whether it was made", "won't retry"]}},
+      {"say": "confirm", "expect": {"kind": "commit_refused", "gateway": []}}
+    ]
+  },
+  {
+    "name": "a_year_for_a_write_must_be_said_not_inherited",
+    "turns": [
+      {"say": "What is Cascade's credit for 2023?",
+       "model": [{"tools": [{"tool": "client_eligibility", "args": {"tax_year": 2023}}]}, {"text": "Both methods are shown."}],
+       "expect": {"kind": "answer"}},
+      {"say": "Mark Cascade's GA_JTC claim as assessed",
+       "model": [{"tools": [{"tool": "claim_transition_prepare", "args": {"program_code": "GA_JTC", "status": "assessed", "tax_year": 2023}}]}, {"text": "I need the year."}],
+       "expect": {"kind": "clarify", "contains": ["Which tax year do you mean?"], "absent": ["Reply **confirm**"]}}
+    ]
+  }
+]

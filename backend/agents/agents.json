@@ -1,0 +1,19 @@
+{
+  "format": 1,
+  "_about": "The one list of the specialist Foundry prompt agents. Adding or changing an agent is an edit here (agents/roster.py reads it; agents/factory.py publishes from it). `module` is the file under agents/ that holds the agent's display profile; `prompt` is the file stem under agents/prompts/; `role` picks the model (AI_MODEL_<ROLE>, never a deployment name, so a customer changes a model by setting, not by a code edit); `tools` is always empty because agents narrate and tools calculate (ADR-004).",
+  "agents": [
+    {"module": "orchestrator", "name": "OrchestratorAgent", "prompt": "orchestrator", "role": "router", "temperature": 0.2, "tools": []},
+    {"module": "payroll_ingest", "name": "PayrollIngestAgent", "prompt": "payroll_ingest", "role": "narrator", "temperature": 0.2, "tools": []},
+    {"module": "headcount", "name": "HeadcountAgent", "prompt": "headcount", "role": "narrator", "temperature": 0.2, "tools": []},
+    {"module": "credit_rules", "name": "CreditRulesAgent", "prompt": "credit_rules", "role": "narrator", "temperature": 0.2, "tools": []},
+    {"module": "credit_discovery", "name": "CreditDiscoveryAgent", "prompt": "credit_discovery", "role": "narrator", "temperature": 0.2, "tools": []},
+    {"module": "client_situation", "name": "ClientSituationAgent", "prompt": "client_situation", "role": "narrator", "temperature": 0.3, "tools": []},
+    {"module": "page_summary", "name": "PageSummaryAgent", "prompt": "page_summary", "role": "narrator", "temperature": 0.2, "tools": []},
+    {"module": "reporting", "name": "ReportingAgent", "prompt": "reporting", "role": "narrator", "temperature": 0.3, "tools": []},
+    {"module": "rules_ingestion", "name": "RulesIngestionAgent", "prompt": "rules_ingestion", "role": "analysis", "temperature": 0.1, "tools": []},
+    {"module": "exception_report", "name": "ExceptionReportAgent", "prompt": "exception_report", "role": "analysis", "temperature": 0.2, "tools": []},
+    {"module": "legislative_monitor", "name": "LegislativeMonitorAgent", "prompt": "legislative_monitor", "role": "analysis", "temperature": 0.2, "tools": []},
+    {"module": "channel_narrator", "name": "ChannelNarratorAgent", "prompt": "channel_narrator", "role": "narrator", "temperature": 0.2, "tools": []}
+  ],
+  "excluded_prompts": {}
+}

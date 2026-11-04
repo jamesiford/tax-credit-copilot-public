@@ -29,13 +29,12 @@ and neither does this. Dates land as `date32`, money as `decimal128(18, 2)`.
 """
 from __future__ import annotations
 
-import os
 from dataclasses import fields as dataclass_fields
 from datetime import date, datetime
 from decimal import Decimal
 from typing import Any, Iterable
 
-from config import SOURCE_SCHEMA
+from config import SOURCE_SCHEMA, get_settings
 
 from .schema import SourceDataset
 
@@ -154,6 +153,13 @@ def _to_arrow(dataset: SourceDataset, table: str):
     return pa.Table.from_pydict(columns, schema=schema)
 
 
+def _required(value: str | None, name: str) -> str:
+    """A setting the write cannot guess; unset raises `KeyError` naming it, as the direct read did."""
+    if value is None:
+        raise KeyError(name)
+    return value
+
+
 def _storage_options() -> dict[str, str]:
     from azure.identity import DefaultAzureCredential
 
@@ -198,8 +204,9 @@ def write_datasets(
     from deltalake import write_deltalake
     import pyarrow as pa
 
-    workspace = workspace or os.environ["FABRIC_WORKSPACE"]
-    lakehouse = lakehouse or os.environ["FABRIC_LAKEHOUSE"]
+    configured = get_settings().data_source
+    workspace = workspace or _required(configured.fabric_workspace, "FABRIC_WORKSPACE")
+    lakehouse = lakehouse or _required(configured.fabric_lakehouse, "FABRIC_LAKEHOUSE")
     datasets = list(datasets)
     options = _storage_options()
     written: dict[str, int] = {}

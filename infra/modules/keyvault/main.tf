@@ -109,6 +109,11 @@ output "id" {
   value = var.enabled ? azurerm_key_vault.this[0].id : null
 }
 
+output "name" {
+  description = "Vault name, for App Service Key Vault references."
+  value       = var.enabled ? azurerm_key_vault.this[0].name : null
+}
+
 output "uri" {
   value = var.enabled ? azurerm_key_vault.this[0].vault_uri : null
 }

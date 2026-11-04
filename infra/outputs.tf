@@ -91,6 +91,11 @@ output "DATA_CLASSIFICATION" {
   value = local.data_classification
 }
 
+output "network_posture" {
+  description = "private (default) or demo-public-foundry. The second is a DEMO posture: the Foundry data plane is reachable from the internet (Entra-only). Synthetic data only."
+  value       = local.network_posture
+}
+
 output "api_role_assignments" {
   description = "Every role the API identity holds, for review against REQUIREMENTS section 6."
   value = concat(
@@ -107,4 +112,41 @@ output "web_role_assignments" {
 
 output "easy_auth_enabled" {
   value = module.app_service.easy_auth_enabled
+}
+
+output "mock_ai_gateway_url" {
+  description = "URL of the PoC mock model gateway; empty unless enable_mock_ai_gateway."
+  value       = module.mock_ai_gateway.default_hostname == "" ? "" : "https://${module.mock_ai_gateway.default_hostname}"
+}
+
+output "CHANNEL_APP_NAME" {
+  description = "Name of the channel gateway App Service; empty unless enable_m365_channel. azd deploys the `channel` service to it."
+  value       = module.channel.app_name
+
+  # The gateway calls the API with a token, so the API must validate tokens and
+  # have an audience to validate them against. The public profile defaults to
+  # AUTH_MODE=none, so enabling the channel there means also setting auth_mode.
+  precondition {
+    condition     = !var.enable_m365_channel || (local.auth_mode == "entra" && local.api_audience != "" && local.tenant_id != "")
+    error_message = "enable_m365_channel needs the API to validate tokens: set auth_mode = \"entra\" and api_client_id (or api_audience). The public profile defaults to AUTH_MODE=none."
+  }
+}
+
+output "CHANNEL_BASE_URL" {
+  description = "https://<gateway hostname>; empty unless enable_m365_channel. The orchestrator and the Cowork connector call this."
+  value       = module.channel.url
+}
+
+output "GATEWAY_IDENTITY_NAME" {
+  description = "Display name of the gateway identity; scripts/grant-warehouse-sql.py --profile gateway grants to it. Empty unless enable_m365_channel."
+  value       = module.channel.identity_name
+}
+
+output "GATEWAY_IDENTITY_PRINCIPAL_ID" {
+  description = "Object id to assign the API's TCC.Agent app role to (an operator step). Empty unless enable_m365_channel."
+  value       = module.channel.identity_principal_id
+}
+
+output "GATEWAY_IDENTITY_CLIENT_ID" {
+  value = module.channel.identity_client_id
 }

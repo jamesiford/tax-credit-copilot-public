@@ -30,7 +30,7 @@ from pathlib import Path
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from application.wiring import get_claim_repository
+from bootstrap.wiring import get_claim_repository
 from domain.claims import ClaimStatus, EngagementScope, ProgramEngagement, Provenance
 
 # (client, program, year, claimed, note) — what each client says they already

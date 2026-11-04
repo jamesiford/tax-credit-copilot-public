@@ -18,4 +18,8 @@ Forward-only changes to the Warehouse schema after the DDL v2.0 bootstrap (D22).
   INDEX`, no `IDENTITY`, no `MERGE`), and regenerate the SQL Server variant of
   the bootstrap only if the bootstrap itself changes.
 
-The set is empty: v2.0 is the current schema.
+The set is `0001_channel_audit.sql` (the Microsoft 365 channel's audit trail, writer
+allow-list and write confirmations) and `0002_engagement_actor.sql` (who set a
+programme engagement). Keys are declared `NOT ENFORCED`, as in the bootstrap;
+`scripts/generate-schema-variants.py` strips that for SQL Server, and the same one-line strip
+makes a migration run there.

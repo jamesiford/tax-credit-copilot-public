@@ -10,7 +10,7 @@ from decimal import Decimal
 
 import pytest
 
-from application import wiring
+from bootstrap import wiring
 from domain.claims import ClaimStatus, ProgramClaim, Provenance
 from infrastructure.persistence.sqlite_claims import SqliteClaimRepository
 

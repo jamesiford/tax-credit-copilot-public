@@ -1,0 +1,93 @@
+"""Per-conversation state, in memory, with a time to live. [CH-08]
+
+A hosted agent's replicas are interchangeable and its filesystem is not durable across
+restarts, so nothing here is a record of anything: it is a convenience ("their" means
+the client we were just talking about) and one safety device (a pending write waits for
+a word from the SAME person). Losing it costs a repeated question, never a wrong answer
+and never a silent write: a pending confirmation that is lost simply cannot be confirmed,
+and the person asks again.
+
+The key is the person AND the conversation. In a group chat somebody else's `confirm`
+looks in their own slot, finds nothing, and is told so.
+"""
+from __future__ import annotations
+
+import time
+from collections.abc import Callable
+from dataclasses import dataclass, field
+from typing import Any
+
+HISTORY_LIMIT = 6
+
+
+@dataclass
+class PendingWrite:
+    """A prepared change waiting for its owner's `confirm`. The token is held here and never shown."""
+
+    tool: str
+    args: dict[str, Any]
+    token: str
+    expires_at: float
+    summary: str = ""
+
+    @classmethod
+    def from_preview(cls, tool: str, args: dict[str, Any], envelope: dict[str, Any], expires_at: float) -> "PendingWrite | None":
+        """The change a preview's envelope asks to have confirmed, or None when it carried no confirmation token."""
+        token = ((envelope.get("facts") or {}).get("confirmation") or {}).get("token")
+        return cls(tool, dict(args), str(token), expires_at) if token else None
+
+
+@dataclass
+class PausedWrite:
+    """A write workflow waiting for its owner's reply: where its checkpoint is and which request it paused on.
+
+    The prepared change and its single-use token are inside the checkpoint, which is in this process's memory
+    and nowhere else, so a restart loses it exactly as it loses the rest of the conversation: it cannot be
+    confirmed, and the person asks again. `storage` is the framework's `InMemoryCheckpointStorage`.
+    """
+
+    storage: Any
+    checkpoint_id: str
+    request_id: str
+
+
+@dataclass
+class ConversationState:
+    """What the next turn may rely on."""
+
+    client_id: int | None = None
+    tax_year: int | None = None
+    write: PausedWrite | None = None
+    candidates: list[dict[str, Any]] = field(default_factory=list)
+    question: str = ""
+    history: list[dict[str, str]] = field(default_factory=list)
+    touched: float = 0.0
+
+    def remember(self, role: str, text: str) -> None:
+        """Keep a bounded history: each entry is cut to 500 characters and only the last few survive, because it is routing context, not a transcript."""
+        self.history.append({"role": role, "text": text[:500]})
+        del self.history[:-HISTORY_LIMIT]
+
+
+class StateStore:
+    """Holds `ConversationState` per `(oid, conversation)` until it has been idle for `ttl_seconds`."""
+
+    def __init__(self, ttl_seconds: int, clock: Callable[[], float] = time.monotonic) -> None:
+        self._ttl, self._clock = ttl_seconds, clock
+        self._items: dict[tuple[str, str], ConversationState] = {}
+
+    def get(self, key: tuple[str, str]) -> ConversationState:
+        """The live state for `key`, or a fresh one. Idle states are dropped here, so nothing runs in the background."""
+        now = self._clock()
+        for stale in [k for k, s in self._items.items() if now - s.touched > self._ttl]:
+            del self._items[stale]
+        state = self._items.setdefault(key, ConversationState())
+        state.touched = now
+        return state
+
+    def forget(self, key: tuple[str, str]) -> None:
+        """Drop a conversation's state so a finished turn leaves nothing behind."""
+        self._items.pop(key, None)
+
+    def __len__(self) -> int:
+        return len(self._items)

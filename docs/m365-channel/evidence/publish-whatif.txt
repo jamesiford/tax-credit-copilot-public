@@ -1,0 +1,96 @@
+# scripts/publish-m365.ps1 -WhatIf, against a fake `az` (backend/tests/publish_shim.py).
+# Every identifier below is a placeholder. The agent was read; nothing was created, changed or published.
+# pwsh -File scripts/publish-m365.ps1 -ProjectEndpoint https://account-example.services.ai.azure.com/api/projects/project-example -AgentName tcc-channel-orchestrator -ResourceGroup rg-example -BotName bot-tcc-channel-example -DisplayName "Tax Credit Copilot" -ShortDescription "Questions about job-creation tax credits." -FullDescription "Answers from the platform's own calculations, with the figures it computed." -AppVersion 1.0.3 -PublishScope Shared -OutputDir ./publish-output -ColorIconPath ./color.png -OutlineIconPath ./outline.png -WhatIf
+# exit code: 0
+
+Icon (color): ./color.png (548 bytes, 732 base64 characters)
+Icon (outline): ./outline.png (104 bytes, 140 base64 characters)
+Publishing agent 'tcc-channel-orchestrator' (scope Shared); bot 'bot-tcc-channel-example' in resource group 'rg-example'.
+-> Create or update the Azure Bot Service resource 'bot-tcc-channel-example'
+What if: Performing the operation "Create or update the Azure Bot Service resource 'bot-tcc-channel-example'" on target "https://management.azure.com/subscriptions/22222222-2222-4222-8222-222222222222/resourceGroups/rg-example/providers/Microsoft.BotService/botServices/bot-tcc-channel-example?api-version=2022-09-15".
+  PUT https://management.azure.com/subscriptions/22222222-2222-4222-8222-222222222222/resourceGroups/rg-example/providers/Microsoft.BotService/botServices/bot-tcc-channel-example?api-version=2022-09-15
+    {
+      "location": "global",
+      "kind": "azurebot",
+      "sku": {
+        "name": "F0"
+      },
+      "properties": {
+        "displayName": "Tax Credit Copilot",
+        "endpoint": "https://account-example.services.ai.azure.com/api/projects/project-example/agents/tcc-channel-orchestrator/endpoint/protocols/activityProtocol?api-version=v1",
+        "msaAppId": "33333333-3333-4333-8333-333333333333",
+        "msaAppTenantId": "11111111-1111-4111-8111-111111111111",
+        "msaAppType": "SingleTenant",
+        "publicNetworkAccess": "Disabled"
+      }
+    }
+-> Enable the Microsoft Teams channel on 'bot-tcc-channel-example'
+What if: Performing the operation "Enable the Microsoft Teams channel on 'bot-tcc-channel-example'" on target "https://management.azure.com/subscriptions/22222222-2222-4222-8222-222222222222/resourceGroups/rg-example/providers/Microsoft.BotService/botServices/bot-tcc-channel-example/channels/MsTeamsChannel?api-version=2021-03-01".
+  PUT https://management.azure.com/subscriptions/22222222-2222-4222-8222-222222222222/resourceGroups/rg-example/providers/Microsoft.BotService/botServices/bot-tcc-channel-example/channels/MsTeamsChannel?api-version=2021-03-01
+    {
+      "location": "global",
+      "properties": {
+        "channelName": "MsTeamsChannel"
+      }
+    }
+-> Enable the Activity Protocol route and the Bot Service authorization scheme (merged with the existing settings)
+What if: Performing the operation "Enable the Activity Protocol route and the Bot Service authorization scheme (merged with the existing settings)" on target "https://account-example.services.ai.azure.com/api/projects/project-example/agents/tcc-channel-orchestrator?api-version=v1".
+  PATCH https://account-example.services.ai.azure.com/api/projects/project-example/agents/tcc-channel-orchestrator?api-version=v1
+    {
+      "agent_endpoint": {
+        "protocol_configuration": {
+          "responses": {},
+          "invocations": {
+            "keep": "me"
+          },
+          "activity": {
+            "enable_m365_public_endpoint": true
+          }
+        },
+        "authorization_schemes": [
+          {
+            "type": "AzureRbac"
+          },
+          {
+            "type": "BotServiceRbac"
+          }
+        ]
+      }
+    }
+-> Publish version 1.0.3 to Microsoft 365 (Shared)
+What if: Performing the operation "Publish version 1.0.3 (Shared)" on target "https://account-example.services.ai.azure.com/api/projects/project-example/agents/tcc-channel-orchestrator/microsoft365/publish?api-version=v1".
+  POST https://account-example.services.ai.azure.com/api/projects/project-example/agents/tcc-channel-orchestrator/microsoft365/publish?api-version=v1
+    {
+      "agentDisplayName": "Tax Credit Copilot",
+      "botServiceArmId": "/subscriptions/22222222-2222-4222-8222-222222222222/resourceGroups/rg-example/providers/Microsoft.BotService/botServices/bot-tcc-channel-example",
+      "publishScope": "Shared",
+      "publishAsAutopilot": false,
+      "appVersion": "1.0.3",
+      "shortDescription": "Questions about job-creation tax credits.",
+      "fullDescription": "Answers from the platform's own calculations, with the figures it computed.",
+      "developerName": "Tax Credit Copilot (PoC)",
+      "developerWebsiteUrl": "https://github.com/jamesiford/tax-credit-copilot-public",
+      "privacyUrl": "https://github.com/jamesiford/tax-credit-copilot-public/blob/main/SECURITY.md",
+      "termsOfUseUrl": "https://github.com/jamesiford/tax-credit-copilot-public/blob/main/DISCLAIMER.md",
+      "colorIconBase64": "<732 base64 characters>",
+      "outlineIconBase64": "<140 base64 characters>"
+    }
+-> Download the validated app package
+What if: Performing the operation "Download the app package to .\publish-output\appPackage.zip" on target "https://account-example.services.ai.azure.com/api/projects/project-example/agents/tcc-channel-orchestrator/microsoft365/zip?api-version=v1".
+  POST https://account-example.services.ai.azure.com/api/projects/project-example/agents/tcc-channel-orchestrator/microsoft365/zip?api-version=v1
+    {
+      "agentDisplayName": "Tax Credit Copilot",
+      "botServiceArmId": "/subscriptions/22222222-2222-4222-8222-222222222222/resourceGroups/rg-example/providers/Microsoft.BotService/botServices/bot-tcc-channel-example",
+      "publishScope": "Shared",
+      "publishAsAutopilot": false,
+      "appVersion": "1.0.3",
+      "shortDescription": "Questions about job-creation tax credits.",
+      "fullDescription": "Answers from the platform's own calculations, with the figures it computed.",
+      "developerName": "Tax Credit Copilot (PoC)",
+      "developerWebsiteUrl": "https://github.com/jamesiford/tax-credit-copilot-public",
+      "privacyUrl": "https://github.com/jamesiford/tax-credit-copilot-public/blob/main/SECURITY.md",
+      "termsOfUseUrl": "https://github.com/jamesiford/tax-credit-copilot-public/blob/main/DISCLAIMER.md",
+      "colorIconBase64": "<732 base64 characters>",
+      "outlineIconBase64": "<140 base64 characters>"
+    }
+WhatIf: nothing was published.

@@ -15,7 +15,8 @@ it is why the stack needs no Key Vault.
 from __future__ import annotations
 
 import logging
-import os
+
+from config import get_settings
 
 _log = logging.getLogger(__name__)
 _initialized = False
@@ -26,7 +27,8 @@ def configure_telemetry(service_name: str = "tax-credit-copilot-api") -> None:
     global _initialized
     if _initialized:
         return
-    conn = os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING")
+    observability = get_settings().observability
+    conn = observability.appinsights_connection_string
     if not conn:
         _log.info("APPLICATIONINSIGHTS_CONNECTION_STRING not set; telemetry disabled.")
         _initialized = True
@@ -39,7 +41,7 @@ def configure_telemetry(service_name: str = "tax-credit-copilot-api") -> None:
         # identity in Azure and a developer's `az login` locally, so this is one
         # code path rather than a branch on environment.
         credential = DefaultAzureCredential(
-            managed_identity_client_id=os.getenv("AZURE_CLIENT_ID") or None
+            managed_identity_client_id=observability.azure_client_id
         )
 
         configure_azure_monitor(
@@ -65,7 +67,7 @@ def instrument_fastapi(app) -> bool:
     dependencies but not one request — and `requests` is what the runbook reads.
     The tracer resolves through the global provider, so configuring later works.
     """
-    if not os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING"):
+    if not get_settings().observability.appinsights_connection_string:
         return False
     try:
         from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor

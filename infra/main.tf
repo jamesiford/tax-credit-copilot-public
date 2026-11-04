@@ -15,6 +15,57 @@ locals {
     var.enable_key_vault ? { vault = "privatelink.vaultcore.azure.net" } : {},
     local.web_inbound == "private_endpoint" ? { sites = "privatelink.azurewebsites.net" } : {},
   )
+
+  # AI-03: a setting is emitted only when its variable is set, so the defaults
+  # leave an existing deployment's plan unchanged. Nothing here is a secret.
+  ai_plain_settings = {
+    AI_GATEWAY_ENDPOINT        = trimspace(var.ai_gateway_endpoint)
+    AI_PROVIDER_CHAIN          = join(",", [for p in split(",", var.ai_provider_chain) : trimspace(p)])
+    AI_GATEWAY_AUTH            = trimspace(var.ai_gateway_auth)
+    AI_GATEWAY_API_STYLE       = trimspace(var.ai_gateway_api_style)
+    AI_GATEWAY_ENTRA_AUDIENCE  = trimspace(var.ai_gateway_entra_audience)
+    AI_GATEWAY_OAUTH_TOKEN_URL = trimspace(var.ai_gateway_oauth_token_url)
+    AI_GATEWAY_OAUTH_CLIENT_ID = trimspace(var.ai_gateway_oauth_client_id)
+    AI_GATEWAY_OAUTH_SCOPE     = trimspace(var.ai_gateway_oauth_scope)
+    AI_GATEWAY_TIMEOUT_SECONDS = trimspace(var.ai_gateway_timeout_seconds)
+    AI_EGRESS_POLICY           = trimspace(var.ai_egress_policy)
+    AI_MODEL_ROUTER            = trimspace(var.ai_model_router)
+    AI_MODEL_NARRATOR          = trimspace(var.ai_model_narrator)
+    AI_MODEL_ANALYSIS          = trimspace(var.ai_model_analysis)
+    AI_FOUNDRY_CONNECTION_NAME = trimspace(var.ai_foundry_connection_name)
+  }
+
+  # Key Vault references, never values: App Service resolves them at runtime
+  # with the API identity (key_vault_reference_identity_id), which the keyvault
+  # module grants Key Vault Secrets User. The secret must already exist.
+  ai_secret_names = {
+    AI_GATEWAY_API_KEY             = trimspace(var.ai_gateway_api_key_secret_name)
+    AI_GATEWAY_OAUTH_CLIENT_SECRET = trimspace(var.ai_gateway_oauth_secret_name)
+  }
+
+  api_ai_settings = merge(
+    { for k, v in local.ai_plain_settings : k => v if v != "" },
+    var.enable_key_vault ? {
+      for k, v in local.ai_secret_names : k => "@Microsoft.KeyVault(VaultName=${module.keyvault.name};SecretName=${v})" if v != ""
+    } : {},
+  )
+
+  # CH-16f: the governed data query's settings, on the API only (the gateway never touches
+  # data). Emitted only when set, so a default plan is unchanged; the application defaults
+  # (20 s, 500 rows, 30 a minute, 4 at once, source datasets off) apply when absent.
+  data_query_plain_settings = {
+    DATA_QUERY_TIMEOUT_SECONDS = trimspace(var.data_query_timeout_seconds)
+    DATA_QUERY_MAX_ROWS        = trimspace(var.data_query_max_rows)
+    DATA_QUERY_RATE_PER_MINUTE = trimspace(var.data_query_rate_per_minute)
+    DATA_QUERY_MAX_CONCURRENCY = trimspace(var.data_query_max_concurrency)
+    LAKEHOUSE_SQL_SERVER       = trimspace(var.lakehouse_sql_server)
+    LAKEHOUSE_SQL_DATABASE     = trimspace(var.lakehouse_sql_database)
+  }
+
+  api_data_query_settings = merge(
+    { for k, v in local.data_query_plain_settings : k => v if v != "" },
+    var.data_query_source_enabled ? { DATA_QUERY_SOURCE_ENABLED = "true" } : {},
+  )
 }
 
 module "identity" {
@@ -97,6 +148,10 @@ module "foundry" {
   ]
   user_principal_id          = module.identity.api.principal_id
   log_analytics_workspace_id = module.monitoring.log_analytics_workspace_id
+  public_network_access      = var.foundry_public_network_access
+  allowed_ip_ranges          = local.foundry_ip_ranges
+
+  depends_on = [terraform_data.foundry_network_inputs]
 }
 
 module "fabric" {
@@ -171,9 +226,67 @@ module "app_service" {
     }, local.auth_mode == "entra" ? {
     AUTH_TENANT_ID = local.tenant_id
     API_AUDIENCE   = local.api_audience
-    } : {}, trimspace(var.ai_gateway_endpoint) != "" ? {
-    AI_GATEWAY_ENDPOINT = trimspace(var.ai_gateway_endpoint)
-  } : {})
+    # Running without sign-in is a stated choice, not a default: the API refuses AUTH_MODE=none
+    # outside local development unless this is set, and then only over synthetic data. [RM-03]
+    } : { ALLOW_ANONYMOUS_SYNTHETIC = "1" },
+    # The API enforces the writer entitlement itself (it refuses an agent token whose acting
+    # user may not write), so it must read the same source as the gateway. [CH-13]
+    var.enable_m365_channel ? merge(
+      { CHANNEL_WRITER_SOURCE = var.channel_writer_source },
+      trimspace(var.channel_writer_group_id) != "" ? { CHANNEL_WRITER_GROUP_ID = trimspace(var.channel_writer_group_id) } : {},
+  ) : {}, local.api_ai_settings, local.api_data_query_settings)
 
   web_app_settings = {}
+}
+
+# PoC only. Creates the App Service and its settings; deploying
+# scripts/mock-ai-gateway.py (copied as mock_ai_gateway.py) is a separate manual
+# step, as the module comment explains. Refused for the enterprise profile.
+module "mock_ai_gateway" {
+  source                = "./modules/mock_ai_gateway"
+  enabled               = var.enable_mock_ai_gateway
+  name_suffix           = local.token
+  resource_group_name   = azurerm_resource_group.this.name
+  location              = var.location
+  tags                  = local.tags
+  service_plan_id       = module.app_service.plan_id
+  integration_subnet_id = module.network.app_subnet_id
+  mock_auth             = var.mock_ai_gateway_auth
+  entra_audience        = var.mock_ai_gateway_entra_audience
+}
+
+# CH-07: the Microsoft 365 channel gateway. Count 0 unless enable_m365_channel,
+# so the default plan is unchanged. A third App Service on the same plan and in
+# the same integration subnet as the API, which is why the API's access
+# restriction needs no change.
+module "channel" {
+  source                         = "./modules/channel"
+  enabled                        = var.enable_m365_channel
+  name_suffix                    = local.token
+  resource_group_name            = azurerm_resource_group.this.name
+  location                       = var.location
+  tags                           = local.tags
+  service_plan_id                = module.app_service.plan_id
+  integration_subnet_id          = module.network.app_subnet_id
+  tenant_id                      = local.tenant_id
+  gateway_audience               = trimspace(var.channel_gateway_audience)
+  api_base_url                   = module.app_service.api_url
+  api_audience                   = local.api_audience
+  data_classification            = local.data_classification
+  allowed_caller_app_ids         = var.channel_allowed_caller_app_ids
+  writer_source                  = var.channel_writer_source
+  writer_group_id                = var.channel_writer_group_id
+  allowed_ip_ranges              = var.channel_allowed_ip_ranges
+  debug_whoami                   = var.channel_debug_whoami
+  resolve_display_names          = var.channel_resolve_display_names
+  git_commit                     = var.git_commit
+  app_insights_id                = module.monitoring.app_insights_id
+  app_insights_connection_string = module.monitoring.app_insights_connection_string
+  log_analytics_workspace_id     = module.monitoring.log_analytics_workspace_id
+
+  warehouse = {
+    server    = module.fabric.warehouse_server
+    database  = module.fabric.warehouse_database
+    workspace = module.fabric.workspace_name
+  }
 }

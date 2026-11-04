@@ -1,0 +1,347 @@
+# The hosted orchestrator
+
+`channel_orchestrator/` is a Foundry **hosted agent** that answers questions in Teams and
+Microsoft 365 Copilot Chat. It holds no tax logic and no data: it decides which of the platform's
+deterministic tools to run for the person asking, calls them through the channel gateway, and
+returns the engine's own words around, at most, one verified sentence from a language model.
+
+Every figure is the engine's. Every action is attributed to a named person.
+
+## A turn
+
+```mermaid
+flowchart TD
+    M[message + platform signals] --> I{identity resolved?}
+    I -- no --> R1[one-sentence refusal: nothing runs, no model]
+    I -- yes --> C{exact confirm / cancel?}
+    C -- confirm --> W[maf_write_flow.commit_pending: resumes the write Workflow, the ONLY commit path]
+    C -- cancel --> R2[write Workflow ends: pending change dropped]
+    C -- no --> D[cancel the Workflow's pending request]
+    D --> N{numbered reply to a client question?}
+    N -- yes --> S[client chosen by code; earlier question resumes]
+    N -- no --> P
+    S --> P["planner (the Agent), or the review pack Workflow when it is asked for by name"]
+    P --> T["tools mode (the planner): MAF Agent drives the model's tool calls\ndegraded, no tool-calling model: json mode (model returns a plan) or keywords (platform table, no model)"]
+    T --> TR["MAF function middleware: budget, refusal, client, year and method, schema; then the call and the fact ledger"]
+    TR --> G[(channel gateway: authenticate, entitle, audit, forward)]
+    G --> TR
+    TR --> Q{clarify?}
+    Q -- yes --> R3[numbered client list or year question]
+    Q -- no --> K["compose(): platform blocks + model sentence\nnumeric guard + output policy"]
+    K --> F[provenance footer, disclaimer, confirm hint]
+    F --> A[narration report to the gateway: audit row per user]
+    A --> OUT[reply]
+```
+
+`TurnPipeline.handle` (`app/core/turn.py`) is that diagram. The pieces are in `app/core/`:
+`identity`, `state`, `toolset`/`tools` (the turn's state), `reader_arguments`, `planner` (the Agent planner) and `degraded` (the two degraded planners), `planned` (the one compose path), `review_pack` (what the pack asks for and runs), the `maf_*` modules (the
+framework layer: `maf_agent`, `maf_catalog_tools`, `maf_tool_rules`, `maf_tool_call`, `maf_tool_run`, `maf_write_steps`, `maf_write_flow`, `maf_review_pack`), `models`,
+`compose`, `writes`, `replies`, `gateway_client`, `settings`; `app/host.py` and `app/main.py` are the hosting shell.
+
+## What no model controls
+
+| Decision | Who makes it | Where |
+| --- | --- | --- |
+| Who is asking | The platform's signals, or nobody | `identity.resolve_identity` |
+| Whose client this is | The platform's deterministic resolver (`client_resolve`; the channel settles one exact full name or alias as `resolved: true`, while partial or ambiguous text still asks and the portal chat stays strict). The model's `client_id` is overwritten | `maf_tool_rules.ClientFromReader`, `tools.ToolRunner.ensure_client` |
+| Which tax year | The reader's words, or the conversation's, or a question back. A year the model names is used only if the reader said it. A write never inherits one | `maf_tool_rules.YearAndMethodFromReader`, `reader_arguments.ReaderWords` |
+| Which method | The reader's. Eligibility runs under **both** certified methods unless one is named, each labelled | `ReaderWords.method`, `maf_tool_call.CallAndCapture`, `compose.blocks_of` |
+| A what-if's size, a base year | The reader's. A number or year the model chose is dropped; a missing size or base year is a question back | `ReaderWords.scenario`, `ReaderWords.years` |
+| Which arguments are the reader's, and which tools a model may name | The catalog: `CapabilitySpec.reader_owned`, the `code-only` tag, `catalog.model_offered()` | `application/capabilities` |
+| Any figure | The tools' facts, rendered by the platform's formatter | `composer.compose` |
+| Whether a model sentence survives | The numeric guard and output policy, on the model's raw words and on the finished reply | `composer.compose` |
+| How many tools run, how long a turn takes | `CHANNEL_MAX_TOOL_CALLS`, `CHANNEL_TURN_TIMEOUT_SECONDS` | `maf_tool_rules.Budget`, `turn.TurnPipeline` |
+| Whether a model may name a tool | Not a commit, not plumbing: refused and recorded | `maf_tool_rules.RefuseUnlisted`, `RecordUnregisteredCalls` |
+| Whether a change is made | The same person, typing `confirm`, within `CHANNEL_CONFIRM_TTL_SECONDS` | `maf_write_flow.commit_pending` resumes the write Workflow; its commit executor is the only caller of `writes.send_commit` |
+
+What the model sees of a tool result is the **names** of the facts (`narrator_brief`), never their
+values, so it cannot copy a figure as a digit. It writes `{{facts.path|format}}` placeholders and the
+formatter substitutes the engine's rendering. The prepared change's confirmation token is removed from
+the facts before anyone, model included, sees them.
+
+## Identity
+
+The gateway needs the person's Entra object id, name and tenant (`X-Acting-*`). Where the orchestrator
+gets them is **not settled for the Teams path**: the Foundry runtime documents an opaque per-user id
+(`x-agent-user-id`), an experimental original-subject assertion (`x-ms-original-subject`: `oid`, `tid`,
+`idtype`, described as attribution, not proof) and, only when end-user delegation is authorised, a
+trusted `x-ms-user-identity`. `CHANNEL_IDENTITY_SOURCES` chooses, in order:
+
+| Source | Signal | Assurance | Default |
+| --- | --- | --- | --- |
+| `original-subject` | `x-ms-original-subject` (oid, tid) | the platform asserts it; the gateway records `channel-asserted` | on |
+| `platform` | `x-ms-user-identity` | the platform's trusted resolved user | on |
+| `client-headers` | `x-client-acting-user-*` | **caller-supplied**: anyone who can call the agent can claim anyone | off |
+
+`x-agent-user-id` is not a source: it is not an object id, the gateway would refuse it, and mapping it
+to one would assert an identity nobody proved. With nothing resolvable the turn says so in one sentence
+and runs **nothing**: no tool, no model. The resolution records which source answered; `/whoami` (only
+with `CHANNEL_DEBUG_WHOAMI`) reports the signals received so the live spike can settle it.
+
+Whatever the source, the gateway records the assurance as `channel-asserted`: the person did not
+present a token of their own. That is stated in the audit row, not inferred.
+
+## Which framework pattern, where
+
+| Pattern | Used for | Where | Not for |
+| --- | --- | --- | --- |
+| **Agent** (`maf_agent`) | An open-ended question: a model chooses which catalog tools to call | `planner.Planner` (and, as the framework's way to run function middleware without a model, `maf_tool_run`) | A fixed sequence, a confirmation |
+| **Workflow** (`maf_write_flow`, `maf_review_pack`) | A confirmation (prepare, wait for the reader, commit) and a fixed sequence (the review pack) | Started by the pipeline, or by the generated prepare tool | Open Q&A; nothing in a workflow imports a model |
+| **Tool or executor body** | Forward one call as the acting person; move a message | `maf_catalog_tools`, `maf_write_steps`, `maf_review_pack` | Computing, rounding, ranking, summing or formatting a number |
+
+`tests/test_architecture_patterns.py` states each row as a rule over the source, with a registry (and a reason) per exception, and a figure detector proved on seeded violations ([D-132](DECISIONS.md)).
+
+## Confirming a change
+
+A model may only **prepare**. A prepare tool starts the **write Workflow** (`maf_write_flow`, `maf_write_steps`; MAF `WorkflowBuilder`, three executors):
+
+```mermaid
+flowchart LR
+    M[model: a *_prepare tool] --> P[Prepare executor: asks the gateway for the preview, writes nothing]
+    P --> A["AwaitConfirmation: request_info, the workflow waits (in-memory checkpoint)"]
+    R[the reader's exact word, our gate] -- Confirmation --> A
+    A -- "confirmed and in time: Approved" --> C[Commit executor: one commit, once]
+    A -- cancel or expired --> O[outcome]
+    C --> O
+```
+
+The model can start the workflow only at Prepare (its one start input is `PrepareRequest`); `Commit` accepts only `Approved`, which only the request step creates; and the reply that resumes the request step is produced by the orchestrator's exact-word gate, never by a model. The graph is built fresh on every run and resumes from the framework's `InMemoryCheckpointStorage` (one per paused write); the checkpoint holds the single-use token, so it is never on a disk or in a store another replica reads, and a restart loses a pending confirmation exactly as before ([D-81](DECISIONS.md), [D-130](DECISIONS.md)).
+
+The preview is shown with *Reply **confirm** to apply this change, or **cancel** to drop it.* The token stays in the orchestrator's memory and never in text. Then:
+
+- **exact words only**: `confirm`, `yes, apply`, `cancel` (case and trailing punctuation ignored);
+  "please go ahead" is a new question;
+- **per person and conversation**: somebody else's `confirm` finds nothing, and is told so;
+- **any other message** drops the pending change, and the reply to that message says so ("The change I
+  previewed earlier was dropped; nothing was changed");
+- **expiry**: after `CHANNEL_CONFIRM_TTL_SECONDS` the preview is refused with a fresh-preview hint;
+- **the pending change is cleared before the commit is sent**, with a fresh idempotency key, and a
+  commit is **never retried** by the orchestrator. If the answer is lost the person is told the outcome is
+  unknown and to check the record. The gateway and API check the token, user, tool, arguments, expiry and
+  single use again, and the writer entitlement again.
+
+`*_commit` is not a tool a model can name: `tools.model_tools()` excludes it, no MAF tool is registered
+for it, an attempt is refused and recorded (`TurnReply.refused`), and `test_orch_structure.py` fails the
+build if a commit name or `commit_pending` call appears outside `writes.py` / `turn.py`, and
+`test_architecture_patterns.py` fails it if the commit executor or `send_commit` is reached from anywhere but the workflow.
+
+## The client review pack
+
+The second MAF Workflow ([D-131](DECISIONS.md)) is a fixed, read-only sequence the reader asks for by name ("client review pack for X", "client briefing", "credit review"). It runs with no model: the Agent is for open questions, a Workflow for a sequence that is always the same.
+
+```mermaid
+flowchart LR
+    Q["'client review pack for X'"] --> R[ResolveClient: by code or a question back]
+    R --> S1[situation] --> S2["eligibility: both certified methods"] --> S3[trend] --> S4[at risk] --> S5[other programmes]
+    S5 --> CK[Check: something answered] --> CO["Compose: engine blocks, verbatim composer, numeric guard"]
+```
+
+Each step is `ToolRunner.run` on one catalog capability, so it passes through the same budget, client, year, method and schema rules as an Agent's call and ends in the same gateway call; no executor computes a figure, and the reply is the platform's blocks through the composer and the numeric guard. It has no what-if, data or write step: those are the Agent's and the write Workflow's ([F-14](REMEDIATION-FINDINGS.md)), and the reply says so in one fixed sentence. A missing year or an ambiguous client is asked for, and the next message resumes the pack.
+
+## When the guard rejects the narration
+
+The reply is the platform's blocks and the standing disclaimer, then a line saying the commentary was
+withheld because it could not be verified, then the provenance footer. The narration is dropped **whole**
+(never patched), the guard status is `rejected`, and the report filed with the gateway says so and how
+many figures failed. A model that is down gets the same reply with a line saying so.
+
+Besides a bad digit, an unresolvable placeholder or a policy break, a narration is dropped when an approximation qualifier ("about", "roughly", "rounded", "up to"...) sits within three tokens of a figure (`application/composer/hedging.py`, CH-15c): every figure shown is exact, and "not rounded" is rejected as well.
+
+A narration is also dropped when a placeholder points at a fact the model was never shown: the person's lane (employee-level `rows`) or a row past the model's cut of fifty (`compose.paths_outside_model_view`, RM-05, [D-123](DECISIONS.md)). A figure only the person's rows hold is not allowed context for the narrator: not in its brief, not in the reader's allowed numerals, not a placeholder target. The reader's reply still shows the rows, and the audit records the refusal as a code that does not name the path.
+
+## Narration and planning quality (CH-15c)
+
+The narrator prompt (`backend/agents/prompts/channel_narrator.md`, vendored unchanged, version 3) asks for a senior colleague's voice: one to four sentences, the answer first, the engine's own labels, no rank prose, no hedging, the exact `placeholder` copied from `fact_paths`, and twelve worked examples (six added in CH-16e for data results). The planner's instructions and the tools' descriptions are the model's only guide to choosing a tool: `book_rank` says it is for the whole book only and every client tool begins "ONE client (needs a client)". Which client is still code (`ToolRunner.ensure_client`, run before any client tool). `golden/planning.json` and `test_orch_planning.py` pin the sequences and the wording; `tests/ai_evals` carries the routing and narration items. See [D-109](DECISIONS.md).
+
+## Using the data tools (CH-16e)
+
+The planner's instructions carry one decision rule, and the descriptions of `data_catalog`, `data_query` and `data_distinct_values` say the same thing, so a model reads it twice:
+
+1. The **fixed engine tools** (`client_eligibility`, `client_trend`, `client_at_risk`, `client_discovery`, `simulate`) come first for the credit, eligibility, a trend, jobs at risk and a what-if. They are authoritative.
+2. For a **descriptive or comparative** question about payroll or enriched data (an average, a count or a total by location, month, year, designation or method), `data_catalog` then `data_query`. A "why" question takes the fixed tool first and the data second: the data shows when a figure moved, not why.
+3. `data_distinct_values` turns a name the reader gave into the value the data holds, before a filter.
+4. **Never an invented column.** A catalog search with no match now says the data has nothing for it; say so and stop.
+5. Name every measure with `as`; the narration refers to a result column by it. Prefer an aggregate to a list; a result is capped and says so.
+6. The client is the one in the conversation; another client, or several, is a question back (`client_resolve`), never a data query.
+
+Tool mode follows this naturally (the model reads the catalog result, then plans the query). **JSON mode** (`AI_GATEWAY_SUPPORTS_TOOLS=false`) has no tool loop, so a plan made only of lookup tools is run and the model is shown their results (the same lane projection) and asked once more; a plan that already holds a query is unchanged, and there is never a third planning call. What a model is shown never includes a person-level value: employee-level rows go to the reader and are dropped from `model_facts` ([ADR-009](../architecture/ADR-009-m365-channel.md)).
+
+The narrator (prompt version 3) describes a data result by placeholder, says when it was capped (the limit by placeholder), says plainly when no rows matched or the data has no column for the question, never interprets ("unusual", "explains"), and never describes rows that went to the reader alone. `golden/data_use.json` (29 conversations), the `data_routing` AI eval (34 plans) and `test_data_equivalence.py` (the generic query equals the fixed tools on the real engine's Gold output) hold all of it; see [D-115](DECISIONS.md).
+
+## Audit
+
+The gateway audits every tool call itself (reads) or the API does (writes). The orchestrator adds the
+one thing neither can see: that a model took part. After a turn in which a model was called it posts
+`{agent_name, agent_version, model, prompt_sha256, tool_names, guard_status, violations_count,
+output_summary}` to `POST /channel/v1/audit/narration`. The gateway writes a `channel_audit` event
+(`action_kind='narrate'`, `numeric_guard` = the verdict) and a `tcc_ops.agent_action_audit` row whose
+`is_deterministic_path` is true only when the guard passed. The prompt is represented by its hash, the
+reply by its length. If filing fails the answer still goes out; the failure is logged and counted
+(`/whoami` shows the count).
+
+## Models
+
+The orchestrator reads the same `AI_*` settings as the API, and `AI_PROVIDER_CHAIN` decides which of two model paths
+serves a turn (`app/core/model_access.py`, [D-127](DECISIONS.md)); both sit behind one interface the planner reads:
+
+- **A chain that is exactly `foundry`** (the deployed default) is served by the **Microsoft Agent Framework's own chat client**,
+  `OpenAIChatCompletionClient`, given the account's OpenAI v1 host (`https://<account>.openai.azure.com/openai/v1`) and a token
+  provider over `DefaultAzureCredential` (the agent's managed identity when deployed). No key exists anywhere. `FoundryChatClient`
+  is not used: it takes a project endpoint only and reaches the model on the project host the hosted runtime cannot resolve.
+- **Any chain that names `gateway`** (alone, or with `foundry` before or after it) is served by `ModelChain` through
+  `PortChatClient`: the shared `OpenAICompatibleChatModel` for each provider (`foundry`: the account's v1 surface; `gateway`: the
+  customer's). The framework has no failover client, and the customer's gateway has its own dialect and authentication.
+
+Neither path uses `NarrationService`, because that path drops a model's tool calls by design and the orchestrator needs
+them. What `ModelChain` does around a call is kept on both: the egress policy (an identifier never leaves;
+`aggregates_only` and `block` apply to external providers), a per-call deadline and the injection screen (a flagged message
+reaches no model and is answered by the keyword table). The chain's own rule (fall to the next provider only when one fails,
+never splice two models' sentences, and stay with one provider through a tool loop) applies to `ModelChain`; the foundry-only
+path has no second provider to move to, and a failure degrades to the engine's own answer.
+
+Three planning modes, one outcome: **tools** (a provider offers tool calling: MAF `Agent` + `FunctionTool`s
+generated from the catalog, the turn's rules as function middleware, and a middleware that replaces the model's
+text with the composer's), **json**
+(`AI_GATEWAY_SUPPORTS_TOOLS=false`: the model returns `{"tools": [...]}`, validated, and each named tool runs through
+the same middleware via a one-shot agent, then a second call narrates) and **keywords** (no model, or the model
+failed: the platform's own keyword table). Invented tool names are never run.
+
+Not carried over from the API's stack, and why: the token budget, breaker, bulkhead and retry wrappers
+(`bootstrap/ai_wiring._decorate`) wrap `AgentRuntime`, which has no tool calls; here a call has a timeout
+(`AI_TOTAL_DEADLINE_SECONDS`) and the chain's fallback. A shared budget is the follow-up if a customer needs it.
+
+## Claim packages
+
+"Send me the claim package for <client> <year>" is a write like any other: the model prepares
+`claim_package_create`, the person confirms, the code commits, and then the **code** (not the model) asks the
+gateway for `claim_package_link` and shows that link. A storage URL is never shown. If the package was built but
+the link could not be had, the reply says so after "Done."
+
+## Limits and failures
+
+A turn has a deadline (`CHANNEL_TURN_TIMEOUT_SECONDS`, default 90). A gateway call that fails is a plain sentence
+(`replies.py`): unreachable or timed out ("did not answer, nothing has been changed"), rate limited, the gateway
+refusing the orchestrator's credentials, or the platform's own message for a refusal such as an unauthored tax
+year. No status code, error code or stack trace reaches the reader. Conversation state is an in-memory dictionary
+with a time to live, per replica: the runtime's session storage is a filesystem the platform may discard, and a
+lost state costs a repeated question, never a wrong answer or a silent write (D-81).
+
+## Telemetry
+
+One span per gateway call (`tcc.tool.<name>`) through the hosting adapter's OpenTelemetry provider, carrying the
+tool, its kind, the channel, the correlation id and the outcome. Never an argument, a fact, a client name, a figure
+or a message (`test_orch_resilience.py` asserts this).
+
+## Text, not cards
+
+Published agents cannot stream, and no adaptive-card or attachment path through the hosted Responses runtime
+was found in the documentation, so replies are Markdown text: the platform's blocks as headings, tables and
+callouts. `composer.cards_payload` exists for a later card path; nothing here uses it. File uploads do not
+work in Microsoft 365 Copilot (they do in Teams), so the claim package is offered as a gateway link.
+
+## Run it offline
+
+```pwsh
+python scripts/vendor-orchestrator.py                 # copy the shared modules in (idempotent; --check verifies)
+cd backend; ..\.venv\Scripts\python.exe -m pytest tests/channel_orchestrator -q
+```
+
+The tests run the real pipeline, MAF agent, tool runner, composer and guard against a fake gateway (an ASGI
+app serving envelopes built with the platform's own block helpers), a scripted model, the mock model gateway
+(`scripts/mock-ai-gateway.py`) for the wire, and, in `test_orch_e2e.py`, the real gateway and API.
+
+To run the host itself against the mock gateway, export the variables in
+[ENV-VARS.md](../architecture/ENV-VARS.md) section 9b with `AI_GATEWAY_AUTH=none` and
+`pip install -r channel_orchestrator/requirements.txt`, then `python channel_orchestrator/main.py` and
+`POST http://localhost:8088/responses {"input": "..."}`. A local request carries no platform headers, so set
+`CHANNEL_IDENTITY_SOURCES=client-headers` and send `x-client-acting-user-oid` to be someone.
+
+## Agent as code (RM-11)
+
+Two kinds of agent exist here, and each has one declarative home.
+
+**The hosted orchestrator** (this directory) is `channel_orchestrator/azure.yaml`: the `azure.ai.agent` service (`kind: hosted`,
+the agent's name, description, `codeConfiguration`, `env`, `container.resources`, the endpoint's `protocols` and
+`authorizationSchemes`) plus the `azure.ai.project` service it uses. The extension's current reference
+([azure.yaml reference for hosted agents](https://learn.microsoft.com/en-us/azure/foundry/agents/concepts/azure-yaml-reference),
+read 2026-11-04) makes `azure.yaml` the **single** project file and calls the older `agent.manifest.yaml` + `agent.yaml` pair legacy;
+the current `azd ai agent init` rejects the manifest wrapper. So there is deliberately no manifest file to add. What the agent *does* is
+code (`app/`); how it is *deployed* is that one file, and `tests/channel_orchestrator/test_orch_agent_definition.py` holds it to the
+reference (host and kind, name equals the service key, source deployment rather than an image, an entry point that exists, resource
+ranges, the endpoint scheme Activity needs, no `identity` block, no legacy manifest, no reserved or secret-looking variable, no
+endpoint or tenant literal, every variable documented in ENV-VARS.md and read by code). The protocols stay as D-100 fixed them (the
+container serves `responses` only; the endpoint declares `responses` and `activity`) and are guarded by `test_orch_hosting_seam.py`.
+Nothing here ran `azd`; the two fields added by RM-11 (`description`, `requiredVersions`) are documented but have not been through a
+deploy (RM-16).
+
+**The specialist prompt agents** (twelve Foundry v2 prompt agents the portal's chat and the Agents page use, `backend/agents/`) are
+declared in **one list**, `backend/agents/agents.json`: for each agent its `name`, its `prompt` file (under `agents/prompts/`), its model
+`role` (the model is the setting `AI_MODEL_<ROLE>`, never a deployment name in the repository), its `temperature` and its `tools`
+(always empty: agents narrate, tools calculate, ADR-004). `agents/roster.py` reads and validates it; each `agents/<module>.py` keeps only
+the display profile the Agents page shows and takes its spec from the list (`SPEC = build_spec("<module>", AGENT_PROFILE)`);
+`agents/factory.py` yields the specs; `bootstrap/ai_wiring.py` hands them to the Foundry catalog, which publishes them as before.
+
+- **Add an agent:** a prompt file, a module with its profile, an entry in `agents.json`. **Change one:** edit its entry or its prompt file
+  (a prompt edit also needs the version bump `test_prompt_manifest.py` asks for).
+- **Publishing is unchanged:** `create_version` always creates, versions are immutable, an identical definition (model and instructions)
+  is reused, a pinned version is fetched. A temperature change alone does not change what that comparison looks at, so it does not
+  publish a new version by itself (F-18).
+- **Enforced:** `tests/test_agent_roster.py` (the list loads, each fault is refused, the specs equal the declarations, one version per agent, no
+  tool attached, an identical definition reused) and `tests/test_architecture_agent_roster.py` (no agent module declares a name, prompt, role or
+  temperature; only `roster.py` builds an `AgentSpec` or loads a prompt; the publisher is fed from the roster alone; every file under
+  `agents/prompts/` is an agent's or listed under `excluded_prompts` with a reason). The specs the list produces are byte-identical to
+  the ones the twelve modules produced before (a hash over name, instructions, role, temperature and profile matched).
+- No live publish was run; startup still publishes in the background (`FoundryAgentCatalog.warm`).
+
+## Reference text: the knowledge tier (RM-15)
+
+Off by default and not built beyond a port. With `KNOWLEDGE_ENABLED=true` and `KNOWLEDGE_PROVIDER=fake` (tests and local runs only) the planner adds one framework
+context provider to the Agent (`app/core/maf_knowledge.py`): it asks the knowledge port for the passages that bear on the question and adds them to the model's
+instructions as fenced reference text (no figure to use, no citation to copy). After a narration that passed the guard, the reply gains a quoted block with each
+passage's citation, source and retrieval date, before the provenance footer. A narration that repeats a figure found only in a passage is dropped whole by the
+numeric guard, and then no block is shown. Passages never enter the facts, the ledger or a tool result (architecture-tested); a failing source costs the reader nothing;
+the `json` and `keywords` planners never consult it. Design, the owner's provisioning steps and what is unverified: [KNOWLEDGE-AND-IQ.md](../architecture/KNOWLEDGE-AND-IQ.md),
+[ADR-010](../architecture/ADR-010-knowledge-tier.md).
+
+## Deploying
+
+Recommended: the **source-code (zip) path**: `python scripts/vendor-orchestrator.py`, then `azd up` in
+`channel_orchestrator/` (`azure.yaml`, `codeConfiguration`, `remote_build`). It needs no container registry
+and Terraform adds none. A `Dockerfile` is kept for a local build and for the container path. See
+[PUBLISHING.md](PUBLISHING.md) for putting the agent in Teams and Copilot, and D-74 to D-85 in
+[DECISIONS.md](DECISIONS.md) for the choices and the facts they rest on.
+
+Vendored code is not committed (`channel_orchestrator/app/vendor/` is gitignored): the script copies it
+verbatim from `backend/` and records a SHA-256 manifest, and `test_orch_vendor.py` proves the copy matches,
+that the closure stays inside the allowed layers, and that the copy runs without `backend/` on the path.
+
+## Open for the live sandbox (Prompt 6)
+
+1. Which identity signal a Teams and a Copilot Chat message actually carries (for a direct caller, `x-agent-user-id` is the object id), and whether it is the Entra
+   object id (spike S3). Until then the default sources fail closed.
+2. Whether a hosted agent in a network-isolated project can reach the gateway and the model endpoint. **Per
+   the Foundry documentation, unproven until spike S6** ([HARDENING-SPIKE](HARDENING-SPIKE.md)): the hosted-agent
+   path uses a customer-delegated agent subnet and private endpoints, with no Cosmos DB, AI Search or capability
+   host. The "standard agent setup" this note once named is the classic path that needs them, and the customer
+   has ruled Cosmos out (D-92). For the demo the Foundry data plane is opened by one toggle instead
+   ([HARDENING-PLAN](../architecture/HARDENING-PLAN.md) §2).
+3. Whether the Activity-to-Responses bridge carries the sender's display name (without it the audit row says
+   `(name not provided)`; the object id is still recorded).
+4. Whether `azd ai agent` accepts `channel_orchestrator/azure.yaml` as written, and the hosted-agent region
+   for the sandbox.
+
+## Live findings (CH-14, 3 November 2026)
+
+- **Teams reaches the container through the Responses bridge.** `azure.yaml` declares `activity` on the **endpoint** only
+  (`agentEndpoint.protocols`), never under the container's `protocols:`: this container serves Responses, and a container that
+  declares `activity` is sent Teams messages at `/activity/messages` (a 404 here). Authorization schemes `Entra` and `BotServiceRbac`.
+  After every `azd deploy` or publish, `GET /agents/<name>` and check `definition.protocol_versions` is `responses` only ([D-100](DECISIONS.md)).
+- **The model is reached on `<account>.openai.azure.com`**, not the project's own host, which the hosted runtime cannot resolve ([D-101](DECISIONS.md)).
+  The agent's instance identity needs **Foundry User** and **Cognitive Services User** on the account.
+- **Diagnostics, with `CHANNEL_DEBUG_WHOAMI`:** `/whoami` (identity signals, and the *shape* of `x-agent-user-id`), `/netcheck` (name resolution, TCP, TLS and
+  an unauthenticated HTTP status for the project and account hosts, the gateway, the login host and a public control; names of environment variables, never a value
+  beyond a short allow-list) and `/modelprobe` (the model call exactly as Microsoft's `bring-your-own/responses/hello-world` sample makes it). None returns a token.
+- **Identity.** `x-agent-user-id` is a default source (`agent-user-id`), used only when it is a GUID; for a caller's own token it equalled the caller's object id.
+- **What a model needs to be handed.** Every `fact_paths` entry carries its exact `placeholder` (`{{facts.<path>|<format>}}`); without it a model dropped `facts.` and the
+  whole narration was withheld by the guard.
+- **A hosted orchestrator can use a customer gateway only if that gateway is reachable from the hosted runtime's network.** The mock is not (subnet-only), so the chain is `foundry`.

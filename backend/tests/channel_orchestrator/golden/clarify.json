@@ -1,0 +1,71 @@
+[
+  {
+    "name": "two_named_clients_ask_which",
+    "turns": [{
+      "say": "Compare Cascade and Northwind for 2023",
+      "model": [{"tools": [{"tool": "client_eligibility", "args": {"tax_year": 2023}}]}, {"text": "I need to know more first."}],
+      "expect": {"kind": "clarify", "gateway": ["client_resolve"], "contains": ["Which client do you mean?", "1) Cascade Retail Partners", "2) Northwind Care Systems", "Reply with the number."]}
+    }]
+  },
+  {
+    "name": "a_number_picks_the_client_and_the_question_resumes",
+    "turns": [
+      {"say": "Compare Cascade and Northwind for 2023",
+       "model": [{"tools": [{"tool": "client_eligibility", "args": {"tax_year": 2023}}]}, {"text": "I need to know more first."}],
+       "expect": {"kind": "clarify"}},
+      {"say": "2",
+       "model": [{"tools": [{"tool": "client_eligibility", "args": {"tax_year": 2023}}]}, {"text": "Both methods are shown for the one you picked."}],
+       "expect": {"kind": "answer", "gateway": ["client_eligibility", "client_eligibility"], "args": {"client_eligibility": {"client_id": 2002, "tax_year": 2023}}}}
+    ]
+  },
+  {
+    "name": "a_number_outside_the_list_asks_again",
+    "turns": [
+      {"say": "Compare Cascade and Northwind for 2023",
+       "model": [{"tools": [{"tool": "client_eligibility", "args": {"tax_year": 2023}}]}, {"text": "I need to know more first."}],
+       "expect": {"kind": "clarify"}},
+      {"say": "9", "expect": {"kind": "clarify", "gateway": [], "model_calls": 0, "contains": ["1) Cascade Retail Partners"]}}
+    ]
+  },
+  {
+    "name": "no_client_anywhere_is_a_question_not_a_default",
+    "turns": [{
+      "say": "What is the credit for 2023?",
+      "model": [{"tools": [{"tool": "client_eligibility", "args": {"tax_year": 2023}}]}, {"text": "I need to know more first."}],
+      "expect": {"kind": "clarify", "gateway": ["client_resolve"], "contains": ["Which client do you mean?", "1) Cascade Retail Partners"], "absent": ["$"]}
+    }]
+  },
+  {
+    "name": "a_missing_year_is_asked_not_guessed",
+    "turns": [{
+      "say": "What is Cascade's credit?",
+      "model": [{"tools": [{"tool": "client_eligibility", "args": {}}]}, {"text": "I need to know more first."}],
+      "expect": {"kind": "clarify", "gateway": ["client_resolve"], "contains": ["Which tax year do you mean?"]}
+    }]
+  },
+  {
+    "name": "a_year_the_reader_did_not_say_is_overridden",
+    "turns": [{
+      "say": "What is Cascade's credit for 2023?",
+      "model": [{"tools": [{"tool": "client_eligibility", "args": {"tax_year": 2019}}]}, {"text": "Both methods are shown."}],
+      "expect": {"kind": "answer", "args": {"client_eligibility": {"tax_year": 2023}}, "contains": ["TY2023"], "absent": ["TY2019"]}
+    }]
+  },
+  {
+    "name": "a_client_id_the_model_invents_is_overwritten",
+    "turns": [{
+      "say": "How has Cascade trended?",
+      "model": [{"tools": [{"tool": "client_trend", "args": {"client_id": 2003}}]}, {"text": "The table shows each year."}],
+      "expect": {"kind": "answer", "args": {"client_trend": {"client_id": 2001}}}
+    }]
+  },
+  {
+    "name": "an_unauthored_year_is_stated_not_estimated",
+    "overrides": {"client_eligibility": {"status": 422, "error": {"code": "year_not_authored", "message": "TY2019 has no authored rule pack; no figure can be given", "retryable": false}}},
+    "turns": [{
+      "say": "What is Cascade's credit for 2019?",
+      "model": [{"tools": [{"tool": "client_eligibility", "args": {"tax_year": 2019}}]}, {"text": "I need to know more first."}],
+      "expect": {"kind": "failure", "contains": ["rule pack"], "absent": ["$"], "audit": "ok"}
+    }]
+  }
+]

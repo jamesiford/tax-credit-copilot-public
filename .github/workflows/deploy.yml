@@ -157,7 +157,8 @@ jobs:
           terraform output -json > "$RUNNER_TEMP/outputs.json"
           for key in API_APP_NAME WEB_APP_NAME AZURE_RESOURCE_GROUP WAREHOUSE_SERVER WAREHOUSE_DATABASE \
                      FABRIC_WORKSPACE_ID FABRIC_WAREHOUSE_ID TCC_FABRIC_CREATED API_IDENTITY_NAME \
-                     FABRIC_WORKSPACE FABRIC_LAKEHOUSE SOURCE_SCHEMA TCC_PROFILE; do
+                     FABRIC_WORKSPACE FABRIC_LAKEHOUSE SOURCE_SCHEMA TCC_PROFILE \
+                     CHANNEL_APP_NAME GATEWAY_IDENTITY_NAME; do
             echo "$key=$(jq -r ".${key}.value" "$RUNNER_TEMP/outputs.json")" >> "$GITHUB_ENV"
           done
 
@@ -185,6 +186,10 @@ jobs:
       - name: Grant the API identity on tcc_gold / tcc_ops
         run: python scripts/grant-warehouse-sql.py --target deployed
 
+      - name: Grant the channel gateway identity on tcc_ops.channel_audit (object level)
+        if: env.GATEWAY_IDENTITY_NAME != '' && env.GATEWAY_IDENTITY_NAME != 'null'
+        run: python scripts/grant-warehouse-sql.py --target deployed --profile gateway --principal "$GATEWAY_IDENTITY_NAME"
+
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
@@ -201,6 +206,12 @@ jobs:
         run: |
           az webapp deploy -g "$AZURE_RESOURCE_GROUP" -n "$API_APP_NAME" --src-path "$RUNNER_TEMP/api.zip" --type zip --async false
           az webapp deploy -g "$AZURE_RESOURCE_GROUP" -n "$WEB_APP_NAME" --src-path "$RUNNER_TEMP/web.zip" --type zip --async false
+
+      - name: Zip deploy the channel gateway (only when the channel is enabled)
+        if: env.CHANNEL_APP_NAME != '' && env.CHANNEL_APP_NAME != 'null'
+        env:
+          TCC_ENABLE_M365_CHANNEL: 'true'
+        run: pwsh scripts/deploy-channel.ps1
 
       - name: Smoke test through the web app (public profile)
         if: inputs.profile == 'public'

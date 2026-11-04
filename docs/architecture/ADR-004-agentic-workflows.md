@@ -1,6 +1,6 @@
 # ADR-004 — Production agentic workflows on Foundry and MAF
 
-**Date** 2026-08-25 · **Status** Accepted
+**Date** 2026-08-25 · **Status** Accepted · **Status note:** §3 (numeric integrity) is partially implemented by [ADR-008](ADR-008-channel-numeric-integrity.md) — the placeholder composer and the numeric guard are built for the Microsoft 365 channel. MAF workflows, checkpointing and the other middleware remain specified and unbuilt. **Version note (AI-01, 2026-11-02):** the runtime is gent-framework-foundry 1.16.0 on zure-ai-projects 2.7.0 (was 1.7.0 / 2.1.0). Model access moved behind application ports in AI-02, so the SDK is imported only under ackend/infrastructure/ai/.
 
 ## Context
 

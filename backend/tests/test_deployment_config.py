@@ -22,17 +22,20 @@ DURABLE = {
     "ARTIFACT_STORE": "blob",
     "ARTIFACT_REPOSITORY": "warehouse",
 }
+#: A deployed synthetic demo, which has to say it runs without sign-in.
+DEMO = {"AUTH_MODE": "none", "ALLOW_ANONYMOUS_SYNTHETIC": "1"}
 
 
 def test_local_is_the_default_and_accepts_local_stores():
-    resolved = check_deployment_configuration({})
+    resolved = check_deployment_configuration({"ENVIRONMENT": "local", "AUTH_MODE": "none"})
     assert resolved["environment"] == "local"
     assert resolved["CLAIM_STORE"] == "sqlite" and resolved["RUN_MANIFEST_STORE"] == "memory"
     assert resolved["OVERRIDE_STORE"] == "memory", "overrides follow the run manifest store"
 
 
 def test_a_deployed_environment_with_durable_stores_starts():
-    resolved = check_deployment_configuration({"ENVIRONMENT": "azure", "DATA_CLASSIFICATION": "synthetic", **DURABLE})
+    resolved = check_deployment_configuration(
+        {"ENVIRONMENT": "azure", "DATA_CLASSIFICATION": "synthetic", **DEMO, **DURABLE})
     assert resolved["OVERRIDE_STORE"] == "warehouse"
     assert resolved["data_classification"] == "synthetic"
 

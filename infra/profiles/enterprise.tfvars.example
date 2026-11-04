@@ -31,3 +31,23 @@ fabric_warehouse_id   = "00000000-0000-0000-0000-000000000004"
 warehouse_server      = "<id>.datawarehouse.fabric.microsoft.com"
 warehouse_database    = "<warehouse display name>"
 source_schema         = "<source schema>"
+
+# AI model providers (AI-03). All optional; leave commented out to call Foundry
+# directly. The gateway must expose an OpenAI-compatible chat-completions API
+# with streaming and tool calling. Placeholders only; secrets never go in this
+# file - a credential is the NAME of a secret already in Key Vault.
+#
+# ai_provider_chain          = "foundry,gateway"
+# ai_gateway_endpoint        = "https://gateway.example.com"
+# ai_gateway_auth            = "entra_token"   # none | api_key | oauth_client_credentials | entra_token
+# ai_gateway_entra_audience  = "api://00000000-0000-0000-0000-000000000000"
+# ai_model_narrator          = "<gateway model name>"
+# ai_egress_policy           = "aggregates_only"
+#
+# For ai_gateway_auth = "api_key" or "oauth_client_credentials" (needs enable_key_vault):
+# enable_key_vault               = true
+# ai_gateway_api_key_secret_name = "<existing key vault secret name>"
+# ai_gateway_oauth_token_url     = "https://login.example.com/oauth2/token"
+# ai_gateway_oauth_client_id     = "00000000-0000-0000-0000-000000000000"
+# ai_gateway_oauth_scope         = "api://00000000-0000-0000-0000-000000000000/.default"
+# ai_gateway_oauth_secret_name   = "<existing key vault secret name>"

@@ -19,17 +19,19 @@ suite pay for it would be a poor trade.
 from __future__ import annotations
 
 import logging
-import os
 import time
 from typing import Any
+
+from config import get_settings
 
 log = logging.getLogger("tax-credit-copilot")
 
 
 def should_warm() -> bool:
+    """Warm only against the real lakehouse and only when not opted out: any other source has no slow start to hide."""
     from tools.fabric_source import active_data_source
 
-    if os.getenv("TCC_WARM_ON_START", "1").strip().lower() in ("0", "false", "no"):
+    if not get_settings().runtime.warm_on_start:
         return False
     return active_data_source() == "lakehouse"
 
@@ -40,10 +42,7 @@ def keepalive_interval_s() -> int:
     30s is the measured safe point: a connection is still hot after 30s idle
     (120ms) and dead after 90s (3,216ms).
     """
-    try:
-        return max(5, int(os.getenv("TCC_KEEPALIVE_SECONDS", "30")))
-    except ValueError:
-        return 30
+    return get_settings().runtime.keepalive_seconds
 
 
 def touch_warehouse() -> int:
@@ -55,16 +54,16 @@ def touch_warehouse() -> int:
     """
     if not should_warm():
         return 0
-    from application.wiring import get_gold_reader
+    from application.services import get_gold_reader
 
     return get_gold_reader().connection.keepalive()
 
 
 def _reap_stranded_runs() -> int:
     """Mark runs that died with their process failed, so they stop reading live."""
-    from infrastructure.persistence.warehouse_gold import GoldWriter
+    from application.gold_ports import reap_stranded_runs
 
-    return GoldWriter().reap_stranded_runs()
+    return reap_stranded_runs()
 
 
 def _timed(report: list[dict[str, Any]], step: str, work) -> Any:
@@ -97,9 +96,9 @@ def warm_read_paths(*, warm_workspace=None) -> dict[str, Any]:
     the router that serves it, and the application layer does not import
     routers [ADR-003].
     """
-    from application.wiring import get_gold_reader
+    from application.services import get_gold_reader
     from data.source.from_fabric import FabricLakehouseReader
-    from infrastructure.payroll.pay_period_source import configured_account_id
+    from application.source_ports import configured_account_id
 
     report: list[dict[str, Any]] = []
     started = time.monotonic()

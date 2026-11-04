@@ -15,7 +15,9 @@ hooks:
   #                          deployment just created; otherwise applies pending
   #                          migrations (a re-run applies nothing)
   #   2. load-synthetic    - public profile only: the synthetic source dataset
-  #   3. grant-warehouse-sql - T-SQL grants on tcc_gold / tcc_ops to the API identity
+  #   3. grant-warehouse-sql - T-SQL grants on tcc_gold / tcc_ops to the API identity,
+  #                          and, when the channel is enabled, INSERT/SELECT on
+  #                          tcc_ops.channel_audit to the gateway identity (object level)
   #   4. seed-operational-store - idempotent onboarding assertions
   postprovision:
     windows:
@@ -25,6 +27,21 @@ hooks:
     posix:
       shell: sh
       run: pwsh ./scripts/postprovision.ps1
+      continueOnError: false
+
+  # After every deploy: the Microsoft 365 channel gateway, only when it is enabled.
+  # azd cannot make a service conditional (it resolves each service by its
+  # azd-service-name tag, and with the channel off there is no such app), so the
+  # gateway is deployed here and is NOT a `channel` service. With
+  # TCC_ENABLE_M365_CHANNEL not `true` the script exits 0 at once.
+  postdeploy:
+    windows:
+      shell: pwsh
+      run: ./scripts/deploy-channel.ps1
+      continueOnError: false
+    posix:
+      shell: sh
+      run: pwsh ./scripts/deploy-channel.ps1
       continueOnError: false
 
 services:

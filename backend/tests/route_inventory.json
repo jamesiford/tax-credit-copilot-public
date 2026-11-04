@@ -1,5 +1,7 @@
 [
   "GET /api/alerts/monthly/{tax_year}",
+  "GET /api/audit/channel",
+  "GET /api/capabilities",
   "GET /api/claims/cell/{client_id}/{program_code}/{tax_year}",
   "GET /api/clients/{client_id}/artifacts/{artifact_id}",
   "GET /api/claims/coverage",
@@ -46,6 +48,7 @@
   "GET /api/workspace/comparison",
   "GET /api/workspace/onezero/{method}",
   "POST /api/chat",
+  "POST /api/capabilities/{tool}",
   "POST /api/claims",
   "POST /api/v2/clients/{client_id}/runs",
   "POST /api/v2/clients/{client_id}/units/{unit_id}/base-year",

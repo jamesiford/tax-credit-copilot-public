@@ -20,13 +20,26 @@ identity when there is one, otherwise what the request said, otherwise
 from __future__ import annotations
 
 import json
+import logging
 import re
+from dataclasses import replace
 from typing import Any, Iterable
 
 from fastapi import APIRouter, HTTPException, Request
 
-from application.deployment import auth_mode
-from application.identity import ANONYMOUS, Principal
+from application.acting_user import HEADER as ACTING_USER_HEADER
+from application.acting_user import ActingUserError, parse_acting_user
+from application.deployment import auth_mode, auth_tenant_id
+from application.identity import (
+    ANONYMOUS,
+    AuthenticationFailed,
+    AuthorizationFailed,
+    Principal,
+    set_ambient_principal,
+)
+from application.services import get_client_authorizer, get_token_validator
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api", tags=["auth"])
 
@@ -40,6 +53,23 @@ SELF_AUTHORIZING = re.compile(r"^/api/clients/\d+/artifacts/[^/]+$")
 
 #: Names a request uses for the client it is about.
 _CLIENT_KEYS = ("client_id", "account_id")
+
+#: State-changing routes the channel gateway may NOT call. They change what the
+#: business holds without going through a command with a writer policy, so an
+#: agent token would reach them with no entitlement check at all. Everything the
+#: channel may write goes through the mediator, where `Policy.WRITER` decides;
+#: these stay person-only until they do. `test_agent_principal.py` checks every
+#: pattern still matches a real route, so a rename cannot silently reopen one.
+AGENT_FORBIDDEN_WRITES = tuple(re.compile(p) for p in (
+    r"^POST /api/ingestion/\d+/exceptions/[^/]+/resolve$",
+    r"^POST /api/onezero/employee/[^/]+/review$",
+    r"^POST /api/rules/[^/]+/verify$",
+    r"^POST /api/rules/ingested/[^/]+/apply$",
+    r"^POST /api/workspace/refresh$",
+    r"^POST /api/workspace/comparison/stage$",
+    r"^POST /api/v2/clients/\d+/runs$",
+    r"^POST /api/claims/assess$",
+))
 
 
 def _bearer(request: Request) -> str | None:
@@ -77,20 +107,34 @@ async def _client_ids(request: Request) -> set[int]:
 def authenticate(request: Request) -> Principal:
     if auth_mode() != "entra":
         return ANONYMOUS
-    from application.wiring import get_token_validator
-    from infrastructure.auth.entra import AuthenticationFailed, AuthorizationFailed
-
     try:
-        return get_token_validator().validate(_bearer(request))
+        principal = get_token_validator().validate(_bearer(request))
     except AuthenticationFailed as exc:
         raise HTTPException(status_code=401, detail=str(exc), headers={"WWW-Authenticate": "Bearer"}) from exc
     except AuthorizationFailed as exc:
         raise HTTPException(status_code=403, detail=str(exc)) from exc
+    return bind_acting_user(principal, request.headers.get(ACTING_USER_HEADER))
+
+
+def bind_acting_user(principal: Principal, header: str | None) -> Principal:
+    """Attach the person an agent acts for; leave a user's own identity alone.
+
+    The header is honoured ONLY for an agent principal. A signed-in person who
+    sends it is ignored, with a warning: letting a user name somebody else is
+    impersonation by header.
+    """
+    if not principal.is_agent:
+        if header:
+            logger.warning("ignoring %s from a user principal", ACTING_USER_HEADER)
+        return principal
+    try:
+        acting = parse_acting_user(header, auth_tenant_id())
+    except ActingUserError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return replace(principal, acting_for=acting)
 
 
 def authorize_clients(principal: Principal, client_ids: Iterable[int]) -> None:
-    from application.wiring import get_client_authorizer
-
     authorizer = get_client_authorizer()
     for client_id in sorted(client_ids):
         if not authorizer.is_authorized(principal, client_id):
@@ -100,9 +144,13 @@ def authorize_clients(principal: Principal, client_ids: Iterable[int]) -> None:
 async def request_guard(request: Request) -> None:
     """App-level dependency: authenticate, then authorize every named client."""
     if request.url.path in PUBLIC_PATHS:
+        set_ambient_principal(None)
         return
     principal = authenticate(request)
     request.state.principal = principal
+    set_ambient_principal(principal)
+    if principal.is_agent and any(p.match(f"{request.method} {request.url.path}") for p in AGENT_FORBIDDEN_WRITES):
+        raise HTTPException(status_code=403, detail="this route is not available to the channel agent")
     if SELF_AUTHORIZING.match(request.url.path):
         return
     authorize_clients(principal, await _client_ids(request))

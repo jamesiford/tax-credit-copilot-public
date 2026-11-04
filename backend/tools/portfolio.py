@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import csv
 import json
+from collections.abc import Callable
 from datetime import date
 from pathlib import Path
 from typing import Any
@@ -351,15 +352,20 @@ def chat_jobs_at_risk(
     method: str = "min_max",
     within_weekly_hours: float = 5.0,
     limit: int = 10,
+    on_run: Callable[[dict[str, Any]], None] | None = None,
 ) -> dict[str, Any]:
     """Which counted jobs sit close enough to a floor to fall out, READ.
 
     "Are any of the net-new jobs close to the threshold and therefore may fall
     off" is a question about the people already INSIDE the credit. The
     near-miss cohort cannot answer it — that is everybody outside.
+
+    `on_run` receives the run the figures were read from, so a capability can
+    say where they came from without adding a key to the brief the narrator is
+    handed.
     """
     from application.queries._client_run import ClientRunNotAvailable, resolve_statute
-    from application.wiring import get_gold_reader
+    from application.services import get_gold_reader
     from domain.calculation.proximity import fragile_cohort
 
     try:
@@ -378,6 +384,8 @@ def chat_jobs_at_risk(
         min_weekly_wages=float(floors.min_weekly_wages),
     )
     counts = read["counts"]
+    if read["run"] is not None and on_run is not None:
+        on_run(read["run"])
     if read["run"] is None or counts is None or not int(counts.get("eligible_count") or 0):
         return {"calculated": False, "client_id": account_id, "tax_year": tax_year}
 
@@ -420,6 +428,7 @@ def chat_client_trend(
     *,
     account_id: int,
     method: str = "pay_period",
+    on_run: Callable[[dict[str, Any]], None] | None = None,
 ) -> dict[str, Any]:
     """How a client has moved across years, READ.
 
@@ -427,10 +436,14 @@ def chat_client_trend(
     SERIES. Answering it from a single-year read is how a chat ends up
     describing one year as though it were the whole history — which is exactly
     what the old single-intent router did with any follow-up question.
+
+    `on_run` receives the run the series was read from; see `chat_jobs_at_risk`.
     """
-    from application.wiring import get_gold_reader
+    from application.services import get_gold_reader
 
     series = get_gold_reader().client_year_series(account_id, method=method)
+    if series.get("run") is not None and on_run is not None:
+        on_run(series["run"])
     years = series["years"]
     if not years:
         return {"calculated": False, "client_id": account_id, "method": method}
@@ -471,6 +484,7 @@ def chat_client_context(
     account_id: int,
     tax_year: int,
     method: str = "pay_period",
+    on_run: Callable[[dict[str, Any]], None] | None = None,
 ) -> dict[str, Any]:
     """What the run concluded about this client-year, READ.
 
@@ -484,13 +498,15 @@ def chat_client_context(
     client-year. A chat answer of "$0" and "we have not looked" are different
     statements and only one of them is safe to say to a client.
     """
-    from application.wiring import get_gold_reader
+    from application.services import get_gold_reader
 
     reader = get_gold_reader()
     current = reader.headcount_series(account_id, tax_year=tax_year, method=method)
     if current["run"] is None or current["annual_average"] is None:
         return {"calculated": False, "client_id": account_id, "tax_year": tax_year}
 
+    if on_run is not None:
+        on_run(current["run"])
     prior = reader.headcount_series(account_id, tax_year=tax_year - 1, method=method)
     return {
         "calculated": True,

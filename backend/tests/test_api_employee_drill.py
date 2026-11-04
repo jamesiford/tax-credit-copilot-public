@@ -110,7 +110,7 @@ _STORED_MONTH_ENDS = [
 
 @pytest.fixture
 def stub_reader():
-    from application.wiring import set_gold_reader
+    from bootstrap.wiring import set_gold_reader
 
     set_gold_reader(_DrillReader())
     yield
@@ -119,7 +119,7 @@ def stub_reader():
 
 def test_a_handle_resolves_to_one_employee(stub_reader):
     """The join the sealed path could not make for any client but one."""
-    from application.wiring import get_mediator
+    from bootstrap.wiring import get_mediator
 
     drill = get_mediator().send(GetEmployeeDrillQuery(
         record_token=_KNOWN_TOKEN, tax_year=_YEAR, state="GA", account_id=1001,
@@ -133,7 +133,7 @@ def test_a_handle_resolves_to_one_employee(stub_reader):
 
 
 def test_a_client_is_required_because_a_handle_only_resolves_where_it_was_minted():
-    from application.wiring import get_mediator
+    from bootstrap.wiring import get_mediator
 
     with pytest.raises(ClientRunNotAvailable, match="client is required"):
         get_mediator().send(GetEmployeeDrillQuery(
@@ -142,7 +142,7 @@ def test_a_client_is_required_because_a_handle_only_resolves_where_it_was_minted
 
 
 def test_an_unknown_handle_is_declined_rather_than_matched_to_somebody(stub_reader):
-    from application.wiring import get_mediator
+    from bootstrap.wiring import get_mediator
 
     with pytest.raises(ClientRunNotAvailable):
         get_mediator().send(GetEmployeeDrillQuery(
@@ -158,7 +158,7 @@ def test_the_drill_names_the_window_rows_it_does_not_hold(stub_reader):
     gone — and "why is this person short a month" was exactly what they
     answered. Named here rather than left as a silently shorter list.
     """
-    from application.wiring import get_mediator
+    from bootstrap.wiring import get_mediator
 
     drill = get_mediator().send(GetEmployeeDrillQuery(
         record_token=_KNOWN_TOKEN, tax_year=_YEAR, state="GA", account_id=1001,
@@ -174,7 +174,7 @@ def test_contested_months_are_absent_not_empty(stub_reader):
     An empty list beside a populated panel reads as "we checked and found
     none", which is a different and stronger claim than "not held".
     """
-    from application.wiring import get_mediator
+    from bootstrap.wiring import get_mediator
 
     drill = get_mediator().send(GetEmployeeDrillQuery(
         record_token=_KNOWN_TOKEN, tax_year=_YEAR, state="GA", account_id=1001,
@@ -186,7 +186,7 @@ def test_contested_months_are_absent_not_empty(stub_reader):
 
 def test_the_drill_names_what_it_cannot_show(stub_reader):
     """An empty Access panel would read as 'we checked and found none'."""
-    from application.wiring import get_mediator
+    from bootstrap.wiring import get_mediator
 
     drill = get_mediator().send(GetEmployeeDrillQuery(
         record_token=_KNOWN_TOKEN, tax_year=_YEAR, state="GA", account_id=1001,
@@ -211,7 +211,7 @@ def test_the_drill_agrees_with_the_population_read_about_eligibility(monkeypatch
     # the fiscal window is an assumed CALENDAR year, which holds no 2023 rows
     # for this client.
     monkeypatch.setenv("DATA_SOURCE", "lakehouse")
-    from application.wiring import get_mediator
+    from bootstrap.wiring import get_mediator
 
     mediator = get_mediator()
     population = mediator.send(GetEligibilityQuery(
@@ -243,7 +243,7 @@ def test_payroll_outside_the_window_is_shown_and_marked():
 def test_the_drill_names_what_it_cannot_show_live():
     """The same statement, against the real warehouse."""
     _requires_fabric()
-    from application.wiring import get_mediator
+    from bootstrap.wiring import get_mediator
 
     mediator = get_mediator()
     row = _a_live_token(mediator)
@@ -263,7 +263,7 @@ def test_the_drill_months_are_the_runs_stored_month_ends(stub_reader):
     The live join below caught the derivation one month out from the matrix
     for Candle Bottle, whose fiscal year opens on a stub.
     """
-    from application.wiring import get_mediator
+    from bootstrap.wiring import get_mediator
 
     drill = get_mediator().send(GetEmployeeDrillQuery(
         record_token=_KNOWN_TOKEN, tax_year=_YEAR, state="GA", account_id=1001,
@@ -275,7 +275,7 @@ def test_the_drill_months_are_the_runs_stored_month_ends(stub_reader):
 def test_the_drill_and_the_matrix_agree_on_the_months(monkeypatch):
     """The One/Zero tabs render month columns; they must be the same twelve."""
     from application.queries.get_onezero_matrix import GetOneZeroMatrixQuery
-    from application.wiring import get_mediator
+    from bootstrap.wiring import get_mediator
 
     # The matrix is read from Gold now and the drill still replays the engine,
     # so this is a gold-versus-engine agreement check and needs a client whose
@@ -301,7 +301,7 @@ def test_the_drill_and_the_matrix_agree_on_the_months(monkeypatch):
 def test_the_reference_client_resolves_for_its_certified_year(monkeypatch):
     _requires_fabric()
     monkeypatch.setenv("DATA_SOURCE", "lakehouse")
-    from application.wiring import get_mediator
+    from bootstrap.wiring import get_mediator
 
     mediator = get_mediator()
     body = mediator.send(
@@ -318,7 +318,7 @@ def test_the_reference_client_resolves_for_its_certified_year(monkeypatch):
 def test_the_walk_carries_the_rest_of_year_and_where_they_work(stub_reader):
     """29 Sep: the walk can add this person to a What-if stack, so it carries
     the same rest-of-year reading Near the line does, and the location."""
-    from application.wiring import get_mediator
+    from bootstrap.wiring import get_mediator
 
     drill = get_mediator().send(GetEmployeeDrillQuery(
         record_token=_KNOWN_TOKEN, tax_year=_YEAR, state="GA", account_id=1001,

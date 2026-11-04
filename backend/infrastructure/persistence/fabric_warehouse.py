@@ -31,15 +31,14 @@ branch and no secret in configuration.
 """
 from __future__ import annotations
 
-import os
 import struct
 import threading
 import time
 from contextlib import contextmanager
 from typing import Any, Iterator
 
-from config import GOLD_SCHEMA, OPS_SCHEMA  # noqa: F401 - re-exported for the adapters
-from domain.warehouse import RunManifest
+from config import GOLD_SCHEMA, OPS_SCHEMA, get_settings  # noqa: F401 - GOLD/OPS re-exported for the adapters
+from domain.warehouse import RUN_MANIFEST_COLUMNS, RunManifest
 from infrastructure.persistence.tenant_sql import TenantScopedQuery, tenant_exempt
 
 #: Statements with no tenant: a liveness probe, and lookups by a globally unique run_id.
@@ -50,9 +49,6 @@ _TOKEN_SCOPE = "https://database.windows.net/.default"
 
 #: SQL_COPT_SS_ACCESS_TOKEN. Defined by msodbcsql, not exported by pyodbc.
 _SQL_COPT_SS_ACCESS_TOKEN = 1256
-
-_DEFAULT_DRIVER = "ODBC Driver 18 for SQL Server"
-_DEFAULT_CONNECT_TIMEOUT = 90
 
 #: Refresh this far before expiry, so a long request cannot straddle it.
 _TOKEN_REFRESH_MARGIN_S = 300
@@ -70,7 +66,7 @@ _RECONNECT_PAUSE_S = 1.0
 #: self-correcting: `_mark_complete` sets it back to `success` when it lands.
 #: The reader and the reaper must agree on this, so it is defined once here
 #: rather than in either of them.
-STRANDED_RUN_MINUTES = int(os.getenv("TCC_STRANDED_RUN_MINUTES", "60"))
+STRANDED_RUN_MINUTES = get_settings().warehouse.stranded_run_minutes
 
 
 def _close_quietly(connection: Any) -> None:
@@ -134,30 +130,7 @@ _TOKEN_LOCK = threading.Lock()
 _SHARED_CREDENTIAL: Any = None
 _SHARED_TOKEN: tuple[bytes, int] | None = None
 
-#: Column order is the DDL's. The insert and the row mapper both read it, so the
-#: two cannot drift into disagreeing about position.
-_MANIFEST_COLUMNS = (
-    "run_id",
-    "client_id",
-    "entity_id",
-    "program_code",
-    "tax_year",
-    "fiscal_year_begin",
-    "fiscal_year_end",
-    "source_snapshot_id",
-    "step1_assumption_set_id",
-    "step1_assumption_sha256",
-    "onezero_assumption_set_id",
-    "onezero_assumption_sha256",
-    "rule_pack_version",
-    "code_commit",
-    "calculation_id",
-    "run_started_at",
-    "run_completed_at",
-    "run_status",
-    "superseded_by_run_id",
-    "triggered_by",
-)
+_MANIFEST_COLUMNS = RUN_MANIFEST_COLUMNS
 
 
 class WarehouseNotConfigured(RuntimeError):
@@ -185,14 +158,11 @@ class FabricWarehouseConnection:
         connect_timeout: int | None = None,
         credential: Any = None,
     ) -> None:
-        self.server = (server or os.getenv("WAREHOUSE_SERVER") or "").strip()
-        self.database = (database or os.getenv("WAREHOUSE_DATABASE") or "").strip()
-        self.driver = (driver or os.getenv("WAREHOUSE_ODBC_DRIVER") or _DEFAULT_DRIVER).strip()
-        self.connect_timeout = int(
-            connect_timeout
-            if connect_timeout is not None
-            else os.getenv("WAREHOUSE_CONNECT_TIMEOUT", _DEFAULT_CONNECT_TIMEOUT)
-        )
+        configured = get_settings().warehouse
+        self.server = (server or configured.server).strip()
+        self.database = (database or configured.database).strip()
+        self.driver = (driver or configured.odbc_driver).strip()
+        self.connect_timeout = int(connect_timeout if connect_timeout is not None else configured.connect_timeout)
         self._credential = credential
         #: An INJECTED credential is never shared — a test's fake must not leak
         #: into another test, nor into the process-wide cache.

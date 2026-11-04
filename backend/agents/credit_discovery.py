@@ -4,16 +4,7 @@ Phase 2 registers this agent in Foundry but the chat workflow doesn't invoke
 it yet. Phase 3 wires it into demo question #2."""
 from __future__ import annotations
 
-from .factory import AgentRecord, register_agent
-
-NAME = "CreditDiscoveryAgent"
-INSTRUCTIONS = """\
-You are the Credit Discovery specialist for the Tax Credit Copilot.
-
-The host application will hand you a JSON list of rule-pack hits, each with
-jurisdiction, credit name, rough dollar estimate, and citation. List them as
-short bullets. Never invent a hit; only report what's in the JSON.
-"""
+from .roster import build_spec
 
 AGENT_PROFILE = {
     "tab_label": "Discovery",
@@ -38,14 +29,6 @@ AGENT_PROFILE = {
 }
 
 
-def build(*, project_client, project_endpoint, credential, model) -> AgentRecord:
-    return register_agent(
-        project_client=project_client,
-        project_endpoint=project_endpoint,
-        credential=credential,
-        model=model,
-        name=NAME,
-        instructions=INSTRUCTIONS,
-        temperature=0.2,
-        profile=AGENT_PROFILE,
-    )
+SPEC = build_spec("credit_discovery", AGENT_PROFILE)
+NAME = SPEC.name
+INSTRUCTIONS = SPEC.instructions

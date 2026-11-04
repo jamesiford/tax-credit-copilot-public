@@ -27,12 +27,11 @@ deliberately and noted. `tests/test_source_sql_scope.py` asserts the two agree.
 """
 from __future__ import annotations
 
-import os
 from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import Any, Iterator
 
-from config import SOURCE_SCHEMA
+from config import SOURCE_SCHEMA, get_settings
 from infrastructure.persistence.fabric_warehouse import (
     FabricWarehouseConnection,
     WarehouseNotConfigured,
@@ -133,7 +132,7 @@ class SourceSqlReader:
 
     @property
     def lakehouse(self) -> str:
-        return (os.getenv("FABRIC_LAKEHOUSE") or "").strip()
+        return (get_settings().data_source.fabric_lakehouse or "").strip()
 
     @property
     def schema(self) -> str:
