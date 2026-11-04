@@ -18,3 +18,9 @@ regexes = ['''(?i)record_?token''']
 [[allowlists]]
 description = "the orchestrator's vendor manifest is a list of SHA-256 digests of source files (generated, gitignored; one WIP commit held it)"
 paths = ['''^channel_orchestrator/app/vendor/tcc_shared/MANIFEST\.json$''']
+
+[[allowlists]]
+description = "RM-09 commit ae0428d held one made-up 24-hex employee row handle as a test literal (the egress test); it is not a credential and the literal is gone from the file"
+paths = ['''^backend/tests/channel_orchestrator/test_orch_foundry_client\.py$''']
+regexTarget = "line"
+regexes = ['''0123456789abcdef01234567''']

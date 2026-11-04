@@ -248,8 +248,8 @@ def test_with_no_credential_given_the_client_asks_for_the_default_credential_onc
 
 def test_an_employee_identifier_never_reaches_the_wire(monkeypatch):
     wire = install_wire(monkeypatch, [{"text": NARRATION}])
-    token = "0123456789abcdef01234567"
-    reply = say(pipeline(wire, FakeGateway()), f"How has Cascade trended? record {token}")
+    handle = bytes(range(12)).hex()  # a made-up 24-hex employee row handle, built so no literal looks like a credential
+    reply = say(pipeline(wire, FakeGateway()), f"How has Cascade trended? record {handle}")
     assert wire.requests == [], "the egress rule refused before any request"
     assert reply.kind == "answer" and reply.mode == "keywords" and not reply.narration_used
 
