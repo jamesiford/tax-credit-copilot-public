@@ -1,0 +1,119 @@
+{
+  "book": {
+    "id": "ev-book-1",
+    "tool": "book",
+    "kind": "evidence",
+    "title": "Who to call",
+    "facts": {
+      "total_clients": "2",
+      "assessed_clients": "2",
+      "ranking_note": "Ordered by what inaction costs, not by size, and in the same order as the page. 'On the line' outranks 'Identified' because a threshold missed at year end is gone, while an unclaimed credit is recoverable retroactively. 'Declining' is a forecast about a year nobody has filed, not a finding against a filed return."
+    },
+    "blocks": [
+      {
+        "kind": "text",
+        "text": "2 of 2 clients have been assessed. Ranked by what inaction costs, in the order the page shows."
+      },
+      {
+        "kind": "table",
+        "columns": [
+          "#",
+          "Client",
+          "Reason",
+          "Programme",
+          "Tax year",
+          "Identified",
+          "Jobs margin"
+        ],
+        "rows": [
+          [
+            "1",
+            "Example Client B",
+            "On the line",
+            "GA_JTC",
+            "2022",
+            "$0",
+            "-0.83"
+          ],
+          [
+            "2",
+            "Example Client C",
+            "Identified",
+            "GA_JTC",
+            "2025",
+            "$40,495",
+            "—"
+          ]
+        ]
+      },
+      {
+        "kind": "callout",
+        "title": "Note",
+        "text": "Some rows rest on a claimed figure that is an unverified assertion, not a filing. The ranking uses the identified figure, which is computed.",
+        "tone": "partial"
+      }
+    ],
+    "disclaimer": "Not tax advice: these figures are computed from payroll by this software and must be reviewed by a qualified tax professional before any filing or claim."
+  },
+  "situation": {
+    "id": "ev-situation-1",
+    "tool": "situation",
+    "kind": "evidence",
+    "title": "Situation",
+    "facts": {
+      "client_name": "Example Client A",
+      "cells": "3"
+    },
+    "blocks": [
+      {
+        "kind": "text",
+        "title": "Example Client A",
+        "text": "3 recorded cells. Identified credit: $31,185."
+      },
+      {
+        "kind": "table",
+        "columns": [
+          "Reason",
+          "Programme",
+          "Tax year",
+          "Identified",
+          "Jobs margin"
+        ],
+        "rows": [
+          [
+            "On the line",
+            "GA_JTC",
+            "2023",
+            "$31,185",
+            "-0.83"
+          ],
+          [
+            "Identified",
+            "GA_JTC",
+            "2024",
+            "$0",
+            "—"
+          ]
+        ]
+      },
+      {
+        "kind": "list",
+        "rows": [
+          "First point",
+          "Second point"
+        ]
+      },
+      {
+        "kind": "callout",
+        "title": "Note",
+        "text": "The claimed side of this book is an unverified assertion.",
+        "tone": "partial"
+      }
+    ],
+    "disclaimer": "Not tax advice: these figures are computed from payroll by this software and must be reviewed by a qualified tax professional before any filing or claim.",
+    "provenance": {
+      "run_id": "run-0123456789ab",
+      "rule_pack": "ga_jtc/2023"
+    }
+  }
+}

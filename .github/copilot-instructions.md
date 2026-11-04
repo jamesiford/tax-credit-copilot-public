@@ -447,13 +447,9 @@ store chain. Real client payroll, de-identified at source. Four synthetic client
 
 ## The portal
 
-**One shell, four routed pages.** `frontend/src/App.jsx` is the shell — a top
-bar (brand, three dropdown navigation groups, the tax-year scope, the account
-menu), the drill trail beneath it, the page, a floating **Ask Copilot** launcher
-(Ctrl+K) that opens the Ask workspace, and the tour — and every route renders it; `/golden` redirects. The
-shell's parts live in `src/components/shell/` (`AppShell`, `TopBar`, `NavGroup`,
-`DrillTrail`, `ShellActions`) and are theme-neutral: they read colour roles, so
-classic and modern share the structure. Inside, the URL selects a page:
+**One shell, four routed pages.** `frontend/src/App.jsx` is the shell — nav,
+scope bar, chat, tour — and every route renders it; `/golden` redirects. Inside,
+the URL selects a page:
 
 ```
 /                       PortfolioPage   the book
@@ -470,52 +466,13 @@ Query string carries `year`, `month` and `method`, so a pasted URL renders that
 exact state cold. **An employee id never appears in a URL** — the route carries
 the `record_token`.
 
-Navigation is what is LEFT once the pages absorbed the rest. Each section is a
-**dropdown group in the top bar** (a WAI-ARIA menu button: arrows, Home/End,
-Escape returns focus, Tab and outside-click close):
+Navigation is what is LEFT once the pages absorbed the rest:
 
 ```
-What is it worth       Eligibility · Monthly employment
-What needs a decision  Payroll data · Agents
-Prove it               Audit trail* · Back-test* · Programs · Calculations*
+What is it worth       Who qualifies · One/Zero detail
+What needs a decision  Data ingestion · Agent activity
+Prove it               Evidence pack* · Compare to Access* · Rules & statute · Methodology*
 ```
-
-An entry that needs a client (`needsClient`: Eligibility) is **disabled with its
-reason** ("Pick a client first") at portfolio scope, never hidden: a missing
-entry says "this product does not do that", a disabled one says "not yet".
-
-**The drill trail replaces both the left rail and the page breadcrumb.**
-`lib/drill.js` derives Portfolio → Client → Location → Eligibility → Employee
-from the ROUTE (never from state of its own), so the trail and the page cannot
-disagree. A reached rung is a button; the current one is `aria-current="page"`
-and not a button; an unreached one is dimmed text with a hint and is **never** a
-disabled button. At the book it collapses to one quiet line. Pages take
-`showTrail` (default true, so a page rendered alone keeps its `Breadcrumb`); the
-shell passes `false` so there is one trail, not two. The claim-package button
-sits on the client's review row, beside the stepper.
-
-**The client page is a review flow, not a tab row.** `ClientHeader` is a back
-link, the client as the page's one `h1`, a `MetaLine` of values the page already
-holds (client, tax year, method, run, rule pack), and a `Stepper` of router links
-across the client's views: Position, Eligibility, Trend, At risk, What-if,
-Evidence (`lib/clientFlow.js`). `current` is derived from the ROUTE; the stepper
-never gates content; a step with nothing to show is disabled WITH its reason on
-screen; **a step with no view behind it (Discovery) is omitted, not stubbed.**
-The sections are named regions, not tabpanels, because nothing is a tab.
-
-**The book is a dashboard of cards.** The book itself is one full-width `Card`
-whose tabs are "All clients" then one per priority band that has anyone in it;
-every tab carries its count from the UNFILTERED rows and writes the same `band:`
-term the column header writes. The footprint map and a `KpiRow` of band counts
-sit beneath in a two-column grid. Tiles show client counts only: money is summed
-by the warehouse, never re-summed in the browser.
-
-**`/` opens on a hero and four task cards, then the book.** The hero greets by
-first name when somebody is signed in (`lib/identity.js`, from `/api/me`) and
-says "Welcome back" otherwise. "Start here" is a persisted preference
-(`lib/startHere.js`): open the first time, collapsible after, and the collapsed
-state is what the visible-row gate measures. The cards are shortcuts to places
-that exist — they compute nothing.
 
 **An entry earns its place by answering a question no other entry answers.**
 `NAV` is exported and pinned by `test_the_navigation_is_a_decided_set`, for the
@@ -682,7 +639,7 @@ costs a query rather than a replay. `ClientSituationAgent` narrates it.
   the exact instinct the band ranking corrects. An agent arguing against the
   screen it sits on is worse than no agent.
 - **A row-level ask carries its own scope.** `ask(prompt, scopeOverride)` →
-  `AskWorkspace` → `streamChat`, so asking about a row answers about THAT client
+  `ChatPanel` → `streamChat`, so asking about a row answers about THAT client
   without moving the user's selection.
 - **The chat reads Gold, not payroll.** `_request_scope` resolves `resolve_statute`
   (it never read the payroll `resolve_client_run` loaded), and
@@ -690,34 +647,6 @@ costs a query rather than a replay. `ClientSituationAgent` narrates it.
   `load_payroll_snapshot`, which reads a synthetic CSV and says so in its own
   citation — so the answer described 9,477 invented employees while the question
   was about a client with 10,236.
-
-### The Ask workspace is a conversation beside its evidence
-
-`src/components/ask/` replaced the slide-in chat drawer (`ChatPanel`, deleted).
-A modal workspace: at 1280px and wider the conversation sits left and the
-evidence right; narrower, they are tabs ("Conversation | Evidence (n)").
-Contract: [`docs/design/ASK-EVIDENCE-CONTRACT.md`](../docs/design/ASK-EVIDENCE-CONTRACT.md).
-
-- **There is ONE launcher.** The floating `#ask-launcher` and the row "Ask"
-  buttons open the same workspace; a page does not grow its own Ask button. A
-  page's prompt lives in App's `ASK` map, and portfolio scope is ignored for
-  the two sealed pages (`rules`, `evidence`).
-- **The workspace is always mounted and draws nothing when closed**, so a
-  conversation survives a close. Esc, the focus trap, the scroll lock and
-  returning focus to the launcher are `useModal`.
-- **Evidence is a typed stream event, validated, never repaired.** Every figure
-  is a STRING rendered verbatim (a number would be re-formatted, and a figure
-  re-formatted in the browser is a second derivation). A block that fails the
-  validator is dropped and COUNTED, never fixed up. `chatEventRouter` in
-  `api.js` ignores event types it does not know, so the backend can add one
-  without breaking an older client.
-- **An answer's deep links come from `lib/evidenceRoutes.js`'s `CATALOG`.** A
-  link to a page that does not exist is a 404 the user finds, so the catalog
-  is the only place a route is named.
-- **Fixtures are dev-only** (`?askFixture=1`, behind `import.meta.env.DEV` and a
-  dynamic import), so they cannot ship in a production bundle.
-- **The error copy follows the EmptyState wording** — "The assistant is
-  unavailable…" with a retry, never "request failed".
 
 ### The router picks tools; it never produces a figure
 
@@ -1188,108 +1117,42 @@ for a client whose Gold holds only TY2023. 964 rows had accumulated. Stub
 - **`src/components/` are views and reusable components**, one `.test.jsx` each.
 - **`src/api.js` is the only network layer.** Components never call `fetch`.
   A new endpoint gets a wrapper and an `api.test.js` case.
-- **1440×900 is the acceptance target.** Desktop only; mobile is out of scope
-  (owner decision, UI-01: the frame that shows the full width is the one the
-  design is judged in). Nothing is measured below 1280px.
-- **Two jobs, two treatments, never swapped.** (Re-expressed in the UI-01
-  revamp; the principle is unchanged, only the hues moved.)
-  - **Selection** — the active nav entry, active tab, selected row, focus ring,
-    open menu item, current step — is the brand blue: `--select`,
-    `--select-strong`, `--select-bg`, `--select-line`, `--focus-ring`.
-  - **Readings** — a figure, a status, a statutory verdict — are navy figures
-    (`--reading*`, `--text-primary`) plus the `--state-*` pills and tints. A
-    verdict is **never** the selection blue.
+- **1024×768 is the acceptance target.** Desktop only; mobile is out of scope.
+- **Blue reads, purple selects.** The two accents do different jobs and must
+  not be swapped.
+  - `--accent` / `--accent-strong` / `--accent-bg` — blue. Anything that
+    encodes a *reading*: a figure, a status, a statutory verdict.
+  - `--accent-2` / `--accent-2-strong` / `--accent-2-bg` — purple, aliasing
+    `--exp-violet` / `--exp-purple`. Chrome *selection* only: the active nav
+    entry, active tab, selected row, focus ring, open menu item.
 
-  Purple and violet are an optional overlay accent now
-  (`--overlay-accent*`), not a requirement; the classic theme still maps
-  selection to purple. The distinction is what stops a selected tab being
-  mistaken for a verdict, and `check_brand.py` enforces it: no selection colour
-  may equal a state colour. `--accent*`, `--accent-2*` and `--exp-*` are
-  **deprecated aliases** that still resolve; `src/lib/tokens.test.js` is a
-  ratchet that fails if their use grows. Read the role, not the alias.
-- **Tokens are layers: primitive → role → component** (`src/styles/tokens/`).
-  A component reads a semantic role, never a primitive such as `--brand-500`;
-  a theme assigns roles from primitives. `html[data-theme="modern"|"classic"]`
-  selects the theme (`VITE_THEME`, default modern; `classic` is the previous
-  look, kept so the revamp can be rolled back by configuration). A customer
-  re-skins by overriding roles in `src/styles/overlay.css`, never by editing a
-  component. [docs/design/DESIGN-SYSTEM.md](../docs/design/DESIGN-SYSTEM.md).
+  Never reach past these to `--exp-purple` / `--exp-violet` directly. The
+  distinction is what stops a selected tab being mistaken for a verdict, and
+  the brand guide is explicit that purple and magenta "should be used
+  generously" — so purple is not decoration to be avoided, it is the
+  selection language.
 - **A reading is named for what it means, not what it looks like.** State
   tokens are `--state-base-year`, `--state-above-min`, `--state-below-min`,
   `--state-partial`, `--state-neutral`, each with `-ink` and `-line`. A name
   that describes the hue invites reuse where it means nothing.
 
-  `--state-base-year` (sky blue in the modern theme) and `--state-below-min`
-  (red) mean different things — "we hold no prior year to measure against"
-  versus "they did not grow enough". They must never converge, and base year
-  must never be the selection blue (`check_brand.py` measures both).
-- **State tokens alias, they do not restate.** `--state-below-min:
-  var(--status-bad-bg)`, not a fresh literal (`tokens.test.js` fails on a
-  literal in `state.css`). A literal is how a tint silently drifts during a
+  `--state-base-year` (blue) and `--state-below-min` (orange) mean different
+  things — "we hold no prior year to measure against" versus "they did not
+  grow enough". They must never converge.
+- **State tokens alias, they do not restate.** `--state-below-min: var(--bad-bg)`,
+  not a fresh literal. A literal is how a tint silently drifts during a
   migration.
-- **The typeface is a theme token, `--font-sans`, self-hosted, woff2 only.**
-  Poppins in the modern theme, Roboto in the classic one and in a customer
-  overlay that points it back. `src/styles/fonts.css` declares the faces
-  (`main.jsx` imports it); do NOT import an `@fontsource/*/*.css` file, which
-  declares a woff beside every woff2 and ships both (`fonts.test.js` fails on
-  it). Each family has a metric-matched fallback face (`Poppins Fallback`,
-  `Roboto Fallback`: size-adjust and the three overrides), so the swap moves
-  the layout ~0.001, and `vite.config.js` preloads the two faces the first
-  paint uses. The data register uses
-  `--font-data` (Roboto): Poppins runs ~10% wider, which a 17-column grid
-  cannot afford. Never hotlink Google Fonts — a demo on a network that
-  cannot reach `fonts.gstatic.com` falls back silently. The map geometry is
-  vendored too (`public/us-states-10m.json`); `check_brand.py` fails on ANY
-  request to another origin.
-- **The accessibility, state and performance gates are part of "done".**
-  `check_a11y.py` (axe-core 4.11.0, pinned) allows zero serious or critical
-  violations on every routed page, the styleguide and the open Ask workspace,
-  in both themes; classic `color-contrast` is reported only (the legacy palette
-  is kept for rollback, D9).
-  `check_states.py` makes the app fail on purpose — loading, empty, error,
-  no-client, sealed-run down, assistant down, wrong year — and fails on an
-  uncaught error, the error boundary's fallback, a blank page, a skeleton still
-  on screen after the answers arrive, or banned wording ("could not be read").
-  `check_perf.py` (needs `vite preview` on 4173) reports `dist/` sizes, which
-  font files a cold load requests, and gates font-swap CLS at 0.10. Keyboard
-  walk-throughs of the stepper, the sort header and the filter bar are unit
-  tests (`keyboard.test.jsx`).
-- **The deprecated-alias ratchet is at ZERO.** No component reads `--accent*`,
-  `--accent-2*` or `--exp-*`; they still resolve, so an overlay written against
-  them keeps working, but a new use fails the test. Read the role.
-- **Type is a scale of eight, named for the job, and a theme token.**
-  `--text-micro`, `--text-caption`, `--text-small`, `--text-body`,
-  `--text-strong`, `--text-subhead`, `--text-title`, `--text-display`
-  (modern 12/12/13/14/15/16/24/32, classic 9/10/11/12/13/14/18/22).
-  **A raw `px` in a `font-size` is a bug, and a half-pixel size is always a
-  bug.** There were 23 sizes across 321 uses, 105 of them at
-  9.5/10.5/11.5/12.5px — nobody designs a half-pixel step, that is one person
-  nudging one screen until it looked right. A token named for its size invites
-  the next 12.5px, which is why none of them are. Line height is a token too
-  (`--leading-base|heading|dense`).
-- **Density has two registers.** *Chrome and composition* (header, hero, cards,
-  tiles, tabs, pills, stepper, workspace) use the comfortable scale; **data
-  grids stay dense**: `--text-data` (12px), `--row-height-data` (28px) and
-  `--cell-pad-data` (8px), which no theme changes. A table cell, header,
-  figure or verbatim engine output reads `--text-data`, and inside a `table`
-  or `.trend-block` the modern theme collapses the chrome steps onto it. The
-  visible-row gate at 1440×900 must not regress.
-- **Chrome is calm; the audit is a checklist.** The reference look is light
-  surfaces, hairline borders, one page gutter (`--space-13`) and one rhythm
-  between blocks (`--space-10`). Before a page ships, check it at 1440×900
-  against this list: (1) an icon sits BESIDE its label — never above it (the
-  Tailwind preflight makes every `<svg>` a block, which is why
-  `svg.lucide` and `:where(button, a, summary):has(> svg)` are inline in
-  `index.css`); (2) a chip, pill or button label never wraps (`nowrap`);
-  (3) no coloured stripe unless it is a verdict (`.prog-verdict`, or a
-  `VerdictCard`, whose border carries the reading);
-  (4) titles are sentence case at 600 weight, not 800-weight uppercase;
-  (5) a page's one primary action shares a row with its tabs or title (the
-  claim button is on the client's stepper row), not a row of its own; (6) text blocks
-  stop at ~80ch. The modern page skin is `src/styles/chrome-modern.css`, scoped
-  to `html[data-theme="modern"]` so classic is untouched; the shell (top bar,
-  navigation, drill trail) is `src/components/shell/shell.css`, theme-neutral
-  and held to the token gate.
+- **Roboto, self-hosted.** The brand's specified web font, via `@fontsource`
+  imports in `main.jsx`. Never hotlink Google Fonts — a demo on a network that
+  cannot reach `fonts.gstatic.com` falls back silently.
+- **Type is a scale of eight, named for the job.** `--text-micro`,
+  `--text-caption`, `--text-small`, `--text-body`, `--text-strong`,
+  `--text-subhead`, `--text-title`, `--text-display`. **A raw `px` in a
+  `font-size` is a bug, and a half-pixel size is always a bug.** There were 23
+  sizes across 321 uses, 105 of them at 9.5/10.5/11.5/12.5px — nobody designs a
+  half-pixel step, that is one person nudging one screen until it looked right.
+  A token named for its size invites the next 12.5px, which is why none of them
+  are.
 - **A half-pixel size is a density problem wearing a font-size.** Fix it with
   `line-height` or `letter-spacing`, which is what it was actually asking for.
   `.tcc-cell-btn` is the worked example: it bought its 28px row with 10px type
@@ -1298,21 +1161,19 @@ for a client whose Gold holds only TY2023. 964 rows had accumulated. Stub
   figures, verbatim engine output. Chrome (eyebrows, chip captions, pills,
   superscripts) may go smaller; data may not, and anything below the floor
   needs a stated reason in a comment. IBM Carbon puts data-table row text at
-  **14px**; we sit at 12 because the trend grid is 17 columns in one
+  **14px**; we sit at 12 because the trend grid is 17 columns in a 1024px
   viewport. Nothing ever CHOSE 9px — 9px is what was left when nobody owned
   the scale. Check it with `frontend/tools/check_type_floor.py`, which reads
   COMPUTED sizes off the rendered page; a selector audit over-reports, because
   `.th-sort sup` is a superscript, not a table header.
-- **Padding, margin and gap use `--space-1..16`; a raw `px` in one is a bug.**
-  Two-pixel steps to 16, then 20 and 24 (the dense scale, `--space-1..10`), and
-  28/32/40/48/56/64 for chrome (`--space-11..16`). The previous five-step scale
-  was used ELEVEN times against 381 raw declarations because the values people
-  needed — 2, 4, 8, 12, 14 — were not on it: a scale nobody can hit is a scale
-  nobody uses. Odd values round DOWN, because rounding up costs rows.
-- **Radius is `--radius-sm|--radius|--radius-lg|--radius-xl|--radius-pill`**
-  (modern 8/12/16/20/pill, classic 3/5/8/12). 17 distinct radii were being
-  written by hand; 4px beside 5px beside 6px is drift, not a decision. `50%`
-  stays raw — a circle is a shape, not a step.
+- **Padding, margin and gap use `--space-1..10`; a raw `px` in one is a bug.**
+  Two-pixel steps to 16, then 20 and 24. The previous five-step scale was used
+  ELEVEN times against 381 raw declarations because the values people needed —
+  2, 4, 8, 12, 14 — were not on it: a scale nobody can hit is a scale nobody
+  uses. Odd values round DOWN, because rounding up costs rows.
+- **Radius is `--radius-sm|--radius|--radius-lg|--radius-xl|--radius-pill`.**
+  17 distinct radii were being written by hand; 4px beside 5px beside 6px is
+  drift, not a decision. `50%` stays raw — a circle is a shape, not a step.
 - **No `style={{ }}`.** It steps around every token above, which makes the
   whole system a suggestion. Use a class; `.u-mt-*` / `.u-mb-*` / `.u-ml-*` are
   the sanctioned spacing utilities and are token-valued so a component cannot
@@ -1320,47 +1181,24 @@ for a client whose Gold holds only TY2023. 964 rows had accumulated. Stub
   COMPUTED per render (the tour progress bar), and `react-simple-maps`, whose
   `style` is a library **prop** taking default/hover/pressed objects that no
   class can express. Its fills are read from `--map-*` so the legend and the
-  map cannot disagree; no literal colour appears in chart or map code.
-  `frontend/tools/check_tokens.py` fails on a literal colour or raw-`px`
-  spacing in `src/components/ui/*.css` and on any other inline style.
-- **Compose the shared components; do not hand-roll their job.** The set is
-  `src/components/ui/` (`Button`, `Card`, `Pill`, `CountBadge`, `Tabs`,
-  `KpiTile`/`KpiRow`, `Callout`, `Stepper`, `TaskCard`, `HeroBand`,
-  `MetaLine`, `SectionHeading`, `FloatingAction`, `EmptyState`, `Skeleton`,
-  `VerdictCard`),
-  and there is ONE of each: `PageHeader` owns eyebrow/title/sub/meta/actions
-  (and the back link and `compact` row the client review uses),
-  `KpiTile` + `KpiRow` the figure strip (they replaced `StatCard`/`StatRow` and
-  three hand-rolled `kpi-card` markups), `Tabs` every tab (`MethodTabs`,
-  `GridTabs` and `SectionTabs` are wrappers), `Breadcrumb` the trail,
-  `InsightBar` the page-opening caption, notes and Copilot summary,
-  `ColumnFilter` + `FilterBar` the per-column narrowing, `TrailSteps` the
-  calculation trail. The legacy `.pill-*`
-  classes still exist and migrate to `Pill` with the page work. A second
+  map cannot disagree.
+- **Compose the shared components; do not hand-roll their job.** `PageHeader`
+  owns eyebrow/title/sub/actions, `StatCard` + `StatRow` the figure strip,
+  `Breadcrumb` the trail, `MethodTabs` the Min-Max/Pay Period choice,
+  `GridTabs` two peer grids over one scope, `InsightBar` the page-opening
+  caption, notes and Copilot summary, `ColumnFilter` + `FilterBar` the per-column narrowing. A second
   `PageHeader` once lived in `ReferenceViews.jsx` with a different prop name and
   different classes, and eight call sites used it — two header treatments kept
   in step by hand. If a shared component genuinely cannot express what a view
   needs, say so and leave the duplicate: an abstraction bent to fit is worse
   than an honest one.
-- **A verdict is a `VerdictCard`, and it never invents its derivation.** Where
-  the product states a verdict per programme, year or finding, the card's border
-  carries the reading from `--state-*`, a pill row repeats it in words and a
-  glyph, and an inset `Callout` holds the derivation sentence the page already
-  has; with none, the callout is omitted. A verdict is never the selection blue
-  (`check_brand.py` asserts it over the rendered book). A finding that needs a
-  decision is amber, not red: nothing has failed.
-- **An empty, loading or error state says what is missing and what to do.**
-  `Skeleton` for a read in flight, `EmptyState` (an `h3` title, then the action)
-  for an absence or a failure; an error says nothing was changed. "Not
-  calculated" is a statement and never a zero.
 - **Two peer grids over one scope are TABS, and the tab carries its count.**
-  `GridTabs` and `MethodTabs` are both `ui/Tabs` on purpose — a third tab style
-  makes "which of these is a tab" something a reader works out. Both take the
-  selection colour; they differ in the question: MethodTabs picks a statutory
-  *reading* and this picks which *population* is on screen. "Who to call" does
-  not tell you whether to click; "Who to call (4)" does. **Which tab opens
-  first is a decision that gets stated**: the complete population opens, never
-  a ranked subset of it.
+  `GridTabs` reuses the `MethodTabs` shape on purpose — a third tab style makes
+  "which of these is a tab" something a reader works out — but takes the purple
+  accent, because MethodTabs picks a statutory *reading* and this picks which
+  *population* is on screen. "Who to call" does not tell you whether to click;
+  "Who to call (4)" does. **Which tab opens first is a decision that gets
+  stated**: the complete population opens, never a ranked subset of it.
 - **If a sentence names a fact, the page must be able to show it.** The
   portfolio answer band names the client closest to qualifying and the evidence
   is in the other tab, so the name switches tab and lands on the row
@@ -1415,7 +1253,7 @@ for a client whose Gold holds only TY2023. 964 rows had accumulated. Stub
   everybody, and a constant column costs the same width as one that says
   something, which is the rule the client grid already applies to tier.
 - **Rows are 28px and the fold is measured, never eyeballed.**
-  `python frontend/tools/measure_ui.py` at 1440×900 reports visible rows and
+  `python frontend/tools/measure_ui.py` at 1024×768 reports visible rows and
   the first-row y per page. A layout change reports both before and after; the
   gate is that visible rows do not regress. `frontend/tools/design_metrics.py`
   counts the scale violations, and `check_brand.py` reads the computed font and
