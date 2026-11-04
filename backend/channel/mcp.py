@@ -28,6 +28,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from application.capabilities import catalog
+from application.capabilities.catalog import PREVIEW_SENTENCE  # noqa: F401 - the facade's callers read the sentence from here; the catalog owns it
 from channel.auth import AuthFailure, CallerAuthenticator
 from channel.people import CallerPeople
 from channel.pipeline import ToolCall, ToolPipeline
@@ -38,10 +39,6 @@ PROTOCOL_VERSIONS = ("2025-11-25", "2025-06-18", "2025-03-26")
 SESSION_HEADER = "mcp-session-id"
 SESSION_TTL_SECONDS = 8 * 3600
 MAX_SESSIONS = 5000
-PREVIEW_SENTENCE = (
-    "Returns a preview — nothing is changed until the matching commit tool is called with the "
-    "returned token after the user confirms."
-)
 _PARSE_ERROR, _INVALID_REQUEST, _METHOD_NOT_FOUND, _INVALID_PARAMS = -32700, -32600, -32601, -32602
 
 
@@ -74,19 +71,10 @@ def _parse(raw: bytes) -> dict[str, Any] | McpReply:
 
 
 def describe(spec: catalog.CapabilitySpec) -> dict[str, Any]:
-    """One tool as `tools/list` shows it: schema, honest description, behaviour hints."""
-    read, commit = spec.kind == catalog.READ, spec.kind == catalog.WRITE_COMMIT
-    description = spec.description
-    if spec.kind == catalog.WRITE_PREPARE:
-        description = f"{spec.description} {PREVIEW_SENTENCE}"
-    elif commit:
-        description = f"{spec.description} Call only after the user has confirmed the preview from the matching prepare tool."
+    """One tool as `tools/list` shows it: schema, honest description, behaviour hints, all from the catalog."""
     return {
-        "name": spec.name, "title": spec.name.replace("_", " ").capitalize(), "description": description,
-        "inputSchema": spec.schema,
-        "annotations": {
-            "readOnlyHint": read, "destructiveHint": commit, "idempotentHint": read, "openWorldHint": False,
-        },
+        "name": spec.name, "title": spec.name.replace("_", " ").capitalize(), "description": catalog.channel_description(spec),
+        "inputSchema": spec.schema, "annotations": catalog.behaviour_hints(spec),
     }
 
 

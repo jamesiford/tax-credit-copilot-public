@@ -15,10 +15,11 @@ APP = Path(__file__).resolve().parents[3] / "channel_orchestrator" / "app"
 SOURCES = sorted(p for p in APP.rglob("*.py") if "vendor" not in p.parts)
 STDLIB = __import__("sys").stdlib_module_names
 
-#: Third-party packages the orchestrator may import, and the one module allowed each.
+#: Third-party packages the orchestrator may import, and the modules allowed each. The agent framework is the
+#: MAF layer's alone: the `maf_*` modules (the agent, the generated tools, the middleware).
 THIRD_PARTY = {
-    "httpx": None, "jsonschema": None, "agent_framework": {"maf_agent.py"}, "azure": {"gateway_client.py", "main.py", "modelprobe.py"},
-    "opentelemetry": {"telemetry.py"},
+    "httpx": None, "jsonschema": None, "agent_framework": {p.name for p in SOURCES if p.name.startswith("maf_")},
+    "azure": {"gateway_client.py", "main.py", "modelprobe.py"}, "opentelemetry": {"telemetry.py"},
 }
 #: The repo layers it may import (all vendored, all standard-library-only or model-access adapters).
 LOCAL_OK = ("app", "application", "domain", "infrastructure.ai")
@@ -63,7 +64,7 @@ def test_only_main_imports_the_hosting_package():
 
 def test_only_the_maf_layer_imports_the_agent_framework():
     users = [p.name for p in SOURCES if any(m.split(".")[0] == "agent_framework" for m in imports(p))]
-    assert users == ["maf_agent.py"]
+    assert "maf_agent.py" in users and all(name.startswith("maf_") for name in users), users
 
 
 def test_the_commit_path_is_one_module_called_from_one_place():

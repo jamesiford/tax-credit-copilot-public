@@ -25,8 +25,9 @@ from agent_framework import (
     FunctionTool, Message,
 )
 
+from app.core.maf_catalog_tools import catalog_tools
 from app.core.models import ModelChain, ModelTurn
-from app.core.tools import ToolRunner, model_tools, offered_schema
+from app.core.tools import ToolRunner
 from domain.ai import ChatMessage, ToolCall, ToolSpec
 
 log = logging.getLogger("tcc.orchestrator.maf")
@@ -113,15 +114,11 @@ class ComposeMiddleware(AgentMiddleware):
 
 
 def function_tools(runner: ToolRunner) -> list[FunctionTool]:
-    """One MAF tool per tool a model may name. A commit is not among them."""
-    def make(name: str) -> FunctionTool:
-        async def call(**proposed: Any) -> str:
-            return json.dumps(await runner.run(name, proposed), default=str)
+    """The catalog's tools for a model, each routed through this turn's runner (which holds the turn's rules)."""
+    async def through_the_runner(_ctx: Any, spec: Any, args: dict[str, Any]) -> str:
+        return json.dumps(await runner.run(spec.name, args), default=str)
 
-        spec = model_tools()[name]
-        return FunctionTool(name=name, description=spec.description, func=call, input_model=offered_schema(spec))
-
-    return [make(name) for name in sorted(model_tools())]
+    return catalog_tools(through_the_runner)
 
 
 def build_agent(chain: ModelChain, runner: ToolRunner, trace: ModelTrace, instructions: str, compose: Callable[[str], str]) -> Agent:
