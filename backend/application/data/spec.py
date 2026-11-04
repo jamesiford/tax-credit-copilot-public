@@ -175,8 +175,14 @@ def _years(value: Any) -> tuple[int, ...]:
         if not 0 <= hi - lo < MAX_YEARS:
             raise MalformedSpec(f"a tax-year range must span 1 to {MAX_YEARS} years", field="tax_years")
         return tuple(range(lo, hi + 1))
+    return _year_list(value)
+
+
+def _year_list(value: Any) -> tuple[int, ...]:
     if not isinstance(value, list) or not all(_is_int(y) for y in value):
         raise MalformedSpec("tax_years must be a list of integers or a from/to range", field="tax_years")
+    if len(value) > MAX_YEARS:
+        raise MalformedSpec(f"at most {MAX_YEARS} tax years", field="tax_years")
     return tuple(value)
 
 

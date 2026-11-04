@@ -23,6 +23,8 @@ from application.data.validate_columns import (
 from application.data.validate_filters import plan_filters
 
 MIN_YEAR, MAX_YEAR = 2000, 2100
+#: The widest key a driver binds as an integer parameter (BIGINT); a larger one is an error at the driver, not a client.
+MAX_CLIENT_ID = 2**63 - 1
 
 
 def validate(spec: QuerySpec, model: SemanticModel, *, known_years: Collection[int] | None = None) -> Plan:
@@ -57,7 +59,7 @@ def validate(spec: QuerySpec, model: SemanticModel, *, known_years: Collection[i
 def _client(spec: QuerySpec) -> int:
     if spec.client_id is None:
         raise MissingClient("every query is scoped to one client: give client_id", field="client_id")
-    if isinstance(spec.client_id, bool) or not isinstance(spec.client_id, int) or spec.client_id <= 0:
+    if isinstance(spec.client_id, bool) or not isinstance(spec.client_id, int) or not 0 < spec.client_id <= MAX_CLIENT_ID:
         raise MalformedSpec("client_id must be a positive integer", field="client_id")
     return spec.client_id
 

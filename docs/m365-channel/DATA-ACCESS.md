@@ -26,10 +26,17 @@ model (or a person)        API process                                          
   `group_by`, `order_by`, `limit`, `method`. There is **no field SQL could go in**. `validate()` rejects an unknown
   or blocked column, an operator or aggregation the column does not allow, a group-by of a measure, an `order_by`
   outside the selection, a limit over 500, a missing client, a year the client does not hold, a wrongly typed value,
-  too many filters or measures, and any SQL-looking text in a value. Each refusal is a typed code
-  (`blocked_column`, `limit_too_high`, `sql_like_value`, …) the agent can say in words.
+  too many filters or measures, a list of more than 12 tax years, a client id outside a positive integer, and a value
+  that reads as a statement (`;`, `--`, `/*`, a leading `select ...`, `xp_`, `@@`) or carries control characters.
+  **Quotes are not screened:** a value is a bound parameter, so an apostrophe (O'Brien, Bakers' Group) is an ordinary
+  name and cannot change the statement; `tests/test_data_query_abuse.py` proves it stays out of the SQL text. Each
+  refusal is a typed code (`blocked_column`, `limit_too_high`, `sql_like_value`, …) the agent can say in words.
 - **SQL building**: `build_sql` interpolates only whitelisted physical identifiers from the model. **Every value is a
-  bound parameter.** The client scope is the first predicate, through the tenant helper (`tenant_sql.py`), so the
+  bound parameter.** The one SQL text the model carries is a derived column's expression (`pay_year`, `pay_month`);
+  it must stay inside a closed grammar (`expression_grammar.py`: declared columns, `YEAR`, `MONTH`, `COALESCE`,
+  `CAST ... AS INTEGER`, `strftime` with two formats, short integers, `+`, `*`) or the model cannot be built.
+  Identifier and alias patterns end in `\Z`, not `$`, which would admit a trailing newline. The client scope is the
+  first predicate, through the tenant helper (`tenant_sql.py`), so the
   architecture rules that govern every Warehouse adapter govern this one. T-SQL for the Warehouse and the lakehouse
   endpoint, SQLite for offline tests and local runs.
 - **Execution**: a port (`DataQueryExecutor`) with three adapters. The Warehouse adapter and the lakehouse adapter
@@ -152,7 +159,9 @@ on both lists.
    identify a person is `blocked`. Anything that is one person's pay or hours is `employee_level`. Money and hours
    carry a `unit`; every queryable column needs a description (tests enforce both).
 3. State how live rows are identified (`live_run` or `is_current`) for a Gold dataset, and its method column if it
-   holds both statutory readings.
+   holds both statutory readings. A derived column's expression is written for both dialects, names what it
+   `depends_on`, and stays inside the grammar in `expression_grammar.py` (the model refuses to build otherwise;
+   widening the grammar is a change to that file and `test_data_query_abuse.py`).
 4. Regenerate the page: `python scripts/generate-semantic-model-doc.py` (a test fails if the committed
    [SEMANTIC-MODEL](../data/SEMANTIC-MODEL.md) and the model disagree).
 5. **A new lakehouse dataset needs a grant**: `scripts/grant-warehouse-sql.py --profile lakehouse` reads its table

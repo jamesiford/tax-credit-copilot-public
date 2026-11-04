@@ -25,7 +25,7 @@ from application.data.semantic_model import Dataset, SemanticModel, Sensitivity,
 
 DATA_TOOLS = frozenset({"data_query", "data_distinct_values"})
 REDACTED = "<redacted>"
-_NAME = re.compile(r"^[A-Za-z_][A-Za-z0-9_.*]{0,63}$")
+_NAME = re.compile(r"^[A-Za-z_][A-Za-z0-9_.*]{0,63}\Z")  # \Z: `$` admits a trailing newline into an audit line
 _SHOWN = 40
 _LISTED = 5
 

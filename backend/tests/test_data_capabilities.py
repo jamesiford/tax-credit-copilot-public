@@ -160,8 +160,8 @@ def test_a_refusal_names_the_field_and_never_echoes_the_value(data_service):
 
 def test_a_hostile_filter_value_is_refused_by_name_and_never_reaches_a_statement(data_service):
     error = refused(dataset="unit_month_summary", client_id=CLIENT, select=["worksite_id"],
-                    filters=[{"column": "worksite_id", "op": "eq", "value": "x' OR '1'='1"}])
-    assert error.code == "sql_like_value" and error.status == 422 and "OR" not in str(error)
+                    filters=[{"column": "worksite_id", "op": "eq", "value": "x'; DROP TABLE t; --"}])
+    assert error.code == "sql_like_value" and error.status == 422 and "DROP" not in str(error)
 
 
 def test_the_budget_is_a_429_with_the_wait(data_service):

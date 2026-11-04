@@ -27,7 +27,9 @@ import re
 from dataclasses import dataclass
 from enum import Enum
 
-IDENTIFIER = re.compile(r"^[A-Za-z_][A-Za-z0-9_]{0,63}$")
+from application.data.expression_grammar import check_expression
+
+IDENTIFIER = re.compile(r"^[A-Za-z_][A-Za-z0-9_]{0,63}\Z")  # \Z, not $: `$` also matches before a trailing newline
 
 
 class Source(str, Enum):
@@ -136,6 +138,8 @@ class Column:
             raise ValueError(f"{self.logical}: a blocked column takes no aggregation or operator")
         if self.expression is not None and not self.depends_on:
             raise ValueError(f"{self.logical}: a derived column must name what it depends on")
+        if self.expression is not None:
+            check_expression(self.logical, self.expression, self.depends_on)
 
     @property
     def queryable(self) -> bool:
