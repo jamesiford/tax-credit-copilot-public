@@ -9,7 +9,7 @@ check_all 21 of 22 (the all-tree gitleaks row); hosted agent version 20 is the r
 
 | WP | Title | Status | Branch | Merge SHA | Evidence |
 | --- | --- | --- | --- | --- | --- |
-| RM-01 | Small-group suppression | todo | | | |
+| RM-01 | Small-group suppression | done | wp/RM-01-small-group-suppression | f5c7ac5 | backend 4998 passed / 136 skipped / 1 xfailed (+39 new: 35 in `test_data_small_groups.py`, 4 architecture); whitelabel 0 enforced; audit-export 0; links 0 broken; gitleaks (167+ commits) none; vendored copy matches; code-standards ratchet green, no baseline change; D-119 |
 | RM-02 | Cowork fails closed | todo | | | |
 | RM-03 | Auth default and audit alerts | todo | | | |
 | RM-04 | Abuse/fuzz tests | todo | | | |
