@@ -526,7 +526,7 @@ Two DDL files are generated from one source, so they cannot drift:
 
 ```
 docs/data/schema/tcc-schema.fabric.sql       source of truth
-docs/data/schema/generate_variants.py         the transform
+scripts/generate-schema-variants.py          the transform
 docs/data/schema/tcc-schema.sqlserver.sql    generated — do not hand-edit
 ```
 

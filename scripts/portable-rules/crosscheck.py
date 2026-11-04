@@ -7,7 +7,7 @@ this is the evidence, and it is the thing to re-run whenever either side moves.
 Uses the public pay-period fixture in the repo, not the private reference
 dataset, so it runs on any clone. The rules exercised are identical either way.
 
-    cd backend && ../.venv/Scripts/python.exe ../docs/data/portable-rules/crosscheck.py
+    cd backend && ../.venv/Scripts/python.exe ../scripts/portable-rules/crosscheck.py
 """
 from __future__ import annotations
 
@@ -21,11 +21,11 @@ from pathlib import Path
 
 _HERE = Path(__file__).resolve().parent
 
-# Locate the repo's backend. Works both in place (docs/data/portable-rules) and
+# Locate the repo's backend. Works both in place (scripts/portable-rules) and
 # from an extracted zip, provided the repo is somewhere findable.
 def _find_backend() -> Path | None:
     candidates = [
-        _HERE.parents[2] / "backend",                       # in the repo
+        _HERE.parents[1] / "backend",                       # in the repo
         Path(r"C:\Projects\GitHub\tax-credit-copilot\backend"),
     ]
     env = os.getenv("TCC_BACKEND")

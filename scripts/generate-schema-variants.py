@@ -1,7 +1,8 @@
 """Generate the SQL Server variant of the Tax Credit Copilot schema from the Fabric one.
 
-    python docs/data/schema/generate_variants.py
+    python scripts/generate-schema-variants.py
 
+Reads and writes the files under `docs/data/schema/`.
 `tcc-schema.fabric.sql` is the source of truth. It is written to the Fabric
 Warehouse T-SQL subset, which is what makes both targets reachable from one
 file: Fabric's subset is valid SQL Server, so the translation only ever ADDS.
@@ -28,14 +29,14 @@ import re
 import sys
 from pathlib import Path
 
-HERE = Path(__file__).parent
-SOURCE = HERE / "tcc-schema.fabric.sql"
-TARGET = HERE / "tcc-schema.sqlserver.sql"
+SCHEMA_DIR = Path(__file__).resolve().parents[1] / "docs" / "data" / "schema"
+SOURCE = SCHEMA_DIR / "tcc-schema.fabric.sql"
+TARGET = SCHEMA_DIR / "tcc-schema.sqlserver.sql"
 
 BANNER = """/* ============================================================================
    GENERATED FILE — DO NOT EDIT
 
-   Produced from tcc-schema.fabric.sql by generate_variants.py.
+   Produced from tcc-schema.fabric.sql by scripts/generate-schema-variants.py.
    Hand-edits are lost on the next run and silently desynchronise the two
    platforms. Change the Fabric file and regenerate.
 
