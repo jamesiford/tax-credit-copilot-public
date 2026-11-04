@@ -28,16 +28,16 @@ Live redeploy (Stage 3) must: set `TCC_CHANNEL_RESOLVE_DISPLAY_NAMES=true` and p
 `python scripts/vendor-orchestrator.py` before the orchestrator `azd deploy`.
 ## Stage 2 — CH-16 governed Fabric data access: todo
 ## Stage 3 — CH-17 live redeploy and verification: todo
-## Stage 2 — CH-16 governed Fabric data access: in progress
+## Stage 2 — CH-16 governed Fabric data access: done (offline)
 
 | WP | Status | Merge SHA | Evidence |
 | --- | --- | --- | --- |
 | CH-16a semantic model | done | 9992238 | backend 3996 passed (with 16b) |
 | CH-16b spec, validation, SQL builders | done | 3149b1f | |
 | CH-16c executors, limits, provenance | done | 0a63846 | backend 4675 passed |
-| CH-16d capabilities, lanes | todo | | |
-| CH-16e planner, narrator, skills, goldens, equivalence | todo | | |
-| CH-16f docs, security, grants, Fabric-agent evaluation | todo | | |
+| CH-16d capabilities, lanes | done | efd3f70 | backend 4811 passed |
+| CH-16e planner, narrator, skills, goldens, equivalence | done | e85afd4 | backend 4918 passed; 29 goldens; 11 equivalence tests |
+| CH-16f docs, security, grants, Fabric-agent evaluation | done | ed2fbb6 | backend 4942 passed; terraform test 70 passed |
 
 ## Stage 4 — CH-18: runs in "keep main untouched" mode (owner change of plan, 3 Nov)
 
@@ -52,3 +52,5 @@ Status: todo
 ## Blockers
 
 None.
+
+Gate before Stage 3 (tip after CH-16f): backend 4942 passed / 136 skipped / 1 xfailed; frontend 929 passed, build ok; terraform fmt ok, test 70 passed. Operator's Global Administrator (PIM) is NOT active (roles: Agent ID Administrator/Developer, Global Reader, Agent Registry Administrator), so any step needing it is an admin action.
