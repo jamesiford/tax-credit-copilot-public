@@ -4,21 +4,53 @@ The Foundry hosted agent behind the Microsoft 365 channel: Teams and Copilot Cha
 figures out. Read [docs/m365-channel/ORCHESTRATOR.md](../docs/m365-channel/ORCHESTRATOR.md) first; this file
 is the working notes.
 
+## Folder map
+
 ```
-main.py              entry point at the zip root (python main.py)
-app/main.py          the Responses host: one handler (the only module that imports the hosting package)
-app/host.py          what the handler decides: identity, /whoami, hand-off to the turn pipeline
-app/wiring.py        settings in, a TurnPipeline out
-app/core/model_access.py  which model path serves a turn: the framework's client for a foundry-only AI_PROVIDER_CHAIN, ModelChain otherwise
-app/core/            framework-free logic: identity, state, tools (the turn), reader_arguments, planner, composer, writes, replies
-app/core/maf_*.py    the Microsoft Agent Framework layer, the only modules that import it: maf_agent (the Agent and its
-                     client), maf_catalog_tools (a FunctionTool per catalog capability), maf_tool_rules and
-                     maf_tool_call (the turn's tool rules as function middleware), maf_tool_run (one tool through them),
-                     maf_foundry_client (the framework's OpenAI client for a foundry-only chain) and maf_chat (the trace and loop limits both clients share)
-app/vendor/tcc_shared/ the platform's shared modules, copied verbatim (generated; gitignored)
-Dockerfile, azure.yaml, requirements.txt
+main.py                  zip-root entry point: imports app.main and calls main(). Nothing else (see "Two main.py files")
+azure.yaml               the agent's declarative definition for azd (entryPoint, protocols, env)
+Dockerfile               the container path (COPY main.py + app, CMD python main.py)
+requirements.txt         what the zip and the image install
+app/
+  main.py                the seam: the one Responses handler, and the only module that imports a hosting package
+  host.py                what that handler decides: identity, /whoami, /netcheck, /modelprobe, hand-off to the turn
+  wiring.py              composition: settings in, a TurnPipeline out
+  vendor/tcc_shared/     the platform's shared modules, copied verbatim by scripts/vendor-orchestrator.py (generated, gitignored)
+  core/                  everything else; framework-free unless the file is named maf_*
+    turn, planned, planner, degraded, compose, replies, prompts
+                         one turn end to end: attribute, decide, run, compose, audit; the words the orchestrator writes itself;
+                         the degraded (no-model) planners
+    tools, toolset, reader_arguments, writes, state, review_pack
+                         the turn's tool state, what a model may name, the reader's words settling client / year / method,
+                         the confirm-a-change words and the one commit call, per-conversation state, what asks for the review pack
+    identity, gateway_client, settings, audit, telemetry
+                         who is asking, the one outbound dependency (the channel gateway), configuration, the narration
+                         report, spans that carry no payroll
+    model_access, models, placeholders
+                         which model path serves a turn, the provider chain and egress rule, placeholders a model can copy
+    modelprobe, netcheck the two diagnostic endpoints
+    maf_*                the Microsoft Agent Framework layer, the only modules that import it:
+                         maf_agent (the Agent and its client), maf_catalog_tools (a FunctionTool per catalog capability),
+                         maf_tool_rules + maf_tool_call + maf_tool_run (the tool rules as function middleware),
+                         maf_foundry_client + maf_chat (the framework's Foundry client and what both clients share),
+                         maf_write_flow + maf_write_steps (the write path as a Workflow), maf_review_pack (the review pack
+                         as a Workflow), maf_knowledge (reference text as a context provider)
 ```
 
+Tests are in `backend/tests/channel_orchestrator/` (goldens in `golden/`); `test_orch_folder_map.py` fails if a module
+here is missing from the map above.
+
+## Two `main.py` files
+
+| File | Role |
+| --- | --- |
+| `main.py` (zip root) | Nine lines: `from app.main import main`. It exists because the source-code deployment runs `entryPoint: main.py` from the root of the uploaded zip (`azure.yaml`) and the container runs `CMD ["python", "main.py"]` with `COPY main.py ./` (Dockerfile). The two deployment paths therefore share one launcher. |
+| `app/main.py` | The hosting seam: builds the Responses host, registers exactly one handler and hands everything to `app.host` and `app.wiring`. The only module in the repository that may import a hosting package. |
+
+The root file stays. Removing it would mean changing `entryPoint` in `azure.yaml` and the Dockerfile together, and
+`test_orch_hosting_seam.py` pins the pair: the root file imports `app.main` and nothing else, and `app/main.py` is the one
+seam. The split is what lets the host be swapped (RM-12: the hosting package cannot serve `activity`, so it was not adopted)
+without touching the entry point Teams depends on.
 ## Build and test
 
 ```pwsh
