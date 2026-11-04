@@ -19,28 +19,48 @@ from collections.abc import Sequence
 from typing import Any
 
 from app.core.tools import ToolRun
-from application.capabilities.envelope import Block
+from application.capabilities import catalog
+from application.capabilities.envelope import AUDIENCE_USER, AUDIENCES, Block
 from application.composer import Composed, compose
 from application.numeric_guard import AllowedContext
 
 METHOD_LABEL = {"min_max": "Min-Max method", "pay_period": "Pay Period method"}
+LOOKUP_TOOLS = frozenset(spec.name for spec in catalog.CATALOG if catalog.LOOKUP in spec.tags)
 _YEAR_KEYS = ("tax_year", "year")
 
 
 def facts_of(runs: Sequence[ToolRun]) -> dict[str, Any]:
-    """Every run's facts under its own label, so the same tool under two methods never shares a path."""
+    """Every run's facts under its own label, so the same tool under two methods never shares a path.
+
+    These are the reader's: the composer checks the finished reply against them. A model is never
+    handed this; it gets `model_facts_of`.
+    """
     return {run.label: run.facts for run in runs}
 
 
+def model_facts_of(runs: Sequence[ToolRun]) -> dict[str, Any]:
+    """The same, as a model may see them: the person-only lane (employee-level rows) removed [ADR-009]."""
+    return {run.label: run.model_facts for run in runs}
+
+
 def blocks_of(runs: Sequence[ToolRun]) -> list[Block]:
-    """The platform's blocks in call order, each run led by its method when it has one."""
+    """The platform's blocks in call order, each run led by its method when it has one.
+
+    A `lookup` run (the catalog, a list of distinct values) is plumbing for the model's next call; its
+    blocks are left out of the reply when something else answered, and shown when it IS the answer.
+    """
+    answering = [run for run in runs if run.name not in LOOKUP_TOOLS] or list(runs)
     blocks: list[Block] = []
-    for run in runs:
+    for run in answering:
         method = run.args.get("method")
         if method in METHOD_LABEL:
             blocks.append(Block("heading", text=METHOD_LABEL[method]))
         for raw in run.envelope.get("blocks") or []:
-            blocks.append(Block(raw["kind"], raw.get("text", ""), tuple(tuple(row) for row in raw.get("rows") or ())))
+            audience = raw.get("audience", "both")
+            blocks.append(Block(
+                raw["kind"], raw.get("text", ""), tuple(tuple(row) for row in raw.get("rows") or ()),
+                audience if audience in AUDIENCES else AUDIENCE_USER,
+            ))
     return blocks
 
 

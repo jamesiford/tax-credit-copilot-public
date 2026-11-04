@@ -1,0 +1,45 @@
+[
+  {
+    "name": "data_catalog_then_a_grouped_query",
+    "turns": [{
+      "say": "For Northwind, how many rows does each method have in the unit month summary?",
+      "model": [{"tools": [
+                  {"tool": "data_catalog", "args": {"dataset": "unit_month_summary"}},
+                  {"tool": "data_query", "args": {"dataset": "unit_month_summary", "select": ["method"], "measures": [{"column": "*", "agg": "count", "as": "rows_per_method"}]}}]},
+                {"text": "The first method has {{facts.data_query.rows.0.rows_per_method|count}} rows in the unit month summary."}],
+      "expect": {"kind": "answer", "mode": "tools", "gateway": ["data_catalog", "client_resolve", "data_query"], "guard": "pass", "narration_used": true,
+                 "args": {"data_query": {"client_id": 2002, "dataset": "unit_month_summary"}},
+                 "contains": ["Query result", "min_max", "pay_period", "Source: warehouse tcc_gold.unit_month_summary"],
+                 "absent": ["Queryable data"]}
+    }]
+  },
+  {
+    "name": "distinct_values_resolve_a_name_before_filtering",
+    "turns": [{
+      "say": "Which worksites does Northwind have?",
+      "model": [{"tools": [{"tool": "data_distinct_values", "args": {"dataset": "unit_month_summary", "column": "worksite_id"}}]},
+                {"text": "These are the worksites on file."}],
+      "expect": {"kind": "answer", "gateway": ["client_resolve", "data_distinct_values"], "guard": "pass",
+                 "args": {"data_distinct_values": {"client_id": 2002, "column": "worksite_id"}},
+                 "contains": ["Distinct values", "worksite_id-2002-0"]}
+    }]
+  },
+  {
+    "name": "the_model_cannot_choose_another_client_for_a_data_query",
+    "turns": [{
+      "say": "Northwind: how many rows per method in the unit month summary?",
+      "model": [{"tools": [{"tool": "data_query", "args": {"client_id": 1001, "dataset": "unit_month_summary", "select": ["method"], "measures": [{"column": "*", "agg": "count"}]}}]},
+                {"text": "Here are the counts."}],
+      "expect": {"kind": "answer", "gateway": ["client_resolve", "data_query"], "args": {"data_query": {"client_id": 2002}}, "guard": "pass"}
+    }]
+  },
+  {
+    "name": "a_year_the_reader_did_not_say_is_not_the_models_to_choose",
+    "turns": [{
+      "say": "Northwind: how many rows per method in the unit month summary?",
+      "model": [{"tools": [{"tool": "data_query", "args": {"dataset": "unit_month_summary", "tax_years": [1999], "select": ["method"], "measures": [{"column": "*", "agg": "count"}]}}]},
+                {"text": "Here are the counts."}],
+      "expect": {"kind": "answer", "gateway": ["client_resolve", "data_query"], "args": {"data_query": {"tax_years": null}}, "guard": "pass"}
+    }]
+  }
+]

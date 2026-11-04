@@ -34,11 +34,10 @@ from app.core.identity import ActingIdentity
 from app.core.state import ConversationState, PendingWrite
 from app.core.telemetry import tool_span
 from app.core.toolset import (  # noqa: F401 - re-exported: the names the rest of the orchestrator imports from here
-    CLIENT_PLACEHOLDER, SCENARIO_NUMBERS, YEAR_KEYS, Clarification, Problem, ToolRun, first_schema_problem, model_tools,
-    numbers_in, offered_schema, years_in,
+    CLIENT_PLACEHOLDER, SCENARIO_NUMBERS, YEAR_KEYS, Clarification, Problem, ToolRun, first_schema_problem, model_answer,
+    model_tools, numbers_in, offered_schema, years_in,
 )
 from application.capabilities import catalog
-from app.core.placeholders import with_placeholders
 from application.composer import narrator_brief
 
 log = logging.getLogger("tcc.orchestrator.tools")
@@ -137,6 +136,19 @@ class ToolRunner:
             return False
         return True
 
+    def _tax_years(self, args: dict[str, Any]) -> None:
+        """A data tool's years are the reader's, like every other year: a year the model named that the
+        reader did not say (and the conversation is not on) is replaced by the years they did say, or
+        dropped, which means every year the data holds. A model cannot select a return by guessing."""
+        proposed, said = args.pop("tax_years", None), years_in(self.question)
+        allowed = {*said, *([self.state.tax_year] if self.state.tax_year else [])}
+        if isinstance(proposed, dict) and all(isinstance(proposed.get(k), int) and proposed[k] in allowed for k in ("from", "to")):
+            args["tax_years"] = proposed
+            return
+        kept = [y for y in proposed if isinstance(y, int) and y in allowed] if isinstance(proposed, list) else []
+        if kept or said:
+            args["tax_years"] = kept or said
+
     async def _arguments(self, spec: catalog.CapabilitySpec, proposed: dict[str, Any]) -> dict[str, Any] | None:
         args = {k: v for k, v in proposed.items() if v is not None}
         properties = spec.schema["properties"]
@@ -145,6 +157,8 @@ class ToolRunner:
             if client is None:
                 return None
             args[CLIENT_PLACEHOLDER] = client
+        if "tax_years" in properties:
+            self._tax_years(args)
         if not self._years(spec, args) or not self._scenario(spec, args):
             return None
         if "method" in properties:
@@ -210,8 +224,8 @@ class ToolRunner:
             self.state.tax_year = args["tax_year"]
         if spec.kind == catalog.WRITE_PREPARE:
             self._hold(run)
-        brief = narrator_brief(self.question, [spec.name], {run.label: run.facts}, notes=list(reply.body.get("warnings") or []))
-        return {"ok": True, "tool": spec.name, "fact_paths": with_placeholders(brief["fact_paths"]), "notes": brief["notes"]}
+        brief = narrator_brief(self.question, [spec.name], {run.label: run.model_facts}, notes=list(reply.body.get("warnings") or []))
+        return model_answer(spec, run, brief)
 
     def _hold(self, run: ToolRun) -> None:
         """Keep a prepared change for its owner's `confirm`. The token never leaves this object."""

@@ -31,7 +31,7 @@
     {
       "id": "tcc-channel",
       "displayName": "Tax Credit Copilot",
-      "description": "Reads and confirmed writes against the Tax Credit Copilot platform: book ranking, client situation, eligibility, trend, at-risk jobs, discovery, what-ifs, findings, claim lifecycle, engagement scope, claim packages, and a figure check for drafts.",
+      "description": "Reads and confirmed writes against the Tax Credit Copilot platform: book ranking, client situation, eligibility, trend, at-risk jobs, discovery, what-ifs, findings, claim lifecycle, engagement scope, claim packages, a figure check for drafts, and governed read-only questions about a client's payroll and calculation data (a catalog, a structured query and distinct values; no SQL).",
       "toolSource": {
         "remoteMcpServer": {
           "mcpServerUrl": "{{gateway_mcp_url}}",

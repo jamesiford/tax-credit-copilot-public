@@ -25,11 +25,13 @@ ALLOWED_APPLICATION = frozenset({
     "application.agent_audit",                 # the narrator-agent audit row (standard library + domain only)
     "application.capabilities.catalog",        # the tool contract
     "application.capabilities.envelope",       # the result shape
+    "application.capabilities.lanes",          # the person-only lane and the Cowork refusal text (standard library only) [CH-16d]
     "application.capabilities.verify",         # verify_figures, over the ledger
     "application.capabilities.catalog_types",  # via catalog
     "application.channel_audit",               # the auditor and its port
     "application.channel_wiring",              # the audit trail and writer entitlement, without the engine
     "application.composer_render",             # the platform's own block renderer
+    "application.data.audit_summary",          # what a data call's audit line may say, from the semantic model (standard library only) [CH-16d]
     "application.deployment",                  # is_deployed, store_choice
     "application.display_names",               # the display-name port and the placeholder rule (standard library only)
     "application.identity",                    # ActingUser

@@ -17,18 +17,23 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Any
 
-from application.capabilities.envelope import DISCLAIMER, Block
+from application.capabilities.envelope import AUDIENCE_USER, AUDIENCES, DISCLAIMER, Block
 from application.composer_render import render_markdown
 
 VERBATIM = "VERBATIM — quote figures exactly as written."
 
 
 def blocks_from(envelope: Mapping[str, Any]) -> list[Block]:
-    """The envelope's blocks, as `Block`s again, so the one renderer serves every caller."""
-    return [
-        Block(b["kind"], text=b.get("text", ""), rows=tuple(tuple(r) for r in b.get("rows", [])))
-        for b in envelope.get("blocks", [])
-    ]
+    """The envelope's blocks, as `Block`s again, so the one renderer serves every caller.
+
+    An audience this build does not know is read as the person-only lane, never as `both`.
+    """
+    out = []
+    for b in envelope.get("blocks", []):
+        said = b.get("audience", "both")
+        out.append(Block(b["kind"], text=b.get("text", ""), rows=tuple(tuple(r) for r in b.get("rows", [])),
+                         audience=said if said in AUDIENCES else AUDIENCE_USER))
+    return out
 
 
 def _handover_lines(facts: Mapping[str, Any], base_url: str) -> list[str]:

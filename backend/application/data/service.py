@@ -72,6 +72,19 @@ class DataQueryService:
         """Sources a query can run against right now: configured and not switched off."""
         return frozenset(s for s in self._executors if s not in self._disabled)
 
+    @property
+    def model(self) -> SemanticModel:
+        """The semantic model this service validates against: what the catalog tool describes."""
+        return self._model
+
+    def audience_of(self, spec: QuerySpec) -> str:
+        """The lane a result for `spec` would travel in, decided before anything runs.
+
+        Validation only: no budget is spent and no statement reaches a source, so a channel that
+        may not carry person-level rows can refuse a query without having read them.
+        """
+        return result_audience(validate(spec, self._model))
+
     def run(self, spec: QuerySpec, *, principal: str) -> QueryResult:
         """Validate, budget, execute and describe. Raises a typed `QueryError`; never a partial result."""
         source = self._source_of(spec)

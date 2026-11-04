@@ -77,7 +77,12 @@ def summarise_request(args: Mapping[str, Any], limit: int = SUMMARY_LIMIT) -> st
 
 @dataclass(frozen=True)
 class AuditCall:
-    """What is being audited. `args` is hashed and summarised, never stored."""
+    """What is being audited. `args` is hashed and summarised, never stored.
+
+    `summary` replaces `args` as what the human-readable line is drawn from, for a call whose
+    arguments need a purpose-built description (a data query names columns and operators, and
+    values only where the model says they are not sensitive).
+    """
 
     tool_name: str
     action_kind: str
@@ -87,6 +92,7 @@ class AuditCall:
     tax_year: int | None = None
     confirmation_ref: str | None = None
     is_deterministic_path: bool = True
+    summary: Mapping[str, Any] | None = None
 
 
 @dataclass
@@ -135,7 +141,8 @@ class ChannelAuditor:
             identity_assurance=actor.assurance, conversation_id=actor.conversation_id,
             tool_name=call.tool_name, action_kind=call.action_kind,
             client_id=call.client_id, tax_year=call.tax_year,
-            request_summary=None if phase == "end" else summarise_request(call.args),
+            request_summary=None if phase == "end" else summarise_request(
+                call.args if call.summary is None else call.summary),
             request_sha256=request_sha256(call.args),
             confirmation_ref=handle.confirmation_ref or call.confirmation_ref,
             outcome=outcome, error=(error or None) and error[:ERROR_LIMIT],

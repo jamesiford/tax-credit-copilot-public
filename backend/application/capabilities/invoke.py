@@ -21,7 +21,8 @@ from jsonschema import Draft202012Validator
 from application.capabilities import catalog, registry
 from application.capabilities.envelope import ToolResult
 from application.capabilities.errors import (
-    Ambiguous, CapabilityError, ClaimNotFound, ClientNotFound, InvalidArguments, NotCalculated, YearNotAuthored,
+    Ambiguous, CapabilityError, ClaimNotFound, ClientNotFound, DataQueryRefused, InvalidArguments, NotCalculated,
+    YearNotAuthored,
 )
 from application.confirmations import ConfirmationError
 from application.identity import NotAuthorized, Principal
@@ -76,6 +77,8 @@ def failure_for(exc: BaseException) -> CapabilityFailure:
         return CapabilityFailure(_CONFIRMATION_STATUS.get(exc.code, 422), f"confirmation_{exc.code}", str(exc))
     if isinstance(exc, Ambiguous):
         return CapabilityFailure(409, "ambiguous", str(exc), extra={"candidates": list(exc.candidates)})
+    if isinstance(exc, DataQueryRefused):
+        return CapabilityFailure(exc.status, exc.code, str(exc), exc.retryable, exc.extra)
     for kind, status, code in _BY_TYPE:
         if isinstance(exc, kind):
             return CapabilityFailure(status, code, str(exc) or code.replace("_", " "))

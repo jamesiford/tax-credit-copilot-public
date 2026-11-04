@@ -50,3 +50,19 @@ class Ambiguous(CapabilityError):
     def __init__(self, message: str, candidates: tuple[dict, ...] = ()) -> None:
         super().__init__(message)
         self.candidates = candidates
+
+
+class DataQueryRefused(CapabilityError):
+    """A data query that was refused or could not run, in the shape the wire carries. [CH-16d]
+
+    One class for every data-tool failure (a specification the model refuses, a budget, a timeout,
+    a source that is off, an employee-level result Cowork may not carry), because they all need the
+    same four things on the wire: a stable `code`, an HTTP `status`, whether a retry can help, and
+    the `field` or wait time a caller can act on. Never carries a database message.
+    """
+
+    def __init__(
+        self, message: str, *, code: str, status: int = 422, retryable: bool = False, extra: dict | None = None,
+    ) -> None:
+        super().__init__(message)
+        self.code, self.status, self.retryable, self.extra = code, status, retryable, dict(extra or {})
