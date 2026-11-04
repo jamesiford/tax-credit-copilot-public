@@ -14,6 +14,7 @@ from application.source_ports import configured_account_id, new_source_reader
 
 
 def is_placeholder_year(program_code: str, tax_year: int) -> bool:
+    """Whether the year's statute is still marked to-verify; a year that cannot resolve is not a placeholder."""
     from tools.credit_math import resolve_statutory_floors
 
     try:

@@ -148,10 +148,12 @@ _CURRENT: ContextVar[Principal | None] = ContextVar("tcc_current_principal", def
 
 
 def set_ambient_principal(principal: Principal | None) -> None:
+    """Record who the current request acts for, so lower layers can authorize without the person being threaded through every call."""
     _CURRENT.set(principal)
 
 
 def ambient_principal() -> Principal | None:
+    """The person the current request acts for, or None outside a request."""
     return _CURRENT.get()
 
 

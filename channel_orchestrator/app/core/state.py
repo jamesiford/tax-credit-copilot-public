@@ -64,6 +64,7 @@ class ConversationState:
     touched: float = 0.0
 
     def remember(self, role: str, text: str) -> None:
+        """Keep a bounded history: each entry is cut to 500 characters and only the last few survive, because it is routing context, not a transcript."""
         self.history.append({"role": role, "text": text[:500]})
         del self.history[:-HISTORY_LIMIT]
 
@@ -85,6 +86,7 @@ class StateStore:
         return state
 
     def forget(self, key: tuple[str, str]) -> None:
+        """Drop a conversation's state so a finished turn leaves nothing behind."""
         self._items.pop(key, None)
 
     def __len__(self) -> int:

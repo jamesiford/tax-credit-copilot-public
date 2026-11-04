@@ -52,6 +52,7 @@ class AgentInvocation:
 
 
 def prompt_hash(prompt: str) -> str:
+    """The digest the audit stores in place of the prompt, so a row names the prompt without keeping its text."""
     return hashlib.sha256(prompt.encode("utf-8")).hexdigest()
 
 

@@ -130,4 +130,5 @@ class ApiClient:
         return status == 200
 
     async def close(self) -> None:
+        """Release the pooled HTTP connections at shutdown."""
         await self._http.aclose()

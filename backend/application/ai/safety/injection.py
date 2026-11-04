@@ -45,6 +45,7 @@ def normalise(text: str) -> str:
 
 
 def letters_only(text: str) -> str:
+    """The text reduced to a-z, so spacing, punctuation and digits cannot hide a phrase from the scan."""
     return re.sub(r"[^a-z]", "", _clean(text))
 
 
