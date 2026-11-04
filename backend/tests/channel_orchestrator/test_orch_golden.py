@@ -23,7 +23,7 @@ from pathlib import Path
 import pytest
 
 from app.core.compose import allowed_for, facts_of
-from application.numeric_guard import FactIndex, check
+from application.numeric.guard import FactIndex, check
 from orch_harness import OTHER_OID, USER_OID, FakeGateway, build_rig, identity
 
 GOLDEN = Path(__file__).parent / "golden"

@@ -20,11 +20,11 @@ import pytest
 from application import knowledge as k
 from application.capabilities.envelope import Block
 from application.composer import compose
-from application.knowledge_fake import SYNTHETIC_CORPUS, FakeKnowledge
-from application.knowledge_settings import (
+from application.knowledge.fake import SYNTHETIC_CORPUS, FakeKnowledge
+from application.knowledge.settings import (
     IMPLEMENTED, PROVIDERS, KnowledgeConfigError, KnowledgeSettings, build_knowledge, load_knowledge_settings,
 )
-from application.numeric_guard import AllowedContext, FactIndex, check
+from application.numeric.guard import AllowedContext, FactIndex, check
 
 STAMP = datetime(2026, 11, 4, 9, 30, tzinfo=timezone.utc)
 FIGURE_PASSAGE = k.Passage(

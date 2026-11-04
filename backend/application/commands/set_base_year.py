@@ -97,6 +97,7 @@ def _recalculate_in_background(client_id: int, tax_year: int, state: str, actor:
 
 
 def recalculation_running(client_id: int) -> bool:
+    """Whether a re-run for this client is in flight, so a second base-year change is not started under it."""
     with _LOCK:
         return bool(_RUNNING.get(client_id))
 

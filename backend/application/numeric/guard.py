@@ -21,27 +21,27 @@ that guessed at English would be wrong in both directions. Digits that are not
 ASCII (full-width, Arabic-Indic, vulgar fractions) are rejected outright rather
 than normalised: no formatter emits them, so their only use is evasion.
 
-**Where the pieces live.** The rule is here; the parts it uses were split out by
-size and are re-exported below, so every import path is unchanged:
-`numeric_types` (Numeral, Violation, GuardResult), `numeric_extract` (finding the
-numerals), `numeric_context` (what the reader supplied) and `numeric_facts` (what
-the engine said).
+**Where the pieces live.** The rule is here; the parts it uses sit beside it in the
+`application.numeric` package and are re-exported below:
+`types` (Numeral, Violation, GuardResult), `extract` (finding the numerals),
+`context` (what the reader supplied) and `facts` (what the engine said). The package
+`__init__` re-exports the public names.
 
 **Standard library only**, plus `application.capabilities.format` and the sibling
-`numeric_*` modules, which are themselves standard-library only. All are vendored
-into the orchestrator container.
+modules, which are themselves standard-library only. All are vendored into the
+orchestrator container.
 """
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 from typing import Any
 
-from application.numeric_context import AllowedContext
-from application.numeric_extract import (  # noqa: F401 - re-exported
+from application.numeric.context import AllowedContext
+from application.numeric.extract import (  # noqa: F401 - re-exported
     MAX_LIST_MARKER, MAX_ORDINAL, MAX_STEP, extract_numerals,
 )
-from application.numeric_facts import FactIndex, _flatten  # noqa: F401 - re-exported
-from application.numeric_types import PASS, REJECTED, GuardResult, Numeral, Violation
+from application.numeric.facts import FactIndex, _flatten  # noqa: F401 - re-exported
+from application.numeric.types import PASS, REJECTED, GuardResult, Numeral, Violation
 
 
 def _judge(numeral: Numeral, facts: FactIndex, context: AllowedContext) -> str | None:

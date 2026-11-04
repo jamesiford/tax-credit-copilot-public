@@ -37,6 +37,7 @@ def auth_mode(env: Mapping[str, str] | None = None) -> str:
 
 
 def auth_tenant_id(env: Mapping[str, str] | None = None) -> str:
+    """The tenant tokens must come from: `AUTH_TENANT_ID`, else the platform's `AZURE_TENANT_ID`."""
     env = resolve_environ(env)
     return _get(env, "AUTH_TENANT_ID") or _get(env, "AZURE_TENANT_ID")
 
@@ -53,6 +54,7 @@ def explicit_local_dev(env: Mapping[str, str] | None = None) -> bool:
 
 
 def anonymous_synthetic_allowed(env: Mapping[str, str], classification: str | None) -> bool:
+    """Anonymous access needs the explicit flag AND synthetic data, so a customer's data is never served unauthenticated."""
     return _get(env, ANONYMOUS_SYNTHETIC_FLAG).lower() in _TRUE and classification == "synthetic"
 
 

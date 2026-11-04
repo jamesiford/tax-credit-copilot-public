@@ -19,10 +19,11 @@ from pathlib import Path
 
 import pytest
 
-from application import composer, numeric_guard
+from application import composer
+from application.numeric import guard as numeric_guard
 from application.capabilities import format as fmt
 from application.capabilities.envelope import Block
-from application.numeric_guard import (
+from application.numeric.guard import (
     AllowedContext,
     FactIndex,
     GuardResult,
@@ -125,7 +126,7 @@ def test_structural_digits_are_the_narrow_list():
 
 
 def _numeric_leaves():
-    from application.numeric_guard import _flatten
+    from application.numeric.guard import _flatten
 
     flat: dict = {}
     _flatten("", FACTS, flat)
@@ -430,12 +431,12 @@ def _imports(path: Path) -> set[str]:
 def test_the_guard_imports_only_the_standard_library_and_the_formatter():
     """It is vendored into the orchestrator container, which has no repository.
 
-    The guard was split into `numeric_*` siblings by size; the vendored set is all of
+    The guard lives with its parts in `application.numeric`; the vendored set is all of
     them, and each may import only the standard library, the formatter, or a sibling.
     """
     import sys
 
-    modules = ("numeric_guard", "numeric_types", "numeric_extract", "numeric_context", "numeric_facts")
+    modules = ("__init__", "guard", "types", "extract", "context", "facts")
     stdlib = set(sys.stdlib_module_names) | {"__future__"}
     root = Path(numeric_guard.__file__).parent
     imported: set[str] = set()
@@ -443,6 +444,6 @@ def test_the_guard_imports_only_the_standard_library_and_the_formatter():
         found = _imports(root / f"{name}.py")
         imported |= found
         bad = {m for m in found if m.split(".")[0] not in stdlib
-               and m != "application.capabilities.format" and not m.startswith("application.numeric_")}
+               and m != "application.capabilities.format" and not m.startswith("application.numeric")}
         assert not bad, f"{name} imports {sorted(bad)}"
     assert "application.capabilities.format" in imported

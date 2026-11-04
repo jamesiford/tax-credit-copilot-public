@@ -142,7 +142,7 @@ def test_a_malformed_request_gets_no_token(world):
 
 
 def test_the_prepared_blocks_pass_the_numeric_guard(world):
-    from application import numeric_guard
+    from application.numeric import guard as numeric_guard
     from application.composer import render_markdown
 
     prepared = prepare("claim_record", **CLAIM)

@@ -124,6 +124,14 @@ conflicts with *tools calculate* and with the numeric guard, gives no control of
 our lanes or our per-client predicate. The conditions under which a sandbox-only exploratory lane could be enabled
 are in [DATA-ACCESS §9](../m365-channel/DATA-ACCESS.md#9-evaluation-a-microsoft-fabric-data-agent-as-an-optional-provider-not-built).
 
+**The mediator's pipeline is fixed on purpose.** A command runs Authorization, Validation, Handler, Audit, in
+that order, as straight-line code in `Mediator.send`; it is not a configurable list of behaviours. Four stages
+that each state what they refuse (and a test that fails if a stage is added that always passes, such as the
+tenant scope this product does not have) are easier to read, and to audit, than a registry whose order a
+reader has to reconstruct. If a fifth stage is ever genuinely needed, the place for it is a behaviour list
+the mediator walks, introduced in that change with the order and each stage's refusal behaviour stated in the
+ADR and pinned by the pipeline test; do not add a hook before there is a fifth stage to hang on it.
+
 ## Alternatives considered
 
 | Alternative | Why not |

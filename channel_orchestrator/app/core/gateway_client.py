@@ -96,6 +96,7 @@ class GatewayClient:
         return await self._post("/channel/v1/audit/narration", who, report)
 
     async def close(self) -> None:
+        """Release the pooled HTTP connections at shutdown."""
         await self._http.aclose()
 
 

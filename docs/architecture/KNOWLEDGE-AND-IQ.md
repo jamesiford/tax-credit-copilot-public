@@ -24,9 +24,9 @@ flowchart LR
 
 | Piece | Where | Role |
 | --- | --- | --- |
-| `Passage`, `KnowledgePort`, `render_reference`, `model_context` | `backend/application/knowledge.py` | The contract and the two renderings (reader, model). Standard library only; vendored |
-| `KnowledgeSettings`, `load_knowledge_settings`, `build_knowledge` | `backend/application/knowledge_settings.py` | `KNOWLEDGE_ENABLED` (default false), `KNOWLEDGE_PROVIDER` (`none`, `fake`, `foundry-iq`; only the first two exist), `KNOWLEDGE_TOP` (1 to 10, default 3) |
-| `FakeKnowledge`, `SYNTHETIC_CORPUS` | `backend/application/knowledge_fake.py` | Deterministic keyword retrieval over a built-in synthetic corpus, labelled "not statute", with made-up figures on purpose |
+| `Passage`, `KnowledgePort`, `render_reference`, `model_context` | `backend/application/knowledge/port.py` | The contract and the two renderings (reader, model). Standard library only; vendored |
+| `KnowledgeSettings`, `load_knowledge_settings`, `build_knowledge` | `backend/application/knowledge/settings.py` | `KNOWLEDGE_ENABLED` (default false), `KNOWLEDGE_PROVIDER` (`none`, `fake`, `foundry-iq`; only the first two exist), `KNOWLEDGE_TOP` (1 to 10, default 3) |
+| `FakeKnowledge`, `SYNTHETIC_CORPUS` | `backend/application/knowledge/fake.py` | Deterministic keyword retrieval over a built-in synthetic corpus, labelled "not statute", with made-up figures on purpose |
 | `KnowledgeContextProvider` | `channel_orchestrator/app/core/maf_knowledge.py` | The framework `ContextProvider`: `before_run` searches and calls `extend_instructions`; nothing else |
 | Planner, `Planned.reference`, `TurnPipeline._assemble` | `app/core/planner.py`, `planned.py`, `turn.py` | Build the provider only when a source exists; keep the passages; print them after a surviving narration |
 

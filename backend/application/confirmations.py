@@ -106,6 +106,7 @@ class Committed:
 
 
 def token_sha256(token: str) -> str:
+    """The digest a confirmation is stored and looked up by; the token itself is shown once and never kept."""
     return hashlib.sha256(token.encode("utf-8")).hexdigest()
 
 

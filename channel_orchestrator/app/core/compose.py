@@ -26,7 +26,7 @@ from application.ai.safety.untrusted import UntrustedText
 from application.capabilities import catalog
 from application.capabilities.envelope import AUDIENCE_USER, AUDIENCES, Block
 from application.composer import Composed, compose, narrator_brief, placeholders
-from application.numeric_guard import REJECTED, AllowedContext, FactIndex, GuardResult, Numeral, Violation
+from application.numeric.guard import REJECTED, AllowedContext, FactIndex, GuardResult, Numeral, Violation
 
 METHOD_LABEL = {"min_max": "Min-Max method", "pay_period": "Pay Period method"}
 #: What the audit records, as a code: never the path, which names the person's lane.

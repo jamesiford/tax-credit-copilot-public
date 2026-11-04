@@ -19,7 +19,7 @@ from app.core.review_pack import CALL_LIMIT, MODE, step_tools, wants_review_pack
 from app.core.state import ConversationState
 from app.core.tools import ToolRunner
 from application.capabilities import catalog
-from application.numeric_guard import FactIndex, check
+from application.numeric.guard import FactIndex, check
 from orch_harness import FakeClock, FakeGateway, build_rig, identity
 
 ASK = "Give me a client review pack for Cascade for 2023"

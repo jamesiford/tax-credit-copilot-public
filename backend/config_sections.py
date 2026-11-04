@@ -7,7 +7,7 @@ here, and a value that used to raise still raises (a bad number is a typo that
 decides something, not a case to guess).
 
 Variables that are parsed elsewhere, on purpose, are not repeated here: the AI,
-knowledge and safety settings (`application/ai/settings.py`, `knowledge_settings.py`),
+knowledge and safety settings (`application/ai/settings.py`, `knowledge/settings.py`),
 which the orchestrator vendors and so cannot import this module; the sign-in and
 deployment-posture checks (`application/auth_policy.py`, `deployment.py`); the
 gateway (`channel/config.py`); and the data-query limits (`bootstrap/data_wiring.py`).

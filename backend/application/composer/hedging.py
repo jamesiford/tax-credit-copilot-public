@@ -13,7 +13,7 @@ a pattern should be, and a rejected narration costs the reader nothing: they see
 engine's own answer without the commentary.
 
 The check runs on the narrator's words with every placeholder standing as one opaque
-figure token (`composer_placeholders._mask_placeholders`), so a placeholder is a figure by
+figure token (`substitution._mask_placeholders`), so a placeholder is a figure by
 construction and the check needs no knowledge of how the formatter prints it. A token that
 contains a digit (a numeral the guard will reject anyway) counts as a figure too.
 

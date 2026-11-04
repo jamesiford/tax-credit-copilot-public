@@ -111,7 +111,7 @@ def _judge_composed(row: dict[str, Any]) -> tuple[str, bool, str]:
 
 def score_narration(rows: list[dict[str, Any]], reply_for: Callable[[dict[str, Any]], str], mode: str) -> EvalResult:
     """Does the numeric guard (and, for a placeholder narration, the composer) agree with each row's expectation?"""
-    from application.numeric_guard import check
+    from application.numeric.guard import check
 
     def judge(row):
         if "narration" in row:

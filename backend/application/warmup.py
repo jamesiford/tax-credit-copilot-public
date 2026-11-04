@@ -28,6 +28,7 @@ log = logging.getLogger("tax-credit-copilot")
 
 
 def should_warm() -> bool:
+    """Warm only against the real lakehouse and only when not opted out: any other source has no slow start to hide."""
     from tools.fabric_source import active_data_source
 
     if not get_settings().runtime.warm_on_start:

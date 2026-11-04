@@ -18,7 +18,7 @@ from collections.abc import Mapping
 from typing import Any
 
 from application.capabilities.envelope import AUDIENCE_USER, AUDIENCES, DISCLAIMER, Block
-from application.composer_render import render_markdown
+from application.composer.render import render_markdown
 
 VERBATIM = "VERBATIM — quote figures exactly as written."
 

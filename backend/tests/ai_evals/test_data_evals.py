@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import pytest
 
-from application import composer_hedging
+from application.composer import hedging as composer_hedging
 from tests.ai_evals import data_routing, harness
 
 pytestmark = pytest.mark.ai_eval

@@ -38,6 +38,7 @@ def create_host(orchestrator: Orchestrator | None = None) -> ResponsesAgentServe
 
 
 def main() -> None:
+    """Start the hosted agent: set up logging, then run the host. The root `main.py` calls this."""
     logging.basicConfig(level=os.environ.get("LOG_LEVEL", "INFO"), format="%(asctime)s %(levelname)s %(name)s %(message)s")
     create_host().run()
 

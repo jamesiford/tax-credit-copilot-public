@@ -117,7 +117,7 @@ def test_the_detector_finds_each_way_of_reading_the_process_environment(source, 
 
 def test_the_vendored_shared_modules_do_not_import_config():
     """The orchestrator copies these and cannot import `backend`; they take a mapping instead."""
-    seeds = ["application/ai/settings.py", "application/ai/gateway_settings.py", "application/knowledge_settings.py"]
+    seeds = ["application/ai/settings.py", "application/ai/gateway_settings.py", "application/knowledge/settings.py"]
     for relative in seeds:
         tree = ast.parse((BACKEND / relative).read_text(encoding="utf-8"))
         imported = {n.module.split(".")[0] for n in ast.walk(tree) if isinstance(n, ast.ImportFrom) and n.module}

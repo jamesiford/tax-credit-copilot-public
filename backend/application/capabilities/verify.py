@@ -19,9 +19,9 @@ from typing import Any
 
 from application.capabilities import _support as s
 from application.capabilities.envelope import Provenance, ToolResult
-from application.numeric_context import AllowedContext
-from application.numeric_extract import extract_numerals
-from application.numeric_guard import check
+from application.numeric.context import AllowedContext
+from application.numeric.extract import extract_numerals
+from application.numeric.guard import check
 
 #: Numerals that need no fact: a list marker or a step number.
 _FREE_KINDS = frozenset({"structural"})

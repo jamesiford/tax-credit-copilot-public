@@ -17,8 +17,8 @@ import logging
 from collections.abc import Mapping
 from dataclasses import dataclass
 
-from application.knowledge import KnowledgePort
-from application.knowledge_fake import FakeKnowledge
+from application.knowledge.port import KnowledgePort
+from application.knowledge.fake import FakeKnowledge
 
 log = logging.getLogger(__name__)
 

@@ -22,7 +22,7 @@ import re
 import pytest
 
 from app.core.compose import allowed_for, facts_of
-from application.numeric_guard import FactIndex, check
+from application.numeric.guard import FactIndex, check
 from orch_harness import build_rig
 
 QUESTION = "What is Cascade's credit for 2023 under Min-Max?"

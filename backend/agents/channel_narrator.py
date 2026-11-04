@@ -30,8 +30,8 @@ AGENT_PROFILE = {
         "One to four sentences with {{facts.…}} placeholders; the composer substitutes the engine's figures",
     ],
     "tools": [
-        "application/composer.py · compose() — substitutes placeholders through the one formatter",
-        "application/numeric_guard.py · check() — rejects the whole narration if any digit is not the engine's",
+        "application/composer/assemble.py · compose() — substitutes placeholders through the one formatter",
+        "application/numeric/guard.py · check() — rejects the whole narration if any digit is not the engine's",
     ],
     "determinism": (
         "LLM-narrated prose, but it cannot carry a figure: it is never shown the values, and a "

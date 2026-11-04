@@ -10,7 +10,7 @@ import pytest
 
 from app.core.placeholders import placeholder_for, with_placeholders
 from application.composer import narrator_brief
-from application.composer_placeholders import substitute
+from application.composer.substitution import substitute
 
 FACTS = {"clients": [{"client_name": "Example Co", "identified_usd": "40495", "jobs_margin": 11.57, "tax_year": 2025}], "assessed_clients": 5}
 

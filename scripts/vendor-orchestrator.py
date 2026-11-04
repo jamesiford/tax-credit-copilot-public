@@ -32,13 +32,13 @@ BACKEND = ROOT / "backend"
 TARGET = ROOT / "channel_orchestrator" / "app" / "vendor" / "tcc_shared"
 
 SEEDS = (
-    "application.composer", "application.numeric_guard", "application.output_policy",
+    "application.composer", "application.numeric.guard", "application.output_policy",
     "application.capabilities.catalog", "application.capabilities.envelope", "application.capabilities.format",
     "application.capabilities.lanes",
     "application.chat_scope", "application.chat_keywords",
     "application.ai.settings", "application.ai.egress", "application.ai.gateway_settings",
     "application.ai.safety.injection", "application.ai.safety.untrusted",
-    "application.knowledge", "application.knowledge_settings",
+    "application.knowledge", "application.knowledge.settings",
     "domain.ai",
     "infrastructure.ai.openai_compatible", "infrastructure.ai.auth",
 )
