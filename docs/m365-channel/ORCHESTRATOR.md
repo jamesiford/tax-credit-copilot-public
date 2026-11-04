@@ -107,6 +107,8 @@ many figures failed. A model that is down gets the same reply with a line saying
 
 Besides a bad digit, an unresolvable placeholder or a policy break, a narration is dropped when an approximation qualifier ("about", "roughly", "rounded", "up to"...) sits within three tokens of a figure (`composer_hedging`, CH-15c): every figure shown is exact, and "not rounded" is rejected as well.
 
+A narration is also dropped when a placeholder points at a fact the model was never shown: the person's lane (employee-level `rows`) or a row past the model's cut of fifty (`compose.paths_outside_model_view`, RM-05, [D-123](DECISIONS.md)). A figure only the person's rows hold is not allowed context for the narrator: not in its brief, not in the reader's allowed numerals, not a placeholder target. The reader's reply still shows the rows, and the audit records the refusal as a code that does not name the path.
+
 ## Narration and planning quality (CH-15c)
 
 The narrator prompt (`backend/agents/prompts/channel_narrator.md`, vendored unchanged, version 3) asks for a senior colleague's voice: one to four sentences, the answer first, the engine's own labels, no rank prose, no hedging, the exact `placeholder` copied from `fact_paths`, and twelve worked examples (six added in CH-16e for data results). The planner's instructions and the tools' descriptions are the model's only guide to choosing a tool: `book_rank` says it is for the whole book only and every client tool begins "ONE client (needs a client)". Which client is still code (`ToolRunner.ensure_client`, run before any client tool). `golden/planning.json` and `test_orch_planning.py` pin the sequences and the wording; `tests/ai_evals` carries the routing and narration items. See [D-109](DECISIONS.md).
