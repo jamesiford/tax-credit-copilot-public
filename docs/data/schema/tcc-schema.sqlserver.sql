@@ -1,7 +1,7 @@
 /* ============================================================================
    GENERATED FILE — DO NOT EDIT
 
-   Produced from tcc-schema.fabric.sql by generate_variants.py.
+   Produced from tcc-schema.fabric.sql by scripts/generate-schema-variants.py.
    Hand-edits are lost on the next run and silently desynchronise the two
    platforms. Change the Fabric file and regenerate.
 
