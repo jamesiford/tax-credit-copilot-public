@@ -245,7 +245,8 @@ now. Start with [docs/m365-channel/README.md](docs/m365-channel/README.md), then
 backend/
   api/              FastAPI routers — thin, orchestrate only
   application/      Use cases: commands, queries, the mediator that routes them,
-                    and the composition root that selects repository adapters
+                    and the ports they ask for (`services.py`)
+  bootstrap/        The composition root: selects the adapters behind those ports
   domain/           Entities, value objects, ports, and the pure calculation
   infrastructure/   Adapters behind those ports — payroll sources, repositories
   tools/            Services around the core: rule-pack loading, runners, portfolio

@@ -207,7 +207,7 @@ the same middleware via a one-shot agent, then a second call narrates) and **key
 failed: the platform's own keyword table). Invented tool names are never run.
 
 Not carried over from the API's stack, and why: the token budget, breaker, bulkhead and retry wrappers
-(`ai_wiring._decorate`) wrap `AgentRuntime`, which has no tool calls; here a call has a timeout
+(`bootstrap/ai_wiring._decorate`) wrap `AgentRuntime`, which has no tool calls; here a call has a timeout
 (`AI_TOTAL_DEADLINE_SECONDS`) and the chain's fallback. A shared budget is the follow-up if a customer needs it.
 
 ## Claim packages
@@ -279,7 +279,7 @@ declared in **one list**, `backend/agents/agents.json`: for each agent its `name
 `role` (the model is the setting `AI_MODEL_<ROLE>`, never a deployment name in the repository), its `temperature` and its `tools`
 (always empty: agents narrate, tools calculate, ADR-004). `agents/roster.py` reads and validates it; each `agents/<module>.py` keeps only
 the display profile the Agents page shows and takes its spec from the list (`SPEC = build_spec("<module>", AGENT_PROFILE)`);
-`agents/factory.py` yields the specs; `application/ai_wiring.py` hands them to the Foundry catalog, which publishes them as before.
+`agents/factory.py` yields the specs; `bootstrap/ai_wiring.py` hands them to the Foundry catalog, which publishes them as before.
 
 - **Add an agent:** a prompt file, a module with its profile, an entry in `agents.json`. **Change one:** edit its entry or its prompt file
   (a prompt edit also needs the version bump `test_prompt_manifest.py` asks for).
