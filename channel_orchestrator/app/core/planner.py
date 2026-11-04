@@ -22,7 +22,7 @@ from typing import Any
 
 from app.core.compose import LOOKUP_TOOLS, compose_reply, model_facts_of
 from app.core.maf_agent import ModelTrace, build_agent
-from app.core.models import ModelChain
+from app.core.model_access import ModelAccess
 from app.core.placeholders import with_placeholders
 from app.core.prompts import PLAN_JSON, PLANNER, narrator_instructions, tool_catalogue
 from app.core.tools import ToolRunner
@@ -50,7 +50,7 @@ class Planned:
 class Planner:
     """Runs one turn's tools, by whichever mode this process and this message allow."""
 
-    def __init__(self, chain: ModelChain, *, allowed_hosts: tuple[str, ...] = ()) -> None:
+    def __init__(self, chain: ModelAccess, *, allowed_hosts: tuple[str, ...] = ()) -> None:
         self._chain, self._hosts = chain, allowed_hosts
 
     async def plan(self, runner: ToolRunner) -> Planned:

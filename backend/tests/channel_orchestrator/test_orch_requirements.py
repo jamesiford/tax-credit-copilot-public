@@ -32,6 +32,14 @@ def test_the_agent_framework_pin_is_the_one_the_backends_foundry_package_resolve
     assert agent_framework is not None
 
 
+def test_the_frameworks_openai_client_and_its_sdk_are_pinned_to_what_is_installed():
+    from importlib.metadata import version
+
+    ours = pins(ORCHESTRATOR / "requirements.txt")
+    for name in ("agent-framework-openai", "openai"):
+        assert ours[name] == version(name), f"{name}: orchestrator pins {ours[name]}, installed {version(name)}"
+
+
 def test_the_orchestrator_does_not_install_the_backend_and_names_a_stable_hosting_package():
     text = "\n".join(l for l in (ORCHESTRATOR / "requirements.txt").read_text(encoding="utf-8").splitlines() if not l.lstrip().startswith("#"))
     assert "fastapi" not in text.lower() and "pyodbc" not in text.lower() and "-r " not in text

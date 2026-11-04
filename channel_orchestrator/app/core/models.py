@@ -1,8 +1,9 @@
 """Model access for the orchestrator: the shared adapters, an ordered chain, the egress rule. [CH-08]
 
 The orchestrator reads the same `AI_*` settings as the API and builds the same adapter
-(`OpenAICompatibleChatModel`) for each provider in the chain; it does not construct a
-Foundry SDK client. A hosted agent's own model deployment is reached over the Azure OpenAI
+(`OpenAICompatibleChatModel`) for each provider in a gateway or mixed chain. A foundry-only chain is not built here:
+`model_access.select_model_access` hands it to the framework's own chat client (RM-09), so `build_providers` serves only
+the chain that names a gateway. A hosted agent's own model deployment is reached over the Azure OpenAI
 v1 chat-completions surface of its Foundry account with the agent's managed identity, so
 `foundry` and `gateway` are the same adapter with different settings.
 

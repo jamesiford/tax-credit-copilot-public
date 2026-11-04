@@ -7,17 +7,17 @@ tools' own blocks and facts. There is no code path from the model's words to the
 does not go through the numeric guard, because the only thing the Agent can return is the
 middleware's replacement.
 
-The chat client is a bridge from MAF to the shared model adapters (`ModelChain`), so MAF's
-function-invocation loop drives a model that may be a Foundry deployment or the customer's
-gateway, under the same egress rule as everywhere else. MAF's tool loop is bounded by the
-turn's tool budget and runs tools one at a time (their order is the order of the answer).
+Which chat client drives the model is decided by `model_access.select_model_access` from
+`AI_PROVIDER_CHAIN` (RM-09): a foundry-only chain gets the framework's own OpenAI client
+(`maf_foundry_client`); a chain that names the customer's gateway gets `PortChatClient`, a bridge
+from MAF to the shared model adapters (`ModelChain`) that keeps the provider failover and the
+gateway's egress rule. Either way MAF's tool loop is bounded by the turn's tool budget and runs
+tools one at a time (their order is the order of the answer).
 """
 from __future__ import annotations
 
-import json
 import logging
 from collections.abc import Awaitable, Callable
-from dataclasses import dataclass, field
 from typing import Any
 
 from agent_framework import (
@@ -26,48 +26,22 @@ from agent_framework import (
 )
 
 from app.core.maf_catalog_tools import TURN, catalog_tools
+from app.core.maf_chat import ModelTrace, as_chat_messages, loop_limits
+from app.core.maf_foundry_client import foundry_client, foundry_options
 from app.core.maf_tool_call import CallAndCapture
 from app.core.maf_tool_rules import RecordUnregisteredCalls, tool_rules
+from app.core.model_access import FoundryModelAccess, ModelAccess
 from app.core.models import ModelChain, ModelTurn
 from app.core.tools import ToolRunner
-from domain.ai import ChatMessage, ToolCall, ToolSpec
+from domain.ai import ToolSpec
 
 log = logging.getLogger("tcc.orchestrator.maf")
 #: What the framework answers when the tool loop stops at its budget; live it surfaced as the reply's first line.
 LIMIT_NOTICE = "Function invocation limit reached"
 
 
-@dataclass
-class ModelTrace:
-    """What the model layer did this turn, for the audit report. Holds no text."""
-
-    turns: list[ModelTurn] = field(default_factory=list)
-    prompt_parts: list[str] = field(default_factory=list)
-
-    @property
-    def last(self) -> ModelTurn | None:
-        return self.turns[-1] if self.turns else None
-
-
-def _as_chat_messages(messages: Any, instructions: str | None) -> list[ChatMessage]:
-    """MAF's messages as the model adapters' `ChatMessage`s."""
-    out = [ChatMessage("system", instructions)] if instructions else []
-    for message in messages:
-        calls = tuple(
-            ToolCall(c.call_id, c.name, c.arguments if isinstance(c.arguments, str) else json.dumps(c.arguments or {}))
-            for c in message.contents if c.type == "function_call"
-        )
-        results = [c for c in message.contents if c.type == "function_result"]
-        if results:
-            out += [ChatMessage("tool", str(r.result), tool_call_id=r.call_id) for r in results]
-        elif calls:
-            out.append(ChatMessage("assistant", message.text or "", tool_calls=calls))
-        else:
-            out.append(ChatMessage(str(message.role), message.text or ""))
-    return out
-
-
 def _as_response(turn: ModelTurn) -> ChatResponse:
+    """A model adapter's whole turn as the framework's response: the text first, then each tool call the model asked for."""
     contents: list[Any] = [Content.from_function_call(call_id=c.id, name=c.name, arguments=c.arguments or "{}") for c in turn.tool_calls]
     if turn.text:
         contents.insert(0, turn.text)
@@ -78,9 +52,7 @@ class PortChatClient(FunctionInvocationLayer, ChatMiddlewareLayer, BaseChatClien
     """MAF's chat-client contract over `ModelChain`: messages and tools in, one whole answer out."""
 
     def __init__(self, chain: ModelChain, trace: ModelTrace, *, max_calls: int) -> None:
-        super().__init__(function_invocation_configuration={
-            "max_iterations": max_calls + 2, "max_function_calls": max_calls + 1, "allow_concurrent_invocation": False,
-        })
+        super().__init__(function_invocation_configuration=loop_limits(max_calls))
         self._chain, self._trace = chain, trace
 
     def _inner_get_response(self, *, messages: Any, stream: bool, options: Any, **kwargs: Any) -> Awaitable[ChatResponse]:
@@ -90,7 +62,7 @@ class PortChatClient(FunctionInvocationLayer, ChatMiddlewareLayer, BaseChatClien
 
     async def _respond(self, messages: Any, options: Any) -> ChatResponse:
         tools = [ToolSpec(t.name, t.description, t.parameters()) for t in (options.get("tools") or [])]
-        chat = _as_chat_messages(messages, options.get("instructions"))
+        chat = as_chat_messages(messages, options.get("instructions"))
         self._trace.prompt_parts.append("\n".join(m.content for m in chat))
         turn = await self._chain.complete(chat, tools, prefer=self._trace.last.provider if self._trace.last else None)
         self._trace.turns.append(turn)
@@ -117,16 +89,26 @@ def function_tools(_turn: object | None = None) -> list[FunctionTool]:
     return catalog_tools()
 
 
-def build_agent(chain: ModelChain, runner: ToolRunner, trace: ModelTrace, instructions: str, compose: Callable[[str], str]) -> Agent:
+def chat_client_for(model: ModelAccess, trace: ModelTrace, *, max_calls: int) -> tuple[BaseChatClient, dict[str, Any]]:
+    """The chat client for `model` and the run options it needs: the framework's own for a foundry-only chain,
+    `PortChatClient` over `ModelChain` for every other (the selection rule is `model_access.select_model_access`)."""
+    if isinstance(model, FoundryModelAccess):
+        return foundry_client(model, trace, max_calls=max_calls), foundry_options(model)
+    if isinstance(model, ModelChain):
+        return PortChatClient(model, trace, max_calls=max_calls), {}
+    raise TypeError(f"no chat client for {type(model).__name__}")
+
+
+def build_agent(chain: ModelAccess, runner: ToolRunner, trace: ModelTrace, instructions: str, compose: Callable[[str], str]) -> Agent:
     """The turn's Agent: the generated tools, the turn's rules as middleware, and an output bound to the composer.
 
     Function middleware runs in the order `maf_tool_rules` lists it, then `CallAndCapture`; the chat middleware
     records a tool name the model asked for that is not registered (a commit, an invented one). The turn is the
     agent's default `additional_function_arguments`, which is what `function_invocation_kwargs` is per run.
     """
-    client = PortChatClient(chain, trace, max_calls=runner.max_calls)
+    client, options = chat_client_for(chain, trace, max_calls=runner.max_calls)
     return Agent(
         client, instructions, tools=function_tools(),
         middleware=[ComposeMiddleware(compose), *tool_rules(), CallAndCapture(), RecordUnregisteredCalls(runner)],
-        default_options={"additional_function_arguments": {TURN: runner}},
+        default_options={**options, "additional_function_arguments": {TURN: runner}},
     )

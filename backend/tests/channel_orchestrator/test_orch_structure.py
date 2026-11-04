@@ -19,7 +19,8 @@ STDLIB = __import__("sys").stdlib_module_names
 #: MAF layer's alone: the `maf_*` modules (the agent, the generated tools, the middleware).
 THIRD_PARTY = {
     "httpx": None, "jsonschema": None, "agent_framework": {p.name for p in SOURCES if p.name.startswith("maf_")},
-    "azure": {"gateway_client.py", "main.py", "modelprobe.py"}, "opentelemetry": {"telemetry.py"},
+    "agent_framework_openai": {"maf_foundry_client.py"},
+    "azure": {"gateway_client.py", "main.py", "maf_foundry_client.py", "modelprobe.py"}, "opentelemetry": {"telemetry.py"},
 }
 #: The repo layers it may import (all vendored, all standard-library-only or model-access adapters).
 LOCAL_OK = ("app", "application", "domain", "infrastructure.ai")
@@ -63,8 +64,33 @@ def test_only_main_imports_the_hosting_package():
 
 
 def test_only_the_maf_layer_imports_the_agent_framework():
-    users = [p.name for p in SOURCES if any(m.split(".")[0] == "agent_framework" for m in imports(p))]
+    users = [p.name for p in SOURCES if any(m.split(".")[0] in ("agent_framework", "agent_framework_openai") for m in imports(p))]
     assert "maf_agent.py" in users and all(name.startswith("maf_") for name in users), users
+
+
+def constructors(name: str) -> list[str]:
+    """The modules that CALL `name(...)` (a class built), not merely mention it."""
+    return sorted({p.name for p in SOURCES for n in ast.walk(ast.parse(p.read_text(encoding="utf-8")))
+                   if isinstance(n, ast.Call) and getattr(n.func, "id", getattr(n.func, "attr", "")) == name})
+
+
+def test_the_model_path_is_chosen_in_one_place_and_each_client_is_built_in_one_module():
+    """RM-09: `select_model_access` picks from AI_PROVIDER_CHAIN; the framework's OpenAI client is built by the
+    foundry client module alone, `PortChatClient` by the agent module alone, and no key reaches either."""
+    assert constructors("OpenAIChatCompletionClient") == ["maf_foundry_client.py"]
+    assert constructors("FoundryModelAccess") == ["model_access.py"]
+    assert constructors("PortChatClient") == ["maf_agent.py"]
+    assert constructors("select_model_access") == ["wiring.py"]
+    assert constructors("OpenAIChatClient") == [] and constructors("FoundryChatClient") == [], "FoundryChatClient targets a host the runtime cannot resolve (D-101)"
+    for path in SOURCES:
+        assert not re.search(r"\bapi_key\s*=|AZURE_OPENAI_API_KEY|OPENAI_API_KEY", path.read_text(encoding="utf-8")), f"{path.name} handles a model key"
+
+
+def test_the_selection_and_the_shared_adapters_import_no_sdk():
+    for name in ("model_access.py", "models.py", "maf_chat.py"):
+        found = {m.split(".")[0] for m in imports(APP / "core" / name)}
+        assert not found & {"azure", "openai", "agent_framework_openai", "agent_framework_foundry"}, f"{name} imports an SDK: {found}"
+    assert "agent_framework" not in {m.split(".")[0] for m in imports(APP / "core" / "model_access.py")}
 
 
 def test_the_commit_path_is_one_module_called_from_one_place():
