@@ -29,18 +29,18 @@ def claims_client(tmp_path):
     """
     from fastapi.testclient import TestClient
 
-    from api import claims as claims_api
+    from bootstrap import wiring
     from infrastructure.persistence.sqlite_claims import SqliteClaimRepository
     from main import app
 
-    original = claims_api._REPO
+    original = None
     repo = SqliteClaimRepository(tmp_path / "claims.db")
-    claims_api.set_repository(repo)
+    wiring.set_claim_repository(repo)
     try:
         yield TestClient(app)
     finally:
         repo.close()
-        claims_api.set_repository(original)
+        wiring.set_claim_repository(original)
 
 
 def _record(client, **overrides):

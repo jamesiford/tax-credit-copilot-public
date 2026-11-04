@@ -17,7 +17,7 @@ from application.queries.get_in_year_progress import (
     GetInYearProgressQuery,
     ProgressNotAvailable,
 )
-from bootstrap.wiring import get_mediator
+from application.services import get_mediator
 
 router = APIRouter(prefix="/api", tags=["forecast"])
 

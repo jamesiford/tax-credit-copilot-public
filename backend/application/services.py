@@ -12,10 +12,10 @@ A provider is a callable, not an instance, so it is resolved on every call. That
 keeps the root's `set_*` and a test's `monkeypatch.setattr(wiring, "get_x", ...)`
 effective for the handlers that ask, which a value copied at start-up would not be.
 
-A service locator is a deliberate, interim shape: constructor injection is the
-destination (RM-18 routes the routers through the mediator), and until a handler is
-built around its collaborators this is the smallest change that points the
-dependency the right way.
+Routers ask here too: nothing under `api/` imports `infrastructure` or `bootstrap`
+(RM-18). A service locator is a deliberate, interim shape: constructor injection is
+the destination, and until a handler is built around its collaborators this is the
+smallest change that points the dependency the right way.
 """
 from __future__ import annotations
 
@@ -115,3 +115,23 @@ def get_writer_entitlement() -> Any:
 
 def get_data_query_service() -> Any:
     return resolve("data_query_service")
+
+
+def get_token_validator() -> Any:
+    return resolve("token_validator")
+
+
+def get_client_authorizer() -> Any:
+    return resolve("client_authorizer")
+
+
+def get_agent_action_recorder() -> Any:
+    return resolve("agent_action_recorder")
+
+
+def get_output_policy() -> Any:
+    return resolve("output_policy")
+
+
+def get_ai_telemetry() -> Any:
+    return resolve("ai_telemetry")

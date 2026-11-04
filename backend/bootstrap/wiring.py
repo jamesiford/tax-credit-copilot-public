@@ -27,64 +27,8 @@ from bootstrap.channel_wiring import (  # noqa: F401 - re-exported: the channel 
     get_writer_repository, set_agent_action_audit_repository, set_channel_audit_repository,
     set_confirmation_repository, set_display_name_resolver, set_writer_entitlement, set_writer_repository,
 )
-from application.commands.assess_client import AssessClientCommand, handle_assess_client
-from application.commands.resolve_finding import (
-    ReopenFindingCommand,
-    ResolveFindingCommand,
-    handle_reopen_finding,
-    handle_resolve_finding,
-)
-from application.commands.run_client_calculation import (
-    RunClientCalculationCommand,
-    handle_run_client_calculation,
-)
 from application.mediator import Mediator
-from application.queries.get_coverage import (
-    GetCellHistoryQuery,
-    GetClientCoverageQuery,
-    GetPortfolioCoverageQuery,
-    handle_get_cell_history,
-    handle_get_client_coverage,
-    handle_get_portfolio_coverage,
-)
-from application.queries.get_eligibility import (
-    GetEligibilityQuery,
-    handle_get_eligibility,
-)
-from application.queries.get_employee_drill import (
-    GetEmployeeDrillQuery,
-    handle_get_employee_drill,
-)
-from application.queries.get_in_year_progress import (
-    GetInYearProgressQuery,
-    handle_get_in_year_progress,
-)
-from application.queries.get_onezero_matrix import (
-    GetOneZeroMatrixQuery,
-    handle_get_onezero_matrix,
-)
-from application.queries.get_client_situation import (
-    GetClientSituationQuery,
-    handle_get_client_situation,
-)
-from application.queries.get_proximity import GetProximityQuery, handle_get_proximity
-from application.queries.get_channel_audit import GetChannelAuditQuery, handle_get_channel_audit
-from application.queries.list_findings import ListFindingsQuery, handle_list_findings
-from application.queries.get_unit_trend import GetUnitTrendQuery, handle_get_unit_trend
-from application.queries.simulate_portfolio import (
-    SimulatePortfolioQuery,
-    handle_simulate_portfolio,
-)
-from application.queries.simulate_unit import SimulateUnitQuery, handle_simulate_unit
-from application.queries.simulate_employee import SimulateEmployeeQuery, handle_simulate_employee
-from application.queries.rebase_unit import RebaseUnitQuery, handle_rebase_unit
-from application.commands.set_base_year import SetBaseYearCommand, handle_set_base_year
-from application.commands.record_claim import RecordClaimCommand, handle_record_claim
-from application.commands.set_engagement import SetEngagementCommand, handle_set_engagement
-from application.commands.create_claim_package import CreateClaimPackageCommand, handle_create_claim_package
-from application.commands.transition_claim import TransitionClaimCommand, handle_transition_claim
-from application.ai.handlers import handle_channel_narration, handle_narrate_brief, handle_route_question
-from application.ai.requests import ChannelNarrationQuery, NarrateBriefQuery, RouteQuestionQuery
+from bootstrap.handlers import register_handlers
 from bootstrap.ai_wiring import (  # noqa: F401 - re-exported: one import for every composition getter
     ai_health, get_agent_catalog, get_ai_settings, get_ai_telemetry, get_model_router, get_narration_service,
     get_output_policy, get_provider_registry, get_spec_registry, get_token_budget, reset_ai, set_ai_clock,
@@ -348,42 +292,7 @@ def get_confirmation_service() -> Any:
 
 def build_mediator() -> Mediator:
     """Construct and wire a mediator. Called once; safe to call again in tests."""
-    mediator = Mediator(authorizer=get_authorizer())
-
-    # --- Queries: compute and return, change nothing ---
-    mediator.register(GetProximityQuery, handle_get_proximity)
-    mediator.register(GetEligibilityQuery, handle_get_eligibility)
-    mediator.register(GetOneZeroMatrixQuery, handle_get_onezero_matrix)
-    mediator.register(GetUnitTrendQuery, handle_get_unit_trend)
-    mediator.register(GetEmployeeDrillQuery, handle_get_employee_drill)
-    mediator.register(GetClientCoverageQuery, handle_get_client_coverage)
-    mediator.register(GetPortfolioCoverageQuery, handle_get_portfolio_coverage)
-    mediator.register(GetCellHistoryQuery, handle_get_cell_history)
-    mediator.register(SimulatePortfolioQuery, handle_simulate_portfolio)
-    mediator.register(SimulateUnitQuery, handle_simulate_unit)
-    mediator.register(SimulateEmployeeQuery, handle_simulate_employee)
-    mediator.register(RebaseUnitQuery, handle_rebase_unit)
-    mediator.register(GetInYearProgressQuery, handle_get_in_year_progress)
-    mediator.register(GetClientSituationQuery, handle_get_client_situation)
-    mediator.register(ListFindingsQuery, handle_list_findings)
-    mediator.register(GetChannelAuditQuery, handle_get_channel_audit)
-
-    # --- Streaming queries: model narration, through the same pipeline ---
-    mediator.register(NarrateBriefQuery, handle_narrate_brief)
-    mediator.register(RouteQuestionQuery, handle_route_question)
-    mediator.register(ChannelNarrationQuery, handle_channel_narration)
-
-    # --- Commands: change what the business believes ---
-    mediator.register(AssessClientCommand, handle_assess_client)
-    mediator.register(ResolveFindingCommand, handle_resolve_finding)
-    mediator.register(ReopenFindingCommand, handle_reopen_finding)
-    mediator.register(RunClientCalculationCommand, handle_run_client_calculation)
-    mediator.register(SetBaseYearCommand, handle_set_base_year)
-    mediator.register(RecordClaimCommand, handle_record_claim)
-    mediator.register(TransitionClaimCommand, handle_transition_claim)
-    mediator.register(SetEngagementCommand, handle_set_engagement)
-    mediator.register(CreateClaimPackageCommand, handle_create_claim_package)
-    return mediator
+    return register_handlers(Mediator(authorizer=get_authorizer()))
 
 
 def get_mediator() -> Mediator:
@@ -417,4 +326,9 @@ bind(
     channel_auditor="get_channel_auditor",
     channel_audit_repository="get_channel_audit_repository",
     writer_entitlement="get_writer_entitlement",
+    token_validator="get_token_validator",
+    client_authorizer="get_client_authorizer",
+    agent_action_recorder="get_agent_action_recorder",
+    output_policy="get_output_policy",
+    ai_telemetry="get_ai_telemetry",
 )

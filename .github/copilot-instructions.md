@@ -70,11 +70,17 @@ before moving code. The essentials:
   `domain` imports only the standard library and itself. A handler asks for its
   collaborators through `application/services.py` (and the payroll and Gold ports in
   `source_ports.py` / `gold_ports.py`); `bootstrap` binds the adapters to those names.
-  `tests/test_architecture_layers.py` fails on a breach, SDKs included. The one remaining exception,
-  `api/_assess.py`, is allow-listed by name in the architecture test with the
-  reason — it is an application service still filed under `api/` because it
-  depends on `api/_payperiods.py`, a payroll reader that raises `HTTPException`.
-  Moving both is tracked work; do not add a second exception.
+  `tests/test_architecture_layers.py` fails on a breach, SDKs included. There is no
+  longer an exception for `api/`: the assessment service is `application/assessment.py`,
+  and the payroll reader (`application/payroll_rows.py`) raises ordinary errors that
+  `api/_payperiods.py` maps to 404/503.
+- **Routers translate HTTP and call the mediator** (`tests/test_architecture_routers.py`).
+  Nothing under `api/` imports `infrastructure` or `bootstrap` (a router asks
+  `application.services`, which the root fills); nothing inside imports `api`; a route
+  function stays within the length standard (a short pinned list of legacy functions may
+  only shrink); and the thin routers (`claims`, `findings`, `scope`, `ingestion`,
+  `onezero`, `auth`) import no `tools`/`data`/`config` and send every route through
+  `get_mediator()`. The remaining routers may not widen their `tools`/`data` imports.
 - **Writes are commands, reads are queries.** Every write lands on a number on a
   filed return, so it goes through the mediator pipeline: **Authorization →
   Validation → Handler → Audit**, timed. One use case per file, named for the use case.

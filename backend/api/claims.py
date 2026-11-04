@@ -16,7 +16,6 @@ that is arithmetically true and completely misleading.
 """
 from __future__ import annotations
 
-import os
 from decimal import Decimal
 from typing import Any
 
@@ -35,13 +34,13 @@ from application.queries.get_client_situation import (
     SituationNotAvailable,
     with_client_name,
 )
+from application.queries.get_portfolio_page import GetPortfolioPageQuery
 from application.queries.get_coverage import (
     ClaimNotFound,
     GetCellHistoryQuery,
     GetClientCoverageQuery,
     GetPortfolioCoverageQuery,
 )
-from bootstrap.wiring import get_claim_repository, get_mediator, set_claim_repository
 from domain.claims import (
     ClaimError,
     ClaimStatus,
@@ -49,29 +48,11 @@ from domain.claims import (
     Outcome,
     Provenance,
 )
+from application.services import get_mediator
 from domain.coverage import matrix, totals
-from infrastructure.persistence.sqlite_claims import SqliteClaimRepository
 
 router = APIRouter(prefix="/api/claims", tags=["claims"])
 v2_router = APIRouter(prefix="/api/v2", tags=["portfolio"])
-
-_REPO: Any | None = None
-
-
-def get_repository() -> Any:
-    """The claim store. Composition lives in `bootstrap.wiring`. [ADR-002]
-
-    Kept as a thin alias because the router and its tests already name it, and
-    because a router asking the composition root for an adapter is the right
-    direction of dependency — the reverse was not.
-    """
-    return get_claim_repository()
-
-
-def set_repository(repo: Any) -> None:
-    """Point the application at another adapter. Used by tests and by wiring."""
-    set_claim_repository(repo)
-
 
 # ------------------------------------------------------------------ payloads
 
@@ -209,12 +190,12 @@ def portfolio_v2(
     anyone scrolls. That counter is a DIAGNOSTIC: under the pipeline model a
     client sitting unassessed is a gap to close, not a bucket it belongs in.
     """
-    return portfolio.portfolio_page(
+    return get_mediator().send(GetPortfolioPageQuery(
         year=year, program=program, outcome=outcome, scope=scope, near=near,
         status=status, sort=sort, order=order, limit=limit, offset=offset,
         # Looked up on this module at call time, so the seams tests patch hold.
         book=_client_book, states=_footprint, priceable=_priceable_states,
-    )
+    ))
 
 
 @router.get("/cell/{client_id}/{program_code}/{tax_year}")

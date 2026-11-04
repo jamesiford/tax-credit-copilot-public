@@ -26,6 +26,14 @@ class NotAuthorized(PermissionError):
     """The caller is who they say and may not do this. Routers map it to 403."""
 
 
+class AuthenticationFailed(Exception):
+    """401: no proof of identity. Raised by a token validator; the API edge maps it."""
+
+
+class AuthorizationFailed(Exception):
+    """403: identity proven, permission missing. Raised by a token validator; the API edge maps it."""
+
+
 @dataclass(frozen=True)
 class ActingUser:
     """The person a channel request is made on behalf of.

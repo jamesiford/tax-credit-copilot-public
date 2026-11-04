@@ -30,7 +30,14 @@ from fastapi import APIRouter, HTTPException, Request
 from application.acting_user import HEADER as ACTING_USER_HEADER
 from application.acting_user import ActingUserError, parse_acting_user
 from application.deployment import auth_mode, auth_tenant_id
-from application.identity import ANONYMOUS, Principal, set_ambient_principal
+from application.identity import (
+    ANONYMOUS,
+    AuthenticationFailed,
+    AuthorizationFailed,
+    Principal,
+    set_ambient_principal,
+)
+from application.services import get_client_authorizer, get_token_validator
 
 logger = logging.getLogger(__name__)
 
@@ -100,9 +107,6 @@ async def _client_ids(request: Request) -> set[int]:
 def authenticate(request: Request) -> Principal:
     if auth_mode() != "entra":
         return ANONYMOUS
-    from bootstrap.wiring import get_token_validator
-    from infrastructure.auth.entra import AuthenticationFailed, AuthorizationFailed
-
     try:
         principal = get_token_validator().validate(_bearer(request))
     except AuthenticationFailed as exc:
@@ -131,8 +135,6 @@ def bind_acting_user(principal: Principal, header: str | None) -> Principal:
 
 
 def authorize_clients(principal: Principal, client_ids: Iterable[int]) -> None:
-    from bootstrap.wiring import get_client_authorizer
-
     authorizer = get_client_authorizer()
     for client_id in sorted(client_ids):
         if not authorizer.is_authorized(principal, client_id):

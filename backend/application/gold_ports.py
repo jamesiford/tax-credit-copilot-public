@@ -10,6 +10,8 @@ the store, so the composition root supplies them.
 """
 from __future__ import annotations
 
+from typing import Any
+
 from application.services import resolve
 
 
@@ -23,3 +25,18 @@ def section_9_query_count() -> int:
 
 def reap_stranded_runs() -> int:
     return resolve("reap_stranded_runs")()
+
+
+def run_envelope(run: dict[str, Any] | None, in_flight: dict[str, Any] | None, *, has_rows: bool = True) -> dict[str, Any]:
+    """The provenance block every Gold-read screen shows above its figures (produced_at, in_flight)."""
+    return resolve("gold_run_envelope")(run, in_flight, has_rows=has_rows)
+
+
+def employee_filters() -> dict[str, Any]:
+    """The whitelist of columns the employee grid may filter on, with their types."""
+    return resolve("gold_employee_filters")
+
+
+def near_filters() -> dict[str, Any]:
+    """The same whitelist for the near-threshold cohort, which aliases its columns differently."""
+    return resolve("gold_near_filters")

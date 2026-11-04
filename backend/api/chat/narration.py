@@ -33,7 +33,7 @@ def _record_agent_action(agent_name: str, end: StreamEnd | None, prompt: str, ch
     """
     try:
         from application.agent_audit import AgentInvocation
-        from bootstrap.wiring import get_agent_action_recorder
+        from application.services import get_agent_action_recorder
 
         intent = (_TELEMETRY_CONTEXT.get() or {}).get("intent")
         tool = CHAT_INTENT_TOOL.get(intent or "")
@@ -98,14 +98,14 @@ class _Run:
 def _output_gate():
     """A gate that holds back prose breaking an output rule, or None when the policy is off."""
     from application.ai.safety.stream_gate import OutputGate
-    from bootstrap.wiring import get_output_policy
+    from application.services import get_output_policy
 
     policy = get_output_policy()
     return OutputGate(policy) if policy is not None else None
 
 
 def _withheld(gate) -> None:
-    from bootstrap.wiring import get_ai_telemetry
+    from application.services import get_ai_telemetry
 
     get_ai_telemetry().count("ai.output_withheld")
     log.warning("model prose withheld by output policy: %s", ",".join(gate.blocked))
@@ -134,7 +134,7 @@ class _Release:
 
 async def _frames(agent_name: str, prompt: str, run: _Run) -> AsyncIterator[str]:
     """Token frames for one narration, each released only once the output policy accepts it."""
-    from bootstrap.wiring import get_mediator
+    from application.services import get_mediator
 
     release = _Release()
     async for event in get_mediator().stream(NarrateBriefQuery(agent_name=agent_name, prompt=prompt)):

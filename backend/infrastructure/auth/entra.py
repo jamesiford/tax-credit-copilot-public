@@ -26,7 +26,13 @@ from typing import Any, Iterable
 
 import jwt
 
-from application.identity import PRINCIPAL_AGENT, PRINCIPAL_USER, Principal
+from application.identity import (  # noqa: F401 - the failures are the application's; re-exported for existing importers
+    PRINCIPAL_AGENT,
+    PRINCIPAL_USER,
+    AuthenticationFailed,
+    AuthorizationFailed,
+    Principal,
+)
 
 REQUIRED_SCOPE = "user_impersonation"
 REQUIRED_ROLE = "TCC.User"
@@ -35,14 +41,6 @@ AGENT_ROLE = "TCC.Agent"
 
 #: Accept a token a few seconds either side of the clock it was minted by.
 _LEEWAY_S = 60
-
-
-class AuthenticationFailed(Exception):
-    """401: no proof of identity."""
-
-
-class AuthorizationFailed(Exception):
-    """403: identity proven, permission missing."""
 
 
 def issuer_for(tenant_id: str) -> str:

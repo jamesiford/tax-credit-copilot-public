@@ -105,7 +105,7 @@ def _candidate_year(client_id: int, req: ChatRequest) -> int | None:
         return req.tax_year
     try:
         from application.queries.get_client_situation import GetClientSituationQuery
-        from bootstrap.wiring import get_mediator
+        from application.services import get_mediator
 
         lead = get_mediator().send(GetClientSituationQuery(client_id=client_id)).get("lead_tax_year")
         if lead is not None:
@@ -113,7 +113,7 @@ def _candidate_year(client_id: int, req: ChatRequest) -> int | None:
     except Exception:  # noqa: BLE001
         pass
     try:
-        from bootstrap.wiring import get_run_manifest_repository
+        from application.services import get_run_manifest_repository
 
         manifest = get_run_manifest_repository().latest(client_id)
         return int(manifest.tax_year) if manifest is not None else None

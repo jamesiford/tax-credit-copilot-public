@@ -46,17 +46,17 @@ def book(monkeypatch):
 
 @pytest.fixture
 def claims_repo(tmp_path):
-    from api import claims as claims_api
+    from bootstrap import wiring
     from infrastructure.persistence.sqlite_claims import SqliteClaimRepository
 
-    original = claims_api._REPO
+    original = None
     repo = SqliteClaimRepository(tmp_path / "claims.db")
-    claims_api.set_repository(repo)
+    wiring.set_claim_repository(repo)
     try:
         yield repo
     finally:
         repo.close()
-        claims_api.set_repository(original)
+        wiring.set_claim_repository(original)
 
 
 def _seed(claims_repo):
@@ -486,17 +486,17 @@ def test_employee_drill_equals_the_query():
 
 @pytest.fixture
 def findings_repo(tmp_path):
-    from api import findings as findings_api
+    from bootstrap import wiring
     from infrastructure.persistence.sqlite_findings import SqliteFindingRepository
 
-    original = findings_api._REPO
+    original = None
     repo = SqliteFindingRepository(tmp_path / "findings.db")
-    findings_api.set_repository(repo)
+    wiring.set_finding_repository(repo)
     try:
         yield repo
     finally:
         repo.close()
-        findings_api.set_repository(original)
+        wiring.set_finding_repository(original)
 
 
 def test_findings_list_equals_the_rest_endpoint(findings_repo):

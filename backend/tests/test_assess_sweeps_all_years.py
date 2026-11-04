@@ -15,7 +15,7 @@ from datetime import date, timedelta
 
 import pytest
 
-from api import _assess
+from application import assessment as _assess
 from application.commands.run_client_calculation import RunClientCalculationCommand
 
 

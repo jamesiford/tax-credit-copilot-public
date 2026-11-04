@@ -80,7 +80,7 @@ async def _plan(message: str, history: list[ChatTurn], scope: dict[str, Any]) ->
     With no model available the keyword fallback answers; a router that errors
     must never fail the turn.
     """
-    from bootstrap.wiring import get_mediator, get_narration_service
+    from application.services import get_mediator, get_narration_service
     from application.ai.handlers.route import ROUTER_AGENT
 
     if not get_narration_service().available([ROUTER_AGENT]):
