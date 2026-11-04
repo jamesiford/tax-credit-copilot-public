@@ -105,6 +105,12 @@ withheld because it could not be verified, then the provenance footer. The narra
 (never patched), the guard status is `rejected`, and the report filed with the gateway says so and how
 many figures failed. A model that is down gets the same reply with a line saying so.
 
+Besides a bad digit, an unresolvable placeholder or a policy break, a narration is dropped when an approximation qualifier ("about", "roughly", "rounded", "up to"...) sits within three tokens of a figure (`composer_hedging`, CH-15c): every figure shown is exact, and "not rounded" is rejected as well.
+
+## Narration and planning quality (CH-15c)
+
+The narrator prompt (`backend/agents/prompts/channel_narrator.md`, vendored unchanged, version 2) asks for a senior colleague's voice: one to four sentences, the answer first, the engine's own labels, no rank prose, no hedging, the exact `placeholder` copied from `fact_paths`, and six worked examples. The planner's instructions and the tools' descriptions are the model's only guide to choosing a tool: `book_rank` says it is for the whole book only and every client tool begins "ONE client (needs a client)". Which client is still code (`ToolRunner.ensure_client`, run before any client tool). `golden/planning.json` and `test_orch_planning.py` pin the sequences and the wording; `tests/ai_evals` carries the routing and narration items. See [D-109](DECISIONS.md).
+
 ## Audit
 
 The gateway audits every tool call itself (reads) or the API does (writes). The orchestrator adds the
