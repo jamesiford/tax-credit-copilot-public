@@ -17,7 +17,9 @@ from collections import Counter
 from typing import Any
 
 from application.capabilities import _support as s
-from application.capabilities.data_access import asker, refuse_employee_level_for_cowork, refused, service
+from application.capabilities.data_access import (
+    asker, refuse_employee_level_for_cowork, refused, service, suppress_small_groups,
+)
 from application.capabilities.data_render import cell, to_tool_result
 from application.capabilities.envelope import Provenance, ToolResult
 from application.capabilities.errors import DataQueryRefused
@@ -38,7 +40,7 @@ def data_query(principal: Principal, **query: Any) -> ToolResult:
         spec = QuerySpec.from_dict(query)
         svc = service()
         refuse_employee_level_for_cowork(principal, svc.audience_of(spec))
-        return to_tool_result(svc.run(spec, principal=asker(principal)))
+        return to_tool_result(svc.run(spec, principal=asker(principal), suppress_small_groups=suppress_small_groups(principal)))
     except QueryError as exc:
         raise refused(exc) from exc
 
@@ -108,7 +110,8 @@ def data_distinct_values(
     """The distinct values of one category column for a client, so a filter can be written without guessing."""
     try:
         _listable(dataset, column)
-        result = service().run(_values_spec(client_id, dataset, column, tax_years, limit), principal=asker(principal))
+        result = service().run(_values_spec(client_id, dataset, column, tax_years, limit), principal=asker(principal),
+                               suppress_small_groups=suppress_small_groups(principal))
     except QueryError as exc:
         raise refused(exc) from exc
     values = _merge(result.columns, result.rows, column)
@@ -119,6 +122,7 @@ def data_distinct_values(
         "dataset": dataset, "column": column, "client_id": client_id, "tax_years": list(p.tax_years),
         "value_count": len(values), "truncated": truncated, "row_limit": limit, "values": values,
         "source": p.source_line, "notes": list(p.notes),
+        **({"small_groups": dict(p.small_groups)} if p.small_groups else {}),
     }
     return s.result(
         "data_distinct_values", facts, _values_blocks(dataset, column, values, truncated, p.source_line),

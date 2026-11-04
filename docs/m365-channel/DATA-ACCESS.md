@@ -64,6 +64,26 @@ unless the caller is a writer**, with a refusal that names Teams as the place to
 API before anything is read, the gateway on the way back). An aggregate over employee-level data carries no person
 and is allowed everywhere. The reasoning is in [ADR-009 §8](../architecture/ADR-009-m365-channel.md).
 
+**Small groups (RM-01).** An aggregate over an employee-level dataset (`employee_period_fact`,
+`employee_eligibility`, `onezero_matrix`, `payroll`) shows only groups of at least **K distinct people**
+(default **5**, `DATA_MIN_GROUP_SIZE`, never below **2**). The rule is applied in the data service, after the rows
+are read and before any lane is projected, so the model lane and the person's lane obey it alike:
+
+| Case | What happens |
+| --- | --- |
+| a group has fewer than K people | the group is **left out**, not merged, rounded or altered; the result says how many were (`facts.small_groups.suppressed_groups`, a note, the provenance) |
+| an ungrouped aggregate over a filter that leaves fewer than K people | the single row is left out and counted the same way |
+| every group in a group-by holds one person | refused, `groups_are_individuals`: it would list individuals |
+| the caller is a writer | not applied; the result says `exempt: writer` (a writer may already read the client's employee rows; there is no per-client ownership beyond the API's client check) |
+| the dataset is not employee-level (`unit_month_summary`, `unit_year_master`, `run_method_summary`, the credit and ops datasets, `location`, `pay_code`) | not applied: the grain is already a worksite or a year and no person key exists to count; the "both" lane for these is unchanged |
+| raw rows with no aggregate | not applied: they are the person's lane (never a model's), and Cowork refuses them for a non-writer |
+
+A group's size is counted in **people** (the dataset's declared `person_key`), not rows: twelve pay-period rows of
+three people are a group of three. The count rides in the same statement as a hidden `_group_size` column that the
+service removes, so the client scope stays the first predicate and no second query runs. When the row limit cuts a
+result the count of groups left out covers only the groups fetched. Suppression does not stop differencing (two
+queries differing by one person); see [KNOWN-LIMITATIONS](KNOWN-LIMITATIONS.md#data-queries).
+
 ## 3. Limits
 
 | Limit | Value | Setting | On breach |
@@ -72,6 +92,7 @@ and is allowed everywhere. The reasoning is in [ADR-009 §8](../architecture/ADR
 | Rows | spec `limit` ≤ 500, default 100; server cap 500 (1-500) | `DATA_QUERY_MAX_ROWS` | the result says it was capped; the cap can only lower a spec's limit |
 | Per-person budget | 30 a minute (1-600), token bucket, per process | `DATA_QUERY_RATE_PER_MINUTE` | typed `query_budget_exceeded` (refused, not queued) |
 | Concurrency | 4 in flight across all people (1-16) | `DATA_QUERY_MAX_CONCURRENCY` | typed `query_busy` after a 0.25 s wait |
+| Smallest group | 5 people (2-1000; below 2 is read as 2) | `DATA_MIN_GROUP_SIZE` (not in Terraform: a privacy floor) | the group is left out and counted; every-group-a-singleton is `groups_are_individuals` |
 | Spec size | 8 filters, 6 measures, 12 selected, 8 group-by, 4 order-by, 50 values in an `in`, 12 years, 100-char text | code (`spec.py`) | typed `too_many_items` |
 | Reply table | the first 50 rows, with the number cut stated | code | the facts keep every row the cap allowed |
 

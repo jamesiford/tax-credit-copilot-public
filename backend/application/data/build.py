@@ -30,6 +30,7 @@ from application.data.dialect import (
 )
 from application.data.plan import BASE_ALIAS, ColumnRef, MeasurePlan, Plan
 from application.data.semantic_model import Agg, SemanticModel
+from application.data.small_groups import SIZE_LABEL, counts_people
 from application.data.spec import QuerySpec
 from application.data.validate import validate
 
@@ -45,6 +46,7 @@ class BuiltQuery:
     params: list[Any]
     plan: Plan
     dialect: Dialect
+    counts_people: bool = False
 
     def as_tuple(self) -> tuple[str, list[Any]]:
         """The `(sql, params)` pair."""
@@ -58,17 +60,23 @@ def build_sql(spec: QuerySpec, model: SemanticModel, dialect: Dialect, schemas: 
 
 
 def build_query(spec: QuerySpec, model: SemanticModel, dialect: Dialect, schemas: SchemaNames = DEFAULT_SCHEMAS,
-                *, known_years: Collection[int] | None = None) -> BuiltQuery:
-    """Validate, then build; the plan travels with the statement for provenance and audience."""
+                *, known_years: Collection[int] | None = None, count_people: bool = False) -> BuiltQuery:
+    """Validate, then build; the plan travels with the statement for provenance and audience.
+
+    `count_people` asks for the hidden group-size column wherever the small-group rule applies
+    (`small_groups.counts_people`); it is off for a caller exempt from the rule.
+    """
     plan = validate(spec, model, known_years=known_years)
-    return BuiltQuery(*_statement(plan, dialect, schemas), plan=plan, dialect=dialect)
+    counted = count_people and counts_people(plan)
+    return BuiltQuery(*_statement(plan, dialect, schemas, counted), plan=plan, dialect=dialect, counts_people=counted)
 
 
-def _statement(plan: Plan, dialect: Dialect, schemas: SchemaNames) -> tuple[str, list[Any]]:
+def _statement(plan: Plan, dialect: Dialect, schemas: SchemaNames, counted: bool) -> tuple[str, list[Any]]:
     fetch = plan.limit + TRUNCATION_PROBE
     top = f"TOP ({fetch}) " if dialect is Dialect.TSQL else ""
     where, params = where_clause(plan, dialect, schemas)
-    parts = [f"SELECT {top}{', '.join(_select_items(plan, dialect))}", _from(plan, dialect, schemas), where]
+    items = _select_items(plan, dialect) + ([_group_size(plan, dialect)] if counted else [])
+    parts = [f"SELECT {top}{', '.join(items)}", _from(plan, dialect, schemas), where]
     if plan.group_by:
         parts.append("GROUP BY " + ", ".join(column_sql(dialect, r.column, r.alias) for r in plan.group_by))
     order = _order_items(plan, dialect)
@@ -82,6 +90,16 @@ def _statement(plan: Plan, dialect: Dialect, schemas: SchemaNames) -> tuple[str,
 def _select_items(plan: Plan, dialect: Dialect) -> list[str]:
     dims = [f"{column_sql(dialect, r.column, r.alias)} AS {quote(dialect, r.label)}" for r in plan.select]
     return dims + [f"{_aggregate(m, dialect)} AS {quote(dialect, m.alias)}" for m in plan.measures]
+
+
+def _group_size(plan: Plan, dialect: Dialect) -> str:
+    """People in each group: distinct person keys, plus one where a row has no key (an unknown person counts).
+
+    The model supplies the column (`Dataset.person_key`); an empty ungrouped result sums to NULL, which
+    `small_groups` reads as no people.
+    """
+    key = column_sql(dialect, plan.dataset.column(plan.dataset.person_key), BASE_ALIAS)
+    return f"COUNT(DISTINCT {key}) + MAX(CASE WHEN {key} IS NULL THEN 1 ELSE 0 END) AS {quote(dialect, SIZE_LABEL)}"
 
 
 def _aggregate(measure: MeasurePlan, dialect: Dialect) -> str:

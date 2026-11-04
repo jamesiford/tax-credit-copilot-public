@@ -29,6 +29,7 @@ from application.data.dialect import SchemaNames
 from application.data.executor import Rows
 from application.data.plan import FilterPlan
 from application.data.semantic_model import Currency, Sensitivity
+from application.data.small_groups import SmallGroupReport
 
 REDACTED = "<redacted>"
 
@@ -70,6 +71,7 @@ class QueryProvenance:
     run: LiveRun | None
     as_of: str
     as_of_basis: str
+    small_groups: dict[str, Any] | None
     notes: tuple[str, ...]
 
     def to_dict(self) -> dict[str, Any]:
@@ -81,8 +83,8 @@ class QueryProvenance:
         return data
 
 
-def build_provenance(built: BuiltQuery, schemas: SchemaNames, rows: Rows, *,
-                     row_limit: int, run: LiveRun | None, executed_at: datetime) -> QueryProvenance:
+def build_provenance(built: BuiltQuery, schemas: SchemaNames, rows: Rows, *, row_limit: int, run: LiveRun | None,
+                     executed_at: datetime, small_groups: SmallGroupReport | None = None) -> QueryProvenance:
     """The provenance for a result, from the statement that ran and the rows it returned."""
     plan, dataset = built.plan, built.plan.dataset
     table = f"{schemas.name(dataset.schema)}.{dataset.table}"
@@ -98,7 +100,8 @@ def build_provenance(built: BuiltQuery, schemas: SchemaNames, rows: Rows, *,
         statement_sha256=sha256_text(built.sql), params_sha256=sha256_text(json.dumps(param_structure(built.params))),
         param_count=len(built.params), row_count=rows.row_count, row_limit=row_limit, truncated=rows.truncated,
         currency=dataset.currency.value, run=run, as_of=as_of, as_of_basis=basis,
-        notes=_notes(built, rows, row_limit, run),
+        small_groups=None if small_groups is None else small_groups.to_dict(),
+        notes=(*_notes(built, rows, row_limit, run), *(small_groups.notes() if small_groups else ())),
     )
 
 

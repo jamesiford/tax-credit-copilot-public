@@ -9,6 +9,7 @@ would be switched off by someone, which is worse than not having it).
 from __future__ import annotations
 
 import ast
+from pathlib import Path
 
 import pytest
 
@@ -77,3 +78,54 @@ def test_every_dataset_runs_end_to_end_through_the_adapter_on_sqlite():
         built = build_query(QuerySpec.from_dict({**random_spec(dataset, seed), "client_id": CLIENT_A}), MODEL, Dialect.SQLITE)
         rows = executor.execute(built.sql, built.params, client_id=CLIENT_A, timeout_s=5, max_rows=built.plan.limit)
         assert rows.row_count <= built.plan.limit
+
+
+def test_the_statements_that_count_people_pass_the_guard_and_run_on_sqlite():
+    database = build_database(MODEL)
+    executor = SqliteDataQueryExecutor(lambda: database)
+    counted = 0
+    for dataset, seed in GENERATED:
+        for dialect in (Dialect.TSQL, Dialect.SQLITE):
+            spec = QuerySpec.from_dict({**random_spec(dataset, seed), "client_id": CLIENT_A})
+            built = build_query(spec, MODEL, dialect, count_people=True)
+            assert_read_only(built.sql)
+            if dialect is Dialect.SQLITE and built.counts_people:
+                counted += 1
+                rows = executor.execute(built.sql, built.params, client_id=CLIENT_A, timeout_s=5, max_rows=built.plan.limit)
+                assert not rows.rows or len(rows.rows[0]) == len(built.plan.result_columns) + 1, "one hidden size column"
+    assert counted, "the generator reaches an aggregate over an employee-level dataset"
+
+
+def _capability_run_calls() -> list[tuple[str, ast.Call]]:
+    """Every `<something>.run(..., principal=...)` call in the capabilities: the shape of a data-service call."""
+    calls = []
+    for path in sorted((Path(__file__).resolve().parents[1] / "application" / "capabilities").glob("*.py")):
+        for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+            if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute) and node.func.attr == "run" \
+                    and any(k.arg == "principal" for k in node.keywords):
+                calls.append((path.name, node))
+    return calls
+
+
+def test_every_capability_that_runs_a_data_query_states_whether_small_groups_are_suppressed():
+    """A new tool that calls the service and forgets the keyword would get the safe default, but the
+    decision about WHO is exempt belongs in the capability, in the open, so it is required to be written."""
+    calls = _capability_run_calls()
+    assert {name for name, _ in calls} >= {"data_query.py"}, "the scan found the data tools"
+    for name, call in calls:
+        assert any(k.arg == "suppress_small_groups" for k in call.keywords), f"{name} runs a query without saying who is exempt"
+
+
+def test_the_scan_notices_a_run_without_the_keyword():
+    call = ast.parse("service().run(spec, principal=who)").body[0].value
+    assert not any(k.arg == "suppress_small_groups" for k in call.keywords)
+
+
+def test_only_the_service_executes_a_built_query_and_only_it_applies_the_group_rule():
+    root = Path(__file__).resolve().parents[1] / "application"
+    for path in root.rglob("*.py"):
+        text = path.read_text(encoding="utf-8")
+        if "withhold(" in text and path.name not in ("service.py", "small_groups.py"):
+            raise AssertionError(f"{path.name} applies the small-group rule; only the data service may")
+        if "count_people=" in text and path.name not in ("service.py", "build.py"):
+            raise AssertionError(f"{path.name} builds a query that counts people; only the data service may decide when")

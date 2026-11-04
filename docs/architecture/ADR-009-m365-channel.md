@@ -82,8 +82,24 @@ the person alone. A writer is entitled to see person-level data and chooses Cowo
 bar the platform sets for changing it. The rule is enforced twice: the API refuses before anything is read (it
 knows the specification and the channel), and the gateway refuses on the way back if any result still carries a
 person-only lane for a non-writer, so neither check is the only one. An aggregate over employee-level data (a
-count of people by location, an average by month) carries no person and is allowed everywhere. Not decided here:
-suppressing small groups (see [KNOWN-LIMITATIONS](../m365-channel/KNOWN-LIMITATIONS.md#data-queries)).
+count of people by location, an average by month) carries no person and is allowed everywhere, subject to the
+small-group rule below.
+
+**Small groups are left out, never altered (RM-01).** A count or an average over a group of one is that person's own
+figure, and over Cowork the text a tool returns IS what the model reads. So the data service withholds, **before any
+lane is projected**, every group of an aggregate over an employee-level dataset that holds fewer than **K distinct
+people** (default 5, `DATA_MIN_GROUP_SIZE`, never below 2: a lower value is read as 2). The size is counted from
+the dataset's declared person key, not from rows, in the same statement (a hidden `_group_size` column the service
+removes). A group is **omitted, not merged and not rounded**, so every figure shown is exact; the result reports the
+number of groups it omitted and why (`facts.small_groups`, a note, the provenance). That is how the rule reconciles
+with the product's exactness, and it replaces CH-16d's earlier decision against suppression, which assumed a
+suppressed group would be silently altered. An ungrouped aggregate is one group, so an average over a filter that
+isolates two people is withheld; a group-by whose every group is one person is refused (`groups_are_individuals`).
+It applies in both lanes and every channel, **except** to a writer, who may already read the client's employee rows
+(there is no per-client ownership in this build beyond the API's client check, so "a writer viewing their own
+client" is a writer on an authorised client). Datasets that are not employee-level (the worksite and year
+summaries, the credit datasets) are not suppressed: their grain is already an aggregate and no person key exists to
+count. Suppression does not defeat differencing, which KNOWN-LIMITATIONS says plainly.
 
 The data path is bounded and audited like every other capability: a statement timeout (20 s), a 500-row cap, a
 per-person budget and a concurrency bulkhead, each of which **refuses rather than queues** so the shared Fabric

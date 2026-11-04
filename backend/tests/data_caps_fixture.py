@@ -32,14 +32,20 @@ def person(oid: str = READER_OID, channel: str | None = "teams") -> Principal:
     return Principal(oid="gateway", principal_type=PRINCIPAL_AGENT, acting_for=acting, authenticated=True)
 
 
+#: The fixture holds two people per client, so the shared service runs at the smallest K the rule allows;
+#: `tests/test_data_small_groups.py` runs the default K=5 over a database built for it.
+FIXTURE_LIMITS = QueryLimits(min_group_size=2)
+
+
 def make_service(sources=(Source.WAREHOUSE, Source.LAKEHOUSE), **kwargs) -> DataQueryService:
     executor = SqliteDataQueryExecutor(lambda db=build_database(MODEL): db)
+    kwargs.setdefault("limits", FIXTURE_LIMITS)
     return DataQueryService(MODEL, {s: executor for s in sources}, **kwargs)
 
 
 @pytest.fixture()
 def data_service():
-    service = make_service(limits=QueryLimits())
+    service = make_service(limits=FIXTURE_LIMITS)
     set_data_query_service(service)
     set_writer_entitlement(Writers())
     yield service
