@@ -13,13 +13,7 @@ quotes figures from its brief. This agent has nothing to quote.
 """
 from __future__ import annotations
 
-from domain.ai import AgentSpec, ModelRole
-
-from ._prompts import load_instructions
-
-
-NAME = "ChannelNarratorAgent"
-INSTRUCTIONS = load_instructions("channel_narrator")
+from .roster import build_spec
 
 AGENT_PROFILE = {
     "tab_label": "Channel Narrator",
@@ -48,7 +42,6 @@ AGENT_PROFILE = {
 }
 
 
-SPEC = AgentSpec(
-    name=NAME, instructions=INSTRUCTIONS, role=ModelRole.NARRATOR,
-    temperature=0.2, profile=AGENT_PROFILE,
-)
+SPEC = build_spec("channel_narrator", AGENT_PROFILE)
+NAME = SPEC.name
+INSTRUCTIONS = SPEC.instructions

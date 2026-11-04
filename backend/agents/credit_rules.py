@@ -1,13 +1,7 @@
 """CreditRulesAgent — narrates pre-computed credit math."""
 from __future__ import annotations
 
-from domain.ai import AgentSpec, ModelRole
-
-from ._prompts import load_instructions
-
-
-NAME = "CreditRulesAgent"
-INSTRUCTIONS = load_instructions("credit_rules")
+from .roster import build_spec
 
 AGENT_PROFILE = {
     "tab_label": "Credit Rules",
@@ -34,7 +28,6 @@ AGENT_PROFILE = {
 }
 
 
-SPEC = AgentSpec(
-    name=NAME, instructions=INSTRUCTIONS, role=ModelRole.NARRATOR,
-    temperature=0.2, profile=AGENT_PROFILE,
-)
+SPEC = build_spec("credit_rules", AGENT_PROFILE)
+NAME = SPEC.name
+INSTRUCTIONS = SPEC.instructions

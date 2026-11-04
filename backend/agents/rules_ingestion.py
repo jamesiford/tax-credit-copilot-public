@@ -8,13 +8,7 @@ config. Every value it reports carries a source URL + retrieved-at date.
 """
 from __future__ import annotations
 
-from domain.ai import AgentSpec, ModelRole
-
-from ._prompts import load_instructions
-
-
-NAME = "RulesIngestionAgent"
-INSTRUCTIONS = load_instructions("rules_ingestion")
+from .roster import build_spec
 
 AGENT_PROFILE = {
     "tab_label": "Rules Ingestion",
@@ -45,7 +39,6 @@ AGENT_PROFILE = {
 }
 
 
-SPEC = AgentSpec(
-    name=NAME, instructions=INSTRUCTIONS, role=ModelRole.ANALYSIS,
-    temperature=0.1, profile=AGENT_PROFILE,
-)
+SPEC = build_spec("rules_ingestion", AGENT_PROFILE)
+NAME = SPEC.name
+INSTRUCTIONS = SPEC.instructions

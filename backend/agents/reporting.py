@@ -1,13 +1,7 @@
 """ReportingAgent — exec-friendly narrative summary."""
 from __future__ import annotations
 
-from domain.ai import AgentSpec, ModelRole
-
-from ._prompts import load_instructions
-
-
-NAME = "ReportingAgent"
-INSTRUCTIONS = load_instructions("reporting")
+from .roster import build_spec
 
 AGENT_PROFILE = {
     "tab_label": "Reporting",
@@ -32,7 +26,6 @@ AGENT_PROFILE = {
 }
 
 
-SPEC = AgentSpec(
-    name=NAME, instructions=INSTRUCTIONS, role=ModelRole.NARRATOR,
-    temperature=0.3, profile=AGENT_PROFILE,
-)
+SPEC = build_spec("reporting", AGENT_PROFILE)
+NAME = SPEC.name
+INSTRUCTIONS = SPEC.instructions
