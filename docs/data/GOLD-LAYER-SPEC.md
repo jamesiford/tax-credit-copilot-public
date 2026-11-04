@@ -33,7 +33,7 @@ write and read paths were built on 8 Sep.
 | The schema itself | **Deployed.** All 20 tables live in the Fabric Warehouse, verified against this spec |
 | Rows in those tables | **Populated** for the clients that have been run |
 | The write path (a run populates Gold) | **Built.** `application/commands/run_client_calculation.py` → `infrastructure/persistence/warehouse_gold.py` |
-| The read path (screens read Gold) | **Built** for Position by location. `infrastructure/persistence/gold_reader.py` serves `GET /api/v2/clients/{id}/units`, and that page load runs no engine |
+| The read path (screens read Gold) | **Built** for Position by location. `infrastructure/persistence/gold_reader/` serves `GET /api/v2/clients/{id}/units`, and that page load runs no engine |
 
 The reference client (account 1001, TY2023) was written on 8 Sep as run
 `76348c5c3bcf411ca6b636cd1e23e3ec`: 384,418 `employee_period_fact` rows, 20,472

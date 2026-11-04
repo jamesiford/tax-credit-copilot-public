@@ -92,14 +92,12 @@ the gate", not a rewrite.
 
 | Offender | Measure | Note |
 | --- | ---: | --- |
-| `infrastructure/persistence/gold_reader.py` | 1,821 lines | One module, one 830-line `GoldReader` class; split by read model |
 | `tools/reference_step1.py::run_reference_step1` | 279 lines | Reference tooling; independent of the product path |
 | `application/commands/run_client_calculation.py::_replay_unit_series` | 255 lines | The write-time engine replay — **parity-critical** |
 | `domain/calculation/onezero.py::run_pay_period_method` | 244 lines | Certified method — **parity-critical** |
 | `domain/calculation/onezero.py::run_min_max_method` | 239 lines | Certified method — **parity-critical** |
-| `infrastructure/persistence/gold_reader.py::GoldReader` | 830 lines | As above |
 | `application/queries/simulate_employee.py::handle_simulate_employee` | 219 lines, complexity 52 | Extract per-lever helpers |
-| `domain/calculation/onezero.py` | 1,295 lines | Certified method — **parity-critical** |
+| `domain/calculation/onezero.py` | 1,295 lines | Certified method — **parity-critical**. Not split in RM-19: see D-141 |
 | `application/queries/get_portfolio.py::portfolio_page` | 205 lines | Extract the band and filter steps |
 | `tools/build_approval_package.py::_cover_sheet` | 192 lines | Document assembly; split by section |
 | `application/commands/run_client_calculation.py::handle_run_client_calculation` | 178 lines | Write path — parity-critical |
