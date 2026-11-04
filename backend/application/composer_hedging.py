@@ -63,6 +63,18 @@ def _qualifier_positions(tokens: list[str]) -> set[int]:
     return found
 
 
+#: Words that say a figure was rounded or approximated. The narrator may never use them at all
+#: ("never say a figure is rounded, even to deny it"): live, "Rounded to the nearest thousand, you can see
+#: these figures in the table" passed the window rule because no figure sat beside the word, and it told the
+#: reader a rounding had happened when the engine's exact figures were shown.
+ROUNDING_WORDS = frozenset({"rounded", "rounding", "round", "approximate", "approximately", "approximated", "approx"})
+
+
+def states_rounding(masked: str) -> int:
+    """How many tokens of `masked` say something was rounded or approximated, wherever they sit."""
+    return sum(1 for token in _tokens(masked) if token in ROUNDING_WORDS)
+
+
 def hedged_figures(masked: str) -> int:
     """How many figures in `masked` sit within three tokens of an approximation qualifier.
 

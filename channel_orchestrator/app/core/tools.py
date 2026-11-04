@@ -22,6 +22,7 @@ write's confirmation token is removed from the facts before anyone sees them.
 """
 from __future__ import annotations
 
+import json
 import logging
 import re
 import time
@@ -64,6 +65,7 @@ class ToolRunner:
     pending: PendingWrite | None = None
     calls: int = 0
     client_id: int | None = None
+    _answered: dict[tuple[str, str], dict[str, Any]] = field(default_factory=dict)
 
     # ----------------------------------------------------------------- the client
 
@@ -189,9 +191,13 @@ class ToolRunner:
         if invalid:
             self.problems.append(Problem(name, "invalid_arguments", invalid))
             return {"ok": False, "error": "invalid_arguments", "message": invalid}
-        if args.get("method") == "both":
-            return await self._both_methods(spec, args)
-        return await self._call(spec, args)
+        key = (name, json.dumps(args, sort_keys=True, default=str))
+        if key in self._answered:
+            # A model that repeats a call it already made gets the earlier answer, not a second run and a second table.
+            return self._answered[key]
+        answer = await (self._both_methods(spec, args) if args.get("method") == "both" else self._call(spec, args))
+        self._answered[key] = answer
+        return answer
 
     async def _both_methods(self, spec: catalog.CapabilitySpec, args: dict[str, Any]) -> dict[str, Any]:
         """Eligibility under both certified methods, as two runs: the statute has not chosen between them."""
@@ -241,5 +247,3 @@ class ToolRunner:
     @property
     def tool_names(self) -> list[str]:
         return [run.name for run in self.runs]
-
-

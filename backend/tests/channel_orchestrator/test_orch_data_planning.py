@@ -87,3 +87,12 @@ def test_json_mode_with_no_lookup_asks_nothing_more():
     rig, reply = play([{"text": json.dumps({"tools": [{"tool": "client_trend", "args": {}}]})}, {"text": "The table shows each year."}],
                       "How has Northwind trended?")
     assert reply.kind == "answer" and len(rig.chat.seen) == 2
+
+
+def test_the_planner_says_what_a_location_question_is_and_how_to_name_an_hours_measure():
+    text = flat(prompts.PLANNER)
+    for must in ("narrowed to one location", "only `simulate` takes a location", "`average_hours_per_pay_period`",
+                 "never one `select` of thirteen columns", "`month_01` to `month_06`", "you never subtract them",
+                 "`magnitude` of 5"):
+        assert must in text, must
+    assert "never weekly" in flat(prompts.PLAN_JSON).lower()

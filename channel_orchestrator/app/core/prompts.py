@@ -54,6 +54,20 @@ Rules:
      says so.
   6. A question about another client, or about several, is not one a data tool answers:
      the client is the one the reader is working on.
+  7. A fixed tool answers for a whole client-year. A question narrowed to one location, one
+     month or a comparison at a place is a data question (`data_catalog`, then `data_query`);
+     only `simulate` takes a location. Never answer a location question with a client-wide tool.
+  8. Name a measure for what its column holds. `hours` on `employee_period_fact` is hours on a
+     payroll row (a pay period), so call its average `average_hours_per_pay_period`, never
+     "weekly". Average weekly hours exist only per employee, on `employee_eligibility`.
+  9. A query takes at most six measures. A question across the twelve months of a year needs
+     `month_01` to `month_12`: ask in two queries (`month_01` to `month_06`, then `month_07` to
+     `month_12`), never one `select` of thirteen columns.
+  10. "How many were counted under one method but not the other" is two counts by method
+     (`count_distinct` of `record_token` on `onezero_matrix`, grouped by `method`), not a
+     client-wide tool. Show both; you never subtract them.
+- A what-if (`simulate`) needs the location the reader named as `worksite_id` and the number
+  they said as `magnitude` ("hired 5 more people" is a `magnitude` of 5).
 - Pass a tax year only if the reader said it. Do not pass a method unless the reader named
   one.
 - You may PREPARE a change (a tool ending in `_prepare`) only when the reader clearly asks
@@ -77,6 +91,9 @@ Fixed engine tools first for credit, eligibility, trend, at-risk and what-if que
 descriptive or comparative question about payroll or enriched data, name `data_catalog` then
 `data_query`; name `data_distinct_values` first to resolve a location or designation the reader
 gave. Never invent a column name: arguments to `data_query` use only names `data_catalog` lists.
+A question narrowed to one location or month is a data question, not a client-wide tool. A
+`data_query` takes at most six measures: the twelve months go in two queries. Name an average of
+`hours` per pay period, never weekly.
 If you have not read the catalog yet, reply with `data_catalog` (and `data_distinct_values`) alone:
 you will be shown what they return and asked again, once.
 """

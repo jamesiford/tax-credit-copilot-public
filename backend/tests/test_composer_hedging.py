@@ -111,6 +111,24 @@ def test_compose_keeps_a_plain_narration():
     assert reply.text.startswith("Their annual credit is $3,500")
 
 
+@pytest.mark.parametrize("narration", [
+    "Rounded to the nearest thousand, you can see these figures in the table.",
+    "I can't round these; the table shows them exactly.",
+    "The figures are approximately where you would expect, see the table.",
+    "Rounding is not applied, the table is exact.",
+])
+def test_saying_a_figure_was_rounded_is_rejected_even_with_no_figure_beside_it(narration):
+    reply = compose(BLOCKS, narration, FACTS)
+    assert reply.narration_used is False and reply.guard.status == REJECTED
+    assert reply.text == BLOCKS_ONLY
+    assert any(v.numeral.kind == "approximation" for v in reply.guard.violations)
+
+
+def test_the_rounding_family_is_a_small_closed_set():
+    assert composer_hedging.states_rounding("The table shows them exactly, around the page.") == 0
+    assert composer_hedging.states_rounding("Round, rounded and approximately.") == 3
+
+
 def test_a_hedge_beside_prose_only_is_fine_and_a_hedge_beside_a_figure_is_not():
     assert compose(BLOCKS, "Roughly speaking, call them first.", FACTS).narration_used is True
     assert compose(BLOCKS, f"Roughly {FIG}.", FACTS).narration_used is False
