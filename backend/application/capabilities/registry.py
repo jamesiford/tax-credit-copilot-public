@@ -11,7 +11,7 @@ from collections.abc import Callable
 from typing import Any
 
 from application.capabilities import (
-    book, catalog, claims, client, findings, package, simulate, verify, walkthrough, writes,
+    book, catalog, claims, client, data_catalog, data_query, findings, package, simulate, verify, walkthrough, writes,
 )
 from application.capabilities.envelope import ToolResult
 
@@ -29,6 +29,11 @@ FUNCTIONS: dict[str, Callable[..., ToolResult]] = {
     "findings_list": findings.findings_list,
     "claim_cell_history": claims.claim_cell_history,
     "verify_figures": verify.verify_figures,
+    # Data tools take `principal` first: it picks the budget a query is spent against and decides
+    # whether Copilot Cowork may be handed employee-level rows.
+    "data_catalog": data_catalog.data_catalog,
+    "data_query": data_query.data_query,
+    "data_distinct_values": data_query.data_distinct_values,
     # Downloads are bound to a person, so these take `principal` first as well.
     "claim_package_link": package.claim_package_link,
     "claim_package_redeem": package.claim_package_redeem,
@@ -47,7 +52,7 @@ FUNCTIONS: dict[str, Callable[..., ToolResult]] = {
 #: The tools whose first argument is the caller. Named, not inferred from a
 #: signature: what a function is handed is part of its contract.
 NEEDS_PRINCIPAL = frozenset(
-    {"claim_package_link", "claim_package_redeem"}
+    {"claim_package_link", "claim_package_redeem", "data_catalog", "data_query", "data_distinct_values"}
     | {n for n in FUNCTIONS if n.endswith(("_prepare", "_commit"))}
 )
 

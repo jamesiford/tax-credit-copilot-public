@@ -249,10 +249,19 @@ def test_function_names_match_catalog_names():
 
 
 def test_every_schema_property_is_a_parameter_of_its_function():
-    """The orchestrator calls a tool with the schema's arguments, so they must fit."""
+    """The orchestrator calls a tool with the schema's arguments, so they must fit.
+
+    One function declares `**query` instead of a parameter per property: `data_query`'s arguments
+    are a ten-field specification, and `QuerySpec.from_dict` is what checks them by name (an unknown
+    key is refused). That is the only exception, and it is named.
+    """
+    spread = {"data_query"}
     for name, fn in registry.FUNCTIONS.items():
         spec = catalog.get(name)
         params = inspect.signature(fn).parameters
+        if name in spread:
+            assert any(p.kind is inspect.Parameter.VAR_KEYWORD for p in params.values()), name
+            continue
         assert set(spec.schema["properties"]) <= set(params), name
         for required in spec.schema["required"]:
             assert required in params, (name, required)

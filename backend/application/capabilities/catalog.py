@@ -22,6 +22,7 @@ unchanged.
 """
 from __future__ import annotations
 
+from application.capabilities.catalog_data import DATA_TOOLS, LOOKUP  # noqa: F401 - re-exported
 from application.capabilities.catalog_intents import CAPABILITIES, CHAT_INTENT_TOOL, NEEDS_CLIENT  # noqa: F401
 from application.capabilities.catalog_types import (  # noqa: F401 - re-exported
     ACTIONS, KINDS, METHODS, READ, WRITE_COMMIT, WRITE_PREPARE, CapabilitySpec, _CLAIM_STATUSES,
@@ -170,6 +171,7 @@ CATALOG: tuple[CapabilitySpec, ...] = (
         {"client_id": _CLIENT_ID, "program_code": _PROGRAM, "tax_year": _TAX_YEAR},
         ("client_id", "program_code", "tax_year"), needs_year=True,
     ),
+    *DATA_TOOLS,
     CapabilitySpec(
         name="verify_figures",
         description=(

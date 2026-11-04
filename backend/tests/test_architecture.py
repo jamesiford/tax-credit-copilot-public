@@ -438,7 +438,8 @@ def test_capabilities_import_no_framework_router_or_agent():
 
 
 _VENDORED_CAPABILITY_MODULES = (
-    "catalog", "catalog_types", "catalog_intents", "format", "format_core", "format_renderers", "envelope",
+    "catalog", "catalog_types", "catalog_intents", "catalog_data", "format", "format_core", "format_renderers",
+    "envelope", "lanes",
 )
 
 
