@@ -17,12 +17,12 @@ tools one at a time (their order is the order of the answer).
 from __future__ import annotations
 
 import logging
-from collections.abc import Awaitable, Callable
+from collections.abc import Awaitable, Callable, Sequence
 from typing import Any
 
 from agent_framework import (
-    Agent, AgentContext, AgentMiddleware, AgentResponse, BaseChatClient, ChatMiddlewareLayer, ChatResponse, Content,
-    FunctionInvocationLayer, FunctionTool, Message,
+    Agent, AgentContext, AgentMiddleware, AgentResponse, BaseChatClient, ChatMiddlewareLayer, ChatResponse, ContextProvider,
+    Content, FunctionInvocationLayer, FunctionTool, Message,
 )
 
 from app.core.maf_catalog_tools import TURN, catalog_tools
@@ -99,16 +99,20 @@ def chat_client_for(model: ModelAccess, trace: ModelTrace, *, max_calls: int) ->
     raise TypeError(f"no chat client for {type(model).__name__}")
 
 
-def build_agent(chain: ModelAccess, runner: ToolRunner, trace: ModelTrace, instructions: str, compose: Callable[[str], str]) -> Agent:
+def build_agent(
+    chain: ModelAccess, runner: ToolRunner, trace: ModelTrace, instructions: str, compose: Callable[[str], str],
+    context_providers: Sequence[ContextProvider] = (),
+) -> Agent:
     """The turn's Agent: the generated tools, the turn's rules as middleware, and an output bound to the composer.
 
     Function middleware runs in the order `maf_tool_rules` lists it, then `CallAndCapture`; the chat middleware
     records a tool name the model asked for that is not registered (a commit, an invented one). The turn is the
     agent's default `additional_function_arguments`, which is what `function_invocation_kwargs` is per run.
+    `context_providers` is empty unless the knowledge tier is on (RM-15); a provider adds instructions only.
     """
     client, options = chat_client_for(chain, trace, max_calls=runner.max_calls)
     return Agent(
-        client, instructions, tools=function_tools(),
+        client, instructions, tools=function_tools(), context_providers=list(context_providers) or None,
         middleware=[ComposeMiddleware(compose), *tool_rules(), CallAndCapture(), RecordUnregisteredCalls(runner)],
         default_options={**options, "additional_function_arguments": {TURN: runner}},
     )

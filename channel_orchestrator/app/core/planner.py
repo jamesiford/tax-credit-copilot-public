@@ -21,11 +21,13 @@ from collections.abc import Mapping
 
 from app.core.degraded import JSON, KEYWORDS, DegradedPlanner, JsonPlanner, KeywordPlanner
 from app.core.maf_agent import build_agent
+from app.core.maf_knowledge import KnowledgeContextProvider
 from app.core.model_access import ModelAccess
 from app.core.planned import Planned
 from app.core.prompts import PLANNER, narrator_instructions
 from app.core.tools import ToolRunner
 from application.ai.safety.untrusted import UntrustedText
+from application.knowledge import KnowledgePort
 
 log = logging.getLogger("tcc.orchestrator.planner")
 TOOLS = "tools"
@@ -36,8 +38,10 @@ class Planner:
 
     def __init__(
         self, chain: ModelAccess, *, allowed_hosts: tuple[str, ...] = (), degraded: Mapping[str, DegradedPlanner] | None = None,
+        knowledge: KnowledgePort | None = None, knowledge_top: int = 3,
     ) -> None:
         self._chain, self._hosts = chain, allowed_hosts
+        self._knowledge, self._knowledge_top = knowledge, knowledge_top
         self._degraded: Mapping[str, DegradedPlanner] = degraded or {JSON: JsonPlanner(chain), KEYWORDS: KeywordPlanner()}
 
     async def plan(self, runner: ToolRunner) -> Planned:
@@ -61,6 +65,8 @@ class Planner:
             planned.narrate(raw)
             return planned.composed_for(runner).text
 
-        agent = build_agent(self._chain, runner, planned.trace, PLANNER + "\n" + narration, compose)
+        providers = [KnowledgeContextProvider(self._knowledge, runner.question, top=self._knowledge_top)] if self._knowledge else []
+        agent = build_agent(self._chain, runner, planned.trace, PLANNER + "\n" + narration, compose, providers)
         await agent.run(UntrustedText(runner.question, "reader question").fenced())
+        planned.reference = providers[0].passages if providers else ()
         return planned

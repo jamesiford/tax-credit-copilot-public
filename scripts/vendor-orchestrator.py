@@ -38,6 +38,7 @@ SEEDS = (
     "application.chat_scope", "application.chat_keywords",
     "application.ai.settings", "application.ai.egress", "application.ai.gateway_settings",
     "application.ai.safety.injection", "application.ai.safety.untrusted",
+    "application.knowledge", "application.knowledge_settings",
     "domain.ai",
     "infrastructure.ai.openai_compatible", "infrastructure.ai.auth",
 )

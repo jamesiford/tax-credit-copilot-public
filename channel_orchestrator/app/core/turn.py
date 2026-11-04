@@ -38,6 +38,7 @@ from app.core.state import ConversationState, StateStore
 from app.core.tools import Clarification, ToolRunner, years_in
 from app.core.writes import CommitOutcome, parse_command
 from application.composer import Composed
+from application.knowledge import render_reference
 
 log = logging.getLogger("tcc.orchestrator.turn")
 
@@ -158,7 +159,8 @@ class TurnPipeline:
         )
 
     def _assemble(self, runner: ToolRunner, planned: Planned, composed: Composed) -> str:
-        parts = [composed.text, provenance_footer(runner.runs)]
+        reference = render_reference(planned.reference) if composed.narration_used else ""
+        parts = [composed.text, reference, provenance_footer(runner.runs)]
         if planned.model_used and planned.narration and not composed.narration_used:
             parts.append(WITHHELD)
         if planned.degraded:

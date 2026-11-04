@@ -293,6 +293,16 @@ the display profile the Agents page shows and takes its spec from the list (`SPE
   the ones the twelve modules produced before (a hash over name, instructions, role, temperature and profile matched).
 - No live publish was run; startup still publishes in the background (`FoundryAgentCatalog.warm`).
 
+## Reference text: the knowledge tier (RM-15)
+
+Off by default and not built beyond a port. With `KNOWLEDGE_ENABLED=true` and `KNOWLEDGE_PROVIDER=fake` (tests and local runs only) the planner adds one framework
+context provider to the Agent (`app/core/maf_knowledge.py`): it asks the knowledge port for the passages that bear on the question and adds them to the model's
+instructions as fenced reference text (no figure to use, no citation to copy). After a narration that passed the guard, the reply gains a quoted block with each
+passage's citation, source and retrieval date, before the provenance footer. A narration that repeats a figure found only in a passage is dropped whole by the
+numeric guard, and then no block is shown. Passages never enter the facts, the ledger or a tool result (architecture-tested); a failing source costs the reader nothing;
+the `json` and `keywords` planners never consult it. Design, the owner's provisioning steps and what is unverified: [KNOWLEDGE-AND-IQ.md](../architecture/KNOWLEDGE-AND-IQ.md),
+[ADR-010](../architecture/ADR-010-knowledge-tier.md).
+
 ## Deploying
 
 Recommended: the **source-code (zip) path**: `python scripts/vendor-orchestrator.py`, then `azd up` in
