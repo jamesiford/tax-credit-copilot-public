@@ -20,7 +20,7 @@ import logging
 from dataclasses import dataclass, field
 from typing import Any
 
-from app.core.compose import compose_reply, model_facts_of
+from app.core.compose import LOOKUP_TOOLS, compose_reply, model_facts_of
 from app.core.maf_agent import ModelTrace, build_agent
 from app.core.models import ModelChain
 from app.core.placeholders import with_placeholders
@@ -86,14 +86,26 @@ class Planner:
     async def _with_json(self, runner: ToolRunner, planned: Planned) -> Planned:
         system = f"{PLAN_JSON}\nTOOLS:\n{tool_catalogue()}"
         asked = [ChatMessage("system", system), ChatMessage("user", UntrustedText(runner.question, "reader question").fenced())]
-        turn = await self._chain.complete(asked)
-        planned.trace.turns.append(turn)
-        planned.trace.prompt_parts.append("\n".join(m.content for m in asked))
-        for step in plan_steps(turn.text, runner.max_calls):
-            await runner.run(step["tool"], step["args"])
+        looked_up = await self._plan_round(asked, runner, planned)
+        if looked_up and all(run.name in LOOKUP_TOOLS for run in runner.runs):
+            # A plan made only of lookups cannot name a column it has not read: show the model what they returned, once.
+            asked.append(ChatMessage("user", "LOOKUP RESULTS (the data's own names; use only these):\n" + json.dumps(looked_up)))
+            await self._plan_round(asked, runner, planned)
         if runner.runs and not runner.clarify:
             planned.narration = await self._narrate(runner, planned)
         return planned
+
+    async def _plan_round(self, asked: list[ChatMessage], runner: ToolRunner, planned: Planned) -> dict[str, Any]:
+        """One planning call and the tools it names; the `result` of each lookup tool that answered, by tool."""
+        turn = await self._chain.complete(asked)
+        planned.trace.turns.append(turn)
+        planned.trace.prompt_parts.append("\n".join(m.content for m in asked))
+        looked_up: dict[str, Any] = {}
+        for step in plan_steps(turn.text, runner.max_calls):
+            answer = await runner.run(step["tool"], step["args"])
+            if answer.get("ok") and "result" in answer:
+                looked_up[step["tool"]] = answer["result"]
+        return looked_up
 
     async def _narrate(self, runner: ToolRunner, planned: Planned) -> str:
         text, _ = narrator_instructions()

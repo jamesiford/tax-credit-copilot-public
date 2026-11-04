@@ -96,14 +96,17 @@ def _query_properties() -> dict:
 
 
 DATA_QUERY_DESCRIPTION = (
-    "Structured, read-only query over ONE client's payroll and enriched calculation data. Use it only for "
-    "questions the fixed tools (client_eligibility, client_trend, client_at_risk, simulate and the rest) "
-    "cannot answer. For anything about the credit figure, eligibility or what the engine concluded, the "
-    "fixed tools are authoritative; this tool returns exact rows and aggregates from the data, it does not "
-    "interpret them. Read data_catalog first and use its names exactly; use data_distinct_values to find a "
-    "location or code before filtering on it. Never write SQL. Prefer an aggregate to a long list: a result "
-    "is capped (default 100 rows, at most 500) and says when it was cut. Rows that describe individual "
-    "employees go to the person asking only; Copilot Cowork refuses them unless the user is a writer."
+    "Structured, read-only query over ONE client's payroll and enriched calculation data (needs a client). "
+    "Use it only for questions the fixed tools (client_eligibility, client_trend, client_at_risk, simulate and "
+    "the rest) cannot answer: descriptive or comparative questions such as an average, a count or a total by "
+    "location, month, year, designation or method. For anything about the credit figure, eligibility or what the "
+    "engine concluded, the fixed tools are authoritative; this tool returns exact rows and aggregates from the "
+    "data, it does not interpret them. Read data_catalog first and use its names exactly, never an invented "
+    "column; use data_distinct_values to find a location or code before filtering on it. Name every measure with "
+    "`as` (for example `average_headcount`): the answer refers to a result column by that name. Never write SQL. "
+    "Prefer an aggregate to a long list: a result is capped (default 100 rows, at most 500) and says when it was "
+    "cut. Rows that describe individual employees go to the person asking only; Copilot Cowork refuses them "
+    "unless the user is a writer."
 )
 
 DATA_TOOLS: tuple[CapabilitySpec, ...] = (
@@ -112,8 +115,8 @@ DATA_TOOLS: tuple[CapabilitySpec, ...] = (
         description=(
             "What data can be queried: datasets (what one row is), and with `dataset` their columns with "
             "meaning, unit, role, sensitivity and the aggregations and filters each allows. `search` narrows by "
-            "a word in a name or description. Holds no values from the data. Read it before data_query and "
-            "never invent a column name."
+            "a word in a name or description. Holds no values from the data. Needs no client. Call it before "
+            "data_query, and never invent a column name: if the catalog has no column for the question, say so."
         ),
         kind=READ, needs_client=False, needs_year=False, tags=(LOOKUP,),
         schema=_object({
@@ -129,7 +132,8 @@ DATA_TOOLS: tuple[CapabilitySpec, ...] = (
         name="data_distinct_values",
         description=(
             "The distinct values (with how many rows carry each) of ONE dimension column for a client, for "
-            "example locations, designations or pay codes, so a filter can be written without guessing. "
+            "example locations, designations or pay codes. Use it to resolve a name the reader gave (a location, "
+            "a designation) to the value the data holds before filtering on it, never to guess one. "
             "Refuses a column whose values describe individual people. Capped; says when it was."
         ),
         kind=READ, needs_client=True, needs_year=False, tags=(LOOKUP,),

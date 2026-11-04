@@ -40,17 +40,21 @@ def facts_for(example: dict[str, str]) -> dict:
     return tree
 
 
-def test_the_prompt_is_version_two_and_the_manifest_records_it():
+def test_the_prompt_is_version_three_and_the_manifest_records_every_version():
     version = FilePromptStore().get("channel_narrator").version
-    assert version == 2
-    assert "2" in load_manifest()["prompts"]["channel_narrator"]["versions"]
+    assert version == 3
+    assert {"1", "2", "3"} <= set(load_manifest()["prompts"]["channel_narrator"]["versions"])
 
 
-def test_it_teaches_by_four_to_six_worked_examples():
-    assert 4 <= len(examples()) <= 6
+def test_it_teaches_by_worked_examples_and_keeps_them_few_enough_to_read():
+    assert 4 <= len(examples()) <= 12
 
 
-@pytest.mark.parametrize("topic", ["book", "brief", "both methods", "trend", "at-risk", "refusal"])
+@pytest.mark.parametrize("topic", [
+    "book", "brief", "both methods", "trend", "at-risk", "refusal",
+    "descriptive aggregate", "comparison between the two methods", "capped result", "no column for",
+    "individual employees", "why",
+])
 def test_the_examples_cover_the_answers_a_reader_asks_for(topic):
     assert any(topic in e["title"].lower() for e in examples()), topic
 
@@ -77,6 +81,8 @@ def test_every_example_is_one_to_four_sentences():
     "lead with the answer", "the engine's own labels", "never turn a rank into prose", "every figure is exact",
     "never say a figure is rounded", "approximately", "roughly", "character for character", "the `facts.` prefix",
     "no authored rule pack", "not a zero", "never state tax law",
+    "exact rows and aggregates, not a conclusion", "capped", "has nothing for it", "have not been shown",
+    "engine's figure is the authority",
 ])
 def test_the_voice_and_the_composer_rules_are_stated(must_say):
     assert must_say.lower() in FLAT.lower() or must_say.lower() in " ".join(TEXT.lower().split())
