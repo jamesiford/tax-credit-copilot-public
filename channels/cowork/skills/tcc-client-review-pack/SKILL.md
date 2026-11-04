@@ -1,7 +1,7 @@
 ---
 name: tcc-client-review-pack
 description: |
-  Builds a client credit review pack for a tax consultant: resolves the client, reads eligibility, trend, jobs at risk and other programmes, runs what-ifs the user names, walks through each open finding for a decision, records confirmed decisions and a claim move to proposed, then authors a Word briefing and a short PowerPoint from the engine's own figures and builds the claim package with a download link. Use when the user asks for a "client review pack", "credit review", "review pack for <client>", "client briefing", "walk me through <client>'s credit", "prepare the claim package", or "resolve the findings for <client>".
+  Builds a client credit review pack for a tax consultant: resolves the client, reads eligibility, trend, jobs at risk and other programmes, runs what-ifs the user names, walks through each open finding for a decision, records confirmed decisions and a claim move to proposed, then authors a Word briefing and a short PowerPoint from the engine's own figures and builds the claim package with a download link, and on request goes deeper into the client's payroll and calculation data with the governed read-only data tools. Use when the user asks for a "client review pack", "credit review", "review pack for <client>", "client briefing", "walk me through <client>'s credit", "go deeper on <client>", "prepare the claim package", or "resolve the findings for <client>".
 license: MIT
 metadata:
   author: Tax Credit Copilot
@@ -21,6 +21,8 @@ figure exactly as a tool returned it, never produce one yourself, verify every a
 - A decision about a finding or a claim is the person's, never yours. Ask; do not assume.
 - Each change is one prepare, one preview shown exactly, one explicit confirmation, one commit.
 - Do not copy an employee identifier into a document. Findings are about records, not people.
+- A "go deeper" data answer is data, never a finding, and never restates a credit, eligibility or
+  trend figure the fixed tools returned.
 - Put the disclaimer from the tool results in every artifact.
 
 ## Procedure
@@ -59,21 +61,34 @@ figure exactly as a tool returned it, never produce one yourself, verify every a
    around it.
 7. **Show the working.** Call `calc_walkthrough` for the client-year and keep the trail for the
    appendix: step, inputs, formula, output, citation and the evidence hash, as returned.
-8. **Author the briefing and the deck.** A Word briefing and a PowerPoint of at most six slides,
+8. **Go deeper (optional, only when the user asks a question the steps above do not answer).**
+   For a descriptive or comparative question about the client's payroll or calculation data
+   (an average, a count or a total by location, month, year, designation or method), call
+   `data_catalog` to read what can be asked, `data_distinct_values` to turn a name the user
+   gave into the value the data holds, then `data_query`. The fixed tools above stay
+   authoritative for the credit, eligibility and trend: never use `data_query` to restate or
+   second-guess one of those figures. Use only the column names the catalog lists, name every
+   measure with `as`, and prefer an aggregate to a list. If the catalog has no column for the
+   question, say so; do not guess. The result states when it was capped; repeat that. Copy
+   the returned table and its `Source:` line as written, and mark it in the briefing as data,
+   not a finding. A question that would list individual employees is refused here unless the
+   user is on the writer list; offer a count or an average instead.
+   `references/data-questions.md` lists questions worth asking.
+9. **Author the briefing and the deck.** A Word briefing and a PowerPoint of at most six slides,
    from tool output only (`references/word-briefing-outline.md`, `references/slide-outline.md`).
    Every figure is copied. Include the disclaimer and a provenance footer: copy the
    `Provenance:` line the tools returned (run, rule pack, assumptions, trail hash). If a value is
    not shown, write "not shown"; never write one from memory.
-9. **Build the claim package.** When the user wants it: `claim_package_create_prepare`, preview,
+10. **Build the claim package.** When the user wants it: `claim_package_create_prepare`, preview,
    confirm, `claim_package_create_commit`, then `claim_package_link` with the same `client_id`
    and `tax_year`. Include the link exactly as returned, and say it works once, for the person
    who asked.
-10. **Verify every artifact.** Call `verify_figures` on the full text of the briefing, of the
+11. **Verify every artifact.** Call `verify_figures` on the full text of the briefing, of the
     deck (all slides and notes) and of any message you will send. Pass in `allowed_context`
     the numbers you or the user introduced (dates, slide numbers, the user's what-if sizes) and
     the four provenance values from the footer. Fix each reported figure by quoting the tool's
     wording and verify again. Do not hand over text that has not passed.
-11. **Offer a follow-up hold.** Using your own built-in calendar ability, offer to put a
+12. **Offer a follow-up hold.** Using your own built-in calendar ability, offer to put a
     follow-up on the calendar. The invite body contains **no figures**: a title, the client's
     name and the purpose.
 
@@ -87,6 +102,8 @@ figure exactly as a tool returned it, never produce one yourself, verify every a
 - [ ] The footer carries the run, rule pack, assumptions and trail hash, or says "not shown".
 - [ ] `verify_figures` passed on every artifact. The disclaimer is in each.
 - [ ] The package link was given as returned. The calendar invite has no figures.
+- [ ] Any "go deeper" table was read from the catalog's own names, copied as returned with its
+      source line, labelled as data, and any cap was repeated.
 
 ## If something fails
 
@@ -99,6 +116,13 @@ figure exactly as a tool returned it, never produce one yourself, verify every a
   first (`findings_list`, `claim_cell_history`) before assuming anything.
 - A commit that times out: read the record back before trying again; it may have gone through.
 - `verify_figures` keeps failing: remove the figure, say so, and tell the user.
+- `employee_level_not_available` from `data_query`: the question would list individual
+  employees, which Copilot Cowork cannot carry unless the user is a writer. Say so in the
+  tool's words and offer a count or an average by location, month or year.
+- `query_timeout`, `query_budget_exceeded` or `query_busy`: nothing partial is returned. Say so,
+  and either narrow the question or wait the stated time; do not estimate the answer.
+- A `data_query` refusal that names a column, an operator or a dataset: the catalog has no such
+  name. Read `data_catalog` again; never retry with a guessed name.
 
 Full error wording: `skills/tcc-figures-and-writes` > `references/error-messages.md`.
 
@@ -107,3 +131,4 @@ Full error wording: `skills/tcc-figures-and-writes` > `references/error-messages
 - `references/word-briefing-outline.md`: headings and what goes under each.
 - `references/slide-outline.md`: the six slides.
 - `references/decision-prompts.md`: how to ask for each decision.
+- `references/data-questions.md`: questions worth asking of the data, and which tool is authoritative.

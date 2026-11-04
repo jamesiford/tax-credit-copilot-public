@@ -29,7 +29,7 @@ _EMAIL = re.compile(r"[\w.+-]+@([\w-]+(?:\.[\w-]+)+)")
 _FIELD_SUFFIXES = ("_id", "_name", "_token", "_key", "_sha256", "_version", "_usd", "_year", "_code", "_path", "_context")
 _ENVELOPE_FIELDS = frozenset({"run_id", "client_id", "tax_year", "program_code"})
 # Stable error codes a skill may quote; they wear a tool-family prefix without being tools.
-_ERROR_CODES = frozenset({"client_not_found", "client_not_authorized"})
+_ERROR_CODES = frozenset({"client_not_found", "client_not_authorized", "employee_level_not_available", "column_not_listable"})
 _TEXT = (".md", ".json", ".svg", ".txt")
 SAFE_EMAIL_DOMAINS = frozenset({"example.com", "example.org", "example.net"})
 
@@ -69,8 +69,16 @@ def _skill_texts(files: dict[str, bytes]) -> dict[str, str]:
     return {skill: "\n".join(chunks) for skill, chunks in grouped.items()}
 
 
+def _datasets() -> frozenset[str]:
+    """The data catalog's dataset names: a skill may name them (`unit_month_summary`) without naming a tool."""
+    _catalog()
+    from application.capabilities import catalog_data
+
+    return frozenset(catalog_data.DATASETS)
+
+
 def _classify(skill: str, tokens: set[str], catalog: Any) -> list[Finding]:
-    fields = _property_names([spec.schema for spec in catalog.CATALOG]) | _ENVELOPE_FIELDS | _ERROR_CODES
+    fields = _property_names([spec.schema for spec in catalog.CATALOG]) | _ENVELOPE_FIELDS | _ERROR_CODES | _datasets()
     families = {spec.name.split("_")[0] for spec in catalog.CATALOG}
     found: list[Finding] = []
     for token in sorted(tokens):

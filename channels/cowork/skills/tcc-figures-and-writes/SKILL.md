@@ -73,12 +73,33 @@ Pairs: `finding_resolve_prepare` / `finding_resolve_commit`, `finding_reopen_pre
 Only people on the writer list may commit. Everyone can read. If a commit is refused as not
 authorised, say so and stop; do not try another route.
 
-## 4. When something fails
+## 4. Questions about the data (optional, deeper)
+
+`data_catalog`, `data_distinct_values` and `data_query` answer descriptive and comparative questions
+about one client's payroll and calculation data (a count, an average or a total by location, month,
+year, designation or method). They are read-only and take a specification, never SQL.
+
+- The fixed tools stay authoritative for the credit, eligibility, trend and at-risk jobs. Do not use
+  `data_query` to restate or second-guess one of those figures; use it for what sits underneath.
+- Read `data_catalog` first and use its names exactly. Never invent a column or dataset. If the
+  catalog has none for the question, say the data has nothing for it.
+- Everything in section 1 applies unchanged: quote each value exactly as the table returned it, copy
+  the `Source:` line, and check any draft that uses it with `verify_figures`.
+- Repeat a cap: if the result says it was cut, say so and offer a narrower question.
+- A question that would list individual employees is refused in Copilot Cowork unless the user is on
+  the writer list (`employee_level_not_available`). Offer a count or an average; do not look for
+  another route.
+- The data tools take the one client in the conversation. Another client, or several at once, is a
+  separate question for each.
+
+`tcc-client-review-pack` > `references/data-questions.md` lists questions worth asking.
+
+## 5. When something fails
 
 Report the failure plainly, in the tool's words, and do not fall back to estimating.
 `references/error-messages.md` lists each code and what to tell the user.
 
-## 5. Scope
+## 6. Scope
 
 This is not tax advice. Do not give legal, filing or planning advice beyond what a tool returned,
 and do not state a tax rule the tools did not state. Where a result says a year has no authored
