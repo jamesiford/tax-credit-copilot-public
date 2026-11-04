@@ -226,7 +226,9 @@ module "app_service" {
     }, local.auth_mode == "entra" ? {
     AUTH_TENANT_ID = local.tenant_id
     API_AUDIENCE   = local.api_audience
-    } : {},
+    # Running without sign-in is a stated choice, not a default: the API refuses AUTH_MODE=none
+    # outside local development unless this is set, and then only over synthetic data. [RM-03]
+    } : { ALLOW_ANONYMOUS_SYNTHETIC = "1" },
     # The API enforces the writer entitlement itself (it refuses an agent token whose acting
     # user may not write), so it must read the same source as the gateway. [CH-13]
     var.enable_m365_channel ? merge(

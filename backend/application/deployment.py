@@ -19,7 +19,13 @@ from __future__ import annotations
 import os
 from typing import Mapping
 
-LOCAL = "local"
+# The sign-in rules live in `auth_policy`; these are re-exported because every
+# caller already reads them from here.
+from application.auth_policy import (  # noqa: F401
+    ANONYMOUS_SYNTHETIC_FLAG, AUTH_MODES, LOCAL, anonymous_synthetic_allowed, auth_mode, auth_problems,
+    auth_tenant_id, explicit_local_dev,
+)
+
 CLASSIFICATIONS = ("synthetic", "customer")
 
 #: Store names that persist beyond the process.
@@ -59,20 +65,6 @@ def data_classification(env: Mapping[str, str] | None = None) -> str | None:
     env = os.environ if env is None else env
     value = _get(env, "DATA_CLASSIFICATION").lower()
     return value or None
-
-
-AUTH_MODES = ("none", "entra")
-
-
-def auth_mode(env: Mapping[str, str] | None = None) -> str:
-    """`none` (default) or `entra`. Unknown values are reported by the startup check."""
-    env = os.environ if env is None else env
-    return (_get(env, "AUTH_MODE") or "none").lower()
-
-
-def auth_tenant_id(env: Mapping[str, str] | None = None) -> str:
-    env = os.environ if env is None else env
-    return _get(env, "AUTH_TENANT_ID") or _get(env, "AZURE_TENANT_ID")
 
 
 WRITER_SOURCES = ("allowlist", "entra_group", "either")
@@ -170,21 +162,10 @@ def check_deployment_configuration(env: Mapping[str, str] | None = None) -> dict
         )
 
     mode = auth_mode(env)
-    if mode not in AUTH_MODES:
-        problems.append(f"AUTH_MODE={mode!r} is not one of {', '.join(AUTH_MODES)}")
-    elif mode == "entra":
-        if not auth_tenant_id(env):
-            problems.append("AUTH_MODE=entra needs AUTH_TENANT_ID (or AZURE_TENANT_ID)")
-        if not _get(env, "API_AUDIENCE"):
-            problems.append("AUTH_MODE=entra needs API_AUDIENCE (the API app registration)")
+    deployed = is_deployed(env)
+    problems.extend(auth_problems(env, deployed=deployed, classification=classification))
 
     stores = {name: store_choice(name, env) for name in store_names()}
-    deployed = is_deployed(env)
-    if deployed and mode == "none" and classification == "customer":
-        problems.append(
-            "AUTH_MODE=none is refused with DATA_CLASSIFICATION=customer outside a local "
-            "environment (D26): customer payroll is never served without authentication"
-        )
     if deployed:
         if classification is None:
             problems.append(

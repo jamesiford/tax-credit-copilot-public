@@ -17,6 +17,7 @@ from api.chat.sse import (
     _ACTOR, _TELEMETRY_CONTEXT, _append_audit_event, _append_span, _now_iso, _record_agent_metric, _sse,
 )
 from application.ai.requests import NarrateBriefQuery
+from application.audit_alert import audit_write_failed
 from application.capabilities.catalog import CHAT_INTENT_TOOL
 from domain.ai import OutputWithheld, SafetyRefusal, StreamEnd, TextDelta
 
@@ -41,8 +42,9 @@ def _record_agent_action(agent_name: str, end: StreamEnd | None, prompt: str, ch
             tool_calls=[tool] if tool else [], intent=intent, actor=_ACTOR.get(),
             agent_version=getattr(end, "agent_version", None), model_deployment=getattr(end, "model", None),
         ))
-    except Exception:  # noqa: BLE001 - an audit failure must not break an answer
+    except Exception as exc:  # noqa: BLE001 - an audit failure must not break an answer, and must not be silent
         log.exception("agent action audit failed for %s", agent_name)
+        audit_write_failed("agent_audit", "portal_chat_record", exc, fatal=False)
 
 
 def _observe(agent_name: str, started: float, char_count: int, ok: bool, error_text: str | None) -> None:

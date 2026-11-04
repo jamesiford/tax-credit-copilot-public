@@ -29,6 +29,7 @@ from application.capabilities import catalog
 from application.capabilities.envelope import ToolResult
 from application.channel_audit import AuditCall, ChannelAuditor
 from application.data.audit_summary import summarise_data_call
+from application.writer_alert import writer_check_failed
 from channel import lane_guard
 from channel.api_client import ApiClient, ApiResult, ApiUnavailable
 from channel.auth import Caller
@@ -121,8 +122,8 @@ class ToolPipeline:
     async def _is_writer(self, oid: str) -> bool:
         try:
             return bool(await asyncio.to_thread(self._entitlement.is_writer, oid))
-        except Exception as exc:  # noqa: BLE001 - an entitlement that cannot answer denies
-            log.warning("writer check failed, denying: %s", type(exc).__name__)
+        except Exception as exc:  # noqa: BLE001 - an entitlement that cannot answer denies, and says so
+            writer_check_failed("gateway_check", exc)
             return False
 
     def _single(self, audit: AuditCall, outcome: str, error: str, **result: Any) -> None:

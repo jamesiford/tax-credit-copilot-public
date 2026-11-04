@@ -123,6 +123,7 @@ def test_gateway_options_are_read():
 
 def _env(**extra):
     return {"ENVIRONMENT": "azure", "DATA_CLASSIFICATION": "synthetic", "CLAIM_STORE": "warehouse",
+            "AUTH_MODE": "none", "ALLOW_ANONYMOUS_SYNTHETIC": "1",
             "FINDING_STORE": "warehouse", "RUN_MANIFEST_STORE": "warehouse", "ARTIFACT_STORE": "blob",
             "ARTIFACT_REPOSITORY": "warehouse", "OVERRIDE_STORE": "warehouse", "CHANNEL_STORE": "warehouse", **extra}
 

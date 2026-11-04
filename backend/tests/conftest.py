@@ -41,6 +41,13 @@ if str(TESTS_ROOT) not in sys.path:
 # Set before `main` is imported so its load_dotenv(override=False) can't flip it.
 os.environ["DATA_SOURCE"] = "csv"
 
+# Local-development opt-in to running without sign-in. AUTH_MODE defaults to
+# `entra`, and `none` is accepted only with ENVIRONMENT=local stated outright, so
+# the suite says both rather than relying on an absence. Tests of the other modes
+# set their own values with monkeypatch.
+os.environ["ENVIRONMENT"] = "local"
+os.environ["AUTH_MODE"] = "none"
+
 # The opt-in live-Fabric tests (TCC_FABRIC_TESTS=1) still need somewhere to
 # connect. Take only the connection settings from `.env`, never DATA_SOURCE —
 # which is why this cannot just be `load_dotenv()`. The WAREHOUSE_ pair is the

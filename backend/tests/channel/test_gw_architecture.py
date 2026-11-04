@@ -23,6 +23,7 @@ INVENTORY = BACKEND / "tests" / "channel_route_inventory.json"
 ALLOWED_APPLICATION = frozenset({
     "application.acting_user",                 # the header the API parses
     "application.agent_audit",                 # the narrator-agent audit row (standard library + domain only)
+    "application.audit_alert",                 # the `audit_write_failed` alert a failed audit write raises (standard library only) [RM-03]
     "application.capabilities.catalog",        # the tool contract
     "application.capabilities.envelope",       # the result shape
     "application.capabilities.lanes",          # the person-only lane and the Cowork refusal text (standard library only) [CH-16d]
@@ -36,6 +37,7 @@ ALLOWED_APPLICATION = frozenset({
     "application.display_names",               # the display-name port and the placeholder rule (standard library only)
     "application.identity",                    # ActingUser
     "application.rate_limit",                  # the per-user token bucket (standard library only), shared with the API's data-query budget [CH-16c]
+    "application.writer_alert",                # the `writer_check_failed` event a failing entitlement source raises (standard library only) [RM-03]
 })
 FORBIDDEN_PREFIXES = ("api.", "agents.", "tools.", "infrastructure.persistence", "application.wiring",
                       "application.queries", "application.commands", "application.mediator", "domain.calculation")

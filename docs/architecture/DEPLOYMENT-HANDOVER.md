@@ -67,7 +67,7 @@ its own Terraform variable.
 
 | Setting | `public` (default) | `enterprise` |
 |---|---|---|
-| `AUTH_MODE` / Easy Auth | `none` / off | `entra` / on |
+| `AUTH_MODE` / Easy Auth | `none` (with `ALLOW_ANONYMOUS_SYNTHETIC=1`, set by Terraform) / off | `entra` / on |
 | `DATA_CLASSIFICATION` | `synthetic` | `customer` |
 | Fabric | `create_fabric = true`: F2 capacity, workspace, Lakehouse and Warehouse, DDL bootstrap, synthetic load | `create_fabric = false`: existing workspace, Lakehouse and Warehouse |
 | `manage_fabric_access` (workspace role by Terraform) | `true` | `false` |

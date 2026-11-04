@@ -102,12 +102,12 @@ def get_writer_entitlement() -> Any:
     global _writer_entitlement
     if _writer_entitlement is None:
         from application.deployment import writer_group_id, writer_source
-        from infrastructure.auth.writers import EitherEntitlement, EntraGroupEntitlement
+        from infrastructure.auth.writers import DenyOnFailure, EitherEntitlement, EntraGroupEntitlement
 
         source = writer_source()
         allow = get_writer_repository()
         if source == "allowlist":
-            _writer_entitlement = allow
+            _writer_entitlement = DenyOnFailure(allow, "allowlist")
         else:
             group = EntraGroupEntitlement(writer_group_id())
             _writer_entitlement = group if source == "entra_group" else EitherEntitlement((allow, group))

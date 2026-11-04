@@ -10,8 +10,10 @@ questions.
 
 If the opening event cannot be written, the call does not proceed: an action the
 platform cannot account for is not performed. A failure to write the closing
-event is logged and does not mask the result, because the `begin` row is already
-there to say the request started.
+event does not mask the result, because the `begin` row is already there to say
+the request started. Both raise the `audit_write_failed` alert
+(`application.audit_alert`), so a failure is never silent: the first refuses the
+call, the second only raises the alarm.
 
 The request summary is for a human reading a timeline. It DROPS any key that
 names payroll or an employee, truncates what is left, and is never the request
@@ -30,6 +32,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any
 
+from application.audit_alert import audit_write_failed
 from application.identity import ActingUser, NotAuthorized
 from domain.channel import (
     ERROR_LIMIT, SUMMARY_LIMIT, ChannelAuditEvent, ChannelAuditRepository, utcnow,
@@ -44,6 +47,8 @@ SENSITIVE_KEY = re.compile(
     re.IGNORECASE,
 )
 _VALUE_LIMIT = 80
+#: How the diagnostic log names the event that failed to write.
+_ROLE = {"begin": "opening", "end": "closing"}
 
 
 def _canonical(value: Any) -> str:
@@ -167,7 +172,7 @@ class ChannelAuditor:
         """One `single` event. Returns the audit id."""
         handle = self._open(call)
         handle.annotate(**result)
-        self._repository.append(self._event(handle, phase="single", seq=1, outcome=outcome, error=error))
+        self._append(lambda: self._event(handle, phase="single", seq=1, outcome=outcome, error=error), "read", fatal=True)
         return handle.audit_id
 
     # ------------------------------------------------------------------ writes
@@ -175,18 +180,25 @@ class ChannelAuditor:
     def begin_write(self, call: AuditCall) -> AuditHandle:
         """Write the `pending` event. Raises if it cannot: nothing proceeds unrecorded."""
         handle = self._open(call)
-        self._repository.append(self._event(handle, phase="begin", seq=1, outcome="pending"))
+        self._append(lambda: self._event(handle, phase="begin", seq=1, outcome="pending"), "begin", fatal=True)
         return handle
 
     def finish_write(self, handle: AuditHandle, outcome: str, *, error: str | None = None,
                      **result: Any) -> None:
+        """Write the `end` event. A failure raises the alert and does not mask the result:
+        the `begin` row already says the request started."""
         handle.annotate(**result)
+        self._append(lambda: self._event(handle, phase="end", seq=2, outcome=outcome, error=error), "end", fatal=False)
+
+    def _append(self, make: Callable[[], ChannelAuditEvent], operation: str, *, fatal: bool) -> None:
+        """Build and write one event. A failure raises the alert here, once, and propagates when `fatal`."""
         try:
-            self._repository.append(
-                self._event(handle, phase="end", seq=2, outcome=outcome, error=error)
-            )
-        except Exception:  # noqa: BLE001 - the begin row already says the request started
-            log.exception("could not write the closing channel audit event for %s", handle.audit_id)
+            self._repository.append(make())
+        except Exception as exc:
+            log.exception("could not write the %s channel audit event", _ROLE.get(operation, operation))
+            audit_write_failed("channel_audit", operation, exc, fatal=fatal)
+            if fatal:
+                raise
 
     # -------------------------------------------------------------- the wrapper
 
@@ -215,4 +227,4 @@ class ChannelAuditor:
         if is_write:
             self.finish_write(handle, outcome, error=error)
             return
-        self._repository.append(self._event(handle, phase="single", seq=1, outcome=outcome, error=error))
+        self._append(lambda: self._event(handle, phase="single", seq=1, outcome=outcome, error=error), "single", fatal=True)

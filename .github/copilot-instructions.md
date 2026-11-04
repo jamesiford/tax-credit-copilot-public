@@ -363,7 +363,8 @@ and no image to pin.
   definition=PromptAgentDefinition(...))`. Invoke with
   `await agent.run(prompt, stream=True)` — there is no `.run_stream()`.
 - **Auth:** `DefaultAzureCredential` everywhere. No keys in code or `.env`.
-  User sign-in is `AUTH_MODE` `none` | `entra`: Easy Auth on `web`, bearer
+  User sign-in is `AUTH_MODE` `entra` (the default) | `none` (local development only:
+  `ENVIRONMENT=local` set explicitly, or a flagged synthetic demo): Easy Auth on `web`, bearer
   validation on `api`.
 - **Data:** payroll from the Fabric **Lakehouse** (OneLake, Delta, read via
   `deltalake[pyarrow]`). Operational and Gold data in the Fabric **Warehouse**

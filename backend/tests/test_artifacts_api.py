@@ -85,7 +85,7 @@ def service(tmp_path):
 def api(monkeypatch):
     import main
 
-    monkeypatch.delenv("AUTH_MODE", raising=False)
+    monkeypatch.setenv("AUTH_MODE", "none")
     return TestClient(main.app)
 
 

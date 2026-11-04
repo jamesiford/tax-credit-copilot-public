@@ -286,6 +286,11 @@ The messages it can raise, verbatim fragments to search for:
   `"...must use 'warehouse'"` — `ARTIFACT_STORE` / `ARTIFACT_REPOSITORY`.
 - `"AUTH_MODE=entra needs AUTH_TENANT_ID"` / `"...needs API_AUDIENCE"` —
   enterprise profile misconfigured.
+- `"AUTH_MODE=none is only for local development"` — RM-03: `AUTH_MODE` defaults
+  to `entra`, and `none` needs `ENVIRONMENT=local` set explicitly, or (a deployed
+  synthetic demo) `ALLOW_ANONYMOUS_SYNTHETIC=1` with
+  `DATA_CLASSIFICATION=synthetic`. The Terraform public profile sets the flag; a
+  hand-built environment that forgot `AUTH_MODE` must be given entra settings.
 - `"AUTH_MODE=none is refused with DATA_CLASSIFICATION=customer"` — D26: the
   public profile's defaults (`AUTH_MODE=none`) must never be paired with real
   payroll.
@@ -480,3 +485,19 @@ defect, and it is a bug to raise, never a setting to loosen. Do not raise the to
 
 A related, quieter signal: `verify_figures` saying a figure is wrong right after a restart is the per-process ledger
 (§13.1), not a defect.
+
+### 13.10 An audit write failed (`audit_write_failed`)
+
+A trail that fails quietly is the worst failure it can have, so every failed audit write raises one event: an ERROR on
+the logger `tcc.audit_alert` whose message starts `audit_write_failed` and carries `source=`
+(`channel_audit`, `agent_audit` or `narration`), `operation=` (`begin`, `end`, `read`, `single`, `record`, `report`,
+`agent_action_row`, `portal_chat_record`), `error_type=` and `fatal=`. It holds no payload and no exception message. Alert
+on the message prefix (Log Analytics, `AppTraces | where Message startswith "audit_write_failed"`); any occurrence is
+worth a page, because it means the warehouse trail is missing a row.
+
+`fatal=True` means the work was refused because of it (a read whose opening event cannot be written is not made, and
+the caller sees `503 audit_unavailable`); `fatal=False` means the answer stood but its closing event or agent row is
+missing. The orchestrator logs the same prefix (`source=narration`) when the gateway refuses its narration report. A
+related event, `writer_check_failed` on `tcc.writer_check`, says an entitlement source (`allowlist`, `entra_group`,
+`gateway_check`) could not answer and the person was denied: a run of those with no other change means the allow-list
+table or Graph is down, and legitimate writers are being refused, never the reverse.
