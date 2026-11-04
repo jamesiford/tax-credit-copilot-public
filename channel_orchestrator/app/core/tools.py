@@ -34,8 +34,8 @@ from app.core.identity import ActingIdentity
 from app.core.state import ConversationState, PendingWrite
 from app.core.telemetry import tool_span
 from app.core.toolset import (  # noqa: F401 - re-exported: the names the rest of the orchestrator imports from here
-    CLIENT_PLACEHOLDER, SCENARIO_NUMBERS, YEAR_KEYS, Clarification, Problem, ToolRun, first_schema_problem, model_answer,
-    model_tools, numbers_in, offered_schema, years_in,
+    CLIENT_PLACEHOLDER, SCENARIO_NUMBERS, YEAR_KEYS, Clarification, Problem, ToolRun, first_schema_problem, lane_diagnostic,
+    model_answer, model_tools, numbers_in, offered_schema, years_in,
 )
 from application.capabilities import catalog
 from application.composer import narrator_brief
@@ -225,7 +225,9 @@ class ToolRunner:
         if spec.kind == catalog.WRITE_PREPARE:
             self._hold(run)
         brief = narrator_brief(self.question, [spec.name], {run.label: run.model_facts}, notes=list(reply.body.get("warnings") or []))
-        return model_answer(spec, run, brief)
+        answer = model_answer(spec, run, brief)
+        log.info("model payload: %s", lane_diagnostic(run, answer))
+        return answer
 
     def _hold(self, run: ToolRun) -> None:
         """Keep a prepared change for its owner's `confirm`. The token never leaves this object."""

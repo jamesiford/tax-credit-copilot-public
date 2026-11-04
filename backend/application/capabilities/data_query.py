@@ -24,7 +24,7 @@ from application.capabilities.errors import DataQueryRefused
 from application.data.errors import BlockedColumn, QueryError, UnknownColumn, UnknownDataset
 from application.data.plan import ResultColumn
 from application.data.semantic_model import Role, Sensitivity
-from application.data.spec import MeasureSpec, OrderSpec, QuerySpec
+from application.data.spec import MAX_LIMIT, MeasureSpec, OrderSpec, QuerySpec
 from application.identity import Principal
 
 DEFAULT_DISTINCT = 50
@@ -61,11 +61,20 @@ def _listable(dataset_name: str, column_name: str) -> None:
         )
 
 
+def _rows_to_fetch(dataset: str, limit: int) -> int:
+    """Rows to ask for so that `limit` VALUES come back. A dataset holding both statutory readings returns
+    each value once per reading, so asking for `limit` rows listed only half as many values and still said
+    the list was cut: a client with 101 worksites could never be enumerated past 50."""
+    held = service().model.dataset(dataset)
+    return min(limit * 2, MAX_LIMIT) if held is not None and held.method_column else limit
+
+
 def _values_spec(client_id: int, dataset: str, column: str, tax_years: Any, limit: int) -> QuerySpec:
     years = QuerySpec.from_dict({"dataset": dataset, "client_id": client_id, "tax_years": tax_years}).tax_years
     return QuerySpec(
         dataset=dataset, client_id=client_id, tax_years=years, select=(column,),
-        measures=(MeasureSpec("*", "count", "row_count"),), group_by=(column,), order_by=(OrderSpec(column),), limit=limit,
+        measures=(MeasureSpec("*", "count", "row_count"),), group_by=(column,), order_by=(OrderSpec(column),),
+        limit=_rows_to_fetch(dataset, limit),
     )
 
 
@@ -104,13 +113,15 @@ def data_distinct_values(
         raise refused(exc) from exc
     values = _merge(result.columns, result.rows, column)
     p = result.provenance
+    truncated = p.truncated or len(values) > limit
+    values = values[:limit]
     facts = {
         "dataset": dataset, "column": column, "client_id": client_id, "tax_years": list(p.tax_years),
-        "value_count": len(values), "truncated": p.truncated, "row_limit": limit, "values": values,
+        "value_count": len(values), "truncated": truncated, "row_limit": limit, "values": values,
         "source": p.source_line, "notes": list(p.notes),
     }
     return s.result(
-        "data_distinct_values", facts, _values_blocks(dataset, column, values, p.truncated, p.source_line),
+        "data_distinct_values", facts, _values_blocks(dataset, column, values, truncated, p.source_line),
         provenance=Provenance(run_id=p.run.run_id if p.run else None, source=p.source_line),
         warnings=p.notes,
     )
