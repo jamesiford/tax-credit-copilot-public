@@ -123,7 +123,7 @@ def test_the_settings_reject_values_that_would_weaken_a_control():
         with pytest.raises(OrchestratorConfigError):
             load_settings({**ENV, **bad})
     ok = load_settings({**ENV, "CHANNEL_DEBUG_WHOAMI": "true"})
-    assert ok.debug_whoami and ok.max_tool_calls == 6 and ok.confirm_ttl_seconds == 300
+    assert ok.debug_whoami and ok.max_tool_calls == 8 and ok.confirm_ttl_seconds == 300
     assert ok.gateway_scope == "api://gateway-test/.default" and USER_OID
 
 

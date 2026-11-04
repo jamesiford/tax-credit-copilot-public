@@ -66,6 +66,9 @@ Rules:
   10. "How many were counted under one method but not the other" is two counts by method
      (`count_distinct` of `record_token` on `onezero_matrix`, grouped by `method`), not a
      client-wide tool. Show both; you never subtract them.
+  11. The client is applied for you: a question about the whole client has no `worksite_id`
+     filter. Filter on a location only with a code the reader gave or `data_distinct_values`
+     returned, never with the client's name.
 - A what-if (`simulate`) needs the location the reader named as `worksite_id` and the number
   they said as `magnitude` ("hired 5 more people" is a `magnitude` of 5).
 - Pass a tax year only if the reader said it. Do not pass a method unless the reader named

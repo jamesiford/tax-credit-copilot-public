@@ -212,7 +212,7 @@ the same `load_ai_settings`. The platform injects the reserved `FOUNDRY_*` names
 | `CHANNEL_GATEWAY_AUDIENCE` | `app/core/settings.py` | The gateway's app registration (`api://<id>`); the orchestrator's managed identity requests `<audience>/.default` and must hold `Channel.Invoke`. No default | same value as the gateway's `GATEWAY_AUDIENCE` | `CHANNEL_GATEWAY_AUDIENCE` | Enforced |
 | `TENANT_ID` | `app/core/settings.py` | The Entra tenant (a GUID). A person from another tenant is refused before any call. No default | same as the gateway's | — | Enforced |
 | `CHANNEL_NAME` | `app/core/settings.py` | `teams` (default) or `m365-copilot`: the `X-Channel` the gateway records | not set | — | No |
-| `CHANNEL_MAX_TOOL_CALLS` | `app/core/settings.py` | Tools one turn may run, `1`–`20`. Default `6`. Eligibility under both methods counts as two | not set | — | No |
+| `CHANNEL_MAX_TOOL_CALLS` | `app/core/settings.py` | Tools one turn may run, `1`–`20`. Default `8` (raised from `6`: a data question is a catalog read plus one or two queries). Eligibility under both methods counts as two | not set | — | No |
 | `CHANNEL_CONFIRM_TTL_SECONDS` | `app/core/settings.py` | How long a prepared change waits for its owner's `confirm`, `30`–`3600`. Default `300` | not set | — | No |
 | `CHANNEL_STATE_TTL_SECONDS` | `app/core/settings.py` | Idle time before a conversation's state (last client and year, pending change) is forgotten, `60`–`86400`. Default `3600`. In memory, per replica | not set | — | No |
 | `CHANNEL_REQUEST_TIMEOUT_SECONDS` | `app/core/settings.py` | How long one gateway call may take, `5`–`300`. Default `40`, above the gateway's own `30` | not set | — | No |
