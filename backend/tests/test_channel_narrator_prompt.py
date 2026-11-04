@@ -40,10 +40,10 @@ def facts_for(example: dict[str, str]) -> dict:
     return tree
 
 
-def test_the_prompt_is_version_three_and_the_manifest_records_every_version():
+def test_the_prompt_is_version_four_and_the_manifest_records_every_version():
     version = FilePromptStore().get("channel_narrator").version
-    assert version == 3
-    assert {"1", "2", "3"} <= set(load_manifest()["prompts"]["channel_narrator"]["versions"])
+    assert version == 4
+    assert {"1", "2", "3", "4"} <= set(load_manifest()["prompts"]["channel_narrator"]["versions"])
 
 
 def test_it_teaches_by_worked_examples_and_keeps_them_few_enough_to_read():
@@ -82,7 +82,7 @@ def test_every_example_is_one_to_four_sentences():
     "never say a figure is rounded", "approximately", "roughly", "character for character", "the `facts.` prefix",
     "no authored rule pack", "not a zero", "never state tax law",
     "exact rows and aggregates, not a conclusion", "capped", "has nothing for it", "have not been shown",
-    "engine's figure is the authority",
+    "engine's figure is the authority", "the difference is not in it", "never offer a different figure",
 ])
 def test_the_voice_and_the_composer_rules_are_stated(must_say):
     assert must_say.lower() in FLAT.lower() or must_say.lower() in " ".join(TEXT.lower().split())

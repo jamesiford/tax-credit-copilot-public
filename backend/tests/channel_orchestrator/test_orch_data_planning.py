@@ -93,6 +93,6 @@ def test_the_planner_says_what_a_location_question_is_and_how_to_name_an_hours_m
     text = flat(prompts.PLANNER)
     for must in ("narrowed to one location", "only `simulate` takes a location", "`average_hours_per_pay_period`",
                  "never one `select` of thirteen columns", "`month_01` to `month_06`", "you never subtract them",
-                 "`magnitude` of 5"):
+                 "`magnitude` of 5", "never with the client's name"):
         assert must in text, must
     assert "never weekly" in flat(prompts.PLAN_JSON).lower()

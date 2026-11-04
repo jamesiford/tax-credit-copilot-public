@@ -30,6 +30,8 @@ from app.core.tools import ToolRunner, model_tools, offered_schema
 from domain.ai import ChatMessage, ToolCall, ToolSpec
 
 log = logging.getLogger("tcc.orchestrator.maf")
+#: What the framework answers when the tool loop stops at its budget; live it surfaced as the reply's first line.
+LIMIT_NOTICE = "Function invocation limit reached"
 
 
 @dataclass
@@ -105,6 +107,8 @@ class ComposeMiddleware(AgentMiddleware):
     async def process(self, context: AgentContext, call_next: Callable[[], Awaitable[None]]) -> None:
         await call_next()
         raw = context.result.text if context.result is not None else ""
+        if raw.startswith(LIMIT_NOTICE):
+            raw = ""  # the framework's own stop message is not the model's narration
         context.result = AgentResponse(messages=[Message("assistant", [self._compose(raw)])])
 
 

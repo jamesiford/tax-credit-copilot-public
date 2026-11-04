@@ -36,7 +36,7 @@ class OrchestratorSettings:
     tenant_id: str
     ai: AiSettings
     channel: str = "teams"
-    max_tool_calls: int = 6
+    max_tool_calls: int = 8
     confirm_ttl_seconds: int = 300
     state_ttl_seconds: int = 3600
     request_timeout_seconds: float = 40.0
@@ -107,7 +107,7 @@ def load_settings(env: Mapping[str, str]) -> OrchestratorSettings:
         gateway_url=_text(env, "CHANNEL_GATEWAY_URL").rstrip("/"),
         gateway_audience=_text(env, "CHANNEL_GATEWAY_AUDIENCE"), tenant_id=_text(env, "TENANT_ID").lower(), ai=ai,
         channel=_text(env, "CHANNEL_NAME", "teams"),
-        max_tool_calls=_integer(env, "CHANNEL_MAX_TOOL_CALLS", 6, 1, 20),
+        max_tool_calls=_integer(env, "CHANNEL_MAX_TOOL_CALLS", 8, 1, 20),
         confirm_ttl_seconds=_integer(env, "CHANNEL_CONFIRM_TTL_SECONDS", 300, 30, 3600),
         state_ttl_seconds=_integer(env, "CHANNEL_STATE_TTL_SECONDS", 3600, 60, 86400),
         request_timeout_seconds=float(_integer(env, "CHANNEL_REQUEST_TIMEOUT_SECONDS", 40, 5, 300)),

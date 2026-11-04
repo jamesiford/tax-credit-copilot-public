@@ -42,3 +42,11 @@ def test_the_tool_loop_is_bounded_by_the_turn_budget():
     asyncio.run(agent.run("How has Cascade trended?"))
     assert runner.calls <= 3, "the MAF loop stops near the budget instead of running a runaway model forever"
     assert len(chat.seen) < 20
+
+
+def test_the_frameworks_stop_message_is_never_handed_to_the_composer_as_narration():
+    seen: list[str] = []
+    agent, runner, _ = agent_for([{"tools": [{"tool": "client_trend", "args": {}}] * 3}] * 20 + [{"text": "done"}], seen)
+    runner.max_calls = 2
+    asyncio.run(agent.run("How has Cascade trended?"))
+    assert seen and not any(text.startswith("Function invocation limit") for text in seen)
