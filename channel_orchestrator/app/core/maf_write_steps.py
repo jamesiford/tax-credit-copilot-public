@@ -68,14 +68,14 @@ class Prepared:
 class WriteContext:
     """What the executors act with: the gateway, the person, the pipeline's clock and the confirmation window.
 
-    `forward` is the turn's one outbound call; it exists only on the turn that prepares and is absent on a
-    turn that merely resumes the workflow.
+    `forward` (the turn's one outbound call) and `deadline` (when a preview made now expires) exist only on the
+    turn that prepares and are absent on a turn that merely resumes the workflow.
     """
 
     gateway: GatewayClient
     who: ActingIdentity
     clock: Any
-    ttl_seconds: int = 300
+    deadline: Any = None
     forward: Any = None
     prepared: Prepared = field(default_factory=Prepared)
 
@@ -90,11 +90,11 @@ class Prepare(Executor):
     @handler
     async def prepare(self, request: PrepareRequest, ctx: WorkflowContext[PendingWrite]) -> None:
         spec = catalog.BY_NAME[request.tool]
-        if spec.kind != catalog.WRITE_PREPARE or self._c.forward is None:
+        if spec.kind != catalog.WRITE_PREPARE or self._c.forward is None or self._c.deadline is None:
             raise ValueError(f"{request.tool} is not a preview this workflow may ask for")
         reply = await self._c.forward(spec, request.args)
         self._c.prepared.reply = reply
-        pending = PendingWrite.from_preview(request.tool, request.args, reply.body, self._c.clock() + self._c.ttl_seconds) if reply.ok else None
+        pending = PendingWrite.from_preview(request.tool, request.args, reply.body, self._c.deadline()) if reply.ok else None
         if pending is not None:
             await ctx.send_message(pending)
 

@@ -71,6 +71,9 @@ def test_the_prepare_step_refuses_anything_that_is_not_a_preview():
         class Turn:
             gateway, who, clock, confirm_ttl_seconds, flow = rig.pipeline._gateway, identity(), FakeClock(), 300, None
 
+            def deadline(self):
+                raise AssertionError("no deadline is needed for a tool that is not a preview")
+
             async def forward(self, spec, args):
                 raise AssertionError("nothing may be sent for a tool that is not a preview")
 

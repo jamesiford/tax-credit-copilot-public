@@ -93,10 +93,14 @@ class ToolRunner:
         self.client_id = self.state.client_id = int(chosen)
         return self.client_id
 
+    def deadline(self) -> float:
+        """When a preview prepared now stops being confirmable, on the pipeline's clock."""
+        return self.clock() + self.confirm_ttl_seconds
+
     def hold(self, run: ToolRun) -> None:
         """Note that a preview is waiting for its owner. The token is kept by the write workflow (`maf_write_flow`)
         and, as a flag for this turn's reply, here; it never reaches a fact, a prompt or a log."""
-        pending = PendingWrite.from_preview(run.name, run.args, run.envelope, self.clock() + self.confirm_ttl_seconds)
+        pending = PendingWrite.from_preview(run.name, run.args, run.envelope, self.deadline())
         if pending is None:
             self.problems.append(Problem(run.name, "no_confirmation", "the preview carried no confirmation"))
             return

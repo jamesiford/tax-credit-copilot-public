@@ -64,7 +64,7 @@ async def prepare_write(turn: Any, spec: catalog.CapabilitySpec, args: dict[str,
     was refused (not entitled, bad arguments) or carried no confirmation never pauses.
     """
     storage = InMemoryCheckpointStorage()
-    context = WriteContext(turn.gateway, turn.who, turn.clock, turn.confirm_ttl_seconds, turn.forward)
+    context = WriteContext(turn.gateway, turn.who, turn.clock, turn.deadline, turn.forward)
     flow = build_write_flow(context, storage)
     try:
         result = await flow.run(PrepareRequest(spec.name, dict(args)))
