@@ -25,10 +25,11 @@ from typing import Any
 
 from app.core import replies
 from app.core.audit import NarrationAuditor
-from app.core.compose import compose_reply, provenance_footer
+from app.core.compose import provenance_footer
 from app.core.gateway_client import GatewayClient
 from app.core.identity import ActingIdentity
-from app.core.planner import Planned, Planner
+from app.core.planned import Planned
+from app.core.planner import Planner
 from app.core.settings import OrchestratorSettings
 from app.core.state import ConversationState, StateStore
 from app.core.tools import Clarification, ToolRunner
@@ -140,7 +141,7 @@ class TurnPipeline:
             text = replies.failure(runner.problems) if runner.problems or runner.refused else HELP
             audit = await self._auditor.report(who, planned, runner, None, text)
             return TurnReply(text, "failure" if runner.problems else "help", planned.mode, refused=tuple(runner.refused), audit=audit)
-        composed = planned.composed or compose_reply(question, runner.runs, planned.narration, self._s.ai.safety.output_allowed_hosts)
+        composed = planned.composed_for(runner)
         text = self._assemble(runner, planned, composed)
         state.pending = runner.pending
         state.remember("assistant", text)

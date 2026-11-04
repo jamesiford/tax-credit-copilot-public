@@ -13,7 +13,6 @@ from typing import Any
 
 from jsonschema import Draft202012Validator
 
-from app.core.placeholders import with_placeholders
 from application.capabilities import catalog
 from application.capabilities.catalog_types import OWNED_METHOD, OWNED_METHOD_BOTH
 from application.capabilities.lanes import has_user_lane, is_user_block
@@ -107,11 +106,13 @@ class ToolRun:
 def model_answer(spec: catalog.CapabilitySpec, run: ToolRun, brief: dict[str, Any]) -> dict[str, Any]:
     """The reply a model gets for one tool: the NAMES of the facts, never their values.
 
+    `brief` is `compose.narration_brief` for this run (its paths already carry their placeholders).
+
     One exception, by declaration: a `lookup` tool (`data_catalog`, `data_distinct_values`) describes the
     shape of the data, never its content, and the model cannot write a valid query without reading it, so it
     is handed the facts themselves (still through the lane projection) and only the numeric paths.
     """
-    paths = with_placeholders(brief["fact_paths"])
+    paths = brief["fact_paths"]
     if catalog.LOOKUP not in spec.tags:
         return {"ok": True, "tool": spec.name, "fact_paths": paths, "notes": brief["notes"]}
     numeric = [p for p in paths if p.get("format") != "text"]
