@@ -2,9 +2,9 @@
 
 What the modern-theme revamp (UI-01 to UI-08) changed, what it deliberately did
 not, where the doctrine moved, the before/after numbers, and what is still open.
-The reference is [DESIGN-SYSTEM.md](DESIGN-SYSTEM.md); every choice has its
-reasoning in [UI-DECISIONS.md](UI-DECISIONS.md) (D1 to D34); work package
-history is in [UI-STATUS.md](UI-STATUS.md). Nothing here was pushed.
+The reference is [DESIGN-SYSTEM.md](../../design/DESIGN-SYSTEM.md); every choice has its
+reasoning in [UI-DECISIONS.md](../../design/UI-DECISIONS.md) (D1 to D34); work package
+history is in [UI-STATUS.md](../../design/UI-STATUS.md). Nothing here was pushed.
 
 ## What changed
 

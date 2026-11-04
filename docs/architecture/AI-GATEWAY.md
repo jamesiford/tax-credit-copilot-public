@@ -148,7 +148,7 @@ The orchestrator's default chain is therefore `foundry` alone.
 **Live check (CH-14).** `scripts/live-ai-checks.py` drives the real narration chain from inside
 the network (the API app's Kudu console) against the deployed mock in each auth mode, with a
 queued 429 + `Retry-After`, with queued failures to force a hop, and with an identifier-shaped
-prompt. Results: `docs/m365-channel/evidence/live-smoke-2026-11-03.md`.
+prompt. Results: `docs/archive/evidence/live-smoke-2026-11-03.md`.
 
 ## Questions for the gateway team
 

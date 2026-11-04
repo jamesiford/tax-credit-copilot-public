@@ -1,7 +1,95 @@
 # Remediation findings
 
-Customer-neutral. Findings from the remediation run (RM) that need an owner or a framework feature, appended per work package. The run's final summary
-(what was fixed, deliberately not done, residual risks, owner decisions) is written at the end of the run.
+Customer-neutral. The run's summary comes first (what was fixed, what was deliberately not done, residual risks, and the decisions only the
+owner can take); below it are the findings, appended per work package, that need an owner or a framework feature. Status per work package
+is in [REMEDIATION-STATUS.md](REMEDIATION-STATUS.md), the reasoning in [DECISIONS.md](DECISIONS.md) (the build log), and the one document that
+explains what the run produced is [ONE-ANSWER-EVERYWHERE.md](../architecture/ONE-ANSWER-EVERYWHERE.md).
+
+## Summary
+
+Written at the RM-22 merge, after RM-25. `main` is untouched at `029b9ad2d2c002c09167375748120c7a8af3bc03`; nothing is pushed. **Test evidence
+as of this writing:** the last **full** backend run was RM-20: 6,166 passed / 136 skipped / 1 xfailed (baseline 4,957 / 136 / 1). RM-21 to RM-25
+ran only the fast gate by the owner's instruction (architecture and code-standards tests, the tests that read what changed, and
+`pytest tests --collect-only`: 6,338 collected, 0 errors at RM-25). The full backend and frontend suites and `check_all.py` run once at the end of
+the run, by the orchestrating session; **they have not run on the RM-21 to RM-25 tip**.
+
+### What was fixed, by tier
+
+**Tier 1, security (offline, all merged).**
+- RM-01 small-group suppression: aggregates over employee rows leave out groups smaller than K (default 5, floor 2), say how many were left out, and refuse an all-singleton group-by; a writer is exempt (D-119).
+- RM-02 Cowork fails closed: only a positively first-party channel gets employee rows; the API refuses for itself, so a token sent straight to the API no longer skips the check; an agent's claimed channel is bound to its registered app id (D-120).
+- RM-03 authentication is the default; `none` is a stated local opt-in; a failed audit write always raises an alert and never passes silently (D-121).
+- RM-04 a seeded abuse fuzzer over the query builder, a closed grammar for derived columns, apostrophes in names work; it found four holes and they were fixed (D-122).
+- RM-05 a narration cannot point into the person's lane, and the data tools have no door past the numeric guard (D-123).
+
+**Tier 2, the Microsoft Agent Framework as the orchestration layer (offline; one live redeploy).**
+- RM-06 the alignment spike and the hand-rolled inventory (47 rows) with a verdict per component (D-124).
+- RM-07 every model-facing tool is generated from the catalog; nothing else defines one (D-125).
+- RM-08 the tool rules (budget, commit refusal, client, year and method, schema, capture) are function middleware inside the model's loop (D-126).
+- RM-09 a foundry-only provider chain is served by the framework's own chat client; a chain that names a gateway keeps the custom client (D-127).
+- RM-10a the Agent is the planner; JSON and keyword modes are one small degraded path (D-129). RM-10b the write path is a Workflow (prepare, request, commit; D-130). RM-10c the client review pack is a second Workflow (D-131). RM-10d where each pattern is allowed, and that no executor or tool body computes a figure, are tests (D-132). RM-10e nothing was done by weakening a guarantee.
+- RM-11 agent as code: `azure.yaml` is the orchestrator's definition, and the twelve specialist prompt agents are declared in one list (D-133).
+- RM-12 hosting: **NO-GO**, the host stays behind the `main.py` seam; the seam and the protocol rule are tests (D-128).
+- RM-13 parity and conformance: 19 questions across five doors, 102 answers compared, identical (D-135). One adapter bug found and fixed.
+- RM-14 the MCP facade is kept, proved standard by the SDK's own client and an 89-test conformance suite; four gaps in it fixed (D-136).
+- RM-15 the knowledge tier is a port, a fake and a context provider, off by default; a cited passage is never a figure (D-134, ADR-010).
+- RM-16 API, gateway and the orchestrator (agent version 21) deployed; invariants 13 of 13 before and after; **live verification not finished** (below) (D-137, D-138).
+
+**Tier 3, layering, SOLID, DRY (offline, behaviour-preserving).**
+- RM-17 the composition root is `backend/bootstrap/`; `application` imports nothing from `infrastructure`, and the inner rings import no framework or SDK (D-139).
+- RM-18 routers send requests through the mediator and import no adapter; the one `api` allow-list entry is gone (D-140).
+- RM-19 a `GoldReadPort`, and `gold_reader.py` (1,821 lines) became a package of 16 modules with identical reads (D-141).
+- RM-20 `backend/config.py` is the only reader of the process environment (D-142).
+- RM-21 small wins: dispatch tables in the renderer, `numeric`, `composer` and `knowledge` packages, an ADR-009 note on the fixed pipeline (D-143).
+
+**Tier 4, structure and docs.**
+- RM-22 (this package) docs: a "Start here" and an index of every docs folder, ADR-006 and ADR-001's successor in the index, stale UI briefs and dated evidence archived, the build log named as such with an index of the durable decisions, the hand-rolled inventory completed, [ONE-ANSWER-EVERYWHERE.md](../architecture/ONE-ANSWER-EVERYWHERE.md) and this summary (D-147).
+- RM-23 executable code left `docs/` for `scripts/` (D-144). RM-24 `scripts/README.md` indexes every script (D-145). RM-25 folder maps for `channel_orchestrator/` and `backend/`, `variables.tf` in numbered sections (D-146).
+
+### Deliberately not done, and why
+
+| Not done | Why | Finding |
+| --- | --- | --- |
+| Anything under `frontend/` | The UI work is being split onto its own branch. Issues found are recorded, not fixed | the run's rule |
+| Renaming `backend/tools` to `devtools` | It is not developer tooling: it holds the statutory math and the calculation trail, imported by 103 files; a rename would call the audit boundary a dev folder | F-42 |
+| Splitting `domain/calculation/onezero.py` and `domain/claims.py` | The private reference fixtures are absent here, so the certified 10,236 / 539 / 656 gate could not run, and the import cycle is the fault a split hides | F-38 |
+| The MAF hosting package | Pre-release only (`1.0.0b261030`) with no Activity handler; Teams works through the Responses bridge | F-01, D-128 |
+| Replacing the MCP facade with the SDK | The SDK serves a second person on the first person's session and answers an unauthenticated call with HTTP 200; the binding is code either way | F-08, D-136 |
+| The Foundry IQ adapter, the corpus, any Search resource | Designed, not built; needs owner decisions and provisioning | F-20, F-21, ADR-010 |
+| Moving the Gold-read, forecast and other routers behind queries | Out of the brief's list and the Gold ones would move twice; pinned so they only shrink | F-35 |
+| `application` still imports `tools`, `data` and `config`; adapters fall back to `get_settings()` | Larger than a package and not a behaviour change | F-36, F-41 |
+| One typed settings object for the orchestrator and the AI, knowledge and gateway parsers | The orchestrator vendors its parsers and cannot import the backend's config | F-40 |
+| Grouping `chat_*`, `output_policy` and the audit modules; moving `synth.py` out of the shipped package; docstrings on about 300 port members | The same mechanical change with vendoring and allow-list updates; postprovision needs `synth.py` | F-43, F-44, F-45 |
+| A what-if, data or write step in the review pack | A step that chose a worksite or a size in code would invent it; a model inside a fixed sequence would make it open-ended | F-14 |
+| A durable write checkpoint | A pending confirmation does not survive a restart (as before); the single-use token must not be persisted | F-15, D-130 |
+| Running the composer over the portal's prose | The portal's narration still streams unchecked (the known limit in ADR-008) | F-23 |
+| A portal what-if, `explain` and `eligibility` on the catalog tool | Needs a product decision on how a city in a sentence becomes a worksite | F-22 |
+| Resuming the shared Fabric capacity | A shared resource outside this run's guards | F-30 |
+
+### Residual risks
+
+- **Nothing the run changed in the orchestrator has been exercised end to end on the live service.** The ten live questions, the prepared write, the review pack and the smoke's data steps did not run because the Warehouse was unavailable (the capacity was suspended). Agent invariants (13 of 13) and the framework client's reach of the model host were verified (F-32). The framework path, the Workflows and the middleware are proven in process only.
+- **`CHANNEL_CALLER_CHANNELS` is unset in the live gateway,** so an agent's claimed channel is trusted at the enum level for every registered caller (F-34, D-120).
+- **The Origin default for `/mcp` is unverified against the real Cowork client** (F-27); a wrong default would refuse its connection, and the setting and RUNBOOK say how to add one origin.
+- **The portal's narration is not checked.** Anything shown to a customer must render from the evidence pane and the canonical values, not the stream (F-23).
+- **The parity proof ran on the synthetic payroll in a SQLite stand-in,** not on the Warehouse; the hosted handler, a real model in the Agent loop and Cowork's own client were not driven (F-26).
+- **Infrastructure drift**: five in-place changes (plan SKU, `always_on`) that the run did not cause and did not apply (F-31); `always_on` off makes the first request after idle slow.
+- **Unverified deploys**: the `azure.yaml` fields RM-11 added were not deploy-tested (`azd` was not run for them); the RM-03 alert query was not run against a workspace; the two additive Warehouse migrations were read, not run on a fresh Warehouse; `FOUNDRY_MODEL` sits under a name the extension's documentation reserves (F-17).
+- **When the Warehouse is down, every orchestrator reply says the audit is unavailable,** including for a read whose tool call had already failed (F-33): correct for a write, arguably too strict for a read.
+- **The release gates are pending**: the full backend and frontend suites and `check_all.py` have not run on the final tip (the orchestrating session runs them once).
+
+### The owner's decisions
+
+1. **MAF hosting package, go or no-go.** NO-GO today. Re-check when the package is generally available, serves `activity`, passes the acting person into a workflow, and leaves `azure.yaml` and the endpoint protocols unchanged; the conditions are in [MAF-ALIGNMENT.md](MAF-ALIGNMENT.md) ("Hosting: go / no-go and when to re-check"). Nothing to do until then.
+2. **MCP SDK or the facade.** Recommendation: keep the facade (D-136). Revisit if the SDK gains a hook to bind a session to an authenticated principal, or if a client we must serve speaks only the 2026-07-28 protocol (F-28).
+3. **Knowledge tier provisioning.** Whether to build the Foundry IQ source at all, the corpus and who approves it, whether a reader-visible quote may contain figures from the statute text, and the latency inside a Teams turn (F-21). The provisioning steps are in [KNOWLEDGE-AND-IQ.md](../architecture/KNOWLEDGE-AND-IQ.md) section 7; nothing was created.
+4. **The branch split.** Which of `feat/m365-channel`'s work goes to `main`, and as how many branches; see FINAL-STATE.md ("Planned branch split") and PUSH-CHECKLIST.md. Nothing is pushed and `main` has not moved.
+5. **`CHANNEL_CALLER_CHANNELS`.** Supply the agent's app id and the channels it may assert, and set it (value shape and the order of checks are in D-137), or accept enum-level trust (F-34).
+6. **The App Service plan SKU and `always_on` drift.** Decide whether the live plan was scaled down on purpose (then follow it in the overlay) or the overlay is right (then `azd provision` restores it) (F-31).
+7. **The QC-exception and employee-annotation commands (F-37).** Whether a non-writer person may resolve a QC exception or annotate an employee at all. Today any signed-in user can, and the annotation is in memory only; making them `Policy.WRITER` changes who may call a route.
+8. **The Origin header for Cowork.** Confirm on the first live Cowork connection whether the client sends one; if it does, set `CHANNEL_MCP_ALLOWED_ORIGINS` (F-27).
+9. **Resume the shared Fabric capacity and run the pending live checks (F-30).** Resume the capacity, then run the checklist in [evidence/live-remediation-2026-11-04.md](evidence/live-remediation-2026-11-04.md) ("How to finish"): the invariants, the live smoke, the twelve questions including a review pack and a prepared, uncommitted write, and the RM-09 points 3, 5 and 6. If anything regresses, pin agent version 20.
+10. **Smaller questions the findings raise:** whether the stored `decided_by` should be one representation everywhere (F-24); whether to rename `FOUNDRY_MODEL` (F-17); whether `definitions_match` should include the temperature (F-18); whether the Warehouse-down wording should change (F-33).
 
 ## RM-06: Microsoft Agent Framework alignment spike
 

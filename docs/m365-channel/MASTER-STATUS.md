@@ -1,6 +1,8 @@
 # Master run status
 
-Customer-neutral. Resume from this file if the run is interrupted.
+Customer-neutral. Resume from this file if the run is interrupted. The remediation run that followed it is tracked in
+[REMEDIATION-STATUS.md](REMEDIATION-STATUS.md); the first run's work-package table (CH-01 to CH-18, AI-01 to AI-08) is archived at
+[docs/archive/m365-channel/STATUS.md](../archive/m365-channel/STATUS.md).
 
 Rollback tag: `pre-master-2026-11-03` (tip `58dcd53`).
 
@@ -113,7 +115,7 @@ Settings: `azd env set` the three new values back (`false`/empty) and `azd provi
 
 ### 3.6 and 3.7 Live verification and hand-off: done
 
-Evidence: [evidence/live-final-2026-11-03.md](evidence/live-final-2026-11-03.md).
+Evidence: [evidence/live-final-2026-11-03.md](../archive/evidence/live-final-2026-11-03.md).
 
 | Check | Result |
 | --- | --- |

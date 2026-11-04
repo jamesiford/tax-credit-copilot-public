@@ -7,8 +7,8 @@ the accessibility rules and the gates that defend them.
 
 The rules the code must obey are in `.github/copilot-instructions.md`
 ("Frontend rules"); this file explains the system they describe. History of
-earlier rounds is in [REVAMP-REPORT.md](REVAMP-REPORT.md) and
-[UI-REVAMP-BRIEF.md](UI-REVAMP-BRIEF.md); decisions taken in this revamp, with
+earlier rounds is archived in [REVAMP-REPORT.md](../archive/design/REVAMP-REPORT.md) and
+[UI-REVAMP-BRIEF.md](../archive/design/UI-REVAMP-BRIEF.md); decisions taken in this revamp, with
 their reasons, are in [UI-DECISIONS.md](UI-DECISIONS.md); progress and measured
 numbers are in [UI-STATUS.md](UI-STATUS.md).
 

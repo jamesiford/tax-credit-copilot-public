@@ -167,4 +167,4 @@ the orchestrator does not, and a model that writes a Word briefing cannot be ass
 | [DEMO-CLEANUP.md](DEMO-CLEANUP.md) | What to switch off after a demo, with the commands |
 | [RUNBOOK §13](../architecture/RUNBOOK.md) · [CONNECTIVITY-MATRIX §1a](../architecture/CONNECTIVITY-MATRIX.md) | Operating it; who calls what |
 | [HARDENING-PLAN](../architecture/HARDENING-PLAN.md) · [HARDENING-SPIKE](HARDENING-SPIKE.md) | The demo posture and the later private one |
-| [DECISIONS.md](DECISIONS.md) · [STATUS.md](STATUS.md) | Every decision, and what is done |
+| [DECISIONS.md](DECISIONS.md) (the build log) · [REMEDIATION-STATUS.md](REMEDIATION-STATUS.md) · [MASTER-STATUS.md](MASTER-STATUS.md) | Every decision taken building the channel, and what is done. The first run's work-package table is archived: [STATUS.md](../archive/m365-channel/STATUS.md) |

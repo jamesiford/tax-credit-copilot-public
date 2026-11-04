@@ -250,14 +250,14 @@ Run it once per surface. Tick, date and initial each line; record a failure with
 | 17 | `network_posture` is read back to `private` after the demo | ☐ | | |
 | 18 | The caveats were said: asserted identity, Cowork wording, synthetic data | ☐ | ☐ | ☐ |
 
-Anything that fails is recorded in [STATUS.md](STATUS.md) under Blockers with the prompt, the reply and the
+Anything that fails is recorded in [REMEDIATION-STATUS.md](REMEDIATION-STATUS.md) under Blockers with the prompt, the reply and the
 correlation id from the error body ([RUNBOOK §13](../architecture/RUNBOOK.md)).
 
 ## Appendix: the live sandbox, what only a person can do
 
 Placeholders only here; the filled-in copy is the private deploy notes. Everything the automation could check
 (gateway REST and MCP, the per-user audit, the writes, the certified figures) is in
-[evidence/live-smoke-2026-11-03.md](evidence/live-smoke-2026-11-03.md). What follows needs a person in Teams or
+[evidence/live-smoke-2026-11-03.md](../archive/evidence/live-smoke-2026-11-03.md). What follows needs a person in Teams or
 Copilot, because nothing can send a message on a person's behalf.
 
 1. **S2 / S1: Teams.** Open `<share link>`, add the agent, send `/whoami`. Expect: your object id (`<operator oid>`),
@@ -321,7 +321,7 @@ framework's chat client) is deployed as agent **version 21**, but its data check
 1. **Resume the shared Fabric capacity** (owner action) and wait a few minutes for the API to warm.
 2. Run the checklist at the end of the evidence file: invariants, `/whoami` (expect `version: 21`), the gateway smoke, then the twelve questions
    (the ten of the CH-17 retest, plus a client review pack and a prepared write you do not confirm).
-3. Compare with [evidence/live-final-2026-11-03.md](evidence/live-final-2026-11-03.md). Any regression: `agent-endpoint.ps1 -Action Pin -Version 20`.
+3. Compare with [evidence/live-final-2026-11-03.md](../archive/evidence/live-final-2026-11-03.md). Any regression: `agent-endpoint.ps1 -Action Pin -Version 20`.
 4. Then the retest above (CH-17) in Teams and Cowork. Small groups: a non-writer asking for an average over fewer than five people gets the group left out and
    counted; a writer (you) is exempt, so the demo shows the exempt view.
 
