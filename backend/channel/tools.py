@@ -3,9 +3,9 @@
 Two tools are answered here and never by the API: `verify_figures`, because only the
 gateway holds the conversation's facts, and the diagnostic `channel_ping`, which
 exists to answer "who does the platform think is calling, and by which rule" during
-the identity spikes. `channel_ping` is not in the shared catalog: it is not part of
-the contract the orchestrator or the tests share, and it is offered only when
-`CHANNEL_DEBUG_WHOAMI` is on.
+the identity spikes. Both are DEFINED in the catalog (`catalog.CHANNEL_PING`; `channel_ping` sits
+outside `CATALOG` because the API has no capability behind it) and offered only through
+`catalog.offered_for_channel`, with the diagnostic only when `CHANNEL_DEBUG_WHOAMI` is on.
 
 The catalog's schemas are the contract, so the same JSON-Schema that the API
 enforces is enforced here for the local tools.
@@ -20,18 +20,13 @@ from jsonschema import Draft202012Validator
 from application.capabilities import catalog
 from channel.config import GatewaySettings
 
-PING_SPEC = catalog.CapabilitySpec(
-    name="channel_ping",
-    description="Diagnostics: the gateway's version, who it believes is calling and by which rule, and whether the API answers.",
-    kind=catalog.READ, needs_client=False, needs_year=False, tags=(catalog.GATEWAY_LOCAL, "debug"),
-    schema={"type": "object", "properties": {}, "required": [], "additionalProperties": False},
-)
+#: Defined in the catalog with the other tools; named here because the gateway answers it itself.
+PING_SPEC = catalog.CHANNEL_PING
 
 
 def offered_tools(settings: GatewaySettings) -> tuple[catalog.CapabilitySpec, ...]:
     """Every tool a caller may be shown: the built catalog, and the diagnostic when it is on."""
-    extra = (PING_SPEC,) if settings.debug_whoami else ()
-    return (*catalog.offered(), *extra)
+    return catalog.offered_for_channel(debug=settings.debug_whoami)
 
 
 def check_arguments(spec: catalog.CapabilitySpec, args: Mapping[str, Any]) -> str | None:

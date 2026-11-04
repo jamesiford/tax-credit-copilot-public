@@ -25,8 +25,12 @@ from __future__ import annotations
 from application.capabilities.catalog_data import DATA_TOOLS, LOOKUP  # noqa: F401 - re-exported
 from application.capabilities.catalog_intents import CAPABILITIES, CHAT_INTENT_TOOL, NEEDS_CLIENT  # noqa: F401
 from application.capabilities.catalog_types import (  # noqa: F401 - re-exported
-    ACTIONS, KINDS, METHODS, READ, WRITE_COMMIT, WRITE_PREPARE, CapabilitySpec, _CLAIM_STATUSES,
-    _CLIENT_ID, _METHOD, _PROGRAM, _STATE, _TAX_YEAR, _TOKEN, _object, _read, _write_pair,
+    ACTIONS, CERTIFIED_METHODS, CODE_ONLY, DEBUG, GATEWAY_LOCAL, INTERNAL, KINDS, METHODS, READ, TAX_YEAR, WRITE_COMMIT,
+    WRITE_PREPARE, CapabilitySpec, ReaderOwned, _CLAIM_STATUSES, _CLIENT_ID, _METHOD, _PROGRAM, _STATE, _TAX_YEAR, _TOKEN,
+    _marked, _object, _read, _write_pair,
+)
+from application.capabilities.channel_view import (  # noqa: F401 - re-exported
+    CHANNEL_PING, COMMIT_SENTENCE, DIAGNOSTICS, PREVIEW_SENTENCE, behaviour_hints, channel_description, model_schema,
 )
 
 _WRITES: tuple[CapabilitySpec, ...] = (
@@ -74,11 +78,6 @@ _WRITES: tuple[CapabilitySpec, ...] = (
     ),
 )
 
-#: Tools the API never answers by name over the wire to a channel caller; the
-#: gateway holds what they need (the conversation's facts) or they are plumbing.
-GATEWAY_LOCAL = "gateway-local"
-INTERNAL = "internal"
-
 _PACKAGE_TOOLS: tuple[CapabilitySpec, ...] = (
     CapabilitySpec(
         name="claim_package_link",
@@ -111,22 +110,22 @@ CATALOG: tuple[CapabilitySpec, ...] = (
         {"limit": {"type": "integer", "minimum": 1, "maximum": 25, "default": 8}},
         needs_client=False, chat_intent="book",
     ),
-    _read(
+    _marked(_read(
         "client_resolve", "Resolve a name or a pronoun to one client (resolved=true) or return candidates to ask about. One exact name resolves; never guess.",
         {"name_or_text": {"type": "string"},
          "history": {"type": "array", "items": _object({"role": {"type": "string"}, "text": {"type": "string"}}, ("role", "text"))},
          "current_client_id": {"type": ["integer", "null"]}},
         ("name_or_text",), needs_client=False,
-    ),
+    ), CODE_ONLY),
     _read(
         "client_situation", "ONE client (needs a client): a brief on why it is worth calling: reasons, programmes and years, from recorded claims. Use for \"brief me on X\", \"why call them\".",
         {"client_id": _CLIENT_ID, "year": _TAX_YEAR}, ("client_id",), chat_intent="situation",
     ),
-    _read(
+    _marked(_read(
         "client_eligibility", "ONE client (needs a client): the credit figure and headcount for one client-year.",
         {"client_id": _CLIENT_ID, "tax_year": _TAX_YEAR, "state": _STATE, "method": _METHOD},
         ("client_id", "tax_year"), needs_year=True, chat_intent="eligibility",
-    ),
+    ), both_methods=True),
     _read(
         "client_trend", "ONE client (needs a client): how it has moved across years, and whether it has been eligible since its base year.",
         {"client_id": _CLIENT_ID}, ("client_id",), chat_intent="trend",
@@ -156,11 +155,11 @@ CATALOG: tuple[CapabilitySpec, ...] = (
         {"client_id": _CLIENT_ID, "tax_year": _TAX_YEAR, "state": _STATE, "method": _METHOD},
         ("client_id", "tax_year"), needs_year=True, chat_intent="explain",
     ),
-    _read(
+    _marked(_read(
         "employee_drill", "One employee's derivation for a client-year, by opaque record token.",
         {"client_id": _CLIENT_ID, "record_token": _TOKEN, "tax_year": _TAX_YEAR, "state": _STATE},
         ("client_id", "record_token", "tax_year"), needs_year=True, sensitive=True,
-    ),
+    ), CODE_ONLY),
     _read(
         "findings_list", "ONE client (needs a client): open findings for a client-year that need a human decision.",
         {"client_id": _CLIENT_ID, "tax_year": _TAX_YEAR, "state": _STATE},
@@ -194,6 +193,11 @@ BY_NAME: dict[str, CapabilitySpec] = {spec.name: spec for spec in CATALOG}
 if len(BY_NAME) != len(CATALOG):
     raise ValueError("duplicate capability name in CATALOG")
 
+#: The tool the orchestrator's own code calls to resolve a client from the reader's words.
+CLIENT_RESOLVER = "client_resolve"
+if {s.name for s in DIAGNOSTICS} & BY_NAME.keys():
+    raise ValueError("a diagnostic shares a name with a capability")
+
 
 def get(name: str) -> CapabilitySpec:
     """The spec for `name`, or a `KeyError` naming it."""
@@ -211,6 +215,24 @@ def implemented() -> tuple[CapabilitySpec, ...]:
 def offered() -> tuple[CapabilitySpec, ...]:
     """What a channel caller may be shown: built, and not plumbing."""
     return tuple(spec for spec in implemented() if INTERNAL not in spec.tags)
+
+
+def offered_for_channel(*, debug: bool = False) -> tuple[CapabilitySpec, ...]:
+    """Every tool the channel gateway lists: the offered catalog, and the diagnostics while `debug` is on."""
+    return (*offered(), *DIAGNOSTICS) if debug else offered()
+
+
+def owned_names(*kinds: str) -> frozenset[str]:
+    """Every argument name that any capability treats as the reader's, of the given kinds."""
+    return frozenset(o.name for spec in CATALOG for o in spec.owned(*kinds))
+
+
+def model_offered() -> tuple[CapabilitySpec, ...]:
+    """The tools a MODEL may name: built reads and previews, never a commit, never plumbing or code-only tools."""
+    return tuple(
+        spec for spec in offered()
+        if spec.kind != WRITE_COMMIT and not {GATEWAY_LOCAL, INTERNAL, CODE_ONLY, DEBUG} & set(spec.tags)
+    )
 
 
 def offered_or_declared() -> tuple[CapabilitySpec, ...]:

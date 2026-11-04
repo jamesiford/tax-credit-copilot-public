@@ -24,7 +24,6 @@ from __future__ import annotations
 
 import json
 import logging
-import re
 import time
 from collections.abc import Callable
 from dataclasses import dataclass, field
@@ -32,19 +31,18 @@ from typing import Any
 
 from app.core.gateway_client import GatewayClient
 from app.core.identity import ActingIdentity
+from app.core.reader_arguments import ReaderWords
 from app.core.state import ConversationState, PendingWrite
 from app.core.telemetry import tool_span
 from app.core.toolset import (  # noqa: F401 - re-exported: the names the rest of the orchestrator imports from here
-    CLIENT_PLACEHOLDER, SCENARIO_NUMBERS, YEAR_KEYS, Clarification, Problem, ToolRun, first_schema_problem, lane_diagnostic,
-    model_answer, model_tools, numbers_in, offered_schema, years_in,
+    Clarification, Problem, ToolRun, first_schema_problem, lane_diagnostic, model_answer, model_tools, numbers_in,
+    offered_schema, years_in,
 )
 from application.capabilities import catalog
+from application.capabilities.catalog_types import OWNED_CLIENT, OWNED_METHOD, OWNED_METHOD_BOTH, OWNED_YEARS
 from application.composer import narrator_brief
 
 log = logging.getLogger("tcc.orchestrator.tools")
-
-_PAY_PERIOD = re.compile(r"pay[\s-]?period", re.IGNORECASE)
-_MIN_MAX = re.compile(r"min[\s-]?max", re.IGNORECASE)
 
 
 @dataclass
@@ -82,11 +80,11 @@ class ToolRunner:
         """The one client this turn is about, or None with `clarify` set."""
         if self.client_id is not None or self.clarify is not None:
             return self.client_id
-        reply = await self._timed("client_resolve", catalog.READ, {
+        reply = await self._timed(catalog.CLIENT_RESOLVER, catalog.READ, {
             "name_or_text": self.question, "history": self.state.history, "current_client_id": self.state.client_id,
         })
         if not reply.ok:
-            self.problems.append(Problem("client_resolve", reply.error_code, reply.error_message))
+            self.problems.append(Problem(catalog.CLIENT_RESOLVER, reply.error_code, reply.error_message))
             return None
         facts = reply.body.get("facts") or {}
         chosen = facts.get("client_id")
@@ -100,75 +98,27 @@ class ToolRunner:
 
     # ------------------------------------------------------------------ arguments
 
-    def _year(self, proposed: Any, *, allow_state: bool = True) -> int | None:
-        said = years_in(self.question)
-        state_year = self.state.tax_year if allow_state else None
-        if isinstance(proposed, int) and not isinstance(proposed, bool) and (proposed in said or proposed == state_year):
-            return proposed
-        return said[0] if len(said) == 1 else state_year
-
-    def _method(self, name: str, proposed: Any) -> str | None:
-        if name != "client_eligibility":
-            return proposed if isinstance(proposed, str) else None
-        pay, minmax = bool(_PAY_PERIOD.search(self.question)), bool(_MIN_MAX.search(self.question))
-        return "pay_period" if pay and not minmax else "min_max" if minmax and not pay else "both"
-
-    def _years(self, spec: catalog.CapabilitySpec, args: dict[str, Any]) -> bool:
-        """Settle every year argument from the reader's words; False (with `clarify` set) when a needed one is missing."""
-        for key in (k for k in YEAR_KEYS if k in spec.schema["properties"]):
-            explicit_only = spec.kind == catalog.WRITE_PREPARE or key == "base_year"
-            year = self._year(args.get(key), allow_state=not explicit_only)
-            if year is not None:
-                args[key] = year
-            elif key in spec.schema.get("required", []) or spec.needs_year:
-                self.clarify = self.clarify or Clarification("year", "no tax year was named")
-                return False
-            else:
-                args.pop(key, None)
-        return True
-
-    def _scenario(self, spec: catalog.CapabilitySpec, args: dict[str, Any]) -> bool:
-        """A what-if's numbers are the reader's: one the model chose is dropped, and a missing size is asked for."""
-        said = numbers_in(self.question)
-        for key in SCENARIO_NUMBERS:
-            if key in args and not (isinstance(args[key], (int, float)) and float(args[key]) in said):
-                del args[key]
-        if "magnitude" in spec.schema["properties"] and "magnitude" not in args:
-            self.clarify = self.clarify or Clarification("detail", "How many, or by how much?")
-            return False
-        return True
-
-    def _tax_years(self, args: dict[str, Any]) -> None:
-        """A data tool's years are the reader's, like every other year: a year the model named that the
-        reader did not say (and the conversation is not on) is replaced by the years they did say, or
-        dropped, which means every year the data holds. A model cannot select a return by guessing."""
-        proposed, said = args.pop("tax_years", None), years_in(self.question)
-        allowed = {*said, *([self.state.tax_year] if self.state.tax_year else [])}
-        if isinstance(proposed, dict) and all(isinstance(proposed.get(k), int) and proposed[k] in allowed for k in ("from", "to")):
-            args["tax_years"] = proposed
-            return
-        kept = [y for y in proposed if isinstance(y, int) and y in allowed] if isinstance(proposed, list) else []
-        if kept or said:
-            args["tax_years"] = kept or said
-
     async def _arguments(self, spec: catalog.CapabilitySpec, proposed: dict[str, Any]) -> dict[str, Any] | None:
+        """The arguments a tool actually runs with: the model's proposal, settled from the reader's words."""
         args = {k: v for k, v in proposed.items() if v is not None}
-        properties = spec.schema["properties"]
-        if CLIENT_PLACEHOLDER in properties:
+        words = ReaderWords(self.question, self.state.tax_year)
+        for owned in spec.owned(OWNED_CLIENT):
             client = await self.ensure_client()
             if client is None:
                 return None
-            args[CLIENT_PLACEHOLDER] = client
-        if "tax_years" in properties:
-            self._tax_years(args)
-        if not self._years(spec, args) or not self._scenario(spec, args):
+            args[owned.name] = client
+        for owned in spec.owned(OWNED_YEARS):
+            words.tax_years(owned.name, args)
+        asked = words.years(spec, args) or words.scenario(spec, args)
+        if asked:
+            self.clarify = self.clarify or asked
             return None
-        if "method" in properties:
-            method = self._method(spec.name, args.get("method"))
+        for owned in spec.owned(OWNED_METHOD, OWNED_METHOD_BOTH):
+            method = words.method(owned.kind, args.get(owned.name))
             if method is None:
-                args.pop("method", None)
+                args.pop(owned.name, None)
             else:
-                args["method"] = method
+                args[owned.name] = method
         return args
 
     # -------------------------------------------------------------------- running
@@ -195,24 +145,33 @@ class ToolRunner:
         if key in self._answered:
             # A model that repeats a call it already made gets the earlier answer, not a second run and a second table.
             return self._answered[key]
-        answer = await (self._both_methods(spec, args) if args.get("method") == "both" else self._call(spec, args))
+        answer = await (self._both_methods(spec, args) if self._asks_every_method(spec, args) else self._call(spec, args))
         self._answered[key] = answer
         return answer
 
+    @staticmethod
+    def _method_name(spec: catalog.CapabilitySpec) -> str | None:
+        return next((o.name for o in spec.owned(OWNED_METHOD, OWNED_METHOD_BOTH)), None)
+
+    def _asks_every_method(self, spec: catalog.CapabilitySpec, args: dict[str, Any]) -> bool:
+        name = self._method_name(spec)
+        return name is not None and args.get(name) == "both"
+
     async def _both_methods(self, spec: catalog.CapabilitySpec, args: dict[str, Any]) -> dict[str, Any]:
-        """Eligibility under both certified methods, as two runs: the statute has not chosen between them."""
-        answers = []
-        for position, method in enumerate(("min_max", "pay_period")):
+        """The tool under every certified method, as separate runs: the statute has not chosen between them."""
+        answers, name = [], self._method_name(spec)
+        for position, method in enumerate(catalog.CERTIFIED_METHODS):
             if position:
                 if self.calls >= self.max_calls:
                     break
                 self.calls += 1
-            answers.append(await self._call(spec, {**args, "method": method}))
+            answers.append(await self._call(spec, {**args, name: method}))
         ok = [a for a in answers if a.get("ok")]
         return {"ok": bool(ok), "tool": spec.name, "fact_paths": [p for a in ok for p in a["fact_paths"]], "notes": []}
 
-    def _label(self, name: str, args: dict[str, Any]) -> str:
-        base = f"{name}_{args['method']}" if isinstance(args.get("method"), str) else name
+    def _label(self, spec: catalog.CapabilitySpec, args: dict[str, Any]) -> str:
+        method = args.get(self._method_name(spec) or "")
+        base = f"{spec.name}_{method}" if isinstance(method, str) else spec.name
         taken = {run.label for run in self.runs}
         label, n = base, 2
         while label in taken:
@@ -224,10 +183,10 @@ class ToolRunner:
         if not reply.ok:
             self.problems.append(Problem(spec.name, reply.error_code, reply.error_message))
             return {"ok": False, "error": reply.error_code, "message": reply.error_message}
-        run = ToolRun(spec.name, args, reply.body, self._label(spec.name, args))
+        run = ToolRun(spec.name, args, reply.body, self._label(spec, args))
         self.runs.append(run)
-        if isinstance(args.get("tax_year"), int):
-            self.state.tax_year = args["tax_year"]
+        if isinstance(args.get(catalog.TAX_YEAR), int):
+            self.state.tax_year = args[catalog.TAX_YEAR]
         if spec.kind == catalog.WRITE_PREPARE:
             self._hold(run)
         brief = narrator_brief(self.question, [spec.name], {run.label: run.model_facts}, notes=list(reply.body.get("warnings") or []))
