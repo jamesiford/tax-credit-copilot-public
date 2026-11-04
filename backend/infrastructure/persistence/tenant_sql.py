@@ -18,6 +18,7 @@ module replaces the partition with a rule the code cannot route around:
   one way past the rule — the portfolio matrix spans clients by design, and a
   connection keep-alive has no tenant at all. Every use logs its reason, so an
   exemption is a line someone can read rather than a predicate someone forgot.
+- **The client column is `client_id` unless the marker names one from a closed set** (`@AccountId`). [CH-16b]
 
 `tests/test_architecture.py` fails the build if a Warehouse adapter calls
 `execute` anywhere but here.
@@ -31,7 +32,9 @@ from typing import Any, Callable, Iterable, Sequence
 
 log = logging.getLogger("tcc.tenant_sql")
 
-_MARKER = re.compile(r"\{tenant(?::([A-Za-z_][A-Za-z0-9_]*))?\}")
+_MARKER = re.compile(r"\{tenant(?::([A-Za-z_][A-Za-z0-9_]*))?(?:@([A-Za-z_][A-Za-z0-9_]*))?\}")
+#: `{tenant:alias@Column}` names a non-`client_id` client column (the lakehouse keys on `AccountId`); a closed set.
+TENANT_COLUMNS = frozenset({"client_id", "AccountId"})
 #: The marker must be the first term of a WHERE or ON clause.
 _ANCHORED = re.compile(r"\b(WHERE|ON)\s+$", re.IGNORECASE)
 
@@ -43,6 +46,14 @@ class TenantScopeViolation(ValueError):
 def _count_params(sql: str) -> int:
     """Count `?` placeholders outside string literals."""
     return re.sub(r"'(?:[^']|'')*'", "''", sql).count("?")
+
+
+def _predicate(marker: re.Match[str]) -> str:
+    """The `[alias.]column = ?` a marker stands for; the column must be in the closed set."""
+    alias, column = marker.group(1), marker.group(2) or "client_id"
+    if column not in TENANT_COLUMNS:
+        raise TenantScopeViolation(f"{column!r} is not a known tenant column")
+    return f"{alias + '.' if alias else ''}{column} = ?"
 
 
 class TenantScopedQuery:
@@ -87,9 +98,8 @@ class TenantScopedQuery:
             n = _count_params(before)
             out_params.extend(given[consumed: consumed + n])
             consumed += n
-            alias = marker.group(1)
             out_sql.append(before)
-            out_sql.append(f"{alias + '.' if alias else ''}client_id = ?")
+            out_sql.append(_predicate(marker))
             out_params.append(self.client_id)
             cursor = marker.end()
         out_sql.append(sql[cursor:])
