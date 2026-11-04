@@ -15,7 +15,9 @@ module substitutes through the one formatter, and every reply is checked twice:
 
 Between them the narration is also reviewed by `output_policy` [AI-07]: a link, an
 address, an identifier shape, a code block, or the narrator presenting itself as
-counsel drops the narration exactly as a bad figure does.
+counsel drops the narration exactly as a bad figure does. So does hedging a figure:
+`composer_hedging` rejects an approximation qualifier ("about", "roughly", "rounded",
+"up to"...) within three tokens of a figure, because every figure shown is exact [CH-15c].
 
 If any fails, the reply is the platform's own blocks and the standing
 disclaimer, nothing else. The composer never softens, rounds or patches a
@@ -36,7 +38,7 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any
 
-from application import numeric_guard, output_policy
+from application import composer_hedging, numeric_guard, output_policy
 from application.capabilities.envelope import DISCLAIMER, Block
 from application.composer_placeholders import (  # noqa: F401 - re-exported
     PlaceholderError, _mask_placeholders, narrator_brief, placeholders, substitute,
@@ -85,15 +87,23 @@ def _policy_violations(narration: str, allowed_hosts: Sequence[str]) -> list[Vio
     return [Violation(Numeral(f"output policy: {c}", 0, 0, "output_policy"), f"output policy: {c}", stage="output_policy") for c in codes]
 
 
+def _hedge_violations(masked: str) -> list[Violation]:
+    """One violation per figure the wording hedges; the code, never the words, is what is recorded."""
+    message = "narration style: an approximation qualifier next to a figure"
+    return [Violation(Numeral(message, 0, 0, "approximation"), message, stage="narration")
+            for _ in range(composer_hedging.hedged_figures(masked))]
+
+
 def _narrate(
     narration: str, index: FactIndex, context: AllowedContext, allowed_hosts: Sequence[str],
 ) -> tuple[str, FactIndex, list[Violation]]:
-    """Screen the model's own words: no typed digit, every placeholder renderable, policy clean.
+    """Screen the model's own words: no typed digit, no hedged figure, every placeholder renderable, policy clean.
 
     Returns the substituted text ("" when it could not be rendered), the index told
     which paths were percentages, and every violation found.
     """
-    violations = list(numeric_guard.check_raw(_mask_placeholders(narration), allowed_context=context).violations)
+    masked = _mask_placeholders(narration)
+    violations = [*numeric_guard.check_raw(masked, allowed_context=context).violations, *_hedge_violations(masked)]
     try:
         substituted, index = substitute(narration, index)
     except PlaceholderError as exc:
