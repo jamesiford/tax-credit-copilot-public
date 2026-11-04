@@ -5,8 +5,9 @@ deployed process refuses `ARTIFACT_STORE=local` at startup.
 """
 from __future__ import annotations
 
-import os
 from pathlib import Path, PurePosixPath
+
+from config import get_settings
 
 _DEFAULT_ROOT = Path(__file__).resolve().parents[2] / "data" / "artifacts"
 
@@ -15,7 +16,7 @@ class LocalArtifactStore:
     is_durable = False
 
     def __init__(self, root: str | Path | None = None) -> None:
-        self.root = Path(root or os.getenv("ARTIFACT_LOCAL_ROOT") or _DEFAULT_ROOT)
+        self.root = Path(root or get_settings().stores.artifact_local_root or _DEFAULT_ROOT)
 
     def _path(self, container: str, path: str) -> Path:
         relative = PurePosixPath(path)

@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import asyncio
 import logging
-import os
 from contextlib import asynccontextmanager
 
 from dotenv import load_dotenv
@@ -14,6 +13,7 @@ from fastapi.responses import JSONResponse
 load_dotenv()  # local dev — production env vars come from the host.
 
 from telemetry import configure_telemetry, instrument_fastapi  # noqa: E402
+from config import get_settings  # noqa: E402
 from api.artifacts import router as artifacts_router  # noqa: E402
 from api.audit import router as audit_router  # noqa: E402
 from api.capabilities import router as capabilities_router  # noqa: E402
@@ -36,7 +36,7 @@ from api.scope import router as scope_router  # noqa: E402
 from api.trend import router as trend_router  # noqa: E402
 from api.workspace import router as workspace_router  # noqa: E402
 
-logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO"))
+logging.basicConfig(level=get_settings().runtime.log_level)
 log = logging.getLogger("tax-credit-copilot")
 
 
@@ -179,10 +179,10 @@ def health() -> dict:
     return {
         "status": "ok",
         "phase": 2,
-        "foundry_configured": bool(os.getenv("FOUNDRY_PROJECT_ENDPOINT")),
+        "foundry_configured": bool(get_settings().observability.foundry_project_endpoint),
         "agents_registered": ai["agents_published"] > 0,
         "ai": ai,
-        "telemetry_configured": bool(os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING")),
+        "telemetry_configured": bool(get_settings().observability.appinsights_connection_string),
         "warm": getattr(app.state, "warm", {"status": "unknown"}),
     }
 

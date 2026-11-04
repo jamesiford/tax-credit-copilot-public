@@ -31,6 +31,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 
+from config import get_settings
 from domain.findings import FindingResolution
 
 _SCHEMA = """
@@ -70,9 +71,8 @@ class SqliteFindingRepository:
 
     def __init__(self, path: str | Path | None = None) -> None:
         from infrastructure.persistence.sqlite_claims import _DEFAULT_PATH
-        import os
 
-        self.path = Path(path) if path else Path(os.getenv("OPERATIONAL_DB", _DEFAULT_PATH))
+        self.path = Path(path) if path else Path(get_settings().stores.operational_db_or(_DEFAULT_PATH))
         self._local = threading.local()
         if str(self.path) != ":memory:":
             self.path.parent.mkdir(parents=True, exist_ok=True)

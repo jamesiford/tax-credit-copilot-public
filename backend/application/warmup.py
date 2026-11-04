@@ -19,9 +19,10 @@ suite pay for it would be a poor trade.
 from __future__ import annotations
 
 import logging
-import os
 import time
 from typing import Any
+
+from config import get_settings
 
 log = logging.getLogger("tax-credit-copilot")
 
@@ -29,7 +30,7 @@ log = logging.getLogger("tax-credit-copilot")
 def should_warm() -> bool:
     from tools.fabric_source import active_data_source
 
-    if os.getenv("TCC_WARM_ON_START", "1").strip().lower() in ("0", "false", "no"):
+    if not get_settings().runtime.warm_on_start:
         return False
     return active_data_source() == "lakehouse"
 
@@ -40,10 +41,7 @@ def keepalive_interval_s() -> int:
     30s is the measured safe point: a connection is still hot after 30s idle
     (120ms) and dead after 90s (3,216ms).
     """
-    try:
-        return max(5, int(os.getenv("TCC_KEEPALIVE_SECONDS", "30")))
-    except ValueError:
-        return 30
+    return get_settings().runtime.keepalive_seconds
 
 
 def touch_warehouse() -> int:

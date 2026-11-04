@@ -16,11 +16,11 @@ warehouse per process"), so borrowing from it here would hand a lakehouse link t
 """
 from __future__ import annotations
 
-import os
 import threading
 import time
 from typing import Any
 
+from config import get_settings
 from infrastructure.persistence.fabric_warehouse import (
     _POOL_MAX_AGE_S,
     FabricWarehouseConnection,
@@ -36,9 +36,10 @@ class LakehouseSqlConnection(FabricWarehouseConnection):
     """`FabricWarehouseConnection` pointed at the lakehouse endpoint, with a pool of its own."""
 
     def __init__(self, *, server: str | None = None, database: str | None = None, **kwargs: Any) -> None:
+        settings = get_settings()
         super().__init__(
-            server=server or os.getenv("LAKEHOUSE_SQL_SERVER") or os.getenv("WAREHOUSE_SERVER"),
-            database=database or os.getenv("LAKEHOUSE_SQL_DATABASE") or os.getenv("FABRIC_LAKEHOUSE"),
+            server=server or settings.warehouse.lakehouse_sql_server or settings.warehouse.server,
+            database=database or settings.warehouse.lakehouse_sql_database or settings.data_source.fabric_lakehouse,
             **kwargs,
         )
         self._idle: list[tuple[Any, float]] = []

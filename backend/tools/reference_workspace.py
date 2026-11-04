@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-import os
 import subprocess
 from collections import Counter
 from dataclasses import dataclass, field
@@ -28,6 +27,7 @@ from .reference_source import (
 )
 from .reference_step1 import ReferenceStep1Run, run_reference_step1
 
+from config import get_settings
 from data.source.from_reference import REFERENCE_ACCOUNT_ID, REFERENCE_ACCOUNT_NAME
 from tools.tokens import record_token
 
@@ -169,12 +169,11 @@ class ReferenceWorkspaceService:
         # other view, and the equivalence gate below is what makes that safe.
         from tools.fabric_source import resolve_data_source_alias
 
-        raw_source_kind = (source_kind or os.getenv("DATA_SOURCE") or "csv").strip().lower()
+        configured = get_settings().data_source
+        raw_source_kind = (source_kind or configured.explicit_data_source or "csv").strip().lower()
         self.source_kind = resolve_data_source_alias(raw_source_kind)
         configured_access = access_output_path or (
-            Path(os.environ["REFERENCE_ACCESS_OUTPUT_PATH"])
-            if os.getenv("REFERENCE_ACCESS_OUTPUT_PATH")
-            else None
+            Path(configured.reference_access_output_path) if configured.reference_access_output_path else None
         )
         self.access_output_path = configured_access
         self._state: ReferenceWorkspaceState | None = None

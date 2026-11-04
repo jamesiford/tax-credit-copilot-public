@@ -16,14 +16,15 @@ in-memory store forgets every decision on the next restart.
 """
 from __future__ import annotations
 
-import os
 from typing import Mapping
+
+from config import resolve_environ
 
 # The sign-in rules live in `auth_policy`; these are re-exported because every
 # caller already reads them from here.
 from application.auth_policy import (  # noqa: F401
-    ANONYMOUS_SYNTHETIC_FLAG, AUTH_MODES, LOCAL, anonymous_synthetic_allowed, auth_mode, auth_problems,
-    auth_tenant_id, explicit_local_dev,
+    ANONYMOUS_SYNTHETIC_FLAG, AUTH_MODES, LOCAL, anonymous_synthetic_allowed, api_audience, auth_mode,
+    auth_problems, auth_tenant_id, explicit_local_dev,
 )
 
 CLASSIFICATIONS = ("synthetic", "customer")
@@ -53,7 +54,7 @@ def _get(env: Mapping[str, str], name: str) -> str:
 
 
 def environment(env: Mapping[str, str] | None = None) -> str:
-    env = os.environ if env is None else env
+    env = resolve_environ(env)
     return (_get(env, "ENVIRONMENT") or LOCAL).lower()
 
 
@@ -62,7 +63,7 @@ def is_deployed(env: Mapping[str, str] | None = None) -> bool:
 
 
 def data_classification(env: Mapping[str, str] | None = None) -> str | None:
-    env = os.environ if env is None else env
+    env = resolve_environ(env)
     value = _get(env, "DATA_CLASSIFICATION").lower()
     return value or None
 
@@ -74,7 +75,7 @@ DEFAULT_CONFIRM_TTL_SECONDS = 600
 def writer_source(env: Mapping[str, str] | None = None) -> str:
     """Where writer entitlement comes from. An unknown value raises: guessing a
     source for a permission check is how a typo grants everyone."""
-    env = os.environ if env is None else env
+    env = resolve_environ(env)
     value = (_get(env, "CHANNEL_WRITER_SOURCE") or "allowlist").lower()
     if value not in WRITER_SOURCES:
         raise ValueError(f"CHANNEL_WRITER_SOURCE must be one of {', '.join(WRITER_SOURCES)}; got {value!r}")
@@ -82,17 +83,17 @@ def writer_source(env: Mapping[str, str] | None = None) -> str:
 
 
 def writer_group_id(env: Mapping[str, str] | None = None) -> str:
-    env = os.environ if env is None else env
+    env = resolve_environ(env)
     return _get(env, "CHANNEL_WRITER_GROUP_ID")
 
 
 def enforce_writer_for_users(env: Mapping[str, str] | None = None) -> bool:
-    env = os.environ if env is None else env
+    env = resolve_environ(env)
     return _get(env, "CHANNEL_ENFORCE_WRITER_FOR_USERS").lower() in ("1", "true", "yes", "on")
 
 
 def confirm_ttl_seconds(env: Mapping[str, str] | None = None) -> int:
-    env = os.environ if env is None else env
+    env = resolve_environ(env)
     raw = _get(env, "CHANNEL_CONFIRM_TTL_SECONDS")
     try:
         seconds = int(raw) if raw else DEFAULT_CONFIRM_TTL_SECONDS
@@ -114,7 +115,7 @@ def store_choice(name: str, env: Mapping[str, str] | None = None) -> str:
     `OVERRIDE_STORE` follows `RUN_MANIFEST_STORE` unless set: an override is run
     provenance and lives where the run it changes is recorded.
     """
-    env = os.environ if env is None else env
+    env = resolve_environ(env)
     if name == "OVERRIDE_STORE":
         default = store_choice("RUN_MANIFEST_STORE", env)
     elif name == "CHANNEL_STORE":
@@ -138,12 +139,12 @@ ARTIFACT_REPOSITORIES = ("sqlite", "warehouse")
 
 
 def artifact_store(env: Mapping[str, str] | None = None) -> str:
-    env = os.environ if env is None else env
+    env = resolve_environ(env)
     return (_get(env, "ARTIFACT_STORE") or "local").lower()
 
 
 def artifact_repository(env: Mapping[str, str] | None = None) -> str:
-    env = os.environ if env is None else env
+    env = resolve_environ(env)
     return normalise_store(_get(env, "ARTIFACT_REPOSITORY") or "sqlite")
 
 
@@ -152,7 +153,7 @@ def check_deployment_configuration(env: Mapping[str, str] | None = None) -> dict
 
     Returns the resolved settings, for logging and `/api/health`.
     """
-    env = os.environ if env is None else env
+    env = resolve_environ(env)
     problems: list[str] = []
 
     classification = data_classification(env)

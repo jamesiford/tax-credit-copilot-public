@@ -9,12 +9,12 @@ from __future__ import annotations
 import argparse
 import csv
 import json
-import os
 import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 
+from config import get_settings
 from .reference_onezero import ReferenceOneZeroMethodResult, ReferenceOneZeroRun, run_reference_onezero
 from .reference_source import TccPayrollAdapter
 from .reference_step1 import EmployeeEligibility, EmployeeTotals, ReferenceStep1Run, run_reference_step1
@@ -26,7 +26,7 @@ _REPO_ROOT = _BACKEND_ROOT.parent
 
 
 def _code_commit() -> str:
-    configured = os.getenv("GIT_COMMIT")
+    configured = get_settings().runtime.git_commit
     if configured:
         return configured
     try:

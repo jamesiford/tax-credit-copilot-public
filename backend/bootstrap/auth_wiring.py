@@ -5,7 +5,6 @@ to the bindings the mediator needs.
 """
 from __future__ import annotations
 
-import os
 from typing import Any
 
 _client_authorizer: Any | None = None
@@ -32,11 +31,11 @@ def get_token_validator() -> Any:
     """The Entra token validator, built from AUTH_TENANT_ID and API_AUDIENCE."""
     global _token_validator
     if _token_validator is None:
-        from application.deployment import auth_tenant_id
+        from application.deployment import api_audience, auth_tenant_id
         from infrastructure.auth.entra import EntraTokenValidator
 
         _token_validator = EntraTokenValidator(
-            tenant_id=auth_tenant_id(), api_audience=os.getenv("API_AUDIENCE", "").strip()
+            tenant_id=auth_tenant_id(), api_audience=api_audience()
         )
     return _token_validator
 

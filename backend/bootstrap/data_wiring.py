@@ -26,7 +26,6 @@ for a local `DATA_QUERY_SQLITE_DIR`, otherwise no executor, so a query is a type
 """
 from __future__ import annotations
 
-import os
 from collections.abc import Mapping
 from typing import Any
 
@@ -40,35 +39,38 @@ from application.data.small_groups import DEFAULT_MIN_GROUP_SIZE, MIN_GROUP_SIZE
 from application.data.spec import MAX_LIMIT
 from application.rate_limit import RateLimiter
 from bootstrap.binding import bind
+from config import resolve_environ
 
 _TRUE = frozenset({"1", "true", "yes", "on"})
 _service: DataQueryService | None = None
 
 
-def _number(environ: Mapping[str, str], name: str, default: float, low: float, high: float) -> float:
+def _number(env: Mapping[str, str], name: str, default: float, low: float, high: float) -> float:
     """A setting clamped to a sane range; an unparseable value is the default, not a crash at startup."""
     try:
-        return min(high, max(low, float(environ.get(name, "") or default)))
+        return min(high, max(low, float(env.get(name, "") or default)))
     except ValueError:
         return default
 
 
-def source_enabled(environ: Mapping[str, str] = os.environ) -> bool:
+def source_enabled(env: Mapping[str, str] | None = None) -> bool:
     """`DATA_QUERY_SOURCE_ENABLED`, false unless set to a truthy value."""
-    return (environ.get("DATA_QUERY_SOURCE_ENABLED") or "").strip().lower() in _TRUE
+    env = resolve_environ(env)
+    return (env.get("DATA_QUERY_SOURCE_ENABLED") or "").strip().lower() in _TRUE
 
 
-def limits_from_env(environ: Mapping[str, str] = os.environ) -> QueryLimits:
+def limits_from_env(env: Mapping[str, str] | None = None) -> QueryLimits:
     """The timeout, row cap, concurrency and group floor from settings, each clamped into its allowed range.
 
     `DATA_MIN_GROUP_SIZE` (5) can raise the smallest group a result may show but never lower it below 2:
     a smaller value is read as 2, not as "off".
     """
+    env = resolve_environ(env)
     return QueryLimits(
-        timeout_s=_number(environ, "DATA_QUERY_TIMEOUT_SECONDS", DEFAULT_TIMEOUT_S, 1, 120),
-        hard_max_rows=int(_number(environ, "DATA_QUERY_MAX_ROWS", MAX_LIMIT, 1, MAX_LIMIT)),
-        max_concurrency=int(_number(environ, "DATA_QUERY_MAX_CONCURRENCY", DEFAULT_MAX_CONCURRENCY, 1, 16)),
-        min_group_size=int(_number(environ, "DATA_MIN_GROUP_SIZE", DEFAULT_MIN_GROUP_SIZE, MIN_GROUP_SIZE_FLOOR, 1000)),
+        timeout_s=_number(env, "DATA_QUERY_TIMEOUT_SECONDS", DEFAULT_TIMEOUT_S, 1, 120),
+        hard_max_rows=int(_number(env, "DATA_QUERY_MAX_ROWS", MAX_LIMIT, 1, MAX_LIMIT)),
+        max_concurrency=int(_number(env, "DATA_QUERY_MAX_CONCURRENCY", DEFAULT_MAX_CONCURRENCY, 1, 16)),
+        min_group_size=int(_number(env, "DATA_MIN_GROUP_SIZE", DEFAULT_MIN_GROUP_SIZE, MIN_GROUP_SIZE_FLOOR, 1000)),
     )
 
 
@@ -79,33 +81,34 @@ def schemas_from_config() -> SchemaNames:
     return SchemaNames(gold=GOLD_SCHEMA, ops=OPS_SCHEMA, source=SOURCE_SCHEMA)
 
 
-def build_executors(environ: Mapping[str, str], schemas: SchemaNames) -> dict[Source, Any]:
+def build_executors(env: Mapping[str, str], schemas: SchemaNames) -> dict[Source, Any]:
     """One executor per configured source; the lakehouse only when its flag is on."""
     executors: dict[Source, Any] = {}
-    if environ.get("WAREHOUSE_SERVER") and environ.get("WAREHOUSE_DATABASE"):
+    if env.get("WAREHOUSE_SERVER") and env.get("WAREHOUSE_DATABASE"):
         from infrastructure.persistence.warehouse_data_query import WarehouseDataQueryExecutor
 
         executors[Source.WAREHOUSE] = WarehouseDataQueryExecutor()
-    elif environ.get("DATA_QUERY_SQLITE_DIR"):
+    elif env.get("DATA_QUERY_SQLITE_DIR"):
         from infrastructure.persistence.sqlite_data_query import SqliteDataQueryExecutor
         from infrastructure.persistence.sqlite_data_source import open_attached
 
-        local = SqliteDataQueryExecutor(open_attached(environ["DATA_QUERY_SQLITE_DIR"], schemas))
+        local = SqliteDataQueryExecutor(open_attached(env["DATA_QUERY_SQLITE_DIR"], schemas))
         executors = {Source.WAREHOUSE: local, Source.LAKEHOUSE: local}
-    if source_enabled(environ) and Source.LAKEHOUSE not in executors:
+    if source_enabled(env) and Source.LAKEHOUSE not in executors:
         from infrastructure.persistence.lakehouse_data_query import LakehouseDataQueryExecutor
 
         executors[Source.LAKEHOUSE] = LakehouseDataQueryExecutor()
     return executors
 
 
-def build_data_query_service(environ: Mapping[str, str] = os.environ) -> DataQueryService:
+def build_data_query_service(env: Mapping[str, str] | None = None) -> DataQueryService:
     """A service from settings. Separate from the cached getter so tests can build one from a dict."""
+    env = resolve_environ(env)
     schemas = schemas_from_config()
-    rate = int(_number(environ, "DATA_QUERY_RATE_PER_MINUTE", DEFAULT_RATE_PER_MINUTE, 1, 600))
-    disabled = () if source_enabled(environ) else (Source.LAKEHOUSE,)
+    rate = int(_number(env, "DATA_QUERY_RATE_PER_MINUTE", DEFAULT_RATE_PER_MINUTE, 1, 600))
+    disabled = () if source_enabled(env) else (Source.LAKEHOUSE,)
     return DataQueryService(
-        default_model(), build_executors(environ, schemas), limits=limits_from_env(environ),
+        default_model(), build_executors(env, schemas), limits=limits_from_env(env),
         budget=RateLimiter(rate), schemas=schemas, disabled=disabled,
     )
 

@@ -11,7 +11,6 @@ Everything is built lazily and cached; `set_*` swap a piece for tests and
 from __future__ import annotations
 
 import logging
-import os
 from typing import Any
 
 from application.ai.catalog import CompositeCatalog
@@ -20,6 +19,7 @@ from application.ai.providers import ProviderRegistry
 from application.ai.router import ModelRouter
 from application.ai.settings import AiSettings, load_ai_settings
 from application.ai.specs import SpecRegistry
+from config import get_settings
 
 log = logging.getLogger(__name__)
 
@@ -37,7 +37,7 @@ _clock: Any = None
 def get_ai_settings() -> AiSettings:
     global _settings
     if _settings is None:
-        _settings = load_ai_settings(os.environ)
+        _settings = load_ai_settings(get_settings().environ)
     return _settings
 
 

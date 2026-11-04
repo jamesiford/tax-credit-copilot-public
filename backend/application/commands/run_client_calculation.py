@@ -25,7 +25,6 @@ place, because a superseded figure may already be on a filed return.
 from __future__ import annotations
 
 import logging
-import os
 import subprocess
 import uuid
 from dataclasses import dataclass
@@ -33,6 +32,7 @@ from pathlib import Path
 from typing import Any
 
 from application.mediator import Command
+from config import get_settings
 
 logger = logging.getLogger(__name__)
 
@@ -77,7 +77,7 @@ class RunFailed(RuntimeError):
 
 def _code_commit() -> str:
     """The commit the engine ran at. `char(40)`, so it must not exceed 40."""
-    configured = os.getenv("GIT_COMMIT")
+    configured = get_settings().runtime.git_commit
     if configured:
         return configured.strip()[:40]
     try:

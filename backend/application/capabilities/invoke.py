@@ -12,7 +12,6 @@ this is what a test, a notebook or another transport would call.
 from __future__ import annotations
 
 import logging
-import os
 from collections.abc import Mapping
 from typing import Any
 
@@ -27,6 +26,7 @@ from application.capabilities.errors import (
 )
 from application.confirmations import ConfirmationError
 from application.identity import NotAuthorized, Principal
+from config import resolve_environ
 
 log = logging.getLogger("tcc.capabilities")
 
@@ -138,7 +138,7 @@ def timeout_seconds(env: Mapping[str, str] | None = None) -> float:
     A bad value raises rather than falling back, since a silent default would hide
     a typo that decides whether callers hang.
     """
-    raw = ((env if env is not None else os.environ).get("CAPABILITY_TIMEOUT_SECONDS") or "").strip()
+    raw = (resolve_environ(env).get("CAPABILITY_TIMEOUT_SECONDS") or "").strip()
     if not raw:
         return DEFAULT_TIMEOUT_SECONDS
     try:
