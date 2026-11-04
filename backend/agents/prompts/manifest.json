@@ -3,7 +3,8 @@
   "prompts": {
     "channel_narrator": {
       "versions": {
-        "1": "2f90a56fa35f616a533a920bcaccf1a09d8da2f61ab39f77d1209b4a08afee71"
+        "1": "2f90a56fa35f616a533a920bcaccf1a09d8da2f61ab39f77d1209b4a08afee71",
+        "2": "130dc2f9bf3c8ea6be8b7d0cbb8b4a4801cc1ef5eaffd7adf1bef95e24f33f65"
       }
     },
     "client_situation": {
