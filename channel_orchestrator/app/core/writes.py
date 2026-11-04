@@ -1,11 +1,11 @@
-"""The confirmation protocol for changes: the ONLY code that can send a commit. [CH-08]
+"""The words that confirm a change and the one function that sends its commit. [CH-08, RM-10b]
 
-A change is two steps, and the second is never the model's. A model may PREPARE (the tool
-runner holds the token and the preview is shown); the change is made only when the SAME
-person, in the SAME conversation, types one of a few exact words within the time limit.
-`commit_pending` is called from `TurnPipeline` and nowhere else, and no MAF tool, tool-spec
-or plan can name a commit: `tools.model_tools()` excludes them and an attempt is refused and
-recorded.
+A change is two steps, and the second is never the model's. A model may PREPARE (the write workflow,
+`maf_write_flow`, asks for the preview and pauses on it); the change is made only when the SAME person, in the
+SAME conversation, types one of a few exact words within the time limit. That reply resumes the workflow, whose
+commit executor is the only caller of `send_commit`; `maf_write_flow.commit_pending` is called from
+`TurnPipeline` and nowhere else, and no MAF tool, tool-spec or plan can name a commit: `tools.model_tools()`
+excludes them and an attempt is refused and recorded.
 
 Rules, each tested:
 
@@ -21,9 +21,7 @@ Rules, each tested:
 """
 from __future__ import annotations
 
-import time
 import uuid
-from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any
 
@@ -31,7 +29,7 @@ from app.core import replies
 from app.core.compose import compose_reply, provenance_footer
 from app.core.gateway_client import GatewayClient
 from app.core.identity import ActingIdentity
-from app.core.state import ConversationState, PendingWrite
+from app.core.state import PendingWrite
 from app.core.tools import ToolRun
 
 _TRAILING = ".!"
@@ -72,17 +70,13 @@ async def _package_link(gateway: GatewayClient, who: ActingIdentity, args: dict[
     return None, f"The package was built, but I could not get its link: {reply.error_message or reply.error_code}."
 
 
-async def commit_pending(
-    gateway: GatewayClient, who: ActingIdentity, state: ConversationState,
-    clock: Callable[[], float] = time.monotonic,
-) -> CommitOutcome:
-    """Send the held commit for `who`, once. Clears the pending change first."""
-    pending: PendingWrite | None = state.pending
-    state.pending = None
-    if pending is None:
-        return CommitOutcome(replies.NOTHING_PENDING, False)
-    if clock() >= pending.expires_at:
-        return CommitOutcome(replies.EXPIRED, False, pending.tool, "expired")
+async def send_commit(gateway: GatewayClient, who: ActingIdentity, pending: PendingWrite) -> CommitOutcome:
+    """Send the confirmed change's commit for `who`, once, and say what happened.
+
+    Called by the write workflow's commit executor and by nothing else. It sends a fresh idempotency key and
+    the token the preview issued; the gateway and the API check the person, the tool, the arguments, the
+    expiry and that the token is unused, and refuse otherwise.
+    """
     tool = commit_tool_for(pending.tool)
     reply = await gateway.call_tool(
         who, tool, pending.args, idempotency_key=uuid.uuid4().hex, confirmation_token=pending.token,

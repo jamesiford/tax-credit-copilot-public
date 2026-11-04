@@ -23,7 +23,7 @@ from typing import Any
 
 from app.core.gateway_client import GatewayClient, GatewayReply
 from app.core.identity import ActingIdentity
-from app.core.state import ConversationState, PendingWrite
+from app.core.state import ConversationState, PausedWrite, PendingWrite
 from app.core.telemetry import tool_span
 from app.core.toolset import (  # noqa: F401 - re-exported: the names the rest of the orchestrator imports from here
     Clarification, Problem, ToolRun, first_schema_problem, lane_diagnostic, model_answer, model_tools, numbers_in,
@@ -50,6 +50,7 @@ class ToolRunner:
     refused: list[str] = field(default_factory=list)
     clarify: Clarification | None = None
     pending: PendingWrite | None = None
+    flow: PausedWrite | None = None
     calls: int = 0
     client_id: int | None = None
     answered: dict[tuple[str, str], dict[str, Any]] = field(default_factory=dict)
@@ -93,13 +94,13 @@ class ToolRunner:
         return self.client_id
 
     def hold(self, run: ToolRun) -> None:
-        """Keep a prepared change for its owner's `confirm`. The token never leaves this object."""
-        confirmation = (run.envelope.get("facts") or {}).get("confirmation") or {}
-        token = confirmation.get("token")
-        if not token:
+        """Note that a preview is waiting for its owner. The token is kept by the write workflow (`maf_write_flow`)
+        and, as a flag for this turn's reply, here; it never reaches a fact, a prompt or a log."""
+        pending = PendingWrite.from_preview(run.name, run.args, run.envelope, self.clock() + self.confirm_ttl_seconds)
+        if pending is None:
             self.problems.append(Problem(run.name, "no_confirmation", "the preview carried no confirmation"))
             return
-        self.pending = PendingWrite(run.name, dict(run.args), str(token), self.clock() + self.confirm_ttl_seconds)
+        self.pending = pending
 
     async def run(self, name: str, proposed: dict[str, Any] | None = None) -> dict[str, Any]:
         """Run `name` through the turn's rules; return what the MODEL may see (names, never values).

@@ -30,10 +30,21 @@ async def forward_to_gateway(ctx: FunctionInvocationContext, spec: catalog.Capab
     return await turn.forward(spec, args)
 
 
-def catalog_tool(spec: catalog.CapabilitySpec, body: ToolBody = forward_to_gateway) -> FunctionTool:
+def body_for(spec: catalog.CapabilitySpec) -> ToolBody:
+    """A tool's body: a preview starts the write workflow (the model can reach nothing past it); every other tool forwards."""
+    if spec.kind == catalog.WRITE_PREPARE:
+        from app.core.maf_write_flow import prepare_body  # the write path imports this module's TURN, not the reverse
+
+        return prepare_body
+    return forward_to_gateway
+
+
+def catalog_tool(spec: catalog.CapabilitySpec, body: ToolBody | None = None) -> FunctionTool:
     """The framework tool for `spec`: name, description and kind from the catalog, the model's schema derived from it."""
+    run = body or body_for(spec)
+
     async def call(ctx: FunctionInvocationContext, **args: Any) -> Any:
-        return await body(ctx, spec, args)
+        return await run(ctx, spec, args)
 
     return FunctionTool(
         name=spec.name, description=spec.description, func=call, input_model=catalog.model_schema(spec),
@@ -41,6 +52,6 @@ def catalog_tool(spec: catalog.CapabilitySpec, body: ToolBody = forward_to_gatew
     )
 
 
-def catalog_tools(body: ToolBody = forward_to_gateway) -> list[FunctionTool]:
+def catalog_tools(body: ToolBody | None = None) -> list[FunctionTool]:
     """A tool for every capability a model may name, in name order. A commit is not among them."""
     return [catalog_tool(spec, body) for spec in sorted(catalog.model_offered(), key=lambda s: s.name)]
