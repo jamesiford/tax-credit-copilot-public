@@ -6,7 +6,8 @@
 
 Runs axe-core (pinned in package.json) on every routed page, on the dev
 `/__styleguide`, and with the Ask workspace open (conversation, and the
-evidence pane from the dev-only `?askFixture=1` stream), in both themes. The gate
+evidence pane from the dev-only `?askFixture=1` stream and from the real backend
+stream shape served by `mock_api.py`), in both themes. The gate
 is ZERO violations of impact `serious` or `critical`. Lesser impacts are
 printed, never hidden, so they can be worked down.
 
@@ -91,20 +92,25 @@ def main() -> int:
                     failing += scan(page, f"{name} + workspace", theme, report)
                 page.context.close()
 
-            # The evidence pane, fed by the dev-only fixture stream.
-            for width, height in ((1440, 900), (1024, 768)):
-                page = new_page(browser, width, height)
-                page.goto(f"{BASE}/c/2001?year=2023&askFixture=1", wait_until="networkidle", timeout=120_000)
-                page.wait_for_timeout(800)
-                open_workspace(page)
-                page.fill("#ask-input", "how are we doing?")
-                page.keyboard.press("Enter")
-                page.wait_for_timeout(1500)
-                if width < 1280:
-                    page.get_by_role("tab", name="Evidence").first.click()
-                    page.wait_for_timeout(300)
-                failing += scan(page, f"workspace evidence @{width}", theme, report)
-                page.context.close()
+            # The evidence pane, fed by the dev-only fixture stream and by the real
+            # backend shape (the mock serves `/api/chat` from askBackendShape.json).
+            for source, query in (("fixture", "&askFixture=1"), ("backend shape", "")):
+                for width, height in ((1440, 900), (1024, 768)):
+                    page = new_page(browser, width, height)
+                    page.goto(f"{BASE}/c/2001?year=2023{query}", wait_until="networkidle", timeout=120_000)
+                    page.wait_for_timeout(800)
+                    open_workspace(page)
+                    page.fill("#ask-input", "how are we doing?")
+                    page.keyboard.press("Enter")
+                    page.wait_for_timeout(1500)
+                    if width < 1280:
+                        page.get_by_role("tab", name="Evidence").first.click()
+                        page.wait_for_timeout(300)
+                    if source != "fixture" and page.get_by_role("tab", name="Who to call").count() == 0:
+                        print(f"FAIL  {theme:<8} workspace evidence ({source}) @{width}: no evidence tab rendered")
+                        failing += 1
+                    failing += scan(page, f"workspace evidence ({source}) @{width}", theme, report)
+                    page.context.close()
 
             page = new_page(browser, 1440, 900)
             page.goto(f"{BASE}/__styleguide", wait_until="networkidle", timeout=60_000)
