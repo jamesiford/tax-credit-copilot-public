@@ -106,7 +106,7 @@ _PACKAGE_TOOLS: tuple[CapabilitySpec, ...] = (
 #: connector and the tests share.
 CATALOG: tuple[CapabilitySpec, ...] = (
     _read(
-        "book_rank", "Who to call across every client, ranked by why, in the page's own order.",
+        "book_rank", "WHOLE BOOK only: which clients to call across every client, ranked by a named reason, in the page's own order. Needs no client. Never use it for a question about one client (a client named, or \"them\" or \"this client\"): use that client's tools.",
         {"limit": {"type": "integer", "minimum": 1, "maximum": 25, "default": 8}},
         needs_client=False, chat_intent="book",
     ),
@@ -118,30 +118,30 @@ CATALOG: tuple[CapabilitySpec, ...] = (
         ("name_or_text",), needs_client=False,
     ),
     _read(
-        "client_situation", "Why this client is worth calling: bands, programmes and years, from recorded claims.",
+        "client_situation", "ONE client (needs a client): a brief on why it is worth calling: reasons, programmes and years, from recorded claims. Use for \"brief me on X\", \"why call them\".",
         {"client_id": _CLIENT_ID, "year": _TAX_YEAR}, ("client_id",), chat_intent="situation",
     ),
     _read(
-        "client_eligibility", "The credit figure and headcount for one client-year.",
+        "client_eligibility", "ONE client (needs a client): the credit figure and headcount for one client-year.",
         {"client_id": _CLIENT_ID, "tax_year": _TAX_YEAR, "state": _STATE, "method": _METHOD},
         ("client_id", "tax_year"), needs_year=True, chat_intent="eligibility",
     ),
     _read(
-        "client_trend", "How a client has moved across years, and whether it has been eligible since its base year.",
+        "client_trend", "ONE client (needs a client): how it has moved across years, and whether it has been eligible since its base year.",
         {"client_id": _CLIENT_ID}, ("client_id",), chat_intent="trend",
     ),
     _read(
-        "client_at_risk", "Counted jobs close enough to a statutory floor that they could fall out of the credit.",
+        "client_at_risk", "ONE client (needs a client): counted jobs close enough to a statutory floor that they could fall out of the credit.",
         {"client_id": _CLIENT_ID, "tax_year": _TAX_YEAR, "state": _STATE, "method": _METHOD},
         ("client_id", "tax_year"), needs_year=True, sensitive=True, chat_intent="at_risk",
     ),
     _read(
-        "client_discovery", "Other programmes the client may qualify for, from the rule-pack library.",
+        "client_discovery", "ONE client (needs a client): other programmes it may qualify for, from the rule-pack library.",
         {"client_id": _CLIENT_ID, "tax_year": _TAX_YEAR, "state": _STATE},
         ("client_id",), chat_intent="discovery",
     ),
     _read(
-        "simulate", "What-if at one location: add or remove headcount, or change hours or wages.",
+        "simulate", "ONE client (needs a client): what-if at one location: add or remove headcount, or change hours or wages.",
         {"client_id": _CLIENT_ID, "tax_year": _TAX_YEAR, "worksite_id": {"type": "string"},
          "action": {"type": "string", "enum": list(ACTIONS), "default": "add_headcount"},
          "magnitude": {"type": "number", "default": 1}, "state": _STATE,
@@ -151,7 +151,7 @@ CATALOG: tuple[CapabilitySpec, ...] = (
         ("client_id", "tax_year", "worksite_id"), needs_year=True, chat_intent="simulate",
     ),
     _read(
-        "calc_walkthrough", "The calculation trail for a client-year: step, inputs, formula, output, citation, SHA-256.",
+        "calc_walkthrough", "ONE client (needs a client): the calculation trail for a client-year: step, inputs, formula, output, citation, SHA-256.",
         {"client_id": _CLIENT_ID, "tax_year": _TAX_YEAR, "state": _STATE, "method": _METHOD},
         ("client_id", "tax_year"), needs_year=True, chat_intent="explain",
     ),
@@ -161,12 +161,12 @@ CATALOG: tuple[CapabilitySpec, ...] = (
         ("client_id", "record_token", "tax_year"), needs_year=True, sensitive=True,
     ),
     _read(
-        "findings_list", "Open findings for a client-year that need a human decision.",
+        "findings_list", "ONE client (needs a client): open findings for a client-year that need a human decision.",
         {"client_id": _CLIENT_ID, "tax_year": _TAX_YEAR, "state": _STATE},
         ("client_id", "tax_year"), needs_year=True, sensitive=True,
     ),
     _read(
-        "claim_cell_history", "One claim cell and everything that ever happened to it.",
+        "claim_cell_history", "ONE client (needs a client): one claim cell and everything that ever happened to it.",
         {"client_id": _CLIENT_ID, "program_code": _PROGRAM, "tax_year": _TAX_YEAR},
         ("client_id", "program_code", "tax_year"), needs_year=True,
     ),

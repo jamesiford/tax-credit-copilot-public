@@ -40,7 +40,8 @@ def test_its_profile_is_json_for_the_workbench_to_serve():
 
 
 def test_its_instructions_carry_no_digit_to_copy():
-    assert not re.search(r"\d", channel_narrator.INSTRUCTIONS)
+    # A list index inside a fact path (clients.0.name) is addressing, not a figure; CH-15c's worked examples need one.
+    assert not re.search(r"\d", re.sub(r"(?<=\.)\d+(?=\.)", "", channel_narrator.INSTRUCTIONS))
 
 
 @pytest.mark.parametrize("must_say", [

@@ -18,6 +18,7 @@ test (or `scripts/ai-eval.py`) decide pass or fail.
 from __future__ import annotations
 
 import json
+import re
 from collections.abc import Awaitable, Callable, Iterable
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -58,19 +59,63 @@ def _tally(suite: str, mode: str, outcomes: Iterable[tuple[str, bool, str]]) -> 
 
 
 def score_routing(rows: list[dict[str, Any]], route: Callable[[str], list[str]], mode: str) -> EvalResult:
-    """Did the router name exactly the capabilities the question needs (order aside)?"""
+    """Did the router name exactly the capabilities the question needs (order aside), and none it must not?
+
+    `forbidden` names a capability that is wrong for the question even alongside the right one:
+    a question about one client must never be answered by the whole-book ranking.
+    """
     def judge(row):
         got = route(row["question"])
-        return row["id"], set(got) == set(row["expected"]), f"expected {sorted(row['expected'])}, got {sorted(got)}"
+        banned = sorted(set(got) & set(row.get("forbidden", ())))
+        ok = set(got) == set(row["expected"]) and not banned
+        return row["id"], ok, f"expected {sorted(row['expected'])}, got {sorted(got)}" + (f", forbidden {banned}" if banned else "")
 
     return _tally("routing", mode, map(judge, rows))
 
 
+#: Wording a narration must never contain, whatever the row says. Each is a failure seen live:
+#: a hedge on an exact figure, and a rank restated as prose ("position 1", "ranked first because of").
+FORBIDDEN_WORDING = (
+    r"(?i)\b(about|roughly|approximately|approx\.?|around|nearly|almost|rounded|up to|close to|more or less|or so)\b",
+    r"(?i)\bposition\s+(?:\d+|one)\b|\branked?\s+(?:number\s+)?(?:\d+|one|first)\b|\bnumber\s+one\b",
+)
+
+
+def composed_reply(row: dict[str, Any]) -> tuple[str, bool]:
+    """A recorded narration (with placeholders) as the channel composer would show it, and whether it survived."""
+    from application.capabilities.envelope import Block
+    from application.composer import compose
+
+    composed = compose([Block("paragraph", text="The table below is the platform's own.")], row["narration"], row["brief"])
+    return composed.text, composed.narration_used
+
+
+def _wording_problems(row: dict[str, Any], text: str) -> list[str]:
+    """Missing must-contain patterns and present forbidden ones, for a narration that was kept."""
+    missing = [p for p in row.get("must_contain", ()) if not re.search(p, text)]
+    banned = [p for p in (*FORBIDDEN_WORDING, *row.get("forbidden", ())) if re.search(p, text)]
+    return [*(f"missing /{p}/" for p in missing), *(f"forbidden /{p}/" for p in banned)]
+
+
+def _judge_composed(row: dict[str, Any]) -> tuple[str, bool, str]:
+    """A composed narration: kept or dropped as expected; if kept, in the wording the prompt asks for."""
+    text, used = composed_reply(row)
+    if row["expect"] == "reject":
+        # `by: composer` demands the composer itself drops it; otherwise a wording flag also counts (rank prose has no guard).
+        flagged = not used or (row.get("by") != "composer" and bool(_wording_problems(row, text)))
+        leaked = [p for p in row.get("forbidden", ()) if not used and re.search(p, text)]
+        return row["id"], flagged and not leaked, f"narration {'kept' if used else 'dropped'}, expected reject" + (f", leaked {leaked}" if leaked else "")
+    problems = [] if used else ["narration was dropped"]
+    problems += _wording_problems(row, text) if used else []
+    return row["id"], not problems, "; ".join(problems) or "ok"
+
 def score_narration(rows: list[dict[str, Any]], reply_for: Callable[[dict[str, Any]], str], mode: str) -> EvalResult:
-    """Does the numeric guard agree with the expectation about each reply?"""
+    """Does the numeric guard (and, for a placeholder narration, the composer) agree with each row's expectation?"""
     from application.numeric_guard import check
 
     def judge(row):
+        if "narration" in row:
+            return _judge_composed(row)
         rejected = not check(reply_for(row), facts=row["brief"]).passed
         wanted_reject = row["expect"] == "reject"
         return row["id"], rejected == wanted_reject, f"guard {'rejected' if rejected else 'passed'}, expected {row['expect']}"
@@ -142,7 +187,7 @@ async def run_live() -> list[EvalResult]:
     routing_rows = load_rows("routing", live=True)
     plans = {r["id"]: await _live_plan(r["question"]) for r in routing_rows}
     by_question = {r["question"]: plans[r["id"]] for r in routing_rows}
-    narration_rows = [r for r in load_rows("narration", live=True) if r["expect"] == "pass"]
+    narration_rows = [r for r in load_rows("narration", live=True) if r["expect"] == "pass" and "narration" not in r]
     replies = {r["id"]: await _live_narration(r) for r in narration_rows}
     return [
         score_routing(routing_rows, lambda q: by_question[q], "live"),

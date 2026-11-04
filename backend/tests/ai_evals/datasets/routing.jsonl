@@ -19,3 +19,13 @@
 {"id":"two-intents-2","question":"What is their trend, and walk me through how you got the credit","expected":["explain","trend"]}
 {"id":"live-only-1","mode":"live","question":"Is anyone we counted in danger of dropping out, and what would it take to keep them?","expected":["at_risk"]}
 {"id":"live-only-2","mode":"live","question":"I only care about the ones we could still win this year","expected":["book"]}
+{"id":"book-3","question":"Which of our clients should we call first and why?","expected":["book"]}
+{"id":"book-4","question":"Across all our clients, who is worth contacting this week?","expected":["book"]}
+{"id":"client-brief-named","question":"Brief me on Northwind Care Systems before my call","expected":["situation"],"forbidden":["book"]}
+{"id":"client-their-trend","question":"And what is their trend?","expected":["trend"],"forbidden":["book"]}
+{"id":"client-their-credit","question":"What is their credit for 2023?","expected":["eligibility"],"forbidden":["book"]}
+{"id":"client-what-if","question":"What if Cascade Retail Partners hired three more people at site A-1 in 2023?","expected":["simulate"],"forbidden":["book"]}
+{"id":"client-at-risk","question":"Which counted jobs at Ironbridge Logistics could fall out of the credit in 2023?","expected":["at_risk"],"forbidden":["book"]}
+{"id":"client-at-risk-their","question":"Which of their counted jobs could fall out?","expected":["at_risk"],"forbidden":["book"]}
+{"id":"live-only-3","mode":"live","question":"Give me a brief on Northwind Care Systems before my call","expected":["situation"],"forbidden":["book"]}
+{"id":"live-only-4","mode":"live","question":"Where does Ironbridge stand this year?","expected":["situation"],"forbidden":["book"]}

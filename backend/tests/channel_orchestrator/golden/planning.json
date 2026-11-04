@@ -1,0 +1,89 @@
+[
+  {
+    "name": "planning_whole_book_runs_book_rank_and_resolves_no_client",
+    "turns": [{
+      "say": "Which of our clients should we call first and why?",
+      "model": [{"tools": [{"tool": "book_rank", "args": {}}]}, {"text": "Start with {{facts.book_rank.rows.0.name}}, which the page puts under {{facts.book_rank.rows.0.band}}."}],
+      "expect": {"kind": "answer", "mode": "tools", "gateway": ["book_rank"], "guard": "pass", "narration_used": true, "audit": "ok",
+                 "contains": ["Start with Cascade Retail Partners", "Who to call"], "absent": ["position", "Which client do you mean?"]}
+    }]
+  },
+  {
+    "name": "planning_named_client_brief_resolves_the_client_then_uses_the_client_tool",
+    "turns": [{
+      "say": "Give me a brief on Northwind Care Systems before my call",
+      "model": [{"tools": [{"tool": "client_situation", "args": {}}]}, {"text": "Here is where they stand; the table gives each reason."}],
+      "expect": {"kind": "answer", "gateway": ["client_resolve", "client_situation"], "args": {"client_situation": {"client_id": 2002}}, "guard": "pass"}
+    }]
+  },
+  {
+    "name": "planning_their_follow_up_stays_on_the_client_tools_and_the_same_client",
+    "turns": [
+      {"say": "Give me a brief on Northwind Care Systems",
+       "model": [{"tools": [{"tool": "client_situation", "args": {}}]}, {"text": "Here is where they stand."}],
+       "expect": {"kind": "answer", "gateway": ["client_resolve", "client_situation"], "args": {"client_situation": {"client_id": 2002}}}},
+      {"say": "And what is their trend?",
+       "model": [{"tools": [{"tool": "client_trend", "args": {}}]}, {"text": "The table shows each year."}],
+       "expect": {"kind": "answer", "gateway": ["client_resolve", "client_trend"], "args": {"client_trend": {"client_id": 2002}}, "absent": ["Which client do you mean?"]}}
+    ]
+  },
+  {
+    "name": "planning_a_book_question_after_a_client_is_still_the_whole_book",
+    "turns": [
+      {"say": "Give me a brief on Northwind Care Systems",
+       "model": [{"tools": [{"tool": "client_situation", "args": {}}]}, {"text": "Here is where they stand."}],
+       "expect": {"kind": "answer", "gateway": ["client_resolve", "client_situation"]}},
+      {"say": "Now, across all our clients, who is worth contacting this week?",
+       "model": [{"tools": [{"tool": "book_rank", "args": {}}]}, {"text": "The table ranks every client."}],
+       "expect": {"kind": "answer", "gateway": ["book_rank"]}}
+    ]
+  },
+  {
+    "name": "planning_a_what_if_resolves_the_client_then_simulates",
+    "turns": [{
+      "say": "What if Cascade Retail Partners hired 3 more people at site A-1 in 2023?",
+      "model": [{"tools": [{"tool": "simulate", "args": {"worksite_id": "A-1", "action": "add_headcount", "magnitude": 3}}]}, {"text": "The what-if is shown below."}],
+      "expect": {"kind": "answer", "gateway": ["client_resolve", "simulate"], "args": {"simulate": {"client_id": 2001, "tax_year": 2023, "worksite_id": "A-1", "magnitude": 3}}, "guard": "pass"}
+    }]
+  },
+  {
+    "name": "planning_an_at_risk_question_resolves_the_client_then_reads_at_risk",
+    "turns": [{
+      "say": "Which counted jobs at Ironbridge Logistics could fall out of the credit in 2023?",
+      "model": [{"tools": [{"tool": "client_at_risk", "args": {"tax_year": 2023}}]}, {"text": "The table lists each cushion."}],
+      "expect": {"kind": "answer", "gateway": ["client_resolve", "client_at_risk"], "args": {"client_at_risk": {"client_id": 2003, "tax_year": 2023}}, "absent": ["Which client do you mean?"]}
+    }]
+  },
+  {
+    "name": "planning_in_keyword_mode_a_client_question_never_ranks_the_book",
+    "configured": false,
+    "turns": [{
+      "say": "Brief me on Northwind Care Systems before my call",
+      "expect": {"kind": "answer", "mode": "keywords", "gateway": ["client_resolve", "client_situation"], "args": {"client_situation": {"client_id": 2002}}}
+    }]
+  },
+  {
+    "name": "narration_that_hedges_an_exact_figure_is_withheld_and_the_engine_answers_alone",
+    "turns": [{
+      "say": "What is Cascade's credit for 2023 under Min-Max?",
+      "model": [{"tools": [{"tool": "client_eligibility", "args": {"tax_year": 2023}}]}, {"text": "The annual credit is roughly {{facts.client_eligibility_min_max.credit.annual_credit_usd|money}}."}],
+      "expect": {"kind": "answer", "guard": "rejected", "narration_used": false, "audit": "ok", "contains": ["$227,605", "commentary was withheld"], "absent": ["roughly"]}
+    }]
+  },
+  {
+    "name": "narration_that_says_an_exact_figure_is_not_rounded_is_still_withheld",
+    "turns": [{
+      "say": "What is Cascade's credit for 2023 under Min-Max?",
+      "model": [{"tools": [{"tool": "client_eligibility", "args": {"tax_year": 2023}}]}, {"text": "The credit is not rounded: {{facts.client_eligibility_min_max.credit.annual_credit_usd|money}}."}],
+      "expect": {"kind": "answer", "guard": "rejected", "narration_used": false, "contains": ["$227,605"], "absent": ["not rounded"]}
+    }]
+  },
+  {
+    "name": "a_plain_senior_colleague_narration_is_kept",
+    "turns": [{
+      "say": "What is Cascade's credit for 2023 under Min-Max?",
+      "model": [{"tools": [{"tool": "client_eligibility", "args": {"tax_year": 2023}}]}, {"text": "Their annual credit is {{facts.client_eligibility_min_max.credit.annual_credit_usd|money}}, and the table shows the working."}],
+      "expect": {"kind": "answer", "guard": "pass", "narration_used": true, "contains": ["Their annual credit is $227,605"]}
+    }]
+  }
+]

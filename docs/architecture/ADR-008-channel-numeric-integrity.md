@@ -127,6 +127,8 @@ both rule-based and both explainable in a sentence:
   released is reviewed whole first, so a link or address is never shown, in whole or
   in part; what a reader has already seen has always passed.
 
+**Hedging a figure (CH-15c).** The numeric guard proves a numeral is the engine's, not that a sentence leaves it alone: a narrator once called an exact credit "rounded". `application/composer_hedging.py` rejects, structurally, any narration with an approximation qualifier (about, roughly, approximately, around, nearly, almost, rounded, up to, close to, or so, more or less) within three tokens of a figure, where a placeholder counts as a figure. It rejects rather than reads, so "not rounded" is rejected too, and a rejection degrades like every other: the engine's own answer without the commentary. It does not catch rank prose ("position 1" is a substituted value the guard accepts); the narrator prompt forbids it and `tests/ai_evals` flags it.
+
 Violations are recorded as rule codes. The offending text is never repeated into a
 log, a span or an error, because it is exactly what must not be repeated.
 
