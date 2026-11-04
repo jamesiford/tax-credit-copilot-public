@@ -8,13 +8,7 @@ one on screen; it can only choose what to lead with and say it plainly.
 """
 from __future__ import annotations
 
-from domain.ai import AgentSpec, ModelRole
-
-from ._prompts import load_instructions
-
-
-NAME = "PageSummaryAgent"
-INSTRUCTIONS = load_instructions("page_summary")
+from .roster import build_spec
 
 AGENT_PROFILE = {
     "tab_label": "Page Summary",
@@ -42,7 +36,6 @@ AGENT_PROFILE = {
 }
 
 
-SPEC = AgentSpec(
-    name=NAME, instructions=INSTRUCTIONS, role=ModelRole.NARRATOR,
-    temperature=0.2, profile=AGENT_PROFILE,
-)
+SPEC = build_spec("page_summary", AGENT_PROFILE)
+NAME = SPEC.name
+INSTRUCTIONS = SPEC.instructions

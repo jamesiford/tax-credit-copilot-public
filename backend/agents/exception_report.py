@@ -8,13 +8,7 @@ drops a record — every exception is a human-validation checkpoint (CALC-07/08)
 """
 from __future__ import annotations
 
-from domain.ai import AgentSpec, ModelRole
-
-from ._prompts import load_instructions
-
-
-NAME = "ExceptionReportAgent"
-INSTRUCTIONS = load_instructions("exception_report")
+from .roster import build_spec
 
 AGENT_PROFILE = {
     "tab_label": "Exception Report",
@@ -45,7 +39,6 @@ AGENT_PROFILE = {
 }
 
 
-SPEC = AgentSpec(
-    name=NAME, instructions=INSTRUCTIONS, role=ModelRole.ANALYSIS,
-    temperature=0.2, profile=AGENT_PROFILE,
-)
+SPEC = build_spec("exception_report", AGENT_PROFILE)
+NAME = SPEC.name
+INSTRUCTIONS = SPEC.instructions

@@ -4,13 +4,7 @@ Phase 2 registers this agent in Foundry but the chat workflow doesn't invoke
 it yet. Phase 3 wires it into demo question #2."""
 from __future__ import annotations
 
-from domain.ai import AgentSpec, ModelRole
-
-from ._prompts import load_instructions
-
-
-NAME = "CreditDiscoveryAgent"
-INSTRUCTIONS = load_instructions("credit_discovery")
+from .roster import build_spec
 
 AGENT_PROFILE = {
     "tab_label": "Discovery",
@@ -35,7 +29,6 @@ AGENT_PROFILE = {
 }
 
 
-SPEC = AgentSpec(
-    name=NAME, instructions=INSTRUCTIONS, role=ModelRole.NARRATOR,
-    temperature=0.2, profile=AGENT_PROFILE,
-)
+SPEC = build_spec("credit_discovery", AGENT_PROFILE)
+NAME = SPEC.name
+INSTRUCTIONS = SPEC.instructions

@@ -8,13 +8,7 @@ the manual Thomson-Reuters "fire-hose" reading the partner does today.
 """
 from __future__ import annotations
 
-from domain.ai import AgentSpec, ModelRole
-
-from ._prompts import load_instructions
-
-
-NAME = "LegislativeMonitorAgent"
-INSTRUCTIONS = load_instructions("legislative_monitor")
+from .roster import build_spec
 
 AGENT_PROFILE = {
     "tab_label": "Legislative Monitor",
@@ -43,7 +37,6 @@ AGENT_PROFILE = {
 }
 
 
-SPEC = AgentSpec(
-    name=NAME, instructions=INSTRUCTIONS, role=ModelRole.ANALYSIS,
-    temperature=0.2, profile=AGENT_PROFILE,
-)
+SPEC = build_spec("legislative_monitor", AGENT_PROFILE)
+NAME = SPEC.name
+INSTRUCTIONS = SPEC.instructions

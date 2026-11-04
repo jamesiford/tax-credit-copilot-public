@@ -8,13 +8,7 @@ the ranking it is sitting on would be worse than no agent.
 """
 from __future__ import annotations
 
-from domain.ai import AgentSpec, ModelRole
-
-from ._prompts import load_instructions
-
-
-NAME = "ClientSituationAgent"
-INSTRUCTIONS = load_instructions("client_situation")
+from .roster import build_spec
 
 AGENT_PROFILE = {
     "tab_label": "Client Situation",
@@ -41,7 +35,6 @@ AGENT_PROFILE = {
 }
 
 
-SPEC = AgentSpec(
-    name=NAME, instructions=INSTRUCTIONS, role=ModelRole.NARRATOR,
-    temperature=0.3, profile=AGENT_PROFILE,
-)
+SPEC = build_spec("client_situation", AGENT_PROFILE)
+NAME = SPEC.name
+INSTRUCTIONS = SPEC.instructions

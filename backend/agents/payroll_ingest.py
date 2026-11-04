@@ -1,13 +1,7 @@
 """PayrollIngestAgent — confirms which payroll snapshot is in scope."""
 from __future__ import annotations
 
-from domain.ai import AgentSpec, ModelRole
-
-from ._prompts import load_instructions
-
-
-NAME = "PayrollIngestAgent"
-INSTRUCTIONS = load_instructions("payroll_ingest")
+from .roster import build_spec
 
 AGENT_PROFILE = {
     "tab_label": "Payroll Ingest",
@@ -32,7 +26,6 @@ AGENT_PROFILE = {
 }
 
 
-SPEC = AgentSpec(
-    name=NAME, instructions=INSTRUCTIONS, role=ModelRole.NARRATOR,
-    temperature=0.2, profile=AGENT_PROFILE,
-)
+SPEC = build_spec("payroll_ingest", AGENT_PROFILE)
+NAME = SPEC.name
+INSTRUCTIONS = SPEC.instructions

@@ -1,4 +1,8 @@
 # The orchestrator as an azd project of its own, deployed from source (no container registry).
+# This file IS the agent's declarative definition: `azure.yaml` is the single project file for a hosted agent, and the
+# older two-file model (agent.manifest.yaml + agent.yaml) is legacy and rejected by the current `azd ai agent init`
+# (Microsoft Learn, "azure.yaml reference for hosted agents" and "agent.yaml schema reference", read 2026-11-04).
+# test_orch_agent_definition.py holds it to that reference. What the agent does is code (app/); how it is deployed is here.
 # Written to the `azd ai agent` schema (extension azure.ai.agents 1.0.0-beta.23; the shape below is what
 # `azd ai agent init --deploy-mode code --protocol responses --protocol activity` generates, adapted):
 # https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/deploy-hosted-agent-code
@@ -13,6 +17,9 @@
 # section "Channel orchestrator"; supply them with `azd env set` and list them under `env:` below.
 # `proj-tcc` is the existing Foundry project: set `endpoint` to your project's endpoint (the azd
 # environment value FOUNDRY_PROJECT_ENDPOINT is what the deploy actually uses).
+requiredVersions:
+  extensions:
+    azure.ai.agents: ">=1.0.0-beta.20"
 name: tcc-channel-orchestrator
 services:
   foundry-project:
@@ -24,6 +31,7 @@ services:
     language: python
     kind: hosted
     name: tcc-channel-orchestrator
+    description: Reads a Teams or Copilot Chat message, runs the platform's tools through the channel gateway and replies in the engine's own figures.
     uses:
       - foundry-project
     env:

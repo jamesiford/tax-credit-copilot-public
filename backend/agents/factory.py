@@ -1,8 +1,9 @@
-"""The agent roster. [AI-02]
+"""The agent roster. [AI-02, RM-11]
 
-Single source of truth for which agents ship: add an agent by creating a module
-under `backend/agents/` that exports `NAME`, `INSTRUCTIONS`, `AGENT_PROFILE` and
-`SPEC`, its prompt under `agents/prompts/`, and appending it to `list_agent_modules`.
+`agents/agents.json` is the single source of truth for which agents ship and how each is
+published (name, instructions file, model role, temperature, tools). Add an agent by adding
+an entry there, its prompt under `agents/prompts/`, and a module under `backend/agents/`
+that holds its display profile and calls `build_spec`; there is no second list to keep in step.
 
 This module imports NO SDK. Publishing and running an agent is the provider's job
 (`infrastructure/ai/`), driven by the specs this roster yields.
@@ -11,30 +12,15 @@ from __future__ import annotations
 
 from domain.ai import AgentSpec, supports_temperature
 
+from .roster import agent_modules
+
 #: Kept under its old name: callers and tests import it from here.
 _supports_temperature = supports_temperature
 
 
 def list_agent_modules():
-    """Every agent module, in roster order."""
-    from . import (  # noqa: PLC0415 — deferred to avoid circular import
-        channel_narrator,
-        client_situation,
-        credit_discovery,
-        credit_rules,
-        exception_report,
-        headcount,
-        legislative_monitor,
-        orchestrator,
-        page_summary,
-        payroll_ingest,
-        reporting,
-        rules_ingestion,
-    )
-    return [
-        orchestrator, payroll_ingest, headcount, credit_rules, credit_discovery, client_situation,
-        page_summary, reporting, rules_ingestion, exception_report, legislative_monitor, channel_narrator,
-    ]
+    """Every agent module, in the order `agents.json` lists them."""
+    return agent_modules()
 
 
 def all_specs() -> list[AgentSpec]:

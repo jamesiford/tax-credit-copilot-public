@@ -256,6 +256,43 @@ To run the host itself against the mock gateway, export the variables in
 `POST http://localhost:8088/responses {"input": "..."}`. A local request carries no platform headers, so set
 `CHANNEL_IDENTITY_SOURCES=client-headers` and send `x-client-acting-user-oid` to be someone.
 
+## Agent as code (RM-11)
+
+Two kinds of agent exist here, and each has one declarative home.
+
+**The hosted orchestrator** (this directory) is `channel_orchestrator/azure.yaml`: the `azure.ai.agent` service (`kind: hosted`,
+the agent's name, description, `codeConfiguration`, `env`, `container.resources`, the endpoint's `protocols` and
+`authorizationSchemes`) plus the `azure.ai.project` service it uses. The extension's current reference
+([azure.yaml reference for hosted agents](https://learn.microsoft.com/en-us/azure/foundry/agents/concepts/azure-yaml-reference),
+read 2026-11-04) makes `azure.yaml` the **single** project file and calls the older `agent.manifest.yaml` + `agent.yaml` pair legacy;
+the current `azd ai agent init` rejects the manifest wrapper. So there is deliberately no manifest file to add. What the agent *does* is
+code (`app/`); how it is *deployed* is that one file, and `tests/channel_orchestrator/test_orch_agent_definition.py` holds it to the
+reference (host and kind, name equals the service key, source deployment rather than an image, an entry point that exists, resource
+ranges, the endpoint scheme Activity needs, no `identity` block, no legacy manifest, no reserved or secret-looking variable, no
+endpoint or tenant literal, every variable documented in ENV-VARS.md and read by code). The protocols stay as D-100 fixed them (the
+container serves `responses` only; the endpoint declares `responses` and `activity`) and are guarded by `test_orch_hosting_seam.py`.
+Nothing here ran `azd`; the two fields added by RM-11 (`description`, `requiredVersions`) are documented but have not been through a
+deploy (RM-16).
+
+**The specialist prompt agents** (twelve Foundry v2 prompt agents the portal's chat and the Agents page use, `backend/agents/`) are
+declared in **one list**, `backend/agents/agents.json`: for each agent its `name`, its `prompt` file (under `agents/prompts/`), its model
+`role` (the model is the setting `AI_MODEL_<ROLE>`, never a deployment name in the repository), its `temperature` and its `tools`
+(always empty: agents narrate, tools calculate, ADR-004). `agents/roster.py` reads and validates it; each `agents/<module>.py` keeps only
+the display profile the Agents page shows and takes its spec from the list (`SPEC = build_spec("<module>", AGENT_PROFILE)`);
+`agents/factory.py` yields the specs; `application/ai_wiring.py` hands them to the Foundry catalog, which publishes them as before.
+
+- **Add an agent:** a prompt file, a module with its profile, an entry in `agents.json`. **Change one:** edit its entry or its prompt file
+  (a prompt edit also needs the version bump `test_prompt_manifest.py` asks for).
+- **Publishing is unchanged:** `create_version` always creates, versions are immutable, an identical definition (model and instructions)
+  is reused, a pinned version is fetched. A temperature change alone does not change what that comparison looks at, so it does not
+  publish a new version by itself (F-18).
+- **Enforced:** `tests/test_agent_roster.py` (the list loads, each fault is refused, the specs equal the declarations, one version per agent, no
+  tool attached, an identical definition reused) and `tests/test_architecture_agent_roster.py` (no agent module declares a name, prompt, role or
+  temperature; only `roster.py` builds an `AgentSpec` or loads a prompt; the publisher is fed from the roster alone; every file under
+  `agents/prompts/` is an agent's or listed under `excluded_prompts` with a reason). The specs the list produces are byte-identical to
+  the ones the twelve modules produced before (a hash over name, instructions, role, temperature and profile matched).
+- No live publish was run; startup still publishes in the background (`FoundryAgentCatalog.warm`).
+
 ## Deploying
 
 Recommended: the **source-code (zip) path**: `python scripts/vendor-orchestrator.py`, then `azd up` in
