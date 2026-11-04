@@ -21,8 +21,8 @@ flowchart TD
     N -- yes --> S[client chosen by code; earlier question resumes]
     N -- no --> P
     S --> P[planner]
-    P --> T["tools mode: MAF Agent drives the model's tool calls\njson mode: model returns a plan, runner runs it\nkeywords mode: platform keyword table, no model"]
-    T --> TR[ToolRunner: client, year, method and budget are CODE's]
+    P --> T["tools mode: MAF Agent drives the model's tool calls\njson mode: model returns a plan, one-shot MAF agent runs each tool\nkeywords mode: platform keyword table, no model"]
+    T --> TR["MAF function middleware: budget, refusal, client, year and method, schema; then the call and the fact ledger"]
     TR --> G[(channel gateway: authenticate, entitle, audit, forward)]
     G --> TR
     TR --> Q{clarify?}
@@ -34,21 +34,24 @@ flowchart TD
 ```
 
 `TurnPipeline.handle` (`app/core/turn.py`) is that diagram. The pieces are in `app/core/`:
-`identity`, `state`, `toolset`/`tools` (the runner), `planner`, `maf_agent`, `models`, `compose`,
-`writes`, `replies`, `gateway_client`, `settings`; `app/host.py` and `app/main.py` are the hosting shell.
+`identity`, `state`, `toolset`/`tools` (the turn's state), `reader_arguments`, `planner`, the `maf_*` modules (the
+framework layer: `maf_agent`, `maf_catalog_tools`, `maf_tool_rules`, `maf_tool_call`, `maf_tool_run`), `models`,
+`compose`, `writes`, `replies`, `gateway_client`, `settings`; `app/host.py` and `app/main.py` are the hosting shell.
 
 ## What no model controls
 
 | Decision | Who makes it | Where |
 | --- | --- | --- |
 | Who is asking | The platform's signals, or nobody | `identity.resolve_identity` |
-| Whose client this is | The platform's deterministic resolver (`client_resolve`; the channel settles one exact full name or alias as `resolved: true`, while partial or ambiguous text still asks and the portal chat stays strict). The model's `client_id` is overwritten | `tools.ToolRunner.ensure_client` |
-| Which tax year | The reader's words, or the conversation's, or a question back. A year the model names is used only if the reader said it. A write never inherits one | `tools.ToolRunner._year` |
-| Which method | The reader's. Eligibility runs under **both** certified methods unless one is named, each labelled | `tools._method`, `compose.blocks_of` |
-| A what-if's size, a base year | The reader's. A number or year the model chose is dropped; a missing size or base year is a question back | `tools._scenario`, `tools._years` |
+| Whose client this is | The platform's deterministic resolver (`client_resolve`; the channel settles one exact full name or alias as `resolved: true`, while partial or ambiguous text still asks and the portal chat stays strict). The model's `client_id` is overwritten | `maf_tool_rules.ClientFromReader`, `tools.ToolRunner.ensure_client` |
+| Which tax year | The reader's words, or the conversation's, or a question back. A year the model names is used only if the reader said it. A write never inherits one | `maf_tool_rules.YearAndMethodFromReader`, `reader_arguments.ReaderWords` |
+| Which method | The reader's. Eligibility runs under **both** certified methods unless one is named, each labelled | `ReaderWords.method`, `maf_tool_call.CallAndCapture`, `compose.blocks_of` |
+| A what-if's size, a base year | The reader's. A number or year the model chose is dropped; a missing size or base year is a question back | `ReaderWords.scenario`, `ReaderWords.years` |
+| Which arguments are the reader's, and which tools a model may name | The catalog: `CapabilitySpec.reader_owned`, the `code-only` tag, `catalog.model_offered()` | `application/capabilities` |
 | Any figure | The tools' facts, rendered by the platform's formatter | `composer.compose` |
 | Whether a model sentence survives | The numeric guard and output policy, on the model's raw words and on the finished reply | `composer.compose` |
-| How many tools run, how long a turn takes | `CHANNEL_MAX_TOOL_CALLS`, `CHANNEL_TURN_TIMEOUT_SECONDS` | `tools.ToolRunner.run`, `turn.TurnPipeline` |
+| How many tools run, how long a turn takes | `CHANNEL_MAX_TOOL_CALLS`, `CHANNEL_TURN_TIMEOUT_SECONDS` | `maf_tool_rules.Budget`, `turn.TurnPipeline` |
+| Whether a model may name a tool | Not a commit, not plumbing: refused and recorded | `maf_tool_rules.RefuseUnlisted`, `RecordUnregisteredCalls` |
 | Whether a change is made | The same person, typing `confirm`, within `CHANNEL_CONFIRM_TTL_SECONDS` | `writes.commit_pending` |
 
 What the model sees of a tool result is the **names** of the facts (`narrator_brief`), never their
@@ -151,10 +154,11 @@ never splice two models' sentences, and stay with one provider through a tool lo
 screen (a flagged message reaches no model and is answered by the keyword table).
 
 Three planning modes, one outcome: **tools** (a provider offers tool calling: MAF `Agent` + `FunctionTool`s
-from the catalog, with a middleware that replaces the model's text with the composer's), **json**
-(`AI_GATEWAY_SUPPORTS_TOOLS=false`: the model returns `{"tools": [...]}`, validated and run by the runner,
-then a second call narrates) and **keywords** (no model, or the model failed: the platform's own keyword
-table). Invented tool names are never run.
+generated from the catalog, the turn's rules as function middleware, and a middleware that replaces the model's
+text with the composer's), **json**
+(`AI_GATEWAY_SUPPORTS_TOOLS=false`: the model returns `{"tools": [...]}`, validated, and each named tool runs through
+the same middleware via a one-shot agent, then a second call narrates) and **keywords** (no model, or the model
+failed: the platform's own keyword table). Invented tool names are never run.
 
 Not carried over from the API's stack, and why: the token budget, breaker, bulkhead and retry wrappers
 (`ai_wiring._decorate`) wrap `AgentRuntime`, which has no tool calls; here a call has a timeout

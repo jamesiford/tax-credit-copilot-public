@@ -15,6 +15,7 @@ from jsonschema import Draft202012Validator
 
 from app.core.placeholders import with_placeholders
 from application.capabilities import catalog
+from application.capabilities.catalog_types import OWNED_METHOD, OWNED_METHOD_BOTH
 from application.capabilities.lanes import has_user_lane, is_user_block
 from application.capabilities.lanes import model_facts as lane_model_facts
 
@@ -49,6 +50,22 @@ def numbers_in(text: str) -> set[float]:
 def offered_schema(spec: catalog.CapabilitySpec) -> dict[str, Any]:
     """The schema a model is shown, from the catalog (`catalog.model_schema`)."""
     return catalog.model_schema(spec)
+
+
+def method_argument(spec: catalog.CapabilitySpec) -> str | None:
+    """The name of the argument that carries the certified method, as the catalog marks it (None when there is none)."""
+    return next((o.name for o in spec.owned(OWNED_METHOD, OWNED_METHOD_BOTH)), None)
+
+
+def refusal(code: str, message: str) -> dict[str, Any]:
+    """What a model is told when a call did not run: a stable code and one sentence, never a value."""
+    return {"ok": False, "error": code, "message": message}
+
+
+def needs_reader(clarify: Clarification | None) -> dict[str, Any]:
+    """The model's answer when the reader must say something first (a client, a year, a size): stop and wait."""
+    what = clarify.kind if clarify else "client"
+    return refusal("needs_" + what, f"the reader must say which {what} (or how much); stop and wait")
 
 
 def first_schema_problem(spec: catalog.CapabilitySpec, args: dict[str, Any]) -> str | None:
