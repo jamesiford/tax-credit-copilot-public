@@ -19,6 +19,7 @@ from typing import Any
 from jsonschema import Draft202012Validator
 
 from application.capabilities import catalog, registry
+from application.capabilities.data_access import refuse_user_lane
 from application.capabilities.envelope import ToolResult
 from application.capabilities.errors import (
     Ambiguous, CapabilityError, ClaimNotFound, ClientNotFound, DataQueryRefused, InvalidArguments, NotCalculated,
@@ -162,13 +163,17 @@ def client_ids(args: Mapping[str, Any]) -> set[int]:
 
 
 def invoke(tool: str, args: Mapping[str, Any], principal: Principal) -> ToolResult:
-    """Run `tool` with already-merged `args`. Raises `CapabilityFailure`, never anything else."""
+    """Run `tool` with already-merged `args`. Raises `CapabilityFailure`, never anything else.
+
+    Every result passes `refuse_user_lane` before it leaves: the API's own check that a caller whose model
+    reads tool text is never handed employee rows, whatever the gateway in front of it did or did not do.
+    """
     spec = resolve(tool)
     validate(spec, args)
     function = registry.get(tool)
     try:
-        if tool in registry.NEEDS_PRINCIPAL:
-            return function(principal, **args)
-        return function(**args)
+        result = function(principal, **args) if tool in registry.NEEDS_PRINCIPAL else function(**args)
+        refuse_user_lane(principal, result)
+        return result
     except Exception as exc:  # noqa: BLE001 - every failure leaves as one typed shape
         raise failure_for(exc) from exc

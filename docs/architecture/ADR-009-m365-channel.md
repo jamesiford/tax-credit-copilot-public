@@ -76,12 +76,19 @@ guarantee that a model is only ever shown the *names* of facts is unchanged; the
 and the one that holds where a model is handed text.
 
 Copilot Cowork is that case: its model composes from the text a tool returns, so there is no way to show the
-person a row and hide it from the model. **A result that lists individual employees is therefore refused over
-Cowork unless the caller is a writer**, with a plain-words refusal naming Teams as the place the rows are shown to
-the person alone. A writer is entitled to see person-level data and chooses Cowork knowingly, which is the same
-bar the platform sets for changing it. The rule is enforced twice: the API refuses before anything is read (it
-knows the specification and the channel), and the gateway refuses on the way back if any result still carries a
-person-only lane for a non-writer, so neither check is the only one. An aggregate over employee-level data (a
+person a row and hide it from the model. **A result that lists individual employees is therefore refused unless the
+caller is positively first-party (Teams or Copilot Chat) or a writer**, with a plain-words refusal naming Teams as
+the place the rows are shown to the person alone. The test is positive (RM-02): the gateway acting for a person
+whose Teams or Copilot Chat message it asserts is trusted, and everything else (`cowork`, `api-test`, an unknown or
+missing channel, a person's own token sent straight to the API) is treated like Cowork, so an unrecognised caller
+fails closed rather than open. A writer is entitled to see person-level data and chooses knowingly, which is the
+same bar the platform sets for changing it. The rule is enforced three times, each on its own evidence: the API
+refuses before anything is read (it knows the specification and the channel); `invoke` refuses again on every
+finished result, so a capability that forgot the check, or one added later, cannot hand rows to such a caller
+whatever the gateway did; and the gateway refuses on the way back. The channel an agent asserts is itself bound
+to the caller: `CHANNEL_CALLER_CHANNELS` maps a registered app id to the first-party channels it may claim, so one
+registered caller cannot pose as another channel; with none configured, a registered caller keeps enum-level trust
+(logged at startup), which is the stated residual. An aggregate over employee-level data (a
 count of people by location, an average by month) carries no person and is allowed everywhere, subject to the
 small-group rule below.
 

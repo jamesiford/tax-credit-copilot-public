@@ -19,6 +19,8 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Protocol
 
+from domain.channel_trust import FIRST_PARTY_CHANNELS
+
 
 class NotAuthorized(PermissionError):
     """The caller is who they say and may not do this. Routers map it to 403."""
@@ -40,6 +42,12 @@ class ActingUser:
     channel: str | None = None
     conversation_id: str | None = None
     correlation_id: str | None = None
+
+    @property
+    def is_first_party(self) -> bool:
+        """Positively Teams or Copilot Chat, as the channel asserted it. The one definition both the API and the
+        gateway use to decide who may be handed employee-level rows; anything else is treated like Cowork. [RM-02]"""
+        return self.channel in FIRST_PARTY_CHANNELS and self.assurance == "channel-asserted"
 
     @property
     def actor(self) -> str:

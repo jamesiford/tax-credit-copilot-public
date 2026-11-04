@@ -207,9 +207,17 @@ def test_cowork_may_ask_an_aggregate_over_employee_data(data_service):
     assert result.facts["audience"] == "both"
 
 
-@pytest.mark.parametrize("channel", ["teams", "m365-copilot", None])
-def test_the_other_channels_and_the_portal_receive_the_persons_lane(data_service, channel):
+@pytest.mark.parametrize("channel", ["teams", "m365-copilot"])
+def test_the_first_party_channels_receive_the_persons_lane(data_service, channel):
     assert data_query(person(READER_OID, channel), **EMPLOYEE_ROWS).facts["audience"] == "user"
+
+
+def test_a_signed_in_person_calling_the_api_directly_is_not_first_party_and_is_refused_unless_a_writer(data_service):
+    """RM-02: a person's own token carries no channel assertion, so it fails closed like Cowork."""
+    with pytest.raises(DataQueryRefused) as caught:
+        data_query(person(READER_OID, None), **EMPLOYEE_ROWS)
+    assert caught.value.code == "employee_level_not_available"
+    assert data_query(person(WRITER_OID, None), **EMPLOYEE_ROWS).facts["audience"] == "user"
 
 
 def test_the_refusal_costs_no_budget_and_reads_nothing(data_service):

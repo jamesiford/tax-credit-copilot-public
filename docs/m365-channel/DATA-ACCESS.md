@@ -59,10 +59,18 @@ egress rule (an employee identifier or record token never enters a prompt) is ex
 (`test_data_lanes.py`, `test_orch_data_lanes.py`, `test_gw_data_lanes.py`).
 
 **Copilot Cowork cannot honour the split**: its model composes from the text a tool returns, so a row shown to the
-person is a row shown to the model. A result that lists individual employees is therefore **refused over Cowork
-unless the caller is a writer**, with a refusal that names Teams as the place to see rows. It is enforced twice (the
-API before anything is read, the gateway on the way back). An aggregate over employee-level data carries no person
-and is allowed everywhere. The reasoning is in [ADR-009 §8](../architecture/ADR-009-m365-channel.md).
+person is a row shown to the model. A result that lists individual employees is therefore **refused unless the caller
+is positively first-party (Teams or Microsoft 365 Copilot Chat) or a writer** (RM-02: the test is positive, so it
+fails closed), with a refusal that names Teams as the place to see rows. "Positively first-party" means the channel
+gateway (holding the agent role) acting for a person whose Teams or Copilot Chat message it asserts
+(`channel-asserted`); **everything else is treated like Cowork**: `cowork`, `api-test`, an unknown or missing
+channel, and a person's own token sent straight to the API. It is enforced three times, each on its own evidence: the
+API before anything is read, the API again on every finished result (`invoke`, so a capability that forgot the check
+cannot leak), and the gateway on the way back; none rests on another. The channel an agent asserts is also bound to
+the caller's registered app id (`CHANNEL_CALLER_CHANNELS`: a registered caller can claim only the channels it is
+registered for; with none configured every registered caller keeps enum-level trust and the gateway says so at
+startup). An aggregate over employee-level data carries no person and is allowed everywhere. The reasoning is in
+[ADR-009 §8](../architecture/ADR-009-m365-channel.md).
 
 **Small groups (RM-01).** An aggregate over an employee-level dataset (`employee_period_fact`,
 `employee_eligibility`, `onezero_matrix`, `payroll`) shows only groups of at least **K distinct people**

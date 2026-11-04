@@ -7,7 +7,9 @@ Two token shapes are accepted and they never mix:
   be on `CHANNEL_ALLOWED_CALLER_APP_IDS`. The role is preferred and the path that
   authorised each call is logged. The person it acts for arrives in `X-Acting-*`
   headers and is an ASSERTION by a trusted service, so the audit says
-  `channel-asserted`.
+  `channel-asserted`. The channel it asserts must be one that caller is registered for
+  (`CHANNEL_CALLER_CHANNELS`, `_bind_channel`): a real channel name is not enough, so one
+  registered caller cannot pose as another channel to be handed employee-level rows.
 - **Delegated** — a user's own token with the scope `Channel.Access` (Cowork). The
   acting user IS the token's subject and any acting-user header is ignored: a person
   cannot name somebody else.
@@ -27,13 +29,14 @@ from typing import Any
 
 from application.identity import ActingUser
 from channel.config import GUID, GatewaySettings
+from domain.channel_trust import FIRST_PARTY_CHANNELS
 from infrastructure.auth.entra import AuthenticationFailed, EntraTokenValidator
 
 log = logging.getLogger("tcc.channel.auth")
 
 ROLE_INVOKE = "Channel.Invoke"
 SCOPE_ACCESS = "Channel.Access"
-AGENT_CHANNELS = ("teams", "m365-copilot")
+AGENT_CHANNELS = FIRST_PARTY_CHANNELS
 _FIELD_LIMIT = 256
 _CORRELATION = re.compile(r"^[A-Za-z0-9._-]{1,64}$")
 
@@ -138,7 +141,22 @@ class CallerAuthenticator:
             via = "allow-list"
         else:
             raise AuthFailure(403, "caller_not_allowed", f"the caller holds neither the '{ROLE_INVOKE}' role nor an allowed app id")
-        return Caller(self._asserted_user(headers, conversation_id), "agent", via, app_id)
+        acting = self._asserted_user(headers, conversation_id)
+        self._bind_channel(app_id, acting.channel)
+        return Caller(acting, "agent", via, app_id)
+
+    def _bind_channel(self, app_id: str | None, channel: str | None) -> None:
+        """The channel an agent claims must be one THIS caller is registered to assert, not merely a real one.
+
+        `CHANNEL_CALLER_CHANNELS` maps an app id to its channels. With any entry configured the registry is
+        authoritative: an app it does not list asserts nothing. With none configured every registered caller
+        (role or allow-list) keeps the enum-level trust it had, which is logged at startup. [RM-02]
+        """
+        bound = self._settings.caller_channels
+        permitted = bound.get(app_id or "", ()) if bound else FIRST_PARTY_CHANNELS
+        if channel not in permitted:
+            log.warning("caller refused: channel %r is not registered for this app", channel)
+            raise AuthFailure(403, "channel_not_allowed", "this caller is not registered to assert that channel")
 
     def _asserted_user(self, headers: Mapping[str, str], conversation_id: str | None) -> ActingUser:
         tenant = _guid(_header(headers, "x-acting-tenant"), "X-Acting-Tenant")

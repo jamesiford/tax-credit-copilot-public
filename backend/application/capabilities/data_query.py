@@ -18,7 +18,7 @@ from typing import Any
 
 from application.capabilities import _support as s
 from application.capabilities.data_access import (
-    asker, refuse_employee_level_for_cowork, refused, service, suppress_small_groups,
+    asker, refuse_employee_level_beyond_first_party, refused, service, suppress_small_groups,
 )
 from application.capabilities.data_render import cell, to_tool_result
 from application.capabilities.envelope import Provenance, ToolResult
@@ -39,7 +39,7 @@ def data_query(principal: Principal, **query: Any) -> ToolResult:
     try:
         spec = QuerySpec.from_dict(query)
         svc = service()
-        refuse_employee_level_for_cowork(principal, svc.audience_of(spec))
+        refuse_employee_level_beyond_first_party(principal, svc.audience_of(spec))
         return to_tool_result(svc.run(spec, principal=asker(principal), suppress_small_groups=suppress_small_groups(principal)))
     except QueryError as exc:
         raise refused(exc) from exc
