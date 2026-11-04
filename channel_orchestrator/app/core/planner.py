@@ -20,7 +20,7 @@ import logging
 from dataclasses import dataclass, field
 from typing import Any
 
-from app.core.compose import compose_reply, facts_of
+from app.core.compose import compose_reply, model_facts_of
 from app.core.maf_agent import ModelTrace, build_agent
 from app.core.models import ModelChain
 from app.core.placeholders import with_placeholders
@@ -98,7 +98,7 @@ class Planner:
     async def _narrate(self, runner: ToolRunner, planned: Planned) -> str:
         text, _ = narrator_instructions()
         brief = narrator_brief(
-            UntrustedText(runner.question, "reader question").fenced(), runner.tool_names, facts_of(runner.runs),
+            UntrustedText(runner.question, "reader question").fenced(), runner.tool_names, model_facts_of(runner.runs),
             notes=[w for run in runner.runs for w in run.envelope.get("warnings") or []],
         )
         brief["fact_paths"] = with_placeholders(brief["fact_paths"])

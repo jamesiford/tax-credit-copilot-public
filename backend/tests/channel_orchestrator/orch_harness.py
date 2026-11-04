@@ -34,6 +34,7 @@ from application.capabilities import catalog
 from application.capabilities.client import client_resolve
 from application.capabilities.envelope import Provenance
 from domain.ai import ModelUnavailable, StreamEnd, TextDelta, ToolCall
+from data_harness import DATA_TOOLS, data_reply
 
 TENANT = "00000000-0000-0000-0000-0000000000aa"
 USER_OID = "bbbbbbbb-0000-4000-8000-000000000002"
@@ -208,6 +209,8 @@ class FakeGateway:
         errors = sorted(Draft202012Validator(spec.schema).iter_errors(args), key=lambda e: list(e.absolute_path))
         if errors and spec.kind != catalog.WRITE_COMMIT:
             return 422, {"error": {"code": "invalid_arguments", "message": errors[0].message, "retryable": False}}
+        if tool in DATA_TOOLS:
+            return data_reply(tool, args, oid)
         if spec.kind == catalog.WRITE_PREPARE:
             return self._prepare(tool, args, oid)
         if spec.kind == catalog.WRITE_COMMIT:

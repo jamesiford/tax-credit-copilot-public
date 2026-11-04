@@ -11,7 +11,9 @@ from typing import Any
 
 from jsonschema import Draft202012Validator
 
+from app.core.placeholders import with_placeholders
 from application.capabilities import catalog
+from application.capabilities.lanes import model_facts as lane_model_facts
 
 _YEAR = re.compile(r"\b(?:ty\s?)?((?:19|20)\d\d)\b", re.IGNORECASE)
 _NUMBER = re.compile(r"(?<![\w.\-])\d+(?:\.\d+)?(?![\w])")
@@ -90,6 +92,29 @@ class ToolRun:
     def facts(self) -> dict[str, Any]:
         """The envelope's facts without the confirmation token, which only the owner's `confirm` may use."""
         return {k: v for k, v in (self.envelope.get("facts") or {}).items() if k != "confirmation"}
+
+    @property
+    def model_facts(self) -> dict[str, Any]:
+        """What a MODEL may be shown of this run: `facts` less the person-only lane (employee-level rows).
+
+        The reader's reply is composed from `facts` and the blocks; only this projection may reach a
+        prompt, a tool result handed to a model, or anything else a model reads [ADR-009].
+        """
+        return {k: v for k, v in lane_model_facts(self.envelope).items() if k != "confirmation"}
+
+
+def model_answer(spec: catalog.CapabilitySpec, run: ToolRun, brief: dict[str, Any]) -> dict[str, Any]:
+    """The reply a model gets for one tool: the NAMES of the facts, never their values.
+
+    One exception, by declaration: a `lookup` tool (`data_catalog`, `data_distinct_values`) describes the
+    shape of the data, never its content, and the model cannot write a valid query without reading it, so it
+    is handed the facts themselves (still through the lane projection) and only the numeric paths.
+    """
+    paths = with_placeholders(brief["fact_paths"])
+    if catalog.LOOKUP not in spec.tags:
+        return {"ok": True, "tool": spec.name, "fact_paths": paths, "notes": brief["notes"]}
+    numeric = [p for p in paths if p.get("format") != "text"]
+    return {"ok": True, "tool": spec.name, "fact_paths": numeric, "notes": brief["notes"], "result": run.model_facts}
 
 
 @dataclass(frozen=True)
