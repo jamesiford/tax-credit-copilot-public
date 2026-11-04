@@ -150,8 +150,12 @@ on both lists.
   unconfigured one `data_source_unavailable`; there is never a fallback to another store. Gold and ops datasets are
   not behind this flag.
 - **Settings are all optional**, non-secret and API-only. The gateway never touches data directly.
-- **Not verified live yet.** T-SQL execution, the pyodbc timeout and the lakehouse endpoint are exercised offline over
-  SQLite and fakes shaped like the drivers; the live redeploy (CH-17) is their first run on Fabric.
+- **Verified live (CH-17, 3 November 2026).** T-SQL execution on the Warehouse and the lakehouse SQL endpoint, the
+  row cap, the pyodbc statement timeout (`HYT00` at the limit, classified `query_timeout`), the per-person budget and the
+  concurrency bulkhead ran against Fabric, and every overlapping measure equalled the fixed tools and a direct read-only
+  SQL ([evidence](evidence/live-final-2026-11-03.md)). Warm statements take well under a second; the first
+  connection of a process about 3 s, so the 20-second default needs no widening. A genuine slow-statement timeout and
+  the non-writer Cowork refusal are proven offline only.
 
 ## 8. Grants the lakehouse endpoint needs
 
