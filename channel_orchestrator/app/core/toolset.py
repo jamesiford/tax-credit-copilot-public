@@ -13,6 +13,7 @@ from jsonschema import Draft202012Validator
 
 from app.core.placeholders import with_placeholders
 from application.capabilities import catalog
+from application.capabilities.lanes import has_user_lane, is_user_block
 from application.capabilities.lanes import model_facts as lane_model_facts
 
 _YEAR = re.compile(r"\b(?:ty\s?)?((?:19|20)\d\d)\b", re.IGNORECASE)
@@ -115,6 +116,25 @@ def model_answer(spec: catalog.CapabilitySpec, run: ToolRun, brief: dict[str, An
         return {"ok": True, "tool": spec.name, "fact_paths": paths, "notes": brief["notes"]}
     numeric = [p for p in paths if p.get("format") != "text"]
     return {"ok": True, "tool": spec.name, "fact_paths": numeric, "notes": brief["notes"], "result": run.model_facts}
+
+
+def lane_diagnostic(run: ToolRun, answer: dict[str, Any]) -> str:
+    """One log line about what a model was just handed for `run`: NAMES and COUNTS only, never a value.
+
+    It exists so a live run can show, without reading a row, that a result carrying a person-only lane
+    reached the model as column names and a count: how many blocks and fact keys were withheld, which
+    keys the model's answer holds, and whether any `rows` list crossed.
+    """
+    envelope = run.envelope
+    blocks = envelope.get("blocks") or ()
+    hidden = [b for b in blocks if is_user_block(b)]
+    facts = answer.get("result") if isinstance(answer.get("result"), dict) else {}
+    return (
+        f"tool={run.name} user_lane={'yes' if has_user_lane(envelope) else 'no'} "
+        f"user_blocks_withheld={len(hidden)} user_only_fact_keys_withheld={len(envelope.get('user_only_facts') or ())} "
+        f"answer_keys={','.join(sorted(answer))} fact_paths={len(answer.get('fact_paths') or ())} "
+        f"rows_in_answer={'yes' if 'rows' in facts else 'no'}"
+    )
 
 
 @dataclass(frozen=True)

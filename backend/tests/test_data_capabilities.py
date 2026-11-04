@@ -240,6 +240,22 @@ def test_distinct_values_is_capped_and_says_so(data_service):
     assert any("cut at the limit" in b.text for b in result.blocks)
 
 
+def test_a_limit_counts_values_not_rows_where_both_methods_list_each_value_twice(data_service):
+    """The fixture holds two worksites under two methods: four rows. A limit of two must list both worksites."""
+    full = data_distinct_values(person(), CLIENT, "unit_month_summary", "worksite_id", limit=2).facts
+    assert [v["value"] for v in full["values"]] == [f"worksite_id-{CLIENT}-0", f"worksite_id-{CLIENT}-1"]
+    assert full["truncated"] is False and full["value_count"] == 2, "limit=2 rows used to list one worksite and call it cut"
+    one = data_distinct_values(person(), CLIENT, "unit_month_summary", "worksite_id", limit=1).facts
+    assert one["value_count"] == 1 and one["truncated"] is True and one["values"][0]["row_count"] == 2, "a listed value keeps both readings' rows"
+
+
+def test_a_dataset_with_no_method_is_fetched_at_the_limit_itself(data_service):
+    from application.capabilities.data_query import _rows_to_fetch
+
+    assert _rows_to_fetch("unit_month_summary", 10) == 20 and _rows_to_fetch("employee_period_fact", 10) == 10
+    assert _rows_to_fetch("unit_month_summary", 400) == 500, "never past the server's own ceiling"
+
+
 @pytest.mark.parametrize("dataset, column, code", [
     ("employee_eligibility", "record_token", "column_not_listable"),
     ("employee_period_fact", "hours", "column_not_listable"),

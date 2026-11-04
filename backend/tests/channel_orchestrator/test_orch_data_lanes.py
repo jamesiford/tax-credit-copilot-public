@@ -89,6 +89,31 @@ def test_a_catalog_question_is_answered_with_the_catalog():
     assert "Queryable data" in reply.text and "unit_month_summary" in reply.text
 
 
+def test_a_names_only_diagnostic_line_says_what_the_model_was_handed(caplog):
+    """A live run can show, without reading a row, that the person's lane did not cross."""
+    import logging
+
+    with caplog.at_level(logging.INFO, logger="tcc.orchestrator.tools"):
+        ask([{"tools": [EMPLOYEE_CALL]}, {"text": "Here are the people."}], EMPLOYEE_ASK)
+    lines = [r.getMessage() for r in caplog.records if r.getMessage().startswith("model payload:")]
+    assert lines, "one line per tool answered"
+    line = next(x for x in lines if "tool=data_query" in x)
+    assert "user_lane=yes" in line and "user_blocks_withheld=1" in line and "rows_in_answer=no" in line
+    assert "answer_keys=fact_paths,notes,ok,tool" in line
+    assert ROW_VALUE not in line and "record_token-" not in line, "names and counts, never a value"
+    assert identifier_findings(line) == []
+
+
+def test_the_diagnostic_for_an_aggregate_reports_no_withheld_lane():
+    from app.core.toolset import lane_diagnostic
+    from data_harness import data_reply
+    from orch_harness import USER_OID
+
+    status, envelope = data_reply("data_query", {"client_id": 2002, **AGGREGATE_CALL["args"]}, USER_OID)
+    line = lane_diagnostic(run_of(envelope), {"ok": True, "tool": "data_query", "fact_paths": [1, 2], "notes": []})
+    assert status == 200 and "user_lane=no" in line and "user_blocks_withheld=0" in line and "fact_paths=2" in line
+
+
 # ------------------------------------------------------------------ the projection itself
 
 
