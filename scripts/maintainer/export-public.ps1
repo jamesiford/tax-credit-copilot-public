@@ -39,7 +39,7 @@
     this script only - never use this for the real export.
 
 .EXAMPLE
-    pwsh scripts/export-public.ps1
+    pwsh scripts/maintainer/export-public.ps1
 #>
 [CmdletBinding()]
 param(

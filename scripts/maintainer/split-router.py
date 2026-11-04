@@ -19,7 +19,7 @@ This does the first two mechanically. For the third it reports what each new
 module needs, and `tests/test_architecture.py` fails the build if anything is
 missed. `tests/test_api_surface.py` proves no route was lost.
 
-    python scripts/split_router.py api/onezero.py --plan
+    python scripts/maintainer/split-router.py api/onezero.py --plan
 """
 from __future__ import annotations
 
@@ -29,7 +29,7 @@ import builtins
 import sys
 from pathlib import Path
 
-BACKEND = Path(__file__).resolve().parent.parent / "backend"
+BACKEND = Path(__file__).resolve().parents[2] / "backend"
 _BUILTINS = set(dir(builtins)) | {"Any", "self", "cls"}
 
 
