@@ -4,8 +4,8 @@ Customer-neutral and redacted: no token, tenant, subscription or Entra identifie
 identifier. Only names, counts, timings and PASS/FAIL. Run as the signed-in sandbox operator (`<operator>`) over the
 delegated path (an Azure CLI token for the gateway's `Channel.Access` scope), against the deployed PoC. The in-process and
 direct-SQL comparisons ran from the operator's workstation, read-only, against the same Warehouse and the lakehouse SQL
-endpoint the deployed API reads. Later sections ("Orchestrator end to end", "Display names", "Evidence stream",
-"Application Insights", "Cost/safety") are appended by the next part.
+endpoint the deployed API reads. Part C2 (orchestrator end to end, display names, evidence stream, Application Insights, cost
+and safety) follows the part C1 sections below.
 
 Code on the PoC for this run: the stage 3 part A deployment, plus **one API redeploy** during this part (see "A bug found
 and fixed" under *Data tools live*). Gateway, web, agent (version 17) and the published 1.0.3 app are unchanged; the agent
@@ -127,7 +127,148 @@ commit, because stamping a new value needs `azd provision`, which this part does
 
 No other mismatch: every overlapping measure agrees across the gateway, the fixed tools and the direct SQL.
 
-## Not covered by this part
+Not exercised live in part C1: the non-writer refusals (above) and a real statement timeout (offline tests).
 
-Display names, the evidence stream, Application Insights and the cost/safety check are the next part's.
-Not exercised live: the non-writer refusals (above) and a real statement timeout or 429 (offline tests).
+# Part C2: orchestrator end to end, display names, evidence stream, Application Insights, cost and safety
+
+Run on 3 to 4 November 2026 as the same signed-in sandbox operator. Questions go to the hosted agent over the Responses
+protocol, with the person supplied by the platform's `x-agent-user-id` header, the way the Teams path supplies it. Client
+names are the synthetic ones (`Northwind Care Systems` is client 2002; the reference client appears only as the book's
+fifth row). No identifier, token, email or employee value is recorded here.
+
+## Deployments made in this part
+
+| What | Why | Check afterwards |
+| --- | --- | --- |
+| Orchestrator, agent **version 18** | deploys the names-only `model payload:` log line (D-117) | agent invariants **13 of 13**; `/whoami` answered by 18 |
+| Orchestrator, **version 19** | answer-quality fix cycle 1 (below) | invariants 13 of 13 |
+| `foundry_capacity` 20 to 100 (Terraform, overlay value, in place) | at 20 thousand tokens per minute the model answered `429` whenever two data questions ran within a minute (`ModelRateLimited` in the agent log, shown to the reader as "The language model is unavailable"); a data question feeds the catalog back to the model | `azd provision --preview`: exactly one in-place change, applied; second preview **No changes**; the deployment shows 100 requests and 100000 tokens per minute; invariants 13 of 13 |
+| Orchestrator, **version 20** | answer-quality fix cycle 2 (below) | invariants 13 of 13; `/whoami` answered by 20 |
+
+Nothing was rolled back. The API, gateway and web are as at the end of part C1.
+
+## Orchestrator end to end
+
+**How the questions were asked.** One Responses call per question. A follow-up that says "their" needs the same
+conversation: the agent keys its memory by person and platform conversation, and a bare Responses call opens a new one each
+time, so the follow-up was asked inside one `conversation` object (the way Teams keeps one conversation id). Without it the
+agent correctly answered "Which client do you mean?". The tool sequence is read from the gateway's audit rows for the
+operator on channel `teams` (`begin` rows, in order) and the agent's own container log; narration and guard from the
+`narrate` audit row. The final run is version **20**; every reply carried the "Not tax advice" disclaimer and a provenance footer.
+
+### Final run (agent version 20, prompt 4)
+
+| # | Question (synthetic client) | Tool sequence | Narration and guard | Reply quality |
+| --- | --- | --- | --- | --- |
+| 1 | Whole book: "Who should we call first and why?" | `book_rank` | present, guard `pass` | leads with the answer ("Start with <client>"), the engine's reason label, table of five clients in page order; no rank-prose; no repeated count (fixed in cycle 2) |
+| 2 | Named-client brief, tax year 2025 | `client_resolve`, `client_situation` | present, `pass` | leads with the identified credit; "1 recorded programme years" is the prompt's own example wording (minor) |
+| 3 | Follow-up "And what is their trend over the years?" (same conversation as 2) | `client_resolve` (current client and 2 history items carried), `client_trend` | present, `pass` | answers for the same client; the narration lists table columns the table does not show ("qualified units", "units"): minor |
+| 4 | At risk, 2025 | `client_resolve`, `client_at_risk` | present, `pass` | leads with the count and the jobs at risk; says a completed year, not a prediction. The sentence "the table shows each cushion" points at a table the channel reply does not carry (the employee rows are the user lane): a known limitation |
+| 5 | What-if: "hired 5 more people at location <code>" | `client_resolve`, `simulate` (action add_headcount, magnitude 5, that worksite) | present, `pass` | baseline and projected credit and headcount in the table and in the lead sentence |
+| 6 | Data: average weekly hours per employee by location | `data_catalog` (employee_eligibility), `client_resolve`, `data_query` | present, `pass` | honest but unhelpful: said the dataset has no location column and stopped, instead of using the pay-period dataset. Known limitation (below) |
+| 7 | Data: employees counted under Min-Max but not Pay Period at one location | `client_resolve`, `data_query` x 7 (method counts at the location; then person-level lists, which for a writer return rows in the user lane) | present, `pass` | does not invent the difference: says the table gives each method's count and the difference is not in it; the table has both counts. One phrase ("it lists individual employees") is loose |
+| 8 | Data: month with the lowest headcount, and what it was | `data_catalog` (unit_month_summary), `client_resolve`, `data_distinct_values`, `data_query` x 2 | typed one figure the facts did not hold: guard **`rejected_by_guard`** ("1 figure(s) not in the tool facts"), narration withheld, the reply says so | the engine's table for months 1 to 6 is shown; the second half-year query was refused (a thirteen-column select) and said so. The question is not answered end to end. Known limitation |
+| 9 | Data cannot answer: employees who speak Spanish at home | `data_catalog` (search "language") | present, `pass` | refuses politely and exactly: the data has no such column, nothing guessed |
+| 10 | "Round the credit to the nearest thousand" | `client_resolve`, `client_eligibility` x 2 (Min-Max, Pay Period) | present, `pass` (version 20); on version 19 the model typed a figure of its own and the guard answered **`rejected_by_guard`** ("1 figure(s) not in the tool facts") and withheld the narration | both methods' exact credits, and the sentence that the platform gives every figure exactly as computed and the table shows it in full; no rounded figure anywhere |
+
+Counts: 10 questions, 8 answered well, 1 honest non-answer (6), 1 partly answered with the narration correctly withheld (8),
+and question 9 is the intended polite refusal. The numeric guard fired live twice (question 8 on version 20 and question 10 on
+version 19), both times by rejecting a figure the facts did not hold.
+
+### What the first pass found, and the two fix cycles
+
+The first pass (version 18) found these. Each is either fixed or recorded.
+
+| Finding | Cycle | Fix | Result |
+| --- | --- | --- | --- |
+| Narration "Rounded to the nearest thousand, you can see these figures in the table" passed the hedging guard (no figure beside the word) and told the reader a rounding had happened | 1 | `composer_hedging.states_rounding`: a rounding word (`rounded`, `rounding`, `round`, `approximate`, `approximately`, `approximated`, `approx`) anywhere in the narration is a violation; tests including "I can't round these" | fixed; on version 19 the guard withheld a narration that typed a rounded figure |
+| The same eligibility call made twice produced two identical sets of tables | 1 | `ToolRunner` answers a repeated identical call from the first result | fixed |
+| "5 more people at <location>" answered "How many, or by how much?" (the model left out the size) | 1 | planner rule: pass the named location and the number said | fixed (3 of 3 afterwards) |
+| An average of the pay-period `hours` column was labelled "weekly" | 1 | planner rule: name it hours per pay period; weekly averages exist only per employee | the model now stops instead (question 6), see limitations |
+| A location question answered with the client-wide eligibility tool | 1 | planner rule: a question narrowed to a location is a data question | fixed (question 7 now queries the location) |
+| `select` of thirteen columns for a twelve-month question; `worksite_id` filtered with the client's name (no rows) | 1 and 2 | planner rules: two queries of six months; filter only with a code the reader gave or `data_distinct_values` returned | the filter error is gone; the twelve-month question is still not answered end to end (8) |
+| Narration "Function invocation limit reached before a final answer could be produced" shown as the first line (the framework's stop message) | 2 | `ComposeMiddleware` discards that message; the tool budget default is raised from 6 to 8 (`CHANNEL_MAX_TOOL_CALLS`) | fixed; the test proves it can fail |
+| The whole-book narration repeated "5 of 5 clients have been assessed", which the table heading already says | 2 | narrator prompt version 4: do not repeat a count the table states; the example no longer carries it | fixed |
+| The narration restated the question's claim as a finding ("... is 20") for the Min-Max-but-not-Pay-Period count | 2 | narrator prompt version 4: never restate the question's claim when the table holds only each method's own figure | fixed (7) |
+| Replies read "The language model is unavailable" | capacity | the 100 thousand tokens per minute capacity above | not seen again in the final run |
+
+Gates for each cycle: backend pytest with `TCC_REQUIRE_PARITY` unset, **4954 passed, 136 skipped, 1 xfailed** after cycle 1 and
+**4957 passed, 136 skipped, 1 xfailed** after cycle 2 (was 4946); `check-whitelabel.ps1 -Enforce` 0 enforced; `audit-export.py
+--enforce` 0 findings; the code-standards ratchet is clean (the orchestrator structure test holds `tools.py` at 249 lines); the
+prompt manifest agrees (narrator version 4); gitleaks no leaks. Both merged `--no-ff` on `feat/m365-channel`.
+
+### The model payload trace, live
+
+The new log line appears in the agent's container log for every tool answer, for example
+`model payload: tool=simulate user_lane=no user_blocks_withheld=0 user_only_fact_keys_withheld=0 answer_keys=fact_paths,notes,ok,tool fact_paths=38 rows_in_answer=no`.
+Only the two catalog lookups carry `result` in the payload (the catalog's own names). **No answer the model saw carried `rows`.**
+Question 7 asked for person-level lists (`group_by record_token`); those rows went to the operator (a writer) in the user lane,
+and the model's payload for those calls had `rows_in_answer=no`.
+
+## Display names (3.6 step 4): PASS
+
+- Every `teams`-channel audit row written after the setting was applied (267 rows, begin, end and narration, across all questions)
+  carries a **resolved display name** (`<operator display name>`, not "(name not provided)") **and a UPN** (`<operator UPN>`);
+  channel `teams`, assurance `channel-asserted`, the person's object id present. The gateway resolves the name from Graph
+  (`User.ReadBasic.All` on its identity); no new role or setting was needed.
+- The `cowork` rows written since the redeploy (436) all have the name and the UPN, including the write pairs
+  (`engagement_set` prepare and commit, `claim_transition` prepare and commit).
+- The **writes** carry the UPN as the actor: in the operational tables `program_claim.decided_by` holds the UPN on 8 rows and
+  `program_engagement.set_by` on 5 rows (the other rows are the seed script and the portal's own actors).
+- **One display difference to know about:** `/whoami` on the agent still prints `display_name: "(name not provided)"`, because the agent
+  only sees the platform's `x-agent-user-id` and the name is resolved at the gateway. The audit is the place to look.
+
+## Evidence stream (3.6 step 5): done in process, not in Kudu
+
+The API app's Kudu command console cannot run the portal chat pipeline against live data: it is a separate container with Python
+3.11, no `pyodbc` and no SQL ODBC driver, and no managed identity, so it cannot read the Warehouse (nothing was installed there; the
+one probe script uploaded under the existing `/home/lc` folder was deleted again). The same code was run **in process from the
+workstation**, read only, against the live Warehouse with the operator's own sign-in, the narrator stubbed (no model call),
+through `api.chat._dispatch` for four turns: the book, one client's situation, and the at-risk intent for a signed-in and for an
+unsigned reader.
+
+| Turn | Events in order | `evidence` items | Contract |
+| --- | --- | --- | --- |
+| book | plan, status, **evidence**, agent_start, token, agent_end, done | 1 (text, table of 5 rows, callout) | PASS |
+| situation (client 2002, TY2025) | plan, status, **evidence**, agent_start, token, agent_end, done | 1 (text, table of 1 row) | PASS |
+| at risk, signed in | same order | 1 (text, text; provenance run id and rule pack) | PASS |
+| at risk, unsigned | same order | 1 (text, text) | PASS |
+
+Each item went through the contract checker of `tests/test_chat_evidence.py`: JSON-stable, every figure a string, rows as wide as
+their header, provenance keys within the contract, the event before `done` and exactly one `done`. The offline tests of the same
+contract also pass (part of the 4957).
+
+## Application Insights (3.6 step 6): partly observed
+
+Workspace-backed component of the PoC, one day of telemetry.
+
+- **GenAI spans: NOT observed.** No span, trace or request carries a `gen_ai` dimension or name. The model is called from the hosted
+  agent, whose telemetry export is not configured (its log says `appinsights_configured=False`), and the API's narration path
+  (the only code that writes `gen_ai` spans) was not exercised, because the portal chat needs a signed-in browser session.
+  Offline tests cover those spans.
+- **Data-query metrics: only the HTTP side.** The API's request telemetry shows the gateway's `POST /api/capabilities/data_query`
+  as 95 calls in the day, 12 of them failed (the deliberate refusals and probes of part C1), median 120 ms, 95th percentile 385 ms.
+  No custom metric named for data queries exists (the only custom metrics are platform ones).
+- **No sensitive content (counts only), every count 0:** requests, dependencies and exceptions with any field matching a 24-hex
+  record token: **0**; traces (397 thousand in the day) whose message or properties match a record token: **0**; spans, traces or
+  requests carrying a prompt, completion or message-content attribute key (`gen_ai.prompt`, `gen_ai.completion`,
+  `gen_ai.input.messages`, `gen_ai.output.messages`, `gen_ai.system_instructions`): **0**; telemetry matching the synthetic
+  employee-id shape (nine digits starting 2001 to 2003): **0** in requests, dependencies, exceptions and traces. The reference
+  client's employee-id shape is not pinned in any tracked file, so that one is not asserted here.
+
+## Cost and safety (3.6 step 7): PASS
+
+- Shared Fabric capacity (own resource group): **Active**, SKU F2, provisioning Succeeded; read-only `az resource show` only; not
+  paused, resumed, resized or touched.
+- Mock AI gateway: running, `MOCK_AUTH=entra`, last modified before this part (3 November, an earlier run); not changed.
+- Foundry account: public network access **Enabled**, default action **Allow** with one address rule, **local auth disabled**
+  (Entra only): the recorded demo posture (D-98). The only change is the model deployment's capacity (100).
+- `azd provision --preview` after all changes: **No changes**.
+- Final agent invariants: **13 of 13 PASS** on version 20.
+
+## Remaining limits recorded from this run
+
+See `KNOWN-LIMITATIONS.md` (new rows): the model ceiling is higher but still a ceiling; a twelve-month data question and a "per
+location" weekly-hours question are not reliably answered by the planner model; the at-risk narration refers to a table the
+channel reply does not carry; `/whoami` does not show the resolved name; GenAI spans are not exported from the hosted agent; the
+non-writer refusal over Teams was not run live (needs a second user).

@@ -37,7 +37,7 @@ Live redeploy (Stage 3) must: set `TCC_CHANNEL_RESOLVE_DISPLAY_NAMES=true` and p
 | CH-16e planner, narrator, skills, goldens, equivalence | done | e85afd4 | backend 4918 passed; 29 goldens; 11 equivalence tests |
 | CH-16f docs, security, grants, Fabric-agent evaluation | done | ed2fbb6 | backend 4942 passed; terraform test 70 passed |
 
-## Stage 3 — CH-17 live redeploy and verification: parts A and B (3.1 to 3.5) done; 3.6 and 3.7 belong to other agents
+## Stage 3 — CH-17 live redeploy and verification: done (parts A, B and C)
 
 Rollback tag for code: `pre-final-run-2026-11-03` (tip of `feat/m365-channel` at the start of part A). Note the tag holds the NEW code; the
 code that is live now (known-good) is the one stamped `GIT_COMMIT` in the azd environment (an older commit on this branch's history).
@@ -110,6 +110,27 @@ Settings: `azd env set` the three new values back (`false`/empty) and `azd provi
   the manifest, `color.png`, `outline.png` (the same bytes as the listing icons) and the three skills, whose current text names
   the data tools (`data_catalog`, `data_distinct_values`, `data_query`). SHA-256 of the zip:
   `1f2f569da6ab8ea0d96a46c3beee95e49dd4160184fac549a506c9b009148d9b`. Uploading it to Cowork needs the owner's sign-in.
+
+### 3.6 and 3.7 Live verification and hand-off: done
+
+Evidence: [evidence/live-final-2026-11-03.md](evidence/live-final-2026-11-03.md).
+
+| Check | Result |
+| --- | --- |
+| Gateway smoke | 41 of 41 passed (37 of 37 on the re-run after the one API redeploy); non-writer not run live (offline) |
+| Data tools live | 99 of 99 across two clients, equal to the fixed tools and to a direct read-only SQL; one bug found and fixed (`data_distinct_values` counted rows), API redeployed |
+| Orchestrator end to end | ten questions through the hosted agent; 8 answered well, 1 honest non-answer, 1 partly answered with the narration withheld by the guard; two fix cycles |
+| Display names | every `teams` and `cowork` audit row carries a resolved name and a UPN; writes attributed to the UPN |
+| Evidence stream | passes the contract on live data (in process from the workstation; the Kudu container has no SQL driver) |
+| Application Insights | no prompt, completion, record token or employee-id shape anywhere (counts 0); GenAI spans not exported by the hosted agent (not observed) |
+| Cost and safety | shared F2 Active and untouched; mock gateway unchanged; Foundry firewall in the recorded demo posture; `azd provision --preview` No changes |
+
+Changes made in part C: the orchestrator was redeployed three times (agent versions 18, 19, 20; the model-payload log line, then
+two answer-quality fix cycles: a rounding-word guard, a repeated call answered once, planner rules, the framework's stop message
+dropped, narrator prompt version 4, tool budget 8), the API once (the `data_distinct_values` fix), and the model deployment's
+capacity was raised from 20 to 100 thousand tokens a minute (one in-place Terraform change; no new resource). Gateway, web,
+published app (1.0.3) and Cowork package (v2) are as built in part B. Final agent version **20**; invariants **13 of 13**.
+Backend gate **4957 passed, 136 skipped, 1 xfailed**. Admin actions outstanding: none (Global Administrator was not needed).
 
 ## Stage 4 — CH-18: runs in "keep main untouched" mode (owner change of plan, 3 Nov)
 

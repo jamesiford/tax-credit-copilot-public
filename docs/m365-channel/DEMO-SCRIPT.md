@@ -102,6 +102,24 @@ programmes from the rule-pack library, as possibilities; the what-if's figures l
 year is a run-rate estimate and says so); and the calculation trail, step by step, with its evidence hash.
 The what-if's size (2) and the year are *yours*: if you leave out the number it asks how many.
 
+### 1.6b Nuanced data questions (CH-17)
+
+These go through the governed data tools (`data_catalog`, `data_query`) against a synthetic client, and each is checked live.
+Ask them one at a time, about a minute apart is plenty now; each answer shows the engine's table with its source line.
+
+> **How many employees were counted under Min-Max and under Pay Period at GA_GA-001 for Northwind Care Systems in 2025?**
+> **Which jobs are at risk at Northwind Care Systems in 2025?**
+> **How many Northwind Care Systems employees speak Spanish at home?**
+> **Round the credit to the nearest thousand for Northwind Care Systems in 2025.**
+
+*Expect:* the first returns both methods' counts at that location in a table and says the *difference* is not in it (it never
+subtracts for you); the second gives the count and the jobs at risk for a completed year; the third is a polite, exact refusal
+(the data has no such column; nothing is guessed); the fourth shows both methods' credits exactly and says the platform gives every
+figure exactly as computed (no rounded figure, ever: a narration that rounds is withheld by the guard).
+*Known weak spots, say so if asked:* "which month had the lowest headcount" (a twelve-month series: it shows the first half-year
+and says the rest needs a second query) and "average weekly hours per employee by location" (no single fact holds it); both are in
+[KNOWN-LIMITATIONS](KNOWN-LIMITATIONS.md). A follow-up that says "their" works inside one conversation ("And what is their trend?").
+
 ### 1.7 A change, with the confirm step
 
 > **Mark Cascade's GA_JTC engagement as in scope**
@@ -263,17 +281,36 @@ arrate row per turn). There is no flag that forces a bad narration; skip the blo
 
 ### Retry in Teams (after the CH-14 fix), exactly
 
-The earlier silence was a deployment fault, not Teams: see [D-100](DECISIONS.md). Do this, in order:
+> **Superseded by the CH-17 list below for the icon and the package.** Kept for the diagnostics.
 
 1. Use **Teams on the web in an InPrivate window**. Open the app from *Your agents* (or the share link). If you installed **either** app package by sideloading, remove it first and
-   keep exactly **one** install: the publish package (`publish-appPackage-v1.0.2.zip`) and azd's sideload package share one app id and one bot id.
-2. If the agent still shows as delivered with no reply, re-upload the package as a **new version** (the publish package is manifest 1.0.2; the next publish is 1.0.3) as an admin
+   keep exactly **one** install: the publish package (`publish-appPackage-v1.0.3.zip`) and azd's sideload package share one app id and one bot id.
+2. If the agent still shows as delivered with no reply, re-upload the package as a **new version** (the publish package is manifest 1.0.3 as published; the service stamps the download one patch higher) as an admin
    (Teams admin center, Manage apps, Upload new app), check the app's status is **Allowed**, then refresh the client.
 3. Send `/whoami`. Expect JSON with `identity.resolved: true`, your object id, a source (`original-subject`, `platform` or `agent-user-id`), and under
    `signals.agent_user_id` its `kind` (`guid`) and `equals_an_oid_signal`. Paste it into the private notes.
 4. Send `Which of our clients is closest to a threshold and what should I say if I call them?`. Expect a sentence or two, then the ranked table and the disclaimer.
 5. Run `pwsh scripts/channel-smoke.ps1 -Since '<UTC time just before you typed>'`; the audit rows must show `channel=teams`, `identity_assurance=channel-asserted`, your id and
    a `narrate` row with `guard=pass`.
+
+### Retry after CH-17 (agent version 20, app 1.0.3): in this order
+
+What changed since the last retry: the agent has a new **icon** (published as 1.0.3), the display name and UPN are resolved in the
+audit, the data tools answer nuanced questions, and the Cowork package is **v2**. The agent is **version 20** and the checks are green.
+
+1. **Teams on the web, InPrivate window.** Remove the old app first (Apps, Manage your apps, the agent, Remove), then add
+   `publish-appPackage-v1.0.3.zip` (or the share link): **one install only**. The new icon shows only after the old app is gone.
+2. Send `/whoami`. Expect `version: 20`, `identity.resolved: true`, source `agent-user-id`. The display name there still reads
+   "(name not provided)" (the agent sees no name; the audit has it, step 6).
+3. Ask the whole-book question ("Who should we call first and why?"), a client brief, then "their" in the same chat.
+4. Ask the nuanced questions of 1.6b, one at a time. If a reply says the language model is unavailable, wait a minute and ask again.
+5. Try a what-if and a write with `confirm` (1.6, 1.7), then move the row back.
+6. Run `pwsh scripts/channel-smoke.ps1 -Since '<UTC time before step 3>'`: `channel=teams`, your display name and UPN on every row, `narrate` rows.
+7. **Copilot Chat:** find the agent under *Your agents* and run the same three prompts.
+8. **Cowork:** upload `tcc-cowork-plugin-registered-v2.zip` (Sources and Skills, Plugins; or `atk install --file-path <zip> --scope Personal`),
+   sign in when asked, run W1 and W2 (3.1, 3.2), then show the audit. If the first sign-in fails with an invalid-scope error,
+   remove `offline_access` from the registration's scope.
+9. When finished, switch the diagnostics off ([DEMO-CLEANUP](DEMO-CLEANUP.md)).
 
 ### Troubleshooting: the agent does not answer
 

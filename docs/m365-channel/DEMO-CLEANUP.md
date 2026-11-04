@@ -130,7 +130,13 @@ People who were writers only through the group can read afterwards but not chang
 `GroupMember.Read.All` grant to the gateway and API identities is no longer needed once the group
 source is off; revoke it if nothing else uses it.
 
-## After all five
+## 6. The model capacity (raised in CH-17)
+
+The Foundry model deployment was raised from 20 to 100 thousand tokens a minute (the overlay value `foundry_capacity`), because
+two data questions in a minute drew a `429`. It costs nothing idle. To put it back: remove the `foundry_capacity = 100` line from the
+overlay's tfvars file (and its copy under `infra/`), run `azd provision`, and confirm `azd provision --preview` shows no changes.
+
+## After all six
 
 ```pwsh
 terraform -chdir=infra plan -detailed-exitcode   # 0: nothing left to change
