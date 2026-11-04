@@ -17,7 +17,7 @@ def claim_cell_history(client_id: int, program_code: str, tax_year: int) -> Tool
     claim" and "a claim worth nothing" are different statements.
     """
     from application.queries.get_coverage import ClaimNotFound, GetCellHistoryQuery
-    from application.wiring import get_mediator
+    from application.services import get_mediator
 
     try:
         facts = get_mediator().send(

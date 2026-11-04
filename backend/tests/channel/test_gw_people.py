@@ -14,7 +14,7 @@ import logging
 import httpx
 import pytest
 
-from application import channel_wiring
+from bootstrap import channel_wiring
 from application.display_names import PLACEHOLDER_NAME, ResolvedPerson
 from channel.config import load_settings
 from gateway_harness import (

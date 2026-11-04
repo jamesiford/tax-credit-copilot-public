@@ -48,7 +48,7 @@ def next_claim(current: ProgramClaim, command: TransitionClaimCommand) -> Progra
 
 
 def current_claim(command: TransitionClaimCommand) -> ProgramClaim:
-    from application.wiring import get_claim_repository
+    from application.services import get_claim_repository
 
     current = get_claim_repository().current(command.client_id, command.program_code, command.tax_year)
     if current is None:
@@ -60,6 +60,6 @@ def current_claim(command: TransitionClaimCommand) -> ProgramClaim:
 
 
 def handle_transition_claim(command: TransitionClaimCommand) -> dict[str, Any]:
-    from application.wiring import get_claim_repository
+    from application.services import get_claim_repository
 
     return get_claim_repository().record(next_claim(current_claim(command), command)).to_dict()

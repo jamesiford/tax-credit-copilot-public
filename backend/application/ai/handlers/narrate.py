@@ -8,7 +8,7 @@ from domain.ai import ModelEvent
 
 
 async def handle_narrate_brief(query: NarrateBriefQuery) -> AsyncIterator[ModelEvent]:
-    from application.wiring import get_narration_service
+    from application.services import get_narration_service
 
     async for event in get_narration_service().stream(query.agent_name, query.prompt):
         yield event

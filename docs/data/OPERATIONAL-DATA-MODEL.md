@@ -722,6 +722,6 @@ discussion, both 2026-08-20. Companion to `DATA-REQUIREMENTS.md` (inbound data),
 `SOURCE-SCHEMA-MAPPING.md` (Bronze/Silver).
 
 Build status in §0 verified against `infra/main.bicep`,
-`backend/application/wiring.py` and `backend/infrastructure/persistence/` at
+`backend/application/wiring.py` (now `backend/bootstrap/wiring.py`) and `backend/infrastructure/persistence/` at
 commit `d1beefe`.
 

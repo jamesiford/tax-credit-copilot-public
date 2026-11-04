@@ -136,7 +136,7 @@ def test_counters_carry_only_provider_scope_and_agent(otel):
 
 
 def test_the_composed_stack_is_observed_and_still_leaks_nothing(otel):
-    from application import wiring
+    from bootstrap import wiring
     from tests.ai_fakes import install_providers
     from application.ai.requests import NarrateBriefQuery
     from domain.ai import NarrationUnavailable

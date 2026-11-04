@@ -28,7 +28,7 @@ from decimal import Decimal
 
 import pytest
 
-from application import wiring
+from bootstrap import wiring
 from application.capabilities.envelope import DISCLAIMER
 from channel.render import VERBATIM
 from parity_cases import CASES, NAME, YEAR, Case

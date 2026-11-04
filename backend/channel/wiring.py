@@ -2,7 +2,7 @@
 
 Explicit, in one place, like `application/wiring.py` is for the API: what the gateway
 is made of and where each piece comes from. It composes through
-`application.channel_wiring` (audit trail, writer entitlement), which imports no
+`bootstrap.channel_wiring` (audit trail, writer entitlement), which imports no
 query, command or framework, so the gateway never loads the engine.
 
 Every collaborator can be handed in, which is how the tests run the whole gateway
@@ -13,7 +13,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
-from application import channel_wiring
+from bootstrap import channel_wiring
 from channel.api_client import ApiClient, managed_identity_token
 from channel.auth import CallerAuthenticator
 from channel.config import GatewaySettings

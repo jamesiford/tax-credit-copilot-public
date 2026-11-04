@@ -13,7 +13,7 @@ from fastapi import APIRouter, HTTPException
 from fastapi import Query as QueryParam
 
 from application.queries.get_proximity import GetProximityQuery, ProximityNotAvailable
-from application.wiring import get_mediator
+from bootstrap.wiring import get_mediator
 
 router = APIRouter(prefix="/api/proximity", tags=["proximity"])
 

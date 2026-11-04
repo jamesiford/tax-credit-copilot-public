@@ -58,7 +58,7 @@ def handle_get_in_year_progress(query: GetInYearProgressQuery) -> dict[str, Any]
         ProximityNotAvailable,
         handle_get_proximity,
     )
-    from application.wiring import get_gold_reader
+    from application.services import get_gold_reader
     from tools.forecast import project_state_year_end
 
     state = query.state.upper()

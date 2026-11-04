@@ -12,7 +12,7 @@ from pathlib import Path
 
 import pytest
 
-from application import wiring
+from bootstrap import wiring
 from application.ai.requests import NarrateBriefQuery, RouteQuestionQuery
 from application.ai.safety.injection import PromptInjectionGuard
 from application.ai.safety.untrusted import CLOSE, MAX_CHARS, OPEN, UntrustedText, defang

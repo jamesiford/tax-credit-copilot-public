@@ -12,7 +12,7 @@ from __future__ import annotations
 import pytest
 from fastapi.testclient import TestClient
 
-from application import wiring
+from bootstrap import wiring
 from application.deployment import (
     DeploymentConfigurationError, auth_mode, check_deployment_configuration, explicit_local_dev,
 )

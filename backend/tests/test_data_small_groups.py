@@ -19,8 +19,8 @@ from application.data.small_groups import (
 )
 from application.data.executor import Rows
 from application.data.spec import QuerySpec
-from application.data_wiring import limits_from_env, set_data_query_service
-from application.channel_wiring import set_writer_entitlement
+from bootstrap.data_wiring import limits_from_env, set_data_query_service
+from bootstrap.channel_wiring import set_writer_entitlement
 from tests.data_caps_fixture import CLIENT, READER_OID, WRITER_OID, person
 from tests.small_group_fixture import install
 

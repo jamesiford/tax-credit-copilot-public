@@ -21,8 +21,8 @@ from typing import Any
 
 from application.capabilities import catalog
 from application.capabilities.invoke import CapabilityFailure, invoke
-from application.channel_wiring import set_writer_entitlement
-from application.data_wiring import set_data_query_service
+from bootstrap.channel_wiring import set_writer_entitlement
+from bootstrap.data_wiring import set_data_query_service
 from tests.ai_evals.harness import HERE, EvalResult
 from tests.data_caps_fixture import Writers, make_service, person
 

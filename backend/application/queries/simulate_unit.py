@@ -257,7 +257,7 @@ def run_rate_credit(
 
 def handle_simulate_unit(query: SimulateUnitQuery) -> dict[str, Any]:
     from application.queries._client_run import ClientRunNotAvailable, resolve_client_run
-    from application.wiring import get_gold_reader
+    from application.services import get_gold_reader
     from domain.calculation.onezero import run_min_max_method, run_pay_period_method
     from tools.simulation import apply_onezero_lever
 

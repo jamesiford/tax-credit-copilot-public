@@ -36,6 +36,6 @@ def build_engagement(command: SetEngagementCommand, at: datetime | None = None) 
 
 
 def handle_set_engagement(command: SetEngagementCommand) -> dict[str, Any]:
-    from application.wiring import get_claim_repository
+    from application.services import get_claim_repository
 
     return get_claim_repository().set_engagement(build_engagement(command)).to_dict()

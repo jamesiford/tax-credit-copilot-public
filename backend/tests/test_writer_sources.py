@@ -12,7 +12,8 @@ import logging
 import httpx
 import pytest
 
-from application import channel_wiring, writer_alert
+from application import writer_alert
+from bootstrap import channel_wiring
 from application.writer_alert import EVENT, LOGGER_NAME, denial_counts
 from infrastructure.auth.writers import DenyOnFailure, EitherEntitlement, EntraGroupEntitlement
 

@@ -77,7 +77,7 @@ def handle_get_proximity(query: GetProximityQuery) -> dict[str, Any]:
       miss that the run had already counted.
     """
     from application.queries._client_run import resolve_statute
-    from application.wiring import get_gold_reader
+    from application.services import get_gold_reader
     from domain.calculation.proximity import BAND_CURVE_HOURS, band_curve, near_miss_cohort
 
     # Statute first. An unauthored year and an unmapped state are facts about
@@ -205,7 +205,7 @@ def attach_rest_of_year(
     """
     import logging
 
-    from application.wiring import get_gold_reader
+    from application.services import get_gold_reader
     from domain.calculation.proximity import rest_of_year
 
     try:

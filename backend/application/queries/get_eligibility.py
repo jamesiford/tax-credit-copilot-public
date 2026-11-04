@@ -122,7 +122,7 @@ def handle_get_eligibility(query: GetEligibilityQuery) -> dict[str, Any]:
     Statute and fiscal window are still resolved, because the page states both
     and because the floors draw the near-floor band. Payroll is not loaded.
     """
-    from application.wiring import get_gold_reader
+    from application.services import get_gold_reader
     from application.queries._client_run import resolve_statute
 
     resolved = resolve_statute(

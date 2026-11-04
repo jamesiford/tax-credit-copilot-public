@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import pytest
 
-from application import wiring
+from bootstrap import wiring
 from infrastructure.persistence.sqlite_claims import SqliteClaimRepository
 from infrastructure.persistence.sqlite_findings import SqliteFindingRepository
 

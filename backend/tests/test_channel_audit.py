@@ -19,7 +19,7 @@ from pathlib import Path
 
 import pytest
 
-from application import wiring
+from bootstrap import wiring
 from application.channel_audit import AuditCall, ChannelAuditor, request_sha256, summarise_request
 from application.identity import ActingUser, NotAuthorized
 from domain.channel import ChannelAuditEvent, collapse
@@ -424,7 +424,7 @@ def test_apply_migrations_reports_two_pending_on_a_fresh_store_then_none(migrate
 def api(repo):
     from fastapi.testclient import TestClient
 
-    from application.wiring import set_channel_audit_repository
+    from bootstrap.wiring import set_channel_audit_repository
     from main import app
 
     set_channel_audit_repository(repo)
@@ -565,7 +565,7 @@ class _FakeAgent(FakeAgent):
 
 @pytest.fixture
 def action_repo(tmp_path):
-    from application.wiring import set_agent_action_audit_repository
+    from bootstrap.wiring import set_agent_action_audit_repository
     from infrastructure.persistence.sqlite_channel import SqliteAgentActionAuditRepository
 
     repository = SqliteAgentActionAuditRepository(tmp_path / "actions.db")
@@ -620,7 +620,7 @@ def test_a_failed_agent_call_is_recorded_as_failed(action_repo):
 
 
 def test_an_audit_outage_does_not_break_the_stream(monkeypatch, tmp_path):
-    from application.wiring import set_agent_action_audit_repository
+    from bootstrap.wiring import set_agent_action_audit_repository
 
     class Down:
         def append(self, action):
@@ -668,7 +668,7 @@ def test_a_deployed_process_refuses_a_non_durable_channel_store(value):
 
 
 def test_the_wiring_selects_the_adapter_the_store_names(monkeypatch, tmp_path):
-    from application import wiring
+    from bootstrap import wiring
     from infrastructure.persistence.sqlite_channel import SqliteChannelAuditRepository
     from infrastructure.persistence.sqlite_channel_state import SqliteConfirmationRepository, SqliteWriterRepository
 

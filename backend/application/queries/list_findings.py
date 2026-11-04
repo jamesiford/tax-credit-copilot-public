@@ -18,7 +18,7 @@ from typing import Any
 
 from application.mediator import Query
 from domain.calculation.headcount import row_state
-from infrastructure.payroll.pay_period_source import load_pay_periods
+from application.source_ports import load_pay_periods
 
 # What each kind of finding means, what an agent proposes, and — crucially —
 # the GRAIN a human actually decides at.
@@ -174,7 +174,7 @@ def handle_list_findings(query: ListFindingsQuery) -> dict[str, Any]:
     list: a judgement nobody has made is not the same as one that was made and
     happened to be "accept".
     """
-    from application.wiring import get_finding_repository
+    from application.services import get_finding_repository
 
     client_id, tax_year, state = query.client_id, query.tax_year, query.state
     repo = get_finding_repository()

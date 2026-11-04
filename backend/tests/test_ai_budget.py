@@ -5,7 +5,7 @@ import asyncio
 
 import pytest
 
-from application import wiring
+from bootstrap import wiring
 from application.ai.budget import InMemoryTokenBudget, estimate_tokens
 from application.ai.guarded import GuardedRuntime
 from domain.ai import AgentSpec, BudgetExceeded, ModelUsage, TextDelta

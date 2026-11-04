@@ -65,7 +65,7 @@ def handle_get_onezero_matrix(query: GetOneZeroMatrixQuery) -> dict[str, Any]:
     import json
 
     from application.queries._client_run import resolve_statute
-    from application.wiring import get_gold_reader
+    from application.services import get_gold_reader
 
     if query.account_id is None:
         raise ClientRunNotAvailable(

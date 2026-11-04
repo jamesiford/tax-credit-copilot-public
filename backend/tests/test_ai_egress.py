@@ -91,7 +91,7 @@ def test_the_guarded_runtime_refuses_before_the_provider_is_called():
 
 def test_a_policy_refusal_for_the_gateway_falls_through_to_foundry():
     install_providers(ScriptedRuntime("gateway", ["G"]), ScriptedRuntime("foundry", ["F"]), egress_policy="block")
-    from application import wiring
+    from bootstrap import wiring
     from application.ai.requests import NarrateBriefQuery
 
     async def go():
@@ -104,7 +104,7 @@ def test_a_policy_refusal_for_the_gateway_falls_through_to_foundry():
 def test_an_identifier_refuses_every_provider_so_nothing_is_narrated():
     gateway, foundry = ScriptedRuntime("gateway", ["G"]), ScriptedRuntime("foundry", ["F"])
     install_providers(gateway, foundry)
-    from application import wiring
+    from bootstrap import wiring
     from application.ai.requests import NarrateBriefQuery
 
     async def go():

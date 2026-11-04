@@ -84,7 +84,7 @@ def resolve_statute(
     pricing either from a neighbour is a wrong answer wearing a right one's
     costume [ADR-005].
     """
-    from infrastructure.payroll.fiscal_source import client_fiscal_window
+    from application.source_ports import client_fiscal_window
     from tools.credit_math import (
         PROGRAM_CODE_TO_PACK,
         STATE_TO_PACK,
@@ -143,7 +143,7 @@ def resolve_client_run(
     from a single-year one by taking a shortcut around this function.
     """
     from domain.calculation.headcount import row_state
-    from infrastructure.payroll.pay_period_source import load_pay_periods
+    from application.source_ports import load_pay_periods
 
     statute = resolve_statute(
         account_id=account_id, state=state, tax_year=tax_year

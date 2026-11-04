@@ -35,7 +35,7 @@ def test_every_setting_the_data_query_reads_is_mapped_from_a_terraform_variable(
 
 
 def test_the_terraform_settings_are_the_ones_the_code_reads():
-    code = read("backend", "application", "data_wiring.py") + read(
+    code = read("backend", "bootstrap", "data_wiring.py") + read(
         "backend", "infrastructure", "persistence", "lakehouse_sql_connection.py"
     )
     for setting in DATA_SETTINGS:

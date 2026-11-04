@@ -62,9 +62,15 @@ before moving code. The essentials:
   math, no row mutation, no multi-step business logic in a route.
 - **`tools/` is deterministic compute.** Data in, data out, calculation-trail
   rows recorded. Never imports from `api/`. This is the audit boundary.
-- **Composition lives in `application/wiring.py`.** Repository selection is
-  there, not in a router. A use case that has to import `api.claims` to find its
-  own store drags FastAPI into every caller. The one remaining exception,
+- **Composition lives in `backend/bootstrap/`** (`wiring.py` and its siblings), the
+  outermost ring. Repository selection is there, not in a router. A use case that
+  has to import `api.claims` to find its own store drags FastAPI into every caller,
+  and one that imports `infrastructure` has the adapter layer underneath it:
+  **`application` imports nothing from `infrastructure` or `bootstrap`**, and
+  `domain` imports only the standard library and itself. A handler asks for its
+  collaborators through `application/services.py` (and the payroll and Gold ports in
+  `source_ports.py` / `gold_ports.py`); `bootstrap` binds the adapters to those names.
+  `tests/test_architecture_layers.py` fails on a breach, SDKs included. The one remaining exception,
   `api/_assess.py`, is allow-listed by name in the architecture test with the
   reason — it is an application service still filed under `api/` because it
   depends on `api/_payperiods.py`, a payroll reader that raises `HTTPException`.
@@ -1451,7 +1457,8 @@ cd frontend ; npm test ; npm run build
 ```
 backend/
   api/              FastAPI routers — thin, orchestrate only
-  application/      Commands, queries, the mediator, and the composition root
+  application/      Commands, queries, the mediator, and the ports they ask for
+  bootstrap/        The composition root: the only package that names an adapter
   domain/           Entities, ports, and the pure calculation
   infrastructure/   Adapters behind those ports
   tools/            Services around the core: rule loading, runners, portfolio

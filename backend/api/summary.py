@@ -146,7 +146,7 @@ async def _stream(app: Any, req: SummaryRequest) -> AsyncIterator[str]:
 
     yield _sse("brief", {"page": brief["page"], "headline": brief["headline"], "caveats": brief["caveats"]})
 
-    from application.wiring import get_narration_service
+    from bootstrap.wiring import get_narration_service
 
     if not get_narration_service().available([AGENT]):
         # No model: say the computed facts rather than nothing. They are the

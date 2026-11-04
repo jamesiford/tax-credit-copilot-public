@@ -19,7 +19,7 @@ from application.capabilities.data_catalog import data_catalog
 from application.capabilities.envelope import Block, ToolResult
 from application.capabilities.errors import DataQueryRefused
 from application.capabilities.invoke import CapabilityFailure, invoke
-from application.channel_wiring import set_writer_entitlement
+from bootstrap.channel_wiring import set_writer_entitlement
 from application.identity import ANONYMOUS, ActingUser, Principal, PRINCIPAL_AGENT
 from tests.data_caps_fixture import READER_OID, WRITER_OID, data_service, person  # noqa: F401 - fixture
 from tests.test_agent_principal import OTHER_OID, api, entra  # noqa: F401 - fixtures

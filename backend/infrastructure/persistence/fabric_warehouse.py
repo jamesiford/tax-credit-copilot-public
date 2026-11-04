@@ -39,7 +39,7 @@ from contextlib import contextmanager
 from typing import Any, Iterator
 
 from config import GOLD_SCHEMA, OPS_SCHEMA  # noqa: F401 - re-exported for the adapters
-from domain.warehouse import RunManifest
+from domain.warehouse import RUN_MANIFEST_COLUMNS, RunManifest
 from infrastructure.persistence.tenant_sql import TenantScopedQuery, tenant_exempt
 
 #: Statements with no tenant: a liveness probe, and lookups by a globally unique run_id.
@@ -134,30 +134,7 @@ _TOKEN_LOCK = threading.Lock()
 _SHARED_CREDENTIAL: Any = None
 _SHARED_TOKEN: tuple[bytes, int] | None = None
 
-#: Column order is the DDL's. The insert and the row mapper both read it, so the
-#: two cannot drift into disagreeing about position.
-_MANIFEST_COLUMNS = (
-    "run_id",
-    "client_id",
-    "entity_id",
-    "program_code",
-    "tax_year",
-    "fiscal_year_begin",
-    "fiscal_year_end",
-    "source_snapshot_id",
-    "step1_assumption_set_id",
-    "step1_assumption_sha256",
-    "onezero_assumption_set_id",
-    "onezero_assumption_sha256",
-    "rule_pack_version",
-    "code_commit",
-    "calculation_id",
-    "run_started_at",
-    "run_completed_at",
-    "run_status",
-    "superseded_by_run_id",
-    "triggered_by",
-)
+_MANIFEST_COLUMNS = RUN_MANIFEST_COLUMNS
 
 
 class WarehouseNotConfigured(RuntimeError):

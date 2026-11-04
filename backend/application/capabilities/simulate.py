@@ -39,7 +39,7 @@ def simulate(
     it restates every later year rather than projecting one.
     """
     from application.queries.simulate_unit import SimulateUnitQuery, UnitSimulationNotAvailable
-    from application.wiring import get_mediator
+    from application.services import get_mediator
 
     try:
         query = SimulateUnitQuery(

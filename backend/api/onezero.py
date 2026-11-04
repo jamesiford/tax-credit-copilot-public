@@ -53,7 +53,7 @@ def onezero_matrix(
     """
     from application.queries.get_onezero_matrix import GetOneZeroMatrixQuery
     from application.queries._client_run import ClientRunNotAvailable
-    from application.wiring import get_mediator
+    from bootstrap.wiring import get_mediator
 
     try:
         query = GetOneZeroMatrixQuery(

@@ -177,7 +177,7 @@ async def _live_plan(question: str) -> list[str]:
 
 async def _live_narration(row: dict[str, Any]) -> str:
     from application.ai.requests import NarrateBriefQuery
-    from application.wiring import get_mediator
+    from bootstrap.wiring import get_mediator
     from domain.ai import TextDelta
 
     prompt = f"Summarise for a call.\n\nJSON:\n{json.dumps(row['brief'], indent=2)}"

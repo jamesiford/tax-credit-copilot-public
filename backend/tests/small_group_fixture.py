@@ -9,11 +9,11 @@ from __future__ import annotations
 import sqlite3
 from typing import Any
 
-from application.channel_wiring import set_writer_entitlement
+from bootstrap.channel_wiring import set_writer_entitlement
 from application.data.limits import QueryLimits
 from application.data.semantic_model import Source
 from application.data.service import DataQueryService
-from application.data_wiring import set_data_query_service
+from bootstrap.data_wiring import set_data_query_service
 from infrastructure.persistence.sqlite_data_query import SqliteDataQueryExecutor
 from tests.data_caps_fixture import MODEL, Writers
 from tests.data_fixture import CLIENT_A, build_database

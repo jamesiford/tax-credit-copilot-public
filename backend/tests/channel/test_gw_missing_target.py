@@ -9,7 +9,7 @@ from __future__ import annotations
 import httpx
 import pytest
 
-from application import wiring
+from bootstrap import wiring
 from gateway_harness import USER_OID, agent_headers, build_gateway
 from tests.test_agent_principal import entra, mint_app  # noqa: F401 - fixtures
 from tests.test_artifacts_api import service  # noqa: F401 - fixture

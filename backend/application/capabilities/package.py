@@ -38,7 +38,7 @@ GATEWAY_DOWNLOAD_PATH = "/channel/v1/downloads/{ticket}"
 
 
 def _repository() -> Any:
-    from application.wiring import get_confirmation_repository
+    from application.services import get_confirmation_repository
 
     return get_confirmation_repository()
 

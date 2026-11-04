@@ -41,7 +41,7 @@ from application.queries.get_coverage import (
     GetClientCoverageQuery,
     GetPortfolioCoverageQuery,
 )
-from application.wiring import get_claim_repository, get_mediator, set_claim_repository
+from bootstrap.wiring import get_claim_repository, get_mediator, set_claim_repository
 from domain.claims import (
     ClaimError,
     ClaimStatus,
@@ -59,7 +59,7 @@ _REPO: Any | None = None
 
 
 def get_repository() -> Any:
-    """The claim store. Composition lives in `application.wiring`. [ADR-002]
+    """The claim store. Composition lives in `bootstrap.wiring`. [ADR-002]
 
     Kept as a thin alias because the router and its tests already name it, and
     because a router asking the composition root for an adapter is the right

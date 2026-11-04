@@ -18,7 +18,7 @@ from application.mediator import (
     Mediator,
     Query,
 )
-from application.wiring import build_mediator
+from bootstrap.wiring import build_mediator
 
 
 @dataclass(frozen=True)

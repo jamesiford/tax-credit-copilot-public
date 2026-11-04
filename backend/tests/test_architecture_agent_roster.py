@@ -87,7 +87,7 @@ def test_only_the_roster_builds_an_agent_spec_or_loads_a_prompt_for_one():
 
 
 def test_the_publisher_is_fed_by_the_roster_and_nothing_else():
-    wiring = (BACKEND / "application" / "ai_wiring.py").read_text(encoding="utf-8")
+    wiring = (BACKEND / "bootstrap" / "ai_wiring.py").read_text(encoding="utf-8")
     assert "from agents.factory import all_specs" in wiring and "SpecRegistry(all_specs())" in wiring
     for stem in ("foundry_prompt_agents", "foundry_publish", "foundry_model_connection"):
         text = (BACKEND / "infrastructure" / "ai" / f"{stem}.py").read_text(encoding="utf-8")

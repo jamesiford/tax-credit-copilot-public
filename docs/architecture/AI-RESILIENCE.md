@@ -15,7 +15,7 @@ GuardedRuntime        egress check → token budget           (application/ai/gu
           the provider (Foundry, Foundry connection, gateway, a fake)
 ```
 
-Built once, in `application/ai_wiring._decorate`, for every provider — adding a
+Built once, in `bootstrap/ai_wiring._decorate`, for every provider — adding a
 provider adds no resilience code. The decorators live in
 `infrastructure/ai/resilience/` and take a `Clock`, so tests run on virtual time.
 

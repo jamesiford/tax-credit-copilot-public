@@ -35,7 +35,7 @@ def create_claim_package(client_id: int, request: Request, tax_year: int = Query
 @router.get("/{client_id}/artifacts/{artifact_id}")
 def download_artifact(client_id: int, artifact_id: str, request: Request) -> Response:
     """Stream an artifact the caller may see, recording served/denied/missing."""
-    from application.wiring import get_artifact_service
+    from bootstrap.wiring import get_artifact_service
 
     result = get_artifact_service().get(current_principal(request), client_id, artifact_id)
     if result.outcome == "not_found":

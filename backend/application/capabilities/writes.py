@@ -57,7 +57,7 @@ def _audit_call(spec: WriteSpec, kind: str, principal: Principal, args: Mapping[
 
 
 def _prepare(base: str, principal: Principal, args: Mapping[str, Any]) -> ToolResult:
-    from application.wiring import get_channel_auditor, get_confirmation_service
+    from application.services import get_channel_auditor, get_confirmation_service
 
     spec, args, service = SPECS[base], _clean(args), get_confirmation_service()
     with get_channel_auditor().audited(_audit_call(spec, "write_prepare", principal, args)) as handle:
@@ -84,7 +84,7 @@ def _prepare(base: str, principal: Principal, args: Mapping[str, Any]) -> ToolRe
 def _commit(
     base: str, principal: Principal, arguments: Mapping[str, Any], token: str, idempotency_key: str,
 ) -> ToolResult:
-    from application.wiring import get_channel_auditor, get_confirmation_service, get_mediator
+    from application.services import get_channel_auditor, get_confirmation_service, get_mediator
 
     spec, args, service = SPECS[base], _clean(arguments), get_confirmation_service()
     with get_channel_auditor().audited(_audit_call(spec, "write_commit", principal, args)) as handle:

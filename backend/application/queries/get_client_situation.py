@@ -49,7 +49,7 @@ def with_client_name(
 
 
 def handle_get_client_situation(query: GetClientSituationQuery) -> dict[str, Any]:
-    from application.wiring import get_claim_repository
+    from application.services import get_claim_repository
     from domain.coverage import situation
 
     repo = get_claim_repository()

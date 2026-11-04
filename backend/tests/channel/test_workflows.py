@@ -21,7 +21,7 @@ import re
 import pytest
 from openpyxl import load_workbook
 
-from application import wiring
+from bootstrap import wiring
 from application.capabilities import registry
 from channel.render import VERBATIM, provenance_line
 from test_simulate_unit import SITE, cascade, wired  # noqa: F401 - fixtures

@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import pytest
 
-from application import wiring
+from bootstrap import wiring
 from tests.test_capabilities_api import agent_headers, post
 from tests.test_agent_principal import api, entra  # noqa: F401 - fixtures
 from tests.test_channel_writes import world  # noqa: F401 - fixture

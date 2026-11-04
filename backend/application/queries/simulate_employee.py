@@ -240,7 +240,7 @@ def handle_simulate_employee(query: SimulateEmployeeQuery) -> dict[str, Any]:
         _signed_margin, _unit_reading, location_series, open_year_months, price_location_year,
         run_rate_credit, RUN_RATE_BASIS,
     )
-    from application.wiring import get_gold_reader
+    from application.services import get_gold_reader
     from domain.calculation.onezero import run_min_max_method, run_pay_period_method
     from tools.tokens import record_token
 

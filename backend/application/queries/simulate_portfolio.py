@@ -62,8 +62,7 @@ class PortfolioSimulationNotAvailable(LookupError):
 
 def handle_simulate_portfolio(query: SimulatePortfolioQuery) -> dict[str, Any]:
     from domain.calculation.headcount import average_headcount, rows_for_state_year
-    from infrastructure.payroll.fiscal_source import window_for_state_year
-    from infrastructure.payroll.pay_period_source import load_portfolio_pay_periods
+    from application.source_ports import load_portfolio_pay_periods, window_for_state_year
     from tools.credit_math import (
         PROGRAM_CODE_TO_PACK,
         STATE_TO_PACK,

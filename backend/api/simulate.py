@@ -25,7 +25,7 @@ from application.queries.simulate_employee import (
     EmployeeSimulationNotAvailable,
     SimulateEmployeeQuery,
 )
-from application.wiring import get_mediator
+from bootstrap.wiring import get_mediator
 
 router = APIRouter(prefix="/api", tags=["simulation"])
 

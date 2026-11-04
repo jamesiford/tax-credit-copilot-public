@@ -65,7 +65,7 @@ class WriteSpec:
 
 
 def _finding_now(client_id: int, tax_year: int | None, finding_id: str) -> dict[str, Any] | None:
-    from application.wiring import get_finding_repository
+    from application.services import get_finding_repository
 
     live = get_finding_repository().live(client_id, tax_year)
     match = next((r for r in live if r.finding_id == finding_id), None)
@@ -143,7 +143,7 @@ def _build_record(principal: Principal, a: Mapping[str, Any]) -> Command:
 
 def _preview_record(c: Any) -> dict[str, Any]:
     from application.commands.record_claim import build_claim
-    from application.wiring import get_claim_repository
+    from application.services import get_claim_repository
 
     current = get_claim_repository().current(c.client_id, c.program_code, c.tax_year)
     return {"before": _claim_view(current), "after": _claim_view(build_claim(c))}
@@ -163,7 +163,7 @@ def _build_engagement(principal: Principal, a: Mapping[str, Any]) -> Command:
 
 
 def _preview_engagement(c: Any) -> dict[str, Any]:
-    from application.wiring import get_claim_repository
+    from application.services import get_claim_repository
 
     held = next((e for e in get_claim_repository().engagements(c.client_id)
                  if e.program_code == c.program_code.upper()), None)
@@ -188,7 +188,7 @@ def _build_base_year(principal: Principal, a: Mapping[str, Any]) -> Command:
 def _preview_base_year(c: Any) -> dict[str, Any]:
     from application.commands.set_base_year import plan_base_year
     from application.queries.rebase_unit import RebaseUnitQuery
-    from application.wiring import get_mediator
+    from application.services import get_mediator
 
     plan = plan_base_year(c)
     rebase = get_mediator().send(RebaseUnitQuery(
@@ -220,7 +220,7 @@ def _preview_package(c: Any) -> dict[str, Any]:
     from application.capabilities.errors import NotCalculated
     from application.claim_package import SHEETS
     from application.claim_package_service import latest_package
-    from application.wiring import get_claim_package_source
+    from application.services import get_claim_package_source
 
     run = get_claim_package_source().latest_run(c.client_id)
     if run is None:

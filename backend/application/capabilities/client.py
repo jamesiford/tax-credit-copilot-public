@@ -135,7 +135,7 @@ def client_situation(client_id: int, year: int | None = None) -> ToolResult:
         SituationNotAvailable,
         with_client_name,
     )
-    from application.wiring import get_mediator
+    from application.services import get_mediator
 
     try:
         body = get_mediator().send(GetClientSituationQuery(client_id=client_id, tax_year=year))

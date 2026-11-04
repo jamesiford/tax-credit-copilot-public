@@ -82,7 +82,7 @@ def main(argv: list[str] | None = None, *, repository=None, writers=None) -> int
     args = parser.parse_args(argv)
 
     common.load_env()
-    from application.wiring import get_channel_audit_repository, get_writer_repository
+    from bootstrap.wiring import get_channel_audit_repository, get_writer_repository
     from domain.channel import collapse
 
     repository = repository or get_channel_audit_repository()

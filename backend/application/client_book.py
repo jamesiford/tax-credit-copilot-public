@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from infrastructure.payroll.pay_period_source import configured_account_id
+from application.source_ports import configured_account_id, new_source_reader
 
 
 def is_placeholder_year(program_code: str, tax_year: int) -> bool:
@@ -124,9 +124,7 @@ def accounts_from_warehouse() -> list[dict[str, Any]]:
     Falls back to the Delta reader when the warehouse is not configured, which
     is the case for `DATA_SOURCE=csv` developers and for the test suite.
     """
-    from infrastructure.persistence.source_sql import SourceSqlReader
-
-    reader = SourceSqlReader()
+    reader = new_source_reader()
     if not reader.is_configured():
         from data.source.from_fabric import FabricLakehouseReader
 

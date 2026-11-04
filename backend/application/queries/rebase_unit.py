@@ -52,7 +52,7 @@ def handle_rebase_unit(query: RebaseUnitQuery) -> dict[str, Any]:
     from application.queries.simulate_unit import (
         _num, location_series, location_trend, open_year_months,
     )
-    from application.wiring import get_gold_reader
+    from application.services import get_gold_reader
     from tools.unit_trend import unit_status
 
     reader = get_gold_reader()

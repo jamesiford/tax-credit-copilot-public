@@ -77,7 +77,7 @@ def _recalculate_in_background(client_id: int, tax_year: int, state: str, actor:
 
     def work() -> None:
         from application.commands.run_client_calculation import RunClientCalculationCommand
-        from application.wiring import get_mediator
+        from application.services import get_mediator
 
         while True:
             try:
@@ -118,7 +118,7 @@ def plan_base_year(command: SetBaseYearCommand) -> BaseYearPlan:
     accept a choice the commit would refuse.
     """
     from application.queries.simulate_unit import location_series
-    from application.wiring import get_gold_reader, get_override_repository
+    from application.services import get_gold_reader, get_override_repository
 
     reader = get_gold_reader()
     with reader.scope():
@@ -149,7 +149,7 @@ def plan_base_year(command: SetBaseYearCommand) -> BaseYearPlan:
 
 
 def handle_set_base_year(command: SetBaseYearCommand) -> dict[str, Any]:
-    from application.wiring import get_override_repository, get_run_manifest_repository
+    from application.services import get_override_repository, get_run_manifest_repository
     from domain.warehouse import ManualOverride, base_year_key
 
     plan = plan_base_year(command)

@@ -13,8 +13,8 @@
 > | `domain/` — entities, ports, pure calculation | **Built.** `domain/claims.py` plus `domain/calculation/` (the One/Zero engine, headcount, proximity, the derivation trail) |
 > | `infrastructure/` — adapters behind ports | **Built.** SQLite claim and finding repositories; payroll source adapters |
 > | `application/` — use cases, commands, queries | **Built.** Mediator, wiring, first vertical slice |
-> | CQRS mediator | **Built.** `application/mediator.py`; explicit registration in `application/wiring.py` |
-> | Composition root | **Built.** `application/wiring.py` owns `get_claim_repository` and `get_finding_repository`. They lived in `api/claims.py` and `api/findings.py` until 30 Aug, which meant every handler imported a router to find its own store |
+> | CQRS mediator | **Built.** `application/mediator.py`; explicit registration in `bootstrap/wiring.py` |
+> | Composition root | **Built.** `bootstrap/` (RM-17; it was `application/wiring.py`) owns `get_claim_repository` and `get_finding_repository`, and is the only package that names an adapter: `application` asks through `application/services.py` and imports nothing from `infrastructure`. They lived in `api/claims.py` and `api/findings.py` until 30 Aug, which meant every handler imported a router to find its own store |
 > | Thin routers | **One done** (`api/proximity.py`). The other twelve routers still call compute directly |
 > | Warehouse adapters (ADR-007) | **Built.** `warehouse_claims.py` and `warehouse_findings.py` write to `tcc_ops` in the Fabric Warehouse, the only operational store; every statement goes through `tenant_sql.py` |
 >

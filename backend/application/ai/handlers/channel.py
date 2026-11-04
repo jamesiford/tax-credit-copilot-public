@@ -10,7 +10,7 @@ CHANNEL_NARRATOR = "ChannelNarratorAgent"
 
 
 async def handle_channel_narration(query: ChannelNarrationQuery) -> AsyncIterator[ModelEvent]:
-    from application.wiring import get_narration_service
+    from application.services import get_narration_service
 
     async for event in get_narration_service().stream(CHANNEL_NARRATOR, query.prompt):
         yield event

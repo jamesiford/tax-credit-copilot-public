@@ -24,7 +24,7 @@ THIRD_PARTY = {
 }
 #: The repo layers it may import (all vendored, all standard-library-only or model-access adapters).
 LOCAL_OK = ("app", "application", "domain", "infrastructure.ai")
-LOCAL_FORBIDDEN = ("api", "agents", "tools", "data", "config", "channel", "infrastructure.persistence", "application.wiring",
+LOCAL_FORBIDDEN = ("api", "agents", "tools", "data", "config", "channel", "infrastructure.persistence", "bootstrap.wiring",
                    "application.queries", "application.commands", "application.mediator")
 SECRETS = re.compile(r"token|authorization|bearer|password|secret|cookie|header", re.IGNORECASE)
 LOG_METHODS = {"debug", "info", "warning", "error", "exception", "critical", "log"}

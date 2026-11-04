@@ -44,7 +44,7 @@ _STATUS: dict[str, tuple[int, bool]] = {
 
 def service() -> Any:
     """The process's data-query service. Imported on use: the composition module pulls the adapters."""
-    from application.data_wiring import get_data_query_service
+    from application.services import get_data_query_service
 
     return get_data_query_service()
 
@@ -84,7 +84,7 @@ def is_cowork(principal: Principal) -> bool:
 
 
 def _is_writer(principal: Principal) -> bool:
-    from application.channel_wiring import get_writer_entitlement
+    from application.services import get_writer_entitlement
 
     oid = principal.effective_oid
     return bool(oid) and bool(get_writer_entitlement().is_writer(oid))

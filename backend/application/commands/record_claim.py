@@ -87,6 +87,6 @@ def build_claim(command: RecordClaimCommand) -> ProgramClaim:
 
 
 def handle_record_claim(command: RecordClaimCommand) -> dict[str, Any]:
-    from application.wiring import get_claim_repository
+    from application.services import get_claim_repository
 
     return get_claim_repository().record(build_claim(command)).to_dict()

@@ -13,7 +13,7 @@ import json
 
 import pytest
 
-from application import wiring
+from bootstrap import wiring
 from tools import page_brief as pb
 
 

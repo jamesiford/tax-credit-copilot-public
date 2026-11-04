@@ -18,7 +18,7 @@ from application.queries.get_eligibility import (
     EligibilityNotAvailable,
     GetEligibilityQuery,
 )
-from application.wiring import get_mediator
+from bootstrap.wiring import get_mediator
 
 router = APIRouter(prefix="/api/eligibility", tags=["eligibility"])
 

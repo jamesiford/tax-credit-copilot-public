@@ -58,7 +58,7 @@ async def lifespan(app: FastAPI):
     # stop startup, not the first question), publishing is warmed in the
     # background so Foundry being slow or down never blocks the API. A provider
     # that cannot warm leaves the scripted stream in place.
-    from application.wiring import get_agent_catalog, get_ai_settings, get_model_router
+    from bootstrap.wiring import get_agent_catalog, get_ai_settings, get_model_router
 
     settings = get_ai_settings()
     log.info("AI provider chain: %s", ", ".join(settings.provider_chain))
@@ -160,7 +160,7 @@ def ready() -> dict:
 
 def _ai_state() -> str:
     """`ready` | `degraded` | `disabled`. Reported, never a reason to fail readiness."""
-    from application.wiring import ai_health
+    from bootstrap.wiring import ai_health
 
     try:
         return ai_health()["state"]
@@ -170,7 +170,7 @@ def _ai_state() -> str:
 
 @app.get("/api/health")
 def health() -> dict:
-    from application.wiring import ai_health
+    from bootstrap.wiring import ai_health
 
     try:
         ai = ai_health()

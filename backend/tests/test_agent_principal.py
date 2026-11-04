@@ -16,7 +16,7 @@ import jwt
 import pytest
 from fastapi.testclient import TestClient
 
-from application import wiring
+from bootstrap import wiring
 from application.acting_user import ActingUserError, encode, parse_acting_user
 from application.authorization import WriterPolicy
 from application.identity import ANONYMOUS, ActingUser, NotAuthorized, Policy, Principal

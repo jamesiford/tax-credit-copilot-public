@@ -189,7 +189,7 @@ def test_application_does_not_import_a_router():
     Every handler used to do `from api.claims import get_repository` — the
     composition root lived in a router, so driving a use case from anything but
     HTTP dragged FastAPI in with it. Composition now lives in
-    `application/wiring.py`, which is where [ADR-003] says it belongs.
+    `bootstrap/wiring.py`, which is where [ADR-003] says it belongs.
     """
     violations = []
     for path in _python_files("application"):
@@ -204,7 +204,7 @@ def test_application_does_not_import_a_router():
             violations.append(f"{path.relative_to(BACKEND).as_posix()} -> {module}")
     assert not violations, (
         "application/ imports from api/:\n  " + "\n  ".join(violations)
-        + "\n\nPut the dependency in application/wiring.py and import it from "
+        + "\n\nPut the dependency in application/services.py (bound in bootstrap/) and import it from "
         "there. A use case that needs a router is not a use case."
     )
 
@@ -473,7 +473,7 @@ def test_the_capability_rules_catch_a_crafted_violation():
     assert _forbidden_imports("from api.claims import portfolio_v2", _CAPABILITY_FORBIDDEN) == ["api.claims"]
     assert _forbidden_imports("import agent_framework_foundry", _CAPABILITY_FORBIDDEN) == ["agent_framework_foundry"]
     assert _forbidden_imports("from azure.ai.projects import AIProjectClient", _CAPABILITY_FORBIDDEN)
-    assert _forbidden_imports("from application import wiring", _CAPABILITY_FORBIDDEN) == []
+    assert _forbidden_imports("from bootstrap import wiring", _CAPABILITY_FORBIDDEN) == []
     assert _non_stdlib_imports("import re\nfrom decimal import Decimal") == []
     assert _non_stdlib_imports("from application.capabilities import format") == ["application.capabilities"]
     assert _forbidden_imports("def f():\n    from tools.portfolio import chat_state_credit", ("tools",)) == ["tools.portfolio"]

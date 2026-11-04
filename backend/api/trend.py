@@ -74,7 +74,7 @@ def v2_client_units(
     never as zero. A run that legitimately produced no rows looks different: the
     same empty `items`, but `run` populated.
     """
-    from application.wiring import get_gold_reader
+    from bootstrap.wiring import get_gold_reader
     from infrastructure.persistence.gold_reader import run_envelope
 
     if method not in ("min_max", "pay_period"):
@@ -154,7 +154,7 @@ def set_client_unit_base_year(
 ) -> dict[str, Any]:
     """WI-21. Record the choice and start a recalculation. Thin [ADR-003]."""
     from application.commands.set_base_year import BaseYearNotAllowed, SetBaseYearCommand
-    from application.wiring import get_mediator
+    from bootstrap.wiring import get_mediator
 
     try:
         command = SetBaseYearCommand(
@@ -183,7 +183,7 @@ def rebase_client_unit(
     Declared before the unit drill so `/rebase` is not read as a unit id.
     """
     from application.queries.rebase_unit import RebaseNotAvailable, RebaseUnitQuery
-    from application.wiring import get_mediator
+    from bootstrap.wiring import get_mediator
 
     try:
         query = RebaseUnitQuery(
@@ -251,7 +251,7 @@ def v2_client_unit_detail(
     Candle Bottle holds 10,236 employees across 101 units, so narrowing them in
     Python after fetching them is the same problem one layer down.
     """
-    from application.wiring import get_gold_reader
+    from bootstrap.wiring import get_gold_reader
     from infrastructure.persistence.gold_reader import (
         EMPLOYEE_FILTERS,
         NEAR_FILTERS,
@@ -446,7 +446,7 @@ def v2_employee_detail(
     method: str = FastAPIQuery("min_max", description="min_max | pay_period"),
 ) -> dict[str, object]:
     """One employee's derivation, READ FROM `tcc_gold` and keyed by the token."""
-    from application.wiring import get_gold_reader
+    from bootstrap.wiring import get_gold_reader
     from infrastructure.persistence.gold_reader import run_envelope
 
     if year is None:
@@ -511,7 +511,7 @@ def create_client_run(client_id: int, payload: ClientRunRequest, request: Reques
         RunClientCalculationCommand,
     )
     from application.queries._client_run import ClientRunNotAvailable
-    from application.wiring import get_mediator
+    from bootstrap.wiring import get_mediator
 
     try:
         command = RunClientCalculationCommand(
@@ -536,7 +536,7 @@ def latest_client_run(client_id: int) -> dict[str, Any]:
 
     A 404 here means NOT YET CALCULATED, which is a real state and not a zero.
     """
-    from application.wiring import get_run_manifest_repository
+    from bootstrap.wiring import get_run_manifest_repository
 
     manifest = get_run_manifest_repository().latest(client_id)
     if manifest is None:
@@ -577,7 +577,7 @@ def employee_drill(payload: EmployeeDrillRequest) -> dict[str, Any]:
     """One employee's derivation for the SELECTED client-year, not the sealed run."""
     from application.queries._client_run import ClientRunNotAvailable
     from application.queries.get_employee_drill import GetEmployeeDrillQuery
-    from application.wiring import get_mediator
+    from bootstrap.wiring import get_mediator
 
     try:
         query = GetEmployeeDrillQuery(

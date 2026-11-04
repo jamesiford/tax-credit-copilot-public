@@ -214,7 +214,7 @@ _RUN = {
 @pytest.fixture
 def use_reader(monkeypatch):
     def _install(reader):
-        from application import wiring
+        from bootstrap import wiring
 
         monkeypatch.setattr(wiring, "get_gold_reader", lambda: reader)
         monkeypatch.setattr(trend_api, "get_gold_reader", lambda: reader, raising=False)

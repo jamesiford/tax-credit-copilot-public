@@ -12,7 +12,7 @@ from pathlib import Path
 
 import pytest
 
-import application.data_wiring as wiring
+import bootstrap.data_wiring as wiring
 from application.data.exec_errors import DataSourceDisabled, DataSourceUnavailable
 from application.data.semantic_model import Source
 from application.data.spec import QuerySpec

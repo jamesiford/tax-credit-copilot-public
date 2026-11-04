@@ -10,8 +10,8 @@ from __future__ import annotations
 from typing import Any
 
 from application.capabilities.invoke import CapabilityFailure, invoke
-from application.channel_wiring import set_writer_entitlement
-from application.data_wiring import set_data_query_service
+from bootstrap.channel_wiring import set_writer_entitlement
+from bootstrap.data_wiring import set_data_query_service
 from tests.data_caps_fixture import Writers, make_service, person
 
 DATA_TOOLS = frozenset({"data_catalog", "data_query", "data_distinct_values"})

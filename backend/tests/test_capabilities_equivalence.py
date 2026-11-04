@@ -185,7 +185,7 @@ def test_client_situation_equals_the_rest_endpoint(book, claims_repo):
 def test_the_narrator_brief_is_the_endpoint_without_the_display_name(book, claims_repo):
     from application.capabilities.client import client_situation
     from application.queries.get_client_situation import GetClientSituationQuery
-    from application.wiring import get_mediator
+    from bootstrap.wiring import get_mediator
 
     _seed(claims_repo)
     facts = client_situation(2001, 2023).facts
@@ -287,7 +287,7 @@ class _Gold:
 
 @pytest.fixture
 def gold():
-    from application.wiring import set_gold_reader
+    from bootstrap.wiring import set_gold_reader
 
     reader = _Gold()
     set_gold_reader(reader)
@@ -439,7 +439,7 @@ def test_simulate_headcount_equals_the_chat_tool():
 def test_simulate_equals_the_location_query(wired):
     from application.capabilities.simulate import simulate
     from application.queries.simulate_unit import SimulateUnitQuery
-    from application.wiring import get_mediator
+    from bootstrap.wiring import get_mediator
 
     expected = get_mediator().send(SimulateUnitQuery(
         client_id=2001, worksite_id=SITE, tax_year=2025, action="add_headcount", magnitude=2,
@@ -464,7 +464,7 @@ def test_simulate_translates_the_queries_refusals(wired):
 def test_employee_drill_equals_the_query():
     from application.capabilities.walkthrough import employee_drill
     from application.queries.get_employee_drill import GetEmployeeDrillQuery
-    from application.wiring import get_mediator, set_gold_reader
+    from bootstrap.wiring import get_mediator, set_gold_reader
 
     set_gold_reader(_DrillReader())
     try:

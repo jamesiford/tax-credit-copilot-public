@@ -436,7 +436,7 @@ def test_an_expired_token_is_refreshed():
 
 
 def test_the_default_store_is_the_one_that_needs_no_warehouse(monkeypatch):
-    import application.wiring as wiring
+    import bootstrap.wiring as wiring
 
     monkeypatch.delenv("RUN_MANIFEST_STORE", raising=False)
     wiring.set_run_manifest_repository(None)
@@ -446,7 +446,7 @@ def test_the_default_store_is_the_one_that_needs_no_warehouse(monkeypatch):
 
 
 def test_an_unknown_store_name_raises_rather_than_falling_back(monkeypatch):
-    import application.wiring as wiring
+    import bootstrap.wiring as wiring
 
     monkeypatch.setenv("RUN_MANIFEST_STORE", "postgres")
     wiring.set_run_manifest_repository(None)
