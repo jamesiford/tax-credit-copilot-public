@@ -11,12 +11,11 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 
 from app.core.gateway_client import GatewayClient, managed_identity_token
-from app.core.models import ModelChain, build_providers
+from app.core.model_access import ModelAccess, select_model_access
 from app.core.planner import Planner
 from app.core.settings import OrchestratorSettings, load_settings
 from app.core.state import StateStore
 from app.core.turn import TurnPipeline
-from application.ai.safety.injection import PromptInjectionGuard
 
 log = logging.getLogger("tcc.orchestrator")
 
@@ -27,7 +26,7 @@ class Orchestrator:
 
     settings: OrchestratorSettings
     pipeline: TurnPipeline
-    chain: ModelChain
+    chain: ModelAccess
     gateway: GatewayClient
 
 
@@ -40,7 +39,7 @@ def effective_environment(env: Mapping[str, str]) -> dict[str, str]:
 
 
 def build_orchestrator(
-    env: Mapping[str, str] | None = None, *, gateway: GatewayClient | None = None, chain: ModelChain | None = None,
+    env: Mapping[str, str] | None = None, *, gateway: GatewayClient | None = None, chain: ModelAccess | None = None,
 ) -> Orchestrator:
     """Build from the environment. Raises `OrchestratorConfigError` naming every problem."""
     settings = load_settings(effective_environment(os.environ if env is None else env))
@@ -52,12 +51,7 @@ def build_orchestrator(
     gateway = gateway or GatewayClient(
         settings.gateway_url, managed_identity_token(settings.gateway_scope), timeout_seconds=settings.request_timeout_seconds,
     )
-    safety = settings.ai.safety
-    chain = chain or ModelChain(
-        build_providers(settings), egress_policy=settings.ai.egress_policy,
-        timeout_seconds=settings.ai.resilience.total_deadline_s,
-        injection=PromptInjectionGuard() if safety.injection_guard else None,
-    )
-    planner = Planner(chain, allowed_hosts=safety.output_allowed_hosts)
+    chain = chain or select_model_access(settings)
+    planner = Planner(chain, allowed_hosts=settings.ai.safety.output_allowed_hosts)
     pipeline = TurnPipeline(settings, gateway, planner, StateStore(settings.state_ttl_seconds))
     return Orchestrator(settings, pipeline, chain, gateway)

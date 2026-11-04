@@ -144,14 +144,23 @@ reply by its length. If filing fails the answer still goes out; the failure is l
 
 ## Models
 
-The orchestrator reads the same `AI_*` settings as the API and builds the shared
-`OpenAICompatibleChatModel` for each provider in the chain (`foundry`: the agent's own Foundry account
-over its Azure OpenAI v1 surface, with the agent's identity; `gateway`: the customer's). It does not use
-`NarrationService`, because that path drops a model's tool calls by design and the orchestrator needs
-them; it keeps the rest of the contract: the chain's rule (fall to the next provider only when one fails,
-never splice two models' sentences, and stay with one provider through a tool loop), the egress policy
-(an identifier never leaves; `aggregates_only` and `block` apply to external providers) and the injection
-screen (a flagged message reaches no model and is answered by the keyword table).
+The orchestrator reads the same `AI_*` settings as the API, and `AI_PROVIDER_CHAIN` decides which of two model paths
+serves a turn (`app/core/model_access.py`, [D-127](DECISIONS.md)); both sit behind one interface the planner reads:
+
+- **A chain that is exactly `foundry`** (the deployed default) is served by the **Microsoft Agent Framework's own chat client**,
+  `OpenAIChatCompletionClient`, given the account's OpenAI v1 host (`https://<account>.openai.azure.com/openai/v1`) and a token
+  provider over `DefaultAzureCredential` (the agent's managed identity when deployed). No key exists anywhere. `FoundryChatClient`
+  is not used: it takes a project endpoint only and reaches the model on the project host the hosted runtime cannot resolve.
+- **Any chain that names `gateway`** (alone, or with `foundry` before or after it) is served by `ModelChain` through
+  `PortChatClient`: the shared `OpenAICompatibleChatModel` for each provider (`foundry`: the account's v1 surface; `gateway`: the
+  customer's). The framework has no failover client, and the customer's gateway has its own dialect and authentication.
+
+Neither path uses `NarrationService`, because that path drops a model's tool calls by design and the orchestrator needs
+them. What `ModelChain` does around a call is kept on both: the egress policy (an identifier never leaves;
+`aggregates_only` and `block` apply to external providers), a per-call deadline and the injection screen (a flagged message
+reaches no model and is answered by the keyword table). The chain's own rule (fall to the next provider only when one fails,
+never splice two models' sentences, and stay with one provider through a tool loop) applies to `ModelChain`; the foundry-only
+path has no second provider to move to, and a failure degrades to the engine's own answer.
 
 Three planning modes, one outcome: **tools** (a provider offers tool calling: MAF `Agent` + `FunctionTool`s
 generated from the catalog, the turn's rules as function middleware, and a middleware that replaces the model's
