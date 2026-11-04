@@ -12,7 +12,7 @@ from application.data.resolve import ColumnResolver
 from application.data.semantic_model import Agg, Role
 from application.data.spec import MAX_GROUP_BY, MAX_MEASURES, MAX_ORDER_BY, MAX_SELECT, QuerySpec
 
-_ALIAS = re.compile(r"^[a-z][a-z0-9_]{0,39}$")
+_ALIAS = re.compile(r"^[a-z][a-z0-9_]{0,39}\Z")  # \Z, not $: `$` also matches before a trailing newline
 ROW_COUNT = "*"
 
 

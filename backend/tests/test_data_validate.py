@@ -130,10 +130,14 @@ def test_a_query_is_capped_in_every_dimension(changes, cap):
 
 
 HOSTILE = [
-    "'; DROP TABLE tcc_gold.unit_year_master; --", "x' OR '1'='1", "x\" OR \"1\"=\"1", "1; SELECT * FROM sys.tables",
+    "'; DROP TABLE tcc_gold.unit_year_master; --", "1; SELECT * FROM sys.tables",
     "a UNION SELECT name FROM sys.objects", "x/* c */y", "x--y", "ＤＲＯＰ ＴＡＢＬＥ x", "ｓｅｌｅｃｔ * from t", "x；DROP", "a\x00b",
-    "a\u202eb", "a\u200bb", "EXEC xp_cmdshell 'dir'", "x'; WAITFOR DELAY '0:0:5'--", "x' = '", "@@version",
+    "a\u202eb", "a\u200bb", "EXEC xp_cmdshell 'dir'", "x'; WAITFOR DELAY '0:0:5'--", "@@version",
 ]
+#: Quote-shaped injection attempts. They are no longer refused (a quote cannot alter a bound
+#: parameter, and the pattern that refused them also refused "Bakers' Group"); they must arrive as
+#: the value, verbatim, and `test_data_build_sql` / `test_data_query_abuse` prove they stay out of the SQL text.
+QUOTE_ONLY = ["x' OR '1'='1", "x\" OR \"1\"=\"1", "x' = '"]
 
 
 @pytest.mark.parametrize("value", HOSTILE)
@@ -141,6 +145,12 @@ def test_a_value_that_looks_like_sql_is_refused_on_an_equality_filter(value):
     for op, payload in ((Op.EQ, value), (Op.IN, [value])):
         with pytest.raises((E.SqlLikeValue, E.ValueTypeMismatch)):
             validate(spec(filters=[{"column": "worksite_id", "op": op.value, "value": payload}]), MODEL)
+
+
+@pytest.mark.parametrize("value", QUOTE_ONLY)
+def test_a_quote_shaped_value_is_carried_as_the_value_because_it_is_bound(value):
+    plan = validate(spec(filters=[{"column": "worksite_id", "op": "eq", "value": value}]), MODEL)
+    assert plan.filters[0].value == value
 
 
 def test_free_text_contains_accepts_sql_words_but_never_control_characters():

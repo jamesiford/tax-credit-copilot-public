@@ -1,12 +1,16 @@
-"""Filter values: coerced to the column's type, refused if they look like SQL. [CH-16b]
+"""Filter values: coerced to the column's type, refused if they look like a statement. [CH-16b]
 
 Every value reaches the database as a bound parameter, so a quote in a value cannot
-change the statement. These checks are the second wall, not the first: a model that is
-being steered by text from a document or an email may try to put SQL in a filter, and a
-rejected value is a signal worth surfacing rather than a string quietly passed along.
+change the statement. That is the first wall, and it is the one that holds: tests bind
+hostile values and check they never reach the SQL text. The checks here are the second
+wall, kept for what a bound value still can be: statement punctuation (`;`, `--`, `/*`),
+a leading `select ...`, `xp_` and `@@` names, and control or invisible characters. A
+model steered by text from a document may try to put SQL in a filter, and a rejected
+value is a signal worth surfacing rather than a string quietly passed along.
 
-The check is deliberately a little paranoid for equality-style filters and relaxed for
-the one place free text belongs, a `contains` filter on a free-text dimension, where it
+Quotes are NOT screened. An apostrophe is ordinary in a name (O'Brien, Bakers' Group,
+L'Oréal) and cannot affect a bound parameter, so the old quote-and-keyword pattern only
+ever refused legitimate values. Free text on a `contains` filter on a free-text dimension
 still refuses control characters and is escaped for `LIKE`.
 """
 from __future__ import annotations
@@ -22,10 +26,9 @@ from application.data.errors import SqlLikeValue, ValueNotAllowed, ValueTypeMism
 from application.data.spec import MAX_TEXT
 from application.data.semantic_model import ColType, Column
 
-_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
-_DATETIME = re.compile(r"^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}(:\d{2})?$")
+_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}\Z")
+_DATETIME = re.compile(r"^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}(:\d{2})?\Z")
 _SQL_PUNCTUATION = re.compile(r";|--|/\*|\*/|@@|\bxp_\w")
-_SQL_QUOTE_TRICK = re.compile(r"['\"`]\s*(?:or|and|union|having|order|group|;|--)\b|['\"`]\s*[=<>]", re.IGNORECASE)
 _SQL_STATEMENT = re.compile(
     r"\b(?:select|insert|update|delete|drop|alter|create|truncate|exec|execute|union|merge|grant|declare|waitfor|shutdown)"
     r"\b[\s(]+\S", re.IGNORECASE,
@@ -39,14 +42,15 @@ def has_control_characters(text: str) -> bool:
 
 
 def looks_like_sql(text: str) -> bool:
-    """True when `text` reads as SQL rather than as a value.
+    """True when `text` reads as a statement rather than as a value.
 
     Checked on the NFKC form, so full-width and compatibility characters cannot hide a
     keyword or a semicolon. False positives (a job title that begins "Select ...") are
-    acceptable: the caller is told which field and can rephrase.
+    acceptable: the caller is told which field and can rephrase. Quotes are not checked: see
+    the module note.
     """
     folded = unicodedata.normalize("NFKC", text)
-    return bool(_SQL_PUNCTUATION.search(folded) or _SQL_QUOTE_TRICK.search(folded) or _SQL_STATEMENT.search(folded))
+    return bool(_SQL_PUNCTUATION.search(folded) or _SQL_STATEMENT.search(folded))
 
 
 def escape_like(text: str) -> str:

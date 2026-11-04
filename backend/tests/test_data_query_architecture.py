@@ -129,3 +129,41 @@ def test_only_the_service_executes_a_built_query_and_only_it_applies_the_group_r
             raise AssertionError(f"{path.name} applies the small-group rule; only the data service may")
         if "count_people=" in text and path.name not in ("service.py", "build.py"):
             raise AssertionError(f"{path.name} builds a query that counts people; only the data service may decide when")
+
+
+# --- RM-04: what the query layer accepts as an identifier or a SQL fragment is closed -------------------------
+
+
+def _data_layer_sources() -> list[Path]:
+    return sorted((Path(__file__).resolve().parents[1] / "application" / "data").glob("*.py"))
+
+
+def test_no_pattern_in_the_query_layer_anchors_with_a_dollar_sign():
+    """`$` also matches before a trailing newline, so `^[a-z]+$` accepted "n\\n" as an alias and the builder
+    interpolated it. A pattern here ends in `\\Z`, so what a regex calls an identifier is one."""
+    offenders = []
+    for path in _data_layer_sources():
+        for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+            if (isinstance(node, ast.Call) and getattr(node.func, "attr", "") == "compile" and node.args
+                    and isinstance(node.args[0], ast.Constant) and isinstance(node.args[0].value, str)):
+                pattern = node.args[0].value
+                if pattern.startswith("^") and pattern.endswith("$") and not pattern.endswith("\\$"):
+                    offenders.append(f"{path.name}:{node.lineno}")
+    assert not offenders, f"patterns anchored with $ instead of \\Z: {offenders}"
+
+
+def test_the_scan_notices_a_dollar_anchored_pattern():
+    node = ast.parse('re.compile(r"^[a-z]+$")').body[0].value
+    assert node.args[0].value.endswith("$")
+
+
+def test_a_derived_column_is_checked_against_the_grammar_where_the_column_is_built():
+    source = (Path(__file__).resolve().parents[1] / "application" / "data" / "semantic_model.py").read_text(encoding="utf-8")
+    assert "check_expression(self.logical, self.expression, self.depends_on)" in source
+
+
+def test_sql_text_of_a_derived_column_is_authored_only_in_the_model_files():
+    """The one SQL text a model carries is written in a `model_*.py` file, where the grammar test covers it."""
+    elsewhere = [p.name for p in _data_layer_sources()
+                 if "expression=" in p.read_text(encoding="utf-8") and not p.name.startswith("model_") and p.name != "semantic_model.py"]
+    assert elsewhere == []

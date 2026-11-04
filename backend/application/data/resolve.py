@@ -13,7 +13,7 @@ from application.data.errors import BlockedColumn, UnknownColumn
 from application.data.plan import BASE_ALIAS, ColumnRef, JoinPlan
 from application.data.semantic_model import Column, Dataset, SemanticModel
 
-_REF = re.compile(r"^[A-Za-z_][A-Za-z0-9_]{0,63}(\.[A-Za-z_][A-Za-z0-9_]{0,63})?$")
+_REF = re.compile(r"^[A-Za-z_][A-Za-z0-9_]{0,63}(\.[A-Za-z_][A-Za-z0-9_]{0,63})?\Z")  # \Z: `$` admits a trailing newline
 
 
 class ColumnResolver:
