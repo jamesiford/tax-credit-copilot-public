@@ -1,0 +1,281 @@
+# Microsoft Agent Framework alignment (RM-06 spike)
+
+**Status:** spike, no production code changed. Run on 2026-11-04 against the packages installed in the repo's `.venv`
+(Python 3.14.2), plus the newest published hosting package read from a wheel downloaded **outside** the repo (nothing was
+installed, no requirements file changed). Every claim below is backed by a version, a class name, a file path or a command in
+[Evidence](#evidence-and-how-to-reproduce). Decisions: [D-124](DECISIONS.md). Findings that need an owner or a framework feature:
+[REMEDIATION-FINDINGS.md](REMEDIATION-FINDINGS.md). Inputs to RM-07 to RM-14: the [inventory](#hand-rolled-inventory) and the
+[go / no-go table](#go--no-go).
+
+## Summary
+
+| Question | Answer |
+| --- | --- |
+| Is the hosting package GA? | **No.** `agent-framework-foundry-hosting` has only alpha and beta releases; newest `1.0.0b261030` (classifier *4 - Beta*). It needs `agent-framework-core>=1.24.0,<2`, so our pin is compatible, but the D-76 reason (no `--pre` in a production build) still holds. |
+| Can it serve `activity`? | **No.** It ships `ResponsesHostServer` and `InvocationsHostServer` only; no Activity handler exists in it or in `azure-ai-agentserver-core` 2.3.0 / `-responses` 2.4.0 / `-invocations` 1.3.0. **Teams does not need the container to**: the platform converts an Activity into a Responses call for a Responses-only container, and a container that declares `activity` is sent `/activity/messages` (404) (D-100). |
+| Is MAF enough to be the orchestration layer? | **Yes for tools, middleware, workflow, human-in-the-loop, telemetry and model access**; verified by running code (below). Six small gaps are recorded (F-01 to F-06); three change a verdict: no multi-provider failover client, function middleware never sees a call to an unregistered tool, and `FoundryChatClient` has no endpoint override (it targets a host the hosted runtime could not resolve, D-101). |
+| Can a `FunctionTool` take its name, description and schema from the catalog? | **Yes**, exactly (snippet and output in [section 4](#4-a-functiontool-from-a-catalog-schema)). The per-request identity reaches the body through `function_invocation_kwargs`, so tools are built once, not per turn. |
+| MCP SDK for the facade? | The D-65 blocker (the request's headers are not in the handler) **no longer holds in `mcp` 2.3.0**: `ServerRequestContext.request` carries them, in stateless and stateful mode. The SDK does **not** bind a session to its user, so the facade's rule needs code either way. Spike it in RM-14. |
+
+## 1. Versions and status (a)
+
+Command: `.venv\Scripts\pip.exe index versions <package> --pre` and `pip show`, 2026-11-04.
+
+| Package | Pinned in `channel_orchestrator/requirements.txt` | Installed in `.venv` | Newest on PyPI | Status |
+| --- | --- | --- | --- | --- |
+| `agent-framework-core` | 1.24.0 | 1.24.0 | 1.24.0 | GA (1.x since `1.0.0`) |
+| `agent-framework-foundry` | not pinned (orchestrator uses core only) | 1.16.0 | 1.16.0 | GA |
+| `agent-framework-openai` | not pinned | 1.18.0 | 1.18.0 | GA |
+| `agent-framework` (meta) | not used | not installed | 1.24.0 | GA |
+| `agent-framework-foundry-hosting` | not used (D-76) | not installed | `1.0.0b261030` | **Pre-release only**: 29 releases, all `a`/`b` (first `1.0.0a260421`) |
+| `azure-ai-agentserver-responses` | 2.4.0 | **not installed** | 2.4.0 | stable |
+| `azure-ai-agentserver-core` | via responses | not installed | 2.3.0 | stable |
+| `azure-ai-agentserver-invocations` | not used | not installed | 1.3.0 | stable |
+| `azure-ai-projects` | 2.7.0 | 2.7.0 | 2.10.0 | stable (not upgraded here) |
+| `mcp` | not used by the orchestrator | 2.3.0 | not re-queried (2.3.0 was current in D-65) | stable |
+
+`agent-framework-foundry-hosting 1.0.0b261030` declares: `agent-framework-core>=1.24.0,<2`, `azure-ai-agentserver-core>=2.1.0,<3`,
+`azure-ai-agentserver-responses>=2.2.0b1,<3`, `azure-ai-agentserver-invocations>=1.1.0,<2`, `httpx>=0.28,<1`, `httpx2>=2.0.0,<3`,
+`mcp>=2.2.0,<3`, `tenacity>=9.1.4,<9.2.0`. Adopting it adds `httpx2`, `mcp`, `tenacity` and the invocations package to the orchestrator's zip.
+
+Note: the `agentserver` packages are not in the repo's `.venv` (the orchestrator's host `app/main.py` is the one module that imports them, and the offline
+tests stub it). They were read from wheels downloaded to the session folder, not installed.
+
+## 2. Installed API map (b)
+
+Command: introspection with `python -c` (`dir`, `inspect.signature`, `inspect.getdoc`) against core 1.24.0, foundry 1.16.0, openai 1.18.0. Names are exact.
+
+| Need | Class / function (module) | Evidence and notes |
+| --- | --- | --- |
+| Foundry v2 Responses chat client | `agent_framework_foundry.FoundryChatClient` (MRO: `FunctionInvocationLayer`, `ChatMiddlewareLayer`, `ChatTelemetryLayer`, `RawFoundryChatClient`, `RawOpenAIChatClient`, `BaseChatClient`) | Docstring: "Microsoft Foundry chat client using the OpenAI Responses API". Built from `project_endpoint` + `credential` or an `AIProjectClient`; it calls `project_client.get_openai_client()` (`_chat_client.py` line 261) and takes **no `base_url`**. See finding F-02. |
+| The same wire, endpoint chosen by us | `agent_framework_openai.OpenAIChatClient` (Responses) and `OpenAIChatCompletionClient` (chat completions v1) | Both accept `base_url`, `azure_endpoint`, `api_key` (a callable token provider), `async_client`, `middleware`, `function_invocation_configuration`. Probe: `OpenAIChatClient(model=..., base_url="https://<account>.openai.azure.com/openai/v1", api_key=<callable>)` builds and reports that base URL. |
+| An existing Foundry prompt or hosted agent as a client | `FoundryAgent`, `RawFoundryAgent` | Docstring: "Connects to an existing PromptAgent or HostedAgent"; `tools=` supplies local implementations only. Not needed for the orchestrator. |
+| Function tool | `agent_framework.FunctionTool(name, description, approval_mode, kind, max_invocations, max_invocation_exceptions, additional_properties, func, input_model, result_parser)`; decorator `agent_framework.tool(func, name, description, schema, ...)` | `input_model` is a Pydantic model **or a JSON-schema mapping**. A tool body may declare a `FunctionInvocationContext` parameter, which is injected and kept out of the model's schema (probe, section 4). |
+| Function middleware | `FunctionMiddleware.process(context: FunctionInvocationContext, call_next)`; decorator `function_middleware`; `MiddlewareTermination`, `MiddlewareFailure` | The context carries `function`, `arguments` (mutable, re-validated after `call_next`), `session`, `metadata`, `result`, `kwargs`. An ordinary exception becomes a tool-error result; `MiddlewareTermination` stops the loop with an optional result; `MiddlewareFailure` aborts the run. Other layers: `AgentMiddleware` (we already use it), `ChatMiddleware` (`ChatContext` has `messages`, `result`, `function_invocation_kwargs`). |
+| Per-request values into tools and middleware | `Agent.run(..., function_invocation_kwargs=, client_kwargs=, middleware=, tools=, session=)`; `Workflow.run(..., function_invocation_kwargs=, client_kwargs=)` | Verified end to end (section 4). |
+| Loop limits | `FunctionInvocationConfiguration`: `max_iterations`, `max_function_calls`, `max_duration_seconds`, `allow_concurrent_invocation`, `terminate_on_unknown_calls` | `max_function_calls` is documented as **best-effort**, checked after each batch (our `test_orch_maf.py` already relies on "near the budget"). |
+| Context providers | `ContextProvider` (`before_run(*, agent, session, context, state)`, `after_run`), `SessionContext` (`extend_instructions`, `extend_messages`, `extend_tools`, `extend_middleware`), `MemoryContextProvider`, `SkillsProvider`, `FoundryMemoryProvider` (foundry package) | Provider `state` lives in `AgentSession.state`. |
+| History and sessions | `HistoryProvider` (`get_messages`, `save_messages`), `InMemoryHistoryProvider`, `FileHistoryProvider`, `AgentSession`, `SessionStore`, `FileSessionStore` | `FileSessionStore` writes to disk; the platform may discard the container's filesystem (D-81). |
+| Approval-required tools | `FunctionTool(approval_mode="always_require")`, `ToolApprovalMiddleware`, `Content.from_function_approval_request / _response`, `create_always_approve_tool_response` | The model **names** the tool and the run pauses for a structured approval response. See "Why not tool approval for a commit" below. |
+| MCP tools (client side) | `MCPStreamableHTTPTool` (`header_provider`, `static_headers`, `allowed_tools`, `approval_mode`, `http_client`), `MCPStdioTool`, `MCPWebsocketTool` | A **client** of an MCP server. It does not serve MCP. |
+| OpenTelemetry | `agent_framework.observability`: `configure_otel_providers`, `enable_instrumentation`, `get_tracer`, `OBSERVABILITY_SETTINGS`; layers `AgentTelemetryLayer`, `ChatTelemetryLayer` | `FunctionTool.invoke` opens an `execute_tool` span (`get_function_span`, `_tools.py` line 1264). Arguments and results are recorded only when `SENSITIVE_DATA_ENABLED`; default observed: `False`, `ENABLED: True`. |
+| Workflow | `WorkflowBuilder(start_executor=, checkpoint_storage=, name=, ...)` with `add_edge`, `add_chain`, `add_fan_out_edges`, `add_fan_in_edges`, `add_switch_case_edge_group`, `build`; `Executor` + `@handler`; `@response_handler`; `@executor` (function executors); `WorkflowContext` (`send_message`, `yield_output`, `request_info`, `set_state`, `get_state`); `Workflow.run(message, responses=, checkpoint_id=, checkpoint_storage=, ...)`; `Workflow.cancel_pending_requests`; `FunctionalWorkflow` / `@workflow`; `Edge`, `EdgeCondition` | Request/response and checkpoint resume verified by running code (section 5). |
+| Checkpointing | `CheckpointStorage`, `InMemoryCheckpointStorage`, `FileCheckpointStorage`, `WorkflowCheckpoint`, `register_checkpoint_type` | `get_latest(workflow_name=)`, `load`, `save`, `list_checkpoints`. |
+| Experimental, not adopted | `agent_framework.security` (`PolicyEnforcementFunctionMiddleware`, `LabelTrackingFunctionMiddleware`, `ConfidentialityLabel`) | Emits `ExperimentalWarning: [FIDES] ... may change or be removed`. Watch, do not build on. |
+| No framework primitive | multi-provider failover chat client | `Select-String 'class \w*(Fallback|Failover|Router)'` over `agent_framework/*.py`: no match. |
+
+### Why not tool approval for a commit
+
+Teams and Copilot Chat deliver **text**; the platform bridge turns the reader's `confirm` into the next Responses call's input text. MAF's approval is a
+structured `function_approval_response` Content tied to a tool call **the model made**, so using it for `*_commit` would (1) put the commit in the model's tool set,
+weakening "writes are only prepared by the model" to "...and approved", and (2) need a structured reply the channel cannot send. A Workflow's `request_info` /
+`@response_handler` carries the same pause and resume, with the reply produced by **our code** after the exact-word, same-person, in-time check. `approval_mode`
+is still the right primitive for a future read-only tool that must never run unattended; none exists today.
+
+## 3. Hosting, protocols and `activity` (c)
+
+| Fact | Evidence |
+| --- | --- |
+| The hosting package serves `Responses` and `Invocations`. | `agent_framework_foundry_hosting.__all__` lists `ResponsesHostServer` and `InvocationsHostServer`; `class ResponsesHostServer(ResponsesAgentServerHost)` (`_responses.py` line 907), the same base class `channel_orchestrator/app/main.py` already uses. |
+| No Activity handler exists in any of the four packages. | A case-insensitive search for `activity` over the hosting wheel (code and `METADATA`) and the `azure-ai-agentserver-invocations` 1.3.0 wheel finds nothing; in `-core` 2.3.0 and `-responses` 2.4.0 it finds only a tracing comment and a storage-docstring mention. |
+| The container contract needs only `Responses` or `Invocations`. | Microsoft Learn, *Hosted agent runtime contract* (updated 2026-08-18): "Serve at least one of `POST /responses` or `POST /invocations`"; adapters exist for those two. |
+| Activity is an **endpoint** protocol. | Microsoft Learn, *Configure and share your agent*: `agent_endpoint.protocol_configuration` is keyed by protocol (`responses`, `activity`, `a2a`); `activity.enable_m365_public_endpoint` opens the Teams route. Our live definition (D-100): `agent_endpoint.protocols` = `activity, responses`, container `protocol_versions` = `responses` only. |
+| "Protocol 2.0.0" is the **container** protocol version. | `azure.yaml` line `protocols: - protocol: responses / version: 2.0.0` (same record the SDK writes: `ProtocolVersionRecord(protocol="responses", version="2.0.0")`). On 2.0.0 the platform adds `x-agent-user-id` and `x-agent-foundry-call-id` to every protocol request (runtime-contract page), which `azure-ai-agentserver-core` exposes as `FoundryAgentRequestContext(call_id, user_id, session_id, original_subject)`. |
+| Adopting hosting would not change `azure.yaml`. | It serves the same `POST /responses`; the endpoint's `responses` + `activity` and the container's `responses` 2.0.0 stay as they are. The existing rule (`activity` never under the container's `protocols:`) is unaffected. |
+| Hosting owns durable state we do not use today. | README: default stores are `FoundryAgentSessionStore`, `FoundryCheckpointStore`, `FoundryFunctionApprovalStore`, "backed by Foundry storage when hosted", scoped to the platform user and `FOUNDRY_AGENT_SESSION_ID`; "Existing hosted state is not migrated". Our state is in memory by decision (D-81). Whether those stores work in this tenant's network is unverified. |
+| What hosting gives an agent about the person. | `get_request_context()` has `user_id`, `call_id`, `original_subject` (oid, tid, idtype). It does not carry `x-client-*` headers (those are on `ResponseContext.client_headers`, which our handler reads). Per-request identity **into an `Agent`'s tools** under hosting is not documented (a zero-argument agent factory cannot see the request; `prepare_options` may not set `function_invocation_kwargs`); a **workflow** factory does receive `HostedResponseRequest`. Unverified: needs a live spike. |
+
+**Conclusion for RM-12.** Literal rule of the brief: hosting cannot serve `activity`, so **KEEP the current host behind the `main.py` seam**. The stronger reason is
+independent of `activity`: only pre-release builds exist, and adopting it needs a per-request identity path that is not yet shown to work. Revisit at GA.
+
+## 4. A FunctionTool from a catalog schema (d)
+
+The catalog's `CapabilitySpec` carries `name`, `description`, `kind`, `needs_client`, `needs_year`, `schema`, `sensitive`, `implemented`, `chat_intent`, `tags`.
+This code was run (from `backend/`, using the real `client_eligibility` spec and a fake gateway). It builds the tool once and carries the person per request:
+
+```python
+import json
+from agent_framework import FunctionInvocationContext, FunctionTool
+from application.capabilities import catalog
+
+def tool_for(spec: catalog.CapabilitySpec, gateway) -> FunctionTool:
+    async def forward(ctx: FunctionInvocationContext, **args):
+        reply = await gateway.call_tool(ctx.kwargs["acting"], spec.name, args)   # forwards, computes nothing
+        return json.dumps(reply.body)
+    return FunctionTool(name=spec.name, description=spec.description, func=forward, input_model=spec.schema)
+
+# per request:  await agent.run(question, function_invocation_kwargs={"acting": who})
+```
+
+Observed output:
+
+```text
+name matches: True
+description matches: True
+schema equal to catalog: True            # tool.parameters() == spec.schema
+invoke -> body saw: {'client_id': 1001, 'tax_year': 2023, 'method': 'min_max'}
+final: done | gateway saw: [('person-oid-1', 'client_eligibility', {'client_id': 4242, 'tax_year': 2023})]
+```
+
+The last line ran a real `Agent` with a scripted chat client: the model asked for `client_id=1`, a `FunctionMiddleware` overwrote it with `4242` (the reader's client),
+and the body received the identity from `function_invocation_kwargs`. Cautions for RM-07 and RM-08:
+
+1. **A mapping schema is not validated like a Pydantic model.** The docstring: a dict is "checked only for top-level `required` fields, `additionalProperties: false`, and
+   property `enum` and primitive `type` values ... never rely on them as an authorization or security boundary." Observed: `tax_year="abc"` raised `_FunctionArgumentValidationError` (type), but nested constraints and `oneOf` are not enforced. The catalog's strict `jsonschema` check
+   (today `first_schema_problem`) must stay as a middleware step.
+2. `invoke` returns `list[Content]`; use `result_parser=` (or a middleware) to control the string the model sees.
+3. `max_invocations` counts over the **tool instance's lifetime**, not per request: do not use it for the turn budget.
+4. The model-facing schema is the catalog schema **minus** what the reader owns (`client_id`, year keys, what-if sizes) with `additionalProperties: true`
+   (`toolset.offered_schema`). That projection is hard-coded in the orchestrator today (`CLIENT_PLACEHOLDER`, `YEAR_KEYS`, `SCENARIO_NUMBERS`, `_NOT_FOR_MODELS`). For "the catalog is the only source" it must become catalog metadata (finding F-07).
+
+## 5. Spikes run (evidence for the verdicts)
+
+**Workflow with a confirmation (RM-10b).** On core 1.24.0 a `Workflow` of three executors (prepare → confirm → commit) was built with
+`WorkflowBuilder(start_executor=..., checkpoint_storage=InMemoryCheckpointStorage(), name="write").add_edge(...).build()`. `await wf.run("...")` ended in
+`IDLE_WITH_PENDING_REQUESTS` with one `request_info` event (`Preview`) and no output; a checkpoint existed. A **freshly built** second graph then ran
+`await wf2.run(responses={request_id: Decision(True)}, checkpoint_id=...)` and ended `IDLE` with the commit executor's output. So the pause, the typed reply and the
+resume on a rebuilt graph work, which is what a restarted replica would do.
+
+**MCP SDK per-request identity (RM-14).** `mcp.server.lowlevel.Server(..., on_call_tool=...)` served through `streamable_http_app(json_response=True)` and driven in process
+with `httpx.ASGITransport`: the handler read `ctx.request.headers["x-test-user"]` and `["authorization"]` of **that** request in `stateless_http=True` (two users, two values)
+and in stateful mode (initialize, then two calls with different users on one session). In stateful mode a second user presented the first user's `Mcp-Session-Id` and was served:
+**the SDK does not bind a session to a person**, which the facade does (a foreign session is "unknown", D-65).
+
+## Hand-rolled inventory
+
+Verdicts: **REPLACE** (a MAF primitive does the whole job), **WRAP** (keep the guarantee and put it in a MAF extension point), **KEEP** (a framework cannot meet it; reason given).
+Guarantees preserved by every verdict: client chosen by code; year and method from the reader; writes only prepared by the model; tool budget; fact ledger; names-not-values
+narrator brief; numeric guard; verbatim composer; lanes; per-request identity. Line counts are physical lines (`Get-Content ... .Count`). **Outcome** is filled in by RM-07 to RM-12 (and RM-14); it reads `pending` until then.
+
+### Orchestrator host and wiring (`channel_orchestrator/`)
+
+| # | Component (path, lines) | What it does | MAF primitive (evidence) | Verdict | Reason / how | Outcome |
+| --- | --- | --- | --- | --- | --- | --- |
+| H1 | Entry shell: `main.py` (9), `app/main.py` (46) | Starts `ResponsesAgentServerHost`, one `@response_handler`, returns `TextResponse` | `ResponsesHostServer(ResponsesAgentServerHost)`, agent-framework-foundry-hosting `1.0.0b261030` (wheel read) | **KEEP** | Only pre-release exists and it cannot serve `activity`; the seam stays so the swap is one file. | pending (RM-12) |
+| H2 | `app/host.py`: `signals_of`, `conversation_of`, `who_is_asking` (~45 of 100) | Flattens platform signals from `ResponseContext` for identity | `azure.ai.agentserver.core.get_request_context()` → `FoundryAgentRequestContext` (not MAF) | **KEEP** | No framework maps the platform's signals to an Entra object id, tenant and a refusal; a hosting swap would still need this reading. | pending |
+| H3 | `app/host.py` debug: `whoami`, `diagnostics`; `core/modelprobe.py` (49), `core/netcheck.py` (140) | Debug-only reports (`CHANNEL_DEBUG_WHOAMI`) | none | **KEEP** | Platform-specific diagnostics for this runtime's network and headers; no framework equivalent. | pending |
+| H4 | `app/wiring.py` (63) | Composition root: settings, gateway, chain, planner, pipeline | none (`Agent` has no composition root) | **KEEP** | Composition is the app's; it will construct the generated tools and middleware (RM-07/08). | pending |
+| H5 | `core/settings.py` (119) | Environment to `OrchestratorSettings`, fail at start | internal `agent_framework._settings.load_settings` (private) | **KEEP** | Private helper; RM-20 moves it to the typed `Settings`, not to MAF. | pending (RM-20) |
+| H6 | `core/identity.py`: `resolve_identity`, readers, `Refusal` (165, extraction part) | Chooses the first configured source with a GUID oid; refuses on tenant mismatch | none | **KEEP** | Attribution to a named person, refusal before any tool or model, and a recorded source are this product's policy; no framework resolves `X-Acting-*` for a gateway. | pending |
+| H7 | `core/identity.py`: `ActingIdentity.gateway_headers`, per-turn closure over `ToolRunner.who` | Carries the person into every tool call | `Agent.run(function_invocation_kwargs=)` + `FunctionInvocationContext.kwargs` (probe) | **WRAP** | Identity is passed per request to tools built once. | pending (RM-07) |
+| H8 | `core/gateway_client.py` (107): `GatewayClient`, `GatewayReply`, `managed_identity_token` | The one outbound call: `POST /channel/v1/tools/{tool}` with `X-Acting-*`, `idempotency_key`, `confirmation_token`, narration report | `MCPStreamableHTTPTool` exists but the gateway's `/mcp` returns rendered text and has no separate `idempotency_key` / `confirmation_token` fields | **KEEP** | The REST contract with typed errors is the audit boundary's door; a generic tool client cannot carry the commit fields. Becomes the body of the generated tools. | pending (RM-07) |
+
+### The turn and conversation state
+
+| # | Component (path, lines) | What it does | MAF primitive (evidence) | Verdict | Reason / how | Outcome |
+| --- | --- | --- | --- | --- | --- | --- |
+| T1 | `core/turn.py` `TurnPipeline` (176) | Identity gate, exact `confirm`/`cancel`, numbered reply resume, deadline, assembly, audit | `Workflow` for fixed sequences (`WorkflowBuilder`, `Executor`); `FunctionInvocationConfiguration.max_duration_seconds` is only a loop budget | **WRAP** | Stays as the thin entry (identity gate, exact-word gate, deadline); the write path moves into a Workflow (RM-10b) and the review pack into another (RM-10c). | pending |
+| T2 | `core/writes.py` `parse_command`, `CONFIRM_WORDS` (in `replies.py`) | Exact words only: "please go ahead" is a new question | none (approval is structured) | **KEEP** | A product rule about free text that no framework approval models; it produces the typed `Decision` the Workflow consumes. | pending |
+| T3 | `core/writes.py` `commit_pending`, `commit_tool_for`, `_package_link`, `CommitOutcome` | Clears pending first, sends the commit once with a fresh idempotency key, never retries, then asks the gateway for the package link | `Executor` + `@response_handler`, `WorkflowContext.request_info` (spike: pause, reply, resume) | **REPLACE** | A commit executor that runs only after the reply; token, person, tool, arguments, expiry and single use are still checked by the gateway and API. | pending (RM-10b) |
+| T4 | `core/state.py` `PendingWrite` | Holds the prepared change and its single-use token with an expiry | Workflow pending request + `InMemoryCheckpointStorage` (spike) | **REPLACE** | The token must not reach a durable store: in-memory only, as today (D-81). | pending (RM-10b) |
+| T5 | `core/state.py` `ConversationState`: `client_id`, `tax_year`, `candidates`, `question` | Conversation pin and numbered-reply memory | `AgentSession.state` via a `ContextProvider` (`before_run(state=...)`) | **WRAP** | Same values, held where MAF keeps provider state. | pending |
+| T6 | `core/state.py` `ConversationState.history`, `remember` (6 turns, 500 chars) | Context for the **deterministic** client resolver, not for a model | `HistoryProvider`, `InMemoryHistoryProvider` keep full `Message`s | **WRAP** | The resolver wants the truncated `{role, text}` shape; derive it from session history rather than keep two histories. | pending |
+| T7 | `core/state.py` `StateStore` (TTL, key = person and conversation) | Per-replica TTL map; somebody else's `confirm` finds nothing | `SessionStore` / `FileSessionStore` (disk) | **KEEP** | A replica-local TTL registry is the decided durability (D-81: the filesystem may be discarded); hosting's Foundry-backed stores are unverified live. | pending |
+| T8 | `core/audit.py` (65): `narration_report`, `NarrationAuditor` | Posts the narration audit to the gateway, counts failures, never hides the answer | `AgentMiddleware` after `call_next()` | **WRAP** | Durable per-person audit is the gateway's row; OpenTelemetry is not a substitute. Moves to the end of the agent run. | pending (RM-08/09) |
+| T9 | `core/replies.py` (83), `core/placeholders.py` (24) | Fixed sentences; `{{facts.path|format}}` placeholders handed to the model | none | **KEEP** | Product copy and the narrator-brief format; not framework concerns. | pending |
+
+### Tool rules (`core/tools.py` `ToolRunner`, 249 lines, plus `core/toolset.py`, 155)
+
+| # | Rule (lines in `tools.py` unless noted) | MAF primitive (evidence) | Verdict | How / reason | Outcome |
+| --- | --- | --- | --- | --- | --- |
+| R1 | Tool budget `max_calls` (L183-185, L206-209) | `FunctionInvocationConfiguration.max_function_calls` is **best-effort** (docstring; `test_orch_maf.py::test_the_tool_loop_is_bounded_by_the_turn_budget` allows `calls <= 3` for a budget of 2); `FunctionMiddleware` | **WRAP** | Count in the first middleware and refuse beyond the budget; keep `max_function_calls` as the backstop. | pending (RM-08) |
+| R2 | Unknown or commit tool is refused and recorded (L178-182; `toolset.model_tools` L30-36, `_NOT_FOR_MODELS`) | Function middleware **never sees** a call to an unregistered tool: `_tools.py` L2219-2227 answers `Function "x" not found` before any middleware; `terminate_on_unknown_calls` aborts the run instead | **WRAP** | Observe the model's `function_call` names in a `ChatMiddleware` (and in `PortChatClient.on_unknown` today) and record `refused`; a commit stub registered only to refuse would put it in the model's set, so it is not allowed. Finding F-03. | pending (RM-08) |
+| R3 | Client chosen by code: `ensure_client`, `client_resolve` (L81-99, L157-161) | `FunctionMiddleware` mutating `context.arguments` (probe: `client_id` 1 became 4242) | **WRAP** | Written over whatever the model passed, after the budget and commit checks. | pending (RM-08) |
+| R4 | Year, method, scenario size, `tax_years` from the reader (`_year`, `_years`, `_method`, `_scenario`, `_tax_years` L103-152; `years_in`, `numbers_in` in `toolset.py`) | `FunctionMiddleware` | **WRAP** | Pure functions of the reader's words stay as helpers; middleware applies them. A missing year or size sets a clarification and stops the loop (`MiddlewareTermination`). | pending (RM-08) |
+| R5 | Schema check against the catalog's strict schema (`first_schema_problem`, `toolset.py` L71-76; L190-193) | `FunctionTool(input_model=<dict>)` validates only `required`, `additionalProperties:false`, `enum`, primitive `type` (docstring) | **WRAP** | `jsonschema` stays, as a middleware step after the overrides. | pending (RM-08) |
+| R6 | A repeated identical call returns the earlier answer (`_answered`, L194-197) | none (`FunctionTool` has no per-run cache) | **WRAP** | Middleware cache keyed by tool and arguments for one turn. | pending (RM-08) |
+| R7 | Eligibility under both methods, labelled runs (`_both_methods`, `_label`, L202-220) | none: a middleware's `call_next()` runs one invocation | **KEEP** (decide in RM-08) | A fan-out of two gateway calls with distinct fact labels is a policy; candidate homes: the generated tool body calling twice, or a Workflow step. Must stay logic-free. | pending (RM-08) |
+| R8 | Fact capture, token strip, hold the prepared write (`_call`, `_hold`, `ToolRun`, L222-245) | `FunctionMiddleware` after `call_next()` (`context.result`) | **WRAP** | Keep the envelope in a per-turn collector; strip `confirmation` before anything model-visible; hand the held write to the Workflow. | pending (RM-08/10b) |
+| R9 | Names-not-values reply to the model (`model_answer`, `narrator_brief`; `toolset.py` L107-118) | `FunctionTool(result_parser=)` or `context.result` in middleware | **WRAP** | The model sees fact **names** and placeholders; lookup tools expose their (lane-projected) result by declaration. | pending (RM-08) |
+| R10 | Lane projection for the model (`ToolRun.model_facts`, `lane_diagnostic`) | none | **KEEP** | Employee-level rows must never reach a model (ADR-009); the projection is `application.capabilities.lanes`, a platform guarantee. | pending |
+| R11 | One span per gateway call (`_timed`, `core/telemetry.py` 49) | `get_function_span` (`execute_tool` span), `enable_instrumentation`, `OBSERVABILITY_SETTINGS.SENSITIVE_DATA_ENABLED` (default `False`) | **REPLACE** (+ **WRAP**) | MAF's span replaces ours; a middleware adds `tcc.channel`, `tcc.correlation_id`, `tcc.outcome` to the current span. A test must keep arguments, facts and messages out of traces. | pending (RM-08) |
+| R12 | Hand-defined model-facing schema: `offered_schema` (`CLIENT_PLACEHOLDER`, `YEAR_KEYS`, `SCENARIO_NUMBERS`) and `function_tools` in `maf_agent.py` | `FunctionTool(name, description, func, input_model=<dict>)` (section 4) | **REPLACE** | A generated factory over the catalog; reader-owned arguments become catalog metadata (F-07). | pending (RM-07) |
+
+### Planning, model access and composition
+
+| # | Component (path, lines) | What it does | MAF primitive (evidence) | Verdict | Reason / how | Outcome |
+| --- | --- | --- | --- | --- | --- | --- |
+| P1 | `core/planner.py` tools mode (`_with_tools`) | An MAF `Agent` drives the model's tool calls | `Agent` | **REPLACE** (already MAF) | Becomes the one planner for open questions (RM-10a). | pending |
+| P2 | `core/planner.py` json mode (`_with_json`, `_plan_round`, `_narrate`, `plan_steps`; `prompts.PLAN_JSON`, `tool_catalogue`) | For a provider without tool calling: the model returns `{"tools": [...]}`, the runner runs them, a second call narrates | none (an `Agent` needs tool calling) | **KEEP** (degraded path) | A model that cannot call tools cannot be an `Agent`; documented degraded path behind one interface (RM-10a). | pending |
+| P3 | `core/planner.py` keywords mode (`_keywords`); `application/chat_keywords.py` (55), `capabilities/catalog_intents.py` (62) | No model, or injection flagged, or the model failed: the platform's keyword table picks tools | none | **KEEP** (degraded path) | It must work with no model at all and cannot be talked into anything. | pending |
+| P4 | `core/maf_agent.py` `PortChatClient`, `_as_chat_messages`, `_as_response`, `ModelTrace` (130 total) | MAF client over `ModelChain`; records turns and prompt hash for the audit | `OpenAIChatClient` / `OpenAIChatCompletionClient` (`base_url`, `api_key` callable); `FoundryChatClient` | **REPLACE** for `foundry`; **KEEP** for a customer gateway chain | The foundry provider uses MAF's client against the account's OpenAI host (what works from the hosted runtime, D-101); a multi-provider chain still needs `ModelChain` (F-05). `ModelTrace` is replaced by a `ChatMiddleware` collector. | pending (RM-09) |
+| P5 | `core/maf_agent.py` `ComposeMiddleware` | The agent's only exit is the composer's reply | `AgentMiddleware` (already used) | **KEEP** (it *is* the MAF primitive) | The structural half of "agents narrate, tools calculate". | pending |
+| P6 | `core/models.py` `ModelChain`, `Provider`, `build_providers`, `foundry_openai_base` (154) | Ordered providers, fall to the next on failure, one model per tool loop, egress policy, injection screen | `ChatMiddleware` (egress, injection screen); **no failover client** | **WRAP** (screen and egress) / **KEEP** (failover) | Egress policy and the injection screen become chat middleware; failover across providers stays in `ModelChain` only when more than one provider is configured. | pending (RM-09) |
+| P7 | `core/compose.py` (121), shared `application/composer*.py`, `numeric_*.py` (`composer.py` 176, `numeric_guard.py` 109) | Verbatim composer, numeric guard, outside-view rule, provenance footer | none | **KEEP** | The exactness guarantee is platform code that no framework can offer; it is the one path from a model's words to a reader. | pending |
+| P8 | `core/prompts.py` `PLANNER`, `narrator_instructions` (115) | Instruction text; narrator prompt vendored unchanged | `Agent(instructions=...)`, `ContextProvider.extend_instructions` | **KEEP** (content) | Prompts are content, already passed through MAF; RM-15's knowledge provider may add instructions, never figures. | pending |
+
+### The channel gateway (`backend/channel/`) and shared pieces
+
+| # | Component (path, lines) | What it does | MAF primitive (evidence) | Verdict | Reason / how | Outcome |
+| --- | --- | --- | --- | --- | --- | --- |
+| G1 | `pipeline.py` `ToolPipeline` (243) | Rate limit, writer check, audit begin/end, lane guard, ledger, one door for REST and MCP | none (serves non-MAF callers) | **KEEP** | The audit boundary for every surface; it is not an agent. | n/a |
+| G2 | `mcp.py` `McpServer`, `describe` (186) | Hand-written Streamable-HTTP MCP subset for Cowork; sessions bound to the user | `mcp` 2.3.0 `Server`, `streamable_http_app`, `ServerRequestContext.request`, `ServerMiddleware` (spike) | **REPLACE** (conditional) | Per-request headers now reach the handler; the SDK does not bind sessions to a person and `describe` alters descriptions (F-07). RM-14 decides; the fallback is KEEP plus a conformance test. | pending (RM-14) |
+| G3 | `auth.py` `CallerAuthenticator`, `Caller` (190) | Two token shapes (agent app token with `X-Acting-*`, delegated user token), channel binding | `mcp.server.auth` `TokenVerifier` covers MCP bearer only | **KEEP** | Entra validation, `Channel.Invoke` and channel binding (RM-02) are product policy. | n/a |
+| G4 | `ledger.py` `FactLedger`, `verify_figures` (79) | Per-conversation record of facts told; zero-tolerance verify for Cowork | none | **KEEP** | A guarantee, not plumbing. | n/a |
+| G5 | `lane_guard.py` (32), `limiter.py` (10), `people.py` (44), `narration.py` (98), `render.py` (81), `downloads.py` (111) | Gateway copy of the lane rule; rate limit; display names; narration audit endpoint; Cowork text; package tickets | none | **KEEP** | Gateway guarantees and endpoints. | n/a |
+| G6 | `api_client.py` (133), `routes.py` (202), `app.py` (59), `wiring.py` (86), `config.py` (140), `main.py` (21) | Gateway to API call, HTTP surface, composition | none | **KEEP** | HTTP shell. | n/a |
+| G7 | `tools.py` (54) `offered_tools`, `check_arguments`, **`PING_SPEC`** | Gateway tool list; `channel_ping` is defined **by hand** outside the catalog | none | **WRAP** | `channel_ping` must be moved into the catalog (tag `gateway_local`, `debug`) or named in the RM-07 architecture test's allow-list (F-07). | pending (RM-07) |
+| G8 | Shared and vendored: `application/ai/safety/injection.py` (105), `untrusted.py` (61), `egress.py` (110), `infrastructure/ai/openai_compatible.py` (108), `capabilities/lanes.py` (78) | Injection screen, fenced reader text, egress policy, the OpenAI-compatible adapter, the lane projection | `ChatMiddleware`; `OpenAIChatCompletionClient` | **WRAP** (safety, egress) / **REPLACE in the orchestrator** (adapter) / **KEEP** (lanes) | The adapter stays in the backend for the portal's providers; the orchestrator stops using it once RM-09 lands. | pending (RM-09) |
+| G9 | `scripts/vendor-orchestrator.py` (180) | Copies shared modules into the zip, manifest hash | none | **KEEP** | Packaging; unrelated to MAF. | n/a |
+
+## Where each guarantee lives after the migration
+
+| Guarantee | Mechanism after RM-07 to RM-10 | Framework extension point |
+| --- | --- | --- |
+| Client chosen by code | `client_resolve` runs first; its answer overwrites the model's `client_id` | `FunctionMiddleware` (`context.arguments`) |
+| Year and method from the reader | Pure helpers over the question and the session | `FunctionMiddleware` |
+| Writes only prepared by the model | The model's tools exclude `*_commit`; commit exists only as a Workflow executor | Tool set (`Agent(tools=)`); `ChatMiddleware` records attempts |
+| Confirmation | Exact-word gate (code) → `Decision` → `@response_handler` → commit executor | `Workflow` + `request_info` |
+| Tool budget | Counted and refused in the first middleware | `FunctionMiddleware` + `max_function_calls` backstop |
+| Fact ledger | Gateway records every envelope it returns | none (gateway) |
+| Names-not-values brief | What the model sees of a tool result | `result_parser` / `context.result` |
+| Numeric guard, verbatim composer | `compose_reply` is the agent's only exit | `AgentMiddleware` (`ComposeMiddleware`) |
+| Lanes | Model projection (`model_facts`) and the gateway/API refusal | none (platform) |
+| Per-request identity | Resolved once per request, passed to tools | `function_invocation_kwargs` → `FunctionInvocationContext.kwargs` |
+
+## GO / NO-GO
+
+| Item | Verdict | Reasoning (evidence) | Conditions and open points |
+| --- | --- | --- | --- |
+| **RM-07** generated FunctionTools | **GO** | `FunctionTool(name, description, func, input_model=spec.schema)` reproduces name, description and schema exactly; identity travels in `function_invocation_kwargs` (section 4). | Add catalog metadata for reader-owned arguments and model-offered tools (F-07); keep `jsonschema` (R5); decide `channel_ping` (G7); the architecture test must also read `mcp.describe`'s description edits. |
+| **RM-08** middleware | **GO** | `FunctionMiddleware` can overwrite arguments and short-circuit (probe); order is under our control. | Record a refused tool name in a `ChatMiddleware`, because function middleware never sees an unregistered name (F-03); budget counted in middleware, `max_function_calls` only a backstop (R1); both-methods fan-out needs a home (R7); byte-compat goldens must pass unchanged. |
+| **RM-09** Foundry chat client | **GO, conditional** | `OpenAIChatClient` / `OpenAIChatCompletionClient` with `base_url=https://<account>.openai.azure.com/openai/v1` and a token provider build and carry MAF's function loop and telemetry. `FoundryChatClient` has no endpoint override and uses the project host that the hosted runtime could not resolve (D-101, F-02). | Use `FoundryChatClient` only if `/modelprobe` on the live runtime shows the project host resolves. Keep `ModelChain` + `PortChatClient` for a multi-provider or customer-gateway chain (F-05). Moving from chat completions to Responses changes the tool wire: re-record the scripted-model tests. |
+| **RM-10a** Agent as planner | **GO** | The tools-mode planner is already an `Agent`; json and keywords modes are degraded paths by nature (P2, P3). | One small interface for the degraded path; remove duplicate plan/narrate code. |
+| **RM-10b** write path as a Workflow | **GO** | Prepare → `request_info` → `@response_handler` → commit paused, then resumed on a **fresh** graph from a checkpoint, on 1.24.0 (section 5). `Workflow.cancel_pending_requests` exists for "any other message drops the change". | Reply built only by the exact-word, same-person, in-time gate; checkpoint storage in memory (the token must not be persisted); a conditional edge so read-only turns never pause (`EdgeCondition`); existing write, workflow and audit tests unchanged. |
+| **RM-10c** client review pack as a Workflow | **GO** | Fixed sequence with fan-out/fan-in edges (`add_fan_out_edges`, `add_fan_in_edges`); each step a call through the same gateway client; `compose_reply` already composes several runs. | No arithmetic in any executor (test in RM-10d); no framework gap found. |
+| **RM-11** agent as code | **GO, scoped** | Microsoft Learn (*agent.yaml schema reference*, updated 2026-10-29): `agent.manifest.yaml` and `agent.yaml` are legacy and superseded by `azure.yaml`; the current `azd ai agent init` rejects the manifest wrapper. Our `azure.yaml` is already the declarative definition (`azure.ai.agent`, `kind: hosted`, `protocols: responses 2.0.0`, `agentEndpoint`). | The work is the single repo-owned list that publishes the specialist prompt agents (`create_version` unchanged). The `azure.ai.agent` host also lists *prompt* agents; adopting that for the specialists is a separate decision, not assumed. No live publish. |
+| **RM-12** hosting package | **NO-GO** (KEEP the host behind the `main.py` seam) | It cannot serve `activity` (no handler in four packages); only pre-release builds exist (`1.0.0b261030`); per-request identity into an `Agent`'s tools under hosting is not shown to work (section 3). Teams works without it (D-100). | Revisit at GA with a live spike: `get_request_context()` identity into a workflow factory, the Foundry-backed stores in this network, and that `azure.yaml` and the endpoint protocols are unchanged. The architecture test confining `azure.ai.agentserver` to `main.py` stays true. |
+| **RM-14** MCP SDK vs facade | **GO (time-boxed spike)**; keep the facade until the spike passes | `mcp` 2.3.0: `ServerRequestContext.request` carries the request's headers (stateless and stateful), so D-65's blocker no longer holds. The SDK does not bind a session to its user (a second user used the first user's session). | The replacement must keep: one pipeline for every call, user-bound sessions or stateless with the conversation id from elsewhere (the ledger key), identical error codes, the description and annotation shape. A protocol-conformance test (initialize, ping, tools/list, tools/call, unknown session, error codes) is required either way. Adds `httpx2`, `sse-starlette` and `mcp-types` to the API image (D-65). `MCPStreamableHTTPTool` is a client and is not a replacement. |
+
+## Missing framework features (also in REMEDIATION-FINDINGS.md)
+
+| Id | What is missing | Effect | Handling |
+| --- | --- | --- | --- |
+| F-01 | A GA hosting package; an Activity protocol host | RM-12 stays NO-GO | Keep the host; revisit at GA |
+| F-02 | An endpoint override on `FoundryChatClient` | The documented client targets the project host that did not resolve from the hosted runtime | Use `OpenAIChatClient` with the account host, or verify the project host live |
+| F-03 | Function middleware sees only registered tools | A refused commit attempt cannot be recorded there | Record in `ChatMiddleware`; never register a refusing stub |
+| F-04 | Full JSON-schema validation for a mapping `input_model` | Nested constraints are not enforced by the framework | Keep `jsonschema` in middleware |
+| F-05 | A multi-provider failover chat client | `ModelChain` stays for more than one provider | Keep, only for the gateway chain |
+| F-06 | An approval path for a free-text channel | MAF approval needs a structured reply Teams cannot send | Workflow `request_info` with our exact-word gate |
+
+## Evidence and how to reproduce
+
+All from the repo root with `.venv\Scripts\python.exe` unless stated; nothing was installed into `.venv`.
+
+| Claim | Command or file |
+| --- | --- |
+| Installed versions | `.venv\Scripts\pip.exe list`, `pip show agent-framework-core agent-framework-foundry agent-framework-openai` |
+| Newest versions, hosting is pre-release only | `.venv\Scripts\pip.exe index versions <package> --pre` |
+| Hosting metadata, README, source | `pip download agent-framework-foundry-hosting==1.0.0b261030 --no-deps --dest <folder outside the repo>`; also `azure-ai-agentserver-responses==2.4.0`, `-core==2.3.0`, `-invocations==1.3.0`; read `METADATA`, `__init__.py`, `_responses.py`, `_request.py` |
+| No Activity handler | `Select-String -Pattern '\bactivity\b'` over those four trees |
+| API names and signatures | `python -c "import agent_framework as af, inspect; ..."` (`dir(af)`, `inspect.signature(af.FunctionTool.__init__)`, `af.Workflow.run`, `af.WorkflowBuilder.__init__`, `af.FunctionMiddleware`, `af.ContextProvider`, `af.HistoryProvider`) |
+| Chat clients | `inspect.signature(FoundryChatClient.__init__)`, `_chat_client.py` lines 175-300, `AIProjectClient.get_openai_client` docstring (`base_url` override exists there) |
+| FunctionTool from a catalog spec; identity through kwargs; middleware override | the snippets in sections 4 and 5, run from `backend\` with `..\.venv\Scripts\python.exe -` |
+| Workflow pause, reply, resume | section 5 snippet (`InMemoryCheckpointStorage`, `Workflow.run(responses=, checkpoint_id=)`) |
+| Unknown tool bypasses function middleware | `agent_framework\_tools.py` lines 2219-2227, 2625-2645 |
+| Telemetry default | `from agent_framework.observability import OBSERVABILITY_SETTINGS` → `SENSITIVE_DATA_ENABLED False` |
+| MCP SDK per-request headers | `mcp.server.lowlevel.Server(on_call_tool=...)` + `streamable_http_app` + `httpx.ASGITransport`, in stateless and stateful mode |
+| Platform contract | Microsoft Learn: *Hosted agent runtime contract*, *Deploy a hosted agent from source code*, *azure.yaml reference for hosted agents*, *agent.yaml schema reference*, *Configure and share your agent* (consulted 2026-11-04) |
+| Line counts | `(Get-Content <file>).Count` |
+
+Not verified: anything on the live Foundry service (these spikes ran in process); whether the project host resolves from the hosted runtime today; the hosting package's behaviour on the real platform; an `mcp`-served facade against the real Cowork client.
