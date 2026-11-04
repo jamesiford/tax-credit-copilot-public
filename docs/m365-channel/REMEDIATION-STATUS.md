@@ -61,3 +61,12 @@ Backend after Tier 1: **5305 passed / 136 skipped / 1 xfailed** (baseline 4957 p
 ## Blockers
 
 None.
+
+## Final gate (end of run, tip before this note)
+
+- Backend: **6209 passed, 136 skipped, 1 xfailed** (baseline 4957 at the start of the run).
+- Frontend (not modified): 929 passed; build ok.
+- Terraform on a clean copy of infra/: fmt, validate, tflint clean; test 70 passed.
+- whitelabel 0 enforced; audit-export 0; links 0 broken (107 files); gitleaks HEAD clean; vendored copy matches; no raster tracked.
+- **check_all.py was NOT completed on the final tip** (stopped at the owner's request to finish; the last complete runs were 21 of 22 at the RM-19 tip, the one failure being the known working-tree gitleaks row). RM-20 to RM-25 were gated by the full backend suite or the fast gate only.
+- Live: RM-16 deployed API, gateway and agent version 21 (rollback: agent version 20), but the live data checks, ten questions and prepared-write check did NOT run because the shared Fabric capacity was suspended; the code deployed is the RM-16 tip, not this tip (RM-17 to RM-25 are behaviour-preserving refactors not yet deployed).
