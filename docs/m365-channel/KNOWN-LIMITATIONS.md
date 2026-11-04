@@ -34,6 +34,16 @@ PoC runs on synthetic data, and several of these are fine there and unacceptable
 | **No employee identifier in a chat** | Employee-level tools take an opaque record token. An employee id never appears in a URL, log or prompt |
 | **No Adaptive Cards** | Replies are text: tables as text, choices as a numbered list |
 
+## Data queries
+
+| Limitation | Detail | What closes it |
+| --- | --- | --- |
+| **Small groups still reach the model (Copilot Cowork)** | An aggregate over one or two people (a count by a location that has one employee, an average by a rare designation) is close to a person's own figure, and over Cowork the aggregate's text is what its model reads. There is **no minimum-group-size suppression**: hiding a small group would make an aggregate silently differ from what the data holds, which breaks the exactness this product is built on, and the person asking is entitled to the figure in Teams, where the model is shown names only. The control is the lane (an employee-level *row* never goes to a model) plus the writer rule for Cowork, not suppression | A suppression policy that withholds a group below a size **and says that it did**, decided with the partner; or refusing group-by on a dimension finer than a location for Cowork. Neither is built |
+| **The table shows at most 50 rows** | The facts keep every row the cap allowed (500 at most); the table in the reply shows the first 50 and says how many it cut, because a message of five hundred rows is not delivered. The person is told to narrow the question or ask for an aggregate | Paging, or a downloadable result. Not built |
+| **A model sees at most 50 rows' worth of fact names** | The narrator can cite the first 50 rows by placeholder; a longer list is cut for the model only. The person's table is unaffected | None planned |
+| **Row counts, not people** | A count over a pay-period dataset counts pay periods; `count_distinct` on `record_token` counts people. The catalog's `engine_notes` say which, and the fixed tools remain authoritative for eligibility and credit | None: said in the catalog |
+| **Not run against a live Fabric capacity** | Everything is verified offline over SQLite and fakes shaped like the drivers; T-SQL execution, the pyodbc timeout and the lakehouse endpoint are first exercised on the live redeploy | The live redeploy (CH-17) |
+
 ## Downloads
 
 A claim package link is a **ticket** on the gateway: 256 bits, single use, valid fifteen minutes, bound to the

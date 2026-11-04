@@ -60,6 +60,31 @@ the gateway's MCP facade and two skills that teach the workflows. Its figures ar
 rules and by `verify_figures`, a gateway-local tool that checks a draft against the conversation's own tool
 results. This is weaker than the orchestrator's guarantee and is documented as such.
 
+**8. Governed data access, in two lanes (CH-16).** The fixed tools answer what the engine concluded. Three more
+read tools let a person ask questions the fixed tools cannot (the wage distribution at a location, which months
+drove a shortfall): `data_catalog` says what exists, `data_query` runs a validated *specification* (never SQL,
+never a model-written statement) built from a checked-in semantic model with every value bound and the client
+scope first, and `data_distinct_values` lists the values of a category so a filter is not guessed. They are
+capabilities like the rest (registry, gateway catalog, MCP list, audit), and the result is divided into two
+**lanes** on the envelope itself. A block carries an `audience` (`both` or `user`); a result names the `facts`
+keys that came from person-level values (`user_only_facts`). A result that lists employees (a record token, one
+person's hours or pay, or raw rows of an employee-level dataset) puts its table in the `user` lane. The
+orchestrator's model-facing projection (`capabilities/lanes.py`: `model_facts`, `model_blocks`) drops both, so a
+model is told the count and the column names and never the rows, while the person's reply, composed from the full
+envelope, shows them. An audience word the consumer does not know is read as `user`, never `both`. The existing
+guarantee that a model is only ever shown the *names* of facts is unchanged; the lane is the second wall behind it,
+and the one that holds where a model is handed text.
+
+Copilot Cowork is that case: its model composes from the text a tool returns, so there is no way to show the
+person a row and hide it from the model. **A result that lists individual employees is therefore refused over
+Cowork unless the caller is a writer**, with a plain-words refusal naming Teams as the place the rows are shown to
+the person alone. A writer is entitled to see person-level data and chooses Cowork knowingly, which is the same
+bar the platform sets for changing it. The rule is enforced twice: the API refuses before anything is read (it
+knows the specification and the channel), and the gateway refuses on the way back if any result still carries a
+person-only lane for a non-writer, so neither check is the only one. An aggregate over employee-level data (a
+count of people by location, an average by month) carries no person and is allowed everywhere. Not decided here:
+suppressing small groups (see [KNOWN-LIMITATIONS](../m365-channel/KNOWN-LIMITATIONS.md#data-queries)).
+
 ## Alternatives considered
 
 | Alternative | Why not |
