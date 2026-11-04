@@ -54,7 +54,8 @@ def test_a_query_over_http_returns_the_envelope(served, api, headers):
 
 def test_the_catalog_over_http_is_the_direct_call(served, api):
     body = post(api, "data_catalog", {"dataset": "unit_month_summary"}).json()
-    assert body["facts"] == data_catalog(person(), dataset="unit_month_summary").to_dict()["facts"]
+    # a person's own token is not first-party, so the catalog tells them what the direct call tells such a caller
+    assert body["facts"] == data_catalog(person(channel=None), dataset="unit_month_summary").to_dict()["facts"]
 
 
 def test_a_client_the_caller_may_not_see_is_refused_before_any_query_runs(served, api):

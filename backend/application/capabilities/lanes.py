@@ -24,12 +24,14 @@ from typing import Any
 BOTH = "both"
 USER = "user"
 
-#: The refusal Copilot Cowork gets for a result that lists individual employees, from the API and
-#: from the gateway alike, so the person is told the same thing wherever it is caught.
+#: The refusal a caller whose model reads tool text (Copilot Cowork, or any caller that is not Teams or Copilot
+#: Chat) gets for a result that lists individual employees, from the API and from the gateway alike, so the
+#: person is told the same thing wherever it is caught.
 EMPLOYEE_LEVEL_CODE = "employee_level_not_available"
 EMPLOYEE_LEVEL_MESSAGE = (
-    "That answer would list individual employees, and Copilot Cowork cannot carry employee-level rows to its "
-    "model unless you are entitled to make changes. Ask for a count or an average by location, month or year "
+    "That answer would list individual employees, and Copilot Cowork (or any client other than Teams or Microsoft "
+    "365 Copilot Chat) cannot carry employee-level rows to its model unless you are entitled to make changes. Ask "
+    "for a count or an average by location, month or year "
     "instead, or ask in Teams, where the rows are shown to you alone."
 )
 

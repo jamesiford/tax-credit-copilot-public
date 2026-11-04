@@ -28,6 +28,11 @@ def create_app(settings: GatewaySettings | None = None, **overrides: Any) -> Fas
     """Build the gateway. `overrides` are `build_services` collaborators (the fakes of a test)."""
     settings = settings or load_settings()
     services: Services = build_services(settings, **overrides)
+    if not settings.caller_channels:
+        log.warning(
+            "CHANNEL_CALLER_CHANNELS is not set: any registered caller may assert Teams or Copilot Chat. "
+            "Bind each caller to the channels it serves (docs/m365-channel/DATA-ACCESS.md, RM-02).",
+        )
     if settings.debug_whoami:
         log.warning(
             "CHANNEL_DEBUG_WHOAMI is ON: the channel_ping diagnostic is offered and echoes the acting-user headers as received. "

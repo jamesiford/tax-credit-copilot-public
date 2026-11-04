@@ -14,9 +14,10 @@ from __future__ import annotations
 import os
 import re
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from application.deployment import DURABLE_STORES, is_deployed, store_choice
+from domain.channel_trust import FIRST_PARTY_CHANNELS
 
 GUID = re.compile(r"^[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$")
 
@@ -43,6 +44,8 @@ class GatewaySettings:
     api_base_url: str
     api_audience: str
     allowed_caller_app_ids: tuple[str, ...] = ()
+    #: app id -> the first-party channels that app may assert in `X-Channel` (`CHANNEL_CALLER_CHANNELS`)
+    caller_channels: Mapping[str, tuple[str, ...]] = field(default_factory=dict)
     rate_limit_per_minute: int = DEFAULT_RATE_LIMIT_PER_MINUTE
     request_timeout_seconds: float = DEFAULT_REQUEST_TIMEOUT_SECONDS
     debug_whoami: bool = False
@@ -77,6 +80,26 @@ def _number(env: Mapping[str, str], name: str, default: float, low: float, high:
     return value
 
 
+def _caller_channels(env: Mapping[str, str]) -> tuple[dict[str, tuple[str, ...]], list[str]]:
+    """`CHANNEL_CALLER_CHANNELS`: `<app id>=<channel>|<channel>,<app id>=<channel>`, and every problem found.
+
+    Only first-party channels may be listed: no agent may be bound to `cowork` or `api-test`, because an
+    agent that could assert those would be asserting a channel that is not its own.
+    """
+    bound: dict[str, tuple[str, ...]] = {}
+    problems: list[str] = []
+    for entry in (e.strip() for e in _text(env, "CHANNEL_CALLER_CHANNELS").split(",") if e.strip()):
+        app, _, listed = entry.partition("=")
+        channels = tuple(c.strip() for c in listed.split("|") if c.strip())
+        if not GUID.match(app.strip()) or not channels or not set(channels) <= set(FIRST_PARTY_CHANNELS):
+            problems.append(
+                f"CHANNEL_CALLER_CHANNELS entries are <app id>=<channel>|<channel> over {', '.join(FIRST_PARTY_CHANNELS)}"
+            )
+            continue
+        bound[app.strip().lower()] = channels
+    return bound, sorted(set(problems))
+
+
 def _problems(env: Mapping[str, str], deployed: bool, store: str) -> list[str]:
     problems = [f"{name} is required" for name in ("TENANT_ID", "GATEWAY_AUDIENCE", "API_BASE_URL", "API_AUDIENCE")
                 if not _text(env, name)]
@@ -96,7 +119,8 @@ def load_settings(env: Mapping[str, str] | None = None) -> GatewaySettings:
     """The settings, or `GatewayConfigurationError` naming every problem at once."""
     env = os.environ if env is None else env
     deployed, store = is_deployed(env), store_choice("CHANNEL_STORE", env)
-    problems = _problems(env, deployed, store)
+    bound, bad_bindings = _caller_channels(env)
+    problems = _problems(env, deployed, store) + bad_bindings
     if problems:
         raise GatewayConfigurationError("refusing to start:\n  - " + "\n  - ".join(problems))
     apps = tuple(a.strip().lower() for a in _text(env, "CHANNEL_ALLOWED_CALLER_APP_IDS").split(",") if a.strip())
@@ -106,6 +130,7 @@ def load_settings(env: Mapping[str, str] | None = None) -> GatewaySettings:
         api_base_url=_text(env, "API_BASE_URL").rstrip("/"),
         api_audience=_text(env, "API_AUDIENCE"),
         allowed_caller_app_ids=apps,
+        caller_channels=bound,
         rate_limit_per_minute=int(_number(env, "CHANNEL_RATE_LIMIT_PER_MINUTE", DEFAULT_RATE_LIMIT_PER_MINUTE, 1, 6000)),
         request_timeout_seconds=_number(env, "CHANNEL_REQUEST_TIMEOUT_SECONDS", DEFAULT_REQUEST_TIMEOUT_SECONDS, 1, 600),
         debug_whoami=_flag(env, "CHANNEL_DEBUG_WHOAMI"),
