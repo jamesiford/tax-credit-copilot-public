@@ -174,15 +174,6 @@ def test_domain_does_not_import_tools():
     )
 
 
-#: The one place `application/` may still name something under `api/`.
-#: `api/_assess.py` holds no routing — it is an application service that was
-#: filed under the router package, and it depends on `api/_payperiods.py`,
-#: which is a payroll reader that raises `HTTPException`. Relocating both is a
-#: real refactor that touches every router, tracked separately. The allowance
-#: is explicit so it stays one exception and does not become a pattern.
-_APPLICATION_IMPORT_ALLOWANCE = {"api._assess"}
-
-
 def test_application_does_not_import_a_router():
     """Use cases must not reach into presentation to find their dependencies.
 
@@ -199,8 +190,6 @@ def test_application_does_not_import_a_router():
             if not stripped.startswith("from api."):
                 continue
             module = stripped.split()[1]
-            if module in _APPLICATION_IMPORT_ALLOWANCE:
-                continue
             violations.append(f"{path.relative_to(BACKEND).as_posix()} -> {module}")
     assert not violations, (
         "application/ imports from api/:\n  " + "\n  ".join(violations)

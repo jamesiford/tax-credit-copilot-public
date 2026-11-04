@@ -25,7 +25,7 @@ from application.queries.simulate_employee import (
     EmployeeSimulationNotAvailable,
     SimulateEmployeeQuery,
 )
-from bootstrap.wiring import get_mediator
+from application.services import get_mediator
 
 router = APIRouter(prefix="/api", tags=["simulation"])
 
@@ -164,7 +164,7 @@ def run_onezero_simulation(payload: OneZeroSimulateRequest) -> dict[str, Any]:
     """
     from tools.credit_math import STATE_TO_PACK, authored_years, load_pack_one_zero
     from tools.simulation import onezero_snapshot, apply_onezero_lever
-    from api._assess import _client_window, average_headcount, rows_for_state_year
+    from application.assessment_inputs import average_headcount, client_window as _client_window, rows_for_state_year
 
     st = payload.state.upper()
     pack_file = STATE_TO_PACK.get(st)

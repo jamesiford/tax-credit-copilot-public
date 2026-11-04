@@ -24,18 +24,18 @@ def findings_client(tmp_path):
     """A TestClient with its own finding database."""
     from fastapi.testclient import TestClient
 
-    from api import findings as findings_api
+    from bootstrap import wiring
     from infrastructure.persistence.sqlite_findings import SqliteFindingRepository
     from main import app
 
-    original = findings_api._REPO
+    original = None
     repo = SqliteFindingRepository(tmp_path / "findings.db")
-    findings_api.set_repository(repo)
+    wiring.set_finding_repository(repo)
     try:
         yield TestClient(app)
     finally:
         repo.close()
-        findings_api.set_repository(original)
+        wiring.set_finding_repository(original)
 
 
 def _first(client):

@@ -49,6 +49,32 @@ def _new_source_reader() -> Any:
     return source_sql.SourceSqlReader()
 
 
+class InfrastructureSourceCatalogue:
+    """`SourceCatalogue` over the source SQL reader, falling back to the rows the payroll source yields."""
+
+    def payroll_scope(self, account_id: int) -> Any:
+        """Asked as a `GROUP BY` where the source supports one.
+
+        The row path is still correct and still used by the fixture sources, but it
+        materialises 384,433 dicts to answer three `DISTINCT`s — ~3s of GIL-bound CPU
+        per request, on an endpoint that returns half a kilobyte.
+        """
+        from infrastructure.payroll.pay_period_source import load_pay_periods
+        from infrastructure.persistence.source_sql import SourceSqlReader, payroll_scope_from_rows
+        from tools.fabric_source import active_data_source
+
+        if active_data_source() == "lakehouse":
+            reader = SourceSqlReader()
+            if reader.is_configured():
+                return reader.payroll_scope(account_id)
+        return payroll_scope_from_rows(load_pay_periods(account_id))
+
+    def shared_scope(self) -> Any:
+        from infrastructure.persistence.source_sql import shared_scope
+
+        return shared_scope()
+
+
 def _section_9_query_count() -> int:
     from infrastructure.persistence import warehouse_gold
 
@@ -61,9 +87,26 @@ def _reap_stranded_runs() -> int:
     return warehouse_gold.GoldWriter().reap_stranded_runs()
 
 
+def _gold_run_envelope() -> Any:
+    from infrastructure.persistence import gold_reader
+
+    return gold_reader.run_envelope
+
+
+def _gold_filters(name: str) -> Any:
+    from infrastructure.persistence import gold_reader
+
+    return getattr(gold_reader, name)
+
+
 _payroll = InfrastructurePayrollSource()
+_catalogue = InfrastructureSourceCatalogue()
 
 provide("payroll_source", lambda: _payroll)
+provide("source_catalogue", lambda: _catalogue)
 provide("source_reader_factory", lambda: _new_source_reader)
 provide("section_9_query_count", lambda: _section_9_query_count)
 provide("reap_stranded_runs", lambda: _reap_stranded_runs)
+provide("gold_run_envelope", _gold_run_envelope)
+provide("gold_employee_filters", lambda: _gold_filters("EMPLOYEE_FILTERS"))
+provide("gold_near_filters", lambda: _gold_filters("NEAR_FILTERS"))

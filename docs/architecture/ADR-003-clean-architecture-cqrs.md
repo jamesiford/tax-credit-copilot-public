@@ -27,10 +27,13 @@
 > Two rules were added on 30 Aug after the audit found violations neither
 > covered: `test_domain_does_not_import_tools` (the domain was reaching into
 > `tools/` for `StatutoryFloors`, now in `domain/calculation/floors.py`) and
-> `test_application_does_not_import_a_router`. The second carries a single
-> named allowance, `api/_assess.py` — an application service still filed under
-> `api/` because it depends on `api/_payperiods.py`, a payroll reader that
-> raises `HTTPException`. Moving that pair is the next step of this migration.
+> `test_application_does_not_import_a_router`. The second carried a single
+> named allowance, `api/_assess.py`, an application service filed under `api/`
+> because it depended on a payroll reader that raised `HTTPException`. RM-18
+> moved both into `application/` (`assessment.py`, `payroll_rows.py`; the router
+> edge `api/_payperiods.py` maps the reader's errors to 404/503) and removed the
+> allowance; `tests/test_architecture_routers.py` now also keeps `infrastructure`
+> and `bootstrap` out of every router and the long route functions out of `api/`.
 >
 > Migration is deliberately incremental. Each router moves behind the mediator
 > only with the parity gate green — the certified figures (10,236 / 539 / 656)

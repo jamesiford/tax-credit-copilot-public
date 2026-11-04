@@ -56,7 +56,7 @@ router = APIRouter(prefix="/api", tags=["chat"])
 async def chat(req: ChatRequest, request: Request) -> StreamingResponse:
     from api.auth import current_principal
     from application.ai.specs import CHAT_PIPELINE_AGENTS
-    from bootstrap.wiring import get_narration_service
+    from application.services import get_narration_service
 
     principal = current_principal(request)
     _ACTOR.set(principal.actor if principal.authenticated else None)

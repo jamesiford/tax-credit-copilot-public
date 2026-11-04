@@ -9,6 +9,7 @@ The composition root (`bootstrap/source_binding.py`) is the only place that name
 """
 from __future__ import annotations
 
+from contextlib import AbstractContextManager
 from datetime import date
 from typing import TYPE_CHECKING, Any, Protocol
 
@@ -46,6 +47,23 @@ class SourceReader(Protocol):
     def footprint(self) -> dict[int, list[str]]: ...
 
 
+class PayrollScopeView(Protocol):
+    """What the scope selector needs of one client's payroll, and nothing else."""
+
+    total_rows: int
+    tax_years: list[int]
+    states: list[str]
+    pay_dates: list[str]
+
+
+class SourceCatalogue(Protocol):
+    """Aggregate answers about a client's payroll, asked where the source can answer cheaply."""
+
+    def payroll_scope(self, account_id: int) -> PayrollScopeView: ...
+
+    def shared_scope(self) -> AbstractContextManager[None]: ...
+
+
 def _payroll() -> PayrollSource:
     return resolve("payroll_source")
 
@@ -73,3 +91,13 @@ def window_for_state_year(account_id: int | None, state: str, tax_year: int) -> 
 def new_source_reader() -> SourceReader:
     """A fresh reader over the source schema; cheap, and cached state lives in the adapter."""
     return resolve("source_reader_factory")()
+
+
+def payroll_scope(account_id: int) -> PayrollScopeView:
+    """Years, states and pay dates for one client, as a GROUP BY where the source supports one."""
+    return resolve("source_catalogue").payroll_scope(account_id)
+
+
+def shared_scope() -> AbstractContextManager[None]:
+    """One connection for an endpoint's several reads, or nothing where the source cannot use one."""
+    return resolve("source_catalogue").shared_scope()

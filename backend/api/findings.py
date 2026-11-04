@@ -11,7 +11,6 @@ that rather than inventing something new.
 """
 from __future__ import annotations
 
-from datetime import datetime, timezone
 from typing import Any
 
 from fastapi import APIRouter, HTTPException, Request
@@ -25,27 +24,11 @@ from application.commands.resolve_finding import (
     ResolveFindingCommand,
 )
 from application.queries import list_findings
+from application.queries.get_finding_history import GetFindingHistoryQuery
 from application.queries.list_findings import FindingsNotAvailable, ListFindingsQuery
-from bootstrap.wiring import get_finding_repository, get_mediator, set_finding_repository
-from infrastructure.persistence.sqlite_findings import (
-    FindingResolution,
-    SqliteFindingRepository,
-)
+from application.services import get_mediator
 
 router = APIRouter(prefix="/api/findings", tags=["findings"])
-
-_REPO: SqliteFindingRepository | None = None
-
-
-def get_repository() -> SqliteFindingRepository:
-    """The finding store. Composition lives in `bootstrap.wiring`. [ADR-002]"""
-    return get_finding_repository()
-
-
-def set_repository(repo: Any) -> None:
-    """Point the application at another adapter. Used by tests."""
-    set_finding_repository(repo)
-
 
 # What each kind of finding means, what an agent proposes, and the GRAIN a human
 # decides at now live in `application/queries/list_findings`. The underscore
@@ -129,7 +112,4 @@ def reopen(finding_id: str, body: ResolveBody, request: Request = None) -> dict[
 @router.get("/{client_id}/{finding_id}/history")
 def history(client_id: int, finding_id: str) -> dict[str, Any]:
     """Every decision ever recorded against one finding."""
-    return {
-        "finding_id": finding_id,
-        "history": [r.to_dict() for r in get_repository().history(client_id, finding_id)],
-    }
+    return get_mediator().send(GetFindingHistoryQuery(client_id=client_id, finding_id=finding_id))

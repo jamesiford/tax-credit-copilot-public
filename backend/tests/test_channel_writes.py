@@ -13,7 +13,7 @@ from datetime import timedelta
 
 import pytest
 
-from bootstrap import wiring
+from bootstrap import handlers, wiring
 from application.capabilities import catalog, registry
 from application.capabilities.write_specs import InvalidWrite
 from application.confirmations import (
@@ -40,7 +40,6 @@ def agent_for(oid: str = USER, upn: str = "pat@example.com") -> Principal:
 @pytest.fixture
 def world(tmp_path, monkeypatch):
     """Every store a channel write touches, on files, with USER a listed writer."""
-    from api import findings as findings_api
     from infrastructure.persistence.sqlite_channel import SqliteChannelAuditRepository
     from infrastructure.persistence.sqlite_channel_state import SqliteConfirmationRepository, SqliteWriterRepository
     from infrastructure.persistence.sqlite_claims import SqliteClaimRepository
@@ -54,9 +53,9 @@ def world(tmp_path, monkeypatch):
     store.writers = SqliteWriterRepository(tmp_path / "writers.db")
     store.confirmations = SqliteConfirmationRepository(tmp_path / "confirmations.db")
     store.audit = SqliteChannelAuditRepository(tmp_path / "audit.db")
-    originals = (wiring.get_claim_repository(), findings_api._REPO)
+    originals = (wiring.get_claim_repository(), None)
     wiring.set_claim_repository(store.claims)
-    findings_api.set_repository(store.findings)
+    wiring.set_finding_repository(store.findings)
     wiring.set_writer_repository(store.writers)
     wiring.set_confirmation_repository(store.confirmations)
     wiring.set_channel_audit_repository(store.audit)
@@ -65,7 +64,7 @@ def world(tmp_path, monkeypatch):
     store.writers.grant(WriterGrant(user_oid=USER, added_by="test"))
     yield store
     wiring.set_claim_repository(originals[0])
-    findings_api.set_repository(originals[1])
+    wiring.set_finding_repository(originals[1])
     for setter in (wiring.set_writer_repository, wiring.set_confirmation_repository,
                    wiring.set_channel_audit_repository, wiring.set_writer_entitlement):
         setter(None)
@@ -202,7 +201,7 @@ def test_base_year_flows_through_the_command_and_its_preview(world, monkeypatch)
         "application.commands.set_base_year.plan_base_year",
         lambda command: BaseYearPlan({"run_id": "r"}, {2023: {}}, 2022, None),
     )
-    monkeypatch.setattr(wiring, "handle_rebase_unit", lambda q: {
+    monkeypatch.setattr(handlers, "handle_rebase_unit", lambda q: {
         "total_annual_credit_usd": 7000, "run_total_annual_credit_usd": 3500,
         "delta_annual_credit_usd": 3500,
     })
@@ -211,7 +210,7 @@ def test_base_year_flows_through_the_command_and_its_preview(world, monkeypatch)
         seen["actor"], seen["base"] = command.actor, command.base_year
         return {"recorded": True, "base_year": command.base_year}
 
-    monkeypatch.setattr(wiring, "handle_set_base_year", fake_handler)
+    monkeypatch.setattr(handlers, "handle_set_base_year", fake_handler)
     wiring.reset_mediator()
     args = {"client_id": 2001, "unit_id": "GA_GA-001", "base_year": 2023}
     prepared = prepare("base_year_set", **args)

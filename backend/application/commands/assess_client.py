@@ -45,7 +45,7 @@ class ClientHasNoPayroll(LookupError):
 
 
 def handle_assess_client(command: AssessClientCommand) -> dict[str, Any]:
-    from api._assess import assess_client
+    from application.assessment import assess_client
     from application.services import get_claim_repository as get_repository
     from application.source_ports import load_pay_periods
 

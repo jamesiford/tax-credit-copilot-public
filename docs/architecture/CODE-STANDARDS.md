@@ -96,14 +96,11 @@ the gate", not a rewrite.
 | `tools/reference_step1.py::run_reference_step1` | 279 lines | Reference tooling; independent of the product path |
 | `application/commands/run_client_calculation.py::_replay_unit_series` | 255 lines | The write-time engine replay — **parity-critical** |
 | `domain/calculation/onezero.py::run_pay_period_method` | 244 lines | Certified method — **parity-critical** |
-| `api/onezero.py::one_zero` | 242 lines | Legacy route; the architecture rule says routes are thin |
 | `domain/calculation/onezero.py::run_min_max_method` | 239 lines | Certified method — **parity-critical** |
 | `infrastructure/persistence/gold_reader.py::GoldReader` | 830 lines | As above |
 | `application/queries/simulate_employee.py::handle_simulate_employee` | 219 lines, complexity 52 | Extract per-lever helpers |
-| `api/_assess.py::assess_client` | 212 lines | The one allow-listed exception in the architecture test |
 | `domain/calculation/onezero.py` | 1,295 lines | Certified method — **parity-critical** |
 | `application/queries/get_portfolio.py::portfolio_page` | 205 lines | Extract the band and filter steps |
-| `api/onezero.py::one_zero` | complexity 51 | As above |
 | `tools/build_approval_package.py::_cover_sheet` | 192 lines | Document assembly; split by section |
 | `application/commands/run_client_calculation.py::handle_run_client_calculation` | 178 lines | Write path — parity-critical |
 | Chat pipelines (`api/chat/dispatch.py::_dispatch` 86, `pipelines_core.py::_pipeline_eligibility` 92, …) | up to 92 lines | Moved from the old single module; split per scope step |

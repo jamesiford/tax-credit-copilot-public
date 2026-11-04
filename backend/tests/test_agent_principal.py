@@ -203,16 +203,15 @@ def test_the_agent_may_not_read_the_audit_trail(entra, api):
 @pytest.fixture
 def writable(tmp_path, entra, monkeypatch):
     """A finding store, a writer allow-list, and a mediator built under this env."""
-    from api import findings as findings_api
     from infrastructure.persistence.sqlite_channel_state import SqliteWriterRepository
     from infrastructure.persistence.sqlite_findings import SqliteFindingRepository
 
     monkeypatch.delenv("CHANNEL_ENFORCE_WRITER_FOR_USERS", raising=False)
     monkeypatch.setenv("CHANNEL_WRITER_SOURCE", "allowlist")
-    original = findings_api._REPO
+    original = None
     findings = SqliteFindingRepository(tmp_path / "findings.db")
     writers = SqliteWriterRepository(tmp_path / "writers.db")
-    findings_api.set_repository(findings)
+    wiring.set_finding_repository(findings)
     wiring.set_writer_repository(writers)
     wiring.set_writer_entitlement(None)
     wiring.reset_mediator()
@@ -220,7 +219,7 @@ def writable(tmp_path, entra, monkeypatch):
         yield writers
     finally:
         findings.close()
-        findings_api.set_repository(original)
+        wiring.set_finding_repository(original)
         wiring.set_writer_repository(None)
         wiring.set_writer_entitlement(None)
         wiring.reset_mediator()
@@ -490,20 +489,19 @@ def test_an_unknown_writer_source_is_refused(monkeypatch):
 
 
 def test_an_engagement_records_who_set_it(tmp_path, writable, api):
-    from api import claims as claims_api
     from infrastructure.persistence.sqlite_claims import SqliteClaimRepository
 
     _grant(writable)
     repo = SqliteClaimRepository(tmp_path / "claims.db")
     original = wiring.get_claim_repository()
-    claims_api.set_repository(repo)
+    wiring.set_claim_repository(repo)
     try:
         response = api.put(
             "/api/claims/engagement", headers=_agent(acting_header()),
             json={"client_id": 1001, "program_code": "GA_JTC", "scope": "in_scope"},
         )
     finally:
-        claims_api.set_repository(original)
+        wiring.set_claim_repository(original)
     assert response.status_code == 200, response.text
     body = response.json()
     assert body["set_by"] == "pat@example.com" and body["set_at"]
@@ -597,6 +595,8 @@ def test_the_writers_cli_refuses_a_non_guid(tmp_path):
 _OPEN_COMMANDS = {
     "AssessClientCommand": "forbidden to the agent at the edge (AGENT_FORBIDDEN_WRITES); engine-computed",
     "RunClientCalculationCommand": "forbidden to the agent at the edge; a run, not a decision",
+    "ResolveQcExceptionCommand": "forbidden to the agent at the edge (AGENT_FORBIDDEN_WRITES); in-memory QC annotation",
+    "ReviewEmployeeCommand": "forbidden to the agent at the edge (AGENT_FORBIDDEN_WRITES); in-memory review annotation",
 }
 
 

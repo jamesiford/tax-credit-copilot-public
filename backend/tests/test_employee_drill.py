@@ -34,7 +34,7 @@ def test_employee_drill_unknown_404(client):
 
 
 def test_employee_review_roundtrip(client):
-    from api.onezero import reset_employee_reviews
+    from application.employee_reviews import reset_employee_reviews
 
     reset_employee_reviews()
     eid = _a_ga_employee(client)
