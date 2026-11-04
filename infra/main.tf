@@ -49,6 +49,23 @@ locals {
       for k, v in local.ai_secret_names : k => "@Microsoft.KeyVault(VaultName=${module.keyvault.name};SecretName=${v})" if v != ""
     } : {},
   )
+
+  # CH-16f: the governed data query's settings, on the API only (the gateway never touches
+  # data). Emitted only when set, so a default plan is unchanged; the application defaults
+  # (20 s, 500 rows, 30 a minute, 4 at once, source datasets off) apply when absent.
+  data_query_plain_settings = {
+    DATA_QUERY_TIMEOUT_SECONDS = trimspace(var.data_query_timeout_seconds)
+    DATA_QUERY_MAX_ROWS        = trimspace(var.data_query_max_rows)
+    DATA_QUERY_RATE_PER_MINUTE = trimspace(var.data_query_rate_per_minute)
+    DATA_QUERY_MAX_CONCURRENCY = trimspace(var.data_query_max_concurrency)
+    LAKEHOUSE_SQL_SERVER       = trimspace(var.lakehouse_sql_server)
+    LAKEHOUSE_SQL_DATABASE     = trimspace(var.lakehouse_sql_database)
+  }
+
+  api_data_query_settings = merge(
+    { for k, v in local.data_query_plain_settings : k => v if v != "" },
+    var.data_query_source_enabled ? { DATA_QUERY_SOURCE_ENABLED = "true" } : {},
+  )
 }
 
 module "identity" {
@@ -215,7 +232,7 @@ module "app_service" {
     var.enable_m365_channel ? merge(
       { CHANNEL_WRITER_SOURCE = var.channel_writer_source },
       trimspace(var.channel_writer_group_id) != "" ? { CHANNEL_WRITER_GROUP_ID = trimspace(var.channel_writer_group_id) } : {},
-  ) : {}, local.api_ai_settings)
+  ) : {}, local.api_ai_settings, local.api_data_query_settings)
 
   web_app_settings = {}
 }

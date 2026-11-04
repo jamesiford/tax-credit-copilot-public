@@ -343,3 +343,9 @@ output "api_ai_settings" {
   value     = { for k, v in azurerm_linux_web_app.api.app_settings : k => v if startswith(k, "AI_") }
   sensitive = true
 }
+
+# The governed data query's settings as the resource holds them (CH-16f), for the same reason.
+output "api_data_query_settings" {
+  value     = { for k, v in azurerm_linux_web_app.api.app_settings : k => v if startswith(k, "DATA_QUERY_") || startswith(k, "LAKEHOUSE_SQL_") }
+  sensitive = true
+}

@@ -20,7 +20,10 @@
       3. grant-warehouse-sql T-SQL grants on tcc_gold / tcc_ops to the API identity; when
                              the channel is enabled (GATEWAY_IDENTITY_NAME is set), also
                              INSERT/SELECT on tcc_ops.channel_audit to the gateway
-                             identity, at object level only.
+                             identity, at object level only. When the governed data query's
+                             lakehouse source is on (TCC_DATA_QUERY_SOURCE_ENABLED=true), also
+                             READ-ONLY SELECT on the source payroll tables, on the lakehouse
+                             SQL analytics endpoint, to the API identity (never the gateway).
       4. seed-operational-store  idempotent.
 
     Every SQL step addresses the target `deployed`, which the guard resolves
@@ -77,6 +80,17 @@ Invoke-Step 'grant-warehouse-sql' {
 if (-not [string]::IsNullOrWhiteSpace($env:GATEWAY_IDENTITY_NAME) -and $env:GATEWAY_IDENTITY_NAME -ne 'null') {
     Invoke-Step 'grant-warehouse-sql (channel gateway)' {
         & $python (Join-Path $PSScriptRoot 'grant-warehouse-sql.py') --target deployed --profile gateway --principal $env:GATEWAY_IDENTITY_NAME
+    }
+}
+
+# The governed data query's lakehouse source reads the payroll tables through the lakehouse
+# SQL analytics endpoint. The API identity gets object-level SELECT on exactly the tables
+# the semantic model names; no write, no schema grant, and never the gateway identity.
+# Off unless the azd value TCC_DATA_QUERY_SOURCE_ENABLED is true (the same value Terraform
+# maps to DATA_QUERY_SOURCE_ENABLED). GRANT is idempotent.
+if ($env:TCC_DATA_QUERY_SOURCE_ENABLED -eq 'true') {
+    Invoke-Step 'grant-warehouse-sql (lakehouse endpoint, read-only)' {
+        & $python (Join-Path $PSScriptRoot 'grant-warehouse-sql.py') --target deployed --profile lakehouse
     }
 }
 
