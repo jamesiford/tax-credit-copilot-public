@@ -14,6 +14,9 @@ from typing import Any
 _TELEMETRY_CONTEXT: ContextVar[dict[str, Any] | None] = ContextVar("chat_telemetry_context", default=None)
 #: Who asked, for `tcc_ops.agent_action_audit`. Set once per request by `chat()`.
 _ACTOR: ContextVar[str | None] = ContextVar("chat_actor", default=None)
+#: Whether the reader is a signed-in principal. It gates employee-level rows in the
+#: `evidence` event, so it defaults to False: an unset request is never trusted.
+_AUTHENTICATED: ContextVar[bool] = ContextVar("chat_authenticated", default=False)
 
 
 def _sse(event: str, payload: dict) -> str:

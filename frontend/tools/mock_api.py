@@ -5,7 +5,8 @@ shell needs the sealed reference workspace (`One.csv`..`Four.csv`) and every
 per-client read needs the Fabric Warehouse. The design gates (visible rows,
 type floor, brand, sweep) need a rendered page, so this serves a small,
 deterministic, SYNTHETIC dataset for exactly those endpoints and forwards
-everything else to a real backend on port 8001 when one is running.
+everything else to a real backend on port 8001 when one is running. `POST /api/chat`
+is answered here, always, with a real-shape stream (`src/lib/askBackendShape.json`).
 
     python frontend/tools/mock_api.py            # listens on :8000
 
@@ -21,6 +22,7 @@ import sys
 import urllib.error
 import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
 PORT = 8000
@@ -169,6 +171,32 @@ def upstream_json(path: str):
         return json.loads(response.read())
 
 
+#: What `/api/chat` really emits for evidence (backend/tests/test_chat_evidence.py
+#: compares the backend's output to this file), so the Ask workspace is exercised
+#: against the true shape and not only the dev fixtures.
+BACKEND_SHAPE = Path(__file__).resolve().parents[1] / "src" / "lib" / "askBackendShape.json"
+
+
+def sse(event: str, payload: dict) -> str:
+    return f"event: {event}\ndata: {json.dumps(payload, separators=(',', ':'))}\n\n"
+
+
+def chat_stream() -> bytes:
+    """A chat answer in the backend's own framing, evidence ahead of the narration it shows."""
+    shape = json.loads(BACKEND_SHAPE.read_text(encoding="utf-8"))
+    frames = [
+        sse("plan", {"intents": ["book", "situation"], "needs_client": [], "capabilities": {}}),
+        sse("status", {"phase": 3, "intent": "book"}),
+        sse("evidence", shape["book"]),
+        sse("agent_start", {"agent": "ClientSituationAgent"}),
+        sse("token", {"agent": "ClientSituationAgent", "content": "Call the first client on the list."}),
+        sse("agent_end", {"agent": "ClientSituationAgent"}),
+        sse("evidence", shape["situation"]),
+        sse("done", {}),
+    ]
+    return "".join(frames).encode()
+
+
 CLIENTS = [
     (2001, "Cascade Retail Partners", 784, "Retail", "unclaimed_at_scale", 11.4, "148750"),
     (2002, "Ironbridge Logistics", 512, "Logistics", "on_the_line", -0.4, "52500"),
@@ -242,6 +270,15 @@ class Handler(BaseHTTPRequestHandler):
     def log_message(self, *args):  # quiet
         pass
 
+    def _send_chat(self) -> None:
+        raw = chat_stream()
+        self.send_response(200)
+        self.send_header("Content-Type", "text/event-stream")
+        self.send_header("Cache-Control", "no-cache")
+        self.send_header("Content-Length", str(len(raw)))
+        self.end_headers()
+        self.wfile.write(raw)
+
     def _send(self, status: int, payload, headers=None):
         raw = payload if isinstance(payload, bytes) else json.dumps(payload).encode()
         self.send_response(status)
@@ -254,6 +291,8 @@ class Handler(BaseHTTPRequestHandler):
         parsed = urlparse(self.path)
         length = int(self.headers.get("Content-Length") or 0)
         body = self.rfile.read(length) if length else b""
+        if self.command == "POST" and parsed.path == "/api/chat":
+            return self._send_chat()
         result = route(self.command, parsed.path, parse_qs(parsed.query), body)
         if result is not None:
             status, payload = result if isinstance(result, tuple) else (200, result)

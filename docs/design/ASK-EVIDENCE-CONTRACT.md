@@ -12,14 +12,64 @@ and nothing breaks.
 
 The frontend half is `frontend/src/lib/evidence.js` (framework-free: it defines
 and validates the contract), `frontend/src/api.js` (`chatEventRouter`, which
-accepts the event) and `frontend/src/components/ask/` (which draws it). Nothing
-in `backend/` was changed to produce this document.
+accepts the event) and `frontend/src/components/ask/` (which draws it). The
+backend half is `backend/api/chat/evidence.py` (shapes a capability's `ToolResult`
+into an item) and `evidence_tap.py` (emits it); see "What the portal chat emits".
+
+## Status
+
+| Part | State |
+| --- | --- |
+| `evidence` item, kind `evidence` | **Emitted** by `POST /api/chat` (CH-15d), one item per capability that ran. |
+| `confirmation` item | **Inert, by design.** The portal chat has no write flow: nothing in `/api/chat` can record a decision, so there is nothing to preview or confirm. The frontend still validates and draws the kind (`ConfirmCard`) so the channel's write flow can reuse it; the portal backend never sends one. Writes in the portal go through the page's own forms and the mediator, not through chat. |
+| `kpis` block | Defined and drawn, **not emitted**: no capability renders tiles today. |
+
+## What the portal chat emits
+
+One `evidence` event per capability that ran, built from that capability's
+`ToolResult` envelope (`tool`, `facts`, `blocks`, `provenance`, `disclaimer`,
+`warnings`). It is sent **ahead of the next frame the pipeline yields**, so the
+evidence for a capability arrives before the narration of it and always before
+`done`. Every other event, and every field of them, is unchanged. Mapping:
+
+| Envelope | Evidence item |
+| --- | --- |
+| (the chat intent that ran) | `tool` and `id` (`ev-<intent>-<n>`) and a fixed tab `title` (`Who to call`, `Situation`, `Eligibility`, `At risk`, `Trend`, `All programmes`, `Other programmes`, `What-if`, `Calculation`). `tool` is the **intent** named in the `plan` event, not the envelope's own tool name (two intents share `client_discovery`). A re-sent id replaces the earlier tab, so the latest answer for a capability wins. |
+| `paragraph` / `callout` | `text` / `callout` block, text verbatim. |
+| `heading` | The `title` of the block that follows it (a heading with nothing after it is a `text` block). |
+| `bullets` | `list` block. |
+| `table` (header row first) | `table` block: `columns` = the header, `rows` = the rest. No `align`: the platform does not guess. |
+| `facts` | Top-level scalar facts as strings; nested values are left out. |
+| `provenance` | `run_id`, `rule_pack` (= `rule_pack_version`), `trail_hash` (= `trail_sha256`); a field the envelope does not hold is absent. `assumption_set_id` and `source` have no slot in the contract and are not sent. |
+| `warnings` | One `callout` (`tone: partial`, title `Note`) each. These are caveats such as "the claimed side is an unverified assertion", and must not be lost. |
+| `disclaimer` | `disclaimer`. |
+
+Text and rows pass through **character for character**: no model text, no
+reformatting, every figure the string the platform wrote. A result with no
+blocks emits no event. The golden file `frontend/src/lib/askBackendShape.json`
+holds two real items; `backend/tests/test_chat_evidence.py` compares the backend's
+output to it and `components/ask/AskWorkspace.backend.test.jsx` reads the same
+file through the real stream reader, so the two halves cannot drift apart.
+
+### Who sees employee rows
+
+A capability the catalog marks `sensitive` (`client_at_risk`, `employee_drill`,
+`findings_list`), or one the catalog does not know, has its table **withheld**
+unless the caller is a signed-in principal (`principal.authenticated`, so never
+under `AUTH_MODE=none`). The table is replaced by a text block that keeps the
+count ("12 rows withheld. Employee-level rows are shown to a signed-in user
+only.") and the item's `facts` are emptied, because an empty table would read as
+"nobody". Today none of these capabilities renders a row that names an employee
+(D-08), so this rule is a guard on the next one that does. Employee rows were
+never sent to the model, and are not now: the narrator is handed `facts`, never
+`blocks`.
 
 ## The event
 
 `POST /api/chat` already streams Server-Sent Events: `status`, `plan`,
 `agent_start`, `token`, `agent_end`, `calculation_trail`, `clarify`, `done`. This
-adds one **optional** event:
+adds one event (emitted since CH-15d; a client may still see none, for example
+from the scripted stub stream):
 
 ```
 event: evidence

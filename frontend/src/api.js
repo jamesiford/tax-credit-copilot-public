@@ -704,8 +704,9 @@ export async function streamChat(message, onEvent, signal, scope = {}, history =
  * Events: `status`, `plan`, `agent_start`, `token`, `agent_end`,
  * `calculation_trail`, `clarify`, `evidence`, `done`. Anything else is IGNORED
  * (and handed to `unknown` if given), so a backend that grows a new event never
- * breaks a client that has not heard of it. `evidence` is OPTIONAL: today's
- * stream emits none, and the workspace then shows deep links instead. An
+ * breaks a client that has not heard of it. `evidence` is OPTIONAL: the portal
+ * chat emits one per capability that ran (CH-15d), but the scripted stub stream
+ * emits none, and the workspace then shows deep links instead. An
  * evidence payload that fails the contract (lib/evidence.js) is dropped and
  * reported through `invalidEvidence`, never repaired.
  */

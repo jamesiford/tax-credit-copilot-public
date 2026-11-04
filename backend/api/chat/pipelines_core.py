@@ -10,6 +10,7 @@ import uuid
 from typing import Any, AsyncIterator
 
 from api.chat.narration import _brief, _question, _stream_agent
+from api.chat.evidence_tap import tap
 from api.chat.scope import _detect_state
 from api.chat.sse import _TELEMETRY_CONTEXT, _sse
 from application.capabilities.client import client_discovery, client_eligibility
@@ -53,9 +54,9 @@ async def _pipeline_eligibility(app, message: str, *, scope: dict[str, Any] | No
         # `method="pay_period"` is what this brief has always read. The scope's
         # method selector never reached it, and the capability's default is the
         # channel's, so the portal says so explicitly (DECISIONS D-05).
-        eligibility = client_eligibility(
+        eligibility = tap(client_eligibility(
             account_id, tax_year, state, method="pay_period", window=scope.get("window"),
-        ).facts
+        )).facts
         snapshot = eligibility["snapshot"]
         credit = eligibility["credit"]
         async for f in _stream_agent("PayrollIngestAgent", _brief(f"Confirm the payroll snapshot in scope for state={state}.", snapshot)):
@@ -125,7 +126,7 @@ async def _pipeline_portfolio(app, message: str) -> AsyncIterator[str]:
         async for f in _stream_agent("OrchestratorAgent", f"User question:\n{_question(message)}\nIntent: full multi-state portfolio across every rule pack."):
             yield f
 
-        result = client_discovery(exclude_codes=[]).facts  # no exclusions — include GA + every other pack
+        result = tap(client_discovery(exclude_codes=[])).facts  # no exclusions — include GA + every other pack
         async for f in _stream_agent("CreditDiscoveryAgent", _brief(
                                          "List EVERY hit as a short bullet (jurisdiction, credit name, lifetime credit, citation). "
                                          "This is the full portfolio — do NOT exclude Georgia. "
@@ -166,7 +167,7 @@ async def _pipeline_discovery(app, message: str) -> AsyncIterator[str]:
             yield f
 
         # Exclude GA_JTC since the user's asking what *other* credits apply.
-        result = client_discovery(exclude_codes=["GA_JTC"]).facts
+        result = tap(client_discovery(exclude_codes=["GA_JTC"])).facts
         async for f in _stream_agent("CreditDiscoveryAgent", _brief(
                                          "List each hit as a short bullet (jurisdiction, credit name, "
                                          "rough lifetime credit, citation). Mention which packs were considered.",

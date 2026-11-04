@@ -6,6 +6,7 @@ import uuid
 from typing import AsyncIterator
 
 from api.chat.narration import _brief, _question, _stream_agent
+from api.chat.evidence_tap import tap
 from api.chat.sse import _TELEMETRY_CONTEXT, _sse
 from application.capabilities.simulate import simulate_headcount
 from domain.calculation.trail import TrailRecorder, reset_recorder, set_recorder
@@ -48,7 +49,7 @@ async def _pipeline_simulate(app, message: str) -> AsyncIterator[str]:
         async for f in _stream_agent("OrchestratorAgent", ack):
             yield f
 
-        sim = simulate_headcount(city, new_hires).facts
+        sim = tap(simulate_headcount(city, new_hires)).facts
 
         async for f in _stream_agent("HeadcountAgent", _brief(
                                          f"Report the projected headcount shift for {city} in one sentence.",
