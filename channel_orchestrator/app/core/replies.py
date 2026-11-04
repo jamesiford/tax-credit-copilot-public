@@ -68,7 +68,7 @@ def failure(problems: Sequence[Problem]) -> str:
         return RATE_LIMITED
     if first.code == "invalid_arguments":
         return f"I need a little more to run that: {first.message}"
-    return f"I couldn't answer that: {first.message or first.code.replace('_', ' ')}."
+    return f"I couldn't answer that: {(first.message or first.code.replace('_', ' ')).rstrip('.')}."
 
 
 def commit_failure(code: str, message: str) -> str:

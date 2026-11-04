@@ -29,6 +29,10 @@ _COWORK_NOTE = (
     "entitled to make changes; counts, sums and averages over employees are."
 )
 _NEXT_STEP = "Pass dataset=<name> to see a dataset's columns, then call data_query with those names exactly."
+_NO_MATCH = (
+    "No dataset or column matches that search, so the data has nothing for it. Say so; do not guess a "
+    "column name. Try a different word, or call with no search to list every dataset."
+)
 
 
 def _column(column: Column) -> dict[str, Any]:
@@ -77,8 +81,10 @@ def _entry(dataset: Dataset, *, detail: bool, needle: str | None) -> dict[str, A
     return entry
 
 
-def _notes(principal: Principal, dataset: str | None, omitted: int) -> list[str]:
+def _notes(principal: Principal, dataset: str | None, omitted: int, *, missed: bool = False) -> list[str]:
     notes = [_NEXT_STEP] if dataset is None else []
+    if missed:
+        notes.append(_NO_MATCH)
     if omitted:
         notes.append(f"{omitted} dataset(s) are not available in this environment and are not listed.")
     if is_cowork(principal):
@@ -86,14 +92,20 @@ def _notes(principal: Principal, dataset: str | None, omitted: int) -> list[str]
     return notes
 
 
-def _facts(principal: Principal, dataset: str | None, search: str | None) -> dict[str, Any]:
+def _entries(dataset: str | None, needle: str | None) -> tuple[list[dict[str, Any]], int]:
+    """The catalog entries this environment can serve for the request, and how many datasets it cannot."""
     svc = service()
     sources = svc.available_sources()
     asked = [d for d in svc.model.datasets if dataset is None or d.name == dataset]
-    needle = search.strip().lower() if search else None
     entries = [e for d in asked if d.source in sources if (e := _entry(d, detail=dataset is not None, needle=needle))]
-    omitted = sum(1 for d in asked if d.source not in sources)
-    return {"dataset_count": len(entries), "datasets": entries, "notes": _notes(principal, dataset, omitted)}
+    return entries, sum(1 for d in asked if d.source not in sources)
+
+
+def _facts(principal: Principal, dataset: str | None, search: str | None) -> dict[str, Any]:
+    needle = search.strip().lower() if search else None
+    entries, omitted = _entries(dataset, needle)
+    missed = bool(needle) and not entries and not omitted
+    return {"dataset_count": len(entries), "datasets": entries, "notes": _notes(principal, dataset, omitted, missed=missed)}
 
 
 def _column_row(c: dict[str, Any]) -> tuple[str, ...]:
