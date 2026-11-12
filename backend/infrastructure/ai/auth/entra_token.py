@@ -25,6 +25,8 @@ class EntraTokenAuth:
         self._credential = credential
 
     def _cred(self) -> Any:
+        # The backend injects its shared credential (`bootstrap/ai_wiring.py`); this default is what the hosted
+        # orchestrator, which vendors this module and cannot import `backend`, runs.
         if self._credential is None:
             from azure.identity import DefaultAzureCredential
 
