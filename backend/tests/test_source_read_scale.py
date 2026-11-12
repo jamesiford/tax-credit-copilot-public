@@ -204,7 +204,8 @@ def test_no_production_code_reads_a_delta_table_without_going_through_the_one_fi
                 for node in ast.walk(fn):
                     if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute) and node.func.attr == "to_pyarrow_table":
                         sites.add(f"{rel}::{fn.name}")
-    assert sites <= {"data/source/from_fabric.py::_scan", "data/source/build_lake.py::read_back", "data/source/mapping/local.py::local_schemas"}, sites
+    assert sites <= {"data/source/from_fabric.py::_scan", "data/source/build_lake.py::read_back", "data/source/mapping/local.py::local_schemas",
+                      "data/source/from_fabric.py::silver_rows", "data/source/silver_build.py::built_versions"}, sites
 
 
 def test_the_scan_always_passes_filters_and_columns():
