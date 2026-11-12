@@ -42,6 +42,7 @@ from config_sections import (
     WebIqSettings, parse_data_source, parse_identity, parse_observability, parse_portfolio, parse_runtime, parse_schema_name,
     parse_source_schema, parse_stores, parse_warehouse, parse_webiq,
 )
+from config_platform import PlatformSettings, parse_platform
 from config_source_model import SourceModelSettings, parse_source_model
 
 #: Calendar year. The only value the deleted setting ever returned in practice.
@@ -88,6 +89,10 @@ class Settings:
     @cached_property
     def source_model(self) -> SourceModelSettings:
         return parse_source_model(self.environ)
+
+    @cached_property
+    def platform(self) -> PlatformSettings:
+        return parse_platform(self.environ)
 
     @cached_property
     def warehouse(self) -> WarehouseSettings:

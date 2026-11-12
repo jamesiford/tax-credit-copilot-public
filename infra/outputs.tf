@@ -67,11 +67,31 @@ output "FABRIC_WAREHOUSE_ID" {
 }
 
 output "WAREHOUSE_SERVER" {
-  value = module.fabric.warehouse_server
+  value = local.warehouse_server
 }
 
 output "WAREHOUSE_DATABASE" {
-  value = module.fabric.warehouse_database
+  value = local.warehouse_database
+}
+
+output "WAREHOUSE_PLATFORM" {
+  description = "fabric or azure_sql: where tcc_ops and tcc_gold live."
+  value       = var.warehouse_platform
+}
+
+output "SQL_SERVER_FQDN" {
+  description = "The Azure SQL server Terraform created (the migration guard compares WAREHOUSE_SERVER to it); empty on Fabric."
+  value       = local.azure_sql ? module.azure_sql.server_fqdn : ""
+}
+
+output "SQL_DATABASE_NAME" {
+  description = "The Azure SQL database Terraform created; empty on Fabric."
+  value       = local.azure_sql ? module.azure_sql.database_name : ""
+}
+
+output "TCC_SQL_CREATED" {
+  description = "'true' only when this deployment created the Azure SQL database: the one case the destructive bootstrap may run."
+  value       = tostring(module.azure_sql.created)
 }
 
 output "SOURCE_SCHEMA" {

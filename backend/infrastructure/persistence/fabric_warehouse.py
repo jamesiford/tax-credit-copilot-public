@@ -39,6 +39,7 @@ from typing import Any, Iterator
 
 from config import GOLD_SCHEMA, OPS_SCHEMA, get_settings  # noqa: F401 - GOLD/OPS re-exported for the adapters
 from domain.warehouse import RUN_MANIFEST_COLUMNS, RunManifest
+from infrastructure.persistence import pool_policy, sql_errors
 from infrastructure.persistence.tenant_sql import TenantScopedQuery, tenant_exempt
 
 #: Statements with no tenant: a liveness probe, and lookups by a globally unique run_id.
@@ -287,7 +288,7 @@ class FabricWarehouseConnection:
                 if not _POOL:
                     break
                 connection, opened_at = _POOL.pop()
-            if now - opened_at <= _POOL_MAX_AGE_S:
+            if now - opened_at <= pool_policy.max_age_s(_POOL_MAX_AGE_S):
                 return connection
             _close_quietly(connection)
         return self.open()
@@ -301,7 +302,7 @@ class FabricWarehouseConnection:
             _close_quietly(connection)
             return
         with _POOL_LOCK:
-            if len(_POOL) < _POOL_MAX_IDLE:
+            if len(_POOL) < pool_policy.max_idle(_POOL_MAX_IDLE):
                 _POOL.append((connection, time.time()))
                 return
         _close_quietly(connection)
@@ -357,7 +358,7 @@ class FabricWarehouseConnection:
             alive.append((connection, time.time()))
 
         with _POOL_LOCK:
-            _POOL[:] = (alive + _POOL)[:_POOL_MAX_IDLE]
+            _POOL[:] = (alive + _POOL)[:pool_policy.max_idle(_POOL_MAX_IDLE)]
         return len(alive)
 
     @contextmanager
@@ -455,21 +456,18 @@ class FabricRunManifestRepository:
 
     def record(self, manifest: RunManifest) -> RunManifest:
         if self.get(manifest.run_id) is not None:
-            raise ValueError(
-                f"run_id={manifest.run_id!r} is already recorded. The warehouse "
-                f"does not enforce the primary key, so a second insert would "
-                f"silently duplicate the run rather than failing."
-            )
+            raise ValueError(f"run_id={manifest.run_id!r} is already recorded (Fabric does not enforce the key).")
 
         values = [getattr(manifest, column) for column in _MANIFEST_COLUMNS]
 
         with self._connection.connect() as connection:
             cursor = connection.cursor()
             try:
-                TenantScopedQuery(manifest.client_id).insert(
-                    cursor, f"{OPS_SCHEMA}.run_manifest", _MANIFEST_COLUMNS, [values]
-                )
-                connection.commit()
+                with sql_errors.duplicate_key_as(f"run_id={manifest.run_id!r} is already recorded"):
+                    TenantScopedQuery(manifest.client_id).insert(
+                        cursor, f"{OPS_SCHEMA}.run_manifest", _MANIFEST_COLUMNS, [values]
+                    )
+                    connection.commit()
             finally:
                 cursor.close()
         return manifest

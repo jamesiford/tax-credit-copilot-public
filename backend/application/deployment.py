@@ -31,8 +31,9 @@ CLASSIFICATIONS = ("synthetic", "customer")
 
 #: Store names that persist beyond the process.
 DURABLE_STORES = frozenset({"warehouse"})
-#: Accepted spellings, normalised. `fabric` is the v1 name for the Warehouse.
-_ALIASES = {"fabric": "warehouse"}
+#: Accepted spellings, normalised. `fabric` is the v1 name for the Warehouse; `azure_sql` and `sql` name the same
+#: adapter pointed at an Azure SQL Database (WAREHOUSE_PLATFORM says which platform it is).
+_ALIASES = {"fabric": "warehouse", "azure_sql": "warehouse", "sql": "warehouse"}
 
 #: The operational stores and their LOCAL defaults.
 STORE_DEFAULTS = {

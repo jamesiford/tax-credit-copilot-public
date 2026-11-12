@@ -14,11 +14,34 @@ from typing import Any
 from application.deployment import store_choice
 from application.errors import as_dependency_failure
 from application.store_readiness import Finding
-from config import OPS_SCHEMA
+from config import OPS_SCHEMA, get_settings
 
 log = logging.getLogger(__name__)
 
 _CLAIM_TABLES = ("program_claim", "program_engagement")
+
+#: What to do on Azure SQL, where access is a database user rather than a Fabric workspace role.
+_AZURE_REMEDIES = {
+    "config": "Set WAREHOUSE_SERVER (the server FQDN) and WAREHOUSE_DATABASE, with WAREHOUSE_PLATFORM=azure_sql.",
+    "bootstrap": (
+        "Run `python scripts/apply-migrations.py --target deployed --bootstrap` "
+        "(TCC_SQL_CREATED=true on a database Terraform just created)."
+    ),
+    "migrate": "Run `python scripts/apply-migrations.py --target deployed`.",
+    "grants": (
+        "Create the identity as a database user and grant it: `python scripts/grant-sql.py --platform azure_sql "
+        "--target deployed --profile api` (run by the server's Entra admin)."
+    ),
+    "unreachable": (
+        " Check the server firewall rule or private endpoint, and that the identity exists as a database user "
+        "(CREATE USER ... FROM EXTERNAL PROVIDER)."
+    ),
+}
+
+
+def _azure() -> bool:
+    """Whether the operational store is an Azure SQL Database, whose remedies differ from Fabric's."""
+    return get_settings().platform.is_azure_sql
 
 
 class OperationalStoreProbe:
@@ -38,7 +61,7 @@ class OperationalStoreProbe:
             connection.require_configuration()
         except WarehouseNotConfigured as exc:
             return [Finding("warehouse_not_configured", str(exc),
-                            "Set WAREHOUSE_SERVER and WAREHOUSE_DATABASE.")]
+                            _AZURE_REMEDIES["config"] if _azure() else "Set WAREHOUSE_SERVER and WAREHOUSE_DATABASE.")]
         try:
             with connection.connect() as live:
                 return self._inspect(live, available_migrations)
@@ -47,7 +70,7 @@ class OperationalStoreProbe:
             if failure is None:
                 raise
             log.warning("operational store check failed: %s: %s", type(exc).__name__, str(exc)[:200])
-            return [Finding("operational_store_unreachable", f"the operational store {failure.reason}", failure.remedy)]
+            return [Finding("operational_store_unreachable", f"the operational store {failure.reason}", failure.remedy + (_AZURE_REMEDIES["unreachable"] if _azure() else ""))]
 
     def _inspect(self, live: Any, available_migrations: list[Any] | None) -> list[Finding]:
         from infrastructure.persistence.schema_admin import applied_migrations, pending_migrations, table_exists
@@ -56,7 +79,7 @@ class OperationalStoreProbe:
         if applied is None:
             return [Finding(
                 "migration_table_missing", f"{OPS_SCHEMA}.schema_migration not found: the schema was never created here.",
-                "Run `python scripts/apply-migrations.py --target deployed --bootstrap` on a new Warehouse.",
+                _AZURE_REMEDIES["bootstrap"] if _azure() else "Run `python scripts/apply-migrations.py --target deployed --bootstrap` on a new Warehouse.",
             )]
         missing = [t for t in _CLAIM_TABLES if not table_exists(live, OPS_SCHEMA, t)]
         if missing:
@@ -70,12 +93,12 @@ class OperationalStoreProbe:
             if behind:
                 findings.append(Finding(
                     "migrations_pending", f"{len(behind)} migration(s) not applied, first {behind[0].version}.",
-                    "Run `python scripts/apply-migrations.py --target deployed`.",
+                    _AZURE_REMEDIES["migrate"],
                 ))
         return findings + self._grants(live)
 
     def _grants(self, live: Any) -> list[Finding]:
-        remedy = "Run `python scripts/grant-warehouse-sql.py --profile api` and check the Fabric workspace role."
+        remedy = _AZURE_REMEDIES["grants"] if _azure() else "Run `python scripts/grant-warehouse-sql.py --profile api` and check the Fabric workspace role."
         cursor = live.cursor()
         try:
             try:

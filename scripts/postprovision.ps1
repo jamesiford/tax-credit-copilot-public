@@ -51,7 +51,12 @@ function Invoke-Step([string]$Title, [scriptblock]$Body) {
     if ($LASTEXITCODE -ne 0) { throw "$Title failed with exit code $LASTEXITCODE" }
 }
 
-$created = ($env:TCC_FABRIC_CREATED -eq 'true')
+# WAREHOUSE_PLATFORM (a Terraform output) says where tcc_ops and tcc_gold live: the Fabric Warehouse, or an
+# Azure SQL Database. `$created` is whether THIS apply created that store, the one case the destructive
+# bootstrap may run; `$createdLakehouse` is about the Lakehouse the synthetic source is loaded into.
+$azureSql = ($env:WAREHOUSE_PLATFORM -eq 'azure_sql')
+$createdLakehouse = ($env:TCC_FABRIC_CREATED -eq 'true')
+$created = if ($azureSql) { $env:TCC_SQL_CREATED -eq 'true' } else { $createdLakehouse }
 Invoke-Step 'apply-migrations' {
     if ($created) {
         & $python (Join-Path $PSScriptRoot 'apply-migrations.py') --target deployed --bootstrap
@@ -60,7 +65,7 @@ Invoke-Step 'apply-migrations' {
     }
 }
 
-if ($env:TCC_PROFILE -eq 'public' -and $created) {
+if ($env:TCC_PROFILE -eq 'public' -and $createdLakehouse) {
     Invoke-Step 'load-synthetic' {
         Push-Location (Join-Path $repoRoot 'backend')
         try {
@@ -69,8 +74,16 @@ if ($env:TCC_PROFILE -eq 'public' -and $created) {
     }
 }
 
-Invoke-Step 'grant-warehouse-sql' {
-    & $python (Join-Path $PSScriptRoot 'grant-warehouse-sql.py') --target deployed
+# Azure SQL has no workspace role: each identity is first created as an Entra database user, which needs the
+# server's Entra admin. Run this hook as a member of that group, or run grant-sql.py yourself.
+if ($azureSql) {
+    Invoke-Step 'grant-sql (azure_sql)' {
+        & $python (Join-Path $PSScriptRoot 'grant-sql.py') --platform azure_sql --target deployed
+    }
+} else {
+    Invoke-Step 'grant-warehouse-sql' {
+        & $python (Join-Path $PSScriptRoot 'grant-warehouse-sql.py') --target deployed
+    }
 }
 
 # The channel gateway writes the audit trail and nothing else in the Warehouse:
@@ -79,7 +92,11 @@ Invoke-Step 'grant-warehouse-sql' {
 # idempotent, so a re-run changes nothing.
 if (-not [string]::IsNullOrWhiteSpace($env:GATEWAY_IDENTITY_NAME) -and $env:GATEWAY_IDENTITY_NAME -ne 'null') {
     Invoke-Step 'grant-warehouse-sql (channel gateway)' {
-        & $python (Join-Path $PSScriptRoot 'grant-warehouse-sql.py') --target deployed --profile gateway --principal $env:GATEWAY_IDENTITY_NAME
+        if ($azureSql) {
+            & $python (Join-Path $PSScriptRoot 'grant-sql.py') --platform azure_sql --target deployed --profile gateway --principal $env:GATEWAY_IDENTITY_NAME
+        } else {
+            & $python (Join-Path $PSScriptRoot 'grant-warehouse-sql.py') --target deployed --profile gateway --principal $env:GATEWAY_IDENTITY_NAME
+        }
     }
 }
 

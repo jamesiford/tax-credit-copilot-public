@@ -277,7 +277,7 @@ def load_pinned_targets(path: Path) -> dict[str, AllowedTarget]:
             bootstrap_approved=bool(entry.get("bootstrap_approved", False)),
         )
         for name, entry in data.items()
-        if not name.startswith("_")
+        if not name.startswith("_") and entry.get("platform", "fabric") == "fabric"
     }
 
 
@@ -437,9 +437,9 @@ def applied_migrations(connection: Any, ops: str) -> dict[str, str] | None:
         cursor.close()
 
 
-def apply_migration(connection: Any, migration: Migration, ops: str) -> list[BatchResult]:
+def apply_migration(connection: Any, migration: Migration, ops: str, translate: Callable[[str], str] = str) -> list[BatchResult]:
     """Run one migration's batches, then record it. Not recorded if any batch fails."""
-    text = migration.path.read_text(encoding="utf-8")
+    text = translate(migration.path.read_text(encoding="utf-8"))
     results = run_batches(connection, split_batches(text))
     failed = [r for r in results if r.error]
     if failed:

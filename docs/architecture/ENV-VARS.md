@@ -119,6 +119,9 @@ see [RUNBOOK.md §8](RUNBOOK.md#8-deployment-configuration-refused-at-startup).
 | `WAREHOUSE_DATABASE` | same as above | Warehouse database (item display name). No default | TF api: `module.fabric.warehouse_database` (created, or azd `TCC_WAREHOUSE_DATABASE`) | `WAREHOUSE_DATABASE` | Setting from param `warehouseDatabase`; not an output | Functional |
 | `WAREHOUSE_ODBC_DRIVER` | `backend/infrastructure/persistence/fabric_warehouse.py` | ODBC driver name. Default `ODBC Driver 18 for SQL Server` | not set | — | not set | No |
 | `WAREHOUSE_CONNECT_TIMEOUT` | `backend/infrastructure/persistence/fabric_warehouse.py` | Connect timeout, seconds. Default `90` | not set | — | not set | No |
+| `WAREHOUSE_PLATFORM` | `backend/config_platform.py`, `scripts/sql_common.py`, `backend/infrastructure/persistence/store_probe.py` | Where `tcc_ops` / `tcc_gold` live: `fabric` (default, the Fabric Warehouse) or `azure_sql` (an Azure SQL Database). `azure_sql` makes the migration and grant tooling check the target against a server and database allow-list instead of resolving a Fabric item, and names Azure SQL remedies in readiness messages. The store settings keep the value `warehouse` | TF api: `WAREHOUSE_PLATFORM=azure_sql`, only when `warehouse_platform = "azure_sql"` | output `WAREHOUSE_PLATFORM` | not set | No (needed on Azure SQL) |
+| `WAREHOUSE_POOL_MAX_IDLE` | `backend/infrastructure/persistence/pool_policy.py` | Idle Warehouse connections kept. Unset: 4 (the value measured on Fabric) | not set | — | not set | No |
+| `WAREHOUSE_POOL_MAX_AGE_SECONDS` | same | How long an idle Warehouse connection is trusted. Unset: 45 (measured on Fabric; not yet measured on Azure SQL, so raise it only after a live check) | not set | — | not set | No |
 | `DATA_QUERY_TIMEOUT_SECONDS` | `backend/bootstrap/data_wiring.py` | Governed data-query statement time limit, seconds (clamped 1-120). Default `20`. A query past it is a typed `query_timeout`, never a partial result [CH-16c] | TF api: variable `data_query_timeout_seconds` (azd `TCC_DATA_QUERY_TIMEOUT_SECONDS`), only when set | — | not set | No |
 | `DATA_QUERY_MAX_ROWS` | same | Server row cap for a data query (1-500); can only lower a specification's own limit. Default `500` | TF api: `data_query_max_rows` (azd `TCC_DATA_QUERY_MAX_ROWS`), only when set | — | not set | No |
 | `DATA_QUERY_RATE_PER_MINUTE` | same | Data queries per person per minute (token bucket, 1-600), refused beyond it. Per process. Default `30` | TF api: `data_query_rate_per_minute` (azd `TCC_DATA_QUERY_RATE_PER_MINUTE`), only when set | — | not set | No |
@@ -309,6 +312,8 @@ outputs it needs into `$GITHUB_ENV` after `terraform apply`.
 | `WAREHOUSE_SERVER`, `WAREHOUSE_DATABASE` | `scripts/sql_common.py`, `scripts/seed-operational-store.ps1`, `scripts/postprovision.ps1` | Connect, and check the resolved target | TF outputs |
 | `FABRIC_WORKSPACE_ID`, `FABRIC_WAREHOUSE_ID` | `scripts/sql_common.py`, `scripts/postprovision.ps1` | Target `deployed`: the guard resolves these through the Fabric API before any SQL runs | TF outputs (new in v2) |
 | `TCC_FABRIC_CREATED` | `scripts/sql_common.py`, `scripts/postprovision.ps1`, `deploy.yml` | `true` only when this apply created the Warehouse; the only case the destructive bootstrap may run (D22) | TF output (new in v2) |
+| `SQL_SERVER_FQDN`, `SQL_DATABASE_NAME` | `scripts/sql_common.py` | Target `deployed` on `WAREHOUSE_PLATFORM=azure_sql`: the server and database Terraform created. The guard compares `WAREHOUSE_SERVER` / `WAREHOUSE_DATABASE` to them before any SQL runs | TF outputs (empty on Fabric) |
+| `TCC_SQL_CREATED` | `scripts/sql_common.py`, `scripts/postprovision.ps1` | `true` only when this apply created the Azure SQL database: the one case the destructive bootstrap may run | TF output |
 | `API_IDENTITY_NAME` | `scripts/grant-warehouse-sql.py` | Principal for the T-SQL grants | TF output (new in v2) |
 | `TCC_DATA_QUERY_SOURCE_ENABLED` | `scripts/postprovision.ps1` | `true` adds the read-only lakehouse-endpoint grant step (`grant-warehouse-sql.py --profile lakehouse`, API identity only) | azd value, the same one Terraform maps to `DATA_QUERY_SOURCE_ENABLED` |
 | `TCC_PROFILE` | `scripts/postprovision.ps1` | `public` runs the synthetic load | azd input, echoed as TF output |
@@ -326,6 +331,7 @@ outputs it needs into `$GITHUB_ENV` after `terraform apply`.
 |---|---|---|
 | `TCC_REQUIRE_PARITY` | `backend/tests/test_engine_parity_reference.py`, `backend/tests/test_flex_roundtrip.py` | `1` turns a missing-fixture skip of the parity gate into a collection error |
 | `TCC_FABRIC_TESTS` | live-Fabric tests under `backend/tests/` | `1` opts in to tests that read the Lakehouse and Warehouse |
+| `TCC_SQL_TESTS` | `backend/tests/contracts/conftest.py` | `1` runs the operational-store contract suite against the Warehouse the `WAREHOUSE_*` settings name, Fabric or Azure SQL (`TCC_FABRIC_TESTS=1` still works). Rows are written under a client_id block of its own and deleted afterwards |
 | `TCC_AZURE_TESTS` | `backend/tests/contracts/conftest.py` | `1` (with `ARTIFACT_BLOB_ACCOUNT_URL`) runs the artifact store contract against Blob |
 | `DATA_SOURCE` | `backend/tests/conftest.py` | Pinned to `csv` for the whole suite; never taken from `.env` |
 | `FABRIC_WORKSPACE`, `FABRIC_LAKEHOUSE`, `FABRIC_EMPLOYEES_TABLE`, `WAREHOUSE_SERVER`, `WAREHOUSE_DATABASE` | `backend/tests/conftest.py` | Copied from `backend/.env` when unset, for the opt-in live tests |
@@ -366,6 +372,8 @@ into the settings above. Full guidance is in [DEPLOYMENT-HANDOVER.md](DEPLOYMENT
 | `TCC_FABRIC_WAREHOUSE_ID` | `fabric_warehouse_id` | none | enterprise (required) | Output `FABRIC_WAREHOUSE_ID` |
 | `TCC_WAREHOUSE_SERVER` | `warehouse_server` | created Warehouse | enterprise (required) | `WAREHOUSE_SERVER` |
 | `TCC_WAREHOUSE_DATABASE` | `warehouse_database` | created Warehouse | enterprise (required) | `WAREHOUSE_DATABASE` |
+| `TCC_WAREHOUSE_PLATFORM` | `warehouse_platform` | `fabric` | both | `WAREHOUSE_PLATFORM` (only when `azure_sql`); `azure_sql` creates the Azure SQL module and points `WAREHOUSE_SERVER` / `WAREHOUSE_DATABASE` at it |
+| `TCC_SQL_ADMIN_GROUP_OBJECT_ID`, `TCC_SQL_ADMIN_GROUP_NAME` | `azure_sql_admin_group_object_id`, `azure_sql_admin_group_name` | none | both (required for `azure_sql`) | The Entra group that administers the server and creates database users. Terraform-only inputs without an azd value: `azure_sql_database_name`, `azure_sql_sku`, `azure_sql_max_size_gb`, `azure_sql_public_network_access`, `azure_sql_firewall_rules` |
 | `SOURCE_SCHEMA` | `source_schema` | `flex` | both | `SOURCE_SCHEMA` |
 | `FOUNDRY_MODEL` | `foundry_model` | `gpt-4.1-mini` | both | `FOUNDRY_MODEL`, deployment name |
 | `FOUNDRY_MODEL_VERSION` | `foundry_model_version` | `2025-04-14` | both | Model version (not an app setting) |

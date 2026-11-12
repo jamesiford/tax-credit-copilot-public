@@ -63,7 +63,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.resolve:
         return common.EXIT_OK
 
-    text = rename_schemas(args.file.read_text(encoding="utf-8"), gold=GOLD_SCHEMA, ops=OPS_SCHEMA)
+    text = rename_schemas(common.translate_sql(args.file.read_text(encoding="utf-8")), gold=GOLD_SCHEMA, ops=OPS_SCHEMA)
     if args.section:
         batches = split_statements(extract_section(text, args.section))
     else:

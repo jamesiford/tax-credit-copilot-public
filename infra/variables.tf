@@ -269,8 +269,8 @@ variable "fabric_warehouse_id" {
   type        = string
   default     = ""
   validation {
-    condition     = (var.create_fabric == true || (var.create_fabric == null && var.profile == "public")) || trimspace(var.fabric_warehouse_id) != ""
-    error_message = "fabric_warehouse_id is required when Fabric is brought (create_fabric = false)."
+    condition     = (var.create_fabric == true || (var.create_fabric == null && var.profile == "public")) || var.warehouse_platform == "azure_sql" || trimspace(var.fabric_warehouse_id) != ""
+    error_message = "fabric_warehouse_id is required when Fabric is brought (create_fabric = false) and the warehouse is Fabric."
   }
 }
 
@@ -279,8 +279,8 @@ variable "warehouse_server" {
   type        = string
   default     = ""
   validation {
-    condition     = (var.create_fabric == true || (var.create_fabric == null && var.profile == "public")) || trimspace(var.warehouse_server) != ""
-    error_message = "warehouse_server is required when Fabric is brought (create_fabric = false)."
+    condition     = (var.create_fabric == true || (var.create_fabric == null && var.profile == "public")) || var.warehouse_platform == "azure_sql" || trimspace(var.warehouse_server) != ""
+    error_message = "warehouse_server is required when Fabric is brought (create_fabric = false) and the warehouse is Fabric."
   }
 }
 
@@ -289,8 +289,8 @@ variable "warehouse_database" {
   type        = string
   default     = ""
   validation {
-    condition     = (var.create_fabric == true || (var.create_fabric == null && var.profile == "public")) || trimspace(var.warehouse_database) != ""
-    error_message = "warehouse_database is required when Fabric is brought (create_fabric = false)."
+    condition     = (var.create_fabric == true || (var.create_fabric == null && var.profile == "public")) || var.warehouse_platform == "azure_sql" || trimspace(var.warehouse_database) != ""
+    error_message = "warehouse_database is required when Fabric is brought (create_fabric = false) and the warehouse is Fabric."
   }
 }
 
@@ -660,4 +660,64 @@ variable "outputs_retention_days" {
   description = "Lifecycle retention on the outputs container (D9)."
   type        = number
   default     = 2555
+}
+
+# -- Azure SQL as the Warehouse (prompt 09). Off by default: nothing changes unless warehouse_platform = "azure_sql". --
+
+variable "warehouse_platform" {
+  description = "Where tcc_ops and tcc_gold live: the Fabric Warehouse (fabric) or an Azure SQL Database (azure_sql). The payroll lakehouse stays in Fabric either way."
+  type        = string
+  default     = "fabric"
+  validation {
+    condition     = contains(["fabric", "azure_sql"], var.warehouse_platform)
+    error_message = "warehouse_platform must be fabric or azure_sql."
+  }
+}
+
+variable "azure_sql_admin_group_object_id" {
+  description = "Object id of the Entra group that administers the Azure SQL server and creates its database users. Required for azure_sql."
+  type        = string
+  default     = ""
+  validation {
+    condition     = var.warehouse_platform != "azure_sql" || trimspace(var.azure_sql_admin_group_object_id) != ""
+    error_message = "azure_sql_admin_group_object_id is required when warehouse_platform = azure_sql."
+  }
+}
+
+variable "azure_sql_admin_group_name" {
+  description = "Display name of that Entra group."
+  type        = string
+  default     = ""
+  validation {
+    condition     = var.warehouse_platform != "azure_sql" || trimspace(var.azure_sql_admin_group_name) != ""
+    error_message = "azure_sql_admin_group_name is required when warehouse_platform = azure_sql."
+  }
+}
+
+variable "azure_sql_database_name" {
+  type    = string
+  default = "tcc"
+}
+
+variable "azure_sql_sku" {
+  description = "Azure SQL database SKU (for example GP_S_Gen5_2, GP_Gen5_2, S3)."
+  type        = string
+  default     = "GP_S_Gen5_2"
+}
+
+variable "azure_sql_max_size_gb" {
+  type    = number
+  default = 32
+}
+
+variable "azure_sql_public_network_access" {
+  description = "false (default): private endpoint only. true: the public endpoint, open only to azure_sql_firewall_rules."
+  type        = bool
+  default     = false
+}
+
+variable "azure_sql_firewall_rules" {
+  description = "Public access only: name => { start, end } IPv4 ranges."
+  type        = map(object({ start = string, end = string }))
+  default     = {}
 }
