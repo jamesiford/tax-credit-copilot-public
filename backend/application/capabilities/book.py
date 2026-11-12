@@ -25,12 +25,63 @@ BAND_LABEL = {
     "unclaimed_at_scale": "Identified",
     "not_assessed": "Not assessed",
     "settled": "Nothing found",
+    "unavailable": "Unavailable",
 }
 
 _UNVERIFIED = (
     "Some rows rest on a claimed figure that is an unverified assertion, not a "
     "filing. The ranking uses the identified figure, which is computed."
 )
+
+
+def _client_entry(position: int, row: dict[str, Any]) -> dict[str, Any]:
+    band = row.get("priority_band")
+    trend = row.get("trend") or {}
+    return {
+        "position": position,
+        "client_name": row.get("client_name") or f"Account {row.get('client_id')}",
+        "reason": BAND_LABEL.get(band, band),
+        "program_code": row.get("program_code"),
+        "tax_year": row.get("tax_year"),
+        "identified_usd": row.get("identified_usd"),
+        "jobs_margin": row.get("jobs_margin"),
+        "credit_earned_on_trend_usd": trend.get("credit_earned_usd") if band == "declining" else None,
+        "provenance_verified": row.get("provenance_verified"),
+    }
+
+
+def _nothing_to_rank(page: dict[str, Any], unavailable: list[str]) -> dict[str, Any]:
+    """The brief when no client can be ranked. Unavailable and not-assessed are different sentences."""
+    if unavailable:
+        return {
+            "calculated": False,
+            "unavailable": True,
+            "message": (
+                "Claim figures are unavailable right now, so the clients cannot be ranked. That does not mean "
+                "any client was assessed with no result, and it does not mean none was assessed."
+            ),
+            "unavailable_clients": unavailable,
+            "degraded": page.get("degraded") or [],
+        }
+    return {
+        "calculated": False,
+        "message": (
+            "No client has been assessed yet. There is nothing to rank — "
+            "that is not the same as nobody being worth calling."
+        ),
+    }
+
+
+def _split(page: dict[str, Any]) -> tuple[list[dict[str, Any]], list[str]]:
+    """(the rows that can be ranked, the names of the clients whose figures are unavailable)."""
+    rows = page.get("items") or []
+    ranked = [row for row in rows if not row.get("data_unavailable")]
+    names = [row.get("client_name") or f"Account {row.get('client_id')}" for row in rows if row.get("data_unavailable")]
+    return ranked, names
+
+
+def _any_unverified(clients: list[dict[str, Any]]) -> bool:
+    return any(not c.get("provenance_verified", True) for c in clients)
 
 
 def _brief(page: dict[str, Any]) -> dict[str, Any]:
@@ -40,32 +91,15 @@ def _brief(page: dict[str, Any]) -> dict[str, Any]:
     shell's year. The book has no year, and that ranking had no `declining`
     overlay — so the headline question answered "Northwind first" while the
     page behind the chat said Ironbridge. One ranking, one read.
+
+    A client whose claims could not be read is not ranked, and is never described as assessed or not:
+    "unavailable" is a third state, and the narration must not turn it into either of the others.
     """
-    items = page.get("items") or []
+    items, unavailable = _split(page)
     if not items:
-        return {
-            "calculated": False,
-            "message": (
-                "No client has been assessed yet. There is nothing to rank — "
-                "that is not the same as nobody being worth calling."
-            ),
-        }
-    clients = []
-    for position, row in enumerate(items, start=1):
-        band = row.get("priority_band")
-        trend = row.get("trend") or {}
-        clients.append({
-            "position": position,
-            "client_name": row.get("client_name") or f"Account {row.get('client_id')}",
-            "reason": BAND_LABEL.get(band, band),
-            "program_code": row.get("program_code"),
-            "tax_year": row.get("tax_year"),
-            "identified_usd": row.get("identified_usd"),
-            "jobs_margin": row.get("jobs_margin"),
-            "credit_earned_on_trend_usd": trend.get("credit_earned_usd") if band == "declining" else None,
-            "provenance_verified": row.get("provenance_verified"),
-        })
-    return {
+        return _nothing_to_rank(page, unavailable)
+    clients = [_client_entry(position, row) for position, row in enumerate(items, start=1)]
+    brief = {
         "calculated": True,
         "total_clients": page.get("total_clients"),
         "assessed_clients": page.get("assessed_clients"),
@@ -77,8 +111,10 @@ def _brief(page: dict[str, Any]) -> dict[str, Any]:
             "retroactively. 'Declining' is a forecast about a year nobody has "
             "filed, not a finding against a filed return."
         ),
-        "claimed_is_unverified": any(not c.get("provenance_verified", True) for c in clients),
+        "claimed_is_unverified": _any_unverified(clients),
     }
+    # Only when something is unavailable, so an ordinary answer is exactly what it always was.
+    return {**brief, "unavailable_clients": unavailable, "degraded": page.get("degraded") or []} if unavailable else brief
 
 
 def _blocks(facts: dict[str, Any]) -> list:
@@ -96,12 +132,20 @@ def _blocks(facts: dict[str, Any]) -> list:
         )
         for c in facts["clients"]
     ]
-    return [
-        s.paragraph(
-            f"{s.cell(facts['assessed_clients'], 'count')} of "
-            f"{s.cell(facts['total_clients'], 'count')} clients have been assessed. "
-            f"Ranked by what inaction costs, in the order the page shows."
-        ),
+    coverage = (
+        f"{s.cell(facts['assessed_clients'], 'count')} of {s.cell(facts['total_clients'], 'count')} clients have been assessed. "
+        if facts["assessed_clients"] is not None
+        else "How many clients have been assessed is unavailable right now. "
+    )
+    unavailable = facts.get("unavailable_clients") or []
+    note = (
+        [s.paragraph(
+            f"{len(unavailable)} client(s) are unavailable (their claim figures cannot be read) and are not ranked: "
+            + ", ".join(unavailable) + ". Unavailable is not the same as not assessed."
+        )] if unavailable else []
+    )
+    return note + [
+        s.paragraph(coverage + "Ranked by what inaction costs, in the order the page shows."),
         s.table(
             ("#", "Client", "Reason", "Programme", "Tax year", "Identified", "Jobs margin"),
             rows,

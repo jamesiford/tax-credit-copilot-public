@@ -67,6 +67,15 @@ export const BANDS = {
     line: 'Assessed, and no credit identified.',
     why: '',
   },
+  // A third state, and NOT a kind of "not assessed": the claim store could not answer, so whether this
+  // client was assessed is unknown. Sorted last, never among the ranked, and never drawn like a zero.
+  unavailable: {
+    label: 'Unavailable',
+    rank: 6,
+    tone: 'neutral',
+    line: 'Claim figures are unavailable right now.',
+    why: 'Not the same as not assessed, and not a zero: whether this client was assessed is unknown.',
+  },
 };
 
 const UNKNOWN = {

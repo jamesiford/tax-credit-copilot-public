@@ -189,6 +189,9 @@ export default function PortfolioPage({
             summary?.unassessed_clients
               ? `${summary.unassessed_clients} client(s) have not been assessed yet, so they carry no figure — not a zero.`
               : null,
+            summary?.unavailable_clients
+              ? `${summary.unavailable_clients} client(s) are unavailable: whether they were assessed is unknown. That is not "not assessed".`
+              : null,
           ]}
           request={{ page: 'portfolio' }}
         />
@@ -225,6 +228,7 @@ export default function PortfolioPage({
             onPickClient={onPickClient}
             onAskCopilot={askAbout}
             unassessedCount={summary?.unassessed_clients || 0}
+            unavailableHint={(summary?.degraded || []).find((d) => d.dependency === 'claims_store')?.remedy}
           />
         </GridTabPanel>
       </Card>

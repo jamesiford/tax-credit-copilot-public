@@ -143,7 +143,7 @@ function ExpandedCells({ clientId }) {
 }
 
 export default function BookGrid({
-  rows, filters, onFilter, onPickClient, onAskCopilot, unassessedCount,
+  rows, filters, onFilter, onPickClient, onAskCopilot, unassessedCount, unavailableHint,
   sort, onSort,
 }) {
   const [open, setOpen] = useState(() => new Set());
@@ -158,6 +158,7 @@ export default function BookGrid({
   }, []);
 
   const all = rows || [];
+  const unavailableCount = all.filter((r) => r.data_unavailable).length;
   // Five clients. Filtering in the browser is the same call the coverage matrix
   // makes, and through the same grammar so a URL means one thing in both.
   const shown = useMemo(() => applyFilters(all, SPECS, filters), [all, filters]);
@@ -300,7 +301,11 @@ export default function BookGrid({
                   <BandCell row={row} />
                   <td>{row.program_code || '—'}</td>
                   <td>{row.tax_year ? `TY${row.tax_year}` : '—'}</td>
-                  <td className="num">{row.identified_usd == null ? '—' : money(Number(row.identified_usd))}</td>
+                  <td className="num">
+                    {row.data_unavailable
+                      ? <span className="muted" title={unavailableHint || undefined}>Unavailable</span>
+                      : (row.identified_usd == null ? '—' : money(Number(row.identified_usd)))}
+                  </td>
                   <td>
                     <button
                       type="button"
@@ -324,6 +329,14 @@ export default function BookGrid({
           </tbody>
         </table>
       </div>
+
+      {unavailableCount ? (
+        <p className="small muted u-mt-2">
+          {unavailableCount} of these are unavailable: the claim figures cannot be loaded right now, so whether
+          they were assessed is unknown. That is not &ldquo;not assessed&rdquo; and not a zero.
+          {unavailableHint ? ` ${unavailableHint}` : ''}
+        </p>
+      ) : null}
 
       {unassessedCount ? (
         <p className="small muted u-mt-2">

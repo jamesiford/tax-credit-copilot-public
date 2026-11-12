@@ -4,7 +4,7 @@ import { BAND_ORDER, band, marginReading, trendReading } from './priority.js';
 describe('priority bands', () => {
   it('orders by what inaction costs, not by dollar value', () => {
     expect(BAND_ORDER).toEqual([
-      'exposed', 'on_the_line', 'declining', 'unclaimed_at_scale', 'not_assessed', 'settled',
+      'exposed', 'on_the_line', 'declining', 'unclaimed_at_scale', 'not_assessed', 'settled', 'unavailable',
     ]);
   });
 

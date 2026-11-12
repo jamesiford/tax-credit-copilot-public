@@ -43,6 +43,32 @@ beforeEach(() => window.localStorage.clear());
 afterEach(() => { vi.clearAllMocks(); window.localStorage.clear(); });
 
 describe('the home page opens with a hero, the task cards, then the book', () => {
+  it('shows Unavailable, never Not assessed, for a client whose claim figures could not be loaded', async () => {
+    api.fetchPortfolioV2.mockResolvedValue({
+      total_clients: 1, assessed_clients: null, unassessed_clients: null, unavailable_clients: 1,
+      items: [{
+        client_id: 2001, client_name: 'Cascade', program_code: null, tax_year: null, data_unavailable: true,
+        unavailable_dependency: 'claims_store', priority_band: 'unavailable', priority_rank: 6,
+        identified_usd: null, claimed_usd: null, opportunity_usd: null,
+      }],
+      degraded: [{ dependency: 'claims_store', impact: 'claim figures are unavailable.', remedy: 'Run the migration.' }],
+    });
+    render(<MemoryRouter><PortfolioPage scopeOptions={null} /><Where /></MemoryRouter>);
+    await screen.findByRole('button', { name: 'Open Cascade' });
+    const grid = within(screen.getByRole('table'));
+    expect(grid.getAllByText('Unavailable').length).toBeGreaterThanOrEqual(2);
+    expect(screen.queryByText('Not assessed')).not.toBeInTheDocument();
+    expect(screen.queryByText(/0 assessed/)).not.toBeInTheDocument();
+    expect(screen.getByText(/1 of these are unavailable/)).toBeInTheDocument();
+    expect(screen.getByText('Part of this page is unavailable')).toBeInTheDocument();
+  });
+
+  it('says nothing when everything answered', async () => {
+    draw();
+    await screen.findByRole('button', { name: 'Open Cascade' });
+    expect(screen.queryByText(/of these are unavailable/)).not.toBeInTheDocument();
+  });
+
   it('says what is unavailable, and what to do, when the page answered with part of its data', async () => {
     api.fetchPortfolioV2.mockResolvedValue({
       total_clients: 2, assessed_clients: 0, unassessed_clients: 2, items: ROWS,
