@@ -281,6 +281,8 @@ class SourceDataset:
     pay_frequencies: list[PayFrequency] = field(default_factory=list)
     fiscal_year_rules: list[EntityFiscalYearRules] = field(default_factory=list)
     payroll: list[Payroll] = field(default_factory=list, repr=False)
+    #: Optional source tables that were absent from the lakehouse, so a reader can tell "none found" from "not there".
+    missing_tables: tuple[str, ...] = ()
 
     def counts(self) -> dict[str, int]:
         return {
