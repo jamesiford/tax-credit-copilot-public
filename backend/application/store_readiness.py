@@ -50,6 +50,14 @@ def settings_findings(environ: Mapping[str, str] | None = None) -> list[Finding]
 
     env = resolve_environ(environ)
     out: list[Finding] = []
+    if "SOURCE_SCHEMA" in env and not (env["SOURCE_SCHEMA"] or "").strip():
+        out.append(Finding(
+            "source_schema_blank",
+            "SOURCE_SCHEMA is blank: treating the lakehouse as not schema-enabled (Tables/<table>).",
+            "If the lakehouse is schema-enabled set SOURCE_SCHEMA=dbo (or its schema name); remove the line to use the "
+            "default schema. `python scripts/check-onelake-access.py --probe-layout` tells you which layout opens the table.",
+            "warning",
+        ))
     for name in ("WAREHOUSE_SERVER", "WAREHOUSE_DATABASE", "LAKEHOUSE_SQL_SERVER", "FABRIC_WORKSPACE", "FABRIC_LAKEHOUSE"):
         if looks_like_placeholder(env.get(name, "")):
             out.append(Finding(

@@ -90,6 +90,28 @@ def check_token(get_token: Callable[[], str] = onelake.storage_token) -> Step:
     return Step("token", True, "storage token acquired (not shown)")
 
 
+def layouts(configured: str) -> list[str]:
+    """The schema layouts to try: the configured one, then the other (a schema versus none)."""
+    return [configured, "" if configured else "dbo"]
+
+
+def probe_layout(open_table: Callable[[str], dict], table: str, configured: str) -> tuple[list[Step], str | None]:
+    """Try the table under the configured schema and then the alternative layout.
+
+    Returns every attempt and the schema that opened it (None when neither did). Saves running the check twice
+    to find out whether a lakehouse is schema-enabled.
+    """
+    steps: list[Step] = []
+    winner: str | None = None
+    for schema in layouts(configured):
+        label = f"schema {schema!r}" if schema else "no schema (Tables/<table>)"
+        step = check_table(lambda schema=schema: open_table(schema), table)
+        steps.append(Step(f"layout: {label}", step.ok, step.detail, step.hint))
+        if step.ok and winner is None:
+            winner = schema
+    return steps, winner
+
+
 def check_table(open_table: Callable[[], dict], table: str) -> Step:
     try:
         lineage = open_table()
