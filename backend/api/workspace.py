@@ -7,12 +7,15 @@ from __future__ import annotations
 
 from pathlib import Path
 from typing import Any, Literal
+import logging
 
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
 
+from application.errors import DependencyUnavailable
 from tools.reference_workspace import ReferenceWorkspaceService
 
+log = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/workspace", tags=["reference-workspace"])
 _SERVICE = ReferenceWorkspaceService()
 _LOCAL_HOSTS = {"127.0.0.1", "::1", "localhost", "testclient"}
@@ -38,6 +41,30 @@ def _load(*, force: bool = False):
         raise HTTPException(status_code=503, detail=str(exc)) from exc
     except (OSError, ValueError) as exc:
         raise HTTPException(status_code=500, detail=f"Reference workspace failed: {exc}") from exc
+
+
+def _summary_or_unavailable(*, force: bool = False) -> dict[str, Any]:
+    """The sealed run's summary, or a statement that it is not available and why.
+
+    The shell renders nothing until this answers, and the sealed run needs the reference client. A
+    source that does not hold it must still open the portal on the real book, so that is an answer,
+    not an error. A dependency that is down or unconfigured is different: it propagates as a 503 that
+    names it (`application.errors`), because nothing can be read at all.
+    """
+    try:
+        _service().get(force=force)
+        return _service().summary()
+    except DependencyUnavailable:
+        raise
+    except Exception as exc:  # noqa: BLE001 - the sealed run is one artifact; its failure, whatever the cause, must not blind the shell
+        log.warning("sealed reference run unavailable: %s: %s", type(exc).__name__, str(exc)[:200])
+        return {
+            "available": False,
+            "workspace": None,
+            "reason": str(exc)[:400],
+            "remedy": "The certified reference run needs the reference client (account 1001) and its source; "
+                      "every other view reads the data that is present.",
+        }
 
 
 class SearchRequest(BaseModel):
@@ -75,15 +102,13 @@ class ComparisonStageRequest(BaseModel):
 @router.get("")
 def workspace_summary(request: Request) -> dict[str, Any]:
     _require_local(request)
-    _load()
-    return _service().summary()
+    return _summary_or_unavailable()
 
 
 @router.post("/refresh")
 def refresh_workspace(request: Request) -> dict[str, Any]:
     _require_local(request)
-    _load(force=True)
-    return _service().summary()
+    return _summary_or_unavailable(force=True)
 
 
 @router.post("/source/search")
