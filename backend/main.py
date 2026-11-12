@@ -122,9 +122,7 @@ async def lifespan(app: FastAPI):
     # The pool goes cold on its own. `prewarm` fills it once; without something
     # holding the links open they hit the ODBC pool's 60s idle timeout and the
     # next request pays a full handshake — 3.2s against 120ms.
-    keepalive_task = None
-    if should_warm():
-        keepalive_task = asyncio.create_task(_keepalive())
+    keepalive_task = asyncio.create_task(_keepalive()) if should_warm() else None
 
     # Is the operational store usable? Claims and findings live only there, so an unreachable or
     # uninitialised store is reported (with its remedy) here and in /api/ready, never discovered as
@@ -132,10 +130,12 @@ async def lifespan(app: FastAPI):
     app.state.stores = {"status": "running"}
     stores_task = asyncio.create_task(_check_stores(app))
 
+    from application.source_validation import start_source_schema_check
+    schema_task = await start_source_schema_check(app.state)
     app.state.started = True
     yield
     app.state.started = False
-    for task in (warm_task, keepalive_task, stores_task):
+    for task in (warm_task, keepalive_task, stores_task, schema_task):
         if task is not None and not task.done():
             task.cancel()
     log.info("API shutting down.")
@@ -188,10 +188,10 @@ def ready() -> dict:
     started = bool(getattr(app.state, "started", False))
     return {
         "ready": started and warm.get("status") != "running",
-        "warm": warm,
-        "ai": _ai_state(),
+        "warm": warm, "ai": _ai_state(),
         # Reported, never a reason to fail the platform probe: the app can still answer, and says what it cannot.
         "stores": getattr(app.state, "stores", {"status": "unknown"}),
+        "source_schema": getattr(app.state, "source_schema", {"status": "unknown"}),
     }
 
 

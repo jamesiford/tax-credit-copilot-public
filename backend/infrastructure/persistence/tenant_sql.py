@@ -30,30 +30,18 @@ import re
 import time
 from typing import Any, Callable, Iterable, Sequence
 
+from infrastructure.persistence.tenant_marker import (
+    ANCHORED as _ANCHORED, MARKER as _MARKER, TenantScopeViolation, closed_set, count_params as _count_params,
+    predicate as _predicate,
+)
+
 log = logging.getLogger("tcc.tenant_sql")
 
-_MARKER = re.compile(r"\{tenant(?::([A-Za-z_][A-Za-z0-9_]*))?(?:@([A-Za-z_][A-Za-z0-9_]*))?\}")
-#: `{tenant:alias@Column}` names a non-`client_id` client column (the lakehouse keys on `AccountId`); a closed set.
-TENANT_COLUMNS = frozenset({"client_id", "AccountId"})
-#: The marker must be the first term of a WHERE or ON clause.
-_ANCHORED = re.compile(r"\b(WHERE|ON)\s+$", re.IGNORECASE)
-
-
-class TenantScopeViolation(ValueError):
-    """A statement that could return or write another client's rows."""
-
-
-def _count_params(sql: str) -> int:
-    """Count `?` placeholders outside string literals."""
-    return re.sub(r"'(?:[^']|'')*'", "''", sql).count("?")
-
-
-def _predicate(marker: re.Match[str]) -> str:
-    """The `[alias.]column = ?` a marker stands for; the column must be in the closed set."""
-    alias, column = marker.group(1), marker.group(2) or "client_id"
-    if column not in TENANT_COLUMNS:
-        raise TenantScopeViolation(f"{column!r} is not a known tenant column")
-    return f"{alias + '.' if alias else ''}{column} = ?"
+def __getattr__(name: str):
+    """`TENANT_COLUMNS`, computed on access so a change to the source mapping is honoured."""
+    if name == "TENANT_COLUMNS":
+        return closed_set()
+    raise AttributeError(name)
 
 
 class TenantScopedQuery:

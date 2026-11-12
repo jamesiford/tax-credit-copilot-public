@@ -88,19 +88,9 @@ def _check_allowed(reader: Any, mode: str, max_rows: int) -> None:
 
 def _scan(reader: Any, timeout_seconds: int) -> list[tuple]:
     """The one `GROUP BY` over payroll, under the statement timeout. A timeout becomes `DependencyUnavailable`."""
-    from infrastructure.persistence import source_sql as s
+    from infrastructure.persistence import source_queries
 
-    payroll, location, address, zips = (reader._table(t) for t in ("Payroll", "Location", "Address", "StateCountyZip"))
-    sql = f"""
-        SELECT p.AccountId AS account_id, {s._STATE} AS work_state
-        FROM {payroll} p
-        LEFT JOIN {location} l ON l.LocationId = {s._LOCATION}
-        LEFT JOIN {address} a ON a.AddressId = l.AddressId
-        LEFT JOIN {zips} s
-               ON s.StateCountyZipId = a.StateCountyZipId
-        WHERE {s._HAS_SPAN}
-        GROUP BY p.AccountId, {s._STATE}
-        """
+    sql = source_queries.footprint(reader._table)
     try:
         return reader._query(sql, [], **({"timeout": timeout_seconds} if timeout_seconds else {}))
     except Exception as exc:  # noqa: BLE001 - only a statement timeout is translated here; the caller classifies the rest

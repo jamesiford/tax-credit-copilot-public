@@ -31,6 +31,7 @@ if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
 from config import SOURCE_SCHEMA, get_settings
+from data.source.mapping import column
 from data.source.from_reference import build_reference_source_dataset
 from data.source.synth import build_all_synthetic
 from data.source.to_bcs import source_to_bcs_rows, projection_controls
@@ -70,17 +71,18 @@ def main() -> int:
         ids = ", ".join(str(a) for a in args.accounts)
         # Synthetic employee ids are `account_id * 100_000 + n` (synth.py), so a
         # tenant's Employment rows are one contiguous block.
+        employee = column("Employment", "employee_id")
         blocks = " OR ".join(
-            f"(EmployeeId >= {a * 100_000} AND EmployeeId < {(a + 1) * 100_000})"
+            f"({employee} >= {a * 100_000} AND {employee} < {(a + 1) * 100_000})"
             for a in args.accounts
         )
         predicates = {
-            "Payroll": f"AccountId IN ({ids})",
+            "Payroll": f"{column('Payroll', 'account_id')} IN ({ids})",
             "Employment": blocks,
-            "Account": f"AccountId IN ({ids})",
+            "Account": f"{column('Account', 'account_id')} IN ({ids})",
             # Opt-in, like Account: a location's open date is reshaped only by
             # a story that opens a site late (GA-016, 30 Sep).
-            "Location": f"AccountId IN ({ids})",
+            "Location": f"{column('Location', 'account_id')} IN ({ids})",
         }
         if args.tables and set(args.tables) - set(predicates):
             print(f"--accounts writes only {sorted(predicates)}", file=sys.stderr)

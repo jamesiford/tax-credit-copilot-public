@@ -15,9 +15,14 @@ Silver holds every in-scope row. The engine decides what counts.
 """
 from __future__ import annotations
 
+import logging
 from typing import Any
 
+from . import mapping
+from .mapping import transforms
 from .schema import SourceDataset
+
+log = logging.getLogger(__name__)
 
 # BA-03. The source PayFrequencyId is a surrogate key whose lookup the partner has
 # not supplied. It is carried through as lineage and never used as a multiplier
@@ -84,6 +89,7 @@ def source_to_bcs_rows(dataset: SourceDataset) -> list[dict[str, Any]]:
     # the source, so fall back to `LocationId` — which is NOT NULL — rather than
     # dropping the row. Flagged for the partner; the fallback is explicit here so
     # the choice is visible if the answer changes it.
+    worksite_mode, pay_date_mode = mapping.worksite_mode(), mapping.null_pay_date_mode()
     unit_of: dict[int, str] = {}
     state_of: dict[int, str] = {}
     county_of: dict[int, str] = {}
@@ -111,14 +117,17 @@ def source_to_bcs_rows(dataset: SourceDataset) -> list[dict[str, Any]]:
 
     rows: list[dict[str, Any]] = []
     for p in dataset.payroll:
+        paid = transforms.effective_pay_date(pay_date_mode, p.pay_date, p.pay_period_end)
+        if paid is None and p.pay_period_end is not None and p.pay_period_start is not None:
+            continue  # `null_pay_date=exclude`: counted in `projection_controls`, never silent
         if p.pay_period_start is None or p.pay_period_end is None:
             # A period with no span cannot contribute a denominator. Surfacing
             # it as an exception is Silver's job; dropping it silently is not,
             # so this is counted by `projection_controls`.
             continue
 
-        location_id = p.worksite_location_id or p.location_id
-        pay_date = p.pay_date
+        location_id = transforms.worksite_id(worksite_mode, p.worksite_location_id, p.location_id)
+        pay_date = paid
 
         rows.append({
             # BA-02 trims on paycheck date; tax year is derived downstream from
@@ -134,9 +143,10 @@ def source_to_bcs_rows(dataset: SourceDataset) -> list[dict[str, Any]]:
             "Entity_FEIN": fein_by_entity.get(p.entity_id, ""),
             "Pay_Period_Start": p.pay_period_start.isoformat(),
             "Pay_Period_End": p.pay_period_end.isoformat(),
-            # Q1: nullable in source. Left as None so the engine's trim can
-            # treat it as an exception rather than silently bucketing it.
-            "Pay_Date": pay_date.isoformat() if pay_date else None,
+            # Q1: nullable in source. The `null_pay_date` transform decides (period end stands in, or the
+            # row is excluded above); an imputed date is flagged on the row and counted in the controls.
+            "Pay_Date": pay_date.isoformat(),
+            "_Pay_Date_Imputed": p.pay_date is None,
             "Pay_Frequency": str(p.pay_frequency_id) if p.pay_frequency_id else _UNKNOWN_FREQUENCY,
             # BA-07: the canonical category the rule pack names, not the raw
             # client code — see `canonical_pay_code`. The source code is kept as
@@ -154,6 +164,13 @@ def source_to_bcs_rows(dataset: SourceDataset) -> list[dict[str, Any]]:
             "_Source_Account_Id": p.account_id,
         })
 
+    imputed = sum(1 for r in rows if r["_Pay_Date_Imputed"])
+    if imputed or len(rows) < len(dataset.payroll):
+        log.warning(
+            "account %s: %d payroll row(s) have no paycheck date; null_pay_date=%s (%s). Counted in the projection controls.",
+            dataset.account.account_id, sum(1 for p in dataset.payroll if p.pay_date is None), pay_date_mode,
+            f"{imputed} used the period end" if pay_date_mode == "period_end" else "left out",
+        )
     return rows
 
 
@@ -171,6 +188,7 @@ def projection_controls(dataset: SourceDataset, rows: list[dict[str, Any]]) -> d
         if p.pay_period_start is None or p.pay_period_end is None
     )
     missing_worksite = sum(1 for p in dataset.payroll if p.worksite_location_id is None)
+    no_span_null = sum(1 for p in dataset.payroll if p.pay_date is None and (p.pay_period_start is None or p.pay_period_end is None))
 
     return {
         "account_id": dataset.account.account_id,
@@ -179,6 +197,9 @@ def projection_controls(dataset: SourceDataset, rows: list[dict[str, Any]]) -> d
         "bcs_rows_out": len(rows),
         "dropped_no_period_span": no_span,
         "null_pay_date": null_pay_date,              # Q1
+        "null_pay_date_policy": mapping.null_pay_date_mode(),
+        "null_pay_date_imputed": sum(1 for r in rows if r["_Pay_Date_Imputed"]),
+        "null_pay_date_excluded": null_pay_date - sum(1 for r in rows if r["_Pay_Date_Imputed"]) - no_span_null,
         "null_hours_coerced_to_zero": null_hours,    # Q2
         "null_wages_coerced_to_zero": null_wages,    # Q2
         "worksite_fell_back_to_location": missing_worksite,  # Q3

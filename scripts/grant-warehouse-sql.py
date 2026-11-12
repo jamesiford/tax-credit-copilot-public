@@ -66,6 +66,7 @@ def gateway_grant_statements(principal: str, ops_schema: str, objects: tuple[str
 
 def lakehouse_source_tables() -> tuple[str, ...]:
     """The source tables the data query reads, from the semantic model so the two cannot drift."""
+    import bootstrap.data_wiring  # noqa: F401 - installs the mapping-backed lakehouse names the model asks for
     from application.data.semantic_model import Source, default_model
 
     return tuple(sorted(d.table for d in default_model().datasets if d.source is Source.LAKEHOUSE))

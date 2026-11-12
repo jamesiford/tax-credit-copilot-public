@@ -60,6 +60,7 @@ def warehouse_tables() -> dict[str, list[str]]:
 
 def source_tables() -> dict[str, list[str]]:
     """Lakehouse table -> its physical (PascalCase) columns, as written to Delta."""
-    from data.source.to_delta import TABLE_SPECS, _pascal
+    from data.source.mapping import column
+    from data.source.to_delta import TABLE_SPECS
 
-    return {table: [_pascal(f) for f in spec] for table, (_attr, spec) in TABLE_SPECS.items()}
+    return {table: [column(table, f) for f in spec] for table, (_attr, spec) in TABLE_SPECS.items()}

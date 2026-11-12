@@ -32,6 +32,7 @@ from dataclasses import dataclass
 from typing import Any, Iterator
 
 from config import SOURCE_SCHEMA, get_settings
+from infrastructure.persistence import source_queries
 from infrastructure.persistence.fabric_warehouse import (
     FabricWarehouseConnection,
     WarehouseNotConfigured,
@@ -52,22 +53,6 @@ class PayrollScope:
     states: list[str]
     pay_dates: list[str]
 
-
-#: `source_to_bcs_rows` skips a period with no span, so the row population this
-#: aggregates over has to skip it too or the totals disagree.
-_HAS_SPAN = "p.PayPeriodStart IS NOT NULL AND p.PayPeriodEnd IS NOT NULL"
-
-#: `Tax_Year` in the projection is the pay date's year, falling back to the
-#: period end when the pay date is null (Q1).
-_TAX_YEAR = "YEAR(COALESCE(p.PayDate, p.PayPeriodEnd))"
-
-#: The projection resolves state through Location -> Address -> StateCountyZip
-#: with a Python `or` chain, which treats '' as missing. `COALESCE` treats only
-#: NULL as missing, so the empty strings are nulled out first to match.
-_STATE = "UPPER(COALESCE(NULLIF(s.StateAbbr, ''), NULLIF(a.StateOriginal, ''), ''))"
-
-#: Q3: `WorksiteLocationId` is nullable, `LocationId` is not.
-_LOCATION = "COALESCE(p.WorksiteLocationId, p.LocationId)"
 
 #: One connection instance for the process, so `scope()` can span the several
 #: readers a single endpoint builds. `scope()` keys off `threading.local` on the
@@ -174,21 +159,8 @@ class SourceSqlReader:
         cached = _ACCOUNTS_CACHE.get(self.lakehouse)
         if cached is not None:
             return cached
-        rows = self._query(
-            f"SELECT AccountId, Name, BillingState, ActualNumberOfEmployees, IndustryTypeId "
-            f"FROM {self._table('Account')}",
-            [],
-        )
-        accounts = [
-            {
-                "AccountId": r[0],
-                "Name": r[1],
-                "BillingState": r[2],
-                "ActualNumberOfEmployees": r[3],
-                "IndustryTypeId": r[4],
-            }
-            for r in rows
-        ]
+        sql, keys = source_queries.accounts(self._table)
+        accounts = [dict(zip(keys, row)) for row in self._query(sql, [])]
         _ACCOUNTS_CACHE[self.lakehouse] = accounts
         return accounts
 
@@ -204,23 +176,7 @@ class SourceSqlReader:
         thing in this statement's history. The date is grouped as a date and
         rendered in Python, for the same reason.
         """
-        payroll, location, address, zips = (self._table(t) for t in ("Payroll", "Location", "Address", "StateCountyZip"))
-        rows = self._query(
-            f"""
-            SELECT {_TAX_YEAR} AS tax_year,
-                   {_STATE} AS work_state,
-                   p.PayDate AS pay_date,
-                   COUNT_BIG(*) AS rows_in
-            FROM {payroll} p
-            LEFT JOIN {location} l ON l.LocationId = {_LOCATION}
-            LEFT JOIN {address} a ON a.AddressId = l.AddressId
-            LEFT JOIN {zips} s
-                   ON s.StateCountyZipId = a.StateCountyZipId
-            WHERE p.AccountId = ? AND {_HAS_SPAN}
-            GROUP BY {_TAX_YEAR}, {_STATE}, p.PayDate
-            """,
-            [account_id],
-        )
+        rows = self._query(source_queries.payroll_scope(self._table), [account_id])
         return PayrollScope(
             total_rows=sum(int(r[3]) for r in rows),
             tax_years=sorted({int(r[0]) for r in rows if r[0] is not None}),
@@ -257,18 +213,7 @@ class SourceSqlReader:
         if cached is not None:
             return cached
 
-        rules_table, entity = self._table("EntityFiscalYearRules"), self._table("Entity")
-        rows = self._query(
-            f"""
-            SELECT DISTINCT r.FiscalYearRulesId, r.Name, r.FiscalYearBegin,
-                            r.FiscalYearEnd, r.RuleExpression, r.Inferred
-            FROM {rules_table} r
-            JOIN {entity} e ON e.FiscalYearRulesId = r.FiscalYearRulesId
-            WHERE e.AccountId = ?
-            ORDER BY r.FiscalYearRulesId
-            """,
-            [account_id],
-        )
+        rows = self._query(source_queries.fiscal_rules(self._table), [account_id])
         rules = [
             EntityFiscalYearRules(
                 fiscal_year_rules_id=r[0],

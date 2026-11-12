@@ -15,6 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "backend"))
 
 from application.data.model_doc import render_markdown  # noqa: E402
+import bootstrap.data_wiring  # noqa: E402,F401 - installs the lakehouse names the model asks for
 from application.data.semantic_model import default_model  # noqa: E402
 
 PAGE = ROOT / "docs" / "data" / "SEMANTIC-MODEL.md"

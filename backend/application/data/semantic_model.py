@@ -245,6 +245,6 @@ def default_model() -> SemanticModel:
     from application.data.model_gold_credit import CREDIT_DATASETS
     from application.data.model_gold_facts import FACT_DATASETS
     from application.data.model_gold_units import UNIT_DATASETS
-    from application.data.model_source import SOURCE_DATASETS
+    from application.data.model_source import source_datasets
 
-    return SemanticModel((*FACT_DATASETS, *UNIT_DATASETS, *CREDIT_DATASETS, *SOURCE_DATASETS))
+    return SemanticModel((*FACT_DATASETS, *UNIT_DATASETS, *CREDIT_DATASETS, *source_datasets()))
