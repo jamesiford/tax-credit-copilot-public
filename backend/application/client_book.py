@@ -11,7 +11,7 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from application.source_ports import configured_account_id, new_source_reader
+from application.source_ports import fixture_account_id, new_source_reader
 
 log = logging.getLogger(__name__)
 
@@ -78,6 +78,16 @@ def programs() -> list[dict[str, Any]]:
     return out
 
 
+def _is_synthetic(account: dict[str, Any]) -> bool:
+    """Whether the account is generated: its own marker, else the environment's classification, else no."""
+    from config import synthetic_environment
+
+    marker = account.get("IsSynthetic", account.get("is_synthetic"))
+    if marker is not None:
+        return bool(marker)
+    return synthetic_environment()
+
+
 def clients() -> list[dict[str, Any]]:
     """Every tenant the active data source can see."""
     from tools.fabric_source import active_data_source
@@ -85,8 +95,11 @@ def clients() -> list[dict[str, Any]]:
     if active_data_source() != "lakehouse":
         # Single-tenant fixture sources still present a one-entry portfolio, so
         # the UI has one code path rather than two.
+        tenant = fixture_account_id()
+        if tenant is None:
+            return []
         return [{
-            "account_id": configured_account_id(),
+            "account_id": tenant,
             "name": "Reference Dataset Client",
             "billing_state": "GA",
             "employees": None,
@@ -104,10 +117,10 @@ def clients() -> list[dict[str, Any]]:
                 "name": a.get("Name") or f"Account {a['AccountId']}",
                 "billing_state": a.get("BillingState") or "",
                 "employees": a.get("ActualNumberOfEmployees"),
-                # Account ids below 2000 are real client data under a codename;
-                # 2000+ are generated. Surfacing it prevents a demo figure being
-                # quoted as a client result.
-                "synthetic": int(a["AccountId"]) >= 2000,
+                # Surfacing generated data prevents a demo figure being quoted as a client
+                # result. It comes from the data (an `IsSynthetic` marker on the account) or
+                # from the environment's classification, never from the shape of an id.
+                "synthetic": _is_synthetic(a),
                 # WI-20. Display-only; None where we do not hold it.
                 "industry": industry_name(a.get("IndustryTypeId")),
             }

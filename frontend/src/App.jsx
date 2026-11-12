@@ -5,7 +5,7 @@ import {
   MessageSquare, Play, RefreshCw, ShieldCheck,
   ShieldQuestion, Users, X,
 } from 'lucide-react';
-import { fetchClientScope, fetchScope, fetchWorkspace, hasYear, refreshWorkspace } from './api.js';
+import { fetchClientScope, fetchPortfolioV2, fetchScope, fetchWorkspace, hasYear, refreshWorkspace } from './api.js';
 import AgentActivityView from './components/AgentActivityView.jsx';
 import PanelBoundary from './components/PanelBoundary.jsx';
 import AskWorkspace from './components/ask/AskWorkspace.jsx';
@@ -29,7 +29,7 @@ import UnitPage from './pages/UnitPage.jsx';
 import {
   PORTFOLIO, loadStoredScope, reconcileScope, scopeLabel, storeScope,
 } from './lib/scopeDimension.js';
-import { TOUR_DEFAULT_DWELL_MS, TOUR_STEPS } from './lib/tour.js';
+import { TOUR_DEFAULT_DWELL_MS, loadTourSteps } from './lib/tour.js';
 import {
   AssumptionsView, CompareView, EligibilityView, OneZeroView,
 } from './components/ReferenceViews.jsx';
@@ -218,6 +218,7 @@ export default function App() {
 
   const [tourActive, setTourActive] = useState(false);
   const [tourStep, setTourStep] = useState(0);
+  const [tourSteps, setTourSteps] = useState([]);
   const [tourPaused, setTourPaused] = useState(false);
 
   // Scope lives in the shell, not in a view, because it survives navigation.
@@ -371,7 +372,12 @@ export default function App() {
     setTourPaused(false);
   }, []);
 
-  const startTour = useCallback(() => {
+  const startTour = useCallback(async () => {
+    // The stops come from the loaded book; a book with nothing to show has no tour.
+    const book = await fetchPortfolioV2({ limit: 100 }).catch(() => null);
+    const steps = await loadTourSteps(book?.items || []);
+    if (!steps.length) return;
+    setTourSteps(steps);
     setTourStep(0);
     setTourPaused(false);
     setTourActive(true);
@@ -379,7 +385,7 @@ export default function App() {
 
   useEffect(() => {
     if (!tourActive) return undefined;
-    const step = TOUR_STEPS[tourStep];
+    const step = tourSteps[tourStep];
     if (!step) { setTourActive(false); return undefined; }
     const nextScope = step.scope ? { ...scope, ...step.scope } : scope;
     setScope(nextScope);
@@ -393,13 +399,13 @@ export default function App() {
     if (tourPaused) return undefined;
     const id = setTimeout(
       () => {
-        if (tourStep + 1 < TOUR_STEPS.length) setTourStep((s) => s + 1);
+        if (tourStep + 1 < tourSteps.length) setTourStep((s) => s + 1);
         else setTourActive(false);
       },
       step.dwell_ms || TOUR_DEFAULT_DWELL_MS,
     );
     return () => clearTimeout(id);
-  }, [tourActive, tourStep, tourPaused, scope, navigate, search]);
+  }, [tourActive, tourStep, tourSteps, tourPaused, scope, navigate, search]);
 
   useEffect(() => {
     const handler = (event) => {
@@ -601,7 +607,7 @@ export default function App() {
   }
 
   const label = scopeLabel(resolved.scope, scopeOptions, clientScope);
-  const step = tourActive ? TOUR_STEPS[tourStep] : null;
+  const step = tourActive ? tourSteps[tourStep] : null;
 
   const navItems = navGroups(NAV, { hasClient: resolved.scope.clientId !== PORTFOLIO });
   const goPortfolio = () => navigate(buildRouteUrl({ clientId: PORTFOLIO }));
@@ -693,10 +699,10 @@ export default function App() {
       <div className="tour-bar">
         {/* Inline because the width is COMPUTED from tour position; a class
             cannot carry a per-render percentage. */}
-        <div className="tour-progress" style={{ width: `${((tourStep + 1) / TOUR_STEPS.length) * 100}%` }} />
+        <div className="tour-progress" style={{ width: `${((tourStep + 1) / tourSteps.length) * 100}%` }} />
         <div className="tour-bar-row">
           <div className="tour-bar-meta">
-            <div className="tour-step-num">Step {tourStep + 1} of {TOUR_STEPS.length}</div>
+            <div className="tour-step-num">Step {tourStep + 1} of {tourSteps.length}</div>
             <div className="tour-step-title">{step.title}</div>
             <div className="tour-step-summary">{step.summary}</div>
           </div>
@@ -705,7 +711,7 @@ export default function App() {
             <button className="btn btn-secondary" onClick={() => setTourPaused((p) => !p)}>
               {tourPaused ? 'Resume' : 'Pause'}
             </button>
-            <button className="btn btn-secondary" onClick={() => (tourStep + 1 < TOUR_STEPS.length ? setTourStep((s) => s + 1) : exitTour())}>Next</button>
+            <button className="btn btn-secondary" onClick={() => (tourStep + 1 < tourSteps.length ? setTourStep((s) => s + 1) : exitTour())}>Next</button>
             <button className="btn btn-primary" onClick={exitTour}>Exit</button>
           </div>
         </div>

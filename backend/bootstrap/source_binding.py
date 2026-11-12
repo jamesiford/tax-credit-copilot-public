@@ -17,10 +17,10 @@ from application.services import provide
 class InfrastructurePayrollSource:
     """`PayrollSource` over `infrastructure.payroll`."""
 
-    def configured_account_id(self) -> int:
+    def fixture_account_id(self) -> int | None:
         from infrastructure.payroll import pay_period_source
 
-        return pay_period_source.configured_account_id()
+        return pay_period_source.fixture_account_id()
 
     def load_pay_periods(self, account_id: int | None = None) -> list[dict[str, Any]]:
         from infrastructure.payroll import pay_period_source

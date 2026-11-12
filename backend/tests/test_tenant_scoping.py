@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import pytest
 
-from infrastructure.payroll.pay_period_source import configured_account_id
+from infrastructure.payroll.pay_period_source import fixture_account_id
 
 # A tenant no data source holds. Chosen well outside the lakehouse account range
 # (1001, 2001-2004) so this stays meaningful if the suite is ever pointed at
@@ -52,7 +52,7 @@ def test_absent_tenant_is_refused_not_substituted(client, path):
     assert response.status_code == 404, (
         f"{path} answered {response.status_code} for a tenant the source does "
         f"not hold. If this is 200, the endpoint dropped account_id and served "
-        f"tenant {configured_account_id()}'s payroll under another client's id."
+        f"tenant {fixture_account_id()}'s payroll under another client's id."
     )
 
 
@@ -64,7 +64,7 @@ def test_configured_tenant_matches_the_unscoped_default(client, path):
     altered what a single-tenant caller already sees.
     """
     unscoped = client.get(path)
-    scoped = client.get(path, params={"account_id": configured_account_id()})
+    scoped = client.get(path, params={"account_id": fixture_account_id()})
 
     assert unscoped.status_code == scoped.status_code
     if unscoped.status_code == 200:
@@ -77,7 +77,7 @@ def test_configured_tenant_matches_the_unscoped_default(client, path):
 def test_workspace_is_tenant_scoped(client):
     """The portfolio endpoint carries the client's identity, so it matters most."""
     unscoped = client.get("/api/scope")
-    scoped = client.get("/api/scope", params={"account_id": configured_account_id()})
+    scoped = client.get("/api/scope", params={"account_id": fixture_account_id()})
     assert unscoped.status_code == 200
     assert scoped.status_code == 200
     assert scoped.json() == unscoped.json()

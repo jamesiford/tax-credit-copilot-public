@@ -192,8 +192,8 @@ def test_every_default_is_the_value_the_reader_used_before():
     assert settings.runtime == config_sections.RuntimeSettings(None, "INFO", True, 30)
     assert settings.observability == config_sections.ObservabilitySettings(None, None, None)
     source = settings.data_source
-    assert (source.data_source, source.explicit_data_source, source.fabric_employees_table, source.flex_account_id) == (
-        "lakehouse", None, "dbo/employees", 1001)
+    assert (source.data_source, source.explicit_data_source, source.fabric_employees_table, source.fixture_account_id) == (
+        "lakehouse", None, "dbo/employees", None)
     warehouse = settings.warehouse
     assert (warehouse.server, warehouse.database, warehouse.odbc_driver, warehouse.connect_timeout,
             warehouse.stranded_run_minutes) == ("", "", "ODBC Driver 18 for SQL Server", 90, 60)
@@ -205,12 +205,12 @@ def test_every_default_is_the_value_the_reader_used_before():
 
 def test_values_are_parsed_to_their_types():
     settings = load_settings({
-        "TCC_WARM_ON_START": " No ", "TCC_KEEPALIVE_SECONDS": "2", "DATA_SOURCE": " CSV ", "FLEX_ACCOUNT_ID": "42",
+        "TCC_WARM_ON_START": " No ", "TCC_KEEPALIVE_SECONDS": "2", "DATA_SOURCE": " CSV ", "FIXTURE_ACCOUNT_ID": "42",
         "WAREHOUSE_CONNECT_TIMEOUT": "7", "OUTPUTS_RETENTION_DAYS": "30", "WEBIQ_API_KEY": "", "OPERATIONAL_DB": "",
     })
     assert settings.runtime.warm_on_start is False
     assert settings.runtime.keepalive_seconds == 5, "never below 5 seconds"
-    assert settings.data_source.data_source == "csv" and settings.data_source.flex_account_id == 42
+    assert settings.data_source.data_source == "csv" and settings.data_source.fixture_account_id == 42
     assert settings.warehouse.connect_timeout == 7 and settings.stores.outputs_retention_days == 30
     assert settings.webiq.api_key is None
     assert settings.stores.operational_db_or("fallback") == "", "set-but-empty stays empty, as os.getenv had it"
@@ -218,7 +218,7 @@ def test_values_are_parsed_to_their_types():
 
 def test_an_unparseable_keepalive_is_the_default_and_an_unparseable_number_elsewhere_raises():
     assert load_settings({"TCC_KEEPALIVE_SECONDS": "often"}).runtime.keepalive_seconds == 30
-    for name, section in (("FLEX_ACCOUNT_ID", "data_source"), ("WAREHOUSE_CONNECT_TIMEOUT", "warehouse"),
+    for name, section in (("FIXTURE_ACCOUNT_ID", "data_source"), ("WAREHOUSE_CONNECT_TIMEOUT", "warehouse"),
                           ("OUTPUTS_RETENTION_DAYS", "stores")):
         with pytest.raises(ValueError):
             getattr(load_settings({name: "x"}), section)

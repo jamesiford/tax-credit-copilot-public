@@ -31,7 +31,11 @@ def test_warming_is_on_by_default_against_the_lakehouse(monkeypatch):
     assert should_warm() is True
 
 
-def test_a_step_that_fails_is_reported_not_raised():
+def test_a_step_that_fails_is_reported_not_raised(monkeypatch):
+    from data.source.from_fabric import FabricLakehouseReader
+
+    monkeypatch.setattr(FabricLakehouseReader, "list_accounts", lambda self: [{"AccountId": 5}, {"AccountId": 6}])
+
     def boom():
         raise TimeoutError("cold delta log")
 
@@ -41,7 +45,15 @@ def test_a_step_that_fails_is_reported_not_raised():
     assert workspace["ok"] is False
     assert "TimeoutError" in workspace["detail"]
     # The steps after it still ran.
-    assert any(s["step"] == "trend" for s in report["steps"])
+    assert [s["step"] for s in report["steps"] if s["step"].startswith("trend")] == ["trend[5]", "trend[6]"]
+
+
+def test_with_no_accounts_there_is_nothing_to_warm_per_client(monkeypatch):
+    from data.source.from_fabric import FabricLakehouseReader
+
+    monkeypatch.setattr(FabricLakehouseReader, "list_accounts", lambda self: [])
+    report = warm_read_paths(warm_workspace=lambda: None)
+    assert not [s for s in report["steps"] if s["step"].startswith("trend")]
 
 
 def test_every_step_is_timed_so_a_slow_one_can_be_named():

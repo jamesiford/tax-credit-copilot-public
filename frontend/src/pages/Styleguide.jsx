@@ -163,7 +163,7 @@ export default function Styleguide() {
       </Section>
 
       <Section title="MetaLine / SectionHeading">
-        <MetaLine items={[{ label: 'Client', value: 'Cascade' }, { label: 'Tax year', value: 'TY2023' }, { label: 'Method', value: 'Min-Max' }]} />
+        <MetaLine items={[{ label: 'Client', value: 'Example Client A' }, { label: 'Tax year', value: 'TY2023' }, { label: 'Method', value: 'Min-Max' }]} />
         <SectionHeading count={4}>Identified</SectionHeading>
       </Section>
 
@@ -180,10 +180,10 @@ export default function Styleguide() {
         <div className="sg-shell">
           <TopBar groups={SHELL_GROUPS} activeId="onezero" onSelect={() => {}} onHome={() => {}} />
           <DrillTrail clientId="portfolio" view="trend" {...NOOP} />
-          <DrillTrail clientId={2001} clientName="Cascade Retail Partners" view="trend" {...NOOP} />
-          <DrillTrail clientId={2001} clientName="Cascade Retail Partners" unitId="GA_GA-001" view="trend" {...NOOP} />
+          <DrillTrail clientId={101} clientName="Example Client A" view="trend" {...NOOP} />
+          <DrillTrail clientId={101} clientName="Example Client A" unitId="GA_GA-001" view="trend" {...NOOP} />
           <DrillTrail
-            clientId={2001} clientName="Cascade Retail Partners" unitId="GA_GA-001" token="t" view="trend" {...NOOP}
+            clientId={101} clientName="Example Client A" unitId="GA_GA-001" token="t" view="trend" {...NOOP}
           />
         </div>
       </Section>
@@ -192,7 +192,7 @@ export default function Styleguide() {
         <HeroBand compact title="Hi, Jane" aside={<Pill variant="category">Start here</Pill>}>
           Who to target, ranked by the reason to act, not by dollar value.
         </HeroBand>
-        <StartHereCards id="sg-start" firstClientId={2001} onNavigate={() => {}} onShowBook={() => {}} />
+        <StartHereCards id="sg-start" firstClientId={101} onNavigate={() => {}} onShowBook={() => {}} />
       </Section>
 
       <Section title="Card: verdict tones and flush grid">
@@ -205,8 +205,8 @@ export default function Styleguide() {
           <table className="tbl-compact">
             <thead><tr><th>Client</th><th className="num">Identified</th></tr></thead>
             <tbody>
-              <tr><td>Cascade</td><td className="num">$149k</td></tr>
-              <tr className="row-open"><td>Northwind</td><td className="num">$31k</td></tr>
+              <tr><td>Example Client A</td><td className="num">$149k</td></tr>
+              <tr className="row-open"><td>Example Client B</td><td className="num">$31k</td></tr>
             </tbody>
           </table>
         </Card>
@@ -236,8 +236,8 @@ export default function Styleguide() {
       <Section title="Client review header">
         <div className="sg-block">
           <ClientHeader
-            clientId={2001}
-            clientName="Cascade Retail Partners"
+            clientId={101}
+            clientName="Example Client A"
             industry="Retail"
             year={2023}
             current="location"
@@ -256,8 +256,8 @@ export default function Styleguide() {
 
       <Section title="Ask: evidence pane">
         <div className="sg-block">
-          <EvidencePane items={ASK_ITEMS} plan={{ intents: PLAN_EVENT.intents, needsClient: [] }} scope={{ clientId: 2001, year: 2023 }} />
-          <EvidencePane items={[]} plan={{ intents: PLAN_EVENT.intents, needsClient: [] }} scope={{ clientId: 2001, year: 2023 }} />
+          <EvidencePane items={ASK_ITEMS} plan={{ intents: PLAN_EVENT.intents, needsClient: [] }} scope={{ clientId: 101, year: 2023 }} />
+          <EvidencePane items={[]} plan={{ intents: PLAN_EVENT.intents, needsClient: [] }} scope={{ clientId: 101, year: 2023 }} />
           <ConfirmCard item={ASK_ITEMS[2]} onConfirm={() => {}} onCancel={() => {}} />
         </div>
       </Section>

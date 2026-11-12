@@ -68,11 +68,51 @@ _DECLINES = [
 ]
 
 
-def main() -> int:
+# The account each seeded id is allowed to land on. Writing to an id that is
+# somebody else's account would attach an invented claim to a real client.
+_EXPECTED_NAMES = {
+    1001: "Candle Bottle",
+    2001: "Cascade Retail Partners",
+    2003: "Ironbridge Logistics",
+    2004: "Halloway Foods",
+}
+
+
+def refusal_reason() -> str | None:
+    """Why seeding must not run here, or None. Illustrative claims are for generated data only."""
+    from config import get_settings, synthetic_environment
+
+    runtime = get_settings().runtime
+    if not synthetic_environment():
+        return "DATA_CLASSIFICATION is not 'synthetic'; the seed invents claims and must never touch customer data"
+    if not runtime.allow_seed:
+        return "TCC_ALLOW_SEED=1 is not set; seeding is an explicit act, never a side effect"
+    return None
+
+
+def _targets(book) -> set[int]:
+    """The seeded ids whose account in this environment carries the expected seed name."""
+    names = {int(c["account_id"]): str(c.get("name") or "").strip().lower() for c in book()}
+    ok = {i for i, expected in _EXPECTED_NAMES.items() if names.get(i, "").startswith(expected.lower())}
+    for missing in sorted(set(_EXPECTED_NAMES) - ok):
+        print(f"  skip {missing}: no account with the expected seed name in this source")
+    return ok
+
+
+def main(*, book=None) -> int:
+    reason = refusal_reason()
+    if reason:
+        print(f"seed refused: {reason}")
+        return 2
+    if book is None:
+        from application.client_book import clients_checked as book
+    allowed = _targets(book)
     repo = get_claim_repository()
     unchanged = written = 0
 
     for client_id, program, year, claimed, note in _ASSERTIONS:
+        if client_id not in allowed:
+            continue
         current = repo.current(client_id, program, year)
         if current is None:
             print(f"  skip {client_id} {program} TY{year}: not assessed yet")
@@ -117,6 +157,8 @@ def main() -> int:
         )
 
     for client_id, program, year, reason in _DECLINES:
+        if client_id not in allowed:
+            continue
         current = repo.current(client_id, program, year)
         if current is None:
             continue
@@ -134,6 +176,8 @@ def main() -> int:
             print(f"  {client_id} {program} TY{year}: cannot decline ({exc})")
 
     for client_id, program, scope, note in _ENGAGEMENTS:
+        if client_id not in allowed:
+            continue
         # Re-runnable like the assertions: setting the scope that is already live
         # would append a duplicate row to an append-only history on every deploy.
         live = {e.program_code: e for e in repo.engagements(client_id)}

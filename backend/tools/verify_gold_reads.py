@@ -13,7 +13,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-CLIENT = 1001
+from tools.reference_identity import require_reference_account_id
+CLIENT = require_reference_account_id()  # REFERENCE_ACCOUNT_ID; unset is an explained refusal
 YEAR = 2023
 
 

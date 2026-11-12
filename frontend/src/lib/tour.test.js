@@ -1,77 +1,60 @@
 /**
- * The guided tour is the run of show, encoded.
- *
- * It drifted because nothing checked it: the tour previewed an argument the
- * script no longer made, and the only way to notice was to sit through both.
- * These tests pin the shape and the order, not the prose.
+ * The tour is built from the loaded book, so it must work for any book:
+ * ids and names it has never heard of, one client, and none.
  */
 import { describe, it, expect } from 'vitest';
-import { TOUR_STEPS, TOUR_DEFAULT_DWELL_MS } from './tour.js';
-import { ALL_PROGRAMS, PORTFOLIO } from './scopeDimension.js';
+import { buildTour, loadTourSteps } from './tour.js';
+import { PORTFOLIO } from './scopeDimension.js';
 
-/** Every view the shell can render. Must match `NAV` in App.jsx, plus the
- *  route-only ids the pages resolve to. */
-const VIEWS = new Set([
-  'trend', 'eligibility', 'onezero',
-  'ingestion', 'agents', 'compare',
-  'rules', 'assumptions', 'evidence',
-]);
+const row = (over) => ({
+  client_id: 71, client_name: 'Example Client Q', priority_band: 'unclaimed_at_scale',
+  identified_usd: '1000', program_code: 'XX_PROG', tax_year: 2031, ...over,
+});
 
-describe('the guided tour', () => {
-  it('only visits views the shell can actually render', () => {
-    for (const step of TOUR_STEPS) {
-      expect(VIEWS.has(step.view), `unknown view: ${step.view}`).toBe(true);
-    }
+describe('the data-driven tour', () => {
+  it('has no tour for an empty book', () => {
+    expect(buildTour([])).toEqual([]);
   });
 
-  it('gives every stop something to say', () => {
-    for (const step of TOUR_STEPS) {
-      expect(step.title?.length, `missing title on ${step.view}`).toBeGreaterThan(0);
-      expect(step.summary?.length, `missing summary on ${step.view}`).toBeGreaterThan(40);
-    }
+  it('opens on the book and then visits the client with the most identified credit', () => {
+    const steps = buildTour([row({ client_id: 5, identified_usd: '10' }), row({ client_id: 9, identified_usd: '900' })]);
+    expect(steps[0].scope.clientId).toBe(PORTFOLIO);
+    expect(steps[1].scope).toEqual({ clientId: 9, programCode: 'XX_PROG', year: 2031 });
   });
 
-  it('follows the run of show act by act', () => {
-    // Acts 2 -> 3 -> 4 -> 5 -> 6 -> 7 of _john-review-script.md. If you reorder
-    // the script, reorder this; a tour that previews a different argument than
-    // the one you then walk is worse than no tour.
-    //
-    // Six stops now read `trend`: position, progress and plan were absorbed by
-    // the client and portfolio pages, so those acts are sections of one page
-    // rather than destinations. The ARGUMENT is unchanged — the walk is.
-    expect(TOUR_STEPS.map((step) => step.view)).toEqual([
-      'trend',                                       // Act 0/1 — what it is worth
-      'ingestion',                                   // Act 2 — what came in
-      'eligibility', 'eligibility', 'onezero', 'eligibility', // Act 3
-      'compare', 'evidence',                         // Act 4 — prove it
-      'eligibility',                                 // Act 5.0 — the switch was real
-      'trend',                                       // Act 5.1 / 5.2 — verdict, then the cohort
-      'trend',                                       // Act 6 — what would change it
-      'trend', 'trend', 'trend',                     // Act 7 — across the book
+  it('leaves out a role nobody plays rather than inventing one', () => {
+    const titles = buildTour([row({})]).map((s) => s.title);
+    expect(titles.some((t) => t.startsWith('On the line'))).toBe(false);
+    expect(titles.some((t) => t.startsWith('Declining'))).toBe(false);
+  });
+
+  it('adds a stop for each role the book has', () => {
+    const steps = buildTour([
+      row({ client_id: 1 }),
+      row({ client_id: 2, priority_band: 'on_the_line' }),
+      row({ client_id: 3, priority_band: 'declining' }),
     ]);
+    const clients = steps.filter((s) => s.scope).map((s) => s.scope.clientId);
+    expect(clients).toEqual(expect.arrayContaining([PORTFOLIO, 1, 2, 3]));
   });
 
-  it('switches client exactly where the script does, and never switches back', () => {
-    // The reviewer sees Candle Bottle, then Ironbridge, then Cascade, then the
-    // portfolio. Going backwards would land a sealed view on the wrong client.
-    const switches = TOUR_STEPS.filter((step) => step.scope).map((step) => step.scope.clientId);
-    expect(switches).toEqual([1001, 2003, 2001, PORTFOLIO]);
+  it('never walks to a client whose data is unavailable', () => {
+    const steps = buildTour([
+      row({ client_id: 4, data_unavailable: true, priority_band: 'unavailable', identified_usd: null }),
+    ]);
+    expect(steps.every((s) => s.scope?.clientId !== 4)).toBe(true);
   });
 
-  it('opens on the certified client-year so the sealed views agree with the scope', () => {
-    expect(TOUR_STEPS[0].scope).toEqual({ clientId: 1001, programCode: 'GA_JTC', year: 2023 });
+  it('quotes no figure and names no client of its own', () => {
+    for (const step of buildTour([row({}), row({ client_id: 2, priority_band: 'declining' })])) {
+      expect(step.summary).not.toMatch(/\d{2,}/);
+      expect(step.summary.length).toBeGreaterThan(40);
+    }
   });
 
-  it('rolls the book up across every program, not just the one in scope', () => {
-    const portfolio = TOUR_STEPS.find((step) => step.scope?.clientId === PORTFOLIO);
-    expect(portfolio.scope.programCode).toBe(ALL_PROGRAMS);
-  });
-
-  it('runs long enough to read but short enough to sit through', () => {
-    const total = TOUR_STEPS.reduce(
-      (sum, step) => sum + (step.dwell_ms ?? TOUR_DEFAULT_DWELL_MS), 0,
-    );
-    expect(total).toBeGreaterThan(3 * 60_000);
-    expect(total).toBeLessThan(6 * 60_000);
+  it('uses the book-driven tour unless a demo build asks for the script', async () => {
+    const steps = await loadTourSteps([row({})]);
+    expect(steps[0].scope.clientId).toBe(PORTFOLIO);
+    expect(steps.some((s) => s.scope?.clientId === 1001)).toBe(false);
   });
 });

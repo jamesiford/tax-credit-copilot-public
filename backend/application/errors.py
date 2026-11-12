@@ -53,6 +53,19 @@ class SourceNotConfigured(DependencyUnavailable):
         self.missing = missing
 
 
+class ReferenceNotConfigured(DependencyUnavailable):
+    """The certified reference run was asked for, and no deployment account is named as its subject."""
+
+    def __init__(self) -> None:
+        super().__init__(
+            "reference_dataset",
+            "no account is configured as the certified reference (REFERENCE_ACCOUNT_ID is unset).",
+            "Set REFERENCE_ACCOUNT_ID to the reference account's id, only where the reference dataset is loaded. "
+            "Every other screen works without it.",
+            impact="the sealed reference views (evidence pack, back-test, certified figures) are unavailable",
+        )
+
+
 #: A bug in our own code is not an outage. These propagate (a 500 with a trace) instead of
 #: being reported as a dependency that is down, which is how an `except Exception` turned a
 #: typo into "the claims store is unavailable".

@@ -28,7 +28,7 @@ from .reference_source import (
 from .reference_step1 import ReferenceStep1Run, run_reference_step1
 
 from config import get_settings
-from data.source.from_reference import REFERENCE_ACCOUNT_ID, REFERENCE_ACCOUNT_NAME
+from tools.reference_identity import reference_account_name, require_reference_account_id
 from tools.tokens import record_token
 
 _BACKEND_ROOT = Path(__file__).resolve().parent.parent
@@ -112,7 +112,7 @@ def _fiscal_identity(state: ReferenceWorkspaceState) -> dict[str, Any]:
         note=f"Configured window, BA-01 of {assumptions['assumption_set_id']}.",
     )
 
-    account_id = REFERENCE_ACCOUNT_ID if state.snapshot.source_kind == "lakehouse" else None
+    account_id = require_reference_account_id() if state.snapshot.source_kind == "lakehouse" else None
     from_source = client_fiscal_window(account_id, tax_year, convention["label"])
 
     return {
@@ -171,10 +171,9 @@ class ReferenceWorkspaceService:
 
         configured = get_settings().data_source
         self.source_kind = resolve_data_source(source_kind)
-        configured_access = access_output_path or (
+        self.access_output_path = access_output_path or (
             Path(configured.reference_access_output_path) if configured.reference_access_output_path else None
         )
-        self.access_output_path = configured_access
         self._state: ReferenceWorkspaceState | None = None
         self._lock = RLock()
 
@@ -184,6 +183,7 @@ class ReferenceWorkspaceService:
         return TccPayrollAdapter(source_dir=self.source_dir)
 
     def _methodology_fingerprint(self) -> list[list[Any]]:
+        require_reference_account_id()
         # The two assumption-set JSON files are tracked and committed - their
         # absence is a corrupted checkout and stays a loud failure. The
         # methodology workbook and historical wages PDF were removed from the
@@ -260,10 +260,10 @@ class ReferenceWorkspaceService:
             # token minted by the per-client read resolves here. Keying it to the
             # calculation_id instead made the drill 404 on every row the
             # per-client views render, which is where the drill is opened from.
-            floors = _active_floors()
+            floors, reference_id = _active_floors(), require_reference_account_id()
             employee_to_token = {
                 employee_id: record_token(
-                    REFERENCE_ACCOUNT_ID,
+                    reference_id,
                     floors.program_code,
                     floors.tax_year,
                     employee_id,
@@ -370,8 +370,8 @@ class ReferenceWorkspaceService:
                 # both to warn when a sealed view is on screen under a different
                 # selection — a year mismatch was previously silent, which is the
                 # worse of the two because nothing on screen looked wrong.
-                "account_id": REFERENCE_ACCOUNT_ID,
-                "client_name": REFERENCE_ACCOUNT_NAME,
+                "account_id": require_reference_account_id(),
+                "client_name": reference_account_name(),
                 "tax_year": threshold_config["tax_year"],
                 "program_code": threshold_config["program_code"],
                 "single_workspace": True,

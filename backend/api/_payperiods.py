@@ -18,7 +18,7 @@ from fastapi import HTTPException
 from application import payroll_rows
 from application.payroll_rows import (  # noqa: F401 - re-exported: callers import these from here
     NoPayrollForClient,
-    configured_account_id,
+    fixture_account_id,
     iter_state_packs,
     load_pay_periods,
     load_portfolio_pay_periods,

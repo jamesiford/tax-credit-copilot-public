@@ -331,7 +331,7 @@
   "function-lines|application/queries/simulate_portfolio.py::handle_simulate_portfolio": 159,
   "function-lines|application/queries/simulate_unit.py::handle_simulate_unit": 175,
   "function-lines|application/queries/simulate_unit.py::location_trend": 41,
-  "function-lines|application/warmup.py::warm_read_paths": 47,
+  "function-lines|application/warmup.py::warm_read_paths": 43,
   "function-lines|domain/calculation/headcount.py::average_headcount": 41,
   "function-lines|domain/calculation/onezero.py::employee_derivation": 90,
   "function-lines|domain/calculation/onezero.py::preprocess": 98,

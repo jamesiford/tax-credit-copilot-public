@@ -16,7 +16,7 @@ from typing import Any
 from application.mediator import Query
 from application.payroll_rows import require_pay_periods
 from application.qc_resolutions import QC_RESOLUTIONS, exception_id
-from application.source_ports import client_fiscal_window, configured_account_id
+from application.source_ports import client_fiscal_window
 
 # Source column -> canonical field (DATA-03). Shown in the UI so the transform
 # is legible, not a black box.
@@ -52,16 +52,15 @@ class GetIngestionOverviewQuery(Query):
 def _fiscal_window_for(account_id: int | None, tax_year: int, program: str):
     """The client's fiscal window, or None when no rule or statute resolves.
 
-    `account_id` is normalised first: naming the default tenant explicitly and
-    leaving it implicit must resolve the same window, or this screen contradicts
-    itself depending on how the caller addressed it.
+    With no tenant named there is no client whose calendar to read, so the window is None and the
+    screen says so; it used to read whichever client the deployment was configured with.
     """
     from tools.credit_math import resolve_tax_year_convention
 
     try:
         convention = resolve_tax_year_convention(program, tax_year)
         return client_fiscal_window(
-            account_id if account_id is not None else configured_account_id(),
+            account_id,
             tax_year,
             convention["label"],
         )

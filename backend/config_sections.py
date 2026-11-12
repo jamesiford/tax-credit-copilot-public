@@ -19,7 +19,7 @@ import re
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 
-from config_values import choice as _choice, onelake_endpoint as _onelake_endpoint, optional_flag as _optional_flag, table_map as _table_map
+from config_values import choice as _choice, onelake_endpoint as _onelake_endpoint, optional_flag as _optional_flag, optional_int as _optional_int, table_map as _table_map, tuned_int as _tuned_int
 from pathlib import Path
 
 DEFAULT_ODBC_DRIVER = "ODBC Driver 18 for SQL Server"
@@ -28,7 +28,7 @@ DEFAULT_STRANDED_RUN_MINUTES = 60
 DEFAULT_KEEPALIVE_SECONDS = 30
 DEFAULT_RETENTION_DAYS = 2555
 DEFAULT_EMPLOYEES_TABLE = "dbo/employees"
-DEFAULT_FLEX_ACCOUNT_ID = 1001
+DEFAULT_WARM_CLIENTS = 3
 DEFAULT_WEBIQ_BASE_URL = "https://api.microsoft.ai/v3"
 
 #: Schema names are interpolated into SQL text (a schema cannot be a bound parameter),
@@ -55,6 +55,9 @@ class RuntimeSettings:
     log_level: str
     warm_on_start: bool
     keepalive_seconds: int
+    warm_clients: int = DEFAULT_WARM_CLIENTS
+    data_classification: str | None = None
+    allow_seed: bool = False
 
 
 @dataclass(frozen=True)
@@ -86,9 +89,11 @@ class DataSourceSettings:
     fabric_workspace: str | None
     fabric_lakehouse: str | None
     fabric_employees_table: str
-    flex_account_id: int
+    fixture_account_id: int | None
     reference_access_output_path: str | None
     onelake_endpoint: str | None = None
+    reference_account_id: int | None = None
+    reference_account_name: str | None = None
     onelake_path_style: str = "name"
     table_prefix: str = ""
     table_case: str = "as_is"
@@ -142,19 +147,14 @@ class WebIqSettings:
     bearer_token: str | None
 
 
-def _keepalive(environ: Mapping[str, str]) -> int:
-    """How often to touch the pool. An unparseable value is the default: this is tuning, not policy."""
-    try:
-        return max(5, int(environ.get("TCC_KEEPALIVE_SECONDS", str(DEFAULT_KEEPALIVE_SECONDS))))
-    except ValueError:
-        return DEFAULT_KEEPALIVE_SECONDS
-
-
 def parse_runtime(environ: Mapping[str, str]) -> RuntimeSettings:
     warm = environ.get("TCC_WARM_ON_START", "1").strip().lower() not in ("0", "false", "no")
     return RuntimeSettings(
         git_commit=environ.get("GIT_COMMIT"), log_level=environ.get("LOG_LEVEL", "INFO"),
-        warm_on_start=warm, keepalive_seconds=_keepalive(environ),
+        warm_on_start=warm, keepalive_seconds=_tuned_int(environ, "TCC_KEEPALIVE_SECONDS", DEFAULT_KEEPALIVE_SECONDS, 5),
+        warm_clients=_tuned_int(environ, "TCC_WARM_CLIENTS", DEFAULT_WARM_CLIENTS, 0),
+        data_classification=(environ.get("DATA_CLASSIFICATION") or "").strip().lower() or None,
+        allow_seed=environ.get("TCC_ALLOW_SEED", "").strip().lower() in ("1", "true", "yes"),
     )
 
 
@@ -190,9 +190,11 @@ def parse_data_source(environ: Mapping[str, str]) -> DataSourceSettings:
         fabric_workspace=environ.get("FABRIC_WORKSPACE"),
         fabric_lakehouse=environ.get("FABRIC_LAKEHOUSE"),
         fabric_employees_table=environ.get("FABRIC_EMPLOYEES_TABLE", DEFAULT_EMPLOYEES_TABLE),
-        flex_account_id=int(environ.get("FLEX_ACCOUNT_ID", str(DEFAULT_FLEX_ACCOUNT_ID))),
+        fixture_account_id=_optional_int(environ.get("FIXTURE_ACCOUNT_ID")),
         reference_access_output_path=environ.get("REFERENCE_ACCESS_OUTPUT_PATH") or None,
         onelake_endpoint=_onelake_endpoint(environ),
+        reference_account_id=_optional_int(environ.get("REFERENCE_ACCOUNT_ID")),
+        reference_account_name=(environ.get("REFERENCE_ACCOUNT_NAME") or "").strip() or None,
         onelake_path_style=_choice(environ, "ONELAKE_PATH_STYLE", ("name", "guid"), "name"),
         table_prefix=environ.get("SOURCE_TABLE_PREFIX") or "",
         table_case=_choice(environ, "SOURCE_TABLE_CASE", ("as_is", "lower", "upper"), "as_is"),

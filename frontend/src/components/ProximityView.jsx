@@ -348,8 +348,8 @@ export default function ProximityView({ scope, scopeOptions, embedded = false, s
 
       {/* A cohort is a fact about ONE client's run: the floors, the fiscal
           window and the recorded verdicts all belong to it. Portfolio scope
-          used to answer anyway, from the configured tenant, and label account
-          1001's employees "All accounts". Embedded, the parent has already
+          used to answer anyway, from the configured tenant, and label the configured
+          tenant's employees "All accounts". Embedded, the parent has already
           said this — two callouts stacked reads as two different problems. */}
       {isPortfolio && !embedded ? (
         <div className="callout info">
@@ -373,7 +373,7 @@ export default function ProximityView({ scope, scopeOptions, embedded = false, s
           have not priced this" is a different fact from "this does not exist" —
           but every figure below is then absent, and reading `.toLocaleString()`
           off an absent one threw and took the WHOLE CLIENT PAGE down to a blank
-          screen. Candle Bottle holds one fiscal year and the scope opens on the
+          screen. A client that holds one fiscal year and the scope opens on the
           next, so the real client was the one that white-screened. */}
       {payload && payload.calculation_state === 'not_calculated' ? (
         <div className="callout info">

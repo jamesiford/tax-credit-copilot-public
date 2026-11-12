@@ -22,7 +22,7 @@ if TYPE_CHECKING:
 class PayrollSource(Protocol):
     """Where pay-period rows and a client's fiscal calendar physically come from."""
 
-    def configured_account_id(self) -> int: ...
+    def fixture_account_id(self) -> int | None: ...
 
     def load_pay_periods(self, account_id: int | None = None) -> list[dict[str, Any]]: ...
 
@@ -68,8 +68,8 @@ def _payroll() -> PayrollSource:
     return resolve("payroll_source")
 
 
-def configured_account_id() -> int:
-    return _payroll().configured_account_id()
+def fixture_account_id() -> int | None:
+    return _payroll().fixture_account_id()
 
 
 def load_pay_periods(account_id: int | None = None) -> list[dict[str, Any]]:

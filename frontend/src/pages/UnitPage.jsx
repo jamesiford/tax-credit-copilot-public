@@ -492,7 +492,7 @@ export default function UnitPage({
                               {/* A NEGATIVE gap is not a shortfall. The cohort
                                   is everyone ineligible at this unit, which
                                   includes people over the hours floor who fail
-                                  on wages — 192 of 200 at one Candle Bottle
+                                  on wages — 192 of 200 at one reference
                                   unit — and "short by -1.33 hrs" in an amber
                                   pill reads as a shortfall that is not there.
                                   Their real distance is the next column. */}

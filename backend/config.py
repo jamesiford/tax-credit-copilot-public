@@ -111,6 +111,11 @@ def get_settings() -> Settings:
     return _override if _override is not None else load_settings()
 
 
+def synthetic_environment() -> bool:
+    """Whether this environment states that all of its data is generated. Unset is not synthetic."""
+    return get_settings().runtime.data_classification == "synthetic"
+
+
 def set_settings(settings: Settings | None) -> None:
     """Install fixed settings, or with `None` go back to reading the environment."""
     global _override
