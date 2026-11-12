@@ -68,6 +68,34 @@ class SourceSchemaMismatch(DependencyUnavailable):
         self.table, self.missing = table, missing
 
 
+class UnmappedPayCodes(DependencyUnavailable):
+    """Under the `strict` policy, payroll carries pay codes no provider maps; the calculation is blocked, never run on a guess."""
+
+    def __init__(self, codes: tuple[str, ...], rows: int) -> None:
+        shown = ", ".join(codes[:20]) + (f" and {len(codes) - 20} more" if len(codes) > 20 else "")
+        super().__init__(
+            "lookup:pay_code_category",
+            f"{len(codes)} pay code(s) covering {rows} payroll row(s) are not mapped to a canonical category: {shown}.",
+            "Author the mapping with `python scripts/lookups.py import pay_code_category --account <id> <file.csv>`, or have the "
+            "customer's PayCodeCategory supplied. PAY_CODE_POLICY=assume carries the codes through unmapped (flagged, counted).",
+            impact="payroll for this client is not calculated: an unmapped code is dropped by the state's whitelist and eligibility would read zero",
+        )
+        self.codes, self.rows = codes, rows
+
+
+class FiscalRulesMissing(DependencyUnavailable):
+    """Under the `strict` policy, a client has no fiscal rule from any provider."""
+
+    def __init__(self, account_id: int) -> None:
+        super().__init__(
+            "lookup:entity_fiscal_year_rules",
+            f"account {account_id} has no fiscal year rule from the source or an override.",
+            "Author one with `python scripts/lookups.py import entity_fiscal_year_rules --account <id> <file.json>`, or set "
+            "FISCAL_RULES_POLICY=assume to use a calendar year (flagged as assumed).",
+            impact="the client's fiscal window, and so its base year, cannot be determined",
+        )
+
+
 class ReferenceNotConfigured(DependencyUnavailable):
     """The certified reference run was asked for, and no deployment account is named as its subject."""
 

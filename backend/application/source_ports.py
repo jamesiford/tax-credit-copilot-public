@@ -36,6 +36,10 @@ class PayrollSource(Protocol):
         self, account_id: int | None, state: str, tax_year: int
     ) -> tuple[date, date] | None: ...
 
+    def fiscal_window_for_state_year(
+        self, account_id: int | None, state: str, tax_year: int
+    ) -> FiscalWindow | None: ...
+
 
 class SourceReader(Protocol):
     """The client book and the payroll footprint, over the source schema."""
@@ -86,6 +90,10 @@ def client_fiscal_window(account_id: int | None, tax_year: int, convention: TaxY
 
 def window_for_state_year(account_id: int | None, state: str, tax_year: int) -> tuple[date, date] | None:
     return _payroll().window_for_state_year(account_id, state, tax_year)
+
+
+def fiscal_window_for_state_year(account_id: int | None, state: str, tax_year: int) -> FiscalWindow | None:
+    return _payroll().fiscal_window_for_state_year(account_id, state, tax_year)
 
 
 def new_source_reader() -> SourceReader:

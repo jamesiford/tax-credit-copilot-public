@@ -15,6 +15,7 @@ from config_values import choice as _choice
 WORKSITE_SOURCES = ("worksite_then_location", "location_only", "worksite_only")
 NULL_PAY_DATE_POLICIES = ("period_end", "exclude")
 VALIDATION_MODES = ("off", "warn", "fail")
+LOOKUP_POLICIES = ("strict", "assume")
 
 
 @dataclass(frozen=True)
@@ -25,6 +26,9 @@ class SourceModelSettings:
     validation: str = "warn"
     worksite_source: str | None = None
     null_pay_date: str | None = None
+    pay_code_policy: str | None = None
+    fiscal_rules_policy: str | None = None
+    lookup_store: str = "none"
 
 
 def parse_source_model(environ: Mapping[str, str]) -> SourceModelSettings:
@@ -36,4 +40,7 @@ def parse_source_model(environ: Mapping[str, str]) -> SourceModelSettings:
         validation=_choice(environ, "SOURCE_SCHEMA_VALIDATION", VALIDATION_MODES, "warn"),
         worksite_source=optional("WORKSITE_LOCATION_SOURCE", WORKSITE_SOURCES),
         null_pay_date=optional("NULL_PAY_DATE_POLICY", NULL_PAY_DATE_POLICIES),
+        pay_code_policy=optional("PAY_CODE_POLICY", LOOKUP_POLICIES),
+        fiscal_rules_policy=optional("FISCAL_RULES_POLICY", LOOKUP_POLICIES),
+        lookup_store=_choice(environ, "LOOKUP_STORE", ("none", "sqlite", "warehouse"), "none"),
     )

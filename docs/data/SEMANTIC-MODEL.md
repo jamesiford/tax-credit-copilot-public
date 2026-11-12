@@ -440,6 +440,8 @@ The client's pay codes, with whether each is ACA or FUTA wages and its category.
 | `tcc_ops.client_config` | Per-client configuration the platform reads; not a question about payroll. |
 | `tcc_ops.exception_report_item` | Ingestion quality-control exceptions that name employee rows. |
 | `tcc_ops.excluded_record` | Employee-level audit rows with source employee ids; a later dataset behind the user lane if a question needs it. |
+| `tcc_ops.lookup_audit` | Platform audit or security record. Never exposed to the agent; the audit trail has its own readers. |
+| `tcc_ops.lookup_override` | App-owned lookup rows (pay-code mappings, fiscal rules) that configure the engine; not payroll or credit data. |
 | `tcc_ops.manual_override` | Human overrides, with the person who made each; the engine tools report an overridden figure and say so. |
 | `tcc_ops.program_claim` | Claims hold seeded, unverified assertions; client_situation and the book tools own that reading. |
 | `tcc_ops.program_engagement` | Operational record written by the platform to run itself; not payroll or credit data. |

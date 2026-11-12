@@ -50,6 +50,10 @@ def run_boot_check() -> dict[str, Any]:
         log.warning("source schema check could not run: %s", type(exc).__name__)
         return {"status": "unknown", "detail": type(exc).__name__}
     verdict = report.summary()
+    from data.lookups import lookup_status
+
+    for row in lookup_status({"entity_fiscal_year_rules": any(t.logical == "EntityFiscalYearRules" and t.present for t in report.tables)}):
+        log.info("lookup %s: %s (%s)", row["lookup"], row["status"], row["affects"])
     for message in verdict["errors"]:
         log.error("source schema: %s", message)
     for message in verdict["warnings"]:

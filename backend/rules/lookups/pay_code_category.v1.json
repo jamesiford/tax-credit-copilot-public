@@ -1,0 +1,18 @@
+{
+  "lookup": "pay_code_category",
+  "version": 1,
+  "authored_by": "engineering (moved out of data/source/to_bcs.py, where it was hardcoded)",
+  "authored_on": "2026-08-25",
+  "basis": "Convention only: the common short pay-code spellings mapped to the canonical categories the rule packs name. It is NOT a customer's own pay-code list, which the customer's PayCodeCategory lookup (or an override) must supply.",
+  "inferred": true,
+  "entries": {
+    "REG": "Regular",
+    "OT": "Overtime",
+    "BON": "Bonus",
+    "COM": "Commission",
+    "PTO": "Regular",
+    "MIL": "Mileage",
+    "EXP": "Expense_Reimbursement",
+    "RELO": "Relocation"
+  }
+}

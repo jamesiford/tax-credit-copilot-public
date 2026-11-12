@@ -42,6 +42,11 @@ class InfrastructurePayrollSource:
 
         return fiscal_source.window_for_state_year(account_id, state, tax_year)
 
+    def fiscal_window_for_state_year(self, account_id: int | None, state: str, tax_year: int) -> Any:
+        from infrastructure.payroll import fiscal_source
+
+        return fiscal_source.fiscal_window_for_state_year(account_id, state, tax_year)
+
 
 def _new_source_reader() -> Any:
     from infrastructure.persistence import source_sql
@@ -117,3 +122,8 @@ provide("reap_stranded_runs", lambda: _reap_stranded_runs)
 provide("gold_run_envelope", _gold_run_envelope)
 provide("gold_employee_filters", lambda: _gold_filters("EMPLOYEE_FILTERS"))
 provide("gold_near_filters", lambda: _gold_filters("NEAR_FILTERS"))
+
+
+from bootstrap.lookup_wiring import install_lookup_store  # noqa: E402
+
+install_lookup_store()

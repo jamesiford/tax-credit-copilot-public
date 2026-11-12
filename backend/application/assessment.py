@@ -30,7 +30,7 @@ from application.assessment_inputs import (
     MIN_MONTHS_TO_ASSESS,
     MIN_ROWS_TO_ASSESS,
     average_headcount,
-    client_window,
+    client_window_resolution,
     fiscal_years,
     months_with_payroll,
     rows_for_state_year,
@@ -57,6 +57,7 @@ class _Sweep:
     wanted: str | None
     averages: dict[tuple[str, int], float] = field(default_factory=dict)
     declined: list[dict[str, Any]] = field(default_factory=list)
+    assumed: dict[tuple[str, int], str] = field(default_factory=dict)
 
     def run(self, states: list[str]) -> None:
         for state in states:
@@ -107,7 +108,10 @@ class _Sweep:
         # The CLIENT's twelve months, not January to December. A non-calendar
         # filer measured over the calendar year scores every month before its
         # first pay date as zero and still divides by 12.
-        window = client_window(self.client_id, state, year)
+        resolution = client_window_resolution(self.client_id, state, year)
+        window = (resolution.begin, resolution.end) if resolution is not None else None
+        if resolution is not None and resolution.assumed:
+            self.assumed[(state, year)] = resolution.note  # flagged on the claim, never silently a calendar year
         year_rows = rows_for_state_year(self.rows, state, year, window)
         if len(year_rows) < MIN_ROWS_TO_ASSESS:  # too thin to mean anything
             return
@@ -152,7 +156,9 @@ def _assessed_cells(sweep: _Sweep, assessed_by: str, repository: Any) -> list[di
             if existing is not None and existing.status is not ClaimStatus.NOT_ASSESSED:
                 claim = refreshed(existing, claim, assessed_by)
             repository.record(claim)
-        assessed.append(claim.to_dict())
+        cell = claim.to_dict()
+        cell["fiscal_window"] = {"assumed": (state, year) in sweep.assumed, "note": sweep.assumed.get((state, year), "")}
+        assessed.append(cell)
     return assessed
 
 

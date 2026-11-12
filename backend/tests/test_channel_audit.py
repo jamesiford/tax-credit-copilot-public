@@ -337,7 +337,7 @@ def test_the_channel_migrations_are_discovered_in_order():
     from infrastructure.persistence import schema_admin as sa
 
     found = sa.discover_migrations(MIGRATIONS)
-    assert [(m.version, m.name) for m in found] == [("0001", "channel_audit"), ("0002", "engagement_actor")]
+    assert [(m.version, m.name) for m in found] == [("0001", "channel_audit"), ("0002", "engagement_actor"), ("0003", "lookup_override")]
     assert all(len(m.sha256) == 64 for m in found)
 
 
@@ -405,16 +405,16 @@ def migrate_real(monkeypatch):
     return run, fake.FakeWarehouse
 
 
-def test_apply_migrations_reports_two_pending_on_a_fresh_store_then_none(migrate_real, capsys):
+def test_apply_migrations_reports_every_migration_pending_on_a_fresh_store_then_none(migrate_real, capsys):
     run, FakeWarehouse = migrate_real
     warehouse = FakeWarehouse(bootstrapped=True)
     assert run(warehouse) == 0
-    assert list(warehouse.rows) == ["0000", "0001", "0002"]
+    assert list(warehouse.rows) == ["0000", "0001", "0002", "0003"]
     out = capsys.readouterr().out
-    assert "pending: 2" in out
+    assert "pending: 3" in out
     assert run(warehouse) == 0
     assert "pending: 0" in capsys.readouterr().out
-    assert list(warehouse.rows) == ["0000", "0001", "0002"], "a re-run applies nothing"
+    assert list(warehouse.rows) == ["0000", "0001", "0002", "0003"], "a re-run applies nothing"
 
 
 # ------------------------------------------------------------------ the query API
