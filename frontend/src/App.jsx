@@ -20,6 +20,7 @@ import ShellActions from './components/shell/ShellActions.jsx';
 import TopBar from './components/shell/TopBar.jsx';
 import useMe from './components/shell/useMe.js';
 import FloatingAction from './components/ui/FloatingAction.jsx';
+import EmptyState from './components/ui/EmptyState.jsx';
 import { navGroups } from './lib/shellNav.js';
 import ClientPage from './pages/ClientPage.jsx';
 import EmployeePage from './pages/EmployeePage.jsx';
@@ -452,6 +453,9 @@ export default function App() {
     && sealedYear != null
     && Number(resolved.scope.year) !== Number(sealedYear);
   const sealedMismatch = clientDiffers || yearDiffers;
+  // The certified run needs the reference client. A source that does not hold it opens the portal
+  // on the real book, and the three views tied to that run say so rather than failing.
+  const sealedUnavailable = summary?.available === false && Boolean(activeItem?.sealed) && !route.token && !route.unitId;
 
   let view;
   // Which of the four drill pages is showing. The chrome uses it to decide
@@ -470,7 +474,15 @@ export default function App() {
   // client's payroll loads, which posted the drill with no year on every cold
   // open of a shared link.
   const employeeYear = hasYear(search.get('year')) ? Number(search.get('year')) : resolved.scope.year;
-  if (route.token) {
+  if (sealedUnavailable) {
+    view = (
+      <EmptyState title="The certified reference run is not available">
+        <p>{summary.reason}</p>
+        <p>{summary.remedy}</p>
+      </EmptyState>
+    );
+  }
+  else if (route.token) {
     view = <EmployeePage
       showTrail={false}
       clientId={search.get('sealed') === '1' ? null : route.clientId}

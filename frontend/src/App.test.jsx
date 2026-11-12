@@ -217,6 +217,24 @@ describe('the navigation is a decided set, not an accumulation', () => {
 });
 
 describe('the shell opens on the portfolio', () => {
+  it('opens on the real book when the certified reference run is not available', async () => {
+    // The front door used to wait for a sealed run that needs account 1001, so a source without
+    // it never got past "Workspace unavailable". The run is reported as not available, and the
+    // three views tied to it say so; nothing else depends on it.
+    api.fetchWorkspace.mockResolvedValue({
+      available: false,
+      workspace: null,
+      reason: 'account 1001 not found in the lakehouse schema.',
+      remedy: 'The certified reference run needs the reference client.',
+    });
+    mount();
+    expect(await landed()).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Workspace unavailable' })).not.toBeInTheDocument();
+    await goToView('Audit trail', /Prove it/);
+    expect(await screen.findByRole('heading', { name: 'The certified reference run is not available' })).toBeInTheDocument();
+    expect(screen.getByText(/account 1001 not found/)).toBeInTheDocument();
+  });
+
   it('lands on the whole book, because no client is selected yet', async () => {
     mount();
     expect(await landed()).toBeInTheDocument();
