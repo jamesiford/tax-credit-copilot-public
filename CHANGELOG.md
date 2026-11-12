@@ -15,6 +15,7 @@ All notable changes to this project are recorded here, so changes can be followe
 
 ### Added
 
+- A test pins the remaining direct `DefaultAzureCredential` constructions (the hosted orchestrator's three sites and the vendored default) with the reason each cannot use the shared factory; a new one fails the suite. The vendored orchestrator copy is regenerated and in sync. No deployed behaviour changes.
 - Guard for the portfolio footprint read (a `GROUP BY` over every client's payroll that would never finish at billions of rows). `PORTFOLIO_FOOTPRINT_MODE=auto|on|off` (default `auto`), `PORTFOLIO_FOOTPRINT_MAX_ROWS` (default `50000000`) and `PORTFOLIO_FOOTPRINT_TIMEOUT_SECONDS` (default `20`). In `auto` the row count is estimated without scanning (Delta log statistics, else the SQL catalogue); above the limit the scan is not run and the page shows a `source_sql` degraded entry (the footprint map and state filters are empty, and why). With no estimate it runs under the timeout, which is the ODBC statement timeout, so the driver cancels the statement on the server. `on` always runs it under the timeout; `off` never does. A guard decision is not retried for an hour. Below the limit the result is unchanged.
 - `scripts/check-onelake-access.py --probe-layout` tries the table with the configured schema and then the other layout (a schema versus none) and says which opens it.
 - Startup warning when `SOURCE_SCHEMA` is present but blank (treated as a lakehouse that is not schema-enabled); it is also in `/api/ready` `stores.warnings`.

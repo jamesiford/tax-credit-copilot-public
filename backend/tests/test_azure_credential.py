@@ -82,6 +82,35 @@ def test_the_token_is_never_logged(monkeypatch, caplog):
     assert token not in caplog.text
 
 
+#: The only direct constructions left, each with the reason it is not the shared factory. A new one fails the test below.
+REMAINING_DIRECT_SITES = {
+    "backend/infrastructure/ai/auth/entra_token.py": (
+        "the default branch of a module the orchestrator vendors and cannot import `backend` for; the backend passes "
+        "the shared credential in (`bootstrap/ai_wiring.py`), so this branch runs only inside the orchestrator"
+    ),
+    "channel_orchestrator/app/core/gateway_client.py": "the hosted orchestrator is a separate deployable that cannot import `backend`; built once at wiring",
+    "channel_orchestrator/app/core/maf_foundry_client.py": "same deployable; built once per scope behind an `lru_cache`, which a test pins as 'once per process'",
+    "channel_orchestrator/app/core/modelprobe.py": "same deployable; a debug-only diagnostic that deliberately mirrors the platform sample's own call",
+}
+
+
+def test_the_remaining_direct_credential_sites_are_exactly_the_documented_ones():
+    """Everything that talks to Azure shares one credential, except these. Adding another needs a reason here."""
+    repo = BACKEND.parent
+    found = set()
+    for base in ("backend", "channel_orchestrator/app", "scripts"):
+        for path in (repo / base).rglob("*.py"):
+            relative = path.relative_to(repo).as_posix()
+            if "/tests/" in relative or "/vendor/" in relative or relative.endswith("infrastructure/azure_credential.py"):
+                continue
+            if re.search(r"\bDefaultAzureCredential\(", path.read_text(encoding="utf-8")):
+                found.add(relative)
+    assert found == set(REMAINING_DIRECT_SITES), (
+        f"direct DefaultAzureCredential constructions changed: {sorted(found ^ set(REMAINING_DIRECT_SITES))}"
+    )
+    assert all(reason.strip() for reason in REMAINING_DIRECT_SITES.values())
+
+
 # The rule that keeps it one place: a second `DefaultAzureCredential(` is how the probe came back.
 _ALLOWED = {
     "infrastructure/azure_credential.py": "the factory",

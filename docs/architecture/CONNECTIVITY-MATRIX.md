@@ -231,4 +231,7 @@ kind).
 Deployed, it is the full `DefaultAzureCredential` chain with the user-assigned identity from `AZURE_CLIENT_ID`.
 With `ENVIRONMENT=local` the managed-identity probe is left out (it only adds a wait on a developer machine)
 and `az login` is used; set `AZURE_TOKEN_CREDENTIALS` to choose a credential yourself. For the operational
-store use `python scripts/check-operational-store.py`.
+store use `python scripts/check-operational-store.py`. The hosted orchestrator (`channel_orchestrator/`) is a separate
+deployable that cannot import `backend`, so it keeps its own `DefaultAzureCredential` (three sites, deployed-only;
+`backend/tests/test_azure_credential.py` pins them with the reason for each) and the vendored `entra_token.py` default
+runs only there. Their deployed behaviour is unchanged.
