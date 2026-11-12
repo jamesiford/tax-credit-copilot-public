@@ -21,6 +21,8 @@ if str(BACKEND) not in sys.path:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--table", default="Account", help="logical table to open (default: Account)")
+    parser.add_argument("--probe-layout", action="store_true",
+                        help="also try the other schema layout (a schema versus none) and say which one opens the table")
     args = parser.parse_args(argv)
     load_env()
 
@@ -46,11 +48,31 @@ def main(argv: list[str] | None = None) -> int:
     steps = [check_dns(target_host()), check_token()]
     if all(step.ok for step in steps):
         steps.append(check_table(lambda: _open(reader, args.table), args.table))
+    if args.probe_layout and all(step.ok for step in steps[:2]):
+        steps = steps[:2] + _probe(reader, args.table)
     for step in steps:
         print(f"{'ok  ' if step.ok else 'FAIL'} {step.name}: {step.detail}")
         if step.hint and not step.ok:
             print(f"     what it usually means: {step.hint}")
     return 0 if all(step.ok for step in steps) else 1
+
+
+def _probe(reader, table: str) -> list:
+    """Both schema layouts. Passes when either opens the table, and says which one to configure."""
+    from data.source.from_fabric import FabricLakehouseReader
+    from data.source.onelake_diagnostics import Step, probe_layout
+
+    steps, winner = probe_layout(
+        lambda schema: FabricLakehouseReader(workspace=reader.workspace, lakehouse=reader.lakehouse, schema=schema).table_lineage(table) or {},
+        table, reader.schema,
+    )
+    if winner is None:
+        return steps
+    verdict = f"SOURCE_SCHEMA={winner}" if winner else "SOURCE_SCHEMA= (blank: not schema-enabled)"
+    note = "that is what is configured" if winner == reader.schema else "THAT DIFFERS from what is configured"
+    return [Step(s.name, True, s.detail if s.ok else f"did not open ({s.detail[:80]})") for s in steps] + [
+        Step("layout verdict", True, f"{verdict}; {note}.")
+    ]
 
 
 def _open(reader, table: str) -> dict:
