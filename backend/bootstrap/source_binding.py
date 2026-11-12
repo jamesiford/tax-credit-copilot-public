@@ -99,10 +99,17 @@ def _gold_filters(name: str) -> Any:
     return getattr(gold_reader, name)
 
 
+def _store_probe() -> Any:
+    from infrastructure.persistence.store_probe import OperationalStoreProbe
+
+    return OperationalStoreProbe()
+
+
 _payroll = InfrastructurePayrollSource()
 _catalogue = InfrastructureSourceCatalogue()
 
 provide("payroll_source", lambda: _payroll)
+provide("store_probe", _store_probe)
 provide("source_catalogue", lambda: _catalogue)
 provide("source_reader_factory", lambda: _new_source_reader)
 provide("section_9_query_count", lambda: _section_9_query_count)

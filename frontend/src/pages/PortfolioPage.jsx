@@ -7,6 +7,7 @@ import FootprintPanel from '../components/FootprintPanel.jsx';
 import GridTabs, { GridTabPanel } from '../components/GridTabs.jsx';
 import StartHereCards from '../components/StartHereCards.jsx';
 import Card from '../components/ui/Card.jsx';
+import DegradedBanner from '../components/ui/DegradedBanner.jsx';
 import EmptyState from '../components/ui/EmptyState.jsx';
 import HeroBand from '../components/ui/HeroBand.jsx';
 import KpiTile, { KpiRow } from '../components/ui/KpiTile.jsx';
@@ -177,6 +178,7 @@ export default function PortfolioPage({
     <div>
       {header}
       {cards}
+      <DegradedBanner degraded={summary?.degraded} />
       <SectionHeading className="book-heading">
         <span id="targeting" ref={headingRef} tabIndex={-1}>Targeting</span>
       </SectionHeading>

@@ -203,3 +203,32 @@ is [HARDENING-PLAN](HARDENING-PLAN.md); the unproven parts are the spike in
   Warehouse. The provider can't express a narrower item-level grant. A
   customer who needs read-only source access must grant it outside Terraform
   (`manage_fabric_access = false`).
+
+## 6. Private-link workspaces and identity on a developer machine
+
+A Fabric workspace can be configured to block public access and accept only its **workspace-specific
+private link**. Its hostnames are `<workspaceid-no-dashes>.z<xy>.<service>.fabric.microsoft.com`; Fabric does
+not translate the public OneLake name to the private one, so the app has to be told, and the machine has to
+resolve the private name (a VPN or jumpbox and corporate DNS).
+
+| Setting | What it does |
+|---|---|
+| `ONELAKE_ENDPOINT` | The workspace's private **blob** host (`https://<workspaceid-no-dashes>.z<xy>.blob.fabric.microsoft.com`). The Delta reader lists files over the Blob API, so the `dfs` host fails with `IncorrectEndpointError`. It is passed to `deltalake` as the `azure_endpoint` storage option while the `abfss://` URL keeps the public host. The host is never derived from a workspace name |
+| `ONELAKE_PATH_STYLE` | `name` (default): `abfss://<workspace-name>@.../<lakehouse>.Lakehouse/Tables/...`. `guid`: the workspace id and the lakehouse item id |
+| `SOURCE_SCHEMA` | Empty for a lakehouse that is not schema-enabled (`Tables/<table>`) |
+| `SOURCE_TABLE_PREFIX`, `SOURCE_TABLE_CASE`, `SOURCE_TABLE_MAP` | Physical table names when they differ from the logical ones |
+
+Reading OneLake files needs a **Contributor**, Member or Admin workspace role (granted through an Entra
+group); **Viewer** reaches only the SQL analytics endpoint.
+
+`python scripts/check-onelake-access.py` checks it step by step: the host it will call, whether DNS resolves
+it to a private address, whether a token can be acquired (never printed), and the Delta version and file
+count of one small table, or the precise error with what it usually means (`DeniedByPolicy`: the public path
+or no private link; `403` / `not authorized`: the workspace role; `IncorrectEndpointError`: the wrong host
+kind).
+
+**Identity.** Every component that talks to Azure shares one credential (`backend/infrastructure/azure_credential.py`).
+Deployed, it is the full `DefaultAzureCredential` chain with the user-assigned identity from `AZURE_CLIENT_ID`.
+With `ENVIRONMENT=local` the managed-identity probe is left out (it only adds a wait on a developer machine)
+and `az login` is used; set `AZURE_TOKEN_CREDENTIALS` to choose a credential yourself. For the operational
+store use `python scripts/check-operational-store.py`.

@@ -69,6 +69,7 @@ otherwise. "Run by" says who invokes it: **azd** (an `azure.yaml` hook), **CI** 
 | `create-model-connection.ps1` | Creates a Foundry Model Gateway connection without putting a secret in the repo or state. | connection parameters | owner, test |
 | `grant-fabric-mi-access.ps1` | Grants the API's managed identity a role on an existing Fabric workspace when Terraform does not manage access. | workspace and identity parameters | owner |
 | `run-sql.py` | Runs T-SQL against a guarded Warehouse target; `--resolve` only prints the target. | `--target`, `--file`, `--section` | owner |
+| `check-operational-store.py` | Checks the operational store (claims, engagements, findings) is usable: the server answers, `tcc_ops` and its migration table exist, every migration is applied, the identity can read and write the claim table. Prints the first problem with its remedy; changes nothing. | `WAREHOUSE_*` settings | owner, test |
 | `check-onelake-access.py` | Checks this machine can read the lakehouse over OneLake, including a private-link workspace: prints the host, resolves DNS (flags a public address), gets a token (never shown), opens one small Delta table, and explains the usual errors. | `--table`; `FABRIC_*`, `ONELAKE_*`, `SOURCE_*` settings | owner, test |
 | `mock-ai-gateway.py` | OpenAI-compatible stand-in for the customer's model gateway (tests, local, the PoC's mock App Service). Its pip list is `mock-ai-gateway.requirements.txt`. | `MOCK_AUTH` and fault settings | owner, test, Terraform (`mock_ai_gateway`) |
 

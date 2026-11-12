@@ -17,6 +17,9 @@ from collections.abc import Callable
 from typing import Any
 
 from application import client_book
+from application.queries.portfolio_reads import (  # noqa: F401 - re-exported: callers and tests patch them here
+    _engagements, _read_claims, _tolerating, _unique, client_book_rows, footprint, priceable_states,
+)
 from domain.claims import (
     ClaimStatus,
     EngagementScope,
@@ -25,6 +28,7 @@ from domain.claims import (
     ProgramClaim,
     declining_reading,
 )
+
 
 
 def effective_outcome(claim, engagements: dict[str, EngagementScope]) -> str:
@@ -94,17 +98,6 @@ def portfolio_sort_value(item: dict[str, Any], sort: str, order: str) -> float:
     return 0.0
 
 
-def client_book_rows() -> list[dict[str, Any]]:
-    """Every client we hold payroll for, assessed or not.
-
-    One reader, because a second is a second answer to "who are our clients".
-    Degrades to an empty book if the source is unreachable: the portfolio still
-    renders what it has rather than failing whole, and an absent book
-    understates the client count rather than inventing one.
-    """
-    return client_book.clients_or_empty()
-
-
 def _default_program_code(program: str | None, engagements: dict[str, EngagementScope]) -> str | None:
     """Which programme an unassessed client should be reported against.
 
@@ -119,7 +112,7 @@ def _default_program_code(program: str | None, engagements: dict[str, Engagement
         return next(iter(engagements))
     try:
         calculable = [p["program_code"] for p in client_book.programs() if p.get("calculable")]
-    except Exception:  # noqa: BLE001 - fall through to "unknown" rather than fail
+    except (OSError, ValueError):  # rule packs unreadable: "unknown", and priceable_states reports it
         return None
     return calculable[0] if len(calculable) == 1 else None
 
@@ -192,52 +185,6 @@ def _declining_overlay(client_claims: list[Any], chosen: Any) -> dict[str, Any]:
     return out
 
 
-def footprint() -> dict[int, list[str]]:
-    """Payroll states for every client, in one scan.
-
-    Degrades to an empty map for the same reason `client_book_rows` does: a book
-    that cannot say where a client operates is still a usable book, and a map
-    with nothing on it is a visibly weaker answer rather than a wrong one.
-    """
-    try:
-        from application.source_ports import new_source_reader
-        from tools.fabric_source import active_data_source
-
-        if active_data_source() != "lakehouse":
-            return {}
-        reader = new_source_reader()
-        if not reader.is_configured():
-            return {}
-        return reader.footprint()
-    except Exception:  # noqa: BLE001 - a missing footprint must not take the page down
-        return {}
-
-
-def priceable_states() -> set[str]:
-    """States a rule pack can actually price.
-
-    A state we hold payroll in but cannot price is a real gap in statutory
-    coverage, and the map is the one screen that shows it. Deriving the set here
-    keeps the two halves of that distinction from being authored twice.
-    """
-    try:
-        from tools.credit_math import PROGRAM_CODE_TO_PACK, _load_pack, authored_years
-
-        out: set[str] = set()
-        for pack_file in set(PROGRAM_CODE_TO_PACK.values()):
-            try:
-                pack = _load_pack(pack_file)
-            except FileNotFoundError:
-                continue
-            jurisdiction = pack.get("jurisdiction") or {}
-            code = (jurisdiction.get("code") or "").upper()
-            if code and authored_years(pack_file):
-                out.add(code)
-        return out
-    except Exception:  # noqa: BLE001
-        return set()
-
-
 def _client_states(client_id: int, states_by_client: dict[int, list[str]], priceable: set[str]) -> dict[str, Any]:
     """Where this client operates, and which of those we can put a number on."""
     states = states_by_client.get(int(client_id), [])
@@ -284,16 +231,12 @@ def portfolio_page(
     anyone scrolls. That counter is a DIAGNOSTIC: under the pipeline model a
     client sitting unassessed is a gap to close, not a bucket it belongs in.
     """
-    from application.services import get_claim_repository
-
     order_name = (order or "asc").lower()
     if order_name not in {"asc", "desc"}:
         order_name = "asc"
 
-    repo = get_claim_repository()
-    # Read every year ONCE, then narrow. The page needs two different views of
-    # the same claims and they must not come from two reads.
-    all_claims = repo.portfolio_coverage(tax_years=None)
+    degraded: list[dict[str, Any]] = []
+    repo, all_claims = _read_claims(degraded)
 
     if program:
         all_claims = [c for c in all_claims if c.program_code.upper() == program.upper()]
@@ -313,16 +256,16 @@ def portfolio_page(
     for claim in all_claims:
         history[claim.client_id].append(claim)
 
-    book_rows = book()
+    book_rows = _tolerating(book, [], degraded)
     names = {int(c["account_id"]): c.get("name") for c in book_rows}
     industries = {int(c["account_id"]): c.get("industry") for c in book_rows}
-    footprint_by_client = states()
-    priceable_set = priceable()
+    footprint_by_client = _tolerating(states, {}, degraded)
+    priceable_set = _tolerating(priceable, set(), degraded)
 
     rows: list[dict[str, Any]] = []
     assessed_ids: set[int] = set()
     for client_id, client_claims in sorted(grouped.items()):
-        engagements = {e.program_code: e.scope for e in repo.engagements(client_id)}
+        engagements = _engagements(repo, client_id, degraded)
         candidates: list[ProgramClaim] = []
         for claim in client_claims:
             if outcome and effective_outcome(claim, engagements) != outcome:
@@ -408,7 +351,7 @@ def portfolio_page(
             client_id = int(client["account_id"])
             if client_id in grouped:
                 continue
-            engagements = {e.program_code: e.scope for e in repo.engagements(client_id)}
+            engagements = _engagements(repo, client_id, degraded)
             if scope and EngagementScope(scope) not in set(engagements.values()):
                 continue
             row = _unassessed_row(client, program=program, year=year, engagements=engagements)
@@ -444,6 +387,10 @@ def portfolio_page(
         # covered the whole book.
         "total_clients": len(book_rows) or total,
         "assessed_clients": len(assessed_ids),
+        # What could not be read, and what that costs. Empty when everything answered. An EMPTY
+        # claims table is not listed here: that is a normal state, every client simply reads as
+        # not yet assessed. A store that cannot be reached or was never initialised IS listed.
+        "degraded": _unique(degraded),
         "unassessed_clients": len(unassessed_rows),
         "_note": (
             "One row per client, with the most actionable matching cell surfaced. "

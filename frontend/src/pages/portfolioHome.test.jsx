@@ -43,6 +43,22 @@ beforeEach(() => window.localStorage.clear());
 afterEach(() => { vi.clearAllMocks(); window.localStorage.clear(); });
 
 describe('the home page opens with a hero, the task cards, then the book', () => {
+  it('says what is unavailable, and what to do, when the page answered with part of its data', async () => {
+    api.fetchPortfolioV2.mockResolvedValue({
+      total_clients: 2, assessed_clients: 0, unassessed_clients: 2, items: ROWS,
+      degraded: [{ dependency: 'claims_store', impact: 'claim figures are unavailable.', remedy: 'Run the migration.' }],
+    });
+    render(<MemoryRouter><PortfolioPage scopeOptions={null} /><Where /></MemoryRouter>);
+    expect(await screen.findByText('Part of this page is unavailable')).toBeInTheDocument();
+    expect(screen.getByText('Run the migration.')).toBeInTheDocument();
+  });
+
+  it('shows no banner when everything answered', async () => {
+    draw();
+    await screen.findByRole('button', { name: 'Open Cascade' });
+    expect(screen.queryByText(/of this page (is|are) unavailable/)).not.toBeInTheDocument();
+  });
+
   it('has one h1 (the hero) and Targeting as the book\u2019s h2', async () => {
     draw();
     await screen.findByRole('button', { name: 'Open Cascade' });

@@ -231,6 +231,24 @@ class FabricLakehouseReader:
                 )
             return []
 
+    def fiscal_year_rules(self, account_id: int) -> list[EntityFiscalYearRules]:
+        """One client's fiscal rules from two small tables, never from payroll.
+
+        `Entity` is read with the account filter pushed down and `EntityFiscalYearRules` is a lookup,
+        so this is a bounded read where `for_account` would open ten tables including every payroll
+        row. A rules table that is absent reads as no rules (said in the log): "read, found none".
+        """
+        options = self._storage_options()
+        missing: list[str] = []
+        entities = _rows_to(Entity, self._read_table("Entity", options, account_id, missing), TABLE_SPECS["Entity"][1])
+        wanted = {e.fiscal_year_rules_id for e in entities}
+        rules = _rows_to(
+            EntityFiscalYearRules,
+            self._read_table("EntityFiscalYearRules", options, account_id, missing),
+            TABLE_SPECS["EntityFiscalYearRules"][1],
+        )
+        return sorted((r for r in rules if r.fiscal_year_rules_id in wanted), key=lambda r: r.fiscal_year_rules_id)
+
     def list_accounts(self) -> list[dict[str, Any]]:
         """Every tenant in the lakehouse. Cheap — the Account table is tiny."""
         if not self.is_configured():
