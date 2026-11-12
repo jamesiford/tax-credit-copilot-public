@@ -65,8 +65,8 @@ _DESIGNATION_HISTORY: dict[str, list[dict[str, Any]]] = {
 # so a registry entry cannot move a figure. `test_designations.py` fails if one
 # ever would. Wiring designation into eligibility is the first post-demo item.
 
-#: Clients 2000+ are generated (synth.py). Their Georgia locations sit on T1
-#: unless a story below says otherwise.
+#: In an environment classified `synthetic` the generated clients' Georgia locations sit on T1
+#: unless a story below says otherwise. Nowhere else is a designation invented.
 _SYNTHETIC_GA_DEFAULT = [
     {"year": 2020, "tier": 1, "designation": "T1", "min_new_jobs": 2},
 ]
@@ -85,7 +85,10 @@ _SOURCE_DESIGNATIONS: dict[tuple[int, str], list[dict[str, Any]]] = {
 
 
 def _is_synthetic(client_id: int) -> bool:
-    return int(client_id) >= 2000
+    """Generated data only: the environment says so. An id range says nothing about whose data it is."""
+    from config import synthetic_environment
+
+    return synthetic_environment()
 
 
 def designation_history(worksite_id: str, client_id: int | None = None) -> list[dict[str, Any]]:

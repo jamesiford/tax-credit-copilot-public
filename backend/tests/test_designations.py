@@ -36,8 +36,9 @@ def test_no_designation_moves_a_minimum(key, history):
         )
 
 
-def test_the_reference_client_is_never_assigned_a_designation():
-    """Candle Bottle's designations are a fact we do not hold."""
+def test_the_reference_client_is_never_assigned_a_designation(monkeypatch):
+    """Candle Bottle's designations are a fact we do not hold, and no customer environment invents one."""
+    monkeypatch.setenv("DATA_CLASSIFICATION", "customer")
     assert designation_history("GA_1134481", 1001) == []
     assert _designation_at("GA_1134481", 2023, 1001) is None
 

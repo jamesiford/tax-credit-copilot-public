@@ -54,3 +54,14 @@ def optional_flag(environ: Mapping[str, str], name: str) -> bool | None:
     raise ValueError(f"{name}={raw!r} is not a boolean; use true or false")
 
 
+def optional_int(value: str | None) -> int | None:
+    """An integer setting with no default: unset or blank is None, never a made-up value."""
+    return int(value) if value and value.strip() else None
+
+
+def tuned_int(environ: Mapping[str, str], name: str, default: int, minimum: int) -> int:
+    """A tuning knob: never below `minimum`, and an unparseable value is the default (tuning, not policy)."""
+    try:
+        return max(minimum, int(environ.get(name, str(default))))
+    except ValueError:
+        return default

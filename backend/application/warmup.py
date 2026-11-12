@@ -89,6 +89,17 @@ def _timed(report: list[dict[str, Any]], step: str, work) -> Any:
     return result
 
 
+def _reference_configured() -> bool:
+    """Whether a reference account is named; warming the sealed run for a deployment without one is wasted work."""
+    return get_settings().data_source.reference_account_id is not None
+
+
+def _warm_account_ids(accounts: list[dict[str, Any]]) -> list[int]:
+    """The account ids whose landing read is worth warming: a bounded prefix of what the source listed."""
+    limit = get_settings().runtime.warm_clients
+    return [int(a["AccountId"]) for a in accounts[:limit]]
+
+
 def warm_read_paths(*, warm_workspace=None) -> dict[str, Any]:
     """Fill the caches the first screen reads, in the order it reads them.
 
@@ -98,7 +109,6 @@ def warm_read_paths(*, warm_workspace=None) -> dict[str, Any]:
     """
     from application.services import get_gold_reader
     from data.source.from_fabric import FabricLakehouseReader
-    from application.source_ports import configured_account_id
 
     report: list[dict[str, Any]] = []
     started = time.monotonic()
@@ -109,7 +119,7 @@ def warm_read_paths(*, warm_workspace=None) -> dict[str, Any]:
     _timed(report, "connections", lambda: get_gold_reader().connection.prewarm())
 
     # 1. The account table. `/api/scope` blocks the shell's scope selector on it.
-    _timed(report, "accounts", lambda: FabricLakehouseReader().list_accounts())
+    accounts = _timed(report, "accounts", lambda: FabricLakehouseReader().list_accounts()) or []
 
     # 2. Close out runs that died with the process. Nothing in-process can mark
     #    these, because no handler ran; a restart is the first moment anything
@@ -117,17 +127,14 @@ def warm_read_paths(*, warm_workspace=None) -> dict[str, Any]:
     _timed(report, "reap_stranded_runs", _reap_stranded_runs)
 
     # 3. The sealed run. The shell renders nothing until `/api/workspace` answers.
-    if warm_workspace is not None:
+    if warm_workspace is not None and _reference_configured():
         _timed(report, "sealed_workspace", warm_workspace)
 
     # 4. The landing grid. It reads Gold, so the cost to move off the request is
     #    the warehouse connection and its token, not an engine replay.
-    account_id = configured_account_id()
-    _timed(
-        report,
-        "trend",
-        lambda: get_gold_reader().latest_run(account_id),
-    )
+    #    Bounded and data-driven: the first TCC_WARM_CLIENTS accounts the source lists, never a fixed id.
+    for account_id in _warm_account_ids(accounts):
+        _timed(report, f"trend[{account_id}]", lambda a=account_id: get_gold_reader().latest_run(a))
 
     total = round(time.monotonic() - started, 1)
     log.info(

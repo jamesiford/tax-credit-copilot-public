@@ -93,7 +93,10 @@ see [RUNBOOK.md §8](RUNBOOK.md#8-deployment-configuration-refused-at-startup).
 | `PORTFOLIO_FOOTPRINT_MODE`, `PORTFOLIO_FOOTPRINT_MAX_ROWS`, `PORTFOLIO_FOOTPRINT_TIMEOUT_SECONDS` | `backend/infrastructure/persistence/footprint_guard.py`, `backend/application/queries/portfolio_reads.py` | Guard on the portfolio footprint scan. `PORTFOLIO_FOOTPRINT_MODE` is `auto` (default: estimate the row count without scanning and refuse above the limit), `on` (always run, under the timeout) or `off` (never). `PORTFOLIO_FOOTPRINT_MAX_ROWS` defaults to 50,000,000; `PORTFOLIO_FOOTPRINT_TIMEOUT_SECONDS` defaults to 20 and is the ODBC statement timeout (the driver cancels the statement on the server). A refused or cancelled scan is a `source_sql` degraded entry | not set | — | new | No |
 | `SOURCE_FALLBACK` | `backend/infrastructure/payroll/fiscal_source.py` | `delta` lets a failing SQL read of a client's fiscal rules fall back to a bounded read of `Entity` and `EntityFiscalYearRules` from the lakehouse, logged. Default unset: no fallback, the window is a flagged calendar year. Never applies to operational data | not set | — | new | No |
 | `FABRIC_EMPLOYEES_TABLE` | `backend/tools/fabric_source.py` | Table for `DATA_SOURCE=fabric` only. Default `dbo/employees` | not set | — | removed in v2 (was param `fabricEmployeesTable`) | No |
-| `FLEX_ACCOUNT_ID` | `backend/infrastructure/payroll/pay_period_source.py` | Account the configured reference client is read under (warm-up, single-client paths). Default `1001` | not set (code default applies) | — | removed in v2 (was param `flexAccountId`, azd `FLEX_ACCOUNT_ID`) | No |
+| `FIXTURE_ACCOUNT_ID` *(local)* | `backend/infrastructure/payroll/pay_period_source.py` | The one account a single-tenant fixture source (`DATA_SOURCE=csv` or `fabric`) holds. **No default**; the lakehouse never reads it. Replaces `FLEX_ACCOUNT_ID` (whose default `1001` named a specific client) | not set | — | removed in v2 | No |
+| `REFERENCE_ACCOUNT_ID` | `backend/tools/reference_identity.py` | The account the certified reference run is about. **Unset by default**: without it the sealed reference views answer 503 `reference_dataset` and nothing else is affected | not set | — | — | No |
+| `REFERENCE_ACCOUNT_NAME` | `backend/tools/reference_identity.py` | Display name of that account. Default `Reference Dataset Client` | not set | — | — | No |
+| `TCC_ALLOW_SEED` | `backend/data/seed_claims.py` | `1` lets the illustrative seed run, and only with `DATA_CLASSIFICATION=synthetic`; the seed also checks each target account's name. Set by `seed-operational-store.ps1` only for a synthetic environment | not set | — | — | No |
 | `REFERENCE_ACCESS_OUTPUT_PATH` *(local)* | `backend/tools/reference_workspace.py` | Path to the partner's Access output for the sealed comparison | not set | — | not set | No |
 
 ## 3. Fabric Warehouse (`tcc_gold`, `tcc_ops`)
@@ -198,6 +201,7 @@ Accepted values: `warehouse` (durable; `fabric` is the v1 alias), `sqlite`,
 | `WEB_CONCURRENCY` | `backend/startup.sh` | Gunicorn workers. Default `2` | TF api: variable `api_worker_count` (default `2`) | — | new in v2 | No |
 | `PORT` | `backend/startup.sh` | Bind port. Default `8000` | App Service platform | — | n/a (container) | Set by platform |
 | `TCC_WARM_ON_START` | `backend/application/warmup.py` | `0`/`false`/`no` disables the startup warm-up and Warehouse keepalive. Default `1`; skipped unless `DATA_SOURCE=lakehouse` | not set | — | not set | No |
+| `TCC_WARM_CLIENTS` | `backend/application/warmup.py` | How many clients warm-up pre-reads: the first N the source lists, never a fixed id. Default `3`; `0` warms none | not set | — | not set | No |
 | `TCC_KEEPALIVE_SECONDS` | `backend/application/warmup.py` | Warehouse pool keepalive interval. Default `30`, minimum `5` | not set | — | not set | No |
 | `CAPABILITY_TIMEOUT_SECONDS` | `backend/application/capabilities/invoke.py` | How long one `POST /api/capabilities/{tool}` call may run before the caller gets a structured `504 timeout`. Default `25`; a bad value raises. The gateway's own `CHANNEL_REQUEST_TIMEOUT_SECONDS` (default 30) sits just above it | not set | — | new | No |
 | `SCM_DO_BUILD_DURING_DEPLOYMENT` | App Service build (platform) | Build on deploy | TF platform: `true`, both apps | — | n/a (container images) | Platform |
@@ -371,7 +375,7 @@ overlay (`*.auto.tfvars`, `infra/profiles/*.tfvars`, or `TF_VARS_JSON` in
 
 From the deleted `infra/main.parameters.json`: `CONTAINER_APPS_LOCATION`,
 `FOUNDRY_MODEL_SKU` (now Terraform variable `foundry_deployment_sku`, overlay
-only), `DATA_SOURCE`, `FLEX_ACCOUNT_ID`, `FABRIC_EMPLOYEES_TABLE`,
+only), `DATA_SOURCE`, `FLEX_ACCOUNT_ID` (now `FIXTURE_ACCOUNT_ID`), `FABRIC_EMPLOYEES_TABLE`,
 `RUN_MANIFEST_STORE`, `SERVICE_API_IMAGE_NAME`, `SERVICE_WEB_IMAGE_NAME`,
 `AZURE_PRINCIPAL_ID`. `FABRIC_WORKSPACE`, `FABRIC_LAKEHOUSE`,
 `WAREHOUSE_SERVER` and `WAREHOUSE_DATABASE` were inputs in v1; in v2 they are

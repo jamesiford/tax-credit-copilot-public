@@ -19,7 +19,8 @@ from infrastructure.persistence.gold_reader import (  # noqa: E402
 )
 from infrastructure.persistence.fabric_warehouse import GOLD_SCHEMA  # noqa: E402
 
-CLIENT = 1001
+from tools.reference_identity import require_reference_account_id
+CLIENT = require_reference_account_id()  # REFERENCE_ACCOUNT_ID; unset is an explained refusal
 YEAR = 2023
 
 

@@ -28,7 +28,7 @@ otherwise. "Run by" says who invokes it: **azd** (an `azure.yaml` hook), **CI** 
 | `deploy-channel.ps1` | Zip-deploys the Microsoft 365 channel gateway, only when the channel is enabled (azd cannot make a service conditional). | azd environment; builds the zip with `package-app.py` | azd (`postdeploy`), CI (`deploy.yml`) |
 | `apply-migrations.py` | Applies schema migrations (`docs/data/schema/migrations/`) to a guarded Fabric Warehouse; `--bootstrap` only on a Warehouse Terraform just created. | `--target`, `--bootstrap`; Warehouse settings from the environment | `postprovision.ps1`, CI (`deploy.yml`), owner |
 | `grant-warehouse-sql.py` | Grants an identity T-SQL access to `tcc_gold` / `tcc_ops` (profiles `api`, `gateway`, `lakehouse`). Idempotent. | `--target`, `--profile`, `--principal`, `--dry-run` | `postprovision.ps1`, CI (`deploy.yml`), owner |
-| `seed-operational-store.ps1` | Seeds `tcc_ops` claims and engagements so the coverage matrix is not blank after provisioning. Idempotent. | azd environment | `postprovision.ps1`, owner |
+| `seed-operational-store.ps1` | Seeds illustrative `tcc_ops` claims and engagements so the coverage matrix is not blank. Idempotent. Runs only when `DATA_CLASSIFICATION=synthetic` (it sets `TCC_ALLOW_SEED`), and the seed itself refuses elsewhere and checks each account's name. | azd environment | `postprovision.ps1`, owner |
 | `sql_common.py` | Shared plumbing (target resolution and guard, environment loading) for the three SQL scripts above and `run-sql.py`. A module, not a command. | imported | the SQL scripts, tests |
 | `package-app.py` | Zips an App Service package honouring the service's `.webappignore`, so CI ships what `azd up` would. | `backend` or `frontend`, output path | `deploy-channel.ps1`, CI (`deploy.yml`), test |
 
@@ -61,7 +61,7 @@ otherwise. "Run by" says who invokes it: **azd** (an `azure.yaml` hook), **CI** 
 | `channel-writers.py` | Manages the writer allow-list (`add`, `remove`, `list`). | subcommand, object id | owner, test |
 | `channel-audit.py` | Prints one user's channel audit timeline. | `--user`, `--since`, `--until`, `--tool` | owner, test |
 | `channel-smoke.ps1` | Shows what the platform received for your last Teams / Copilot message, then pings the gateway as you. | `az login`, azd environment | owner, test |
-| `channel-live-smoke.py` | Live smoke of the deployed gateway as the signed-in operator. | `GATEWAY_BASE_URL`, `GATEWAY_TOKEN`, `WRONG_TOKEN`, ... | owner |
+| `channel-live-smoke.py` | Live smoke of the deployed gateway as the signed-in operator. | `GATEWAY_BASE_URL`, `GATEWAY_TOKEN`, `WRONG_TOKEN`, `SMOKE_CLIENTS` (or `SMOKE_API_BASE` to discover them), `SMOKE_WRITE_CLIENT`, ... | owner |
 | `live-ai-checks.py` | Live checks of the model provider chain from inside the network. | scenario, `AI_*` / `FOUNDRY_*` environment | owner |
 | `assign-channel-roles.ps1` | Assigns the Entra app roles the channel needs, through Graph with your own sign-in. Supports `-WhatIf`. | principal ids as parameters | owner, test |
 | `publish-m365.ps1` | Publishes a Foundry hosted agent to Microsoft 365 Copilot and Teams (idempotent REST flow). | agent and tenant parameters | owner, test |

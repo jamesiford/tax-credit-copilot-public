@@ -15,7 +15,7 @@ from typing import Any, Iterable, Iterator
 
 from application.qc_resolutions import apply_calc_drops
 from application.source_ports import (
-    configured_account_id,
+    fixture_account_id,
     load_pay_periods,
     load_portfolio_pay_periods,
 )
@@ -24,7 +24,7 @@ from domain.calculation.headcount import states_present as _states_present
 
 __all__ = [
     "NoPayrollForClient", "PayrollDatasetNotGenerated", "PayrollNotAvailable",
-    "configured_account_id", "iter_state_packs", "load_pay_periods",
+    "fixture_account_id", "iter_state_packs", "load_pay_periods",
     "load_portfolio_pay_periods", "require_pay_periods", "row_state", "states_present",
     "unauthored_state_years",
 ]

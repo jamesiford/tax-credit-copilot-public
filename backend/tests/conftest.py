@@ -41,6 +41,13 @@ if str(TESTS_ROOT) not in sys.path:
 # Set before `main` is imported so its load_dotenv(override=False) can't flip it.
 os.environ["DATA_SOURCE"] = "csv"
 
+# The CSV fixture holds exactly one tenant and says which, here, because no production default
+# names one. The suite is also generated data end to end, so it says so.
+os.environ["FIXTURE_ACCOUNT_ID"] = "1001"
+# The certified reference dataset is a conformance fixture; its account is named here, not in the product.
+os.environ["REFERENCE_ACCOUNT_ID"] = "1001"
+os.environ["DATA_CLASSIFICATION"] = "synthetic"
+
 # Local-development opt-in to running without sign-in. AUTH_MODE defaults to
 # `entra`, and `none` is accepted only with ENVIRONMENT=local stated outright, so
 # the suite says both rather than relying on an absence. Tests of the other modes

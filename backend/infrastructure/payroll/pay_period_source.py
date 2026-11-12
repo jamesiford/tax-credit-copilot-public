@@ -24,9 +24,13 @@ from config import get_settings
 _PAY_PERIODS_CSV = Path(__file__).resolve().parents[2] / "data" / "payroll_pay_periods.csv"
 
 
-def configured_account_id() -> int:
-    """The tenant a single-tenant data source represents."""
-    return get_settings().data_source.flex_account_id
+def fixture_account_id() -> int | None:
+    """The one tenant a single-tenant fixture source (`csv`, `fabric`) declares, or None when it does not.
+
+    There is no default: a tenant id that the data did not supply is a guess, and a guess is how one
+    company's payroll ends up under another's name. The lakehouse never consults this.
+    """
+    return get_settings().data_source.fixture_account_id
 
 
 def load_pay_periods(account_id: int | None = None) -> list[dict[str, Any]]:
@@ -53,12 +57,12 @@ def load_pay_periods(account_id: int | None = None) -> list[dict[str, Any]]:
     if source == "lakehouse":
         from data.source.from_fabric import FabricLakehouseReader
 
-        resolved = account_id if account_id is not None else configured_account_id()
-        return FabricLakehouseReader().bcs_rows(resolved)
+        # No tenant named means no rows: a multi-tenant source has no "the" client.
+        return FabricLakehouseReader().bcs_rows(account_id) if account_id is not None else []
 
     # Single-tenant sources below. A mismatched tenant is empty, never somebody
     # else's payroll.
-    if account_id is not None and account_id != configured_account_id():
+    if account_id is not None and account_id != fixture_account_id():
         return []
 
     if source == "fabric":
@@ -93,7 +97,8 @@ def load_portfolio_pay_periods() -> dict[int, list[dict[str, Any]]]:
 
     if active_data_source() != "lakehouse":
         rows = load_pay_periods()
-        return {configured_account_id(): rows} if rows else {}
+        tenant = fixture_account_id()
+        return {tenant: rows} if rows and tenant is not None else {}
 
     from data.source.from_fabric import FabricLakehouseReader
 

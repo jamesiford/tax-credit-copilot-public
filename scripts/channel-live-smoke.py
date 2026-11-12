@@ -8,8 +8,9 @@ Everything comes from the environment; nothing is written into this file:
     GATEWAY_BASE_URL    https://<gateway host>
     GATEWAY_TOKEN       a delegated token for the gateway's `Channel.Access` scope
     WRONG_TOKEN         a token for any OTHER audience (must be refused)
-    SMOKE_CLIENTS       comma-separated synthetic client ids (default 2001,2002)
-    SMOKE_WRITE_CLIENT  the synthetic client the write round trip changes (default 2002)
+    SMOKE_CLIENTS       comma-separated client ids to read (default: the first two the portal lists;\n                    set SMOKE_API_BASE=https://<portal host> so they can be discovered from /api/scope)
+    SMOKE_WRITE_CLIENT  the SYNTHETIC client the write round trip changes (required for the writes step: it
+                    changes that client's record, so it is never guessed)
     SMOKE_PROGRAM       programme code for the write (default GA_JTC)
 
 A person with a delegated token is the acting user, so every audit row it makes reads
@@ -204,6 +205,15 @@ def run_audit() -> None:
     say(f"INFO  audit rows are read with scripts/channel-audit.py --detail; this run's correlation ids start 'smoke-{SMOKE}-'")
 
 
+def discovered_clients(limit: int = 2) -> list[int]:
+    """The first clients the portal lists, so the smoke runs against whatever this environment holds."""
+    base = os.environ.get("SMOKE_API_BASE", "").rstrip("/")
+    if not base:
+        raise SystemExit("set SMOKE_CLIENTS, or SMOKE_API_BASE so clients can be discovered from /api/scope")
+    scope = httpx.get(f"{base}/api/scope", timeout=30).json()
+    return [int(c["account_id"]) for c in scope.get("clients", [])[:limit]]
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--only", default="catalog,reads,writes,verify,limits,audit")
@@ -211,8 +221,10 @@ def main() -> int:
     parser.add_argument("--evidence")
     args = parser.parse_args()
     steps = set(args.only.split(","))
-    clients = [int(c) for c in os.environ.get("SMOKE_CLIENTS", "2001,2002").split(",")]
-    write_client, program = int(os.environ.get("SMOKE_WRITE_CLIENT", "2002")), os.environ.get("SMOKE_PROGRAM", "GA_JTC")
+    clients = [int(c) for c in os.environ["SMOKE_CLIENTS"].split(",")] if os.environ.get("SMOKE_CLIENTS") else discovered_clients()
+    write_client, program = int(os.environ.get("SMOKE_WRITE_CLIENT") or 0), os.environ.get("SMOKE_PROGRAM", "GA_JTC")
+    if steps & {"writes", "nonwriter"} and not write_client:
+        raise SystemExit("set SMOKE_WRITE_CLIENT to a SYNTHETIC client id: the write steps change that client's record")
     gw = Gateway()
     say(f"# live smoke {SMOKE}  steps={sorted(steps)}")
     plan = [("catalog", lambda: run_catalog(gw)), ("reads", lambda: run_reads(gw, clients, args.compare_local)),

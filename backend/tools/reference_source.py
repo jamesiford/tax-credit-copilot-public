@@ -451,9 +451,9 @@ class LakehousePayrollAdapter:
         assumption_path: Path = _DEFAULT_ASSUMPTIONS,
         reader: Any | None = None,
     ) -> None:
-        from data.source.from_reference import REFERENCE_ACCOUNT_ID
+        from tools.reference_identity import require_reference_account_id
 
-        self.account_id = REFERENCE_ACCOUNT_ID if account_id is None else int(account_id)
+        self.account_id = require_reference_account_id() if account_id is None else int(account_id)
         self.assumption_path = Path(assumption_path)
         self.assumption_set = load_assumption_set(self.assumption_path)
         self._reader = reader

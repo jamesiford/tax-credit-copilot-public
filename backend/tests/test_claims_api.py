@@ -631,9 +631,9 @@ def test_assessing_an_unknown_client_is_never_someone_elses_payroll(claims_clien
 
 def test_a_mismatched_tenant_reads_empty_not_default(claims_client):
     """The root fix, at the source rather than at each call site."""
-    from api._payperiods import configured_account_id, load_pay_periods
+    from api._payperiods import fixture_account_id, load_pay_periods
 
-    assert load_pay_periods(configured_account_id()), "the configured tenant has rows"
+    assert load_pay_periods(fixture_account_id()), "the configured tenant has rows"
     assert load_pay_periods(999999) == [], "any other tenant has none"
 
 

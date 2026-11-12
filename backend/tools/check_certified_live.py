@@ -23,7 +23,8 @@ from infrastructure.persistence.fabric_warehouse import (  # noqa: E402
     FabricWarehouseConnection,
 )
 
-CLIENT = 1001
+from tools.reference_identity import require_reference_account_id
+CLIENT = require_reference_account_id()  # REFERENCE_ACCOUNT_ID; unset is an explained refusal
 EXPECTED = {"employees": 10236, "min_max": 539, "pay_period": 656}
 
 with FabricWarehouseConnection().scope() as conn:
