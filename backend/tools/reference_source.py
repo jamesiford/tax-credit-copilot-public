@@ -473,12 +473,7 @@ class LakehousePayrollAdapter:
         from data.source.to_bcs import source_to_bcs_rows
 
         reader = self.reader()
-        if not reader.is_configured():
-            raise FileNotFoundError(
-                "Fabric is not configured: set FABRIC_WORKSPACE and FABRIC_LAKEHOUSE. "
-                "Reported separately from a missing account because the two send you "
-                "looking in completely different places."
-            )
+        reader.require_configured()
         dataset = reader.for_account(self.account_id)
         if dataset is None:
             raise FileNotFoundError(

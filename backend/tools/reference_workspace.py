@@ -167,11 +167,10 @@ class ReferenceWorkspaceService:
         # which left the same client resolving from two different sources on one
         # screen. Under `lakehouse` it now comes out of the lakehouse like every
         # other view, and the equivalence gate below is what makes that safe.
-        from tools.fabric_source import resolve_data_source_alias
+        from tools.fabric_source import resolve_data_source
 
         configured = get_settings().data_source
-        raw_source_kind = (source_kind or configured.explicit_data_source or "csv").strip().lower()
-        self.source_kind = resolve_data_source_alias(raw_source_kind)
+        self.source_kind = resolve_data_source(source_kind)
         configured_access = access_output_path or (
             Path(configured.reference_access_output_path) if configured.reference_access_output_path else None
         )
@@ -214,6 +213,7 @@ class ReferenceWorkspaceService:
             from data.source.from_fabric import FabricLakehouseReader
 
             reader = FabricLakehouseReader()
+            reader.require_configured()
             lineage = reader.table_lineage("Payroll") or {}
             payload.append([f"{reader.schema}.Payroll", lineage.get("version"), lineage.get("files")])
         else:

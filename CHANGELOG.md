@@ -20,6 +20,7 @@ All notable changes to this project are recorded here, so changes can be followe
 
 ### Changed
 
+- A blank or unset `DATA_SOURCE` now resolves to `lakehouse` everywhere (the reference workspace used to treat blank as the local CSV fixture and failed with "Reference workspace inputs missing"). Set `DATA_SOURCE=csv` explicitly for the local test fixture. If the source is the lakehouse but `FABRIC_WORKSPACE` and `FABRIC_LAKEHOUSE` are not set, the API now answers `503` with a body naming the dependency and the settings to set (typed error `SourceNotConfigured`).
 - With `ENVIRONMENT=local` (the default) the Azure credential no longer includes the managed-identity probe, which removes the long wait on a developer machine. Deployed behaviour (managed identity selected by `AZURE_CLIENT_ID`) is unchanged. To restore the probe locally set `AZURE_TOKEN_CREDENTIALS=managedidentitycredential`.
 ### Deprecated
 
