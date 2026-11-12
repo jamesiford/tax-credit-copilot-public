@@ -65,6 +65,15 @@ class ObservabilitySettings:
 
 
 @dataclass(frozen=True)
+class IdentitySettings:
+    """Which Azure identity the process uses. `deployed` is `ENVIRONMENT` other than `local`; no value is a secret."""
+
+    azure_client_id: str | None
+    token_credentials: str
+    deployed: bool
+
+
+@dataclass(frozen=True)
 class DataSourceSettings:
     """Where payroll comes from. `explicit_data_source` is the raw choice, `None` when it was not made."""
 
@@ -135,6 +144,14 @@ def parse_observability(environ: Mapping[str, str]) -> ObservabilitySettings:
         appinsights_connection_string=environ.get("APPLICATIONINSIGHTS_CONNECTION_STRING"),
         azure_client_id=environ.get("AZURE_CLIENT_ID") or None,
         foundry_project_endpoint=environ.get("FOUNDRY_PROJECT_ENDPOINT"),
+    )
+
+
+def parse_identity(environ: Mapping[str, str]) -> IdentitySettings:
+    return IdentitySettings(
+        azure_client_id=environ.get("AZURE_CLIENT_ID") or None,
+        token_credentials=(environ.get("AZURE_TOKEN_CREDENTIALS") or "").strip(),
+        deployed=(environ.get("ENVIRONMENT") or "local").strip().lower() != "local",
     )
 
 

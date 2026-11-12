@@ -57,10 +57,10 @@ def acting_header(acting: ActingUser) -> str:
 
 
 def managed_identity_token(settings: GatewaySettings) -> Callable[[], str]:
-    """A bearer-token provider over `DefaultAzureCredential` (managed identity when deployed)."""
-    from azure.identity import DefaultAzureCredential
+    """A bearer-token provider over the shared Azure credential (managed identity when deployed)."""
+    from infrastructure.azure_credential import shared_credential
 
-    credential = DefaultAzureCredential()
+    credential = shared_credential()
     return lambda: credential.get_token(settings.api_scope).token
 
 

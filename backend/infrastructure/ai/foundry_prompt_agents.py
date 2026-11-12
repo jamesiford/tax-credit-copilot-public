@@ -33,9 +33,10 @@ ModelFor = Callable[[AgentSpec], str]
 
 def _default_client(endpoint: str) -> Any:
     from azure.ai.projects import AIProjectClient
-    from azure.identity import DefaultAzureCredential
 
-    return AIProjectClient(endpoint=endpoint, credential=DefaultAzureCredential())
+    from infrastructure.azure_credential import shared_credential
+
+    return AIProjectClient(endpoint=endpoint, credential=shared_credential())
 
 
 class FoundryAgentCatalog:
@@ -143,11 +144,12 @@ class FoundryAgentRuntime:
 
     def _sdk_agent(self, entry: PublishedAgent) -> Any:
         from agent_framework_foundry import FoundryAgent
-        from azure.identity import DefaultAzureCredential
+
+        from infrastructure.azure_credential import shared_credential
 
         return FoundryAgent(
             project_endpoint=self._catalog.endpoint, agent_name=entry.published_name,
-            agent_version=entry.version, credential=DefaultAzureCredential(),
+            agent_version=entry.version, credential=shared_credential(),
         )
 
     def _agent(self, entry: PublishedAgent) -> Any:

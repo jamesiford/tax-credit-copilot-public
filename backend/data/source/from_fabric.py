@@ -107,11 +107,9 @@ _DATASET_CACHE: dict[tuple[str, str, str, int], SourceDataset] = {}
 _ACCOUNTS_CACHE: dict[tuple[str, str, str], list[dict[str, Any]]] = {}
 _LINEAGE_CACHE: dict[tuple[str, str, str, str], dict[str, Any]] = {}
 
-# One credential for the process. `DefaultAzureCredential` caches tokens per
-# instance, so building a new one per call re-probes IMDS every time — which on
-# a developer machine is a guaranteed timeout before it falls through to the az
-# CLI, on every single read.
-_CREDENTIAL: Any = None
+# The credential is shared by the whole process (`infrastructure/azure_credential.py`),
+# and so is the token it mints: `DefaultAzureCredential` caches nothing for the CLI
+# credentials, which on a developer machine means an `az` subprocess per call.
 
 # OneLake on this capacity accepts connections slowly and erratically. Opening
 # the tiny `Account` Delta log was measured at 13s, 22s, 13s, 38s and 29s on five
@@ -136,12 +134,9 @@ _TRANSPORT_OPTIONS = {
 
 
 def _storage_token() -> str:
-    global _CREDENTIAL
-    if _CREDENTIAL is None:
-        from azure.identity import DefaultAzureCredential
+    from infrastructure.azure_credential import cached_token
 
-        _CREDENTIAL = DefaultAzureCredential()
-    return _CREDENTIAL.get_token("https://storage.azure.com/.default").token
+    return cached_token("https://storage.azure.com/.default")
 
 
 def clear_cache() -> None:

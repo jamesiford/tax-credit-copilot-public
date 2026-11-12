@@ -127,7 +127,6 @@ _POOL_MAX_AGE_S = 45
 #: manifest repository, the scope router — and a per-instance cache meant each
 #: of them paid the 1.1s `az account get-access-token` again.
 _TOKEN_LOCK = threading.Lock()
-_SHARED_CREDENTIAL: Any = None
 _SHARED_TOKEN: tuple[bytes, int] | None = None
 
 _MANIFEST_COLUMNS = RUN_MANIFEST_COLUMNS
@@ -201,19 +200,16 @@ class FabricWarehouseConnection:
         )
 
     def _get_credential(self) -> Any:
-        """The credential, built once per process.
+        """The credential: the injected one, else the process-wide shared credential.
 
         Imported lazily so importing this module does not require
         `azure.identity` — the memory adapter must be selectable without it.
         """
-        global _SHARED_CREDENTIAL
         if self._credential is not None:
             return self._credential
-        if _SHARED_CREDENTIAL is None:
-            from azure.identity import DefaultAzureCredential
+        from infrastructure.azure_credential import shared_credential
 
-            _SHARED_CREDENTIAL = DefaultAzureCredential()
-        return _SHARED_CREDENTIAL
+        return shared_credential()
 
     def _access_token_attribute(self) -> bytes:
         """The packed bearer token, cached until it is near expiry.

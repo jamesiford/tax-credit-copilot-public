@@ -38,9 +38,9 @@ from functools import cached_property
 from types import MappingProxyType
 
 from config_sections import (
-    DataSourceSettings, ObservabilitySettings, RuntimeSettings, StoresSettings, WarehouseSettings, WebIqSettings,
-    parse_data_source, parse_observability, parse_runtime, parse_schema_name, parse_stores, parse_warehouse,
-    parse_webiq,
+    DataSourceSettings, IdentitySettings, ObservabilitySettings, RuntimeSettings, StoresSettings, WarehouseSettings,
+    WebIqSettings, parse_data_source, parse_identity, parse_observability, parse_runtime, parse_schema_name,
+    parse_stores, parse_warehouse, parse_webiq,
 )
 
 #: Calendar year. The only value the deleted setting ever returned in practice.
@@ -71,6 +71,10 @@ class Settings:
     @cached_property
     def observability(self) -> ObservabilitySettings:
         return parse_observability(self.environ)
+
+    @cached_property
+    def identity(self) -> IdentitySettings:
+        return parse_identity(self.environ)
 
     @cached_property
     def data_source(self) -> DataSourceSettings:

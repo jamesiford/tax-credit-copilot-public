@@ -16,9 +16,11 @@ All notable changes to this project are recorded here, so changes can be followe
 ### Added
 
 - `CHANGELOG.md`: this file.
+- `infrastructure/azure_credential.py`: one shared Azure credential (and a token cache) used by every backend component that talks to Azure. New optional setting `AZURE_TOKEN_CREDENTIALS` (`dev`, `prod` or one credential name, as accepted by `azure-identity`) is honoured when set.
 
 ### Changed
 
+- With `ENVIRONMENT=local` (the default) the Azure credential no longer includes the managed-identity probe, which removes the long wait on a developer machine. Deployed behaviour (managed identity selected by `AZURE_CLIENT_ID`) is unchanged. To restore the probe locally set `AZURE_TOKEN_CREDENTIALS=managedidentitycredential`.
 ### Deprecated
 
 ### Removed

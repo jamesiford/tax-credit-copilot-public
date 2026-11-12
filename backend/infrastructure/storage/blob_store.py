@@ -30,9 +30,9 @@ class BlobArtifactStore:
 
             credential = self._credential
             if credential is None:
-                from azure.identity import DefaultAzureCredential
+                from infrastructure.azure_credential import shared_credential
 
-                credential = DefaultAzureCredential()
+                credential = shared_credential()
             self._service = BlobServiceClient(account_url=self.account_url, credential=credential)
         return self._service
 
