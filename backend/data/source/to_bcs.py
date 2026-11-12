@@ -63,18 +63,22 @@ def frequency_label(start, end) -> str:
 class _Context:
     """The lookups one account's projection needs, built once."""
 
-    def __init__(self, dataset: SourceDataset) -> None:
-        from data.lookups import resolve_pay_codes
+    def __init__(self, dataset: SourceDataset, resolve: bool = True) -> None:
+        from data.lookups import PayCodeReport, resolve_pay_codes
 
         self.fein = {e.entity_id: (e.federal_tax_id or "") for e in dataset.entities}
         self.title = {e.employee_id: (e.job_title or "") for e in dataset.employments}
         self.code_text = {c.pay_code_id: c.pay_code for c in dataset.pay_codes}
-        self.canonical, self.pay_code_report = resolve_pay_codes(dataset)
+        self.resolve = resolve
+        self.canonical, self.pay_code_report = resolve_pay_codes(dataset) if resolve else ({}, PayCodeReport("deferred"))
         self.unit, self.state, self.county = _location_dimensions(dataset)
         self.worksite_mode, self.pay_date_mode = mapping.worksite_mode(), mapping.null_pay_date_mode()
 
     def pay_code(self, pay_code_id: Any) -> tuple[str, bool, bool]:
         """(canonical code, unmapped, defaulted): an absent or dangling id is `Regular` and says so; an unmapped code passes through."""
+        if not self.resolve:  # Silver: the pay code stays as the customer wrote it; the lookup is applied on read
+            known = pay_code_id is not None and pay_code_id in self.code_text
+            return ((self.code_text[pay_code_id] or "").strip(), False, False) if known else ("Regular", False, True)
         if pay_code_id is None or pay_code_id not in self.canonical:
             return "Regular", False, True
         found = self.canonical[pay_code_id]
@@ -142,14 +146,14 @@ def _bcs_row(p: Any, paid: Any, ctx: _Context) -> dict[str, Any]:
     }
 
 
-def source_to_bcs_rows(dataset: SourceDataset) -> list[dict[str, Any]]:
+def source_to_bcs_rows(dataset: SourceDataset, *, resolve_pay_codes: bool = True) -> list[dict[str, Any]]:
     """Project one client's source tables into Silver Record Layout rows.
 
     Returns plain dicts. The engine is pure functions over lists of dicts (ADR-003), so nothing about the
     Warehouse, Fabric or Delta reaches it. Under the `strict` pay-code policy, payroll carrying pay codes no
     provider maps raises `UnmappedPayCodes` rather than projecting rows the state's whitelist would silently drop.
     """
-    ctx = _Context(dataset)
+    ctx = _Context(dataset, resolve_pay_codes)
     report = ctx.pay_code_report
     if report.policy == "strict" and report.unmapped_rows:
         from application.errors import UnmappedPayCodes

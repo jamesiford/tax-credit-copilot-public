@@ -21,7 +21,7 @@ from application.queries.portfolio_rows import (  # noqa: F401 - effective_outco
     claim_matches, client_states, effective_outcome, group_claims, unassessed_row, unavailable_rows,
 )
 from application.queries.portfolio_reads import (  # noqa: F401 - re-exported: callers and tests patch them here
-    _engagements, _read_claims, _tolerating, _unique, client_book_rows, footprint, priceable_states,
+    _engagements, _read_claims, prefetch_engagements, _tolerating, _unique, client_book_rows, footprint, priceable_states,
 )
 from domain.claims import (
     ClaimStatus,
@@ -171,9 +171,9 @@ def portfolio_page(
     rows: list[dict[str, Any]] = []
     assessed_ids: set[int] = set()
     unavailable_ids: list[int] = []
-    claims_down = repo is None
+    claims_down, scopes = repo is None, prefetch_engagements(repo, grouped, book_rows)
     for client_id, client_claims in sorted(grouped.items()):
-        engagements = _engagements(repo, client_id, degraded)
+        engagements = _engagements(repo, client_id, degraded, scopes)
         if engagements is None:
             # The claims were read but this client's engagement scope was not: whether its gap is ours to
             # report is unknown, so the row says so instead of asserting an outcome.
@@ -251,7 +251,7 @@ def portfolio_page(
             client_id = int(client["account_id"])
             if client_id in grouped:
                 continue
-            engagements = _engagements(repo, client_id, degraded)
+            engagements = _engagements(repo, client_id, degraded, scopes)
             if engagements is None:
                 unavailable_ids.append(client_id)
                 continue

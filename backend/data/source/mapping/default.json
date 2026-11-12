@@ -23,7 +23,8 @@
         "account_eid": {
           "column": "AccountEid",
           "type": "int64",
-          "required": false
+          "required": false,
+          "engine": false
         },
         "name": {
           "column": "Name",
@@ -37,12 +38,14 @@
         "billing_city": {
           "column": "BillingCity",
           "type": "string",
-          "required": false
+          "required": false,
+          "engine": false
         },
         "billing_postal_code": {
           "column": "BillingPostalCode",
           "type": "string",
-          "required": false
+          "required": false,
+          "engine": false
         },
         "industry_type_id": {
           "column": "IndustryTypeId",
@@ -52,12 +55,14 @@
         "account_status_id": {
           "column": "AccountStatusId",
           "type": "int64",
-          "required": false
+          "required": false,
+          "engine": false
         },
         "account_type_id": {
           "column": "AccountTypeId",
           "type": "int64",
-          "required": false
+          "required": false,
+          "engine": false
         },
         "actual_number_of_employees": {
           "column": "ActualNumberOfEmployees",
@@ -67,12 +72,14 @@
         "external_name": {
           "column": "ExternalName",
           "type": "string",
-          "required": false
+          "required": false,
+          "engine": false
         },
         "create_date": {
           "column": "CreateDate",
           "type": "timestamp[us]",
-          "required": false
+          "required": false,
+          "engine": false
         }
       }
     },
@@ -91,7 +98,8 @@
         "state_name": {
           "column": "StateName",
           "type": "string",
-          "required": false
+          "required": false,
+          "engine": false
         },
         "county_name": {
           "column": "CountyName",
@@ -100,7 +108,8 @@
         "zip_code": {
           "column": "ZipCode",
           "type": "string",
-          "required": false
+          "required": false,
+          "engine": false
         }
       }
     },
@@ -115,7 +124,8 @@
         "street_address_1": {
           "column": "StreetAddress1",
           "type": "string",
-          "required": false
+          "required": false,
+          "engine": false
         },
         "city_name": {
           "column": "CityName",
@@ -129,7 +139,8 @@
         "zip_code_original": {
           "column": "ZipCodeOriginal",
           "type": "string",
-          "required": false
+          "required": false,
+          "engine": false
         },
         "state_original": {
           "column": "StateOriginal",
@@ -139,12 +150,14 @@
         "latitude": {
           "column": "Latitude",
           "type": "double",
-          "required": false
+          "required": false,
+          "engine": false
         },
         "longitude": {
           "column": "Longitude",
           "type": "double",
-          "required": false
+          "required": false,
+          "engine": false
         }
       }
     },
@@ -201,7 +214,8 @@
         "name": {
           "column": "Name",
           "type": "string",
-          "required": false
+          "required": false,
+          "engine": false
         },
         "federal_tax_id": {
           "column": "FederalTaxId",
@@ -210,17 +224,20 @@
         "state_tax_id": {
           "column": "StateTaxId",
           "type": "string",
-          "required": false
+          "required": false,
+          "engine": false
         },
         "parent_entity_id": {
           "column": "ParentEntityId",
           "type": "int64",
-          "required": false
+          "required": false,
+          "engine": false
         },
         "entity_business_type_id": {
           "column": "EntityBusinessTypeId",
           "type": "int64",
-          "required": false
+          "required": false,
+          "engine": false
         },
         "fiscal_year_rules_id": {
           "column": "FiscalYearRulesId",
@@ -230,12 +247,14 @@
         "inception_date": {
           "column": "InceptionDate",
           "type": "date32",
-          "required": false
+          "required": false,
+          "engine": false
         },
         "dissolution_date": {
           "column": "DissolutionDate",
           "type": "date32",
-          "required": false
+          "required": false,
+          "engine": false
         }
       }
     },
@@ -293,7 +312,8 @@
         "screening_status_id": {
           "column": "ScreeningStatusId",
           "type": "int64",
-          "required": false
+          "required": false,
+          "engine": false
         }
       }
     },
@@ -339,17 +359,20 @@
         "description": {
           "column": "Description",
           "type": "string",
-          "required": false
+          "required": false,
+          "engine": false
         },
         "is_aca": {
           "column": "IsAca",
           "type": "bool",
-          "required": false
+          "required": false,
+          "engine": false
         },
         "is_futa": {
           "column": "IsFuta",
           "type": "bool",
-          "required": false
+          "required": false,
+          "engine": false
         },
         "pay_code_category_id": {
           "column": "PayCodeCategoryId",
@@ -366,7 +389,8 @@
         "employment_id": {
           "column": "EmploymentId",
           "type": "int64",
-          "required": false
+          "required": false,
+          "engine": false
         },
         "employee_id": {
           "column": "EmployeeId",
@@ -376,17 +400,20 @@
         "hire_location_id": {
           "column": "HireLocationId",
           "type": "int64",
-          "required": false
+          "required": false,
+          "engine": false
         },
         "current_location_id": {
           "column": "CurrentLocationId",
           "type": "int64",
-          "required": false
+          "required": false,
+          "engine": false
         },
         "status": {
           "column": "Status",
           "type": "string",
-          "required": false
+          "required": false,
+          "engine": false
         },
         "job_title": {
           "column": "JobTitle",
@@ -396,47 +423,56 @@
         "hire_date": {
           "column": "HireDate",
           "type": "date32",
-          "required": false
+          "required": false,
+          "engine": false
         },
         "start_date": {
           "column": "StartDate",
           "type": "date32",
-          "required": false
+          "required": false,
+          "engine": false
         },
         "termination_date": {
           "column": "TerminationDate",
           "type": "date32",
-          "required": false
+          "required": false,
+          "engine": false
         },
         "termination_reason": {
           "column": "TerminationReason",
           "type": "string",
-          "required": false
+          "required": false,
+          "engine": false
         },
         "employment_type": {
           "column": "EmploymentType",
           "type": "string",
-          "required": false
+          "required": false,
+          "engine": false
         },
         "wage_type": {
           "column": "WageType",
           "type": "string",
-          "required": false
+          "required": false,
+          "engine": false
         },
         "employment_status": {
           "column": "EmploymentStatus",
           "type": "string",
-          "required": false
+          "required": false,
+          "engine": false
         },
         "department_number": {
           "column": "DepartmentNumber",
           "type": "string",
-          "required": false
+          "required": false,
+          "engine": false
         },
         "department_name": {
           "column": "DepartmentName",
           "type": "string",
-          "required": false
+          "required": false,
+          "engine": false
         }
       }
     },
@@ -497,22 +533,26 @@
         "client_employee_id": {
           "column": "ClientEmployeeId",
           "type": "string",
-          "required": false
+          "required": false,
+          "engine": false
         },
         "hourly_rate": {
           "column": "HourlyRate",
           "type": "decimal128(18, 2)",
-          "required": false
+          "required": false,
+          "engine": false
         },
         "is_full_time": {
           "column": "IsFullTime",
           "type": "bool",
-          "required": false
+          "required": false,
+          "engine": false
         },
         "is_salaried": {
           "column": "IsSalaried",
           "type": "bool",
-          "required": false
+          "required": false,
+          "engine": false
         },
         "pay_code_id": {
           "column": "PayCodeId",
@@ -526,27 +566,32 @@
         "inload_payroll_id": {
           "column": "InloadPayrollId",
           "type": "int64",
-          "required": false
+          "required": false,
+          "engine": false
         },
         "create_date": {
           "column": "CreateDate",
           "type": "timestamp[us]",
-          "required": false
+          "required": false,
+          "engine": false
         },
         "modify_date": {
           "column": "ModifyDate",
           "type": "timestamp[us]",
-          "required": false
+          "required": false,
+          "engine": false
         },
         "created_by": {
           "column": "CreatedBy",
           "type": "int64",
-          "required": false
+          "required": false,
+          "engine": false
         },
         "modified_by": {
           "column": "ModifiedBy",
           "type": "int64",
-          "required": false
+          "required": false,
+          "engine": false
         }
       }
     }

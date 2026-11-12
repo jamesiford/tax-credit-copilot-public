@@ -38,6 +38,7 @@ class FieldMap:
     column: str
     type: str
     required: bool = True
+    engine: bool = True  # False: carried for the writer and the data-query model, never read on the engine's path
 
 
 @dataclass(frozen=True, slots=True)
@@ -85,11 +86,12 @@ def _field(table: str, name: str, raw: dict[str, Any], base: FieldMap | None) ->
     column = str(raw.get("column", base.column if base else ""))
     type_ = str(raw.get("type", base.type if base else ""))
     required = bool(raw.get("required", base.required if base else True))
+    engine = bool(raw.get("engine", base.engine if base else True))
     if not IDENTIFIER.match(column):
         raise MappingError(f"{table}.{name}: column {column!r} is not a plain identifier")
     if type_ not in ARROW_TYPES:
         raise MappingError(f"{table}.{name}: unknown type {type_!r}; one of {sorted(ARROW_TYPES)}")
-    return FieldMap(name, column, type_, required)
+    return FieldMap(name, column, type_, required, engine)
 
 
 def _table(logical: str, raw: dict[str, Any], base: TableMap | None) -> TableMap:

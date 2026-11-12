@@ -14,6 +14,7 @@ load_dotenv()  # local dev — production env vars come from the host.
 
 from telemetry import configure_telemetry, instrument_fastapi  # noqa: E402
 from config import get_settings  # noqa: E402
+from data.source import read_stats  # noqa: E402 - source read counters, reported by /api/ready
 from api.artifacts import router as artifacts_router  # noqa: E402
 from api.audit import router as audit_router  # noqa: E402
 from api.capabilities import router as capabilities_router  # noqa: E402
@@ -191,7 +192,7 @@ def ready() -> dict:
         "warm": warm, "ai": _ai_state(),
         # Reported, never a reason to fail the platform probe: the app can still answer, and says what it cannot.
         "stores": getattr(app.state, "stores", {"status": "unknown"}),
-        "source_schema": getattr(app.state, "source_schema", {"status": "unknown"}),
+        "source_schema": {**getattr(app.state, "source_schema", {"status": "unknown"}), "reads": read_stats.snapshot()},
     }
 
 

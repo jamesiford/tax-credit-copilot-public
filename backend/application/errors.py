@@ -96,6 +96,31 @@ class FiscalRulesMissing(DependencyUnavailable):
         )
 
 
+class SilverNotBuilt(DependencyUnavailable):
+    """`SOURCE_SILVER=require` and an account has no Silver partition."""
+
+    def __init__(self, account_id: int) -> None:
+        super().__init__(
+            "source_silver", f"account {account_id} has no Silver partition.",
+            "Run scripts/fabric/build-silver.py for it, or set SOURCE_SILVER=auto to fall back to the raw read.",
+            impact="this client's payroll is not loaded",
+        )
+
+
+class AccountTooLarge(DependencyUnavailable):
+    """One account's payroll is larger than the configured bound, so it is refused rather than loaded into memory."""
+
+    def __init__(self, account_id: int, rows: int, limit: int) -> None:
+        super().__init__(
+            "source_lakehouse",
+            f"account {account_id} has {rows:,} payroll rows, over SOURCE_MAX_ACCOUNT_ROWS ({limit:,}).",
+            "Raise SOURCE_MAX_ACCOUNT_ROWS if the host has the memory, or use the pre-aggregated read "
+            "(docs/architecture/SCALE-READS.md); a client-year drill-through reads only that year.",
+            impact="this client's payroll is not loaded",
+        )
+        self.account_id, self.rows, self.limit = account_id, rows, limit
+
+
 class ReferenceNotConfigured(DependencyUnavailable):
     """The certified reference run was asked for, and no deployment account is named as its subject."""
 

@@ -69,6 +69,11 @@ def spec(logical: str) -> dict[str, str]:
     return {name: f.type for name, f in table_map(logical).fields.items()}
 
 
+def engine_fields(logical: str) -> set[str]:
+    """The fields the engine's read path needs. Everything else is carried but not read: a columnar read skips it."""
+    return {name for name, f in table_map(logical).fields.items() if f.engine}
+
+
 def partition_columns(logical: str) -> list[str] | None:
     """The PHYSICAL partition columns of a table, or None."""
     table = table_map(logical)
