@@ -41,6 +41,36 @@ logging.basicConfig(level=get_settings().runtime.log_level)
 log = logging.getLogger("tax-credit-copilot")
 
 
+async def _keepalive() -> None:
+    """Touch the Warehouse pool on an interval so its links do not hit the ODBC idle timeout."""
+    from application.warmup import keepalive_interval_s, touch_warehouse
+
+    interval = keepalive_interval_s()
+    while True:
+        await asyncio.sleep(interval)
+        try:
+            await asyncio.to_thread(touch_warehouse)
+        except asyncio.CancelledError:
+            raise
+        except Exception as exc:  # noqa: BLE001 - never reaches a request
+            log.debug("keepalive skipped: %s", type(exc).__name__)
+
+
+async def _check_stores(app: FastAPI) -> None:
+    """Verify the operational store off the request path and keep the result for /api/ready."""
+    from application.store_readiness import check_operational_store
+
+    try:
+        report = await asyncio.to_thread(check_operational_store)
+    except Exception as exc:  # noqa: BLE001 - a failing check must not stop the API
+        report = {"status": "unknown", "problems": [], "warnings": [], "detail": type(exc).__name__}
+    app.state.stores = report
+    for finding in report.get("problems", []):
+        log.error("operational store: %s Remedy: %s", finding["message"], finding["remedy"])
+    for finding in report.get("warnings", []):
+        log.warning("operational store: %s Remedy: %s", finding["message"], finding["remedy"])
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Before anything else: a deployed process with a non-durable store or no
@@ -94,25 +124,18 @@ async def lifespan(app: FastAPI):
     # next request pays a full handshake — 3.2s against 120ms.
     keepalive_task = None
     if should_warm():
-        from application.warmup import keepalive_interval_s, touch_warehouse
-
-        async def _keepalive() -> None:
-            interval = keepalive_interval_s()
-            while True:
-                await asyncio.sleep(interval)
-                try:
-                    await asyncio.to_thread(touch_warehouse)
-                except asyncio.CancelledError:
-                    raise
-                except Exception as exc:  # noqa: BLE001 - never reaches a request
-                    log.debug("keepalive skipped: %s", type(exc).__name__)
-
         keepalive_task = asyncio.create_task(_keepalive())
+
+    # Is the operational store usable? Claims and findings live only there, so an unreachable or
+    # uninitialised store is reported (with its remedy) here and in /api/ready, never discovered as
+    # an empty page. Off the request path, and never blocks startup.
+    app.state.stores = {"status": "running"}
+    stores_task = asyncio.create_task(_check_stores(app))
 
     app.state.started = True
     yield
     app.state.started = False
-    for task in (warm_task, keepalive_task):
+    for task in (warm_task, keepalive_task, stores_task):
         if task is not None and not task.done():
             task.cancel()
     log.info("API shutting down.")
@@ -163,7 +186,13 @@ def ready() -> dict:
     """
     warm = getattr(app.state, "warm", {"status": "unknown"})
     started = bool(getattr(app.state, "started", False))
-    return {"ready": started and warm.get("status") != "running", "warm": warm, "ai": _ai_state()}
+    return {
+        "ready": started and warm.get("status") != "running",
+        "warm": warm,
+        "ai": _ai_state(),
+        # Reported, never a reason to fail the platform probe: the app can still answer, and says what it cannot.
+        "stores": getattr(app.state, "stores", {"status": "unknown"}),
+    }
 
 
 def _ai_state() -> str:

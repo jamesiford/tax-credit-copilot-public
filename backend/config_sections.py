@@ -15,10 +15,11 @@ Those take a mapping too, and the composition root hands them `Settings.environ`
 """
 from __future__ import annotations
 
-import json
 import re
 from collections.abc import Mapping
 from dataclasses import dataclass, field
+
+from config_values import choice as _choice, onelake_endpoint as _onelake_endpoint, optional_flag as _optional_flag, table_map as _table_map
 from pathlib import Path
 
 DEFAULT_ODBC_DRIVER = "ODBC Driver 18 for SQL Server"
@@ -63,6 +64,8 @@ class ObservabilitySettings:
     appinsights_connection_string: str | None
     azure_client_id: str | None
     foundry_project_endpoint: str | None
+    #: `TELEMETRY_ENABLED` when stated, else `None`: on only if a connection string is set.
+    telemetry_enabled: bool | None = None
 
 
 @dataclass(frozen=True)
@@ -90,6 +93,7 @@ class DataSourceSettings:
     table_prefix: str = ""
     table_case: str = "as_is"
     table_map: Mapping[str, str] = field(default_factory=dict)
+    source_fallback: str = ""
 
 
 @dataclass(frozen=True)
@@ -150,6 +154,7 @@ def parse_observability(environ: Mapping[str, str]) -> ObservabilitySettings:
         appinsights_connection_string=environ.get("APPLICATIONINSIGHTS_CONNECTION_STRING"),
         azure_client_id=environ.get("AZURE_CLIENT_ID") or None,
         foundry_project_endpoint=environ.get("FOUNDRY_PROJECT_ENDPOINT"),
+        telemetry_enabled=_optional_flag(environ, "TELEMETRY_ENABLED"),
     )
 
 
@@ -168,34 +173,8 @@ def parse_source_schema(environ: Mapping[str, str], default: str) -> str:
     return parse_schema_name(environ, "SOURCE_SCHEMA", default)
 
 
-def _choice(environ: Mapping[str, str], name: str, allowed: tuple[str, ...], default: str) -> str:
-    value = (environ.get(name) or default).strip().lower()
-    if value not in allowed:
-        raise ValueError(f"{name}={value!r} is not one of {', '.join(allowed)}")
-    return value
-
-
-def _table_map(environ: Mapping[str, str]) -> dict[str, str]:
-    raw = (environ.get("SOURCE_TABLE_MAP") or "").strip()
-    if not raw:
-        return {}
-    try:
-        parsed = json.loads(raw)
-    except ValueError as exc:
-        raise ValueError(f"SOURCE_TABLE_MAP is not valid JSON: {exc}") from exc
-    if not isinstance(parsed, dict) or not all(isinstance(k, str) and isinstance(v, str) for k, v in parsed.items()):
-        raise ValueError('SOURCE_TABLE_MAP must be a JSON object of strings, e.g. {"Payroll": "payroll_v2"}')
-    return dict(parsed)
-
-
-def _onelake_endpoint(environ: Mapping[str, str]) -> str | None:
-    value = (environ.get("ONELAKE_ENDPOINT") or "").strip().rstrip("/")
-    if value and not value.startswith(("https://", "http://")):
-        raise ValueError("ONELAKE_ENDPOINT must be a full URL, e.g. https://<workspaceid-no-dashes>.z<xy>.blob.fabric.microsoft.com")
-    return value or None
-
-
 def parse_data_source(environ: Mapping[str, str]) -> DataSourceSettings:
+    """Where payroll comes from: the source, the lakehouse and its paths, and the interim table names."""
     return DataSourceSettings(
         data_source=(environ.get("DATA_SOURCE") or "").strip().lower() or "lakehouse",
         explicit_data_source=environ.get("DATA_SOURCE") or None,
@@ -209,6 +188,7 @@ def parse_data_source(environ: Mapping[str, str]) -> DataSourceSettings:
         table_prefix=environ.get("SOURCE_TABLE_PREFIX") or "",
         table_case=_choice(environ, "SOURCE_TABLE_CASE", ("as_is", "lower", "upper"), "as_is"),
         table_map=_table_map(environ),
+        source_fallback=_choice(environ, "SOURCE_FALLBACK", ("", "none", "delta"), "").replace("none", ""),
     )
 
 

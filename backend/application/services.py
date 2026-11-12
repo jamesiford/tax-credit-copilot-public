@@ -114,6 +114,10 @@ def get_writer_entitlement() -> Any:
     return resolve("writer_entitlement")
 
 
+def get_store_probe() -> Any:
+    return resolve("store_probe")
+
+
 def get_data_query_service() -> Any:
     return resolve("data_query_service")
 

@@ -8,9 +8,12 @@ it, so there is still exactly one answer to both questions.
 """
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 from application.source_ports import configured_account_id, new_source_reader
+
+log = logging.getLogger(__name__)
 
 
 def is_placeholder_year(program_code: str, tax_year: int) -> bool:
@@ -129,20 +132,46 @@ def accounts_from_warehouse() -> list[dict[str, Any]]:
     if not reader.is_configured():
         from data.source.from_fabric import FabricLakehouseReader
 
-        return FabricLakehouseReader().list_accounts()
+        delta = FabricLakehouseReader()
+        # An unconfigured source is an outage to report, not a book with no clients in it.
+        delta.require_configured()
+        return delta.list_accounts()
     return reader.list_accounts()
 
 
-def clients_or_empty() -> list[dict[str, Any]]:
-    """The book, or nothing when the source is unreachable.
+def clients_checked() -> list[dict[str, Any]]:
+    """The book, or a typed `DependencyUnavailable` when the source cannot give it.
 
-    Callers that decorate a result with a name or a count would rather render
-    what they have than fail whole; an absent book understates, it never
-    invents.
+    An empty list from here means the source answered and holds no clients. A source that is not
+    configured or cannot be reached is a different state, and the caller must be able to tell.
     """
+    from application.errors import as_dependency_failure
+
     try:
         return clients()
-    except Exception:  # noqa: BLE001 - a missing book must not take a page down
+    except Exception as exc:  # noqa: BLE001 - classified below; a bug in our code is re-raised
+        failure = as_dependency_failure(
+            "source_lakehouse", exc, impact="the client book cannot be listed, so no client names, industries or states appear",
+        )
+        if failure is None:
+            raise
+        if failure is not exc:
+            log.warning("client book unavailable: %s: %s", type(exc).__name__, str(exc)[:200])
+        raise failure from exc
+
+
+def clients_or_empty() -> list[dict[str, Any]]:
+    """The book, or nothing when the source is unavailable (said in the log, once per call).
+
+    For callers that decorate a result with a name or a count and would rather render what they have.
+    A caller that reports to a person uses `clients_checked`, so an outage is not shown as an empty book.
+    """
+    from application.errors import DependencyUnavailable
+
+    try:
+        return clients_checked()
+    except DependencyUnavailable as exc:
+        log.warning("client book unavailable, continuing without it: %s", exc)
         return []
 
 

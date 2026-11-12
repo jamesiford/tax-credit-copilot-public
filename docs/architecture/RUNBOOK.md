@@ -503,3 +503,20 @@ missing. The orchestrator logs the same prefix (`source=narration`) when the gat
 related event, `writer_check_failed` on `tcc.writer_check`, says an entitlement source (`allowlist`, `entra_group`,
 `gateway_check`) could not answer and the person was denied: a run of those with no other change means the allow-list
 table or Graph is down, and legitimate writers are being refused, never the reverse.
+
+## 14. A page says part of it is unavailable (degraded)
+
+`GET /api/v2/portfolio` answers with whatever it can build and a `degraded` list when something it needs
+cannot answer; the page shows a banner naming each dependency, what it costs and what to do. An **empty**
+claims table is normal (every client reads as not yet assessed); an **unreachable or uninitialised** store is
+listed. Claims and engagements have no copy elsewhere, so nothing falls back to another store.
+
+| Dependency | Meaning | First thing to do |
+|---|---|---|
+| `claims_store` | the operational store cannot be read | `python scripts/check-operational-store.py`; it names the first problem (unreachable, `tcc_ops.program_claim` missing, migrations pending, no grant) and the remedy |
+| `source_lakehouse` | the client book cannot be listed, or no lakehouse is configured | `python scripts/check-onelake-access.py`; set `FABRIC_WORKSPACE` / `FABRIC_LAKEHOUSE` |
+| `source_sql` | the payroll footprint scan failed (retried after a minute) | check `WAREHOUSE_SERVER`, the capacity state and the SQL grants |
+
+`/api/ready` carries a `stores` object with the same findings, and the startup log says them once. It never
+turns `ready` false for a store problem: the app can still answer, and says what it cannot. `SOURCE_FALLBACK=delta`
+is the only opt-in fallback (a client's fiscal rules, bounded, logged).

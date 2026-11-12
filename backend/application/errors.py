@@ -49,3 +49,46 @@ class SourceNotConfigured(DependencyUnavailable):
             impact="no client or payroll data can be read",
         )
         self.missing = missing
+
+
+#: A bug in our own code is not an outage. These propagate (a 500 with a trace) instead of
+#: being reported as a dependency that is down, which is how an `except Exception` turned a
+#: typo into "the claims store is unavailable".
+PROGRAMMING_ERRORS = (TypeError, AttributeError, KeyError, NameError, AssertionError, ImportError)
+
+#: (lower-cased fragment of the driver's message, reason, remedy). First match wins.
+_FAILURE_MEANINGS: tuple[tuple[tuple[str, ...], str, str], ...] = (
+    (("invalid object name", "no such table", "no such column", "invalid column name"),
+     "a table or schema it needs is missing (the store was never initialised, or is behind its migrations).",
+     "Run `python scripts/apply-migrations.py --target deployed` (a new Warehouse also needs `--bootstrap`)."),
+    (("permission was denied", "select permission", "insert permission", "login failed", "not authorized",
+      "authorizationfailure", "403"),
+     "the identity can connect but has no permission on the store.",
+     "Grant the app identity access: `python scripts/grant-warehouse-sql.py` and the Fabric workspace role."),
+    (("not set", "warehousenotconfigured"),
+     "the store is not configured.",
+     "Set WAREHOUSE_SERVER and WAREHOUSE_DATABASE (or choose a local store with ENVIRONMENT=local)."),
+    (("timed out", "timeout", "08001", "could not open a connection", "name or service not known",
+      "getaddrinfo", "dns", "network-related", "connection refused", "connect"),
+     "the server could not be reached.",
+     "Check the server name, that the capacity is running, and that this machine's network and DNS reach it."),
+)
+
+
+def as_dependency_failure(dependency: str, exc: BaseException, *, impact: str = "") -> DependencyUnavailable | None:
+    """A typed failure for `exc`, or None when it is a bug that must propagate.
+
+    The reason names the class of failure and never echoes the driver's message, which can carry a
+    server name or a login; the full text is logged once by the caller.
+    """
+    if isinstance(exc, DependencyUnavailable):
+        return exc
+    if isinstance(exc, PROGRAMMING_ERRORS):
+        return None
+    text = f"{type(exc).__name__}: {exc}".lower()
+    for fragments, reason, remedy in _FAILURE_MEANINGS:
+        if any(fragment in text for fragment in fragments):
+            return DependencyUnavailable(dependency, reason, remedy, impact=impact)
+    return DependencyUnavailable(
+        dependency, f"it failed with {type(exc).__name__}.", "See the application log for the detail.", impact=impact,
+    )

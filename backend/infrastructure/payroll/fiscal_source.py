@@ -10,6 +10,7 @@ rather than inventing one; `assumed_calendar_window` carries the flag.
 """
 from __future__ import annotations
 
+import logging
 from datetime import date
 
 from domain.calculation.fiscal import (
@@ -18,6 +19,9 @@ from domain.calculation.fiscal import (
     assumed_calendar_window,
     window_from_client_rules,
 )
+
+
+log = logging.getLogger(__name__)
 
 
 def _as_date(value) -> date | None:
@@ -34,34 +38,62 @@ def _as_date(value) -> date | None:
 def _fiscal_rules(account_id: int) -> list | None:
     """The client's fiscal rules, by the cheapest route that can answer.
 
-    SQL first. The Delta path reads ten tables including every payroll row to
-    reach this one lookup — ~132s cold — and it is on the request path of every
-    screen that resolves a tax year.
+    SQL first. If it is configured and fails, the answer is "could not read" (None), which the caller
+    turns into a flagged calendar-year assumption: it does NOT fall through to another store. The
+    fallback to the lakehouse is opt-in (`SOURCE_FALLBACK=delta`) and, even then, is a bounded read of
+    `Entity` and `EntityFiscalYearRules` rather than the ten-table load it used to be (~132s cold).
 
-    None means "could not read", which the caller turns into a flagged
-    assumption. An empty list means "read it, the client has no rule", and those
-    are different facts: the second is a real gap in the source, the first is an
-    outage, and a lakehouse outage must not silently decide statute.
+    None means "could not read"; an empty list means "read it, the client has no rule". Those are
+    different facts: the second is a real gap in the source, the first is an outage, and an outage
+    must not silently decide statute. Both are logged, and both end in `assumed_calendar`.
     """
     from infrastructure.persistence.source_sql import SourceSqlReader
 
     reader = SourceSqlReader()
     if reader.is_configured():
-        try:
-            return reader.fiscal_year_rules(int(account_id))
-        except Exception:  # noqa: BLE001 - fall through to the Delta reader
-            pass
+        rules, may_fall_back = _rules_over_sql(reader, account_id)
+        if rules is not None or not may_fall_back:
+            return rules
+    return _rules_from_lakehouse(account_id)
 
+
+def _rules_over_sql(reader, account_id: int) -> tuple[list | None, bool]:
+    """(rules, may_fall_back). `rules` is None when SQL failed; `may_fall_back` only with SOURCE_FALLBACK=delta."""
+    from application.errors import as_dependency_failure
+    from config import get_settings
+
+    try:
+        return reader.fiscal_year_rules(int(account_id)), False
+    except Exception as exc:  # noqa: BLE001 - classified below; a bug in our code is re-raised
+        if as_dependency_failure("source_sql", exc) is None:
+            raise
+        fallback = get_settings().data_source.source_fallback == "delta"
+        log.warning(
+            "fiscal rules for account %s could not be read over SQL (%s); %s", account_id, type(exc).__name__,
+            "SOURCE_FALLBACK=delta, so reading Entity and EntityFiscalYearRules from the lakehouse instead."
+            if fallback else
+            "the window is assumed to be a calendar year. Fix the SQL path, or set SOURCE_FALLBACK=delta to read "
+            "them from the lakehouse.",
+        )
+        return None, fallback
+
+
+def _rules_from_lakehouse(account_id: int) -> list | None:
+    """A bounded lakehouse read of the two small tables; None when it cannot be done."""
+    from application.errors import as_dependency_failure
     from data.source.from_fabric import FabricLakehouseReader
 
     delta = FabricLakehouseReader()
     if not delta.is_configured():
         return None
     try:
-        dataset = delta.for_account(int(account_id))
-    except Exception:  # noqa: BLE001 - an outage must not decide statute
+        return delta.fiscal_year_rules(int(account_id))
+    except Exception as exc:  # noqa: BLE001 - an outage must not decide statute; a bug in our code is re-raised
+        if as_dependency_failure("source_lakehouse", exc) is None:
+            raise
+        log.warning("fiscal rules for account %s could not be read from the lakehouse (%s); the window is assumed.",
+                    account_id, type(exc).__name__)
         return None
-    return list(dataset.fiscal_year_rules or []) if dataset else None
 
 
 def client_fiscal_window(
