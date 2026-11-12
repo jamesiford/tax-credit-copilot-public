@@ -34,15 +34,14 @@ def configure_telemetry(service_name: str = "tax-credit-copilot-api") -> None:
         _initialized = True
         return
     try:
-        from azure.identity import DefaultAzureCredential
         from azure.monitor.opentelemetry import configure_azure_monitor
 
-        # DefaultAzureCredential resolves the container's user-assigned managed
-        # identity in Azure and a developer's `az login` locally, so this is one
-        # code path rather than a branch on environment.
-        credential = DefaultAzureCredential(
-            managed_identity_client_id=observability.azure_client_id
-        )
+        from infrastructure.azure_credential import shared_credential
+
+        # The shared DefaultAzureCredential resolves the container's user-assigned
+        # managed identity in Azure and a developer's `az login` locally, so this is
+        # one code path rather than a branch on environment.
+        credential = shared_credential()
 
         configure_azure_monitor(
             connection_string=conn,

@@ -161,10 +161,9 @@ def _required(value: str | None, name: str) -> str:
 
 
 def _storage_options() -> dict[str, str]:
-    from azure.identity import DefaultAzureCredential
+    from infrastructure.azure_credential import cached_token
 
-    token = DefaultAzureCredential().get_token("https://storage.azure.com/.default").token
-    return {"bearer_token": token, "use_fabric_endpoint": "true"}
+    return {"bearer_token": cached_token("https://storage.azure.com/.default"), "use_fabric_endpoint": "true"}
 
 
 def table_uri(table: str, *, workspace: str, lakehouse: str, schema: str = SOURCE_SCHEMA) -> str:

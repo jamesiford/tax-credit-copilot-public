@@ -43,9 +43,9 @@ def fabric_get_json(url: str, *, attempts: int = 4) -> dict:
     import time
     import urllib.error
 
-    from azure.identity import DefaultAzureCredential
+    from infrastructure.azure_credential import cached_token
 
-    token = DefaultAzureCredential().get_token("https://api.fabric.microsoft.com/.default").token
+    token = cached_token("https://api.fabric.microsoft.com/.default")
     request = urllib.request.Request(url, headers={"Authorization": f"Bearer {token}"})
     for attempt in range(1, attempts + 1):
         try:

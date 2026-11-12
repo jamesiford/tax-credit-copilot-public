@@ -80,10 +80,12 @@ def _register_builtin_providers(registry: ProviderRegistry) -> None:
         from infrastructure.ai.auth import build_authenticator
         from infrastructure.ai.chat_model_runtime import ChatModelAgentRuntime
         from infrastructure.ai.openai_compatible import OpenAICompatibleChatModel
+        from infrastructure.azure_credential import shared_credential
 
         if settings.gateway is None:
             raise AiConfigurationError("the gateway provider is configured without AI_GATEWAY_* settings")
-        model = OpenAICompatibleChatModel(settings.gateway, build_authenticator(settings.gateway))
+        credential = shared_credential() if settings.gateway.auth == "entra_token" else None
+        model = OpenAICompatibleChatModel(settings.gateway, build_authenticator(settings.gateway, credential=credential))
         return ChatModelAgentRuntime(model, settings)
 
     registry.register("foundry", foundry)

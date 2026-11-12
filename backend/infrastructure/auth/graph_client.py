@@ -42,9 +42,10 @@ _DENIED_MARKERS = ("authorization_requestdenied", "insufficient privileges")
 
 
 def _default_credential() -> Any:
-    from azure.identity import DefaultAzureCredential
+    from infrastructure.azure_credential import new_credential
 
-    return DefaultAzureCredential()
+    # Its own instance, not the shared one: the rebuild path below exists to bypass a token cache.
+    return new_credential()
 
 
 @dataclass
