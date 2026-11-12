@@ -168,27 +168,23 @@ def map_fabric_employees_row(raw: dict[str, Any]) -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 
 
-def active_data_source() -> str:
-    """`'lakehouse'` (default), `'fabric'`, or `'csv'` from the `DATA_SOURCE` flag.
+def resolve_data_source(explicit: str | None = None) -> str:
+    """`'lakehouse'` (default), `'fabric'` or `'csv'`: the one answer every reader of `DATA_SOURCE` shares.
 
-    * ``lakehouse`` — the customer's **source schema** (`Tables/<SOURCE_SCHEMA>/*`,
-      default `tcc_source`), read via `data.source.FabricLakehouseReader` and
-      projected by the same code path proven lossless against the reference
-      dataset. This is the shape production receives, and it is the default:
-      the product reads Fabric or it does not run, rather than silently
-      falling back to a local file.
-    * ``flex``    — **deprecated alias for ``lakehouse``.** The source schema
-      used to be named after the customer's internal shape ("Flex"); this
-      resolves identically to ``lakehouse`` and emits a `DeprecationWarning`
-      so a caller can find and update the setting.
-    * ``fabric`` — the flattened demo `employees` Delta table; an early slice
-      kept only because the ingestion tests exercise it.
-    * ``csv``    — a local FIXTURE, not a data source. `tests/conftest.py` pins
-      it so the suite stays offline and deterministic; nothing that ships
-      selects it. See `backend/data/payroll_pay_periods.csv`.
+    `explicit` is a caller's own choice and wins over the setting. A blank or unset
+    `DATA_SOURCE` is `lakehouse` (applied in `config_sections.parse_data_source`), `csv` only
+    when it is set explicitly, the retired `flex` alias resolves with its deprecation warning,
+    and an unrecognised value is `lakehouse`. `lakehouse` is the customer's source schema
+    (`data.source.FabricLakehouseReader`); with no lakehouse configured the readers raise
+    `application.errors.SourceNotConfigured`. `fabric` is the early flattened demo slice and
+    `csv` is a local FIXTURE that only `tests/conftest.py` selects; nothing that ships does.
     """
-    value = resolve_data_source_alias(get_settings().data_source.data_source)
+    value = (explicit or "").strip().lower() or get_settings().data_source.data_source
+    value = resolve_data_source_alias(value)
     return value if value in {"fabric", "csv"} else "lakehouse"
+
+
+active_data_source = resolve_data_source
 
 
 def resolve_data_source_alias(value: str) -> str:

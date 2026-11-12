@@ -157,7 +157,7 @@ def parse_identity(environ: Mapping[str, str]) -> IdentitySettings:
 
 def parse_data_source(environ: Mapping[str, str]) -> DataSourceSettings:
     return DataSourceSettings(
-        data_source=environ.get("DATA_SOURCE", "lakehouse").strip().lower(),
+        data_source=(environ.get("DATA_SOURCE") or "").strip().lower() or "lakehouse",
         explicit_data_source=environ.get("DATA_SOURCE") or None,
         fabric_workspace=environ.get("FABRIC_WORKSPACE"),
         fabric_lakehouse=environ.get("FABRIC_LAKEHOUSE"),

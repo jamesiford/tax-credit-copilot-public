@@ -18,6 +18,7 @@ from api.artifacts import router as artifacts_router  # noqa: E402
 from api.audit import router as audit_router  # noqa: E402
 from api.capabilities import router as capabilities_router  # noqa: E402
 from api.auth import request_guard, router as auth_router  # noqa: E402
+from application.errors import DependencyUnavailable  # noqa: E402
 from application.identity import NotAuthorized  # noqa: E402
 from api.chat import router as chat_router  # noqa: E402
 from api.claims import router as claims_router, v2_router as claims_v2_router  # noqa: E402
@@ -138,6 +139,13 @@ app.add_middleware(
 async def _not_authorized(_request: Request, exc: NotAuthorized) -> JSONResponse:
     """A command refused by the Authorization stage is a 403, wherever it was sent from."""
     return JSONResponse(status_code=403, content={"detail": str(exc) or "not authorized"})
+
+
+@app.exception_handler(DependencyUnavailable)
+async def _dependency_unavailable(_request: Request, exc: DependencyUnavailable) -> JSONResponse:
+    """A named dependency that cannot answer is a 503 that says which one and what to do. [03.3]"""
+    log.warning("dependency unavailable: %s (%s)", exc.dependency, exc.reason)
+    return JSONResponse(status_code=503, content=exc.as_detail())
 
 # Must run here, before the app serves: middleware cannot be added once the
 # stack is built, and the lifespan runs inside the first call that builds it.

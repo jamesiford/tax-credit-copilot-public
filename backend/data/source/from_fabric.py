@@ -163,6 +163,21 @@ class FabricLakehouseReader:
     def is_configured(self) -> bool:
         return bool(self.workspace) and bool(self.lakehouse)
 
+    def require_configured(self) -> None:
+        """Raise `SourceNotConfigured`, naming exactly the settings still unset."""
+        if self.is_configured():
+            return
+        from application.errors import SourceNotConfigured
+
+        raise SourceNotConfigured(self.missing_settings())
+
+    def missing_settings(self) -> tuple[str, ...]:
+        """The settings a person must set, so an error names them rather than saying "not configured"."""
+        return tuple(
+            name for name, value in (("FABRIC_WORKSPACE", self.workspace), ("FABRIC_LAKEHOUSE", self.lakehouse))
+            if not value
+        )
+
     def _storage_options(self) -> dict[str, str]:
         return {
             "bearer_token": _storage_token(),
