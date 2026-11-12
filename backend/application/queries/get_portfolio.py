@@ -17,6 +17,9 @@ from collections.abc import Callable
 from typing import Any
 
 from application import client_book
+from application.queries.portfolio_rows import (  # noqa: F401 - effective_outcome is re-exported for its callers
+    claim_matches, client_states, effective_outcome, group_claims, unassessed_row, unavailable_rows,
+)
 from application.queries.portfolio_reads import (  # noqa: F401 - re-exported: callers and tests patch them here
     _engagements, _read_claims, _tolerating, _unique, client_book_rows, footprint, priceable_states,
 )
@@ -29,16 +32,6 @@ from domain.claims import (
     declining_reading,
 )
 
-
-
-def effective_outcome(claim, engagements: dict[str, EngagementScope]) -> str:
-    scope = engagements.get(claim.program_code)
-    if scope is EngagementScope.OUT_OF_SCOPE and claim.outcome in {
-        Outcome.UNCLAIMED,
-        Outcome.NOT_ASSESSED,
-    }:
-        return Outcome.OUT_OF_SCOPE.value
-    return claim.outcome.value
 
 
 def portfolio_sort_key(sort: str) -> str:
@@ -98,68 +91,6 @@ def portfolio_sort_value(item: dict[str, Any], sort: str, order: str) -> float:
     return 0.0
 
 
-def _default_program_code(program: str | None, engagements: dict[str, EngagementScope]) -> str | None:
-    """Which programme an unassessed client should be reported against.
-
-    In order: the one the caller filtered to, the one we are engaged on, or the
-    sole calculable programme. Returns None when the answer is genuinely
-    ambiguous — several programmes and nothing to choose between them — because
-    picking one arbitrarily would assert an engagement that does not exist.
-    """
-    if program:
-        return program.upper()
-    if engagements:
-        return next(iter(engagements))
-    try:
-        calculable = [p["program_code"] for p in client_book.programs() if p.get("calculable")]
-    except (OSError, ValueError):  # rule packs unreadable: "unknown", and priceable_states reports it
-        return None
-    return calculable[0] if len(calculable) == 1 else None
-
-
-def _unassessed_row(
-    client: dict[str, Any],
-    *,
-    program: str | None,
-    year: int | None,
-    engagements: dict[str, EngagementScope],
-) -> dict[str, Any] | None:
-    """A client we have never run, as a first-class portfolio row.
-
-    Synthesised from `ProgramClaim`'s own defaults rather than hand-built, so the
-    row carries exactly the shape every other row does and `outcome` derives
-    NOT_ASSESSED through the same property as everything else. A hand-rolled dict
-    would drift from the domain the first time a field is added.
-
-    Returns None when no programme can be named. The domain requires one, and it
-    is right to: a claim against no programme is not a claim.
-    """
-    program_code = _default_program_code(program, engagements)
-    if not program_code:
-        return None
-    claim = ProgramClaim(
-        claim_id="",
-        client_id=int(client["account_id"]),
-        entity_id=None,
-        program_code=program_code,
-        tax_year=year or 0,
-        status=ClaimStatus.NOT_ASSESSED,
-    )
-    scope = engagements.get(program_code)
-    item = claim.to_dict()
-    item["engagement_scope"] = scope.value if scope is not None else None
-    item["effective_outcome"] = Outcome.NOT_ASSESSED.value
-    item["gap_jobs"] = None
-    item["one_more_job_qualifies"] = False
-    item["client_name"] = client.get("name")
-    # The figures are absent, not zero. A client with no run has no dollars to
-    # report, and reporting 0 would read as "we looked and found nothing" —
-    # which is a different, and wrong, statement.
-    for field in ("identified_usd", "claimed_usd", "certified_usd", "variance_usd", "opportunity_usd"):
-        item[field] = None
-    return item
-
-
 def _declining_overlay(client_claims: list[Any], chosen: Any) -> dict[str, Any]:
     """A falling headcount, read across the client's years rather than one cell.
 
@@ -183,15 +114,6 @@ def _declining_overlay(client_claims: list[Any], chosen: Any) -> dict[str, Any]:
         out["priority_band"] = PriorityBand.DECLINING.value
         out["priority_rank"] = PriorityBand.DECLINING.rank
     return out
-
-
-def _client_states(client_id: int, states_by_client: dict[int, list[str]], priceable: set[str]) -> dict[str, Any]:
-    """Where this client operates, and which of those we can put a number on."""
-    states = states_by_client.get(int(client_id), [])
-    return {
-        "states": states,
-        "priceable_states": [s for s in states if s in priceable],
-    }
 
 
 def portfolio_page(
@@ -238,23 +160,7 @@ def portfolio_page(
     degraded: list[dict[str, Any]] = []
     repo, all_claims = _read_claims(degraded)
 
-    if program:
-        all_claims = [c for c in all_claims if c.program_code.upper() == program.upper()]
-
-    claims = all_claims if year is None else [c for c in all_claims if c.tax_year == year]
-
-    grouped: dict[int, list[ProgramClaim]] = defaultdict(list)
-    for claim in claims:
-        grouped[claim.client_id].append(claim)
-
-    # A TREND IS NOT A CELL, so it cannot be read from the year filter.
-    # `grouped` holds whatever survived `year`, which for a page scoped to
-    # TY2025 is ONE year per client — and one year has no direction. Halloway
-    # has fallen for three years running and read as `settled` on every
-    # year-scoped load until this was separated out.
-    history: dict[int, list[ProgramClaim]] = defaultdict(list)
-    for claim in all_claims:
-        history[claim.client_id].append(claim)
+    all_claims, grouped, history = group_claims(all_claims, program, year)
 
     book_rows = _tolerating(book, [], degraded)
     names = {int(c["account_id"]): c.get("name") for c in book_rows}
@@ -264,25 +170,19 @@ def portfolio_page(
 
     rows: list[dict[str, Any]] = []
     assessed_ids: set[int] = set()
+    unavailable_ids: list[int] = []
+    claims_down = repo is None
     for client_id, client_claims in sorted(grouped.items()):
         engagements = _engagements(repo, client_id, degraded)
-        candidates: list[ProgramClaim] = []
-        for claim in client_claims:
-            if outcome and effective_outcome(claim, engagements) != outcome:
-                continue
-            if scope and engagements.get(claim.program_code, None) is None:
-                continue
-            if scope and engagements.get(claim.program_code) != EngagementScope(scope):
-                continue
-            if near is not None:
-                has_gap = claim.status is ClaimStatus.NOT_ASSESSED or bool(claim.near_threshold)
-                if near and not has_gap:
-                    continue
-                if not near and has_gap:
-                    continue
-            if status and claim.status.value != status:
-                continue
-            candidates.append(claim)
+        if engagements is None:
+            # The claims were read but this client's engagement scope was not: whether its gap is ours to
+            # report is unknown, so the row says so instead of asserting an outcome.
+            unavailable_ids.append(client_id)
+            continue
+        candidates = [
+            c for c in client_claims
+            if claim_matches(c, engagements, outcome=outcome, scope=scope, near=near, status=status)
+        ]
         # Assessed means the repository holds a claim for this client at all —
         # not that it survived the current filter. Otherwise the "2 of 5
         # assessed" denominator would move every time somebody changed a filter.
@@ -326,7 +226,7 @@ def portfolio_page(
         # carry it. Applied over the cell band, and only where nothing more
         # urgent already applies: exposure and the threshold both outrank it.
         item.update(_declining_overlay(history[client_id], chosen))
-        item.update(_client_states(client_id, footprint_by_client, priceable_set))
+        item.update(client_states(client_id, footprint_by_client, priceable_set))
         rows.append(item)
 
     sort_name = portfolio_sort_key(sort)
@@ -346,27 +246,36 @@ def portfolio_page(
         # keep the two consistent rather than answering the same question twice.
         and (near is not False)
     )
-    if wanted_unassessed:
+    if wanted_unassessed and not claims_down:
         for client in book_rows:
             client_id = int(client["account_id"])
             if client_id in grouped:
                 continue
             engagements = _engagements(repo, client_id, degraded)
+            if engagements is None:
+                unavailable_ids.append(client_id)
+                continue
             if scope and EngagementScope(scope) not in set(engagements.values()):
                 continue
-            row = _unassessed_row(client, program=program, year=year, engagements=engagements)
+            row = unassessed_row(client, program=program, year=year, engagements=engagements)
             if row is not None:
                 # Where a client operates is a fact about its payroll, not about
                 # whether we have run it. Omitting it here would drop the
                 # unassessed clients off the map — the ones a footprint filter
                 # most needs to surface.
-                row.update(_client_states(client_id, footprint_by_client, priceable_set))
+                row.update(client_states(client_id, footprint_by_client, priceable_set))
                 # An industry is a fact about the client, not about a run.
                 row["industry"] = client.get("industry")
                 unassessed_rows.append(row)
         unassessed_rows.sort(key=lambda item: str(item.get("client_name") or item["client_id"]))
 
-    all_rows = rows + unassessed_rows
+    # Unavailable rows are in EVERY view, whatever the filters say: a client we could not read is not a client
+    # with nothing to do, and a saved view that dropped it would show exactly that.
+    unavailable_rows_ = unavailable_rows(
+        book_rows, unavailable_ids, names, claims_down=claims_down, program=program, year=year,
+        extra=lambda cid: client_states(cid, footprint_by_client, priceable_set),
+    )
+    all_rows = rows + unassessed_rows + unavailable_rows_
     total = len(all_rows)
     page = all_rows[offset: offset + limit]
     return {
@@ -386,12 +295,15 @@ def portfolio_page(
         # it a headline figure over a mostly-unassessed book reads as though it
         # covered the whole book.
         "total_clients": len(book_rows) or total,
-        "assessed_clients": len(assessed_ids),
+        # None, not 0, when the claim store could not be read: "none assessed" would be a statement about the
+        # clients, and the truth is that nobody knows.
+        "assessed_clients": None if claims_down else len(assessed_ids),
+        "unavailable_clients": len(unavailable_rows_),
         # What could not be read, and what that costs. Empty when everything answered. An EMPTY
         # claims table is not listed here: that is a normal state, every client simply reads as
         # not yet assessed. A store that cannot be reached or was never initialised IS listed.
         "degraded": _unique(degraded),
-        "unassessed_clients": len(unassessed_rows),
+        "unassessed_clients": None if claims_down else len(unassessed_rows),
         "_note": (
             "One row per client, with the most actionable matching cell surfaced. "
             "Ranking is by the jobs gap when possible, because a cell worth $0 can "

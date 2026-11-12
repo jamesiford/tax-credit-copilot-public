@@ -122,8 +122,8 @@ def _tolerating(read: Callable[[], Any], empty: Any, degraded: list[dict[str, An
 
 
 _CLAIMS_IMPACT = (
-    "claim and credit figures are unavailable, so no client shows a figure or a priority band "
-    "and clients are listed without an assessment status"
+    "claim and credit figures are unavailable, so every client is listed as unavailable: whether it was "
+    "assessed is unknown, which is not the same as not assessed"
 )
 
 
@@ -150,9 +150,10 @@ def _read_claims(degraded: list[dict[str, Any]]) -> tuple[Any, list[ProgramClaim
         return None, []
 
 
-def _engagements(repo: Any, client_id: int, degraded: list[dict[str, Any]]) -> dict[str, EngagementScope]:
+def _engagements(repo: Any, client_id: int, degraded: list[dict[str, Any]]) -> dict[str, EngagementScope] | None:
+    """One client's engagement scopes, or None when they could not be read (recorded as degraded)."""
     if repo is None:
-        return {}
+        return None
     try:
         return {e.program_code: e.scope for e in repo.engagements(client_id)}
     except Exception as exc:  # noqa: BLE001 - classified below; a bug in our code is re-raised
@@ -160,4 +161,4 @@ def _engagements(repo: Any, client_id: int, degraded: list[dict[str, Any]]) -> d
         if failure is None:
             raise
         degraded.append(failure.as_degraded())
-        return {}
+        return None
