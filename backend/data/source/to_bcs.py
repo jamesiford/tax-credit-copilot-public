@@ -29,180 +29,192 @@ log = logging.getLogger(__name__)
 # — the engine measures each period's actual span instead.
 _UNKNOWN_FREQUENCY = ""
 
-# BA-07 / Q5 — **INFERRED. Pending the partner's `PayCodeCategory` lookup.**
-#
-# `PayCode.PayCode` is a client-specific string: one account's "REG" is another's
-# "RG01". Rule packs, by contrast, name canonical categories — Georgia includes
-# `Regular`, `Overtime`, `Bonus`, `Commission` and suppresses `Mileage`,
-# `Expense_Reimbursement`, `Relocation`. Something has to map one to the other.
-#
-# In the source that something is almost certainly `PayCode.PayCodeCategoryId`,
-# which is the lookup already owed to us (Q5 in SOURCE-SCHEMA-MAPPING.md). Until
-# it arrives, this maps by convention.
-#
-# The consequence of getting this wrong is not subtle: an unmapped code is
-# dropped by `apply_pay_code_policy` BEFORE the calculation runs, so the engine
-# silently sees no payroll at all. That is how the first source-backed API call
-# returned 9,832 rows loaded and zero eligible employees.
-_CANONICAL_PAY_CODE: dict[str, str] = {
-    "REG": "Regular",
-    "OT": "Overtime",
-    "BON": "Bonus",
-    "COM": "Commission",
-    "PTO": "Regular",          # paid leave is remuneration for the wage test
-    "MIL": "Mileage",
-    "EXP": "Expense_Reimbursement",
-    "RELO": "Relocation",
-}
+# BA-07 / Q5. Pay-code inclusion is an app-owned lookup (`data/lookups`): the customer's `PayCode.PayCode` is a
+# client-specific string ("REG" in one account, "RG01" in another) and the rule packs name canonical categories
+# (`Regular`, `Overtime`, ... and the suppressed `Mileage`, `Expense_Reimbursement`, `Relocation`). An unmapped code
+# is dropped by `apply_pay_code_policy` BEFORE the calculation runs, so the engine silently sees no payroll, which is
+# how the first source-backed call returned 9,832 rows loaded and zero eligible. So every code is resolved through
+# `resolve_pay_codes`, what could not be mapped is counted, and under `strict` it blocks the calculation.
 
 
 def canonical_pay_code(source_code: str | None) -> str:
-    """Client pay code -> the canonical category rule packs name.
+    """Seed-only mapping of one client pay code, kept for callers that have no account: the code itself when unmapped.
 
-    Falls through to the code itself when unmapped, so an unexpected code is
-    visible in the output rather than silently becoming `Regular` and inflating
-    the wage base.
+    The projection does not use this: it resolves per account (override, then seed) with the policy applied.
     """
+    from data.lookups.seeds import load_seed
+
     if not source_code:
         return "Regular"
     code = source_code.strip()
-    return _CANONICAL_PAY_CODE.get(code.upper(), code)
+    seed = load_seed("pay_code_category")
+    return seed.entries.get(code.upper(), code) if seed else code
+
+
+def frequency_label(start, end) -> str:
+    """The pay frequency, read from the period's measured span (BA-03), never from the source's surrogate id."""
+    days = (end - start).days + 1
+    for limit, label in ((1, "daily"), (8, "weekly"), (14, "biweekly"), (16, "semimonthly"), (31, "monthly")):
+        if days <= limit and days >= {1: 1, 8: 5, 14: 13, 16: 15, 31: 27}[limit]:
+            return label
+    return f"{days}d"
+
+
+class _Context:
+    """The lookups one account's projection needs, built once."""
+
+    def __init__(self, dataset: SourceDataset) -> None:
+        from data.lookups import resolve_pay_codes
+
+        self.fein = {e.entity_id: (e.federal_tax_id or "") for e in dataset.entities}
+        self.title = {e.employee_id: (e.job_title or "") for e in dataset.employments}
+        self.code_text = {c.pay_code_id: c.pay_code for c in dataset.pay_codes}
+        self.canonical, self.pay_code_report = resolve_pay_codes(dataset)
+        self.unit, self.state, self.county = _location_dimensions(dataset)
+        self.worksite_mode, self.pay_date_mode = mapping.worksite_mode(), mapping.null_pay_date_mode()
+
+    def pay_code(self, pay_code_id: Any) -> tuple[str, bool, bool]:
+        """(canonical code, unmapped, defaulted): an absent or dangling id is `Regular` and says so; an unmapped code passes through."""
+        if pay_code_id is None or pay_code_id not in self.canonical:
+            return "Regular", False, True
+        found = self.canonical[pay_code_id]
+        return (found, False, False) if found is not None else ((self.code_text.get(pay_code_id) or "").strip(), True, False)
+
+
+def _location_dimensions(dataset: SourceDataset) -> tuple[dict[int, str], dict[int, str], dict[int, str]]:
+    """Unit id, state and county per location, through Location -> Address -> StateCountyZip.
+
+    The same join reaches `county_name`, which Georgia's tier (and so credit value) depends on. The unit id carries
+    its state as a prefix because the pipeline filters per state by worksite prefix; without it every state filter
+    returns empty and the calculation silently produces nothing.
+    """
+    address_by_id = {a.address_id: a for a in dataset.addresses}
+    scz_by_id = {s.state_county_zip_id: s for s in dataset.state_county_zips}
+    unit_of: dict[int, str] = {}
+    state_of: dict[int, str] = {}
+    county_of: dict[int, str] = {}
+    for loc in dataset.locations:
+        address = address_by_id.get(loc.address_id)
+        scz = scz_by_id.get(address.state_county_zip_id) if address else None
+        state = ((scz.state_abbr if scz else None) or (address.state_original if address else "") or "").upper()
+        # Prefer the client's own identifier: it is what appears on their reports.
+        raw_unit = loc.client_location_id or str(loc.location_id)
+        unit_of[loc.location_id] = raw_unit if not state or raw_unit.startswith(f"{state}_") else f"{state}_{raw_unit}"
+        state_of[loc.location_id] = state
+        county_of[loc.location_id] = scz.county_name if scz else ""
+    return unit_of, state_of, county_of
+
+
+def _bcs_row(p: Any, paid: Any, ctx: _Context) -> dict[str, Any]:
+    """One payroll row in the Silver Record Layout."""
+    # Q3: which location the jobs are counted at is the `worksite_location` transform.
+    location_id = transforms.worksite_id(ctx.worksite_mode, p.worksite_location_id, p.location_id)
+    pay_code, unmapped, defaulted = ctx.pay_code(p.pay_code_id)
+    return {
+        # BA-02 trims on paycheck date; tax year is derived downstream from the fiscal window.
+        "Tax_Year": paid.year,
+        "Employee_ID": str(p.employee_id),
+        "Job_Title": ctx.title.get(p.employee_id, ""),
+        "Worksite_ID": ctx.unit.get(location_id, str(location_id)),
+        "Work_State": ctx.state.get(location_id, ""),
+        "Work_County": ctx.county.get(location_id, ""),
+        "Entity_FEIN": ctx.fein.get(p.entity_id, ""),
+        "Pay_Period_Start": p.pay_period_start.isoformat(),
+        "Pay_Period_End": p.pay_period_end.isoformat(),
+        # Q1: nullable in source. The `null_pay_date` transform decides (period end stands in, or the row is
+        # excluded before this); an imputed date is flagged on the row and counted in the controls.
+        "Pay_Date": paid.isoformat(),
+        "_Pay_Date_Imputed": p.pay_date is None,
+        # BA-03: the label is derived from the measured span; the raw id is lineage only.
+        "Pay_Frequency": frequency_label(p.pay_period_start, p.pay_period_end),
+        "_Source_Pay_Frequency_Id": p.pay_frequency_id,
+        # BA-07: the canonical category the rule pack names. The source code is kept as lineage, and a code no
+        # provider maps (or a row with no pay code) is flagged on the row, never absorbed.
+        "Pay_Code": pay_code,
+        "_Source_Pay_Code": ctx.code_text.get(p.pay_code_id, ""),
+        "_Pay_Code_Unmapped": unmapped,
+        "_Pay_Code_Defaulted": defaulted,
+        # Q2: NULL and 0 differ. NULL coerces to 0.0 so BA-05 keeps the row, and the count is reported separately.
+        "Hours_Worked": float(p.hours) if p.hours is not None else 0.0,
+        "Gross_Wages": float(p.wages) if p.wages is not None else 0.0,
+        "_Source_Payroll_Id": p.payroll_id,
+        "_Source_Account_Id": p.account_id,
+    }
 
 
 def source_to_bcs_rows(dataset: SourceDataset) -> list[dict[str, Any]]:
     """Project one client's source tables into Silver Record Layout rows.
 
-    Returns plain dicts. The engine is pure functions over lists of dicts
-    (ADR-003), so nothing about the Warehouse, Fabric or Delta reaches it.
+    Returns plain dicts. The engine is pure functions over lists of dicts (ADR-003), so nothing about the
+    Warehouse, Fabric or Delta reaches it. Under the `strict` pay-code policy, payroll carrying pay codes no
+    provider maps raises `UnmappedPayCodes` rather than projecting rows the state's whitelist would silently drop.
     """
-    fein_by_entity = {e.entity_id: (e.federal_tax_id or "") for e in dataset.entities}
-    title_by_employee = {e.employee_id: (e.job_title or "") for e in dataset.employments}
-    code_by_id = {p.pay_code_id: p.pay_code for p in dataset.pay_codes}
+    ctx = _Context(dataset)
+    report = ctx.pay_code_report
+    if report.policy == "strict" and report.unmapped_rows:
+        from application.errors import UnmappedPayCodes
 
-    # Resolve each worksite's state through Location -> Address -> StateCountyZip.
-    # This is the same join that reaches `county_name`, which Georgia's tier — and
-    # therefore credit value — depends on.
-    address_by_id = {a.address_id: a for a in dataset.addresses}
-    scz_by_id = {s.state_county_zip_id: s for s in dataset.state_county_zips}
-
-    # Q3: GA JTC counts jobs at a worksite. `WorksiteLocationId` is nullable in
-    # the source, so fall back to `LocationId` — which is NOT NULL — rather than
-    # dropping the row. Flagged for the partner; the fallback is explicit here so
-    # the choice is visible if the answer changes it.
-    worksite_mode, pay_date_mode = mapping.worksite_mode(), mapping.null_pay_date_mode()
-    unit_of: dict[int, str] = {}
-    state_of: dict[int, str] = {}
-    county_of: dict[int, str] = {}
-
-    for loc in dataset.locations:
-        address = address_by_id.get(loc.address_id)
-        scz = scz_by_id.get(address.state_county_zip_id) if address else None
-        state = (scz.state_abbr if scz else None) or (address.state_original if address else "") or ""
-        state = state.upper()
-
-        # Prefer the client's own identifier where present: it is what appears on
-        # their reports, and what a reconciliation against them has to match.
-        raw_unit = loc.client_location_id or str(loc.location_id)
-
-        # The pipeline filters per state by worksite prefix
-        # (`_payperiods.iter_state_packs` matches `f"{state}_"`), so the unit id
-        # carries its state the same way `fabric_source.map_fabric_employees_row`
-        # does for the demo table. Without this every state filter returns empty
-        # and the calculation silently produces nothing.
-        unit_of[loc.location_id] = (
-            raw_unit if not state or raw_unit.startswith(f"{state}_") else f"{state}_{raw_unit}"
-        )
-        state_of[loc.location_id] = state
-        county_of[loc.location_id] = scz.county_name if scz else ""
-
+        raise UnmappedPayCodes(report.unmapped_codes, report.unmapped_rows)
     rows: list[dict[str, Any]] = []
     for p in dataset.payroll:
-        paid = transforms.effective_pay_date(pay_date_mode, p.pay_date, p.pay_period_end)
-        if paid is None and p.pay_period_end is not None and p.pay_period_start is not None:
-            continue  # `null_pay_date=exclude`: counted in `projection_controls`, never silent
         if p.pay_period_start is None or p.pay_period_end is None:
-            # A period with no span cannot contribute a denominator. Surfacing
-            # it as an exception is Silver's job; dropping it silently is not,
-            # so this is counted by `projection_controls`.
-            continue
+            continue  # no span means no denominator; counted by `projection_controls`, never silent
+        paid = transforms.effective_pay_date(ctx.pay_date_mode, p.pay_date, p.pay_period_end)
+        if paid is None:
+            continue  # `null_pay_date=exclude`: counted in `projection_controls`
+        rows.append(_bcs_row(p, paid, ctx))
+    _log_findings(dataset, rows, ctx)
+    return rows
 
-        location_id = transforms.worksite_id(worksite_mode, p.worksite_location_id, p.location_id)
-        pay_date = paid
 
-        rows.append({
-            # BA-02 trims on paycheck date; tax year is derived downstream from
-            # the fiscal window, never assumed to be the calendar year.
-            "Tax_Year": pay_date.year if pay_date else p.pay_period_end.year,
-            "Employee_ID": str(p.employee_id),
-            "Job_Title": title_by_employee.get(p.employee_id, ""),
-            "Worksite_ID": unit_of.get(location_id, str(location_id)),
-            "Work_State": state_of.get(location_id, ""),
-            # County reaches the row so credit-value work does not need to
-            # re-walk the dimension join.
-            "Work_County": county_of.get(location_id, ""),
-            "Entity_FEIN": fein_by_entity.get(p.entity_id, ""),
-            "Pay_Period_Start": p.pay_period_start.isoformat(),
-            "Pay_Period_End": p.pay_period_end.isoformat(),
-            # Q1: nullable in source. The `null_pay_date` transform decides (period end stands in, or the
-            # row is excluded above); an imputed date is flagged on the row and counted in the controls.
-            "Pay_Date": pay_date.isoformat(),
-            "_Pay_Date_Imputed": p.pay_date is None,
-            "Pay_Frequency": str(p.pay_frequency_id) if p.pay_frequency_id else _UNKNOWN_FREQUENCY,
-            # BA-07: the canonical category the rule pack names, not the raw
-            # client code — see `canonical_pay_code`. The source code is kept as
-            # lineage so a reconciliation against the client's own report can
-            # still be done.
-            "Pay_Code": canonical_pay_code(code_by_id.get(p.pay_code_id)),
-            "_Source_Pay_Code": code_by_id.get(p.pay_code_id, ""),
-            # Q2: NULL and 0 are not the same thing. Until the partner confirms,
-            # NULL coerces to 0.0 so BA-05 keeps the row — a zero-hour wage row
-            # is a real payroll fact — but the count is reported separately.
-            "Hours_Worked": float(p.hours) if p.hours is not None else 0.0,
-            "Gross_Wages": float(p.wages) if p.wages is not None else 0.0,
-            # Lineage back to the source row, for the audit trail.
-            "_Source_Payroll_Id": p.payroll_id,
-            "_Source_Account_Id": p.account_id,
-        })
-
+def _log_findings(dataset: SourceDataset, rows: list[dict[str, Any]], ctx: _Context) -> None:
+    """Say, once per account load, what the projection had to assume."""
+    account = dataset.account.account_id
     imputed = sum(1 for r in rows if r["_Pay_Date_Imputed"])
     if imputed or len(rows) < len(dataset.payroll):
         log.warning(
             "account %s: %d payroll row(s) have no paycheck date; null_pay_date=%s (%s). Counted in the projection controls.",
-            dataset.account.account_id, sum(1 for p in dataset.payroll if p.pay_date is None), pay_date_mode,
-            f"{imputed} used the period end" if pay_date_mode == "period_end" else "left out",
+            account, sum(1 for p in dataset.payroll if p.pay_date is None), ctx.pay_date_mode,
+            f"{imputed} used the period end" if ctx.pay_date_mode == "period_end" else "left out",
         )
-    return rows
+    report = ctx.pay_code_report
+    if report.unmapped_codes or report.inferred_codes:
+        log.warning(
+            "account %s: pay codes - %d unmapped (%d row(s): %s), %d resolved by an inferred seed; policy=%s. "
+            "An unmapped code is dropped by the state's whitelist.",
+            account, len(report.unmapped_codes), report.unmapped_rows, ", ".join(report.unmapped_codes[:10]) or "-",
+            report.inferred_codes, report.policy,
+        )
 
 
 def projection_controls(dataset: SourceDataset, rows: list[dict[str, Any]]) -> dict[str, Any]:
     """Row-level controls for the projection.
 
-    Every drop and every coercion is counted. A Silver layer that loses rows
-    without saying so is how a wrong number reaches a filed return.
+    Every drop, coercion and assumption is counted. A Silver layer that loses rows without saying so is how a wrong
+    number reaches a filed return.
     """
-    null_pay_date = sum(1 for p in dataset.payroll if p.pay_date is None)
-    null_hours = sum(1 for p in dataset.payroll if p.hours is None)
-    null_wages = sum(1 for p in dataset.payroll if p.wages is None)
-    no_span = sum(
-        1 for p in dataset.payroll
-        if p.pay_period_start is None or p.pay_period_end is None
-    )
-    missing_worksite = sum(1 for p in dataset.payroll if p.worksite_location_id is None)
-    no_span_null = sum(1 for p in dataset.payroll if p.pay_date is None and (p.pay_period_start is None or p.pay_period_end is None))
+    payroll = dataset.payroll
+    null_pay_date = sum(1 for p in payroll if p.pay_date is None)
+    no_span = sum(1 for p in payroll if p.pay_period_start is None or p.pay_period_end is None)
+    no_span_null = sum(1 for p in payroll if p.pay_date is None and (p.pay_period_start is None or p.pay_period_end is None))
+    imputed = sum(1 for r in rows if r["_Pay_Date_Imputed"])
+    from data.lookups import resolve_pay_codes
 
     return {
         "account_id": dataset.account.account_id,
         "account_name": dataset.account.name,
-        "payroll_rows_in": len(dataset.payroll),
+        "payroll_rows_in": len(payroll),
         "bcs_rows_out": len(rows),
         "dropped_no_period_span": no_span,
         "null_pay_date": null_pay_date,              # Q1
         "null_pay_date_policy": mapping.null_pay_date_mode(),
-        "null_pay_date_imputed": sum(1 for r in rows if r["_Pay_Date_Imputed"]),
-        "null_pay_date_excluded": null_pay_date - sum(1 for r in rows if r["_Pay_Date_Imputed"]) - no_span_null,
-        "null_hours_coerced_to_zero": null_hours,    # Q2
-        "null_wages_coerced_to_zero": null_wages,    # Q2
-        "worksite_fell_back_to_location": missing_worksite,  # Q3
+        "null_pay_date_imputed": imputed,
+        "null_pay_date_excluded": null_pay_date - imputed - no_span_null,
+        "null_hours_coerced_to_zero": sum(1 for p in payroll if p.hours is None),    # Q2
+        "null_wages_coerced_to_zero": sum(1 for p in payroll if p.wages is None),    # Q2
+        "worksite_fell_back_to_location": sum(1 for p in payroll if p.worksite_location_id is None),  # Q3
+        "pay_codes": resolve_pay_codes(dataset)[1].as_dict(),
+        "rows_with_no_county": sum(1 for r in rows if not r["Work_County"]),
         "distinct_employees": len({r["Employee_ID"] for r in rows}),
         "distinct_worksites": len({r["Worksite_ID"] for r in rows}),
         "distinct_feins": len({r["Entity_FEIN"] for r in rows}),

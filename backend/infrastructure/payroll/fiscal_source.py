@@ -96,6 +96,27 @@ def _rules_from_lakehouse(account_id: int) -> list | None:
         return None
 
 
+def _rules_with_overrides(account_id: int) -> list | None:
+    """The client's fiscal rules in provider order: source, then app-owned override; None when neither has one.
+
+    Under the `strict` policy a client with no rule from any provider raises `FiscalRulesMissing` instead of
+    quietly getting a calendar year. Under `assume` (the default) None becomes a window flagged `assumed`.
+    """
+    rules = _fiscal_rules(account_id)
+    if rules:
+        return rules
+    from data.lookups import fiscal_override_rules, fiscal_rules_policy
+
+    overridden = fiscal_override_rules(account_id)
+    if overridden:
+        return overridden
+    if fiscal_rules_policy() == "strict":
+        from application.errors import FiscalRulesMissing
+
+        raise FiscalRulesMissing(account_id)
+    return rules
+
+
 def client_fiscal_window(
     account_id: int | None,
     tax_year: int,
@@ -120,69 +141,64 @@ def client_fiscal_window(
     if active_data_source() != "lakehouse":
         return assumed_calendar_window(tax_year, convention)
 
-    rules = _fiscal_rules(account_id)
+    rules = _rules_with_overrides(account_id)
     if rules is None:
         return assumed_calendar_window(tax_year, convention)
 
     for rule in rules:
-        begin = _as_date(rule.fiscal_year_begin)
-        end = _as_date(rule.fiscal_year_end)
-        if not begin or not end or end < begin:
-            continue
-
-        shift = tax_year - (begin.year if convention == "begins" else end.year)
-        try:
-            shifted_begin = begin.replace(year=begin.year + shift)
-            shifted_end = end.replace(year=end.year + shift)
-        except ValueError:  # 29 Feb into a common year
-            continue
-
-        return window_from_client_rules(
-            shifted_begin,
-            shifted_end,
-            convention,
-            note=(
-                f"From EntityFiscalYearRules for account {account_id}"
-                + (f" ({rule.rule_expression})" if rule.rule_expression else "")
-                + (
-                    f", shifted {shift:+d} year(s) from the stored base window "
-                    f"{begin.isoformat()}..{end.isoformat()}."
-                    if shift
-                    else "."
-                )
-            ),
-        )
+        window = _window_from_rule(rule, account_id, tax_year, convention)
+        if window is not None:
+            return window
 
     return assumed_calendar_window(tax_year, convention)
 
 
-def window_for_state_year(
-    account_id: int | None, state: str, tax_year: int
-) -> tuple[date, date] | None:
-    """The client's fiscal window for a state-year, as plain dates.
+def _rule_note(rule: Any, account_id: int, begin: date, end: date, shift: int) -> str:
+    """Where the window came from, so a reader can tell the client's own rule from an app-owned override."""
+    origin = "an app-owned override" if str(rule.name).startswith("override:") else "EntityFiscalYearRules"
+    text = f"From {origin} for account {account_id}" + (f" ({rule.rule_expression})" if rule.rule_expression else "")
+    if not shift:
+        return text + "."
+    return f"{text}, shifted {shift:+d} year(s) from the stored base window {begin.isoformat()}..{end.isoformat()}."
 
-    One resolver for every caller that measures Average Headcount. The
-    assessment and the two what-if simulators each took their own view of "the
-    twelve months", and the last time they disagreed Position quoted $0 for a
-    client-year while Plan quoted $252,280.
 
-    Returns None only when the state has no programme to take a convention
-    from — `client_fiscal_window` already falls back to an assumed calendar
-    window, which is what every caller did before this existed.
+def _window_from_rule(rule: Any, account_id: int, tax_year: int, convention: TaxYearLabel) -> FiscalWindow | None:
+    """The rule's window shifted onto `tax_year`, or None when it cannot represent that year."""
+    begin, end = _as_date(rule.fiscal_year_begin), _as_date(rule.fiscal_year_end)
+    if not begin or not end or end < begin:
+        return None
+    shift = tax_year - (begin.year if convention == "begins" else end.year)
+    try:
+        shifted_begin, shifted_end = begin.replace(year=begin.year + shift), end.replace(year=end.year + shift)
+    except ValueError:  # 29 Feb into a common year
+        return None
+    return window_from_client_rules(shifted_begin, shifted_end, convention, note=_rule_note(rule, account_id, begin, end, shift))
+
+
+def fiscal_window_for_state_year(account_id: int | None, state: str, tax_year: int) -> FiscalWindow | None:
+    """The client's fiscal window for a state-year, WITH its provenance (`basis`, `assumed`, `note`).
+
+    One resolver for every caller that measures Average Headcount. The assessment and the two what-if simulators each
+    took their own view of "the twelve months", and the last time they disagreed Position quoted $0 for a
+    client-year while Plan quoted $252,280. It used to hand back bare dates and swallow every exception, so the
+    `assumed` flag never reached the claim: a calendar year assumed for a non-calendar filer looked identical to the
+    client's own. Only a state with no programme to take a convention from gives None; a typed dependency failure
+    (`strict` policy, an unavailable lookup) propagates.
     """
-    from tools.credit_math import (
-        PROGRAM_CODE_TO_PACK, STATE_TO_PACK, resolve_tax_year_convention,
-    )
+    from tools.credit_math import PROGRAM_CODE_TO_PACK, STATE_TO_PACK, resolve_tax_year_convention
 
     pack_file = STATE_TO_PACK.get((state or "").upper())
-    if not pack_file:
-        return None
-    code = next((c for c, f in PROGRAM_CODE_TO_PACK.items() if f == pack_file), None)
+    code = next((c for c, f in PROGRAM_CODE_TO_PACK.items() if f == pack_file), None) if pack_file else None
     if not code:
         return None
     try:
         convention = resolve_tax_year_convention(code, tax_year)
-        window = client_fiscal_window(account_id, tax_year, convention["label"])
-    except Exception:  # noqa: BLE001 - an unresolvable window is not a failed assessment
+    except (FileNotFoundError, ValueError, KeyError):  # a year with no authored statute has no window
         return None
+    return client_fiscal_window(account_id, tax_year, convention["label"])
+
+
+def window_for_state_year(account_id: int | None, state: str, tax_year: int) -> tuple[date, date] | None:
+    """`fiscal_window_for_state_year` as plain dates, for callers that only measure; None as there."""
+    window = fiscal_window_for_state_year(account_id, state, tax_year)
     return (window.begin, window.end) if window else None

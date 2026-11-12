@@ -1,0 +1,15 @@
+{
+  "lookup": "industry_type",
+  "version": 1,
+  "authored_by": "engineering (moved out of data/source/industry.py)",
+  "authored_on": "2026-08-25",
+  "basis": "Display only. The id is documented as a two-digit NAICS sector; that is an assumption until the data owner confirms it. An id not listed here shows no name.",
+  "inferred": true,
+  "entries": {
+    "31": "Manufacturing",
+    "44": "Retail",
+    "48": "Transportation & warehousing",
+    "62": "Health care",
+    "72": "Food service"
+  }
+}

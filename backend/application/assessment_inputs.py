@@ -10,7 +10,7 @@ from __future__ import annotations
 from datetime import date
 from typing import Any
 
-from application.source_ports import window_for_state_year
+from application.source_ports import fiscal_window_for_state_year, window_for_state_year
 from domain.calculation.headcount import average_headcount as _average_headcount
 from domain.calculation.headcount import rows_for_state_year as _rows_for_state_year
 
@@ -76,3 +76,8 @@ def client_window(client_id: int, state: str, tax_year: int) -> tuple[date, date
     scored zero.
     """
     return window_for_state_year(client_id, state, tax_year)
+
+
+def client_window_resolution(client_id: int, state: str, tax_year: int) -> Any:
+    """`client_window` with its provenance: the `FiscalWindow` (`.begin`, `.end`, `.assumed`, `.note`), or None."""
+    return fiscal_window_for_state_year(client_id, state, tax_year)

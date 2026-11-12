@@ -47,7 +47,17 @@ def main(argv: list[str] | None = None) -> int:
     except Exception as exc:  # noqa: BLE001 - the operator needs the reason, not a trace
         print(f"cannot check the source schema: {type(exc).__name__}: {exc}", file=sys.stderr)
         return 2
-    print(json.dumps(report.summary(), indent=2) if args.json else validate.render(report))
+    from data.lookups import lookup_status
+
+    present = {"entity_fiscal_year_rules": any(t.logical == "EntityFiscalYearRules" and t.present for t in report.tables)}
+    lookups = lookup_status(present)
+    if args.json:
+        print(json.dumps({**report.summary(), "lookups": lookups}, indent=2))
+    else:
+        print(validate.render(report))
+        print("\napp-owned lookups:")
+        for row in lookups:
+            print(f"  {row['lookup']:<26} {row['status']:<28} {row['affects']}" + (f"  IF MISSING: {row['if_missing']}" if row.get('if_missing') else ""))
     return 1 if report.errors else 0
 
 
