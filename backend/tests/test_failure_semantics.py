@@ -168,7 +168,7 @@ class _FakeSql:
     def is_configured(self):
         return True
 
-    def footprint(self):
+    def footprint(self, **_guard):
         self.calls += 1
         raise OSError("timed out")
 

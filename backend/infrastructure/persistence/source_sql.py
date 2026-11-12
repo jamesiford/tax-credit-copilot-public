@@ -157,10 +157,13 @@ class SourceSqlReader:
     def scope(self):
         return self._connection.scope()
 
-    def _query(self, sql: str, params: list[Any]) -> list[tuple]:
+    def _query(self, sql: str, params: list[Any], timeout: int | None = None) -> list[tuple]:
+        """Run one statement. `timeout` is the ODBC statement timeout: the driver cancels it on the server."""
         with self._connection.connect() as live:
             cursor = live.cursor()
             try:
+                if timeout:
+                    cursor.timeout = int(timeout)
                 cursor.execute(sql, params)
                 return cursor.fetchall()
             finally:
@@ -225,41 +228,14 @@ class SourceSqlReader:
             pay_dates=sorted({str(r[2])[:10] for r in rows if r[2]}),
         )
 
-    def footprint(self) -> dict[int, list[str]]:
-        """Which states each client holds payroll in — every client, one query.
+    def footprint(self, *, mode: str = "on", max_rows: int = 0, timeout_seconds: int = 0) -> dict[int, list[str]]:
+        """Which states each client holds payroll in: every client, one query, cached for the process.
 
-        The book needs this per row, and asking `payroll_scope` per client would
-        be one scan per client on an endpoint that already answers in one. It is
-        cached for the process like the account list, because a payroll
-        footprint does not move between requests.
+        The guard (`footprint_guard`) decides whether the scan may run at all; with the defaults it always does.
         """
-        cached = _FOOTPRINT_CACHE.get(self.lakehouse)
-        if cached is not None:
-            return cached
+        from infrastructure.persistence.footprint_guard import read_footprint
 
-        payroll, location, address, zips = (self._table(t) for t in ("Payroll", "Location", "Address", "StateCountyZip"))
-        rows = self._query(
-            f"""
-            SELECT p.AccountId AS account_id, {_STATE} AS work_state
-            FROM {payroll} p
-            LEFT JOIN {location} l ON l.LocationId = {_LOCATION}
-            LEFT JOIN {address} a ON a.AddressId = l.AddressId
-            LEFT JOIN {zips} s
-                   ON s.StateCountyZipId = a.StateCountyZipId
-            WHERE {_HAS_SPAN}
-            GROUP BY p.AccountId, {_STATE}
-            """,
-            [],
-        )
-        out: dict[int, list[str]] = {}
-        for account_id, state in rows:
-            if account_id is None or not state:
-                continue
-            out.setdefault(int(account_id), []).append(str(state))
-        for key in out:
-            out[key] = sorted(set(out[key]))
-        _FOOTPRINT_CACHE[self.lakehouse] = out
-        return out
+        return read_footprint(self, mode=mode, max_rows=max_rows, timeout_seconds=timeout_seconds)
 
     def fiscal_year_rules(self, account_id: int) -> list[Any]:
         """The client's `EntityFiscalYearRules`, reached through `Entity`.

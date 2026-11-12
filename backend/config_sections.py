@@ -97,6 +97,15 @@ class DataSourceSettings:
 
 
 @dataclass(frozen=True)
+class PortfolioSettings:
+    """How the portfolio page's footprint read is guarded (a scan of every client's payroll)."""
+
+    footprint_mode: str
+    footprint_max_rows: int
+    footprint_timeout_seconds: int
+
+
+@dataclass(frozen=True)
 class WarehouseSettings:
     """The Fabric Warehouse and the lakehouse SQL endpoint. Empty string means unset."""
 
@@ -189,6 +198,22 @@ def parse_data_source(environ: Mapping[str, str]) -> DataSourceSettings:
         table_case=_choice(environ, "SOURCE_TABLE_CASE", ("as_is", "lower", "upper"), "as_is"),
         table_map=_table_map(environ),
         source_fallback=_choice(environ, "SOURCE_FALLBACK", ("", "none", "delta"), "").replace("none", ""),
+    )
+
+
+def _positive_int(environ: Mapping[str, str], name: str, default: int) -> int:
+    value = int((environ.get(name) or "").strip() or default)
+    if value <= 0:
+        raise ValueError(f"{name}={value} must be a positive whole number")
+    return value
+
+
+def parse_portfolio(environ: Mapping[str, str]) -> PortfolioSettings:
+    """`PORTFOLIO_FOOTPRINT_MODE` (auto, on, off), `_MAX_ROWS` (default 50 million) and `_TIMEOUT_SECONDS` (default 20)."""
+    return PortfolioSettings(
+        footprint_mode=_choice(environ, "PORTFOLIO_FOOTPRINT_MODE", ("auto", "on", "off"), "auto"),
+        footprint_max_rows=_positive_int(environ, "PORTFOLIO_FOOTPRINT_MAX_ROWS", 50_000_000),
+        footprint_timeout_seconds=_positive_int(environ, "PORTFOLIO_FOOTPRINT_TIMEOUT_SECONDS", 20),
     )
 
 
