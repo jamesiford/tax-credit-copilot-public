@@ -22,8 +22,7 @@ from typing import Any
 
 #: A name becomes a path segment and a bracket-quoted SQL identifier; nothing else gets through.
 IDENTIFIER = re.compile(r"^[A-Za-z0-9_][A-Za-z0-9_\-]{0,127}$")
-ARROW_TYPES = frozenset({"int64", "string", "bool", "double", "date32", "timestamp[us]", "decimal128(18, 2)"})
-#: Widening that is safe to read: a narrower physical type is read as the wider logical one.
+ARROW_TYPES = frozenset({"int64", "int32", "string", "bool", "double", "date32", "timestamp[us]", "decimal128(18, 2)"})
 VERSION = 1
 
 

@@ -70,6 +70,8 @@ otherwise. "Run by" says who invokes it: **azd** (an `azure.yaml` hook), **CI** 
 | `grant-fabric-mi-access.ps1` | Grants the API's managed identity a role on an existing Fabric workspace when Terraform does not manage access. | workspace and identity parameters | owner |
 | `run-sql.py` | Runs T-SQL against a guarded Warehouse target; `--resolve` only prints the target. | `--target`, `--file`, `--section` | owner |
 | `check-operational-store.py` | Checks the operational store (claims, engagements, findings) is usable: the server answers, `tcc_ops` and its migration table exist, every migration is applied, the identity can read and write the claim table. Prints the first problem with its remedy; changes nothing. | `WAREHOUSE_*` settings | owner, test |
+| `fabric/` | Scripts that build or load a Fabric lakehouse. `build-sample-lakehouse.py`: Builds the sample lakehouse in the source mapping's shape (any customer's, via `--mapping-file`) from the sample data or the scale generator, to a local root or (`--fabric --yes`) the configured Fabric lakehouse; reconciles rows and checksums before and after; `--dry-run` writes nothing; app-owned lookups only with `--with-lookups`. | `SOURCE_MAPPING_FILE`, `FABRIC_*` | owner, test |
+| `generate-synthetic-source.py` | Synthetic source at scale: N accounts, M payroll rows, power-law skew, deterministic by `--seed`, ids and names unlike any demo or customer account. Wraps the build script. | `--accounts`, `--rows`, `--seed`, `--root` | owner, test |
 | `lookups.py` | Authors and inspects the app-owned lookups (the override layer): `list`, `show`, `import` (with `--by`, `--basis`, `--dry-run`), `export`, `diff`, `audit`. Pay-code mappings and fiscal rules; every write is audited. Never touches the customer's lakehouse. | `LOOKUP_STORE` (`sqlite`/`warehouse`), `OPERATIONAL_DB`, `WAREHOUSE_*` | owner |
 | `validate-source-schema.py` | Compares the source mapping with the lake and prints a precise report: required fields missing (exit 1), optional or re-typed or re-cased or extra columns (warnings). `--print-effective` shows the mapping in force; `--root DIR` checks a lakehouse on local disk. Reads schemas only. | `SOURCE_MAPPING_FILE`, `FABRIC_*`, `SOURCE_*` | owner, test |
 | `check-onelake-access.py` | Checks this machine can read the lakehouse over OneLake, including a private-link workspace: prints the host, resolves DNS (flags a public address), gets a token (never shown), opens one small Delta table, and explains the usual errors. | `--table`, `--probe-layout`; `FABRIC_*`, `ONELAKE_*`, `SOURCE_*` settings | owner, test |
@@ -94,3 +96,7 @@ otherwise. "Run by" says who invokes it: **azd** (an `azure.yaml` hook), **CI** 
 
 Scripts outside this folder: `backend/tools/` is the engine's deterministic compute and a few data-maintenance
 tools (it is not renamed, see D-143); `frontend/tools/` holds the UI gates.
+
+## `fabric/` (lakehouse builders)
+
+Builds the sample lakehouse in the source mapping's shape; see the `fabric/` row above and `docs/data/SOURCE-SCHEMA-MAPPING.md` section 9.
