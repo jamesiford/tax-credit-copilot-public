@@ -20,6 +20,7 @@ an offline demo stays deterministic — the same posture as
 """
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 from datetime import date, datetime
 from decimal import Decimal
@@ -95,6 +96,17 @@ _CLASS_FOR: dict[str, Any] = {
     "Payroll": Payroll,
 }
 
+
+log = logging.getLogger(__name__)
+
+#: Tables the headcount does not need, and what their absence costs. An absent one is "no rows".
+#: `PayCode` is deliberately not here: its names decide which pay is counted.
+_OPTIONAL_TABLES = {
+    "PayFrequency": "Pay-frequency labels are unavailable; the headcount does not use them.",
+    "EntityFiscalYearRules": "Client fiscal windows fall back to a calendar year, flagged as assumed.",
+    "Employment": "Job titles are unavailable; they are display-only.",
+}
+_WARNED_MISSING: set[str] = set()
 
 # Reading a tenant means opening ten Delta tables over the network — roughly a
 # minute for the reference client. `load_pay_periods()` is called per request, so
@@ -197,6 +209,28 @@ class FabricLakehouseReader:
             ).to_pylist()
         return dt.to_pyarrow_table().to_pylist()
 
+    def _read_table(self, table: str, options: dict[str, str], account_id: int, missing: list[str]) -> list[dict[str, Any]]:
+        """`_read`, except that an optional table that is absent is "no rows", said once, and recorded.
+
+        Only a missing table is tolerated. A table that exists but cannot be read (a timeout, a 403) is an
+        outage and raises, so "could not read" and "read, found none" stay different facts.
+        """
+        if table not in _OPTIONAL_TABLES:
+            return self._read(table, options, account_id)
+        from deltalake.exceptions import TableNotFoundError
+
+        try:
+            return self._read(table, options, account_id)
+        except TableNotFoundError:
+            missing.append(table)
+            if table not in _WARNED_MISSING:
+                _WARNED_MISSING.add(table)
+                log.warning(
+                    "source table %s (%s) is absent from the lakehouse; continuing with no rows. %s",
+                    table, physical_table(table), _OPTIONAL_TABLES[table],
+                )
+            return []
+
     def list_accounts(self) -> list[dict[str, Any]]:
         """Every tenant in the lakehouse. Cheap — the Account table is tiny."""
         if not self.is_configured():
@@ -264,7 +298,8 @@ class FabricLakehouseReader:
 
         options = self._storage_options()
 
-        raw = {t: self._read(t, options, account_id) for t in TABLE_SPECS}
+        missing: list[str] = []
+        raw = {t: self._read_table(t, options, account_id, missing) for t in TABLE_SPECS}
         accounts = _rows_to(Account, raw["Account"], TABLE_SPECS["Account"][1])
         if not accounts:
             return None
@@ -301,6 +336,7 @@ class FabricLakehouseReader:
             pay_frequencies=build("PayFrequency"),
             fiscal_year_rules=fiscal_rules,
             payroll=payroll,
+            missing_tables=tuple(missing),
         )
         _DATASET_CACHE[key] = dataset
         return dataset
