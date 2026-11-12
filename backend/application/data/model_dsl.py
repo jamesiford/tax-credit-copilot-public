@@ -43,17 +43,32 @@ def default_ops(role: Role, type_: ColType, free_text: bool) -> frozenset[Op]:
 
 
 class Cols:
-    """Builds `Column`s with the shared defaults; `pascal_physical` is for the lakehouse."""
+    """Builds `Column`s with the shared defaults.
 
-    def __init__(self, *, pascal_physical: bool = False) -> None:
+    `source_table` names a logical source table: every column's physical name then comes from the source mapping
+    (`data/source/mapping`), so a renamed column changes a file, not this model. `pascal_physical` is the older
+    convention, kept for models that describe their own tables.
+    """
+
+    def __init__(self, *, pascal_physical: bool = False, source_table: str | None = None) -> None:
         self._pascal = pascal_physical
+        self._source_table = source_table
+
+    def _physical(self, logical: str, physical: str | None) -> str:
+        if physical:
+            return physical
+        if self._source_table:
+            from application.data import source_names
+
+            return source_names.column(self._source_table, logical)
+        return pascal(logical) if self._pascal else logical
 
     def _make(self, logical, type_, description, role, emp, physical, **extra) -> Column:
         sens = Sensitivity.EMPLOYEE_LEVEL if emp else Sensitivity.PUBLIC_AGGREGATE
         free_text = extra.pop("free_text", False)
         aggs = extra.pop("aggs", None)
         ops = extra.pop("ops", None)
-        name = physical or (pascal(logical) if self._pascal else logical)
+        name = self._physical(logical, physical)
         return Column(
             logical=logical, physical=name, type=ColType(type_), description=description,
             role=role, sensitivity=sens, free_text=free_text,
@@ -80,7 +95,7 @@ class Cols:
 
     def blocked(self, logical, type_, description, *, physical=None) -> Column:
         """A column that exists in the table and must never be queried."""
-        name = physical or (pascal(logical) if self._pascal else logical)
+        name = self._physical(logical, physical)
         return Column(
             logical=logical, physical=name, type=ColType(type_), description=description,
             role=Role.IDENTIFIER, sensitivity=Sensitivity.BLOCKED,

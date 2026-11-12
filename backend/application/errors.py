@@ -53,6 +53,21 @@ class SourceNotConfigured(DependencyUnavailable):
         self.missing = missing
 
 
+class SourceSchemaMismatch(DependencyUnavailable):
+    """A lake table lacks columns the mapping marks required, so the engine cannot read it faithfully."""
+
+    def __init__(self, table: str, physical: str, missing: tuple[str, ...]) -> None:
+        names = ", ".join(missing)
+        super().__init__(
+            "source_lakehouse",
+            f"table {physical} (logical {table}) has no column for required field(s): {names}.",
+            "Run `python scripts/validate-source-schema.py` for the full report, then correct the column names "
+            "in the source mapping (SOURCE_MAPPING_FILE). A field the engine needs but the lake does not hold needs code.",
+            impact=f"{table} cannot be read, so no payroll can be projected",
+        )
+        self.table, self.missing = table, missing
+
+
 class ReferenceNotConfigured(DependencyUnavailable):
     """The certified reference run was asked for, and no deployment account is named as its subject."""
 

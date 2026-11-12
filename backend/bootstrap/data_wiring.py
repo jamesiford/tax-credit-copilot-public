@@ -29,6 +29,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Any
 
+from application.data import source_names
 from application.data.dialect import SchemaNames
 from application.data.limits import (
     DEFAULT_MAX_CONCURRENCY, DEFAULT_RATE_PER_MINUTE, DEFAULT_TIMEOUT_S, QueryLimits,
@@ -128,3 +129,38 @@ def set_data_query_service(service: DataQueryService | None) -> None:
 
 
 bind(__name__, data_query_service="get_data_query_service")
+
+
+class MappingSourceNames:
+    """The lakehouse datasets' names, from the source mapping in force (`data.source.mapping`)."""
+
+    def physical_table(self, logical: str) -> str:
+        from data.source import mapping
+
+        return mapping.physical_table(logical)
+
+    def column(self, logical_table: str, field: str) -> str:
+        from data.source import mapping
+
+        return mapping.column(logical_table, field)
+
+    def tenant_column(self, logical_table: str) -> str:
+        from data.source import mapping
+
+        column = mapping.tenant_column(logical_table)
+        if column is None:
+            raise ValueError(f"{logical_table} has no tenant column in the source mapping")
+        return column
+
+    def null_pay_date_mode(self) -> str:
+        from data.source import mapping
+
+        return mapping.null_pay_date_mode()
+
+
+def install_source_names() -> None:
+    """Bind the mapping to the data-query model. Idempotent; every process that builds the model calls it."""
+    source_names.install(MappingSourceNames())
+
+
+install_source_names()

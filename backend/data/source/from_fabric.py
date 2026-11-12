@@ -23,7 +23,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 from datetime import date, datetime
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from typing import Any
 
 from config import SOURCE_SCHEMA, get_settings
@@ -41,18 +41,11 @@ from .schema import (
     Payroll,
     StateCountyZip,
 )
+from .book_keys import book_entry
+from .mapping import mapping, optional_tables, table_map
+from .mapping.columns import resolve_for
 from .onelake import physical_table, storage_options, storage_token, table_uri
 from .to_delta import TABLE_SPECS
-
-
-def _snake(name: str) -> str:
-    """`PayPeriodStart` -> `pay_period_start`. Inverse of `to_delta._pascal`."""
-    out: list[str] = []
-    for i, ch in enumerate(name):
-        if ch.isupper() and i > 0:
-            out.append("_")
-        out.append(ch.lower())
-    return "".join(out)
 
 
 def _coerce(value: Any, target: str) -> Any:
@@ -67,18 +60,25 @@ def _coerce(value: Any, target: str) -> Any:
     if target == "date32":
         return value.date() if isinstance(value, datetime) else value
     if target.startswith("decimal"):
-        return value if isinstance(value, Decimal) else Decimal(str(value))
+        return value if isinstance(value, Decimal) else _decimal(value)
     return value
 
 
+def _decimal(value: Any) -> Decimal | None:
+    """A number the source stored as text (`HourlyWage` is a string in the DDL) or as a float; blank or junk is None."""
+    try:
+        return Decimal(str(value).strip().replace(",", "").lstrip("$"))
+    except (InvalidOperation, ValueError):
+        return None
+
+
 def _rows_to(cls, records: list[dict[str, Any]], spec: dict[str, str]) -> list[Any]:
-    """Rebuild dataclass instances from Delta rows."""
+    """Rebuild dataclass instances from rows keyed by LOGICAL field name (`_read` renames the columns)."""
     built = []
     for rec in records:
         kwargs = {}
         for field_name, arrow_type in spec.items():
-            pascal = "".join(p.capitalize() for p in field_name.split("_"))
-            kwargs[field_name] = _coerce(rec.get(pascal), arrow_type)
+            kwargs[field_name] = _coerce(rec.get(field_name), arrow_type)
         built.append(cls(**kwargs))
     return built
 
@@ -99,13 +99,6 @@ _CLASS_FOR: dict[str, Any] = {
 
 log = logging.getLogger(__name__)
 
-#: Tables the headcount does not need, and what their absence costs. An absent one is "no rows".
-#: `PayCode` is deliberately not here: its names decide which pay is counted.
-_OPTIONAL_TABLES = {
-    "PayFrequency": "Pay-frequency labels are unavailable; the headcount does not use them.",
-    "EntityFiscalYearRules": "Client fiscal windows fall back to a calendar year, flagged as assumed.",
-    "Employment": "Job titles are unavailable; they are display-only.",
-}
 _WARNED_MISSING: set[str] = set()
 
 # Reading a tenant means opening ten Delta tables over the network — roughly a
@@ -120,6 +113,7 @@ _DATASET_CACHE: dict[tuple[str, str, str, int], SourceDataset] = {}
 _ACCOUNTS_CACHE: dict[tuple[str, str, str], list[dict[str, Any]]] = {}
 _LINEAGE_CACHE: dict[tuple[str, str, str, str], dict[str, Any]] = {}
 _ROW_ESTIMATE_CACHE: dict[tuple[str, str, str, str], int | None] = {}
+_COLUMN_CACHE: dict[str, dict[str, str]] = {}
 
 # The credential is shared by the whole process (`infrastructure/azure_credential.py`),
 # and so is the token it mints: `DefaultAzureCredential` caches nothing for the CLI
@@ -157,6 +151,7 @@ def clear_cache() -> None:
     _ACCOUNTS_CACHE.clear()
     _LINEAGE_CACHE.clear()
     _ROW_ESTIMATE_CACHE.clear()
+    _COLUMN_CACHE.clear()
 
 
 @dataclass
@@ -195,21 +190,36 @@ class FabricLakehouseReader:
         return storage_options(_storage_token(), _TRANSPORT_OPTIONS)
 
     def _read(self, table: str, options: dict[str, str], account_id: int | None) -> list[dict[str, Any]]:
+        """One table as rows keyed by logical field, reading only the mapped columns that exist.
+
+        The actual column spellings come from the table's own schema (cached per table), so a
+        casing difference (`Accountid`) does not break the tenant filter or the projection.
+        """
         from deltalake import DeltaTable
 
-        uri = table_uri(
-            table, workspace=self.workspace, lakehouse=self.lakehouse, schema=self.schema
-        )
+        uri = table_uri(table, workspace=self.workspace, lakehouse=self.lakehouse, schema=self.schema)
         dt = DeltaTable(uri, storage_options=options)
+        found = self._columns_of(table, uri, [f.name for f in dt.schema().fields])
+        tenant = table_map(table).tenant_field
+        filters = [(found[tenant], "=", account_id)] if account_id is not None and tenant in found else None
+        arrow = dt.to_pyarrow_table(columns=list(found.values()), filters=filters)
+        inverse = {actual: name for name, actual in found.items()}
+        return arrow.rename_columns([inverse[c] for c in arrow.column_names]).to_pylist()
 
-        # Push the tenant filter down. On Payroll this prunes partitions; on the
-        # dimensions it is a cheap column filter.
-        spec = TABLE_SPECS[table][1]
-        if account_id is not None and "account_id" in spec:
-            return dt.to_pyarrow_table(
-                filters=[("AccountId", "=", account_id)]
-            ).to_pylist()
-        return dt.to_pyarrow_table().to_pylist()
+    def _columns_of(self, table: str, uri: str, actual: list[str]) -> dict[str, str]:
+        """logical field -> actual column for this table, resolved once and cached; a missing required field raises."""
+        cached = _COLUMN_CACHE.get(uri)
+        if cached is None:
+            resolution = resolve_for(mapping(), table, actual)
+            if not resolution.ok:
+                from application.errors import SourceSchemaMismatch
+
+                raise SourceSchemaMismatch(table, physical_table(table), resolution.missing_required)
+            if resolution.missing_optional:
+                log.warning("source table %s has no column for optional field(s) %s; they read as empty",
+                            table, ", ".join(resolution.missing_optional))
+            cached = _COLUMN_CACHE[uri] = resolution.found
+        return cached
 
     def _read_table(self, table: str, options: dict[str, str], account_id: int, missing: list[str]) -> list[dict[str, Any]]:
         """`_read`, except that an optional table that is absent is "no rows", said once, and recorded.
@@ -217,7 +227,8 @@ class FabricLakehouseReader:
         Only a missing table is tolerated. A table that exists but cannot be read (a timeout, a 403) is an
         outage and raises, so "could not read" and "read, found none" stay different facts.
         """
-        if table not in _OPTIONAL_TABLES:
+        reasons = optional_tables()
+        if table not in reasons:
             return self._read(table, options, account_id)
         from deltalake.exceptions import TableNotFoundError
 
@@ -229,9 +240,24 @@ class FabricLakehouseReader:
                 _WARNED_MISSING.add(table)
                 log.warning(
                     "source table %s (%s) is absent from the lakehouse; continuing with no rows. %s",
-                    table, physical_table(table), _OPTIONAL_TABLES[table],
+                    table, physical_table(table), reasons[table],
                 )
             return []
+
+    def actual_schemas(self) -> dict[str, dict[str, str] | None]:
+        """logical table -> {column: Delta type} for every mapped table, or None where the table is absent. No data is read."""
+        from deltalake import DeltaTable
+        from deltalake.exceptions import TableNotFoundError
+
+        options, out = self._storage_options(), {}
+        for table in TABLE_SPECS:
+            uri = table_uri(table, workspace=self.workspace, lakehouse=self.lakehouse, schema=self.schema)
+            try:
+                fields = DeltaTable(uri, storage_options=options).schema().fields
+                out[table] = {f.name: str(getattr(f.type, "type", f.type)) for f in fields}
+            except TableNotFoundError:
+                out[table] = None
+        return out
 
     def fiscal_year_rules(self, account_id: int) -> list[EntityFiscalYearRules]:
         """One client's fiscal rules from two small tables, never from payroll.
@@ -258,7 +284,7 @@ class FabricLakehouseReader:
         key = (self.workspace, self.lakehouse, self.schema)
         if key not in _ACCOUNTS_CACHE:
             options = self._storage_options()
-            _ACCOUNTS_CACHE[key] = self._read("Account", options, None)
+            _ACCOUNTS_CACHE[key] = [book_entry(r) for r in self._read("Account", options, None)]
         return _ACCOUNTS_CACHE[key]
 
     def table_lineage(self, table: str) -> dict[str, Any] | None:

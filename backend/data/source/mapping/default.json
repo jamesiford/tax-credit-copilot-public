@@ -1,0 +1,554 @@
+{
+  "version": 1,
+  "description": "Default source mapping: the logical entities the engine reads, and where each one physically lives.",
+  "case_insensitive_columns": true,
+  "naming": {
+    "table_prefix": "",
+    "table_case": "as_is"
+  },
+  "transforms": {
+    "worksite_location": "worksite_then_location",
+    "null_pay_date": "period_end"
+  },
+  "tables": {
+    "Account": {
+      "dataset_attr": "account",
+      "table": "Account",
+      "tenant_field": "account_id",
+      "fields": {
+        "account_id": {
+          "column": "AccountId",
+          "type": "int64"
+        },
+        "account_eid": {
+          "column": "AccountEid",
+          "type": "int64",
+          "required": false
+        },
+        "name": {
+          "column": "Name",
+          "type": "string"
+        },
+        "billing_state": {
+          "column": "BillingState",
+          "type": "string",
+          "required": false
+        },
+        "billing_city": {
+          "column": "BillingCity",
+          "type": "string",
+          "required": false
+        },
+        "billing_postal_code": {
+          "column": "BillingPostalCode",
+          "type": "string",
+          "required": false
+        },
+        "industry_type_id": {
+          "column": "IndustryTypeId",
+          "type": "int64",
+          "required": false
+        },
+        "account_status_id": {
+          "column": "AccountStatusId",
+          "type": "int64",
+          "required": false
+        },
+        "account_type_id": {
+          "column": "AccountTypeId",
+          "type": "int64",
+          "required": false
+        },
+        "actual_number_of_employees": {
+          "column": "ActualNumberOfEmployees",
+          "type": "int64",
+          "required": false
+        },
+        "external_name": {
+          "column": "ExternalName",
+          "type": "string",
+          "required": false
+        },
+        "create_date": {
+          "column": "CreateDate",
+          "type": "timestamp[us]",
+          "required": false
+        }
+      }
+    },
+    "StateCountyZip": {
+      "dataset_attr": "state_county_zips",
+      "table": "StateCountyZip",
+      "fields": {
+        "state_county_zip_id": {
+          "column": "StateCountyZipId",
+          "type": "int64"
+        },
+        "state_abbr": {
+          "column": "StateAbbr",
+          "type": "string"
+        },
+        "state_name": {
+          "column": "StateName",
+          "type": "string",
+          "required": false
+        },
+        "county_name": {
+          "column": "CountyName",
+          "type": "string"
+        },
+        "zip_code": {
+          "column": "ZipCode",
+          "type": "string",
+          "required": false
+        }
+      }
+    },
+    "Address": {
+      "dataset_attr": "addresses",
+      "table": "Address",
+      "fields": {
+        "address_id": {
+          "column": "AddressId",
+          "type": "int64"
+        },
+        "street_address_1": {
+          "column": "StreetAddress1",
+          "type": "string",
+          "required": false
+        },
+        "city_name": {
+          "column": "CityName",
+          "type": "string",
+          "required": false
+        },
+        "state_county_zip_id": {
+          "column": "StateCountyZipId",
+          "type": "int64"
+        },
+        "zip_code_original": {
+          "column": "ZipCodeOriginal",
+          "type": "string",
+          "required": false
+        },
+        "state_original": {
+          "column": "StateOriginal",
+          "type": "string",
+          "required": false
+        },
+        "latitude": {
+          "column": "Latitude",
+          "type": "double",
+          "required": false
+        },
+        "longitude": {
+          "column": "Longitude",
+          "type": "double",
+          "required": false
+        }
+      }
+    },
+    "EntityFiscalYearRules": {
+      "dataset_attr": "fiscal_year_rules",
+      "table": "EntityFiscalYearRules",
+      "optional_reason": "Client fiscal windows fall back to a calendar year, flagged as assumed.",
+      "fields": {
+        "fiscal_year_rules_id": {
+          "column": "FiscalYearRulesId",
+          "type": "int64",
+          "required": false
+        },
+        "name": {
+          "column": "Name",
+          "type": "string",
+          "required": false
+        },
+        "fiscal_year_begin": {
+          "column": "FiscalYearBegin",
+          "type": "date32",
+          "required": false
+        },
+        "fiscal_year_end": {
+          "column": "FiscalYearEnd",
+          "type": "date32",
+          "required": false
+        },
+        "rule_expression": {
+          "column": "RuleExpression",
+          "type": "string",
+          "required": false
+        },
+        "inferred": {
+          "column": "Inferred",
+          "type": "bool",
+          "required": false
+        }
+      }
+    },
+    "Entity": {
+      "dataset_attr": "entities",
+      "table": "Entity",
+      "tenant_field": "account_id",
+      "fields": {
+        "entity_id": {
+          "column": "EntityId",
+          "type": "int64"
+        },
+        "account_id": {
+          "column": "AccountId",
+          "type": "int64"
+        },
+        "name": {
+          "column": "Name",
+          "type": "string",
+          "required": false
+        },
+        "federal_tax_id": {
+          "column": "FederalTaxId",
+          "type": "string"
+        },
+        "state_tax_id": {
+          "column": "StateTaxId",
+          "type": "string",
+          "required": false
+        },
+        "parent_entity_id": {
+          "column": "ParentEntityId",
+          "type": "int64",
+          "required": false
+        },
+        "entity_business_type_id": {
+          "column": "EntityBusinessTypeId",
+          "type": "int64",
+          "required": false
+        },
+        "fiscal_year_rules_id": {
+          "column": "FiscalYearRulesId",
+          "type": "int64",
+          "required": false
+        },
+        "inception_date": {
+          "column": "InceptionDate",
+          "type": "date32",
+          "required": false
+        },
+        "dissolution_date": {
+          "column": "DissolutionDate",
+          "type": "date32",
+          "required": false
+        }
+      }
+    },
+    "Location": {
+      "dataset_attr": "locations",
+      "table": "Location",
+      "tenant_field": "account_id",
+      "fields": {
+        "location_id": {
+          "column": "LocationId",
+          "type": "int64"
+        },
+        "account_id": {
+          "column": "AccountId",
+          "type": "int64"
+        },
+        "entity_id": {
+          "column": "EntityId",
+          "type": "int64",
+          "required": false
+        },
+        "location_name": {
+          "column": "LocationName",
+          "type": "string",
+          "required": false
+        },
+        "address_id": {
+          "column": "AddressId",
+          "type": "int64"
+        },
+        "client_location_id": {
+          "column": "ClientLocationId",
+          "type": "string"
+        },
+        "dba": {
+          "column": "Dba",
+          "type": "string",
+          "required": false
+        },
+        "open_date": {
+          "column": "OpenDate",
+          "type": "date32",
+          "required": false
+        },
+        "close_date": {
+          "column": "CloseDate",
+          "type": "date32",
+          "required": false
+        },
+        "location_status_id": {
+          "column": "LocationStatusId",
+          "type": "int64",
+          "required": false
+        },
+        "screening_status_id": {
+          "column": "ScreeningStatusId",
+          "type": "int64",
+          "required": false
+        }
+      }
+    },
+    "PayFrequency": {
+      "dataset_attr": "pay_frequencies",
+      "table": "PayFrequency",
+      "optional_reason": "Pay-frequency labels are unavailable; the headcount does not use them.",
+      "fields": {
+        "pay_frequency_id": {
+          "column": "PayFrequencyId",
+          "type": "int64",
+          "required": false
+        },
+        "name": {
+          "column": "Name",
+          "type": "string",
+          "required": false
+        },
+        "inferred": {
+          "column": "Inferred",
+          "type": "bool",
+          "required": false
+        }
+      }
+    },
+    "PayCode": {
+      "dataset_attr": "pay_codes",
+      "table": "PayCode",
+      "tenant_field": "account_id",
+      "fields": {
+        "pay_code_id": {
+          "column": "PayCodeId",
+          "type": "int64"
+        },
+        "account_id": {
+          "column": "AccountId",
+          "type": "int64"
+        },
+        "pay_code": {
+          "column": "PayCode",
+          "type": "string"
+        },
+        "description": {
+          "column": "Description",
+          "type": "string",
+          "required": false
+        },
+        "is_aca": {
+          "column": "IsAca",
+          "type": "bool",
+          "required": false
+        },
+        "is_futa": {
+          "column": "IsFuta",
+          "type": "bool",
+          "required": false
+        },
+        "pay_code_category_id": {
+          "column": "PayCodeCategoryId",
+          "type": "int64",
+          "required": false
+        }
+      }
+    },
+    "Employment": {
+      "dataset_attr": "employments",
+      "table": "Employment",
+      "optional_reason": "Job titles are unavailable; they are display-only.",
+      "fields": {
+        "employment_id": {
+          "column": "EmploymentId",
+          "type": "int64",
+          "required": false
+        },
+        "employee_id": {
+          "column": "EmployeeId",
+          "type": "int64",
+          "required": false
+        },
+        "hire_location_id": {
+          "column": "HireLocationId",
+          "type": "int64",
+          "required": false
+        },
+        "current_location_id": {
+          "column": "CurrentLocationId",
+          "type": "int64",
+          "required": false
+        },
+        "status": {
+          "column": "Status",
+          "type": "string",
+          "required": false
+        },
+        "job_title": {
+          "column": "JobTitle",
+          "type": "string",
+          "required": false
+        },
+        "hire_date": {
+          "column": "HireDate",
+          "type": "date32",
+          "required": false
+        },
+        "start_date": {
+          "column": "StartDate",
+          "type": "date32",
+          "required": false
+        },
+        "termination_date": {
+          "column": "TerminationDate",
+          "type": "date32",
+          "required": false
+        },
+        "termination_reason": {
+          "column": "TerminationReason",
+          "type": "string",
+          "required": false
+        },
+        "employment_type": {
+          "column": "EmploymentType",
+          "type": "string",
+          "required": false
+        },
+        "wage_type": {
+          "column": "WageType",
+          "type": "string",
+          "required": false
+        },
+        "employment_status": {
+          "column": "EmploymentStatus",
+          "type": "string",
+          "required": false
+        },
+        "department_number": {
+          "column": "DepartmentNumber",
+          "type": "string",
+          "required": false
+        },
+        "department_name": {
+          "column": "DepartmentName",
+          "type": "string",
+          "required": false
+        }
+      }
+    },
+    "Payroll": {
+      "dataset_attr": "payroll",
+      "table": "Payroll",
+      "tenant_field": "account_id",
+      "partition_by": [
+        "account_id"
+      ],
+      "fields": {
+        "payroll_id": {
+          "column": "PayrollId",
+          "type": "int64",
+          "required": false
+        },
+        "account_id": {
+          "column": "AccountId",
+          "type": "int64"
+        },
+        "employee_id": {
+          "column": "EmployeeId",
+          "type": "int64"
+        },
+        "entity_id": {
+          "column": "EntityId",
+          "type": "int64"
+        },
+        "location_id": {
+          "column": "LocationId",
+          "type": "int64"
+        },
+        "pay_frequency_id": {
+          "column": "PayFrequencyId",
+          "type": "int64",
+          "required": false
+        },
+        "pay_period_start": {
+          "column": "PayPeriodStart",
+          "type": "date32"
+        },
+        "pay_period_end": {
+          "column": "PayPeriodEnd",
+          "type": "date32"
+        },
+        "pay_date": {
+          "column": "PayDate",
+          "type": "date32"
+        },
+        "hours": {
+          "column": "Hours",
+          "type": "decimal128(18, 2)"
+        },
+        "wages": {
+          "column": "Wages",
+          "type": "decimal128(18, 2)"
+        },
+        "client_employee_id": {
+          "column": "ClientEmployeeId",
+          "type": "string",
+          "required": false
+        },
+        "hourly_rate": {
+          "column": "HourlyRate",
+          "type": "decimal128(18, 2)",
+          "required": false
+        },
+        "is_full_time": {
+          "column": "IsFullTime",
+          "type": "bool",
+          "required": false
+        },
+        "is_salaried": {
+          "column": "IsSalaried",
+          "type": "bool",
+          "required": false
+        },
+        "pay_code_id": {
+          "column": "PayCodeId",
+          "type": "int64"
+        },
+        "worksite_location_id": {
+          "column": "WorksiteLocationId",
+          "type": "int64",
+          "required": false
+        },
+        "inload_payroll_id": {
+          "column": "InloadPayrollId",
+          "type": "int64",
+          "required": false
+        },
+        "create_date": {
+          "column": "CreateDate",
+          "type": "timestamp[us]",
+          "required": false
+        },
+        "modify_date": {
+          "column": "ModifyDate",
+          "type": "timestamp[us]",
+          "required": false
+        },
+        "created_by": {
+          "column": "CreatedBy",
+          "type": "int64",
+          "required": false
+        },
+        "modified_by": {
+          "column": "ModifiedBy",
+          "type": "int64",
+          "required": false
+        }
+      }
+    }
+  }
+}

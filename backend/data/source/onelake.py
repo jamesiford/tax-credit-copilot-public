@@ -15,26 +15,21 @@ host inside the URL and honours the option (proved offline in `tests/test_onelak
 `<lakehouse>.Lakehouse`; `guid` addresses `<workspace-id>` and `<lakehouse-item-id>`, with
 `FABRIC_WORKSPACE` and `FABRIC_LAKEHOUSE` holding the ids.
 
-**Table names (interim, replaced by the mapping in prompt 06).** A logical table (`Payroll`) maps
-to a physical one through `SOURCE_TABLE_MAP` (verbatim, wins), else `SOURCE_TABLE_PREFIX` + the
-logical name with `SOURCE_TABLE_CASE` applied to the whole result. With none set the physical name
-is the logical one. An empty `SOURCE_SCHEMA` is a lakehouse that is not schema-enabled:
+**Table names.** A logical table (`Payroll`) maps to a physical one through the source mapping
+(`data/source/mapping/`); `SOURCE_TABLE_MAP` (verbatim, wins), `SOURCE_TABLE_PREFIX` and `SOURCE_TABLE_CASE`
+remain as overrides of it. With nothing set the physical name is the mapping's default. An empty `SOURCE_SCHEMA` is a lakehouse that is not schema-enabled:
 `Tables/<table>`, and `[lakehouse]..[table]` in SQL.
 
 No function here logs a token.
 """
 from __future__ import annotations
 
-import re
 from collections.abc import Mapping
 
 from config import SOURCE_SCHEMA, get_settings
 
 ONELAKE_PUBLIC_HOST = "onelake.dfs.fabric.microsoft.com"
 STORAGE_SCOPE = "https://storage.azure.com/.default"
-
-#: A physical name becomes a path segment and a bracket-quoted SQL identifier.
-_PHYSICAL = re.compile(r"^[A-Za-z0-9_][A-Za-z0-9_\-]{0,127}$")
 
 
 def storage_token() -> str:
@@ -45,23 +40,10 @@ def storage_token() -> str:
 
 
 def physical_table(logical: str) -> str:
-    """The physical name of a logical source table, under the current settings."""
-    source = get_settings().data_source
-    mapped = source.table_map.get(logical)
-    if mapped is not None:
-        name = mapped
-    else:
-        name = f"{source.table_prefix}{logical}"
-        if source.table_case == "lower":
-            name = name.lower()
-        elif source.table_case == "upper":
-            name = name.upper()
-    if not _PHYSICAL.match(name):
-        raise ValueError(
-            f"physical table name {name!r} for {logical!r} is not a plain identifier; "
-            "check SOURCE_TABLE_PREFIX, SOURCE_TABLE_CASE and SOURCE_TABLE_MAP"
-        )
-    return name
+    """The physical name of a logical source table: the mapping's, with the interim settings as overrides."""
+    from .mapping import physical_table as resolved
+
+    return resolved(logical)
 
 
 def sql_table_name(lakehouse: str, schema: str, logical: str) -> str:

@@ -74,6 +74,10 @@ for _name in (
 
 DATA_PAY_PERIODS = BACKEND_ROOT / "data" / "payroll_pay_periods.csv"
 
+# The governed data-query model asks the composition root for the lakehouse names; installing it here
+# lets a test that builds `default_model()` at import time get them.
+import bootstrap.data_wiring  # noqa: E402,F401
+
 
 @pytest.fixture(scope="session")
 def pay_period_rows() -> list[dict]:
