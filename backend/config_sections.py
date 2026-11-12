@@ -15,9 +15,10 @@ Those take a mapping too, and the composition root hands them `Settings.environ`
 """
 from __future__ import annotations
 
+import json
 import re
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 DEFAULT_ODBC_DRIVER = "ODBC Driver 18 for SQL Server"
@@ -84,6 +85,11 @@ class DataSourceSettings:
     fabric_employees_table: str
     flex_account_id: int
     reference_access_output_path: str | None
+    onelake_endpoint: str | None = None
+    onelake_path_style: str = "name"
+    table_prefix: str = ""
+    table_case: str = "as_is"
+    table_map: Mapping[str, str] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -155,6 +161,40 @@ def parse_identity(environ: Mapping[str, str]) -> IdentitySettings:
     )
 
 
+def parse_source_schema(environ: Mapping[str, str], default: str) -> str:
+    """`SOURCE_SCHEMA`; set but blank is a lakehouse that is not schema-enabled (`Tables/<table>`), unset is the default."""
+    if "SOURCE_SCHEMA" in environ and not (environ["SOURCE_SCHEMA"] or "").strip():
+        return ""
+    return parse_schema_name(environ, "SOURCE_SCHEMA", default)
+
+
+def _choice(environ: Mapping[str, str], name: str, allowed: tuple[str, ...], default: str) -> str:
+    value = (environ.get(name) or default).strip().lower()
+    if value not in allowed:
+        raise ValueError(f"{name}={value!r} is not one of {', '.join(allowed)}")
+    return value
+
+
+def _table_map(environ: Mapping[str, str]) -> dict[str, str]:
+    raw = (environ.get("SOURCE_TABLE_MAP") or "").strip()
+    if not raw:
+        return {}
+    try:
+        parsed = json.loads(raw)
+    except ValueError as exc:
+        raise ValueError(f"SOURCE_TABLE_MAP is not valid JSON: {exc}") from exc
+    if not isinstance(parsed, dict) or not all(isinstance(k, str) and isinstance(v, str) for k, v in parsed.items()):
+        raise ValueError('SOURCE_TABLE_MAP must be a JSON object of strings, e.g. {"Payroll": "payroll_v2"}')
+    return dict(parsed)
+
+
+def _onelake_endpoint(environ: Mapping[str, str]) -> str | None:
+    value = (environ.get("ONELAKE_ENDPOINT") or "").strip().rstrip("/")
+    if value and not value.startswith(("https://", "http://")):
+        raise ValueError("ONELAKE_ENDPOINT must be a full URL, e.g. https://<workspaceid-no-dashes>.z<xy>.blob.fabric.microsoft.com")
+    return value or None
+
+
 def parse_data_source(environ: Mapping[str, str]) -> DataSourceSettings:
     return DataSourceSettings(
         data_source=(environ.get("DATA_SOURCE") or "").strip().lower() or "lakehouse",
@@ -164,6 +204,11 @@ def parse_data_source(environ: Mapping[str, str]) -> DataSourceSettings:
         fabric_employees_table=environ.get("FABRIC_EMPLOYEES_TABLE", DEFAULT_EMPLOYEES_TABLE),
         flex_account_id=int(environ.get("FLEX_ACCOUNT_ID", str(DEFAULT_FLEX_ACCOUNT_ID))),
         reference_access_output_path=environ.get("REFERENCE_ACCESS_OUTPUT_PATH") or None,
+        onelake_endpoint=_onelake_endpoint(environ),
+        onelake_path_style=_choice(environ, "ONELAKE_PATH_STYLE", ("name", "guid"), "name"),
+        table_prefix=environ.get("SOURCE_TABLE_PREFIX") or "",
+        table_case=_choice(environ, "SOURCE_TABLE_CASE", ("as_is", "lower", "upper"), "as_is"),
+        table_map=_table_map(environ),
     )
 
 

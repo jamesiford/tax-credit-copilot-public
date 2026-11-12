@@ -127,16 +127,18 @@ def shared_scope() -> Iterator[None]:
 class SourceSqlReader:
     """Aggregate reads over the source tables through the warehouse SQL endpoint."""
 
-    def __init__(self, connection: FabricWarehouseConnection | None = None) -> None:
+    def __init__(self, connection: FabricWarehouseConnection | None = None, schema: str | None = None) -> None:
         self._connection = connection or shared_connection()
+        self.schema = SOURCE_SCHEMA if schema is None else schema
 
     @property
     def lakehouse(self) -> str:
         return (get_settings().data_source.fabric_lakehouse or "").strip()
 
-    @property
-    def schema(self) -> str:
-        return SOURCE_SCHEMA
+    def _table(self, logical: str) -> str:
+        from data.source.onelake import sql_table_name
+
+        return sql_table_name(self.lakehouse, self.schema, logical)
 
     def is_configured(self) -> bool:
         """Whether a SQL read can be attempted at all.
@@ -171,7 +173,7 @@ class SourceSqlReader:
             return cached
         rows = self._query(
             f"SELECT AccountId, Name, BillingState, ActualNumberOfEmployees, IndustryTypeId "
-            f"FROM [{self.lakehouse}].[{self.schema}].[Account]",
+            f"FROM {self._table('Account')}",
             [],
         )
         accounts = [
@@ -199,18 +201,17 @@ class SourceSqlReader:
         thing in this statement's history. The date is grouped as a date and
         rendered in Python, for the same reason.
         """
-        lh = self.lakehouse
-        sch = self.schema
+        payroll, location, address, zips = (self._table(t) for t in ("Payroll", "Location", "Address", "StateCountyZip"))
         rows = self._query(
             f"""
             SELECT {_TAX_YEAR} AS tax_year,
                    {_STATE} AS work_state,
                    p.PayDate AS pay_date,
                    COUNT_BIG(*) AS rows_in
-            FROM [{lh}].[{sch}].[Payroll] p
-            LEFT JOIN [{lh}].[{sch}].[Location] l ON l.LocationId = {_LOCATION}
-            LEFT JOIN [{lh}].[{sch}].[Address] a ON a.AddressId = l.AddressId
-            LEFT JOIN [{lh}].[{sch}].[StateCountyZip] s
+            FROM {payroll} p
+            LEFT JOIN {location} l ON l.LocationId = {_LOCATION}
+            LEFT JOIN {address} a ON a.AddressId = l.AddressId
+            LEFT JOIN {zips} s
                    ON s.StateCountyZipId = a.StateCountyZipId
             WHERE p.AccountId = ? AND {_HAS_SPAN}
             GROUP BY {_TAX_YEAR}, {_STATE}, p.PayDate
@@ -236,15 +237,14 @@ class SourceSqlReader:
         if cached is not None:
             return cached
 
-        lh = self.lakehouse
-        sch = self.schema
+        payroll, location, address, zips = (self._table(t) for t in ("Payroll", "Location", "Address", "StateCountyZip"))
         rows = self._query(
             f"""
             SELECT p.AccountId AS account_id, {_STATE} AS work_state
-            FROM [{lh}].[{sch}].[Payroll] p
-            LEFT JOIN [{lh}].[{sch}].[Location] l ON l.LocationId = {_LOCATION}
-            LEFT JOIN [{lh}].[{sch}].[Address] a ON a.AddressId = l.AddressId
-            LEFT JOIN [{lh}].[{sch}].[StateCountyZip] s
+            FROM {payroll} p
+            LEFT JOIN {location} l ON l.LocationId = {_LOCATION}
+            LEFT JOIN {address} a ON a.AddressId = l.AddressId
+            LEFT JOIN {zips} s
                    ON s.StateCountyZipId = a.StateCountyZipId
             WHERE {_HAS_SPAN}
             GROUP BY p.AccountId, {_STATE}
@@ -281,14 +281,13 @@ class SourceSqlReader:
         if cached is not None:
             return cached
 
-        lh = self.lakehouse
-        sch = self.schema
+        rules_table, entity = self._table("EntityFiscalYearRules"), self._table("Entity")
         rows = self._query(
             f"""
             SELECT DISTINCT r.FiscalYearRulesId, r.Name, r.FiscalYearBegin,
                             r.FiscalYearEnd, r.RuleExpression, r.Inferred
-            FROM [{lh}].[{sch}].[EntityFiscalYearRules] r
-            JOIN [{lh}].[{sch}].[Entity] e ON e.FiscalYearRulesId = r.FiscalYearRulesId
+            FROM {rules_table} r
+            JOIN {entity} e ON e.FiscalYearRulesId = r.FiscalYearRulesId
             WHERE e.AccountId = ?
             ORDER BY r.FiscalYearRulesId
             """,

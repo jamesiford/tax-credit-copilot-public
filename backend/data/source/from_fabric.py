@@ -40,7 +40,8 @@ from .schema import (
     Payroll,
     StateCountyZip,
 )
-from .to_delta import TABLE_SPECS, table_uri
+from .onelake import physical_table, storage_options, storage_token, table_uri
+from .to_delta import TABLE_SPECS
 
 
 def _snake(name: str) -> str:
@@ -134,9 +135,7 @@ _TRANSPORT_OPTIONS = {
 
 
 def _storage_token() -> str:
-    from infrastructure.azure_credential import cached_token
-
-    return cached_token("https://storage.azure.com/.default")
+    return storage_token()
 
 
 def clear_cache() -> None:
@@ -179,11 +178,7 @@ class FabricLakehouseReader:
         )
 
     def _storage_options(self) -> dict[str, str]:
-        return {
-            "bearer_token": _storage_token(),
-            "use_fabric_endpoint": "true",
-            **_TRANSPORT_OPTIONS,
-        }
+        return storage_options(_storage_token(), _TRANSPORT_OPTIONS)
 
     def _read(self, table: str, options: dict[str, str], account_id: int | None) -> list[dict[str, Any]]:
         from deltalake import DeltaTable
@@ -248,7 +243,7 @@ class FabricLakehouseReader:
             records = pa.table(adds).to_pylist()
         lineage = {
             "kind": "delta",
-            "table": f"{self.schema}.{table}",
+            "table": ".".join(part for part in (self.schema, physical_table(table)) if part),
             "uri": uri,
             "version": dt.version(),
             "files": len(records),

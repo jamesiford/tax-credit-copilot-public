@@ -36,6 +36,7 @@ from typing import Any, Iterable
 
 from config import SOURCE_SCHEMA, get_settings
 
+from .onelake import storage_options, storage_token, table_uri  # noqa: F401 - table_uri is re-exported for its callers
 from .schema import SourceDataset
 
 # Column order and Arrow type per table. Explicit rather than inferred: an
@@ -161,17 +162,7 @@ def _required(value: str | None, name: str) -> str:
 
 
 def _storage_options() -> dict[str, str]:
-    from infrastructure.azure_credential import cached_token
-
-    return {"bearer_token": cached_token("https://storage.azure.com/.default"), "use_fabric_endpoint": "true"}
-
-
-def table_uri(table: str, *, workspace: str, lakehouse: str, schema: str = SOURCE_SCHEMA) -> str:
-    """OneLake presents as ADLS Gen2, so a Delta table is a directory path."""
-    return (
-        f"abfss://{workspace}@onelake.dfs.fabric.microsoft.com/"
-        f"{lakehouse}.Lakehouse/Tables/{schema}/{table}"
-    )
+    return storage_options(storage_token())
 
 
 def write_datasets(
