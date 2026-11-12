@@ -208,7 +208,10 @@ class FabricLakehouseReader:
         )
 
     def _storage_options(self) -> dict[str, str]:
-        return storage_options(_storage_token(), _TRANSPORT_OPTIONS)
+        """The Delta storage options; none on the SQL read path, which must never ask for a storage token."""
+        from . import sql_scan
+
+        return {} if sql_scan.read_mode() == "sql" else storage_options(_storage_token(), _TRANSPORT_OPTIONS)
 
     def _read(self, table: str, options: dict[str, str], account_id: int | None) -> list[dict[str, Any]]:
         """One table's rows for one tenant (or all rows when there is no tenant or the table has no tenant column)."""
@@ -225,6 +228,10 @@ class FabricLakehouseReader:
         skip what cannot match) and then semi-joins in Arrow, so a 363-million-row `Address` table is read for the
         addresses of one account's locations and not in full.
         """
+        from . import sql_scan
+
+        if sql_scan.read_mode() == "sql":
+            return sql_scan.scan(self, table, tenant=tenant, key=key, ids=ids)
         import pyarrow as pa
         import pyarrow.compute as pc
         from deltalake import DeltaTable
@@ -317,7 +324,7 @@ class FabricLakehouseReader:
         try:
             if not ids:  # nothing to look up, but an absent optional table is still worth saying
                 uri = table_uri(table, workspace=self.workspace, lakehouse=self.lakehouse, schema=self.schema)
-                if not DeltaTable.is_deltatable(uri, storage_options=options):
+                if not self._table_exists(table, uri, options, DeltaTable):
                     raise TableNotFoundError(uri)
             return self._read_keyed(table, options, key, ids)
         except TableNotFoundError:
@@ -326,6 +333,14 @@ class FabricLakehouseReader:
                 _WARNED_MISSING.add(table)
                 log.warning("source table %s (%s) is absent from the lakehouse; continuing with no rows. %s", table, physical_table(table), reasons[table])
             return []
+
+    def _table_exists(self, table: str, uri: str, options: dict[str, str], delta_table: Any) -> bool:
+        """Whether a table is there, asked of whichever endpoint the read mode uses."""
+        from . import sql_scan
+
+        if sql_scan.read_mode() == "sql":
+            return sql_scan.table_exists(self, table)
+        return delta_table.is_deltatable(uri, storage_options=options)
 
     def fiscal_year_rules(self, account_id: int) -> list[EntityFiscalYearRules]:
         """One client's fiscal rules from two small tables, never from payroll.
@@ -429,6 +444,10 @@ class FabricLakehouseReader:
         Opening a Delta log can take tens of seconds on a slow capacity, so the check is rationed. None when it cannot be
         read (the previous answer is kept if there is one): the cache then simply does not notice a reload until it can.
         """
+        from . import sql_scan
+
+        if sql_scan.read_mode() == "sql":
+            return None
         key = (self.workspace, self.lakehouse, self.schema)
         known = _VERSIONS.get(key)
         if known and time.monotonic() - known[0] < get_settings().source_model.version_check_seconds:
@@ -508,8 +527,11 @@ class FabricLakehouseReader:
         from deltalake import DeltaTable
         from deltalake.exceptions import TableNotFoundError
 
+        from . import sql_scan
         from .silver import from_silver
 
+        if sql_scan.read_mode() == "sql":
+            return None
         key = (self.workspace, self.lakehouse, self.schema, account_id, "silver", self._data_version())
         cached = _dataset_cache().get(key)
         if cached is not None:

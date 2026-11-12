@@ -75,6 +75,8 @@ How the system is hosted, connected and run. Read the C4 model first.
 | [CONNECTIVITY-MATRIX.md](architecture/CONNECTIVITY-MATRIX.md) | Who calls what, over which path, as which identity, with which permission |
 | [ENV-VARS.md](architecture/ENV-VARS.md) | Every setting the app reads, where it is set, and the Terraform output that carries it |
 | [RUNBOOK.md](architecture/RUNBOOK.md) | Health checks, KQL for the common failures, and routine operations |
+| [RUNBOOK-PRIVATE-LINK-AND-IDENTITY.md](architecture/RUNBOOK-PRIVATE-LINK-AND-IDENTITY.md) | Standing the app up behind private link with your own identity: prerequisites, the workspace host and DNS check, roles, configuration, the access checks, Azure SQL, telemetry, and a symptom-cause-fix table for the errors already seen. Placeholders only |
+| [SQL-READ-PATH.md](architecture/SQL-READ-PATH.md) | A proposal and spike (`SOURCE_READ_MODE=sql`, off) for reading payroll rows over the SQL analytics endpoint so the app needs a Viewer role, not a file-reading one: query shapes, the parity evidence, the security comparison, what is not proved, and the recommendation (adopt later) |
 | [OIDC-SETUP.md](architecture/OIDC-SETUP.md) | Deploying from GitHub Actions with OIDC and no stored credential |
 | [AI-GATEWAY.md](architecture/AI-GATEWAY.md) · [AI-PLATFORM-VALUE.md](architecture/AI-PLATFORM-VALUE.md) | How model access reaches a customer's own models, and what the Foundry path gives that a gateway does not |
 | [AI-RESILIENCE.md](architecture/AI-RESILIENCE.md) · [AI-OPERATIONS.md](architecture/AI-OPERATIONS.md) | How a failing, slow or costly model is kept from becoming the reader's problem, and how to run the model side |

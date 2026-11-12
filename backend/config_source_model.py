@@ -16,6 +16,7 @@ WORKSITE_SOURCES = ("worksite_then_location", "location_only", "worksite_only")
 NULL_PAY_DATE_POLICIES = ("period_end", "exclude")
 VALIDATION_MODES = ("off", "warn", "fail")
 LOOKUP_POLICIES = ("strict", "assume")
+READ_MODES = ("onelake", "sql")
 
 
 @dataclass(frozen=True)
@@ -34,6 +35,7 @@ class SourceModelSettings:
     max_account_rows: int = 50_000_000
     version_check_seconds: int = 300
     silver: str = "off"
+    read_mode: str = "onelake"
 
 
 def parse_source_model(environ: Mapping[str, str]) -> SourceModelSettings:
@@ -55,4 +57,5 @@ def parse_source_model(environ: Mapping[str, str]) -> SourceModelSettings:
         max_account_rows=tuned_int(environ, "SOURCE_MAX_ACCOUNT_ROWS", 50_000_000, 1000),
         version_check_seconds=tuned_int(environ, "SOURCE_VERSION_CHECK_SECONDS", 300, 1),
         silver=_choice(environ, "SOURCE_SILVER", ("off", "auto", "require"), "off"),
+        read_mode=_choice(environ, "SOURCE_READ_MODE", READ_MODES, "onelake"),
     )
