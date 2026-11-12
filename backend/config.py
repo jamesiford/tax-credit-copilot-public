@@ -38,8 +38,8 @@ from functools import cached_property
 from types import MappingProxyType
 
 from config_sections import (
-    DataSourceSettings, IdentitySettings, ObservabilitySettings, RuntimeSettings, StoresSettings, WarehouseSettings,
-    WebIqSettings, parse_data_source, parse_identity, parse_observability, parse_runtime, parse_schema_name,
+    DataSourceSettings, IdentitySettings, ObservabilitySettings, PortfolioSettings, RuntimeSettings, StoresSettings, WarehouseSettings,
+    WebIqSettings, parse_data_source, parse_identity, parse_observability, parse_portfolio, parse_runtime, parse_schema_name,
     parse_source_schema, parse_stores, parse_warehouse, parse_webiq,
 )
 
@@ -79,6 +79,10 @@ class Settings:
     @cached_property
     def data_source(self) -> DataSourceSettings:
         return parse_data_source(self.environ)
+
+    @cached_property
+    def portfolio(self) -> PortfolioSettings:
+        return parse_portfolio(self.environ)
 
     @cached_property
     def warehouse(self) -> WarehouseSettings:

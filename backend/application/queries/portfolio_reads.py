@@ -31,19 +31,22 @@ def client_book_rows() -> list[dict[str, Any]]:
 #: A footprint that failed is not retried for this long. It is a scan of every client's payroll,
 #: and a page that is polled while the source is down would otherwise repeat that scan on every view.
 FOOTPRINT_RETRY_SECONDS = 60.0
-_footprint_failure: tuple[float, Any] | None = None
+#: A guard decision (too large, timed out, switched off) is not retried for an hour: the table does not shrink,
+#: and every retry of a timeout is another bounded scan on the server.
+FOOTPRINT_GUARD_RETRY_SECONDS = 3600.0
+_footprint_failure: tuple[float, float, DependencyUnavailable] | None = None
 
 
 def footprint() -> dict[int, list[str]]:
-    """Payroll states for every client, in one scan.
+    """Payroll states for every client, in one guarded scan.
 
     `{}` when the source is not the lakehouse or SQL is not configured (there is nothing to scan).
-    A scan that fails raises `DependencyUnavailable("source_sql")`, which `portfolio_page` reports
-    as degraded: a book that cannot say where a client operates is still usable, but it must say so.
+    A scan that is refused by the guard, cancelled or failed raises `DependencyUnavailable("source_sql")`,
+    which `portfolio_page` reports as degraded: a book that cannot say where a client operates is still
+    usable, but it must say so. The decision is remembered (an hour for the guard, a minute for an error).
     """
     import time
 
-    from application.errors import as_dependency_failure
     from application.source_ports import new_source_reader
     from tools.fabric_source import active_data_source
 
@@ -53,10 +56,31 @@ def footprint() -> dict[int, list[str]]:
     reader = new_source_reader()
     if not reader.is_configured():
         return {}
-    if _footprint_failure and time.monotonic() - _footprint_failure[0] < FOOTPRINT_RETRY_SECONDS:
-        raise _footprint_failure[1]
+    if _footprint_failure and time.monotonic() - _footprint_failure[0] < _footprint_failure[1]:
+        raise _footprint_failure[2]
     try:
-        result = reader.footprint()
+        result = _guarded_footprint(reader)
+    except DependencyUnavailable as failure:
+        _footprint_failure = (time.monotonic(), failure.retry_seconds, failure)
+        raise
+    _footprint_failure = None
+    return result
+
+
+def _guarded_footprint(reader: Any) -> dict[int, list[str]]:
+    """The reader's footprint under the configured guard; any other failure is classified, a bug propagates."""
+    from config import get_settings
+
+    guard = get_settings().portfolio
+    try:
+        return reader.footprint(
+            mode=guard.footprint_mode, max_rows=guard.footprint_max_rows, timeout_seconds=guard.footprint_timeout_seconds,
+        )
+    except DependencyUnavailable as failure:
+        # The guard said no (or the statement was cancelled): a decision, not a transient error.
+        log.warning("payroll footprint not read: %s", failure.reason)
+        failure.retry_seconds = FOOTPRINT_GUARD_RETRY_SECONDS
+        raise
     except Exception as exc:  # noqa: BLE001 - classified below; a bug in our code is re-raised
         failure = as_dependency_failure(
             "source_sql", exc,
@@ -65,10 +89,8 @@ def footprint() -> dict[int, list[str]]:
         if failure is None:
             raise
         log.warning("payroll footprint unavailable: %s: %s", type(exc).__name__, str(exc)[:200])
-        _footprint_failure = (time.monotonic(), failure)
+        failure.retry_seconds = FOOTPRINT_RETRY_SECONDS
         raise failure from exc
-    _footprint_failure = None
-    return result
 
 
 def priceable_states() -> set[str]:

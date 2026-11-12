@@ -119,6 +119,7 @@ _WARNED_MISSING: set[str] = set()
 _DATASET_CACHE: dict[tuple[str, str, str, int], SourceDataset] = {}
 _ACCOUNTS_CACHE: dict[tuple[str, str, str], list[dict[str, Any]]] = {}
 _LINEAGE_CACHE: dict[tuple[str, str, str, str], dict[str, Any]] = {}
+_ROW_ESTIMATE_CACHE: dict[tuple[str, str, str, str], int | None] = {}
 
 # The credential is shared by the whole process (`infrastructure/azure_credential.py`),
 # and so is the token it mints: `DefaultAzureCredential` caches nothing for the CLI
@@ -155,6 +156,7 @@ def clear_cache() -> None:
     _DATASET_CACHE.clear()
     _ACCOUNTS_CACHE.clear()
     _LINEAGE_CACHE.clear()
+    _ROW_ESTIMATE_CACHE.clear()
 
 
 @dataclass
@@ -303,6 +305,29 @@ class FabricLakehouseReader:
         }
         _LINEAGE_CACHE[key] = lineage
         return lineage
+
+    def table_row_estimate(self, table: str) -> int | None:
+        """The table's row count from the Delta log's per-file statistics (no data is read), or None.
+
+        None when the writer recorded no statistics, which is different from a table of zero rows.
+        Cached with the lineage: the log is read once per process.
+        """
+        key = (self.workspace, self.lakehouse, self.schema, table)
+        if key in _ROW_ESTIMATE_CACHE:
+            return _ROW_ESTIMATE_CACHE[key]
+        from deltalake import DeltaTable
+
+        uri = table_uri(table, workspace=self.workspace, lakehouse=self.lakehouse, schema=self.schema)
+        adds = DeltaTable(uri, storage_options=self._storage_options()).get_add_actions()
+        try:
+            records = adds.to_pylist()
+        except AttributeError:
+            import pyarrow as pa
+
+            records = pa.table(adds).to_pylist()
+        counts = [a.get("num_records") for a in records]
+        _ROW_ESTIMATE_CACHE[key] = None if not counts or any(c is None for c in counts) else sum(int(c) for c in counts)
+        return _ROW_ESTIMATE_CACHE[key]
 
     def for_account(self, account_id: int) -> SourceDataset | None:
         """One tenant's full source dataset. Cached per process — see above."""

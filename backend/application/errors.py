@@ -23,6 +23,8 @@ class DependencyUnavailable(RuntimeError):
         self.reason = reason
         self.remedy = remedy
         self.impact = impact
+        #: How long a caller that remembers this failure should not retry it. Set by that caller.
+        self.retry_seconds = 60.0
 
     def as_degraded(self, impact: str | None = None) -> dict[str, Any]:
         """The entry a response carries in its `degraded` list."""
