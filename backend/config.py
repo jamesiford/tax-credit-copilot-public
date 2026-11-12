@@ -40,7 +40,7 @@ from types import MappingProxyType
 from config_sections import (
     DataSourceSettings, IdentitySettings, ObservabilitySettings, RuntimeSettings, StoresSettings, WarehouseSettings,
     WebIqSettings, parse_data_source, parse_identity, parse_observability, parse_runtime, parse_schema_name,
-    parse_stores, parse_warehouse, parse_webiq,
+    parse_source_schema, parse_stores, parse_warehouse, parse_webiq,
 )
 
 #: Calendar year. The only value the deleted setting ever returned in practice.
@@ -159,4 +159,4 @@ OPS_SCHEMA = schema_name("OPS_SCHEMA", DEFAULT_OPS_SCHEMA)
 #: accordingly), and the public default stands in for one that does not.
 DEFAULT_SOURCE_SCHEMA = "tcc_source"
 
-SOURCE_SCHEMA = schema_name("SOURCE_SCHEMA", DEFAULT_SOURCE_SCHEMA)
+SOURCE_SCHEMA = parse_source_schema(get_settings().environ, DEFAULT_SOURCE_SCHEMA)
