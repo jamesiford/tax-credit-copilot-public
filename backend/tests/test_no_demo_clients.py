@@ -26,7 +26,7 @@ def lake(tmp_path, monkeypatch):
     spec = dataclasses.replace(SYNTHETIC_CLIENTS[0], account_id=UNFAMILIAR_ID, name=UNFAMILIAR_NAME)
     write_lakehouse(tmp_path, build_synthetic_dataset(spec), schema="tcc_source")
     use_local_lakehouse(monkeypatch, tmp_path)
-    for name, value in (("DATA_SOURCE", "lakehouse"), ("FABRIC_WORKSPACE", "ws"), ("FABRIC_LAKEHOUSE", "lh"),
+    for name, value in (("DATA_SOURCE", "lakehouse"), ("FABRIC_WORKSPACE", "ws"), ("FABRIC_LAKEHOUSE", "lh"), ("PAY_CODE_POLICY", "assume"),
                         ("DATA_CLASSIFICATION", "customer")):
         monkeypatch.setenv(name, value)
     monkeypatch.setattr("infrastructure.persistence.source_sql.SourceSqlReader.is_configured", lambda self: False)
