@@ -13,8 +13,14 @@ locals {
       aiservices        = "privatelink.services.ai.azure.com"
     },
     var.enable_key_vault ? { vault = "privatelink.vaultcore.azure.net" } : {},
+    var.warehouse_platform == "azure_sql" && !var.azure_sql_public_network_access ? { sql = "privatelink.database.windows.net" } : {},
     local.web_inbound == "private_endpoint" ? { sites = "privatelink.azurewebsites.net" } : {},
   )
+
+  # Prompt 09: the Warehouse is Fabric's unless warehouse_platform says Azure SQL.
+  azure_sql          = var.warehouse_platform == "azure_sql"
+  warehouse_server   = local.azure_sql ? module.azure_sql.server_fqdn : module.fabric.warehouse_server
+  warehouse_database = local.azure_sql ? module.azure_sql.database_name : module.fabric.warehouse_database
 
   # AI-03: a setting is emitted only when its variable is set, so the defaults
   # leave an existing deployment's plan unchanged. Nothing here is a secret.
@@ -177,6 +183,26 @@ module "fabric" {
   }
 }
 
+module "azure_sql" {
+  source                     = "./modules/azure_sql"
+  enabled                    = local.azure_sql
+  name_suffix                = local.token
+  resource_group_name        = azurerm_resource_group.this.name
+  location                   = var.location
+  tags                       = local.tags
+  tenant_id                  = local.tenant_id
+  admin_group_object_id      = trimspace(var.azure_sql_admin_group_object_id)
+  admin_group_name           = trimspace(var.azure_sql_admin_group_name)
+  database_name              = var.azure_sql_database_name
+  sku_name                   = var.azure_sql_sku
+  max_size_gb                = var.azure_sql_max_size_gb
+  public_network_access      = var.azure_sql_public_network_access
+  firewall_rules             = var.azure_sql_firewall_rules
+  private_endpoint_subnet_id = module.network.private_endpoint_subnet_id
+  sql_private_dns_zone_id    = lookup(module.network.private_dns_zone_ids, "sql", "")
+  log_analytics_workspace_id = module.monitoring.log_analytics_workspace_id
+}
+
 module "app_service" {
   source                         = "./modules/app_service"
   name_suffix                    = local.token
@@ -202,30 +228,30 @@ module "app_service" {
 
   # HOST-5: every setting the API reads, from Terraform. None is a secret.
   api_app_settings = merge({
-    ENVIRONMENT               = "azure"
-    DATA_CLASSIFICATION       = local.data_classification
-    AUTH_MODE                 = local.auth_mode
-    CLAIM_STORE               = "warehouse"
-    FINDING_STORE             = "warehouse"
-    RUN_MANIFEST_STORE        = "warehouse"
-    OVERRIDE_STORE            = "warehouse"
-    ARTIFACT_STORE            = "blob"
-    ARTIFACT_REPOSITORY       = "warehouse"
-    ARTIFACT_BLOB_ACCOUNT_URL = module.storage.blob_endpoint
-    OUTPUTS_RETENTION_DAYS    = tostring(var.outputs_retention_days)
-    DATA_SOURCE               = "lakehouse"
-    SOURCE_SCHEMA             = var.source_schema
-    FABRIC_WORKSPACE          = module.fabric.workspace_name
-    FABRIC_LAKEHOUSE          = module.fabric.lakehouse_name
-    WAREHOUSE_SERVER          = module.fabric.warehouse_server
-    WAREHOUSE_DATABASE        = module.fabric.warehouse_database
-    FOUNDRY_PROJECT_ENDPOINT  = module.foundry.project_endpoint
-    FOUNDRY_MODEL             = module.foundry.model
-    WEB_CONCURRENCY           = tostring(var.api_worker_count)
-    GIT_COMMIT                = var.git_commit
-    }, local.auth_mode == "entra" ? {
-    AUTH_TENANT_ID = local.tenant_id
-    API_AUDIENCE   = local.api_audience
+    ENVIRONMENT                               = "azure"
+    DATA_CLASSIFICATION                       = local.data_classification
+    AUTH_MODE                                 = local.auth_mode
+    CLAIM_STORE                               = "warehouse"
+    FINDING_STORE                             = "warehouse"
+    RUN_MANIFEST_STORE                        = "warehouse"
+    OVERRIDE_STORE                            = "warehouse"
+    ARTIFACT_STORE                            = "blob"
+    ARTIFACT_REPOSITORY                       = "warehouse"
+    ARTIFACT_BLOB_ACCOUNT_URL                 = module.storage.blob_endpoint
+    OUTPUTS_RETENTION_DAYS                    = tostring(var.outputs_retention_days)
+    DATA_SOURCE                               = "lakehouse"
+    SOURCE_SCHEMA                             = var.source_schema
+    FABRIC_WORKSPACE                          = module.fabric.workspace_name
+    FABRIC_LAKEHOUSE                          = module.fabric.lakehouse_name
+    WAREHOUSE_SERVER                          = local.warehouse_server
+    WAREHOUSE_DATABASE                        = local.warehouse_database
+    FOUNDRY_PROJECT_ENDPOINT                  = module.foundry.project_endpoint
+    FOUNDRY_MODEL                             = module.foundry.model
+    WEB_CONCURRENCY                           = tostring(var.api_worker_count)
+    GIT_COMMIT                                = var.git_commit
+    }, local.azure_sql ? { WAREHOUSE_PLATFORM = "azure_sql" } : {}, local.auth_mode == "entra" ? {
+    AUTH_TENANT_ID                            = local.tenant_id
+    API_AUDIENCE                              = local.api_audience
     # Running without sign-in is a stated choice, not a default: the API refuses AUTH_MODE=none
     # outside local development unless this is set, and then only over synthetic data. [RM-03]
     } : { ALLOW_ANONYMOUS_SYNTHETIC = "1" },
@@ -285,8 +311,8 @@ module "channel" {
   log_analytics_workspace_id     = module.monitoring.log_analytics_workspace_id
 
   warehouse = {
-    server    = module.fabric.warehouse_server
-    database  = module.fabric.warehouse_database
+    server    = local.warehouse_server
+    database  = local.warehouse_database
     workspace = module.fabric.workspace_name
   }
 }

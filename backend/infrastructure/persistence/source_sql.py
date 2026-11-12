@@ -33,10 +33,8 @@ from typing import Any, Iterator
 
 from config import SOURCE_SCHEMA, get_settings
 from infrastructure.persistence import source_queries
-from infrastructure.persistence.fabric_warehouse import (
-    FabricWarehouseConnection,
-    WarehouseNotConfigured,
-)
+from infrastructure.persistence.fabric_warehouse import WarehouseNotConfigured
+from infrastructure.persistence.lakehouse_sql_connection import LakehouseSqlConnection
 
 
 @dataclass(frozen=True, slots=True)
@@ -58,7 +56,7 @@ class PayrollScope:
 #: readers a single endpoint builds. `scope()` keys off `threading.local` on the
 #: INSTANCE, so separate instances each open their own link and the sharing
 #: silently does nothing.
-_SHARED_CONNECTION: FabricWarehouseConnection | None = None
+_SHARED_CONNECTION: LakehouseSqlConnection | None = None
 
 #: The client book and the fiscal calendars are slow-changing DIMENSIONS — they
 #: move when someone reloads the lakehouse, not per request — so they get the
@@ -81,10 +79,11 @@ def clear_cache() -> None:
     _FOOTPRINT_CACHE.clear()
 
 
-def shared_connection() -> FabricWarehouseConnection:
+def shared_connection() -> LakehouseSqlConnection:
+    """The lakehouse endpoint's connection: its own host, database and pool, never the Warehouse's."""
     global _SHARED_CONNECTION
     if _SHARED_CONNECTION is None:
-        _SHARED_CONNECTION = FabricWarehouseConnection()
+        _SHARED_CONNECTION = LakehouseSqlConnection()
     return _SHARED_CONNECTION
 
 
@@ -97,7 +96,7 @@ def shared_scope() -> Iterator[None]:
     stays true and the scope opens a connection the request will never read —
     which in the test suite is a login timeout on a wholly offline test.
 
-    `FabricWarehouseConnection.scope()` opens eagerly and raises without a
+    `LakehouseSqlConnection.scope()` opens eagerly and raises without a
     server, so an unguarded `with` here would 500 every CSV-backed request.
     """
     from tools.fabric_source import active_data_source
@@ -110,9 +109,9 @@ def shared_scope() -> Iterator[None]:
 
 
 class SourceSqlReader:
-    """Aggregate reads over the source tables through the warehouse SQL endpoint."""
+    """Aggregate reads over the source tables through the lakehouse SQL analytics endpoint."""
 
-    def __init__(self, connection: FabricWarehouseConnection | None = None, schema: str | None = None) -> None:
+    def __init__(self, connection: LakehouseSqlConnection | None = None, schema: str | None = None) -> None:
         self._connection = connection or shared_connection()
         self.schema = SOURCE_SCHEMA if schema is None else schema
 

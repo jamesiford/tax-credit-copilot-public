@@ -16,6 +16,7 @@ REPO = Path(__file__).resolve().parent.parent
 BACKEND = REPO / "backend"
 SCHEMA_DIR = REPO / "docs" / "data" / "schema"
 BOOTSTRAP_DDL = SCHEMA_DIR / "tcc-schema.fabric.sql"
+BOOTSTRAP_DDL_SQLSERVER = SCHEMA_DIR / "tcc-schema.sqlserver.sql"
 MIGRATIONS_DIR = SCHEMA_DIR / "migrations"
 PINNED_TARGETS = REPO / "docs" / "platform-v2" / "live-targets.json"
 
@@ -87,8 +88,82 @@ def allowed_target(name: str):
     return pinned[name]
 
 
+def platform() -> str:
+    """`WAREHOUSE_PLATFORM`: `fabric` (the default) or `azure_sql`."""
+    from config import get_settings
+
+    return get_settings().platform.platform
+
+
+def bootstrap_ddl() -> Path:
+    """The bootstrap DDL for the configured platform (the generated SQL Server variant for Azure SQL)."""
+    return BOOTSTRAP_DDL_SQLSERVER if platform() == "azure_sql" else BOOTSTRAP_DDL
+
+
+def translate_sql(sql: str) -> str:
+    """Fabric T-SQL as the configured platform accepts it; identity on Fabric."""
+    if platform() != "azure_sql":
+        return sql
+    from infrastructure.persistence.schema_platform import sqlserver_sql
+
+    return sqlserver_sql(sql)
+
+
+def allowed_sql_target(name: str):
+    """The Azure SQL allow-list entry a target name refers to.
+
+    `deployed` is the server and database this environment's Terraform outputs name (SQL_SERVER_FQDN /
+    SQL_DATABASE_NAME) — deliberately NOT the WAREHOUSE_* values the connection will use, so the check
+    compares two independent statements of the same fact. It may be bootstrapped only when
+    TCC_SQL_CREATED=true, i.e. Terraform created the database in this apply. Any other name must be pinned
+    in docs/platform-v2/live-targets.json with `"platform": "azure_sql"`.
+    """
+    from infrastructure.persistence.schema_admin import TargetMismatch
+    from infrastructure.persistence.schema_platform import AllowedSqlTarget, load_pinned_sql_targets
+
+    if name == "deployed":
+        server = os.getenv("SQL_SERVER_FQDN", "").strip()
+        database = os.getenv("SQL_DATABASE_NAME", "").strip()
+        if not server or not database:
+            raise TargetMismatch("target 'deployed' needs SQL_SERVER_FQDN and SQL_DATABASE_NAME")
+        return AllowedSqlTarget(
+            name="deployed",
+            server=server,
+            database=database,
+            bootstrap_approved=os.getenv("TCC_SQL_CREATED", "").strip().lower() == "true",
+        )
+    pinned = load_pinned_sql_targets(PINNED_TARGETS)
+    if name not in pinned:
+        raise TargetMismatch(f"unknown target '{name}'; allowed: deployed, {', '.join(sorted(pinned)) or '(none pinned)'}")
+    return pinned[name]
+
+
+def guarded_sql_connection(target_name: str, *, resolve_only: bool = False):
+    """Azure SQL: check the server and database against the allow-list, and only then connect.
+
+    Returns the same triple as `guarded_connection`, with the server and database where the Fabric
+    workspace and item would be, so the callers print one shape.
+    """
+    from infrastructure.persistence.fabric_warehouse import FabricWarehouseConnection
+    from infrastructure.persistence.schema_admin import ResolvedTarget
+    from infrastructure.persistence.schema_platform import check_sql_target
+
+    allowed = allowed_sql_target(target_name)
+    server = os.getenv("WAREHOUSE_SERVER", "")
+    database = os.getenv("WAREHOUSE_DATABASE", "")
+    check_sql_target(allowed, server=server, database=database)
+    resolved = ResolvedTarget(workspace_id="(azure sql)", item_id=allowed.name, endpoint=server, display_name=database)
+    if resolve_only:
+        return allowed, resolved, None
+    connection = FabricWarehouseConnection(server=server, database=database).open()
+    connection.autocommit = True
+    return allowed, resolved, connection
+
+
 def guarded_connection(target_name: str, *, resolve_only: bool = False):
     """Resolve, check, and only then connect. Returns (allowed, resolved, connection|None)."""
+    if platform() == "azure_sql":
+        return guarded_sql_connection(target_name, resolve_only=resolve_only)
     from config import OPS_SCHEMA  # noqa: F401 - validates schema config before any connect
     from infrastructure.persistence.fabric_warehouse import FabricWarehouseConnection
     from infrastructure.persistence.schema_admin import check_target, resolve_via_fabric_api
@@ -127,7 +202,8 @@ def guarded_lakehouse_connection(target_name: str):
     allowed, resolved, _ = guarded_connection(target_name, resolve_only=True)
     lakehouse = LakehouseSqlConnection()
     lakehouse.require_configuration()
-    check_lakehouse_endpoint(resolved, lakehouse.server, target=target_name)
+    if platform() != "azure_sql":  # on Azure SQL the Warehouse and the lakehouse are different hosts by design
+        check_lakehouse_endpoint(resolved, lakehouse.server, target=target_name)
     connection = lakehouse.open()
     connection.autocommit = True
     return allowed, resolved, connection

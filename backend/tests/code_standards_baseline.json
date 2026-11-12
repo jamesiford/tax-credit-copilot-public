@@ -429,7 +429,7 @@
   "module-lines|domain/calculation/proximity.py": 570,
   "module-lines|domain/channel.py": 254,
   "module-lines|domain/claims.py": 666,
-  "module-lines|infrastructure/persistence/fabric_warehouse.py": 580,
+  "module-lines|infrastructure/persistence/fabric_warehouse.py": 578,
   "module-lines|infrastructure/persistence/schema_admin.py": 462,
   "module-lines|infrastructure/persistence/sqlite_claims.py": 387,
   "module-lines|infrastructure/persistence/warehouse_claims.py": 352,

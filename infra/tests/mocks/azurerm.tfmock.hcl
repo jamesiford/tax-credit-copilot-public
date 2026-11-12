@@ -77,3 +77,14 @@ mock_resource "azurerm_key_vault" {
 mock_resource "azurerm_fabric_capacity" {
   defaults = { id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-test/providers/Microsoft.Fabric/capacities/fctest" }
 }
+
+mock_resource "azurerm_mssql_server" {
+  defaults = {
+    id                          = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-test/providers/Microsoft.Sql/servers/sql-test"
+    fully_qualified_domain_name = "sql-test.database.windows.net"
+  }
+}
+
+mock_resource "azurerm_mssql_database" {
+  defaults = { id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-test/providers/Microsoft.Sql/servers/sql-test/databases/tcc" }
+}

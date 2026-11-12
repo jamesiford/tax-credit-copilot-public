@@ -1,4 +1,8 @@
-"""Apply schema migrations to a GUARDED Fabric Warehouse target. [D22]
+"""Apply schema migrations to a GUARDED Fabric Warehouse or Azure SQL target. [D22]
+
+WAREHOUSE_PLATFORM=azure_sql checks the server and database against the allow-list instead of resolving a Fabric
+item, uses the generated SQL Server bootstrap, and applies each migration with NOT ENFORCED removed. Approval for the
+bootstrap there is TCC_SQL_CREATED=true (or a pinned target with bootstrap_approved).
 
     python scripts/apply-migrations.py --target deployed
     python scripts/apply-migrations.py --target deployed --bootstrap      # postprovision, create_fabric only
@@ -69,13 +73,13 @@ def main(argv: list[str] | None = None) -> int:
             if not allowed.bootstrap_approved:
                 print(
                     f"REFUSED: target '{allowed.name}' is not approved for the destructive bootstrap "
-                    "(pinned bootstrap_approved, or deployed with TCC_FABRIC_CREATED=true).",
+                    "(pinned bootstrap_approved, or deployed with TCC_FABRIC_CREATED=true / TCC_SQL_CREATED=true).",
                     file=sys.stderr,
                 )
                 return common.EXIT_FAILED
-            ddl = rename_schemas(common.BOOTSTRAP_DDL.read_text(encoding="utf-8"), gold=GOLD_SCHEMA, ops=OPS_SCHEMA)
+            ddl = rename_schemas(common.translate_sql(common.bootstrap_ddl().read_text(encoding="utf-8")), gold=GOLD_SCHEMA, ops=OPS_SCHEMA)
             batches = split_batches(bootstrap_sql(ddl))
-            print(f"bootstrap: {len(batches)} batches from {common.BOOTSTRAP_DDL.name}")
+            print(f"bootstrap: {len(batches)} batches from {common.bootstrap_ddl().name}")
             if args.dry_run:
                 print("dry run: bootstrap NOT executed")
                 return common.EXIT_OK
@@ -96,7 +100,7 @@ def main(argv: list[str] | None = None) -> int:
             if args.dry_run:
                 print(f"  would apply {migration.version}_{migration.name}")
                 continue
-            apply_migration(connection, migration, OPS_SCHEMA)
+            apply_migration(connection, migration, OPS_SCHEMA, translate=common.translate_sql)
             print(f"  applied {migration.version}_{migration.name} ({migration.sha256[:12]})")
         return common.EXIT_OK
     except MigrationError as exc:

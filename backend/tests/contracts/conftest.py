@@ -1,7 +1,8 @@
 """Shared contract fixtures: every operational-store adapter, one suite. [DATA-2]
 
-SQLite runs always. The Warehouse runs only with `TCC_FABRIC_TESTS=1`, against
-the Warehouse named by WAREHOUSE_SERVER / WAREHOUSE_DATABASE, with a client_id
+SQLite runs always. The Warehouse runs only with `TCC_SQL_TESTS=1` (or the older
+`TCC_FABRIC_TESTS=1`), against the Fabric Warehouse or Azure SQL database named by
+WAREHOUSE_PLATFORM / WAREHOUSE_SERVER / WAREHOUSE_DATABASE, with a client_id
 range unique to this run that is deleted afterwards — so a live run never
 touches a real client's rows and never leaves its own behind.
 """
@@ -13,7 +14,9 @@ import time
 
 import pytest
 
-LIVE = os.getenv("TCC_FABRIC_TESTS") == "1"
+#: `TCC_SQL_TESTS=1` is the platform-neutral gate: the suite runs against whatever WAREHOUSE_PLATFORM / WAREHOUSE_SERVER
+#: / WAREHOUSE_DATABASE name (the Fabric Warehouse or an Azure SQL test database). `TCC_FABRIC_TESTS=1` still works.
+LIVE = os.getenv("TCC_SQL_TESTS") == "1" or os.getenv("TCC_FABRIC_TESTS") == "1"
 
 #: Far above any real AccountId. Each run takes its own block of 1,000.
 _BASE = 900_000_000
@@ -65,7 +68,7 @@ _CLAIM_TABLES = ("program_claim", "program_engagement")
 _FINDING_TABLES = ("agent_finding_resolution",)
 
 _PARAMS = ["sqlite", pytest.param("warehouse", marks=pytest.mark.skipif(
-    not LIVE, reason="set TCC_FABRIC_TESTS=1 to run the contract suite against the live Warehouse"))]
+    not LIVE, reason="set TCC_SQL_TESTS=1 (or TCC_FABRIC_TESTS=1) to run the contract suite against the live Warehouse"))]
 
 
 @pytest.fixture(params=_PARAMS)
