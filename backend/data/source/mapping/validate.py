@@ -21,7 +21,7 @@ from .model import SourceMapping
 
 #: Delta type names that read as each mapped Arrow type with no coercion.
 _NATIVE = {
-    "int64": {"long", "integer", "short", "byte"}, "string": {"string"}, "bool": {"boolean"},
+    "int64": {"long", "integer", "short", "byte"}, "int32": {"integer", "short", "byte"}, "string": {"string"}, "bool": {"boolean"},
     "double": {"double", "float"}, "date32": {"date"}, "timestamp[us]": {"timestamp", "timestamp_ntz"},
 }
 #: Types a mapped decimal or number is still read from, by coercion.

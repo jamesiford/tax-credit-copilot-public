@@ -90,7 +90,7 @@ def _to_arrow(dataset: SourceDataset, table: str):
     records = _rows_for(dataset, attr)
 
     type_map = {
-        "int64": pa.int64(), "string": pa.string(), "bool": pa.bool_(),
+        "int64": pa.int64(), "int32": pa.int32(), "string": pa.string(), "bool": pa.bool_(),
         "double": pa.float64(), "date32": pa.date32(),
         "timestamp[us]": pa.timestamp("us"), _DECIMAL_18_2: pa.decimal128(18, 2),
     }

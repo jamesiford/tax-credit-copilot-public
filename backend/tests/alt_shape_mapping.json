@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "description": "A test mapping for an ALTERNATE lake shape: prefixed lower-case table names, the DDL's own column spellings, and narrower integer types. Customer-neutral: it exists to prove the sample lakehouse build, the reader, the writer and the validation follow a mapping with no code change.",
+  "naming": { "table_prefix": "alt_dbo_", "table_case": "lower" },
+  "tables": {
+    "Payroll": {
+      "fields": {
+        "account_id": { "column": "Accountid" },
+        "pay_date": { "column": "PaycheckDate" },
+        "client_employee_id": { "column": "ClientEmployeeID" },
+        "created_by": { "type": "int32" },
+        "modified_by": { "type": "int32" }
+      }
+    },
+    "Account": { "fields": { "account_eid": { "type": "int32" }, "actual_number_of_employees": { "type": "int32" } } },
+    "Location": { "fields": { "dba": { "column": "DBA" } } },
+    "StateCountyZip": { "fields": { "zip_code": { "column": "ZIPCode" } } },
+    "PayCode": { "fields": { "is_aca": { "column": "IsACA" }, "is_futa": { "column": "isFUTA" } } }
+  }
+}

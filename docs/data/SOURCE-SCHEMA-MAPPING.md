@@ -180,3 +180,35 @@ to the *encrypted* `Employee` table only for tokenisation, never through
 | BA-03 rationale | Corrected: surrogate keys without a lookup, not codes that misbehave |
 | Credit value | County and industry are **available**, so dollar certification becomes plumbing rather than a data gap |
 | F2 multi-tenancy | `Accountid` is the tenant key, and it already partitions the source |
+
+## 9. Building the sample lakehouse in a customer's shape (prompt 05)
+
+The sample lakehouse is not tied to one set of names. The shape (table names, column names and their case, column types,
+the `Payroll` partition by the tenant column) is whatever the **source mapping** says
+([SOURCE-MAPPING.md](../architecture/SOURCE-MAPPING.md)), so the same build produces the default shape or a customer's, and the
+app, the mapping and the tests are exercised against the shape the customer will have.
+
+```
+python scripts/fabric/build-sample-lakehouse.py --root <dir> --mapping-file <mapping.json> [--dry-run]
+python scripts/generate-synthetic-source.py     --root <dir> --accounts 200 --rows 5000000 --seed 7
+```
+
+- **Type rules:** `bigint` to int64, `int` / `tinyint` / `smallint` to int32, `decimal(18,2)` to decimal128(18,2), `date` to date32,
+  `datetime` to timestamp[us], `bit` to boolean, `nvarchar` / `varchar` to string (a numeric stored as text, such as `HourlyWage`,
+  stays a string and is read with coercion), `float` to double, `uniqueidentifier` to string. A narrower mapped type is a mapping
+  override (`"type": "int32"`).
+- **Reconciliation:** per table, the row count and a checksum of the logical values before (the datasets) and after (read back
+  through the same column resolution the reader uses). Any difference exits non-zero. A dry run writes nothing. A re-run overwrites,
+  never appends.
+- **App-owned lookups** (`PayFrequency`, `EntityFiscalYearRules`) are **not** written unless `--with-lookups`; the default build
+  leaves them out so absent-lookup behaviour is tested end to end. They are resolved in the application
+  ([APP-OWNED-LOOKUPS.md](../architecture/APP-OWNED-LOOKUPS.md)).
+- **No `Employee` table** is created: nothing the app reads needs it. If one is ever needed it carries synthetic `EmployeeId`,
+  `AccountId` and `ClientEmployeeId` only, never any personal identifier.
+- **Scale generator** (`scripts/generate-synthetic-source.py`): N accounts and M payroll rows, deterministic by seed, account sizes
+  following a power law (many small accounts, a few very large), account ids from 910001 and names `Scale Account NNNNN`. Used by
+  the scale work and the read-mode spike.
+- The validation CLI checks the result: `python scripts/validate-source-schema.py --root <dir> --schema <schema>`.
+- `--fabric --yes` writes the same tables to the configured Fabric lakehouse over OneLake. It has not been run against a live
+  lakehouse from this repository.
+
