@@ -242,6 +242,8 @@ variable.
 | `TCC_FABRIC_WORKSPACE_ID`, `TCC_FABRIC_WORKSPACE_NAME` | `fabric_workspace_id`, `fabric_workspace_name` | enterprise | Existing workspace. Id required |
 | `TCC_FABRIC_LAKEHOUSE_NAME` | `fabric_lakehouse_name` | enterprise | Lakehouse holding the source schema |
 | `TCC_FABRIC_WAREHOUSE_ID`, `TCC_WAREHOUSE_SERVER`, `TCC_WAREHOUSE_DATABASE` | `fabric_warehouse_id`, `warehouse_server`, `warehouse_database` | enterprise | Existing Warehouse for `tcc_gold` / `tcc_ops`. Required; never bootstrapped (D22) |
+| `TCC_WAREHOUSE_PLATFORM` | `warehouse_platform` | both | `fabric` (default) or `azure_sql`. `azure_sql` creates an Entra-only Azure SQL server and database (`infra/modules/azure_sql`) and points `WAREHOUSE_SERVER` / `WAREHOUSE_DATABASE` at it; the payroll lakehouse stays in Fabric. Not applied or run live yet: see [ADR-011](ADR-011-azure-sql-operational-store.md) |
+| `TCC_SQL_ADMIN_GROUP_OBJECT_ID`, `TCC_SQL_ADMIN_GROUP_NAME` | `azure_sql_admin_group_object_id`, `azure_sql_admin_group_name` | both | Required when `TCC_WAREHOUSE_PLATFORM=azure_sql`: the Entra group that administers the server. `postprovision` runs `grant-sql.py`, which needs a member of that group |
 
 `AZURE_ENV_NAME` and `AZURE_SUBSCRIPTION_ID` are written by azd.
 `backend/tests/test_deployment_docs_contract.py` fails the build if a value
