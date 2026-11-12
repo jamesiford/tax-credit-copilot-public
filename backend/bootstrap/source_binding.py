@@ -136,3 +136,13 @@ def _engagement_batch() -> Any:
 
 
 provide("engagement_batch", _engagement_batch)
+
+
+def _lakehouse_sql() -> Any:
+    """The lakehouse endpoint connection the SQL read path (`SOURCE_READ_MODE=sql`) reads through."""
+    from infrastructure.persistence import source_sql
+
+    return source_sql.shared_connection
+
+
+provide("lakehouse_sql", _lakehouse_sql)
