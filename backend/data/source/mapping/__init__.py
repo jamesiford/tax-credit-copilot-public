@@ -6,12 +6,12 @@ named meanings a mapping can select; `validate` compares a mapping with a real l
 from . import validate
 from .model import MappingError, SourceMapping, parse_mapping
 from .resolver import (
-    column, default_mapping, describe, mapping, null_pay_date_mode, optional_tables, partition_columns,
+    column, default_mapping, describe, engine_fields, mapping, null_pay_date_mode, optional_tables, partition_columns,
     physical_table, quoted, spec, table_map, tenant_column, tenant_columns, worksite_mode,
 )
 
 __all__ = [
-    "MappingError", "SourceMapping", "column", "default_mapping", "describe", "mapping", "null_pay_date_mode",
+    "MappingError", "SourceMapping", "column", "default_mapping", "describe", "engine_fields", "mapping", "null_pay_date_mode",
     "optional_tables", "parse_mapping", "partition_columns", "physical_table", "quoted", "spec", "table_map",
     "tenant_column", "tenant_columns", "validate", "worksite_mode",
 ]

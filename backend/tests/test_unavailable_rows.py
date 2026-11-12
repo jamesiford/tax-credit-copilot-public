@@ -99,6 +99,7 @@ def test_one_clients_engagement_read_failing_makes_only_that_row_unavailable(api
         return real(client_id)
 
     monkeypatch.setattr(repo, "engagements", flaky)
+    monkeypatch.setattr("infrastructure.persistence.engagement_batch.EngagementBatchReader.read", lambda self, repo, ids: None)  # the per-client read is what is under test
     monkeypatch.setattr("application.client_book.clients", lambda: [
         {"account_id": 1001, "name": "Ok", "industry": None}, {"account_id": 2001, "name": "Flaky", "industry": None},
     ])

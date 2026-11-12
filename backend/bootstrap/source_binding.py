@@ -127,3 +127,12 @@ provide("gold_near_filters", lambda: _gold_filters("NEAR_FILTERS"))
 from bootstrap.lookup_wiring import install_lookup_store  # noqa: E402
 
 install_lookup_store()
+
+
+def _engagement_batch() -> Any:
+    from infrastructure.persistence.engagement_batch import EngagementBatchReader
+
+    return EngagementBatchReader()
+
+
+provide("engagement_batch", _engagement_batch)

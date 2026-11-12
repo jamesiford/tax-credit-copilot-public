@@ -172,8 +172,27 @@ def _read_claims(degraded: list[dict[str, Any]]) -> tuple[Any, list[ProgramClaim
         return None, []
 
 
-def _engagements(repo: Any, client_id: int, degraded: list[dict[str, Any]]) -> dict[str, EngagementScope] | None:
-    """One client's engagement scopes, or None when they could not be read (recorded as degraded)."""
+def prefetch_engagements(repo: Any, grouped: Any, book_rows: list[dict[str, Any]]) -> dict[int, dict[str, EngagementScope]]:
+    """Every client's engagement scopes in a few batched reads (the page used to ask once per client: N+1).
+
+    Empty when there is no batch reader for this repository or it fails; the per-client read then answers, and reports, as before.
+    """
+    from application.services import ServiceNotBound, resolve
+
+    client_ids = sorted(set(grouped) | {int(c["account_id"]) for c in book_rows})
+    try:
+        found = resolve("engagement_batch").read(repo, client_ids) if repo is not None else None
+    except ServiceNotBound:
+        return {}
+    except Exception:  # noqa: BLE001 - the per-client path classifies and reports the failure
+        return {}
+    return {cid: {e.program_code: e.scope for e in items} for cid, items in (found or {}).items()}
+
+
+def _engagements(repo: Any, client_id: int, degraded: list[dict[str, Any]], known: dict | None = None) -> dict[str, EngagementScope] | None:
+    """One client's engagement scopes (from the batch in `known` when it holds them), or None when unreadable (recorded as degraded)."""
+    if known is not None and client_id in known:
+        return known[client_id]
     if repo is None:
         return None
     try:

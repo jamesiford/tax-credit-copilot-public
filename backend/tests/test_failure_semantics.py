@@ -119,6 +119,7 @@ def test_the_engagement_read_failing_after_the_claims_read_is_degraded_too(api, 
         "provenance": "computed", "decided_by": "a@example.com", "identified_usd": "100",
     })
     monkeypatch.setattr(repo, "engagements", lambda *_a, **_k: (_ for _ in ()).throw(OSError("timed out")))
+    monkeypatch.setattr("infrastructure.persistence.engagement_batch.EngagementBatchReader.read", lambda self, repo, ids: None)  # the per-client read is what is under test
     entries = _degraded(client.get("/api/v2/portfolio"))
     assert _dependencies(entries) == {"claims_store"}
     assert any("engagement" in e["impact"] for e in entries)
