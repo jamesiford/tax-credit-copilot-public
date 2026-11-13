@@ -51,4 +51,14 @@ verification; no new calculation models; no extension of the ingestion agent.
   registry; the old `"GA"` survives only as a deprecated fallback that warns. Read queries keep their defaults (follow-up).
 - A year skeleton is written as `<year>.draft.json`, which the engine does not read, so a half-filled file can never make a
   program look calculable.
+- **Several programs per state (F04c).** The program is the key. `Registry.for_state` / `programs_for_state` list a state's programs in
+  manifest order (the first is its default and what `STATE_TO_PACK` shows); `program_for_code` looks one up. `resolve_statute` and
+  `resolve_client_run` are program-first (`program_code` wins; a disagreeing state is `ProgramStateConflict`; a federal or unknown
+  program is `ProgramNotRunnable`). A state with several calculable programs resolves to the first with a logged warning on the run
+  path and asks (404 listing them, `require_program`) on a read. `tools/program_credit.py` holds the credit math keyed by program;
+  the state-named functions are wrappers over the default program. `tools/pack_lookup.pack_file_for` finds any program's pack.
+  Which rows a program prices is defined once (`program_rows`). Federal programs stay not runnable. Gold, manifests and claims were
+  already program-keyed; the reads were not (`latest_run` returned the latest run of any program), so `program_code` now threads
+  through the Gold read port. No migration. Limits: capability tool inputs other than `base_year_set` do not yet take a program,
+  and the client-wide trend still reads the latest run (open-questions).
 - See [ADDING-A-PROGRAM.md](ADDING-A-PROGRAM.md).

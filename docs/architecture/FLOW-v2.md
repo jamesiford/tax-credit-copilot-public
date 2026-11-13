@@ -176,7 +176,10 @@ Points worth knowing:
 `POST /api/v2/clients/{client_id}/runs` (route in `backend/api/trend.py`)
 dispatches `RunClientCalculationCommand` to
 `backend/application/commands/run_client_calculation.py`. The request body is
-`{"year": <tax year>, "state": "GA", "triggered_by": ..., "assess_years": [...]}`.
+`{"year": <tax year>, "state": "GA", "program_code": "GA_JTC", "triggered_by": ..., "assess_years": [...]}`. `state` and
+`program_code` are both optional: `program_code` names the program priced and wins over `state` (a state that disagrees is a 422); with
+neither, the state is derived from the client's payroll. A state with several calculable programs resolves to the first with a logged
+warning. The response always names the `program_code` priced.
 
 ```mermaid
 sequenceDiagram
