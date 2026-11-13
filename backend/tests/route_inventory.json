@@ -73,6 +73,8 @@
   "POST /api/workspace/refresh",
   "POST /api/workspace/source/search",
   "PUT /api/claims/engagement",
+  "GET /api/v2/programs",
+  "GET /api/v2/programs/{code}",
   "GET /api/v2/run-batches",
   "POST /api/v2/run-batches",
   "GET /api/v2/run-batches/{batch_id}",
