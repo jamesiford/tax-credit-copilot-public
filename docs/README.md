@@ -21,6 +21,7 @@ run it.
 | Run it day to day | [RUNBOOK.md](architecture/RUNBOOK.md) and, for the Microsoft 365 channel, [OPERATIONS.md](m365-channel/OPERATIONS.md) |
 | [RUN-ORCHESTRATION.md](architecture/RUN-ORCHESTRATION.md) | Running many clients as tracked batches: how to start, preview, watch, cancel and retry; what skipped means; running and sizing the worker; failure signatures |
 | [ADDING-A-PROGRAM.md](architecture/ADDING-A-PROGRAM.md) | Adding a tax incentive program by data: the registry, rule and year packs, validation and scaffolding commands, the supported models and what needs engine work |
+| [PROGRAM-DRAFTS.md](architecture/PROGRAM-DRAFTS.md) | Bringing on a new program from the portal: the draft lifecycle, validation and review rules, the API, storage and settings; a draft has no runtime authority |
 | Review a decision | the [ADR index](#architecture) below; the [build log](m365-channel/DECISIONS.md) for the Microsoft 365 channel |
 | See what the last remediation run fixed, skipped and needs from the owner | [REMEDIATION-FINDINGS.md](m365-channel/REMEDIATION-FINDINGS.md) (Summary) |
 

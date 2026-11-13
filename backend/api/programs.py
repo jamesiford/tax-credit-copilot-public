@@ -13,9 +13,11 @@ from pydantic import BaseModel, Field
 
 from application.program_catalog import UnknownProgram
 from application.queries.program_catalog_reads import GetProgramDetailQuery, ListProgramCatalogQuery
+from api.program_drafts import router as drafts_router
 from application.services import get_mediator
 
-router = APIRouter(prefix="/api/v2/programs", tags=["programs"])
+router = APIRouter(tags=["programs"])
+router.include_router(drafts_router)
 
 
 class Jurisdiction(BaseModel):
@@ -98,13 +100,13 @@ class ProgramDetail(ProgramRow):
     blockers: list[str]
 
 
-@router.get("", response_model=CatalogOut)
+@router.get("/api/v2/programs", response_model=CatalogOut)
 def list_programs() -> Any:
     """Every registered program, with its lifecycle, authored years, unverified years, engagement counts and calculability."""
     return get_mediator().send(ListProgramCatalogQuery())
 
 
-@router.get("/{code}", response_model=ProgramDetail)
+@router.get("/api/v2/programs/{code}", response_model=ProgramDetail)
 def get_program(code: str) -> Any:
     """One program: pack metadata, per-year status, validation results and what blocks calculability."""
     try:
