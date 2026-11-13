@@ -97,6 +97,13 @@ python scripts/run-worker.py --once     # from the repo root: drain the queue an
   is CPU-bound, so raise it with care. On the Fabric Warehouse, two runs writing Gold at once can conflict (error 24556); the
   writer retries, and an item that still fails is retried by the job with backoff. To raise it, watch the retry counts for errors 24556, 3960 and 1205; if they climb, use 1. Azure SQL
   conflicts less. **This has not been measured on a live Warehouse** (see `live-checks.md` in the build analysis).
+- **Queue cost per item** (statements and transactions the queue issues to claim, mark running, finish and count one item; each is a round
+  trip on a Warehouse): 10 statements in 4 transactions, down from 13 in 8 (`python scripts/run-batch-scale-check.py` prints both; a test holds the
+  budget). The counters are recomputed in the same transaction that finishes the item, the claim returns its items from the claiming
+  transaction, the per-client busy check is part of the candidate query, and lapsed leases are looked for every quarter of a lease rather than on
+  every tick. Leases and the per-client lock are unchanged. These are counts on the SQLite stand-in; they are not Warehouse timings, and
+  `RUN_WORKER_POLL_SECONDS` should still be chosen from live check 24. The candidate query still sorts the queued items, so its cost grows with
+  the number queued (visible on SQLite at a few thousand items); whether the Warehouse's optimizer does the same is a live check.
 - Retries: `RUN_ITEM_MAX_ATTEMPTS` (default 3), only for transient failures, with capped exponential backoff and jitter.
 - A worker that dies loses nothing: its leases lapse (`RUN_LEASE_SECONDS`, default 120) and the items return to the queue.
 

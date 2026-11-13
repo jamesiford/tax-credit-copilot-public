@@ -17,6 +17,16 @@ _ACTIVE_SQL = ", ".join(f"'{s}'" for s in _ACTIVE)
 _ITEM_SELECT = ", ".join(f"i.{c}" for c in rows.ITEM_COLUMNS)
 
 
+def _items_in(tx: Tx, backend: Any, table: str, item_ids: list[str]) -> list[RunBatchItem]:
+    """The items as stored, in the order given, read in the claiming transaction (no second round trip per item)."""
+    if not item_ids:
+        return []
+    marks = ", ".join("?" for _ in item_ids)
+    found = {r["item_id"]: rows.to_item(r, backend.parse) for r in tx.execute(
+        f"SELECT {', '.join(rows.ITEM_COLUMNS)} FROM {table} WHERE item_id IN ({marks})", item_ids).rows}
+    return [found[i] for i in item_ids if i in found]
+
+
 class QueueOps:
     """Mixin: the methods a worker needs."""
 
@@ -34,16 +44,18 @@ class QueueOps:
         """Lease up to `limit` queued items, at most one per client and none for a client already leased."""
         expires = now + timedelta(seconds=lease_seconds)
 
-        def work(tx: Tx) -> list[str]:
+        def work(tx: Tx) -> list[RunBatchItem]:
             """Pick candidates, flip them to leased, and keep only the per-client lock holders."""
-            busy = {r["client_id"] for r in tx.execute(
-                f"SELECT DISTINCT client_id FROM {self._item} WHERE status IN ({_ACTIVE_SQL}) AND lease_expires_at > ?",
-                [self._b.bind(now)]).rows}
+            # A client with a live lease is excluded in the query itself (one statement, and the candidate window holds only
+            # claimable items); `busy` then covers the clients taken in this very claim.
+            busy: set[int] = set()
             clause, extra = self._b.page(limit * 20 + 20, 0)
             candidates = tx.execute(
                 f"SELECT i.item_id, i.client_id FROM {self._item} i JOIN {self._batch} b ON b.batch_id = i.batch_id "
                 "WHERE i.status = 'queued' AND b.cancel_requested = 0 AND (i.not_before IS NULL OR i.not_before <= ?) "
-                f"ORDER BY b.requested_at, i.seq, i.item_id {clause}", [self._b.bind(now), *extra]).rows
+                f"AND NOT EXISTS (SELECT 1 FROM {self._item} x WHERE x.client_id = i.client_id AND x.status IN ({_ACTIVE_SQL}) "
+                f"AND x.lease_expires_at > ?) ORDER BY b.requested_at, i.seq, i.item_id {clause}",
+                [self._b.bind(now), self._b.bind(now), *extra]).rows
             taken: list[tuple[str, int]] = []
             for cand in candidates:
                 if len(taken) >= limit:
@@ -57,10 +69,10 @@ class QueueOps:
                 if won == 1:
                     taken.append((cand["item_id"], cand["client_id"]))
                     busy.add(cand["client_id"])
-            return self._keep_lock_holders(tx, taken, owner, now)
+            kept = self._keep_lock_holders(tx, taken, owner, now)
+            return _items_in(tx, self._b, self._item, kept)
 
-        ids = self._b.transact(work)
-        return [i for i in (self.get_item(x) for x in ids) if i is not None]
+        return self._b.transact(work)
 
     def _keep_lock_holders(self, tx: Tx, taken: list[tuple[str, int]], owner: str, now: datetime) -> list[str]:
         kept: list[str] = []
@@ -91,14 +103,24 @@ class QueueOps:
             "WHERE item_id = ? AND lease_owner = ? AND status = 'leased'",
             [self._b.bind(now), tax_year, program_code, item_id, owner]).rowcount) == 1
 
-    def finish(self, item_id: str, owner: str, now: datetime, result: ItemResult) -> bool:
-        """Record how the item ended and release its lease. False means the lease was no longer ours."""
-        return self._b.transact(lambda tx: tx.execute(
-            f"UPDATE {self._item} SET status = ?, finished_at = ?, run_id = ?, skip_reason = ?, error_dependency = ?, "
-            "error_message = ?, tax_year = COALESCE(?, tax_year), lease_owner = NULL, lease_expires_at = NULL "
-            f"WHERE item_id = ? AND lease_owner = ? AND status IN ({_ACTIVE_SQL})",
-            [result.status.value, self._b.bind(now), result.run_id, result.skip_reason, result.error_dependency,
-             (result.error_message or "")[:1000] or None, result.tax_year, item_id, owner]).rowcount) == 1
+    def finish(self, item_id: str, owner: str, now: datetime, result: ItemResult, *, refresh_batch: str | None = None) -> bool:
+        """Record how the item ended and release its lease. False means the lease was no longer ours.
+
+        With `refresh_batch` the batch's counters are recomputed in the same transaction (one round trip fewer per item, and
+        the counters can never be read out of step with the item that was just finished).
+        """
+        def work(tx: Tx) -> bool:
+            kept = tx.execute(
+                f"UPDATE {self._item} SET status = ?, finished_at = ?, run_id = ?, skip_reason = ?, error_dependency = ?, "
+                "error_message = ?, tax_year = COALESCE(?, tax_year), lease_owner = NULL, lease_expires_at = NULL "
+                f"WHERE item_id = ? AND lease_owner = ? AND status IN ({_ACTIVE_SQL})",
+                [result.status.value, self._b.bind(now), result.run_id, result.skip_reason, result.error_dependency,
+                 (result.error_message or "")[:1000] or None, result.tax_year, item_id, owner]).rowcount == 1
+            if refresh_batch:
+                self.refresh_in(tx, refresh_batch, now)  # type: ignore[attr-defined]
+            return kept
+
+        return self._b.transact(work)
 
     def requeue(
         self, item_id: str, owner: str, not_before: datetime, error_dependency: str | None, error_message: str | None,

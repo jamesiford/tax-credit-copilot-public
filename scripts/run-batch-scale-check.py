@@ -99,14 +99,17 @@ def _run_once(accounts: int, item_ms: float, concurrency: int) -> dict:
     enqueued_s = time.perf_counter() - started
     settings = parse_runs({"ENVIRONMENT": "local", "RUN_WORKER_CONCURRENCY": str(concurrency), "RUN_BATCH_CONFIRM_ABOVE": str(accounts * 2)})
     worker = RunWorker(repo, executor, settings, owner="scale")
+    before = (repo.statement_counter.statements, repo.statement_counter.transactions)
     worker.drain()
     total_s = time.perf_counter() - started
+    spent = (repo.statement_counter.statements - before[0], repo.statement_counter.transactions - before[1])
     done = repo.get(view["batch_id"])
     worker._pool.shutdown()
     repo.close()
     return {"concurrency": concurrency, "items": accounts, "status": done.status.value, "preview_s": round(preview_s, 2),
             "enqueue_s": round(enqueued_s - preview_s, 2), "total_s": round(total_s, 2),
-            "items_per_s": round(accounts / max(total_s - enqueued_s, 1e-9), 1)}
+            "items_per_s": round(accounts / max(total_s - enqueued_s, 1e-9), 1),
+            "statements_per_item": round(spent[0] / accounts, 2), "transactions_per_item": round(spent[1] / accounts, 2)}
 
 
 def main(argv: list[str]) -> int:
