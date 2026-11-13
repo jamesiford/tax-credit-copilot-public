@@ -123,13 +123,13 @@ def test_a_recorded_run_makes_the_next_batch_skip_it_until_forced(world):
     world.manifests.record(RunManifest(**{k: v for k, v in row.items() if k in RunManifest.__dataclass_fields__}))
     runs_before = len(world.writer.payloads)
 
-    again = _batch(kind="assess_and_calculate", idempotency_key="second")
+    again = _batch(kind="assess_and_calculate", skip_unchanged=True, idempotency_key="second")
     _drain(world)
     item = world.batches.list_items(again["batch_id"], None, 10, 0)[0][0]
     assert item.status is ItemStatus.SKIPPED_UNCHANGED and "identical" in item.skip_reason
     assert len(world.writer.payloads) == runs_before
 
-    forced = _batch(kind="assess_and_calculate", force=True, idempotency_key="third")
+    forced = _batch(kind="assess_and_calculate", skip_unchanged=True, force=True, idempotency_key="third")
     _drain(world)
     assert world.batches.list_items(forced["batch_id"], None, 10, 0)[0][0].status is ItemStatus.SUCCEEDED
     assert len(world.writer.payloads) == runs_before + 1

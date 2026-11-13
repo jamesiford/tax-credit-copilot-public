@@ -115,7 +115,7 @@ def test_a_filter_and_the_options_are_validated_before_a_token_exists(queue):
         prepare("run_batch", options={"refresh_once": False}, **SMALL)
     ok = prepare("run_batch", tax_years=[2024, 2025], options={"force": True}, confirm_items=6, **SMALL)
     assert ok.facts["preview"]["after"]["runs to queue"] == 6
-    assert ok.facts["preview"]["after"]["re-run even if unchanged"] == "yes"
+    assert ok.facts["preview"]["after"]["skip unchanged clients"].startswith("no")
 
 
 def test_a_client_the_book_does_not_hold_is_refused_at_prepare(queue):

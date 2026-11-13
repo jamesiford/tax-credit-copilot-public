@@ -48,7 +48,7 @@ def test_start_queues_a_batch_and_returns_it_without_waiting(api):
 
 
 def test_dry_run_writes_nothing_and_says_it_is_a_preview(api):
-    r = _start(api, dry_run=True, scope={"kind": "all"})
+    r = _start(api, dry_run=True, skip_unchanged=True, scope={"kind": "all"})
     assert r.status_code == 202 and r.json()["dry_run"] is True
     preview = r.json()["preview"]
     assert preview["clients"] == 5 and preview["requires_confirmation"] is True

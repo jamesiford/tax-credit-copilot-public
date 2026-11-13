@@ -72,12 +72,14 @@ def item_values(item: RunBatchItem, bind: Bind) -> list[Any]:
 
 
 def to_batch(row: dict[str, Any], parse: Parse) -> RunBatch:
+    """A batch from a stored row; `skip_unchanged` travels in the stored spec, so it needs no column."""
     counts = {k: int(row[k] or 0) for k in (
         "items_total", "items_queued", "items_running", "items_succeeded", "items_skipped", "items_failed",
         "items_cancelled")}
+    spec = json.loads(row["scope_spec"] or "{}")
     return RunBatch(
         batch_id=row["batch_id"], kind=BatchKind(row["kind"]), scope_kind=ScopeKind(row["scope_kind"]),
-        scope_spec=json.loads(row["scope_spec"] or "{}"), program_code=row["program_code"],
+        scope_spec=spec, program_code=row["program_code"], skip_unchanged=bool(spec.get("skip_unchanged")),
         tax_years=tuple(json.loads(row["tax_years"])) if row["tax_years"] else (), force=bool(row["force_run"]),
         include_code_commit=bool(row["include_code_commit"]), refresh_once=bool(row["refresh_once"]),
         status=BatchStatus(row["status"]), cancel_requested=bool(row["cancel_requested"]),

@@ -46,7 +46,8 @@ class StartBody(BaseModel):
     scope: ScopeBody
     program_code: str | None = None
     tax_years: list[int] = Field(default_factory=list, description="Empty: each client's latest runnable year.")
-    force: bool = Field(False, description="Run even when the last run already answers it.")
+    force: bool = Field(False, description="Run every item even if skip_unchanged is on. Kept for compatibility.")
+    skip_unchanged: bool = Field(False, description="Skip clients whose data and rules are unchanged since their last run. Off by default.")
     include_code_commit: bool = False
     refresh_once: bool = Field(True, description="One item per client. Off needs explicit tax_years.")
     idempotency_key: str | None = Field(None, max_length=128)
@@ -88,6 +89,7 @@ class BatchOut(BaseModel):
     program_code: str | None
     tax_years: list[int]
     force: bool
+    skip_unchanged: bool = False
     include_code_commit: bool
     refresh_once: bool
     status: str
@@ -169,7 +171,7 @@ def start_run_batch(body: StartBody, request: Request) -> Any:
     common = dict(
         kind=body.kind, scope_kind=body.scope.kind, client_ids=tuple(body.scope.client_ids), filter=body.scope.filter,
         program_code=body.program_code, tax_years=tuple(body.tax_years), force=body.force,
-        include_code_commit=body.include_code_commit, refresh_once=body.refresh_once,
+        skip_unchanged=body.skip_unchanged, include_code_commit=body.include_code_commit, refresh_once=body.refresh_once,
     )
     if body.dry_run:
         return {"dry_run": True, "preview": _send(PreviewRunBatchQuery(**common))}

@@ -103,6 +103,8 @@ class RunBatch:
     force: bool = False
     include_code_commit: bool = False
     refresh_once: bool = True
+    #: Opt-in. Skipping happens only when this is true and `force` is false. [F04b.1]
+    skip_unchanged: bool = False
     status: BatchStatus = BatchStatus.QUEUED
     idempotency_key: str | None = None
     dry_run_summary: dict[str, Any] = field(default_factory=dict)
@@ -192,6 +194,8 @@ class Fingerprint:
     rule_pack_version: str | None = None
     code_commit: str | None = None
     tax_year: int | None = None
+    #: A digest of ALL the client's authored-year payroll (`application/runs/fingerprint.py`). [F04b.1]
+    source_snapshot_id: str | None = None
 
 
 def unchanged_decision(
@@ -199,8 +203,9 @@ def unchanged_decision(
 ) -> tuple[bool, str]:
     """`(unchanged, reason)`. True only when every compared value is known on both sides and equal.
 
-    `source_snapshot_id` is deliberately not compared: it is never populated, so it cannot say anything.
-    `calculation_id` already digests the year's payroll rows, the floors and the assumption ids.
+    `calculation_id` digests ONE year's payroll, but a run replays and writes every authored year, so it cannot
+    show that a prior year was restated. `source_snapshot_id` is the client-wide digest of all authored-year
+    payroll and is required on both sides: a manifest without it means "cannot tell, so run". [F04b.1]
     """
     if last is None:
         return False, "no earlier successful run for this client and programme"
@@ -209,6 +214,7 @@ def unchanged_decision(
             f"the latest run was for TY{last.tax_year}, not TY{current.tax_year}: cannot tell, so run"
         )
     pairs = [
+        ("client-wide data fingerprint", last.source_snapshot_id, current.source_snapshot_id),
         ("calculation fingerprint", last.calculation_id, current.calculation_id),
         ("step 1 assumption hash", last.step1_assumption_sha256, current.step1_assumption_sha256),
         ("one/zero assumption hash", last.onezero_assumption_sha256, current.onezero_assumption_sha256),

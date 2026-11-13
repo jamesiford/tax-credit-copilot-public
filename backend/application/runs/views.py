@@ -18,7 +18,7 @@ def batch_view(batch: RunBatch, *, replay: bool = False) -> dict[str, Any]:
     return {
         "batch_id": batch.batch_id, "kind": batch.kind.value, "scope_kind": batch.scope_kind.value,
         "scope_spec": batch.scope_spec, "program_code": batch.program_code, "tax_years": list(batch.tax_years),
-        "force": batch.force, "include_code_commit": batch.include_code_commit, "refresh_once": batch.refresh_once,
+        "force": batch.force, "skip_unchanged": batch.skip_unchanged, "include_code_commit": batch.include_code_commit, "refresh_once": batch.refresh_once,
         "status": batch.status.value, "cancel_requested": batch.cancel_requested,
         "counts": {
             "total": c.get("items_total", 0), "queued": c.get("items_queued", 0), "running": c.get("items_running", 0),
