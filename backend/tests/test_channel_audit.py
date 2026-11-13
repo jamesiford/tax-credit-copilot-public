@@ -24,6 +24,7 @@ from application.channel_audit import AuditCall, ChannelAuditor, request_sha256,
 from application.identity import ActingUser, NotAuthorized
 from domain.channel import ChannelAuditEvent, collapse
 from infrastructure.persistence.sqlite_channel import SqliteChannelAuditRepository
+from tests.driver_fidelity import PyodbcCursorModel
 from tests.ai_fakes import FakeAgent, foundry_runtime_over, install_providers
 
 REPO = Path(__file__).resolve().parents[2]
@@ -214,18 +215,18 @@ def test_an_annotation_cannot_overwrite_the_identity_of_the_request(auditor):
 # ----------------------------------------------------- the Warehouse adapter's SQL
 
 
-class _Cursor:
+class _Cursor(PyodbcCursorModel):
     def __init__(self, conn):
-        self.conn, self.description, self.rowcount = conn, None, 1
+        self._conn, self._description, self._rowcount = conn, None, 1
 
     def execute(self, sql, params=None):
-        self.conn.statements.append((" ".join(sql.split()), list(params or [])))
+        self._conn.statements.append((" ".join(sql.split()), list(params or [])))
         if sql.lstrip().startswith("SELECT"):
-            self.description = [(name,) for name in self.conn.columns]
+            self._description = [(name,) for name in self._conn.columns]
         return self
 
     def fetchall(self):
-        return self.conn.rows
+        return self._conn.rows
 
     def close(self):
         pass

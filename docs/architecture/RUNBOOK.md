@@ -566,6 +566,8 @@ Everything below is additive and off or empty until used. Nothing here is applie
 5. The channel: the hosted orchestrator's vendored copy and the Cowork plugin (the catalog is 37 tools) need a republish for chat to offer the new
    capabilities; the portal does not depend on it.
 
+**First thing after any deploy: the live smoke.** `python scripts/live-smoke.py --target <name>` (read-only; GET only; targets from `SMOKE_TARGETS`, a production target needs `--allow-production`) reads `/api/ready`, `/api/scope`, the portfolio, programs, run batches, rules and, per client, the scope, eligibility and trend, and prints every non-2xx with its error code. A driver-level mistake that no offline test can see shows up here as a 500 on a read. Exit 0 means every read answered.
+
 **Order**
 
 1. `terraform plan -detailed-exitcode` on the release (expect no changes with the flag off), then deploy the API and web code.

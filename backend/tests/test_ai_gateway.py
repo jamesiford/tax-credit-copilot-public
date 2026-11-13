@@ -15,6 +15,7 @@ import logging
 
 import httpx
 import pytest
+from azure.core.credentials import AccessToken
 
 from application.ai.settings import AiSettings
 from domain.ai import (
@@ -224,9 +225,9 @@ class _FakeCredential:
     def __init__(self, aud):
         self.aud, self.scopes = aud, []
 
-    def get_token(self, scope):
-        self.scopes.append(scope)
-        return type("T", (), {"token": _jwt(self.aud)})()
+    def get_token(self, *scopes, **kwargs):
+        self.scopes.extend(scopes)
+        return AccessToken(_jwt(self.aud), 4102444800)
 
 
 def test_entra_token_authenticates_with_the_managed_identity_and_asks_for_the_default_scope():
@@ -248,7 +249,7 @@ def test_an_entra_token_for_another_audience_is_refused():
 
 def test_a_credential_failure_is_an_auth_error():
     class Broken:
-        def get_token(self, scope):
+        def get_token(self, *scopes, **kwargs):
             raise RuntimeError("no managed identity")
 
     gw = settings(auth="entra_token", entra_audience="api://x")

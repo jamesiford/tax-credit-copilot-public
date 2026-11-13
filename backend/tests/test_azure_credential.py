@@ -6,6 +6,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
+from azure.core.credentials import AccessToken
 
 from config import override_settings
 from infrastructure import azure_credential as ac
@@ -59,9 +60,9 @@ class _Credential:
         self.calls = 0
         self.expires_on = 10**10
 
-    def get_token(self, scope):
+    def get_token(self, *scopes, **kwargs):
         self.calls += 1
-        return SimpleNamespace(token=f"t{self.calls}:{scope}", expires_on=self.expires_on)
+        return AccessToken(f"t{self.calls}:{scopes[0]}", self.expires_on)
 
 
 def test_a_token_is_reused_until_shortly_before_it_expires(monkeypatch):

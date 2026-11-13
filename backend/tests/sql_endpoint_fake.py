@@ -24,6 +24,7 @@ from deltalake import DeltaTable
 
 from data.source import onelake
 from data.source.to_delta import TABLE_SPECS
+from tests.driver_fidelity import PyodbcCursorModel
 
 _THREE_PART = re.compile(r"\[[^\]]+\]\.(?:\[[^\]]+\])?\.(\[[^\]]+\])")
 _FROM = re.compile(r"FROM\s+\[([^\]]+)\]", re.IGNORECASE)
@@ -69,13 +70,12 @@ def _restore(value: Any, kind: str) -> Any:
     return value
 
 
-class _Cursor:
+class _Cursor(PyodbcCursorModel):
     def __init__(self, endpoint: "FakeLakehouseSql") -> None:
         self._endpoint = endpoint
         self._cursor = endpoint.db.cursor()
         self._kinds: list[str] = []
         self._columns_rows: list[tuple] | None = None
-        self.timeout = 0
 
     def execute(self, sql: str, params: Any = None) -> None:
         params = list(params or [])

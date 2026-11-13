@@ -13,6 +13,7 @@ import time
 
 import httpx
 import pytest
+from azure.core.credentials import AccessToken
 
 from application.display_names import PLACEHOLDER_NAME, ResolvedPerson, needs_resolution
 from application.identity import ActingUser
@@ -244,9 +245,9 @@ def test_a_token_that_predates_the_grant_is_refreshed_once_through_the_shared_cl
         def __init__(self) -> None:
             self.asked = 0
 
-        def get_token(self, scope, **kwargs):
+        def get_token(self, *scopes, **kwargs):
             self.asked += 1
-            return type("T", (), {"token": f"token-{self.asked}"})()
+            return AccessToken(f"token-{self.asked}", 4102444800)
 
     answers = iter([
         httpx.Response(403, json={"error": {"code": "Authorization_RequestDenied"}}),
