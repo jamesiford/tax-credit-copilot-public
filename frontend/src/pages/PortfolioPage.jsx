@@ -2,10 +2,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import InsightBar from '../components/InsightBar.jsx';
-import BookGrid from '../components/BookGrid.jsx';
+import BookGrid, { filterBookRows } from '../components/BookGrid.jsx';
 import FootprintPanel from '../components/FootprintPanel.jsx';
 import GridTabs, { GridTabPanel } from '../components/GridTabs.jsx';
 import StartHereCards from '../components/StartHereCards.jsx';
+import RunDialog from '../components/runs/RunDialog.jsx';
+import SelectionBar from '../components/runs/SelectionBar.jsx';
 import Card from '../components/ui/Card.jsx';
 import DegradedBanner from '../components/ui/DegradedBanner.jsx';
 import EmptyState from '../components/ui/EmptyState.jsx';
@@ -21,6 +23,7 @@ import { band } from '../lib/priority.js';
 import { formatFilters, parseFilters } from '../lib/gridFilter.js';
 import { bookSortQuery, formatBookSort, parseBookSort, toggleBookSort } from '../lib/bookSort.js';
 import { greeting } from '../lib/identity.js';
+import { emptySelection, serverFilter, setPage, toggleId } from '../lib/runBatches.js';
 import { loadStartHere, storeStartHere } from '../lib/startHere.js';
 
 /**
@@ -116,6 +119,33 @@ export default function PortfolioPage({
 
   const rows = summary?.items || [];
   const counts = useMemo(() => bandCounts(rows), [rows]);
+
+  // Selecting clients to run. The filters narrow the screen in the browser, so "all matching" is exact when the page
+  // holds the whole book (explicit ids), and is handed to the server as a filter only when it can be written in the
+  // server's vocabulary; otherwise the bar says why it cannot, rather than running clients nobody saw.
+  const [selection, setSelection] = useState(emptySelection);
+  const [runOpen, setRunOpen] = useState(false);
+  const shown = useMemo(() => filterBookRows(rows, filters), [rows, filters]);
+  const matching = useMemo(() => {
+    if (!rows.length) return null;
+    const total = summary?.total ?? rows.length;
+    if (rows.length >= total) return { ok: true, count: shown.length, explicit: shown.map((r) => r.client_id) };
+    const translated = serverFilter(filters);
+    if (!translated.ok) return { ok: false, count: null, reason: translated.reason };
+    const unfiltered = Object.keys(translated.filter).length === 0;
+    return { ok: true, count: unfiltered ? total : null, filter: translated.filter };
+  }, [rows, summary, shown, filters]);
+  const selectMatching = useCallback(() => {
+    if (!matching?.ok) return;
+    setSelection(matching.explicit
+      ? { ids: matching.explicit, matching: null }
+      : { ids: [], matching: { count: matching.count, filter: matching.filter } });
+  }, [matching]);
+  const started = useCallback((batch) => {
+    setRunOpen(false);
+    setSelection(emptySelection());
+    navigate(`/runs/${encodeURIComponent(batch.batch_id)}`);
+  }, [navigate]);
   const activeTab = activeBookTab(filters);
 
   // 29 Sep: the caption is the COUNTS only. It used to name the single client
@@ -227,11 +257,29 @@ export default function PortfolioPage({
             onSort={setSort}
             onPickClient={onPickClient}
             onAskCopilot={askAbout}
+            selection={selection}
+            onToggleRow={(id) => setSelection((cur) => toggleId(cur, id))}
+            onTogglePage={(ids, on) => setSelection((cur) => setPage(cur, ids, on))}
             unassessedCount={summary?.unassessed_clients || 0}
             unavailableHint={(summary?.degraded || []).find((d) => d.dependency === 'claims_store')?.remedy}
           />
         </GridTabPanel>
       </Card>
+
+      <SelectionBar
+        selection={selection}
+        matching={matching}
+        onSelectMatching={selectMatching}
+        onClear={() => setSelection(emptySelection())}
+        onRun={() => setRunOpen(true)}
+      />
+      <RunDialog
+        open={runOpen}
+        selection={selection}
+        scopeOptions={scopeOptions}
+        onClose={() => setRunOpen(false)}
+        onStarted={started}
+      />
 
       <div className="tcc-card-grid">
         {footprintOf(rows).held.length > 1 ? (

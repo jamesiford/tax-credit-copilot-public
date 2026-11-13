@@ -1,3 +1,4 @@
+import { batchPath, queueOneClient, runAsBatchEnabled, useBatchNavigate } from '../lib/singleRun.js';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
@@ -529,11 +530,17 @@ export default function TrendGridView({
     [payload, calculated],
   );
 
+  // OFF by default (lib/singleRun.js): queue a one-client calculation and open its progress instead of blocking.
+  const goTo = useBatchNavigate();
   const runCalculation = useCallback(async () => {
     if (isPortfolio || !scope?.year) return;
     setRunning(true);
     setError(null);
     try {
+      if (goTo && runAsBatchEnabled()) {
+        goTo(batchPath(await queueOneClient({ kind: 'calculate', clientId: scope.clientId, year: scope.year })));
+        return;
+      }
       await runClientCalculation(scope.clientId, { year: scope.year, state });
       await load();
     } catch (err) {
@@ -541,7 +548,7 @@ export default function TrendGridView({
     } finally {
       setRunning(false);
     }
-  }, [isPortfolio, scope?.clientId, scope?.year, state, load]);
+  }, [isPortfolio, scope?.clientId, scope?.year, state, load, goTo]);
 
   const blocks = useMemo(() => buildBlocks(data), [data]);
 

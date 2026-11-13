@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
-  Binary, BookOpenCheck, ClipboardList, Database, FileDiff,
+  Binary, BookOpenCheck, ClipboardList, Database, FileDiff, ListChecks,
   MessageSquare, Play, RefreshCw, ShieldCheck,
   ShieldQuestion, Users, X,
 } from 'lucide-react';
@@ -25,6 +25,7 @@ import { navGroups } from './lib/shellNav.js';
 import ClientPage from './pages/ClientPage.jsx';
 import EmployeePage from './pages/EmployeePage.jsx';
 import PortfolioPage from './pages/PortfolioPage.jsx';
+import RunsPage from './pages/RunsPage.jsx';
 import UnitPage from './pages/UnitPage.jsx';
 import {
   PORTFOLIO, loadStoredScope, reconcileScope, scopeLabel, storeScope,
@@ -86,6 +87,7 @@ export const NAV = [
   ] },
   { section: 'What needs a decision', items: [
     { id: 'ingestion', label: 'Payroll data', icon: Database },
+    { id: 'runs', label: 'Runs', icon: ListChecks },
     { id: 'agents', label: 'Agents', icon: ShieldQuestion },
   ] },
   { section: 'Prove it', items: [
@@ -122,7 +124,8 @@ function buildRouteUrl({ clientId = PORTFOLIO, view = 'trend', unitId = null, to
 
   const base = clientId === PORTFOLIO ? '/' : `/c/${encodeURIComponent(clientId)}`;
   let pathname = base;
-  if (token) pathname = `${base}/e/${encodeURIComponent(token)}`;
+  if (view === 'runs') pathname = '/runs';
+  else if (token) pathname = `${base}/e/${encodeURIComponent(token)}`;
   else if (unitId) pathname = `${base}/u/${encodeURIComponent(unitId)}`;
   else if (view && view !== 'trend') pathname = clientId === PORTFOLIO ? `/${view}` : `${base}/${view}`;
 
@@ -147,7 +150,9 @@ function parseRouteState(pathname) {
     view = segments[0];
   }
 
-  return { clientId, token, unitId, view, isRoot: segments.length === 0 };
+  // `/runs/<batch id>`: a batch is a place a link can point at, so the id is part of the path.
+  const batchId = clientId == null && segments[0] === 'runs' && segments[1] ? decodeURIComponent(segments[1]) : null;
+  return { clientId, token, unitId, view, batchId, isRoot: segments.length === 0 };
 }
 
 function scrollToTop() {
@@ -590,6 +595,14 @@ export default function App() {
     view = <DataIngestionView
       taxYear={resolved.scope.year}
       accountId={resolved.scope.clientId === PORTFOLIO ? null : resolved.scope.clientId}
+    />;
+  }
+  else if (routeView === 'runs') {
+    view = <RunsPage
+      batchId={route.batchId}
+      onOpenBatch={(id) => navigate(`/runs/${encodeURIComponent(id)}`)}
+      onBack={() => navigate('/runs')}
+      onOpenClient={(clientId) => navigate(buildRouteUrl({ clientId }))}
     />;
   }
   else if (routeView === 'agents') view = <AgentActivityView scope={resolved.scope} scopeOptions={scopeOptions} />;

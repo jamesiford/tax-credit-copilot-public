@@ -295,6 +295,59 @@ export async function fetchLatestRun(clientId) {
   return r.json();
 }
 
+// --- Run batches: recalculate many clients as tracked jobs (ADR-012) ---------
+
+/**
+ * A refusal from the run batch API. `code`, `reason` and `remedy` come from the API's own typed detail, so the dialog
+ * can show what to change without parsing a sentence; `status` distinguishes a confirmation prompt (409) from a size
+ * limit (413) from a bad request (422).
+ */
+export class RunBatchError extends Error {
+  constructor(status, detail) {
+    const d = detail && typeof detail === 'object' ? detail : { detail };
+    super(d.detail || d.reason || `run batches ${status}`);
+    this.status = status;
+    this.code = d.code || null;
+    this.reason = d.reason || null;
+    this.remedy = d.remedy || null;
+    this.dependency = d.dependency || null;
+  }
+}
+
+async function runBatchRequest(path, options = {}) {
+  const r = await fetch(`${BASE}/api/v2/run-batches${path}`, options);
+  if (!r.ok) {
+    let detail = '';
+    try { detail = (await r.json())?.detail || ''; } catch { /* non-JSON error */ }
+    throw new RunBatchError(r.status, detail);
+  }
+  return r.json();
+}
+
+/** Preview a batch: writes nothing and reads no payroll. Resolves to `{ dry_run: true, preview }`. */
+export const previewRunBatch = (body) => runBatchRequest('', jsonPost({ ...body, dry_run: true }));
+
+/** Queue a batch (202). A repeated `idempotency_key` returns the first batch with `idempotent_replay: true`. */
+export const startRunBatch = (body) => runBatchRequest('', jsonPost({ ...body, dry_run: false }));
+
+export function listRunBatches({ limit = 25, offset = 0, status } = {}) {
+  const params = new URLSearchParams({ limit: String(limit), offset: String(offset) });
+  if (status) params.set('status', status);
+  return runBatchRequest(`?${params}`);
+}
+
+export const fetchRunBatch = (batchId) => runBatchRequest(`/${encodeURIComponent(batchId)}`);
+
+export function fetchRunBatchItems(batchId, { status, limit = 50, offset = 0 } = {}) {
+  const params = new URLSearchParams({ limit: String(limit), offset: String(offset) });
+  if (status) params.set('status', status);
+  return runBatchRequest(`/${encodeURIComponent(batchId)}/items?${params}`);
+}
+
+export const cancelRunBatch = (batchId) => runBatchRequest(`/${encodeURIComponent(batchId)}/cancel`, { method: 'POST' });
+
+export const retryFailedRunBatch = (batchId) => runBatchRequest(`/${encodeURIComponent(batchId)}/retry-failed`, { method: 'POST' });
+
 // --- Scope: the persistent client x program x year dimension (B3) ----------
 
 export async function fetchScope() {

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowRight, ChevronDown, ChevronRight, Loader2, MessageSquare } from 'lucide-react';
 import { fetchClientCoverage } from '../api.js';
 import { ColumnFilter, FilterBar } from './ColumnFilter.jsx';
@@ -9,6 +9,7 @@ import {
 import { ranksByValue } from '../lib/bookSort.js';
 import { money } from '../lib/coverage.js';
 import { band, marginReading, trendReading } from '../lib/priority.js';
+import { isSelected, pageState } from '../lib/runBatches.js';
 
 /**
  * The book — every client, ranked by why you would call them.
@@ -46,6 +47,9 @@ const COLUMNS = {
 };
 
 const SPECS = Object.fromEntries(Object.values(COLUMNS).map((c) => [c.key, c]));
+
+/** The rows the filters leave, through the same grammar the grid applies, so a selection means what the screen shows. */
+export const filterBookRows = (rows, filters) => applyFilters(rows || [], SPECS, filters);
 
 function BandChip({ id }) {
   const meta = band(id);
@@ -142,10 +146,31 @@ function ExpandedCells({ clientId }) {
   );
 }
 
+/**
+ * The header checkbox: selects or clears the rows on screen (the filtered page). Indeterminate when some are picked,
+ * which is the one state a checkbox cannot express through `checked`, so it is set on the element.
+ */
+function PageCheckbox({ selection, pageIds, onTogglePage }) {
+  const ref = useRef(null);
+  const state = pageState(selection, pageIds);
+  useEffect(() => { if (ref.current) ref.current.indeterminate = state === 'some'; }, [state]);
+  return (
+    <input
+      ref={ref}
+      type="checkbox"
+      checked={state === 'all'}
+      disabled={!pageIds.length}
+      aria-label={`Select all ${pageIds.length} clients on this page`}
+      onChange={(e) => onTogglePage(pageIds, e.target.checked)}
+    />
+  );
+}
+
 export default function BookGrid({
   rows, filters, onFilter, onPickClient, onAskCopilot, unassessedCount, unavailableHint,
-  sort, onSort,
+  sort, onSort, selection = null, onToggleRow = null, onTogglePage = null,
 }) {
+  const selectable = Boolean(selection && onToggleRow && onTogglePage);
   const [open, setOpen] = useState(() => new Set());
 
   const toggle = useCallback((clientId) => {
@@ -205,6 +230,11 @@ export default function BookGrid({
         <table className="cov-grid tbl-compact">
           <thead>
             <tr>
+              {selectable ? (
+                <th className="tcc-select">
+                  <PageCheckbox selection={selection} pageIds={shown.map((r) => r.client_id)} onTogglePage={onTogglePage} />
+                </th>
+              ) : null}
               <th className="cov-corner" />
               <th>
                 Client
@@ -265,6 +295,16 @@ export default function BookGrid({
               const trend = trendReading(row.trend);
               return [
                 <tr key={row.client_id} className={expanded ? 'row-open' : undefined}>
+                  {selectable ? (
+                    <td className="tcc-select">
+                      <input
+                        type="checkbox"
+                        checked={isSelected(selection, row.client_id)}
+                        aria-label={`Select ${name}`}
+                        onChange={() => onToggleRow(row.client_id)}
+                      />
+                    </td>
+                  ) : null}
                   <td className="tcc-expander">
                     <button
                       type="button"
@@ -319,7 +359,7 @@ export default function BookGrid({
                 </tr>,
                 expanded ? (
                   <tr key={`${row.client_id}-cells`} className="tcc-expand-row">
-                    <td colSpan={8}>
+                    <td colSpan={selectable ? 9 : 8}>
                       <ExpandedCells clientId={row.client_id} />
                     </td>
                   </tr>

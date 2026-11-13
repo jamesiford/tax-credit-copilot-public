@@ -586,3 +586,55 @@ describe('server-side sort (29 Sep)', () => {
     expect(globalThis.fetch.mock.calls[2][0]).not.toContain('sort=');
   });
 });
+
+describe('run batches (ADR-012)', () => {
+  const body = { kind: 'calculate', scope: { kind: 'list', client_ids: [1, 2] } };
+
+  it('previewRunBatch posts with dry_run true and startRunBatch with dry_run false', async () => {
+    const { previewRunBatch, startRunBatch } = await import('./api.js');
+    fetchMock.mockResolvedValue(ok({ dry_run: true, preview: {} }));
+    await previewRunBatch(body);
+    await startRunBatch({ ...body, idempotency_key: 'k' });
+    const [url, init] = fetchMock.mock.calls[0];
+    expect(url).toBe('/api/v2/run-batches');
+    expect(init.method).toBe('POST');
+    expect(JSON.parse(init.body)).toMatchObject({ dry_run: true, kind: 'calculate' });
+    expect(JSON.parse(fetchMock.mock.calls[1][1].body)).toMatchObject({ dry_run: false, idempotency_key: 'k' });
+  });
+
+  it('reads, lists, pages items, cancels and retries on the documented URLs', async () => {
+    const { listRunBatches, fetchRunBatch, fetchRunBatchItems, cancelRunBatch, retryFailedRunBatch } = await import('./api.js');
+    fetchMock.mockResolvedValue(ok({}));
+    await listRunBatches({ limit: 10, status: 'running' });
+    await fetchRunBatch('b 1');
+    await fetchRunBatchItems('b1', { status: 'failed', limit: 5, offset: 10 });
+    await cancelRunBatch('b1');
+    await retryFailedRunBatch('b1');
+    const urls = fetchMock.mock.calls.map((c) => c[0]);
+    expect(urls).toEqual([
+      '/api/v2/run-batches?limit=10&offset=0&status=running',
+      '/api/v2/run-batches/b%201',
+      '/api/v2/run-batches/b1/items?limit=5&offset=10&status=failed',
+      '/api/v2/run-batches/b1/cancel',
+      '/api/v2/run-batches/b1/retry-failed',
+    ]);
+    expect(fetchMock.mock.calls[3][1]).toEqual({ method: 'POST' });
+  });
+
+  it('turns a typed refusal into an error that carries the code and the remedy', async () => {
+    const { startRunBatch, RunBatchError } = await import('./api.js');
+    fetchMock.mockResolvedValueOnce({
+      ok: false, status: 409,
+      json: async () => ({ detail: { detail: 'needs it', code: 'confirmation_required', reason: 'above 25', remedy: 'send confirm_items=40' } }),
+    });
+    const error = await startRunBatch(body).catch((e) => e);
+    expect(error).toBeInstanceOf(RunBatchError);
+    expect(error).toMatchObject({ status: 409, code: 'confirmation_required', remedy: 'send confirm_items=40' });
+  });
+
+  it('keeps a plain-text detail readable', async () => {
+    const { fetchRunBatch } = await import('./api.js');
+    fetchMock.mockResolvedValueOnce({ ok: false, status: 404, json: async () => ({ detail: 'Unknown run batch x.' }) });
+    await expect(fetchRunBatch('x')).rejects.toThrow('Unknown run batch x.');
+  });
+});

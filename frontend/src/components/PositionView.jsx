@@ -1,3 +1,4 @@
+import { batchPath, queueOneClient, runAsBatchEnabled, useBatchNavigate } from '../lib/singleRun.js';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
@@ -352,11 +353,20 @@ export default function PositionView({
   // Only render coverage that belongs to the CURRENT scope.
   const coverage = loaded?.key === scopeKey ? loaded.data : null;
 
+  // OFF by default (lib/singleRun.js): queue a one-client assess batch and open its progress instead of blocking.
+  const goTo = useBatchNavigate();
+  const queueInstead = async (clientId) => {
+    if (!goTo || !runAsBatchEnabled()) return false;
+    goTo(batchPath(await queueOneClient({ kind: 'assess', clientId })));
+    return true;
+  };
+
   const runAssessment = async () => {
     if (isPortfolio) return;
     setAssessing(true);
     setError(null);
     try {
+      if (await queueInstead(scope.clientId)) return;
       const result = await assessClient(scope.clientId);
       setDeclined(result.declined || []);
       await load();
@@ -371,6 +381,7 @@ export default function PositionView({
     setAssessingClient(clientId);
     setError(null);
     try {
+      if (await queueInstead(clientId)) return;
       await assessClient(clientId);
       await load();
     } catch (reason) {

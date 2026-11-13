@@ -1,0 +1,177 @@
+/* Run batches: the selection bar, the start dialog and the Runs page. Tokens only (docs/design/DESIGN-SYSTEM.md). */
+
+.runs-selbar {
+  position: sticky;
+  bottom: var(--space-8);
+  z-index: var(--z-sticky, 5);
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  margin: var(--space-8) 0;
+  padding: var(--space-5) var(--space-8);
+  border: 1px solid var(--select-line);
+  border-radius: var(--radius);
+  background: var(--select-bg);
+  box-shadow: var(--shadow-pop);
+  font-size: var(--text-small);
+}
+
+.runs-selcount {
+  color: var(--text-primary);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.runs-selspacer {
+  flex: 1;
+}
+
+.runs-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.runs-scrim {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--text-primary) 40%, transparent);
+}
+
+.runs-dialog {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(720px, 94vw);
+  max-height: 90vh;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  background: var(--surface-card);
+  box-shadow: var(--shadow-pop);
+}
+
+.runs-head,
+.runs-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  padding: var(--space-7) var(--space-10);
+}
+
+.runs-head {
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.runs-head h2 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: var(--text-strong);
+  font-weight: 600;
+}
+
+.runs-foot {
+  justify-content: flex-end;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.runs-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding: var(--space-8) var(--space-10);
+  overflow-y: auto;
+}
+
+.runs-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: var(--text-small);
+}
+
+.runs-field legend,
+.runs-field > span:first-child {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.runs-choices,
+.runs-years {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4) var(--space-8);
+}
+
+.runs-choice,
+.runs-year {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  font-size: var(--text-small);
+}
+
+.runs-subhead {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: var(--text-body);
+  font-weight: 600;
+}
+
+.runs-lines {
+  margin: 0 0 var(--space-6);
+  padding-left: var(--space-10);
+  font-size: var(--text-small);
+  line-height: var(--leading-base);
+}
+
+.runs-preview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  max-width: 80ch;
+}
+
+.runs-confirm input {
+  max-width: 10ch;
+}
+
+.runs-progress {
+  width: 100%;
+  height: var(--space-4);
+  accent-color: var(--select-strong);
+}
+
+.runs-detail-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+.runs-failures {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.runs-row-link {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--select-strong);
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.runs-row-link:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}

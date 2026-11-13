@@ -201,7 +201,7 @@ describe('the navigation is a decided set, not an accumulation', () => {
     expect(NAV.map((group) => [group.section, group.items.map((item) => item.id)]))
       .toEqual([
         ['What is it worth', ['eligibility', 'onezero']],
-        ['What needs a decision', ['ingestion', 'agents']],
+        ['What needs a decision', ['ingestion', 'runs', 'agents']],
         ['Prove it', ['evidence', 'compare', 'rules', 'assumptions']],
       ]);
   });
