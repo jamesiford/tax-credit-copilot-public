@@ -90,9 +90,9 @@ python scripts/run-worker.py --once     # from the repo root: drain the queue an
 
 ## Sizing and concurrency
 
-- `RUN_WORKER_CONCURRENCY` (default 2, maximum 8) is items in flight per worker. Each run holds one client's payroll in memory and
+- `RUN_WORKER_CONCURRENCY` (default **1**, maximum 8) is items in flight per worker. It defaults to one because the per-client lock on a Warehouse is narrowed, not airtight, and concurrent Gold writes have not been measured live. Each run holds one client's payroll in memory and
   is CPU-bound, so raise it with care. On the Fabric Warehouse, two runs writing Gold at once can conflict (error 24556); the
-  writer retries, and an item that still fails is retried by the job with backoff. If conflicts are logged, use 1. Azure SQL
+  writer retries, and an item that still fails is retried by the job with backoff. To raise it, watch the retry counts for errors 24556, 3960 and 1205; if they climb, use 1. Azure SQL
   conflicts less. **This has not been measured on a live Warehouse** (see `live-checks.md` in the build analysis).
 - Retries: `RUN_ITEM_MAX_ATTEMPTS` (default 3), only for transient failures, with capped exponential backoff and jitter.
 - A worker that dies loses nothing: its leases lapse (`RUN_LEASE_SECONDS`, default 120) and the items return to the queue.
@@ -115,7 +115,7 @@ Settings are in [ENV-VARS.md](ENV-VARS.md) section 4a.
 
 `enable_run_worker = true` (default `false`) adds one App Service on the same plan, `app-tcc-worker-<suffix>`, in the same integration
 subnet, running **as the API's identity** with the API's settings plus `RUN_WORKER_INLINE=false` and `RUN_WORKER_CONCURRENCY`
-(`run_worker_concurrency`, 1 to 8, default 2). It needs no new grants: it calls the same commands, so it needs the API's access. With it
+(`run_worker_concurrency`, 1 to 8, default 1). It needs no new grants: it calls the same commands, so it needs the API's access. With it
 off the plan is unchanged (a Terraform test proves it). `RUN_WORKER_APP_NAME` is the output that names it.
 
 The build only validates and tests the module (`terraform validate`, `terraform test`); it never applies it. Deploying is yours:

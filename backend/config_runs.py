@@ -1,6 +1,6 @@
 """Run orchestration settings: batch limits, worker sizing and lease timing. [ADR-012]
 
-Defaults are conservative: two workers' worth of concurrency (Gold writes can conflict on the Warehouse), three
+Defaults are conservative: one item at a time (Gold writes can conflict on the Warehouse and the per-client lock there is only narrowed, not airtight), three
 attempts for a transient failure, and a lease long enough for a slow run but short enough that a dead worker's
 items come back within minutes. `RUN_WORKER_INLINE` defaults on only for `ENVIRONMENT=local`: an in-process worker
 in a deployed API that scales out would run the same item on several instances.
@@ -18,7 +18,7 @@ class RunSettings:
     """Limits, sizing and lease timing for run batches, with conservative defaults."""
     max_items: int = 5000
     confirm_above: int = 25
-    worker_concurrency: int = 2
+    worker_concurrency: int = 1
     item_max_attempts: int = 3
     worker_inline: bool = False
     lease_seconds: int = 120
@@ -38,7 +38,7 @@ def parse_runs(environ: Mapping[str, str]) -> RunSettings:
     return RunSettings(
         max_items=tuned_int(environ, "RUN_BATCH_MAX_ITEMS", 5000, 1),
         confirm_above=tuned_int(environ, "RUN_BATCH_CONFIRM_ABOVE", 25, 1),
-        worker_concurrency=min(8, tuned_int(environ, "RUN_WORKER_CONCURRENCY", 2, 1)),
+        worker_concurrency=min(8, tuned_int(environ, "RUN_WORKER_CONCURRENCY", 1, 1)),
         item_max_attempts=tuned_int(environ, "RUN_ITEM_MAX_ATTEMPTS", 3, 1),
         worker_inline=local if inline is None else inline,
         lease_seconds=lease,
