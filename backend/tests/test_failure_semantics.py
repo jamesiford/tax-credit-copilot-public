@@ -317,7 +317,7 @@ def probe(monkeypatch):
     from infrastructure.persistence.store_probe import OperationalStoreProbe
 
     monkeypatch.setenv("CLAIM_STORE", "warehouse")
-    state = {"applied": {"0000": "x"}, "tables": {"program_claim", "program_engagement"}}
+    state = {"applied": {"0000": "x"}, "tables": {"program_claim", "program_engagement", "run_batch", "run_batch_item"}}
     monkeypatch.setattr(schema_admin, "applied_migrations", lambda live, ops: state["applied"])
     monkeypatch.setattr(schema_admin, "table_exists", lambda live, schema, table: table in state["tables"])
     monkeypatch.setattr(OperationalStoreProbe, "_grants", lambda self, live: state.get("grants", []))
@@ -341,6 +341,13 @@ def test_a_missing_claim_table_names_it_and_the_migration(probe):
     state["tables"] = {"program_engagement"}
     (finding,) = instance.probe()
     assert "tcc_ops.program_claim not found" in finding.message and "run the migration" in finding.message
+
+
+def test_a_missing_run_batch_table_names_it_and_the_migration(probe):
+    instance, state = probe
+    state["tables"] = {"program_claim", "program_engagement"}
+    (finding,) = instance.probe()
+    assert finding.code == "tables_missing" and "tcc_ops.run_batch not found" in finding.message
 
 
 def test_pending_migrations_are_reported_with_the_first_version(probe):
