@@ -19,6 +19,8 @@ from config import OPS_SCHEMA, get_settings
 log = logging.getLogger(__name__)
 
 _CLAIM_TABLES = ("program_claim", "program_engagement")
+#: Migration 0004: the run batch queue. Missing means the migration has not been applied.
+_RUN_TABLES = ("run_batch", "run_batch_item")
 
 #: What to do on Azure SQL, where access is a database user rather than a Fabric workspace role.
 _AZURE_REMEDIES = {
@@ -81,7 +83,7 @@ class OperationalStoreProbe:
                 "migration_table_missing", f"{OPS_SCHEMA}.schema_migration not found: the schema was never created here.",
                 _AZURE_REMEDIES["bootstrap"] if _azure() else "Run `python scripts/apply-migrations.py --target deployed --bootstrap` on a new Warehouse.",
             )]
-        missing = [t for t in _CLAIM_TABLES if not table_exists(live, OPS_SCHEMA, t)]
+        missing = [t for t in (*_CLAIM_TABLES, *_RUN_TABLES) if not table_exists(live, OPS_SCHEMA, t)]
         if missing:
             return [Finding(
                 "tables_missing", f"{OPS_SCHEMA}.{missing[0]} not found: run the migration.",

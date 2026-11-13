@@ -516,6 +516,7 @@ listed. Claims and engagements have no copy elsewhere, so nothing falls back to 
 | `claims_store` | the operational store cannot be read | `python scripts/check-operational-store.py`; it names the first problem (unreachable, `tcc_ops.program_claim` missing, migrations pending, no grant) and the remedy |
 | `source_lakehouse` | the client book cannot be listed, or no lakehouse is configured | `python scripts/check-onelake-access.py`; set `FABRIC_WORKSPACE` / `FABRIC_LAKEHOUSE` |
 | `source_sql` | the payroll footprint was refused by the size guard, cancelled by its timeout, or failed. A guard decision is not retried for an hour; an error for a minute | the message says which. Over the limit: raise `PORTFOLIO_FOOTPRINT_MAX_ROWS`, or set `PORTFOLIO_FOOTPRINT_MODE=on` to run it under the timeout. Timed out: raise `PORTFOLIO_FOOTPRINT_TIMEOUT_SECONDS`, or set `PORTFOLIO_FOOTPRINT_MODE=off`. Otherwise check `WAREHOUSE_SERVER`, the capacity state and the SQL grants |
+| `run_worker` | batches have queued items and no worker holds a lease (a worker is not running, or cannot reach the store) | start it: `python -m bootstrap.run_worker`, or set `RUN_WORKER_INLINE=true` on a single-instance trial; see [RUN-ORCHESTRATION.md](RUN-ORCHESTRATION.md) |
 
 `/api/ready` carries a `stores` object with the same findings, and the startup log says them once. It never
 turns `ready` false for a store problem: the app can still answer, and says what it cannot. `SOURCE_FALLBACK=delta`
