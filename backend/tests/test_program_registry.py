@@ -129,3 +129,26 @@ def test_rules_dir_and_registry_file_can_be_pointed_elsewhere(tmp_path, monkeypa
         load_registry()
     monkeypatch.setenv("PROGRAM_REGISTRY_FILE", str(custom))
     assert load_registry().source == custom.resolve() and credit_math.authored_years("ga_jtc.json")
+
+
+def test_a_state_can_hold_several_programs_and_the_first_is_the_default():
+    registry = _parse([_entry(code="XX_FIRST"), _entry(code="XX_SECOND", pack_file="sc_jtc.json"), _entry(code="YY_ONE", state="YY")])
+    assert [e.code for e in registry.for_state("xx")] == ["XX_FIRST", "XX_SECOND"]
+    assert registry.state_to_pack()["XX"] == "ga_jtc.json" and registry.for_state("ZZ") == ()
+
+
+def test_programs_for_state_and_program_for_code_read_the_live_registry_and_skip_retired(tmp_path, monkeypatch):
+    from tools.program_registry import program_for_code, programs_for_state
+
+    assert [e.code for e in programs_for_state("GA")] == ["GA_JTC"] and program_for_code("ga_jtc").state == "GA"
+    assert program_for_code("NOPE") is None
+    rules = tmp_path / "rules"
+    shutil.copytree(RULES, rules)
+    manifest = rules / "registry" / "programs.json"
+    data = json.loads(manifest.read_text(encoding="utf-8"))
+    for e in data["programs"]:
+        if e["code"] == "VA_MBJF":
+            e["lifecycle"] = "retired"
+    manifest.write_text(json.dumps(data), encoding="utf-8")
+    monkeypatch.setenv("RULES_DIR", str(rules))
+    assert programs_for_state("VA") == () and program_for_code("VA_MBJF") is None
