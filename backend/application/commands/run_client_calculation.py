@@ -419,6 +419,7 @@ def handle_run_client_calculation(command: RunClientCalculationCommand) -> dict[
     )
     from domain.warehouse import RUN_MANIFEST_COLUMNS as _MANIFEST_COLUMNS, RunManifest
     from application.gold_ports import GoldWriteFailed
+    from application.runs.fingerprint import run_identity
     from tools import gold_projection as gp
 
     state = command.state.upper()
@@ -435,6 +436,7 @@ def handle_run_client_calculation(command: RunClientCalculationCommand) -> dict[
     }
 
     assumptions = _assumption_identity()
+    identity = run_identity(run, assumptions)
     appended_at = gp.utc_now()
 
     manifest = RunManifest(
@@ -454,18 +456,9 @@ def handle_run_client_calculation(command: RunClientCalculationCommand) -> dict[
         step1_assumption_sha256=assumptions[0]["sha256"] if assumptions else None,
         onezero_assumption_set_id=assumptions[1]["set_id"] if len(assumptions) > 1 else None,
         onezero_assumption_sha256=assumptions[1]["sha256"] if len(assumptions) > 1 else None,
-        rule_pack_version=str(run.floors.as_dict().get("source") or ""),
+        rule_pack_version=identity.rule_pack_version,
         code_commit=_code_commit(),
-        calculation_id=gp.calculation_id(
-            client_id=command.client_id,
-            program_code=run.program_code,
-            tax_year=command.tax_year,
-            window_begin=run.window.begin,
-            window_end=run.window.end,
-            floors=run.floors.as_dict(),
-            assumption_ids=[a["set_id"] for a in assumptions],
-            rows=run.rows,
-        ),
+        calculation_id=identity.calculation_id,
         triggered_by=command.actor,
     )
 
