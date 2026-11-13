@@ -25,7 +25,11 @@ python tools/mock_api.py 8000                # serves a small SYNTHETIC dataset
 ```
 
 `mock_api.py` serves invented data (no payroll, no real names, no certified
-figure); it exists only so the gates have a rendered page.
+figure); it exists only so the gates have a rendered page. It also serves a
+stateful, typed stand-in for `/api/v2/run-batches` (`mock_run_batches.py`: list,
+detail, items, preview, start, cancel, retry-failed) so the Runs pages
+(`/runs`, `/runs/b-partial`) and the start dialog can be swept; `check_a11y.py`
+opens the selection dialog from the book.
 
 Node 26 enables an experimental `localStorage` that shadows jsdom's. Run the
 unit tests with `NODE_OPTIONS=--no-experimental-webstorage` on Node ≥ 25

@@ -96,6 +96,7 @@ All notable changes to this project are recorded here, so changes can be followe
 ### Removed
 
 ### Fixed
+- The Runs page no longer crashes when the batch list response has no `items`; it shows "Nothing has been run yet". Found by the states sweep once the offline mock API served run batches.
 
 ### Security
 

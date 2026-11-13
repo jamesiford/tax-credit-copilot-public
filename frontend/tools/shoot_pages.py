@@ -36,6 +36,8 @@ PAGES = {
     "client": "/c/2001?year=2023",
     "client-whatif": "/c/2001?year=2023&ctab=whatif",
     "unit": "/c/2001/u/GA_GA-010?year=2023&method=min_max",
+    "runs": "/runs",
+    "run": "/runs/b-partial",
     "employee": "/c/2001/e/tok-0001?year=2023",
     "rules": "/rules",
     "ingestion": "/c/1001/ingestion",

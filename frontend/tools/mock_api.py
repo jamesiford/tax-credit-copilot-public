@@ -25,6 +25,8 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
+import mock_run_batches
+
 PORT = 8000
 UPSTREAM = "http://127.0.0.1:8001"
 
@@ -241,6 +243,9 @@ def portfolio_payload(query):
 
 def route(method: str, path: str, query: dict[str, list[str]], body: bytes):
     """Return a JSON-able body for the endpoints this stand-in owns, else None."""
+    batches = mock_run_batches.route(method, path, query, body)
+    if batches is not None:
+        return batches
     if path == "/api/scope":
         return scope_payload()
     m = re.fullmatch(r"/api/scope/client/(\d+)", path)

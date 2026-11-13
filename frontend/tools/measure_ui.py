@@ -22,6 +22,8 @@ PAGES = {
     "portfolio": "/",
     "client": "/c/2001?year=2023",
     "unit": "/c/2001/u/GA_GA-010?year=2023&method=min_max",
+    "runs": "/runs",
+    "run": "/runs/b-partial",
 }
 
 PROBE = """

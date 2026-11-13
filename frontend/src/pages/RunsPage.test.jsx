@@ -54,6 +54,13 @@ describe('the list of batches', () => {
     expect(onOpenBatch).toHaveBeenCalledWith('b1');
   });
 
+  it('treats a list response with no items as nothing run, never a crash', async () => {
+    api.listRunBatches.mockResolvedValue({});
+    render(<RunsPage />);
+    await settle();
+    expect(await screen.findByText('Nothing has been run yet')).toBeInTheDocument();
+  });
+
   it('says what to do when nothing has been run, and that an outage is not an empty list', async () => {
     api.listRunBatches.mockResolvedValueOnce({ items: [], total: 0 });
     const { unmount } = render(<RunsPage />);

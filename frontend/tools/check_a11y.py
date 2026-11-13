@@ -20,6 +20,7 @@ enforced in both themes.
 from __future__ import annotations
 
 import json
+import re
 import os
 import sys
 from pathlib import Path
@@ -72,6 +73,19 @@ def open_workspace(page) -> None:
     page.wait_for_timeout(400)
 
 
+def open_run_dialog(page) -> bool:
+    """Select every client on the book and open the start dialog; False when the book offers no selection."""
+    box = page.get_by_role("checkbox", name=re.compile(r"Select all \d+ clients on this page"))
+    if not box.count():
+        return False
+    box.first.check()
+    page.locator("#run-selection-open").click()
+    page.wait_for_selector(".runs-dialog", timeout=10_000)
+    page.wait_for_selector(".runs-dialog [role=status], .runs-dialog .runs-preview, .runs-dialog h3", timeout=10_000)
+    page.wait_for_timeout(800)
+    return True
+
+
 def main() -> int:
     quick = "--quick" in sys.argv
     themes = [os.environ["TCC_THEME"]] if os.environ.get("TCC_THEME") else (["modern"] if quick else ["modern", "classic"])
@@ -91,6 +105,16 @@ def main() -> int:
                     open_workspace(page)
                     failing += scan(page, f"{name} + workspace", theme, report)
                 page.context.close()
+
+            page = new_page(browser, 1440, 900)
+            page.goto(BASE + "/", wait_until="networkidle", timeout=120_000)
+            page.wait_for_timeout(1200)
+            if open_run_dialog(page):
+                failing += scan(page, "run selection dialog", theme, report)
+            else:
+                print(f"FAIL  {theme:<8} run selection dialog: the book offers no selection checkbox")
+                failing += 1
+            page.context.close()
 
             # The evidence pane, fed by the dev-only fixture stream and by the real
             # backend shape (the mock serves `/api/chat` from askBackendShape.json).

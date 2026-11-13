@@ -44,7 +44,8 @@ function BatchList({ onOpen }) {
     return <EmptyState title="Runs are unavailable">{error.message}<br />Nothing was changed; reload the page to try again.</EmptyState>;
   }
   if (!data) return <Skeleton lines={5} label="Loading runs" />;
-  if (!data.items.length) {
+  const batches = data.items || [];
+  if (!batches.length) {
     return (
       <EmptyState title="Nothing has been run yet">
         Select clients in the portfolio and choose &ldquo;Run for N clients&rdquo;. Batches you start appear here with their progress.
@@ -57,7 +58,7 @@ function BatchList({ onOpen }) {
         <tr><th>Started</th><th>What</th><th>Scope</th><th>Status</th><th className="num">Done</th><th className="num">Failed</th><th>By</th></tr>
       </thead>
       <tbody>
-        {data.items.map((b) => (
+        {batches.map((b) => (
           <tr key={b.batch_id}>
             <td>
               <button type="button" className="runs-row-link" onClick={() => onOpen(b.batch_id)} aria-label={`Open batch started ${when(b.requested_at)}`}>
@@ -99,12 +100,12 @@ function Failures({ items }) {
 
 function ItemsTable({ page, onOpenClient }) {
   if (!page) return <Skeleton lines={4} label="Loading items" />;
-  if (!page.items.length) return <EmptyState title="No items match">Nothing has this status in the batch.</EmptyState>;
+  if (!(page.items || []).length) return <EmptyState title="No items match">Nothing has this status in the batch.</EmptyState>;
   return (
     <table className="tbl-compact" aria-label="Batch items">
       <thead><tr><th>Client</th><th>Program</th><th>Year</th><th>Status</th><th>Detail</th><th className="num">Tries</th><th className="num">Seconds</th></tr></thead>
       <tbody>
-        {page.items.map((i) => (
+        {(page.items || []).map((i) => (
           <tr key={i.item_id}>
             <td>
               <button type="button" className="runs-row-link" onClick={() => onOpenClient?.(i.client_id)}>Account {i.client_id}</button>
