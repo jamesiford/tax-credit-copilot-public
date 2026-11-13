@@ -302,7 +302,7 @@
   "function-lines|application/capabilities/walkthrough.py::calc_walkthrough": 51,
   "function-lines|application/chat_scope.py::resolve_referent": 57,
   "function-lines|application/claim_package.py::build_claim_package": 54,
-  "function-lines|application/client_book.py::programs": 50,
+  "function-lines|application/client_book.py::programs": 46,
   "function-lines|application/commands/run_client_calculation.py::_replay_unit_series": 250,
   "function-lines|application/commands/run_client_calculation.py::handle_run_client_calculation": 168,
   "function-lines|application/commands/set_base_year.py::handle_set_base_year": 50,

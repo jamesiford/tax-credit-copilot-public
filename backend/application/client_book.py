@@ -26,6 +26,13 @@ def is_placeholder_year(program_code: str, tax_year: int) -> bool:
         return False
 
 
+def _not_calculable_reason(program: str, years: list[int], jurisdiction: dict[str, Any]) -> str:
+    """Why a program cannot be run, or "" when it can. A federal program has no state, so a run has no rows to price. [F04c.5]"""
+    if years and jurisdiction.get("level", "state") == "federal":
+        return "A federal program has no state, and a run prices a state's payroll rows: federal programs are described, not calculable."
+    return "" if years else f"No year-scoped rule packs authored for {program}. ADR-005: statute is not inherited across years."
+
+
 def programs() -> list[dict[str, Any]]:
     """Every program we hold a rule pack for, with its authored years.
 
@@ -68,12 +75,8 @@ def programs() -> list[dict[str, Any]]:
             # A program without authored years is describable but not
             # calculable. The UI should show it disabled with this reason
             # rather than omitting it, which would look like it does not exist.
-            "calculable": bool(years),
-            "not_calculable_reason": (
-                "" if years else
-                f"No year-scoped rule packs authored for {program}. "
-                f"ADR-005: statute is not inherited across years."
-            ),
+            "calculable": bool(years) and jurisdiction.get("level", "state") != "federal",
+            "not_calculable_reason": _not_calculable_reason(program, years, jurisdiction),
         })
     return out
 
