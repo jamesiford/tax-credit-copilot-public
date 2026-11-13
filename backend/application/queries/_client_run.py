@@ -134,17 +134,6 @@ def resolve_statute(
     )
 
 
-def program_rows(rows: list[dict[str, Any]], program_state: str) -> list[dict[str, Any]]:
-    """The payroll rows a state-level program prices: those whose work state is the program's state.
-
-    The one definition of "which rows does a program see". Two programs in the same state therefore see the SAME rows
-    and differ only by their pack. Federal programs have no state and are not runnable (`ProgramNotRunnable`). [F04c.5]
-    """
-    from domain.calculation.headcount import row_state
-
-    return [r for r in rows if row_state(r) == program_state.upper()]
-
-
 def resolve_client_run(
     *,
     account_id: int | None,
@@ -163,13 +152,13 @@ def resolve_client_run(
     and the same window trim still apply — so a multi-year read cannot drift
     from a single-year one by taking a shortcut around this function.
     """
+    from application.payroll_rows import program_rows
     from application.source_ports import load_pay_periods
 
     statute = resolve_statute(
         account_id=account_id, state=state, tax_year=tax_year, program_code=program_code
     )
-    state = statute.state
-    window = statute.window
+    state, window = statute.state, statute.window
 
     source = load_pay_periods(account_id) if rows is None else rows
     state_rows = program_rows(source, state)

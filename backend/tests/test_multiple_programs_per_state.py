@@ -248,3 +248,11 @@ def test_an_unregistered_key_still_answers_no_pack_by_name(zz):
     from tools.program_credit import apply_one_zero_program_credit, program_per_job_usd
 
     assert apply_one_zero_program_credit("QQ", 10.0)["no_state_pack"] is True and program_per_job_usd("QQ") == 0.0
+
+
+def test_a_program_prices_only_the_rows_of_its_state_and_two_programs_share_them():
+    from application.payroll_rows import program_rows
+
+    rows = [{"Worksite_ID": "ZZ_001"}, {"Worksite_ID": "GA_001"}, {"Worksite_ID": "ZZ_002", "Work_State": "ZZ"}]
+    assert [r["Worksite_ID"] for r in program_rows(rows, "zz")] == ["ZZ_001", "ZZ_002"]
+    assert program_rows(rows, "GA") == [rows[1]] and program_rows(rows, "QQ") == []

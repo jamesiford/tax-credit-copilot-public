@@ -37,7 +37,7 @@ at least one year pack is authored, and the registry loader refuses a typed `cal
 ## Steps
 
 1. **Decide the program and the state.** Two-letter state, a credit code (`XX_JTC`), and whether it is a state, local or federal
-   credit. Several programs may share a state; the first listed is the state's default for derived runs.
+   credit. Several programs may share a state; the first listed is the state's default for derived runs. A federal program has no state and is **not runnable**: a run prices the payroll rows of a state, so a federal entry is described, never calculable.
 2. **Check it fits the supported models** (below). If it does not, stop at "needs engine work".
 3. **Scaffold.** `python scripts/new-program.py program --code XX_JTC --state XX --name "..." --slug jtc` writes a flagged base pack
    and a `draft` registry entry. Every statutory value is `null`.

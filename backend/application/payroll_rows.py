@@ -25,7 +25,7 @@ from domain.calculation.headcount import states_present as _states_present
 __all__ = [
     "NoPayrollForClient", "PayrollDatasetNotGenerated", "PayrollNotAvailable",
     "fixture_account_id", "iter_state_packs", "load_pay_periods",
-    "load_portfolio_pay_periods", "require_pay_periods", "row_state", "states_present",
+    "load_portfolio_pay_periods", "program_rows", "require_pay_periods", "row_state", "states_present",
     "unauthored_state_years",
 ]
 
@@ -77,6 +77,16 @@ def row_state(row: dict[str, Any]) -> str:
     already import it from this module.
     """
     return _row_state(row)
+
+
+def program_rows(rows: list[dict[str, Any]], program_state: str) -> list[dict[str, Any]]:
+    """The payroll rows a state-level program prices: those whose work state is the program's state.
+
+    The ONE definition of "which rows does a program see". Two programs in the same state therefore see the SAME rows
+    and differ only by their pack. A federal program has no state and is not runnable (`program_defaults.program_state`
+    refuses it), so there is no federal row selection to define. [F04c.5]
+    """
+    return [r for r in rows if _row_state(r) == program_state.upper()]
 
 
 def states_present(rows: list[dict[str, Any]]) -> list[str]:
@@ -157,6 +167,6 @@ def iter_state_packs(
         pack = _pack_for(st, tax_year, on_unauthored)
         if pack is None:
             continue
-        state_rows = [r for r in rows if row_state(r) == st]
+        state_rows = program_rows(rows, st)
         if state_rows:
             yield st, pack, state_rows
