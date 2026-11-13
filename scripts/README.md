@@ -54,6 +54,8 @@ otherwise. "Run by" says who invokes it: **azd** (an `azure.yaml` hook), **CI** 
 | `ai-eval.py` | Runs the AI evals and prints a table; `--live` uses the configured providers. | `--live`, `--json` | owner, test (`ai_evals`) |
 | `vendor-orchestrator.py` | Copies the shared framework-free modules into `channel_orchestrator/` (the vendored copy is gitignored); `--check` verifies it. | `--check` | owner, the orchestrator's build, test |
 | `portable-rules/` | `flex_rules.py` (stdlib-only hand-off of the business rules) and `crosscheck.py` (proves it matches the engine). Explained in `docs/data/portable-rules/README.md`. | none; `TCC_BACKEND` optional | owner, test (`test_architecture_docs_code.py`) |
+| `validate-rule-pack.py` | Validates a rule pack or year pack (`<path>`) or every pack under the rules folder (`--all`) against the JSON Schema and the semantic rules. `--json` for machine output. Exit 0 valid, 1 errors, 2 usage. A pass means well-formed, never verified. | `<path>` or `--all`, `--json`, `--rules-dir` | owner, test |
+| `new-program.py` | Scaffolds a program: `program` writes a base pack and a `draft` registry entry, `year` writes `<program>/<year>.draft.json` (ignored by the engine). Every statutory value is `null` and flagged, so it fails validation until filled from a cited source. | `program --code --state --name --slug`, `year --pack --year`, `--dry-run`, `--rules-dir` | owner |
 
 ## Channel operations (owner)
 
