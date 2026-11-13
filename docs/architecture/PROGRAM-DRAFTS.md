@@ -72,7 +72,7 @@ of the rules folder.
 `POST .../preview` prices the draft's year packs with the engine's own functions (the Average Headcount from the draft's floors,
 then the benefit step) over the committed synthetic sample payroll relabelled to the draft's state. It builds the pack from the
 draft's documents in memory, touches no repository, run, claim or file, and returns the result without storing it
-(`persisted: false`). Every response is labelled **"Preview, not verified, not for filing"** and counts the pack's unverified
+(`persisted: false`). A client's payroll is read only for a client in the book that the caller may act for (the client authorizer decides, as for a batch), and nothing is read for an unknown or refused client. Every response is labelled **"Preview, not verified, not for filing"** and counts the pack's unverified
 flags. It refuses a draft that does not validate, and refuses a client's payroll (`dataset: client`) with HTTP 403 unless
 `PROGRAM_PREVIEW_ALLOW_CUSTOMER_DATA=true` or the environment is classified synthetic. A year the sample does not cover is listed
 under `declined`, never priced as zero. `tests/test_program_draft_preview.py` proves the preview agrees to the cent with the real
@@ -110,6 +110,8 @@ Migration `0005` adds `tcc_ops.program_draft`, `program_draft_document` (one row
 it fits `VARCHAR(8000)`) and `program_draft_event`. SQLite for local development (`RUN_MANIFEST_STORE`); the Warehouse or Azure SQL
 when deployed. Apply it with `python scripts/apply-migrations.py --target deployed`; until then `/api/ready` reports
 `tables_missing` with that remedy.
+
+**Bounds.** A draft holds at most 30 year packs; a document nests at most 12 levels and holds at most 8000 characters; a name is at most 200 characters, a review comment 2000 and a withdrawal reason 1000. A request over a bound is a 422 draft_invalid (or a validation 422) naming it, and nothing is stored. The export's `write_local` option also refuses any path that resolves outside the rules folder.
 
 ## Settings
 
