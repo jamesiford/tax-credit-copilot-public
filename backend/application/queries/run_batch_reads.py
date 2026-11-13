@@ -13,6 +13,7 @@ from application.errors import DependencyUnavailable
 from application.mediator import Query
 from application.runs.errors import UnknownBatch
 from application.runs.plan import BatchRequest, preview
+from application.runs import visibility
 from application.runs.selection import Scope
 from application.runs.views import batch_view, item_view
 from domain.runs import BatchKind, ScopeKind
@@ -77,9 +78,13 @@ def handle_get_run_batch(query: GetRunBatchQuery) -> dict[str, Any]:
     from config import get_settings
 
     repo, now = get_run_batch_repository(), datetime.now(timezone.utc)
-    batch = repo.get(query.batch_id)
-    if batch is None:
-        raise UnknownBatch(query.batch_id)
+    can_see = visibility.visible_clients()
+    if can_see is None:
+        batch = repo.get(query.batch_id)
+        if batch is None:
+            raise UnknownBatch(query.batch_id)
+    else:
+        batch, _ = visibility.one_batch(repo, query.batch_id, can_see)
     degraded = worker_degraded(repo.queue_health(now), get_settings().runs.stale_worker_seconds, now)
     return {**batch_view(batch), "degraded": degraded}
 
@@ -87,17 +92,28 @@ def handle_get_run_batch(query: GetRunBatchQuery) -> dict[str, Any]:
 def handle_list_run_batches(query: ListRunBatchesQuery) -> dict[str, Any]:
     from application.services import get_run_batch_repository
 
-    items, total = get_run_batch_repository().list_batches(max(1, min(query.limit, 200)), max(0, query.offset), query.status)
+    repo, limit, offset = get_run_batch_repository(), max(1, min(query.limit, 200)), max(0, query.offset)
+    can_see = visibility.visible_clients()
+    if can_see is None:
+        items, total = repo.list_batches(limit, offset, query.status)
+    else:
+        items, total = visibility.page_of_batches(repo, limit, offset, query.status, can_see)
     return {"items": [batch_view(b) for b in items], "total": total, "limit": query.limit, "offset": query.offset}
 
 
 def handle_list_run_batch_items(query: ListRunBatchItemsQuery) -> dict[str, Any]:
     from application.services import get_run_batch_repository
 
-    repo = get_run_batch_repository()
-    if repo.get(query.batch_id) is None:
-        raise UnknownBatch(query.batch_id)
-    items, total = repo.list_items(query.batch_id, query.status, max(1, min(query.limit, 500)), max(0, query.offset))
+    repo, limit, offset = get_run_batch_repository(), max(1, min(query.limit, 500)), max(0, query.offset)
+    can_see = visibility.visible_clients()
+    if can_see is None:
+        if repo.get(query.batch_id) is None:
+            raise UnknownBatch(query.batch_id)
+        items, total = repo.list_items(query.batch_id, query.status, limit, offset)
+    else:
+        _, mine = visibility.one_batch(repo, query.batch_id, can_see)
+        wanted = [i for i in mine if query.status is None or i.status.value == query.status]
+        items, total = wanted[offset:offset + limit], len(wanted)
     return {"items": [item_view(i) for i in items], "total": total, "limit": query.limit, "offset": query.offset}
 
 

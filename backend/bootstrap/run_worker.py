@@ -26,7 +26,7 @@ from application.runs import metrics
 from application.runs.executor import ItemExecutor
 from application.runs.worker import RunWorker
 from bootstrap.run_batch_wiring import get_run_batch_repository
-from config import get_settings
+from config import get_settings, use_managed_identity
 
 log = logging.getLogger("tcc.runs")
 
@@ -95,6 +95,22 @@ def _warn_if_private_queue() -> None:
         )
 
 
+def apply_worker_identity() -> bool:
+    """Run this PROCESS as its own managed identity when `RUN_WORKER_IDENTITY_CLIENT_ID` is set; True when it did.
+
+    One identity stays the default (the worker shares the API's grants). A separate identity lets an operator give the worker
+    only what a run needs (RUN-ORCHESTRATION.md lists it). The SDK selects a user-assigned identity from `AZURE_CLIENT_ID`, so
+    this sets it for this process before any credential is built. It never applies to the inline worker, which is the API's
+    own process and has no identity of its own.
+    """
+    client_id = get_settings().runs.worker_identity_client_id
+    if not client_id:
+        return False
+    use_managed_identity(client_id)
+    log.info("run worker uses its own managed identity (client id ending ...%s)", client_id[-4:])
+    return True
+
+
 def main(argv: list[str] | None = None) -> int:
     """Run until stopped (SIGINT or SIGTERM), or with `--once` until the queue is empty."""
     parser = argparse.ArgumentParser(description="Run orchestration worker: leases and runs queued client runs.")
@@ -102,6 +118,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--health-port", type=int, default=0, help="serve /healthz on this port (App Service's PORT)")
     args = parser.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
+    apply_worker_identity()
     _warn_if_private_queue()
     worker = build_worker()
     if args.health_port:

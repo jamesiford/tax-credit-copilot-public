@@ -42,6 +42,7 @@ from config_sections import (
     WebIqSettings, parse_data_source, parse_identity, parse_observability, parse_portfolio, parse_runtime, parse_schema_name,
     parse_source_schema, parse_stores, parse_warehouse, parse_webiq,
 )
+from config_limits import LimitSettings, parse_limits
 from config_platform import PlatformSettings, parse_platform
 from config_programs import ProgramSettings, parse_programs
 from config_runs import RunSettings, parse_runs
@@ -101,6 +102,10 @@ class Settings:
         return parse_runs(self.environ)
 
     @cached_property
+    def limits(self) -> LimitSettings:
+        return parse_limits(self.environ)
+
+    @cached_property
     def programs(self) -> ProgramSettings:
         return parse_programs(self.environ)
 
@@ -134,6 +139,14 @@ def get_settings() -> Settings:
 def synthetic_environment() -> bool:
     """Whether this environment states that all of its data is generated. Unset is not synthetic."""
     return get_settings().runtime.data_classification == "synthetic"
+
+
+def use_managed_identity(client_id: str) -> None:
+    """Select a user-assigned managed identity for this process: the Azure SDK reads `AZURE_CLIENT_ID` when a credential is built.
+
+    Here because this module is the one place that touches the process environment. Call it before anything builds a credential.
+    """
+    os.environ["AZURE_CLIENT_ID"] = client_id
 
 
 def set_settings(settings: Settings | None) -> None:

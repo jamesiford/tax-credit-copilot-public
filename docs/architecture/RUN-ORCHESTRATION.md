@@ -100,6 +100,23 @@ python scripts/run-worker.py --once     # from the repo root: drain the queue an
 - Retries: `RUN_ITEM_MAX_ATTEMPTS` (default 3), only for transient failures, with capped exponential backoff and jitter.
 - A worker that dies loses nothing: its leases lapse (`RUN_LEASE_SECONDS`, default 120) and the items return to the queue.
 
+## A separate worker identity (optional)
+
+By default the worker runs as the API's identity. To give it less, create a second user-assigned managed identity for the worker app and set
+`RUN_WORKER_IDENTITY_CLIENT_ID` to its client id (the worker process then runs as it; Terraform defaults are unchanged and nothing here is
+applied by the build). The worker calls the same commands as the API, so it needs exactly what a run needs and nothing the portal needs:
+
+- **Read payroll:** the Fabric workspace role that lets it read the lakehouse (read through OneLake), and for the SQL path the `lakehouse` profile
+  of `scripts/grant-warehouse-sql.py` (SELECT on the source tables).
+- **Write Gold and Ops:** the `api` profile of the same script (read and write on `tcc_gold` and `tcc_ops`).
+- **No draft or portal grants:** the `api` profile grants whole schemas, so deny the tables the worker never touches:
+  `DENY SELECT, INSERT, UPDATE, DELETE ON OBJECT::<ops schema>.program_draft TO [<worker identity>];` and the same for `program_draft_document`,
+  `program_draft_event` and `channel_audit`. A T-SQL DENY on an object overrides a schema GRANT.
+- No Entra app role, no `TCC.User`, no Graph permission: the worker serves only `/healthz` and calls no user-facing API.
+
+Check it: start the worker and drain one small batch (live checks 5 and 6), and confirm `SELECT ... FROM <ops schema>.program_draft` is refused
+for the worker identity. This was not exercised against a live Warehouse in the build.
+
 ## Failure signatures
 
 | You see | It means | Do |
@@ -112,6 +129,9 @@ python scripts/run-worker.py --once     # from the repo root: drain the queue an
 | Item `failed`, dependency `validation` | The request or the client is ambiguous (for example several programmes) | Name the `program_code` |
 | Item `failed`, dependency `worker` | The worker died and attempts were spent | Retry-failed |
 | Item `failed`, dependency `internal` | A bug; the log has the trace | Report it |
+
+An item stores a typed cause (the dependency above) and a fixed remedy sentence, never the raw error text, which can echo a request value or a
+host name. The raw message is in the worker's log (logger `tcc.runs`).
 
 Settings are in [ENV-VARS.md](ENV-VARS.md) section 4a.
 

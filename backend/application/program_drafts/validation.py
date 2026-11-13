@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from typing import Any, Iterator
 
+from application.program_drafts import customer_data
 from application.program_drafts.naming import pack_file_name, year_file_name
 from domain.program_drafts import CODE_PATTERN, MAX_DOCUMENT_CHARS, ProgramDraft, canonical_json
 from tools.pack_validation import Report, validate_document
@@ -101,7 +102,7 @@ def _documents(draft: ProgramDraft) -> list[dict[str, str]]:
 
 def validate_draft(draft: ProgramDraft) -> dict[str, Any]:
     """The full validation result: exact counts, every finding (errors first), and the content hash it covered."""
-    findings = sorted(_identity(draft) + _documents(draft), key=lambda f: (_ORDER[f["severity"]], f["file"], f["path"]))
+    findings = sorted(_identity(draft) + _documents(draft) + customer_data.scan_documents(draft), key=lambda f: (_ORDER[f["severity"]], f["file"], f["path"]))
     counts = {s: sum(f["severity"] == s for f in findings) for s in _ORDER}
     return {
         "content_sha256": draft.content_sha256, "valid": counts["error"] == 0, "errors": counts["error"],

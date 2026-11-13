@@ -8,16 +8,21 @@ is the human step) and an existing file is never overwritten. A repeat export of
 from __future__ import annotations
 
 import io
+import os
+import shutil
+import uuid
 import zipfile
 from datetime import datetime, timezone
+from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
 
+from application.program_drafts import customer_data
 from application.program_drafts.bundle import Bundle, build_bundle
 from application.program_drafts.lifecycle import load, validation_is_current
 from config import get_settings
 from domain.program_drafts import (
-    DraftConflict, DraftEvent, DraftInvalid, DraftStatus, InvalidTransition, ProgramDraft, ProgramDraftRepository, ReviewRefused,
+    CustomerDataInDraft, DraftConflict, DraftEvent, DraftInvalid, DraftStatus, InvalidTransition, ProgramDraft, ProgramDraftRepository, ReviewRefused,
 )
 
 
@@ -38,16 +43,62 @@ def _targets_inside(bundle: Bundle, root: Path) -> dict[str, Path]:
     return targets
 
 
+def _make_parents(folder: Path, made: list[Path]) -> None:
+    """Create the missing folders above a target, remembering each so a rollback can remove what this call made."""
+    missing = []
+    while not folder.exists():
+        missing.append(folder)
+        folder = folder.parent
+    for path in reversed(missing):
+        path.mkdir()
+        made.append(path)
+
+
+def _stage(bundle: Bundle, names: Iterable[str], staging: Path) -> None:
+    """Write every file into the staging folder first, so a failure here has touched nothing that matters."""
+    with zipfile.ZipFile(io.BytesIO(bundle.data)) as archive:
+        for name in names:
+            staged = staging / name
+            staged.parent.mkdir(parents=True, exist_ok=True)
+            staged.write_bytes(archive.read(name))
+
+
+def _rollback(placed: list[Path], made: list[Path]) -> None:
+    """Remove what this call placed and the folders it made; never anything that was there before."""
+    for path in placed:
+        path.unlink(missing_ok=True)
+    for folder in reversed(made):
+        try:
+            folder.rmdir()
+        except OSError:
+            pass
+
+
 def write_into_rules(bundle: Bundle, root: Path) -> list[str]:
-    """Write only the pack and year-pack files, refusing any that already exist; return the paths written."""
+    """Write only the pack and year-pack files, refusing any that already exist; return the paths written.
+
+    All or nothing: every file is first written into a staging folder inside the rules folder (same volume, so a rename is a
+    move), and only when all of them are staged are they moved into place. A failure while staging leaves the rules folder
+    untouched; a failure part-way through the moves removes the files this call already placed and any folder it created.
+    """
     targets = _targets_inside(bundle, root)
     clash = [str(p) for p in targets.values() if p.exists()]
     if clash:
         raise DraftConflict(f"{clash[0]} already exists; nothing was written (a bundle never overwrites a file)")
-    with zipfile.ZipFile(io.BytesIO(bundle.data)) as archive:
+    staging = root / f".export-{uuid.uuid4().hex}"
+    placed: list[Path] = []
+    made: list[Path] = []
+    try:
+        _stage(bundle, targets, staging)
         for name, target in targets.items():
-            target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_bytes(archive.read(name))
+            _make_parents(target.parent, made)
+            os.rename(staging / name, target)
+            placed.append(target)
+    except BaseException:
+        _rollback(placed, made)
+        raise
+    finally:
+        shutil.rmtree(staging, ignore_errors=True)
     return [str(p) for p in targets.values()]
 
 
@@ -59,6 +110,9 @@ def export(repo: ProgramDraftRepository, draft_id: str, actor: str, write_local:
         raise InvalidTransition(f"only an approved draft can be exported (this one is {draft.status.value})")
     if draft.approved_sha256 != draft.content_sha256 or not validation_is_current(draft):
         raise ReviewRefused("the documents differ from what was approved; it cannot be exported")
+    if customer_data.scan_documents(draft):
+        # Re-checked here, not only at validation: the book of client names can change after approval.
+        raise CustomerDataInDraft("the documents look like they hold customer data; validate the draft to see where, remove it and ask for review again")
     if write_local and not get_settings().programs.export_allow_local_write:
         raise LocalWriteRefused("writing into the rules folder is off (ENVIRONMENT=local and PROGRAM_EXPORT_ALLOW_LOCAL_WRITE=true enable it for developers)")
     bundle = build_bundle(draft, repo.events(draft_id))
