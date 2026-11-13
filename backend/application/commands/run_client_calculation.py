@@ -54,7 +54,7 @@ class RunClientCalculationCommand(Command):
 
     client_id: int = 0
     tax_year: int = 0
-    state: str = "GA"
+    state: str | None = None
     #: Which years to record a CLAIM for. Empty means every year the payroll
     #: covers, which is the pipeline model: a client that has been run has been
     #: assessed, not assessed for one year. `tax_year` still scopes the Gold
@@ -422,12 +422,11 @@ def handle_run_client_calculation(command: RunClientCalculationCommand) -> dict[
     from application.runs.fingerprint import run_identity
     from tools import gold_projection as gp
 
-    state = command.state.upper()
     started = gp.utc_now()
     run_id = uuid.uuid4().hex
 
     run = resolve_client_run(
-        account_id=command.client_id, state=state, tax_year=command.tax_year,
+        account_id=command.client_id, state=command.state, tax_year=command.tax_year,
     )
     engine_kwargs = run.engine_kwargs()
     results = {
@@ -492,7 +491,7 @@ def handle_run_client_calculation(command: RunClientCalculationCommand) -> dict[
         master_rows, installment_rows, replay_month_rows,
         replay_eligibility, replay_matrix, replay_periods, replay_summaries,
     ) = _replay_unit_series(
-        client_id=command.client_id, state=state, program_code=run.program_code,
+        client_id=command.client_id, state=run.state, program_code=run.program_code,
         payroll=_all_payroll(command.client_id),
         run_id=run_id, appended_at=appended_at,
     )

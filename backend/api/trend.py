@@ -143,7 +143,7 @@ class BaseYearRequest(BaseModel):
     """Save (or, with null, clear) a location's base year."""
 
     base_year: int | None = None
-    state: str = "GA"
+    state: str | None = None
     justification: str | None = Field(default=None, max_length=2000)
     triggered_by: str = "system"
 
@@ -159,7 +159,7 @@ def set_client_unit_base_year(
     try:
         command = SetBaseYearCommand(
             client_id=client_id, worksite_id=unit_id, base_year=payload.base_year,
-            state=payload.state.upper(), justification=payload.justification,
+            state=payload.state.upper() if payload.state else None, justification=payload.justification,
             actor=attributed(request, payload.triggered_by, default="system"),
         )
     except ValueError as exc:
@@ -351,7 +351,7 @@ def _with_rest_of_year(
     from application.queries.get_proximity import attach_rest_of_year
 
     try:
-        resolved = resolve_statute(account_id=client_id, state=state or "GA", tax_year=tax_year)
+        resolved = resolve_statute(account_id=client_id, state=state, tax_year=tax_year)
     except LookupError:
         return
     as_of = date(tax_year, 8, 31)
@@ -489,7 +489,7 @@ class ClientRunRequest(BaseModel):
     """Run metadata for one client-year."""
 
     year: int
-    state: str = "GA"
+    state: str | None = None
     triggered_by: str = "system"
     #: Omitted means assess every year the payroll covers. Name the years for a
     #: targeted recalculation of one.
@@ -513,7 +513,7 @@ def create_client_run(client_id: int, payload: ClientRunRequest, request: Reques
         command = RunClientCalculationCommand(
             client_id=client_id,
             tax_year=payload.year,
-            state=payload.state.upper(),
+            state=payload.state.upper() if payload.state else None,
             actor=attributed(request, payload.triggered_by, default="system"),
             assess_tax_years=tuple(payload.assess_years or ()),
         )

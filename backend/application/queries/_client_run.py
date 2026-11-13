@@ -17,6 +17,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
+from application.program_defaults import derive_run_state
+
 
 class ClientRunNotAvailable(LookupError):
     """The question cannot be answered, and why.
@@ -75,7 +77,7 @@ class ClientRun:
 
 
 def resolve_statute(
-    *, account_id: int | None, state: str, tax_year: int
+    *, account_id: int | None, state: str | None, tax_year: int
 ) -> ResolvedStatute:
     """Programme, floors, rule pack and fiscal window — no payroll.
 
@@ -93,7 +95,7 @@ def resolve_statute(
         resolve_tax_year_convention,
     )
 
-    state = state.upper()
+    state = (state or derive_run_state(account_id, tax_year)).upper()
 
     pack_file = STATE_TO_PACK.get(state)
     program_code = next(
@@ -128,7 +130,7 @@ def resolve_statute(
 def resolve_client_run(
     *,
     account_id: int | None,
-    state: str,
+    state: str | None,
     tax_year: int,
     rows: list[dict[str, Any]] | None = None,
 ) -> ClientRun:
