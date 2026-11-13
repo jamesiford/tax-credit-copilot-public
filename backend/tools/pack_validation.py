@@ -121,7 +121,7 @@ def _check_verified_claim(pack: dict[str, Any], report: Report) -> None:
 def _check_names(path: Path, pack: dict[str, Any], kind: str, report: Report) -> None:
     j = pack.get("jurisdiction") or {}
     if kind == "year":
-        if path.stem != str(pack.get("tax_year")):
+        if path.stem.split(".")[0] != str(pack.get("tax_year")):
             report.add("error", "filename", f"{path.name} must be named for its tax_year ({pack.get('tax_year')}.json)")
         return
     expected = "federal_" if j.get("level") == "federal" else f"{str(j.get('code', '')).lower()}_"
@@ -131,7 +131,7 @@ def _check_names(path: Path, pack: dict[str, Any], kind: str, report: Report) ->
 
 def validate_pack(path: Path, years_authored: bool = False) -> Report:
     """Validate one base pack or year pack file (a year pack is a `<program>/<year>.json`)."""
-    kind = "year" if path.stem.isdigit() else "base"
+    kind = "year" if path.stem.split(".")[0].isdigit() else "base"
     report = Report(file=str(path), kind=kind)
     try:
         pack = json.loads(path.read_text(encoding="utf-8"))
