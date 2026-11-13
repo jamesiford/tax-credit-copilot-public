@@ -95,6 +95,18 @@ run "on_runs_as_the_api_with_the_api_settings_and_its_own" {
   }
 }
 
+run "concurrency_defaults_to_one" {
+  command = apply
+  variables {
+    enable_run_worker = true
+  }
+
+  assert {
+    condition     = module.run_worker.settings.RUN_WORKER_CONCURRENCY == "1"
+    error_message = "until concurrent Gold writes are measured live, the worker runs one item at a time"
+  }
+}
+
 run "concurrency_is_bounded" {
   command = plan
   variables {

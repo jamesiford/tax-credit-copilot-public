@@ -507,9 +507,9 @@ variable "enable_run_worker" {
 }
 
 variable "run_worker_concurrency" {
-  description = "RUN_WORKER_CONCURRENCY for the worker: items in flight at once, never two for one client. Use 1 if Warehouse write conflicts are logged."
+  description = "RUN_WORKER_CONCURRENCY for the worker: items in flight at once, never two for one client. Defaults to 1 until concurrent Gold writes are measured on a live Warehouse; raise it only while watching the 24556, 3960 and 1205 retry counts."
   type        = number
-  default     = 2
+  default     = 1
   validation {
     condition     = var.run_worker_concurrency >= 1 && var.run_worker_concurrency <= 8
     error_message = "run_worker_concurrency must be between 1 and 8."

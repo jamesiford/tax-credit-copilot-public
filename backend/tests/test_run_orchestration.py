@@ -113,6 +113,12 @@ def test_settings_default_inline_worker_only_locally():
     assert parse_runs({"RUN_WORKER_CONCURRENCY": "99"}).worker_concurrency == 8
 
 
+def test_the_worker_runs_one_item_at_a_time_unless_raised():
+    """Conservative until concurrent Gold writes are measured on a live Warehouse (decision D16)."""
+    assert parse_runs({}).worker_concurrency == 1 and parse_runs({"ENVIRONMENT": "production"}).worker_concurrency == 1
+    assert parse_runs({"RUN_WORKER_CONCURRENCY": "4"}).worker_concurrency == 4
+
+
 # ------------------------------------------------------------------ selection
 
 

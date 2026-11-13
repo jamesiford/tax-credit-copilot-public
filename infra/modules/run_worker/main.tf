@@ -54,7 +54,7 @@ variable "api_app_settings" {
 variable "concurrency" {
   description = "RUN_WORKER_CONCURRENCY: items in flight in this worker."
   type        = number
-  default     = 2
+  default     = 1
 }
 
 variable "app_insights_connection_string" {

@@ -42,7 +42,7 @@ refused on the run routes. Three constraints shape the design:
    `GET /api/v2/run-jobs`, `GET /api/v2/run-jobs/{id}` (counts, items page), `POST /api/v2/run-jobs/{id}/cancel`,
    `POST /api/v2/run-jobs/{id}/retry-failed`. Starting is a command with `Policy.WRITER`; the same command backs the channel.
 9. **Safety.** Size cap `RUN_BATCH_MAX_ITEMS`; typed confirmation above the threshold; idempotency by key and by identical
-   open job; global concurrency `RUN_WORKER_CONCURRENCY` (default 2, maximum 8); every start, cancel and retry is audited,
+   open job; global concurrency `RUN_WORKER_CONCURRENCY` (default 1, maximum 8); every start, cancel and retry is audited,
    failures included.
 10. **Channel.** `run_batch_start` is a two-step `WriteSpec` (preview states the count, mode, years and the unchanged
     estimate); `run_batch_status` is a read capability.
