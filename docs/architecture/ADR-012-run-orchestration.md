@@ -1,8 +1,11 @@
 # ADR-012 — Run orchestration
 
-**Date** 2026-11-12 · **Status** Proposed (design; implemented in later steps, not yet run against a live Warehouse) ·
+**Date** 2026-11-12 · **Status** Proposed (built and tested offline; not yet run against a live Warehouse, and a person accepts it) ·
 **Relates to** [ADR-003](ADR-003-clean-architecture-cqrs.md) (mediator pipeline), [ADR-007](ADR-007-warehouse-operational-store.md)
-(operational store), [ADR-011](ADR-011-azure-sql-operational-store.md) (platform choice).
+(operational store), [ADR-011](ADR-011-azure-sql-operational-store.md) (platform choice), [ADR-013](ADR-013-program-registry.md)
+(program registry). Operator guide: [RUN-ORCHESTRATION.md](RUN-ORCHESTRATION.md).
+
+This record matches the code as built. Where the first design differed, the built behaviour is described and the change is noted.
 
 ## Context
 
@@ -11,59 +14,84 @@ Gold is written. That suits one client at an operator's request. Onboarding a la
 a filtered group or every client, with progress, retry and cancel, and from the Microsoft 365 channel, whose tokens are
 refused on the run routes. Three constraints shape the design:
 
-- A run for one client-year replays every year of that client's payroll and writes Gold for all of them, but records a manifest
-  for the requested year only. The manifest is the unit of "has this been done".
+- A run for one client-year replays every authored year of that client's payroll and writes Gold for all of them, but records a
+  manifest for the requested year only. The manifest is the unit of "has this been done", and a new manifest supersedes the
+  earlier one per (client, program), not per year.
 - Gold writes conflict on Fabric Warehouse (error 24556) when two transactions touch the same table; two runs for the same
   client can leave mixed `is_current` rows.
-- The source snapshot id on the manifest is never populated, so it cannot say "nothing changed".
+- `calculation_id` digests one year's payroll, so on its own it cannot show that a **prior** year was restated.
 
 ## Decision
 
-1. **Job model in `tcc_ops`** (migration 0004): `run_job` (one row per batch: mode, scope, resolved-set hash, years, options,
-   state, counts, requested_by, idempotency key, timestamps) and `run_job_item` (one row per client-year: state, attempts,
-   lease owner and expiry, manifest run id, outcome, reason). Portable T-SQL, tenant-bound through `tenant_sql`.
-2. **Queue with leases.** A worker claims queued items with a conditional `UPDATE`, holds a lease (default 120 s) renewed by
-   a heartbeat; an expired lease returns the item to `queued`. **Per-client lock**: an item is claimable only when no other
-   item of that client holds a live lease.
-3. **Worker is a separate entry point** (`python -m workers.run_worker`) sharing the application code and the mediator. An
-   inline worker thread runs only when `ENVIRONMENT=local`. Deploying the worker as its own process is an operator step.
-4. **Modes.** `calculate` dispatches `RunClientCalculationCommand`; `assess` dispatches `AssessClientCommand`. The existing
-   endpoints are unchanged.
-5. **Selection.** `ids`, `filter` (the portfolio filter expression, resolved from the book, claims and manifests, never from
-   payroll) or `all`; years are explicit or "every year the client holds". The resolved client set and its hash are stored.
-6. **Unchanged skipping.** An item is `skipped_unchanged` only when the latest successful manifest for (client, program, year)
-   has the same `calculation_id`, the same assumption hashes and the same `rule_pack_version` (and, if asked, `code_commit`).
-   Any value missing means "cannot tell": the item runs. `force` disables the check.
-7. **State machines.** Job: `queued -> running -> (succeeded | partial | failed | cancelled)`; item: `queued -> running ->
-   (succeeded | skipped_unchanged | not_available | failed | cancelled)`, `failed -> queued` on retry (max attempts 3, backoff).
-   Cancel is cooperative: queued items become `cancelled`; a running item finishes (a half-written run is never abandoned).
-8. **API (typed models).** `POST /api/v2/run-jobs/preview` (no writes: count, skipped estimate, confirmation need),
-   `POST /api/v2/run-jobs` (start; `idempotency_key`; `confirm_count` above `RUN_BATCH_CONFIRM_ABOVE`),
-   `GET /api/v2/run-jobs`, `GET /api/v2/run-jobs/{id}` (counts, items page), `POST /api/v2/run-jobs/{id}/cancel`,
-   `POST /api/v2/run-jobs/{id}/retry-failed`. Starting is a command with `Policy.WRITER`; the same command backs the channel.
-9. **Safety.** Size cap `RUN_BATCH_MAX_ITEMS`; typed confirmation above the threshold; idempotency by key and by identical
-   open job; global concurrency `RUN_WORKER_CONCURRENCY` (default 1, maximum 8); every start, cancel and retry is audited,
-   failures included.
-10. **Channel.** `run_batch_start` is a two-step `WriteSpec` (preview states the count, mode, years and the unchanged
-    estimate); `run_batch_status` is a read capability.
+1. **Batch model in `tcc_ops`** (migration `0004`): `run_batch` (one row per request) and `run_batch_item` (one row per client and
+   program, optionally a year). Portable T-SQL, one shared SQL store serving SQLite and the Warehouse. The queue follows
+   `RUN_MANIFEST_STORE`; there is no new store setting. The statements are cross-client by nature and go through one named
+   `tenant_exempt` reason. (Names differ from the first draft, which said `run_job`.)
+2. **Queue with leases.** A worker claims queued items with a conditional update and holds a lease (default 120 s) renewed by a
+   heartbeat; an expired lease returns the item to `queued`. **Per-client lock**: an item is claimable only when no other item of
+   that client holds a live lease, with an `item_id` tie-break between racing claimers. This is airtight on SQLite and only
+   **narrowed** on the Warehouse under snapshot isolation; it is not proven there (live check).
+3. **Worker is a separate entry point**, `python -m bootstrap.run_worker` (`scripts/run-worker.py`), not `application.runs.worker`:
+   `application` may not import `bootstrap`, so the framework-free worker lives in `application/runs/worker.py` and the entry
+   point composes it. An inline worker thread starts only when `ENVIRONMENT=local` (or when set explicitly, for a single-instance
+   trial). Terraform for a separate worker app is default off (`enable_run_worker`).
+4. **Modes.** `calculate` dispatches `RunClientCalculationCommand`, `assess` dispatches `AssessClientCommand`,
+   `assess_and_calculate` does both. The existing run and assess endpoints are unchanged.
+5. **One item per (client, program).** A client with payroll in several states that each have a calculable program is run for each,
+   derived from the client book's footprint and the registry with no payroll scan; a named `program_code` applies to everyone;
+   `refresh_once` (default true) makes one item per client rather than per client-year, because every run refreshes every year.
+   `refresh_once=false` needs explicit years. An item with no year resolves to the client's default year when it starts.
+6. **Selection.** Explicit ids, a filter in the portfolio's own vocabulary, or all clients, resolved from the book, claims and
+   footprint, never from payroll, and narrowed to the clients the caller may act for (a named client they may not act for is
+   refused).
+7. **Skipping unchanged is opt-in** (`skip_unchanged`, default **false**; `force` is kept and wins). It needs, on the latest
+   successful manifest for the client and program: the same tax year, the same `calculation_id`, the same assumption SHA-256s and
+   `rule_pack_version` (and `code_commit` only on request), and the same **client-wide data fingerprint**, a digest of all the
+   client's payroll inside any authored year's fiscal window, which a run stores in the manifest's `source_snapshot_id`. A manifest
+   without it means "cannot tell, so run", so the first batch after a release cannot skip anything. The preview reports
+   `skip_coverage` and only an upper bound, never a promised count. Limit: the supersede is per (client, program), so "unchanged"
+   speaks for the latest manifest only.
+8. **State machines.** Batch: `queued -> running -> (succeeded | partial | failed | cancelled)`, derived from the items. Item:
+   `queued -> leased -> running -> (succeeded | skipped_unchanged | skipped_no_payroll | failed | cancelled)`, `failed -> queued` on
+   retry. Cancel is cooperative: queued items become `cancelled`, a running item finishes.
+9. **Failures.** A transient failure (store unreachable, timeout, write conflict) is retried with capped backoff and jitter up to
+   `RUN_ITEM_MAX_ATTEMPTS`. A request the data cannot satisfy is a skip with the reason, never a failure and never a zero. A Gold
+   write that does not validate (section 9: for example more than one current run for a client and program) fails with the named
+   cause `gold_write` and a remedy, and is retried **once** with no other worker on the client; a second failure stays failed and
+   visible.
+10. **API (typed models), `/api/v2/run-batches`.** `POST` starts a batch, or with `dry_run` previews it and writes nothing;
+    `GET` lists, `GET /{id}` reads one, `GET /{id}/items` pages its items, `POST /{id}/cancel`, `POST /{id}/retry-failed`.
+    Starting is a command with `Policy.WRITER` and every account named is authorised; the write routes are refused to an agent
+    token. Confirmation is typed: above `RUN_BATCH_CONFIRM_ABOVE` the start must send `confirm_items` equal to the count.
+11. **Safety defaults.** Size cap `RUN_BATCH_MAX_ITEMS` (only scope `all` may override it); idempotency by key and by an identical
+    open batch; `RUN_WORKER_CONCURRENCY` defaults to **1** (maximum 8) until concurrent Gold writes are measured on a live
+    Warehouse; every start, cancel and retry is audited, failures included.
+12. **Channel.** `run_batch_prepare` and `run_batch_commit` form a two-step write (the preview is the dry run and always comes
+    first; above the confirmation threshold it refuses with the counts until `confirm_items` is supplied); `run_batch_status` and
+    `run_batch_list` are reads. The model-facing schemas carry no `client_id`: a batch's accounts travel as `scope.account_ids`.
+13. **Portal.** Selection and a start dialog on the book (preview first, typed confirmation, an unchecked "skip unchanged"
+    option), a Runs page with progress, failures by cause, cancel and retry, and an opt-in single-client batch mode
+    (`VITE_RUN_AS_BATCH` or `localStorage['tcc.run-as-batch']`, off by default).
 
 ## Failure modes
 
 | Failure | Result |
 |---|---|
-| Worker dies mid-item | Lease expires, item re-queued; the run is idempotent (new `run_id` supersedes); a stranded `running` manifest is reaped by the existing reaper |
-| Writer conflict persists | Item `failed` (retryable), re-queued with backoff up to the attempt limit |
-| Client has no payroll / unauthored year | `not_available` with the reason, never `failed`, never a zero |
-| Same request twice | Same job returned |
-| Fabric/SQL unavailable | `DependencyUnavailable`: the API answers degraded, items stay queued |
+| Worker dies mid-item | The lease lapses and the item returns to the queue; a rerun writes a new `run_id` that supersedes; the existing reaper closes a stranded `running` manifest |
+| Writer conflict persists | The item is retried with backoff up to the attempt limit, then `failed` with cause `conflict` |
+| Gold write does not validate | `failed` with cause `gold_write`, retried once with no other worker on the client, then stays failed |
+| Client has no payroll or an unauthored year | `skipped_no_payroll` with the reason |
+| Same request twice | The same batch is returned |
+| Fabric or SQL unavailable | `DependencyUnavailable`: the API answers degraded and items stay queued; the status read shows a degraded `run_worker` entry when queued work has no live lease |
 
 ## Consequences
 
-Batches survive restarts and scale-out; the interactive endpoints keep their behaviour. A worker must be deployed for jobs
-to progress outside local development, and a live Warehouse check of concurrent writes is required before raising
-concurrency above the default.
+Batches survive restarts and scale-out, and the interactive endpoints keep their behaviour. A worker must be deployed for batches to
+progress outside local development. Live checks remain: concurrent Gold writes and the per-client lock on a Warehouse, migration
+`0004` on a real store, a real batch compared with a single run, and the Teams and Cowork republish.
 
 ## Deliberately not done
 
-No scheduler or cron triggers; no Fabric notebook or pipeline venue; no change to the engine or to the existing run and
-assess routes; no new infrastructure resource.
+No scheduler or cron triggers; no Fabric notebook or pipeline venue; no change to the engine or to the existing run and assess routes;
+no new infrastructure beyond the default-off worker app. Two programs in one state cannot both run, because the run command takes a
+state, not a program.
