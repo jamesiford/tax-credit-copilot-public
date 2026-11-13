@@ -37,7 +37,10 @@ at least one year pack is authored, and the registry loader refuses a typed `cal
 ## Steps
 
 1. **Decide the program and the state.** Two-letter state, a credit code (`XX_JTC`), and whether it is a state, local or federal
-   credit. Several programs may share a state; the first listed is the state's default for derived runs. A federal program has no state and is **not runnable**: a run prices the payroll rows of a state, so a federal entry is described, never calculable.
+   credit. **Several programs may share a state.** The program, not the state, is the key: storage, runs, claims, base years and
+   reads all carry `program_code`, and a state is only a convenient input that resolves to its programs (see "Several programs
+   in one state" below). A federal program has no state and is **not runnable**: a run prices the payroll rows of a state, so a
+   federal entry is described, never calculable (`ProgramNotRunnable`; the program list says so in `not_calculable_reason`).
 2. **Check it fits the supported models** (below). If it does not, stop at "needs engine work".
 3. **Scaffold.** `python scripts/new-program.py program --code XX_JTC --state XX --name "..." --slug jtc` writes a flagged base pack
    and a `draft` registry entry. Every statutory value is `null`.
@@ -51,6 +54,26 @@ at least one year pack is authored, and the registry loader refuses a typed `cal
    for the state, an assessment and a calculation. Never use real payroll in a test.
 8. **Review.** A tax professional reviews the values against the cited sources; only then is a `_prototype_verify` flag removed.
 9. **Deploy.** Packs ship with the backend package. To read them from elsewhere set `RULES_DIR` (and `PROGRAM_REGISTRY_FILE`).
+
+## Several programs in one state
+
+A second program in a state that already has one is a manifest entry plus its packs, with no code change. What it means:
+
+- **Order is meaning.** The registry lists a state's programs in manifest order; the first is the state's **default** program, the
+  one `STATE_TO_PACK` shows and a state-only caller falls back to. Reordering the manifest changes the default.
+- **Program first.** `program_code` on a run request, command, base year, batch or read wins over `state` and fixes it. A state that
+  disagrees is a typed `ProgramStateConflict` (HTTP 422). A state alone resolves to its calculable program for the year; with
+  several, a **run** uses the first and logs a warning naming every candidate (deprecated), and the response always names the
+  program priced. A **read** asks instead (404 listing the programs) rather than answering for the first.
+- **Same rows, different pack.** A state-level program prices the payroll rows whose work state is the program's state
+  (`application/payroll_rows.program_rows`), so two programs of one state see the same rows and differ only by pack.
+- **Independent storage.** `(client, program, year)` is the unit: running one program never supersedes the other's Gold rows,
+  manifest or claim; both are current at once; the section 9 checks are scoped by program. The employee-grain Gold tables carry no
+  program column (they are keyed by `run_id`), so every employee-grain read takes the program to pick the right run.
+- **Batches** plan one item per (client, program); an assessment with no program sweeps every program of each state the payroll holds.
+- **Portal.** Where a state holds several programs, the run and assess controls show and pass the program.
+- **Proof.** `tests/test_multiple_programs_per_state.py` and `tests/test_two_programs_gold_storage.py` register two fictional programs
+  in one fictional state in a temporary `RULES_DIR` and exercise all of the above on the real writer and reader (SQLite).
 
 ## What a pack can express today (supported models)
 
@@ -77,4 +100,4 @@ them wrongly.
 | Tiered per-job amounts that vary by location designation beyond a single negotiated designation threshold | One amount per program-year | `StatutoryFloors` in `domain/calculation/floors.py`, `data/designations.py` |
 | Credits not based on net new jobs, or several simultaneous credit computations per location | The headcount-delta model is the only one | `domain/calculation/onezero.py` |
 | Ingesting statute with the rules-ingestion agent for a state other than Georgia | The agent and its API are Georgia-only by design; statute arrives as an authored year pack | `tools/rules_ingestion.py` |
-| Read endpoints, chat and demo surfaces that default `state` to `GA` | The run, base-year, location-level read and client-grain capability paths derive the state from data. The portfolio reads (`GetEligibilityQuery` and friends) already require a state, chat keyword scope detection and the demo simulators still assume Georgia | `api/chat/scope.py`, `api/chat/pipelines_core.py`, `tools/simulation.py`, `api/simulate.py` |
+| Read endpoints, chat and demo surfaces that default `state` to `GA` | The run, base-year, location-level read and client-grain capability paths derive the state from data. The portfolio reads (`GetEligibilityQuery` and friends) already require a state, chat keyword scope detection and the demo simulators still assume Georgia. Their handling of a state with several programs is described under "Several programs in one state" | `api/chat/scope.py`, `api/chat/pipelines_core.py`, `tools/simulation.py`, `api/simulate.py` |

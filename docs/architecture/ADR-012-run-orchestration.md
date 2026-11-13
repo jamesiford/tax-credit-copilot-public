@@ -93,5 +93,6 @@ progress outside local development. Live checks remain: concurrent Gold writes a
 ## Deliberately not done
 
 No scheduler or cron triggers; no Fabric notebook or pipeline venue; no change to the engine or to the existing run and assess routes;
-no new infrastructure beyond the default-off worker app. Two programs in one state cannot both run, because the run command takes a
-state, not a program.
+no new infrastructure beyond the default-off worker app. (Two programs in one state used to be unrunnable because the run command took a
+state; since F04c the command, the planner and the executor carry `program_code`, so each program is its own item and runs under its
+own pack.)
