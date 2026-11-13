@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Binary, BookOpenCheck, ClipboardList, Database, FileDiff, ListChecks,
-  MessageSquare, Play, RefreshCw, ShieldCheck,
+  MessageSquare, PackagePlus, Play, RefreshCw, ShieldCheck,
   ShieldQuestion, Users, X,
 } from 'lucide-react';
 import { fetchClientScope, fetchPortfolioV2, fetchScope, fetchWorkspace, hasYear, refreshWorkspace } from './api.js';
@@ -25,6 +25,7 @@ import { navGroups } from './lib/shellNav.js';
 import ClientPage from './pages/ClientPage.jsx';
 import EmployeePage from './pages/EmployeePage.jsx';
 import PortfolioPage from './pages/PortfolioPage.jsx';
+import ProgramsPage from './pages/ProgramsPage.jsx';
 import RunsPage from './pages/RunsPage.jsx';
 import UnitPage from './pages/UnitPage.jsx';
 import {
@@ -94,6 +95,7 @@ export const NAV = [
     { id: 'evidence', label: 'Audit trail', icon: ClipboardList, primary: true, sealed: true },
     { id: 'compare', label: 'Back-test', icon: FileDiff, sealed: true },
     { id: 'rules', label: 'Programs', icon: BookOpenCheck },
+    { id: 'programs', label: 'Program manager', icon: PackagePlus },
     { id: 'assumptions', label: 'Calculations', icon: ShieldCheck, sealed: true, clientAgnostic: true },
   ] },
 ];
@@ -152,7 +154,9 @@ function parseRouteState(pathname) {
 
   // `/runs/<batch id>`: a batch is a place a link can point at, so the id is part of the path.
   const batchId = clientId == null && segments[0] === 'runs' && segments[1] ? decodeURIComponent(segments[1]) : null;
-  return { clientId, token, unitId, view, batchId, isRoot: segments.length === 0 };
+  // /programs/<code>, /programs/new, /programs/draft/<id>: the Program manager's own sub-routes, at portfolio scope.
+  const programRoute = clientId == null && segments[0] === 'programs' ? segments.slice(1).map(decodeURIComponent) : [];
+  return { clientId, token, unitId, view, batchId, programRoute, isRoot: segments.length === 0 };
 }
 
 function scrollToTop() {
@@ -170,6 +174,7 @@ const ASK = {
   plan: 'Summarize which lever moves this client\u2019s credit the most, and by how much.',
   rules: 'Summarize how rule packs are versioned per tax year, and how a filed claim stays bound to the statute that was in force that year.',
   evidence: 'What is inside this audit trail, and what makes the calculation reproducible under audit?',
+  programs: 'Which programs can the platform calculate today, which are only described, and what would it take to add another?',
 };
 
 //: At portfolio scope there is no client, so every prompt above is the wrong
@@ -181,7 +186,7 @@ const ASK_PORTFOLIO =
 
 function askForPage(routeView, isPortfolio) {
   // These two describe the product, not a client, so scope does not matter.
-  if (routeView === 'rules' || routeView === 'evidence') return ASK[routeView];
+  if (routeView === 'rules' || routeView === 'evidence' || routeView === 'programs') return ASK[routeView];
   return isPortfolio ? ASK_PORTFOLIO : ASK[routeView];
 }
 
@@ -605,6 +610,7 @@ export default function App() {
       onOpenClient={(clientId) => navigate(buildRouteUrl({ clientId }))}
     />;
   }
+  else if (routeView === 'programs') view = <ProgramsPage route={route.programRoute} navigate={navigate} />;
   else if (routeView === 'agents') view = <AgentActivityView scope={resolved.scope} scopeOptions={scopeOptions} />;
   // Findings used to be the bare `else`, so a nav entry whose route was removed
   // rendered the findings queue under someone else's heading rather than

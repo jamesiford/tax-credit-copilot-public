@@ -1,0 +1,141 @@
+/* Program manager: the catalog, a program's detail, the Add-a-program workflow and its panels. Tokens only (docs/design/DESIGN-SYSTEM.md). */
+
+.prog-grid-2 {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: var(--space-10);
+  align-items: start;
+}
+
+.prog-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.prog-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-6) var(--space-8);
+}
+
+.prog-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  font-size: var(--text-small);
+}
+
+.prog-field > span:first-child,
+.prog-field > label {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.prog-field input,
+.prog-field select,
+.prog-field textarea {
+  padding: var(--space-3) var(--space-5);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  background: var(--surface-card);
+  color: var(--text-primary);
+  font: inherit;
+}
+
+.prog-field input:focus-visible,
+.prog-field select:focus-visible,
+.prog-field textarea:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: var(--space-1);
+}
+
+.prog-field--wide {
+  grid-column: 1 / -1;
+}
+
+.prog-field-note {
+  color: var(--text-muted);
+  font-size: var(--text-small);
+}
+
+.prog-field-error {
+  color: var(--state-below-min-ink);
+  font-size: var(--text-small);
+}
+
+.prog-json {
+  min-height: calc(var(--space-16) * 4);
+  font-family: var(--font-data, monospace);
+  font-size: var(--text-data);
+  line-height: var(--leading-dense);
+}
+
+.prog-findings {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  font-size: var(--text-small);
+}
+
+.prog-finding {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.prog-finding code {
+  font-size: var(--text-data);
+}
+
+.prog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-5);
+  margin-top: var(--space-6);
+}
+
+.prog-savestate {
+  margin-left: auto;
+  color: var(--text-primary);
+  font-size: var(--text-small);
+}
+
+.prog-history {
+  margin: 0;
+  padding-left: var(--space-8);
+  font-size: var(--text-small);
+}
+
+.prog-numbers td.num,
+.prog-numbers th.num {
+  text-align: right;
+}
+
+.prog-preview-label {
+  margin: 0 0 var(--space-5);
+  padding: var(--space-4) var(--space-6);
+  border: 1px dashed var(--state-partial-line);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.prog-years {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+@media (max-width: 1100px) {
+  .prog-grid-2,
+  .prog-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

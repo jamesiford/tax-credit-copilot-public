@@ -653,3 +653,61 @@ describe('run batches (ADR-012)', () => {
     await expect(fetchRunBatch('x')).rejects.toThrow('Unknown run batch x.');
   });
 });
+
+describe('the program catalog and drafts (F05)', () => {
+  it('reads the catalog and one program on the documented URLs', async () => {
+    const { fetchPrograms, fetchProgram } = await import('./api.js');
+    fetchMock.mockResolvedValue(ok({}));
+    await fetchPrograms();
+    await fetchProgram('GA_JTC');
+    expect(fetchMock.mock.calls.map((c) => c[0])).toEqual(['/api/v2/programs', '/api/v2/programs/GA_JTC']);
+  });
+
+  it('creates, saves with the version it read, validates, reviews, previews and reads the manifest', async () => {
+    const api = await import('./api.js');
+    fetchMock.mockResolvedValue(ok({}));
+    await api.createProgramDraft({ code: 'ZY_DEMO', name: 'x', state: 'ZY', years: [2025] });
+    await api.saveProgramDraftDocuments('d 1', { expectedVersion: 3, pack: { a: 1 }, years: { 2025: {} }, name: 'n' });
+    await api.validateProgramDraft('d1');
+    await api.requestProgramReview('d1');
+    await api.reviewProgramDraft('d1', { decision: 'approve', comment: 'ok' });
+    await api.previewProgramDraft('d1');
+    await api.withdrawProgramDraft('d1', 'dup');
+    await api.fetchProgramDraftManifest('d1');
+    const calls = fetchMock.mock.calls.map((c) => [c[1]?.method || 'GET', c[0]]);
+    expect(calls).toEqual([
+      ['POST', '/api/v2/program-drafts'], ['PUT', '/api/v2/program-drafts/d%201/documents'],
+      ['POST', '/api/v2/program-drafts/d1/validate'], ['POST', '/api/v2/program-drafts/d1/request-review'],
+      ['POST', '/api/v2/program-drafts/d1/review'], ['POST', '/api/v2/program-drafts/d1/preview'],
+      ['POST', '/api/v2/program-drafts/d1/withdraw'], ['GET', '/api/v2/program-drafts/d1/export/manifest'],
+    ]);
+    expect(JSON.parse(fetchMock.mock.calls[1][1].body)).toMatchObject({ expected_version: 3, name: 'n' });
+    expect(JSON.parse(fetchMock.mock.calls[4][1].body)).toEqual({ decision: 'approve', comment: 'ok' });
+  });
+
+  it('lists drafts with paging and a status filter', async () => {
+    const { listProgramDrafts } = await import('./api.js');
+    fetchMock.mockResolvedValue(ok({ items: [] }));
+    await listProgramDrafts({ status: 'needs_changes', limit: 10 });
+    expect(fetchMock.mock.calls[0][0]).toBe('/api/v2/program-drafts?limit=10&offset=0&status=needs_changes');
+  });
+
+  it('turns a typed refusal into an error carrying its code and reason', async () => {
+    const { saveProgramDraftDocuments, ProgramDraftError } = await import('./api.js');
+    fetchMock.mockResolvedValueOnce({ ok: false, status: 409, json: async () => ({ detail: { code: 'draft_conflict', reason: 'changed since read' } }) });
+    const error = await saveProgramDraftDocuments('d1', { expectedVersion: 1, pack: {}, years: {} }).catch((e) => e);
+    expect(error).toBeInstanceOf(ProgramDraftError);
+    expect(error).toMatchObject({ status: 409, code: 'draft_conflict', reason: 'changed since read' });
+  });
+
+  it('exports the bundle with its hash and file name from the headers', async () => {
+    const { exportProgramDraft } = await import('./api.js');
+    const blob = new Blob(['zip']);
+    fetchMock.mockResolvedValueOnce({
+      ok: true, status: 200, blob: async () => blob,
+      headers: { get: (k) => ({ 'content-disposition': 'attachment; filename="zy_demo-bundle.zip"', 'x-bundle-sha256': 'abc' }[k.toLowerCase()] ?? null) },
+    });
+    expect(await exportProgramDraft('d1')).toEqual({ blob, sha256: 'abc', filename: 'zy_demo-bundle.zip' });
+    expect(fetchMock.mock.calls[0][1].method).toBe('POST');
+  });
+});

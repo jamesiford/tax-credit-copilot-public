@@ -352,6 +352,72 @@ export const cancelRunBatch = (batchId) => runBatchRequest(`/${encodeURIComponen
 
 export const retryFailedRunBatch = (batchId) => runBatchRequest(`/${encodeURIComponent(batchId)}/retry-failed`, { method: 'POST' });
 
+// --- Program manager: the catalog and program drafts (F05, ADR-013) ---------------------------------------------
+
+/**
+ * A refusal from the program draft API. `code` and `reason` come from its typed detail (draft_conflict, review_refused,
+ * preview_refused, customer_data_refused ...) so a screen can say what to change; `status` 409 is a stale version or a
+ * move the draft's status does not allow.
+ */
+export class ProgramDraftError extends Error {
+  constructor(status, detail) {
+    const d = detail && typeof detail === 'object' ? detail : { reason: detail };
+    super(d.reason || `program drafts ${status}`);
+    this.status = status;
+    this.code = d.code || null;
+    this.reason = d.reason || null;
+  }
+}
+
+async function programRequest(path, options = {}) {
+  const r = await fetch(`${BASE}${path}`, options);
+  if (!r.ok) {
+    let detail = '';
+    try { detail = (await r.json())?.detail || ''; } catch { /* non-JSON error */ }
+    throw new ProgramDraftError(r.status, detail);
+  }
+  return r;
+}
+
+const programJson = async (path, options) => (await programRequest(path, options)).json();
+const putJson = (payload) => ({ method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+
+/** Every registered program with lifecycle, authored years, unverified years, engagement counts and calculability. */
+export const fetchPrograms = () => programJson('/api/v2/programs');
+export const fetchProgram = (code) => programJson(`/api/v2/programs/${encodeURIComponent(code)}`);
+
+const drafts = '/api/v2/program-drafts';
+const draftPath = (id, tail = '') => `${drafts}/${encodeURIComponent(id)}${tail}`;
+
+export function listProgramDrafts({ status, limit = 50, offset = 0 } = {}) {
+  const params = new URLSearchParams({ limit: String(limit), offset: String(offset) });
+  if (status) params.set('status', status);
+  return programJson(`${drafts}?${params}`);
+}
+export const createProgramDraft = (body) => programJson(drafts, jsonPost(body));
+export const fetchProgramDraft = (id) => programJson(draftPath(id));
+/** Replace the documents. `expectedVersion` is the version the editor read; a stale one is a 409 ProgramDraftError. */
+export const saveProgramDraftDocuments = (id, { expectedVersion, pack, years, name }) => programJson(
+  draftPath(id, '/documents'), putJson({ expected_version: expectedVersion, pack, years, name }),
+);
+export const validateProgramDraft = (id) => programJson(draftPath(id, '/validate'), jsonPost({}));
+export const requestProgramReview = (id) => programJson(draftPath(id, '/request-review'), jsonPost({}));
+export const reviewProgramDraft = (id, { decision, comment }) => programJson(draftPath(id, '/review'), jsonPost({ decision, comment }));
+export const withdrawProgramDraft = (id, reason) => programJson(draftPath(id, '/withdraw'), jsonPost({ reason }));
+/** Price the draft on the synthetic sample. Writes nothing; the answer is labelled preview, not verified, not for filing. */
+export const previewProgramDraft = (id, body = {}) => programJson(draftPath(id, '/preview'), jsonPost(body));
+export const fetchProgramDraftManifest = (id) => programJson(draftPath(id, '/export/manifest'));
+
+/** Export the bundle: resolves to `{ blob, sha256, filename }`. The zip is deterministic, so a repeat has the same hash. */
+export async function exportProgramDraft(id) {
+  const r = await programRequest(draftPath(id, '/export'), jsonPost({}));
+  const disposition = r.headers.get('content-disposition') || '';
+  return {
+    blob: await r.blob(), sha256: r.headers.get('x-bundle-sha256'),
+    filename: (/filename="([^"]+)"/.exec(disposition) || [])[1] || 'program-bundle.zip',
+  };
+}
+
 // --- Scope: the persistent client x program x year dimension (B3) ----------
 
 export async function fetchScope() {

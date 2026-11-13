@@ -202,7 +202,7 @@ describe('the navigation is a decided set, not an accumulation', () => {
       .toEqual([
         ['What is it worth', ['eligibility', 'onezero']],
         ['What needs a decision', ['ingestion', 'runs', 'agents']],
-        ['Prove it', ['evidence', 'compare', 'rules', 'assumptions']],
+        ['Prove it', ['evidence', 'compare', 'rules', 'programs', 'assumptions']],
       ]);
   });
 
