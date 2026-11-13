@@ -43,6 +43,9 @@ the Microsoft 365 capability instead).
 - `tax_years` makes one item per client-year. Each of those replays every year, so the cost is N times higher. `refresh_once:
   false` requires explicit years for the same reason.
 - `force: true` runs even when the last run still answers (see below).
+- **Bounds** (a request over one is a 422 naming it, never a truncation): at most 50,000 `client_ids`, 12 filter keys whose values are short
+  text (64 characters), numbers or true/false, 12 `tax_years` and a `program_code` of 64 characters, because the scope and years are stored
+  in bounded columns.
 
 ## What "skipped" means
 

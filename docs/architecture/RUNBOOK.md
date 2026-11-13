@@ -521,3 +521,72 @@ listed. Claims and engagements have no copy elsewhere, so nothing falls back to 
 `/api/ready` carries a `stores` object with the same findings, and the startup log says them once. It never
 turns `ready` false for a store problem: the app can still answer, and says what it cannot. `SOURCE_FALLBACK=delta`
 is the only opt-in fallback (a client's fiscal rules, bounded, logged).
+
+## 15. Run batches and program drafts
+
+Two features added tables, routes and a worker: **run batches** ([RUN-ORCHESTRATION.md](RUN-ORCHESTRATION.md), migration `0004`) and the
+**program manager** ([PROGRAM-DRAFTS.md](PROGRAM-DRAFTS.md), [ADDING-A-PROGRAM.md](ADDING-A-PROGRAM.md), migration `0005`). Typed refusals carry a
+`code`, a `reason` and (for batches) a `remedy`; read them before anything else.
+
+| You see | It means | Do |
+|---|---|---|
+| `/api/ready` or `check-operational-store.py` reports `tables_missing` naming `run_batch`, `run_batch_item` | migration `0004` has not been applied | `python scripts/apply-migrations.py --target deployed`, then `python scripts/check-operational-store.py` |
+| the same, naming `program_draft`, `program_draft_document` or `program_draft_event` | migration `0005` has not been applied | the same command |
+| A batch stays `queued`, degraded `run_worker` | no worker holds a lease | start the worker (RUN-ORCHESTRATION.md "Run the worker"); check the worker app's `/healthz` and that it uses the API's identity and settings |
+| Batch `partial` or `failed` | read the failed items: `GET /api/v2/run-batches/{id}/items?status=failed` gives each item's `error_dependency` and message (with the remedy for a typed dependency) | fix the cause, then `POST .../retry-failed`; only failed items run again |
+| Start refused `confirmation_required` (409) | the batch is above `RUN_BATCH_CONFIRM_ABOVE` items | read the preview and repeat with `confirm_items` equal to the count |
+| Start refused `batch_too_large` (409) | above `RUN_BATCH_MAX_ITEMS`; only scope `all` may override | narrow the selection, or send `override_size_limit` for `all` |
+| 422 on a start, naming a limit | a bound was exceeded (client ids, filter keys or values, tax years, program code length) | shorten the request; limits are in RUN-ORCHESTRATION.md |
+| Item `skipped_unchanged` when it was not expected | `skip_unchanged` was on and the client's fingerprint matched | rerun with `force`, or leave `skip_unchanged` off (the default) |
+| Draft call `draft_conflict` (409) | the version you read is stale, or the code is already registered or has a live draft | reload the draft and apply your change again |
+| Draft call `draft_invalid` (422) naming a size, depth or year count | a document is over 8000 characters, nests deeper than 12 levels, or the draft holds more than 30 year packs | shorten or split the notes; nothing was stored |
+| Draft call `review_refused` | the validation is missing, stale or has errors, or the reviewer wrote the draft and a second reviewer is required | validate again; have a different writer review |
+| Preview `customer_data_refused` (403) | a client's payroll was asked for and the environment does not allow it | leave it on the synthetic sample (default); enabling `PROGRAM_PREVIEW_ALLOW_CUSTOMER_DATA` is a decision for the data owner |
+| Export `local_write_refused` | `write_local` was sent outside `ENVIRONMENT=local` or without `PROGRAM_EXPORT_ALLOW_LOCAL_WRITE` | expected when deployed: download the bundle and commit it to git |
+
+A draft never changes what the system calculates. If a program does not appear as calculable after an export, the bundle has not been
+committed and deployed (the registry entry and the pack files go through git and review, [ADR-005](ADR-005-year-versioned-rules.md)).
+
+## 16. Deploying the run orchestration and program manager release
+
+Everything below is additive and off or empty until used. Nothing here is applied by the build; the operator runs each step against a
+**non-production** environment first.
+
+**What ships**
+
+1. Backend and frontend code (one `azd deploy`, or the usual package): new routes under `/api/v2/run-batches`, `/api/v2/programs` and
+   `/api/v2/program-drafts`; the Runs and Program manager pages; the `program_catalog`, `run_batch_*` read and write capabilities.
+2. Migrations `0004` (run batch tables) and `0005` (program draft tables), forward-only, applied by `scripts/apply-migrations.py`.
+3. Settings, all optional, with safe defaults (ENV-VARS.md sections 4a and 4b): `RUN_BATCH_MAX_ITEMS` 5000, `RUN_BATCH_CONFIRM_ABOVE` 25,
+   `RUN_WORKER_CONCURRENCY` 1, `RUN_ITEM_MAX_ATTEMPTS` 3, `RUN_WORKER_INLINE` (true only when `ENVIRONMENT=local`), `RUN_LEASE_SECONDS`,
+   `RUN_HEARTBEAT_SECONDS`, `RUN_WORKER_POLL_SECONDS`, `RUN_WORKER_STALE_SECONDS`, `RUN_BACKOFF_BASE_SECONDS`, `RULES_DIR`,
+   `PROGRAM_REGISTRY_FILE`, `PROGRAM_DRAFT_REQUIRE_SECOND_REVIEWER` (true outside local), `PROGRAM_PREVIEW_ALLOW_CUSTOMER_DATA` (false),
+   `PROGRAM_EXPORT_ALLOW_LOCAL_WRITE` (false).
+4. Terraform, behind a default-off flag: `enable_run_worker` (false) and `run_worker_concurrency` (1). With the flag off the plan does not change.
+5. The channel: the hosted orchestrator's vendored copy and the Cowork plugin (the catalog is 37 tools) need a republish for chat to offer the new
+   capabilities; the portal does not depend on it.
+
+**Order**
+
+1. `terraform plan -detailed-exitcode` on the release (expect no changes with the flag off), then deploy the API and web code.
+2. `python scripts/apply-migrations.py --target deployed --dry-run`, then without `--dry-run`. Expect 2 pending (`0004`, `0005`) once, then 0.
+   The API reports `tables_missing` until this is done, by design.
+3. `python scripts/check-operational-store.py` (it requires the run batch and draft tables) and `GET /api/ready` (`stores` clean).
+4. Decide the worker: for a first look leave it off and use `RUN_WORKER_INLINE=true` on a single instance, or set `enable_run_worker=true`, run
+   `azd provision`, then deploy the backend package to the worker app (RUN-ORCHESTRATION.md "Deploying the worker"). Check the worker's `/healthz`.
+5. Preview a batch (`dry_run`) for two or three clients, start it with `RUN_WORKER_CONCURRENCY=1`, and compare one client's Gold with a
+   single run of the same client. Only then try a group. Keep `skip_unchanged` off until live check 11 in the build analysis has been done.
+6. Republish the orchestrator and plugin when ready (docs/m365-channel/PUBLISHING.md).
+
+**Rollback**
+
+- Code: redeploy the previous package. The new routes disappear; the new tables stay and are ignored (they are additive, nothing the earlier
+  release reads refers to them). The earlier release does not check for them in `/api/ready`.
+- Worker: set `enable_run_worker=false` and provision, or stop the worker app. Queued items stay queued; running items' leases lapse and they
+  return to the queue, so nothing is half-run. Cancel open batches first if they must not resume.
+- Settings: remove an app setting to return to its default. Do not drop `tcc_ops` tables: migrations are forward-only and the batch and draft
+  rows are the audit trail.
+
+**Checks that it is healthy**: `check-operational-store.py` clean; `/api/ready` shows no `tables_missing` and no degraded `run_worker`; a
+dry-run batch answers with a preview and creates nothing; a one-client batch ends `succeeded` and its manifest and Gold rows equal a single run;
+`terraform plan -detailed-exitcode` returns 0 after apply.
