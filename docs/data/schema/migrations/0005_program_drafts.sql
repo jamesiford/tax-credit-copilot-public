@@ -12,7 +12,7 @@
 
    Keys are NOT ENFORCED, as in the bootstrap. No CREATE INDEX, IDENTITY or MERGE. The optimistic-concurrency check on
    `version` and the one-live-draft-per-code rule are enforced by the application. The SQL Server variant is the same
-   file with `NOT ENFORCED` stripped (scripts/generate-schema-variants.py).
+   file with the Fabric-only clause stripped (scripts/generate-schema-variants.py).
    ============================================================================ */
 
 CREATE TABLE tcc_ops.program_draft
