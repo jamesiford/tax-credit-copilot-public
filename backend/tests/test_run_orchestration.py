@@ -684,3 +684,55 @@ def test_the_default_preview_names_no_skip_candidates_and_says_nothing_is_skippe
                   assumptions=lambda: [{"set_id": "a", "sha256": "s"}])
     assert out["skip_unchanged"] is False and out["skip_candidates_upper_bound"] == 0
     assert out["skip_coverage"] == "cannot_tell_yet" and "Nothing is skipped" in out["notes"][0]
+
+
+# ------------------------------------------------------------------ F04b.3: a Gold write that did not validate
+
+
+def _mixed_state():
+    from application.gold_ports import GoldWriteFailed
+
+    return GoldWriteFailed("run abc violated section 9: one_current_run_per_client (2 rows)")
+
+
+def test_a_mixed_current_state_fails_with_a_named_cause_and_is_retried_once_then_succeeds(repo):
+    env, clock = _Env(), _Clock()
+    env.fail[1] = [_mixed_state()]
+    view = _enqueue(client_ids=(1,))
+    w = _worker(repo, env, clock)
+    w.drain()
+    item = _statuses(repo, view["batch_id"])[1]
+    assert item.status is ItemStatus.QUEUED and item.attempts == 1 and item.error_dependency == "gold_write"
+    assert "retried once" in item.error_message and "section 9" in item.error_message and item.lease_owner is None
+    clock.advance(600)
+    w.drain()
+    item = _statuses(repo, view["batch_id"])[1]
+    assert item.status is ItemStatus.SUCCEEDED and item.attempts == 2
+
+
+def test_a_second_mixed_state_stays_failed_and_visible_never_counted_as_success(repo):
+    env, clock = _Env(), _Clock()
+    env.fail[1] = [_mixed_state(), _mixed_state()]
+    view = _enqueue(client_ids=(1,))
+    w = _worker(repo, env, clock)
+    w.drain()
+    clock.advance(600)
+    w.drain()
+    item = _statuses(repo, view["batch_id"])[1]
+    assert item.status is ItemStatus.FAILED and item.attempts == 2 and item.error_dependency == "gold_write"
+    batch = repo.get(view["batch_id"])
+    assert batch.status is BatchStatus.FAILED and batch.counts["items_failed"] == 1 and batch.counts["items_succeeded"] == 0
+    assert env.sent == [], "no run was counted as having succeeded"
+
+
+def test_a_conflict_then_a_mixed_state_each_get_their_own_one_retry_and_never_overlap_on_a_client(repo):
+    env, clock = _Env(), _Clock()
+    env.fail[1] = [RuntimeError("[08001] (24556) snapshot isolation transaction aborted"), _mixed_state()]
+    env.delay = 0.01
+    first, second = _enqueue(client_ids=(1,)), _enqueue(client_ids=(1,), idempotency_key="other", force=True)
+    w = _worker(repo, env, clock)
+    for _ in range(6):
+        w.drain()
+        clock.advance(600)
+    assert env.max_active[1] == 1, "no other worker ever held the client while its item ran"
+    assert {i.status for i in _statuses(repo, first["batch_id"]).values()} | {i.status for i in _statuses(repo, second["batch_id"]).values()} <= {ItemStatus.SUCCEEDED, ItemStatus.FAILED}

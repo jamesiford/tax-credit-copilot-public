@@ -113,7 +113,7 @@ class RunWorker:
             batch, item, on_target=lambda year, program: self._repo.mark_running(
                 item.item_id, self.owner, year, program, self._clock()),
         )
-        if outcome.status is ItemStatus.FAILED and outcome.transient and item.attempts < self._s.item_max_attempts:
+        if self._should_retry(item, outcome):
             delay = backoff_seconds(item.attempts, base=self._s.backoff_base_seconds, jitter=self._jitter)
             self._repo.requeue(item.item_id, self.owner, self._clock() + timedelta(seconds=delay),
                                outcome.error_dependency, outcome.error_message)
@@ -122,6 +122,18 @@ class RunWorker:
             self._repo.refresh(item.batch_id, self._clock())
             return
         self._finish(item, outcome, started)
+
+    def _should_retry(self, item: RunBatchItem, outcome: ItemOutcome) -> bool:
+        """A transient failure gets the configured attempts. A Gold write that did not validate gets exactly one more.
+
+        The retry is a requeue, and a claim never gives a client to two workers, so the second attempt runs with no
+        other worker holding the client. A second failure stays failed and visible in the batch. [F04b.3]
+        """
+        if outcome.status is not ItemStatus.FAILED:
+            return False
+        if outcome.retry_once:
+            return item.attempts == 1
+        return outcome.transient and item.attempts < self._s.item_max_attempts
 
     def _finish(self, item: RunBatchItem, outcome: ItemOutcome, started: float) -> None:
         now = self._clock()

@@ -17,6 +17,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from application.errors import DependencyUnavailable, PROGRAMMING_ERRORS, as_dependency_failure
+from application.gold_ports import GoldWriteFailed
 from application.runs.fingerprint import (
     current_assumptions, current_code_commit, current_fingerprint, manifest_fingerprint,
 )
@@ -25,6 +26,14 @@ from domain.runs import BatchKind, ItemResult, ItemStatus, RunBatch, RunBatchIte
 log = logging.getLogger("tcc.runs")
 
 #: Named dependencies whose outage is worth retrying (see `application/errors.py` for the convention).
+#: The named cause of a Gold write that did not hold (a section 9 violation such as more than one current run for a
+#: client and program, or the writer failing). Shown in the batch's failures by cause.
+GOLD_WRITE = "gold_write"
+GOLD_WRITE_MESSAGE = (
+    "The Gold write did not validate ({detail}). Gold may briefly hold rows of more than one run for this client. "
+    "It is retried once with no other worker on the client; if it fails again, run the client alone and check section 9 "
+    "(`python backend/tools/verify_gold_reads.py`) before trusting its figures."
+)
 _TRANSIENT_DEPENDENCIES = frozenset({"source_lakehouse", "source_sql", "operational_store", "claims_store", "warehouse"})
 
 
@@ -39,6 +48,8 @@ class ItemOutcome:
     tax_year: int | None = None
     program_code: str | None = None
     transient: bool = False
+    #: A Gold write that did not validate: retried once under the client lock, then it stays failed. [F04b.3]
+    retry_once: bool = False
 
     def result(self) -> ItemResult:
         """The part the queue stores."""
@@ -173,15 +184,26 @@ class ItemExecutor:
         return ItemOutcome(ItemStatus.SUCCEEDED, run_id=result.get("run_id"), tax_year=year, program_code=program)
 
 
-def classify(exc: BaseException, year: int | None, program: str | None) -> ItemOutcome:
-    """Map an exception onto an outcome. See the module docstring for the rule."""
+def _declined(exc: BaseException, common: dict[str, Any]) -> ItemOutcome | None:
+    """The outcomes that are not a plain failure: a request the data cannot satisfy, or a Gold write that did not hold."""
     from application.commands.assess_client import ClientHasNoPayroll
     from application.queries._client_run import ClientRunNotAvailable
     from application.queries.get_scope import NoPayrollForScope, NoResolvableWorkState, UnknownClient
 
-    common = {"tax_year": year, "program_code": program}
+    if isinstance(exc, GoldWriteFailed):
+        return ItemOutcome(ItemStatus.FAILED, error_dependency=GOLD_WRITE, error_message=GOLD_WRITE_MESSAGE.format(detail=str(exc)[:300]),
+                           retry_once=True, **common)
     if isinstance(exc, (ClientHasNoPayroll, ClientRunNotAvailable, NoPayrollForScope, NoResolvableWorkState, UnknownClient)):
         return ItemOutcome(ItemStatus.SKIPPED_NO_PAYROLL, skip_reason=str(exc)[:500], **common)
+    return None
+
+
+def classify(exc: BaseException, year: int | None, program: str | None) -> ItemOutcome:
+    """Map an exception onto an outcome. See the module docstring for the rule."""
+    common = {"tax_year": year, "program_code": program}
+    declined = _declined(exc, common)
+    if declined is not None:
+        return declined
     if _is_conflict(exc):
         return ItemOutcome(ItemStatus.FAILED, error_dependency="conflict", error_message="a write conflict on the warehouse",
                            transient=True, **common)
