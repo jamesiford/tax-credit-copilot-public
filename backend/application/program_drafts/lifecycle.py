@@ -14,7 +14,8 @@ from typing import Any
 from application.program_drafts.validation import for_storage, validate_draft
 from config import get_settings
 from domain.program_drafts import (
-    CODE_PATTERN, EDITABLE, MAX_DOCUMENT_CHARS, DraftConflict, DraftEvent, DraftInvalid, DraftNotFound, DraftStatus,
+    CODE_PATTERN, EDITABLE, MAX_DOCUMENT_CHARS, MAX_DOCUMENT_DEPTH, MAX_YEAR_DOCUMENTS, DraftConflict, DraftEvent, DraftInvalid,
+    DraftNotFound, DraftStatus,
     InvalidTransition, ProgramDraft, ProgramDraftRepository, ReviewRefused, canonical_json,
 )
 
@@ -38,15 +39,42 @@ def _event(draft: ProgramDraft, kind: str, actor: str, at: datetime, to: DraftSt
                       to_status=(to or draft.status).value, detail=detail)
 
 
+def _depth(doc: Any) -> int:
+    """How deeply a JSON value nests, counted without recursion so a hostile document cannot overflow the stack."""
+    deepest, stack = 0, [(doc, 1)]
+    while stack:
+        value, level = stack.pop()
+        if isinstance(value, dict):
+            children = list(value.values())
+        elif isinstance(value, list):
+            children = value
+        else:
+            continue
+        deepest = max(deepest, level)
+        if deepest > MAX_DOCUMENT_DEPTH:
+            return deepest
+        stack.extend((child, level + 1) for child in children)
+    return deepest
+
+
 def _check_documents(pack: Any, years: Any) -> None:
     """Refuse a document that is not an object or will not fit, by name, before the store sees it."""
     if pack is not None and not isinstance(pack, dict):
         raise DraftInvalid("the base pack must be a JSON object")
     if not isinstance(years, dict) or any(not _YEAR.match(str(k)) or not isinstance(v, dict) for k, v in years.items()):
         raise DraftInvalid("years must be an object of four-digit tax years, each a JSON object")
+    if len(years) > MAX_YEAR_DOCUMENTS:
+        raise DraftInvalid(f"a draft holds at most {MAX_YEAR_DOCUMENTS} year packs")
     for key, doc in (("pack", pack), *years.items()):
-        if doc is not None and len(canonical_json(doc)) > MAX_DOCUMENT_CHARS:
-            raise DraftInvalid(f"document {key!r} is larger than {MAX_DOCUMENT_CHARS} characters; split the notes out or shorten it")
+        if doc is not None:
+            _check_one(key, doc)
+
+
+def _check_one(key: str, doc: dict[str, Any]) -> None:
+    if _depth(doc) > MAX_DOCUMENT_DEPTH:
+        raise DraftInvalid(f"document {key!r} nests deeper than {MAX_DOCUMENT_DEPTH} levels")
+    if len(canonical_json(doc)) > MAX_DOCUMENT_CHARS:
+        raise DraftInvalid(f"document {key!r} is larger than {MAX_DOCUMENT_CHARS} characters; split the notes out or shorten it")
 
 
 def create(repo: ProgramDraftRepository, *, code: str, name: str, state: str, years: list[int], actor: str,

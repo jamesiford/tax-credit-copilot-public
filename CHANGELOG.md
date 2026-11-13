@@ -117,4 +117,5 @@ All notable changes to this project are recorded here, so changes can be followe
 - The Runs page no longer crashes when the batch list response has no `items`; it shows "Nothing has been run yet". Found by the states sweep once the offline mock API served run batches.
 
 ### Security
+- Program draft preview on a client's payroll (only where `PROGRAM_PREVIEW_ALLOW_CUSTOMER_DATA` is on) now also requires a client that is in the book and that the caller may act for (the client authorizer); before, allowing customer data was enough to read any id. Drafts are bounded: at most 30 year packs, nesting no deeper than 12 levels, names 200 characters, review comments 2000, reasons 1000. Run batch requests are bounded too (at most 50,000 client ids, 12 filter keys with short scalar values, 12 tax years, program code 64 characters) so the stored scope and years can never overrun their columns; a request over a bound is a 422 with the limit named. The local "write to rules folder" export also refuses any path that resolves outside the rules folder, before writing anything. No operator action.
 

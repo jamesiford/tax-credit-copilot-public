@@ -138,3 +138,21 @@ def test_committing_the_bundle_is_what_makes_the_program_calculable(api, tmp_pat
     assert [r.file for r in validate_all() if not r.ok] == []
     row = next(p for p in programs() if p["program_code"] == dw.CODE)
     assert row["calculable"] is True and row["authored_years"] == [2024, 2025] and row["placeholder_years"] == [2024, 2025]
+
+
+def test_a_bundle_path_that_leaves_the_rules_folder_writes_nothing(tmp_path):
+    """Paths are built from a validated code and four-digit years, so this is defence in depth against a crafted manifest."""
+    from application.program_drafts.bundle import Bundle
+    from application.program_drafts.export import write_into_rules
+    from domain.program_drafts import DraftInvalid
+
+    data = io.BytesIO()
+    with zipfile.ZipFile(data, "w") as archive:
+        archive.writestr("rules/ok.json", "{}")
+        archive.writestr("rules/../escaped.json", "{}")
+    manifest = {"files": [{"path": "rules/ok.json"}, {"path": "rules/../escaped.json"}]}
+    root = tmp_path / "rules"
+    root.mkdir()
+    with pytest.raises(DraftInvalid, match="not a path inside the rules folder"):
+        write_into_rules(Bundle(data.getvalue(), "0" * 64, manifest), root)
+    assert list(tmp_path.rglob("*.json")) == [], "nothing was written, not even the file that was fine"

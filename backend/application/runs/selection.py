@@ -20,6 +20,14 @@ PAGE_FILTERS = ("program", "year", "outcome", "scope", "status", "near")
 ROW_FILTERS = ("band", "state", "unassessed", "unavailable")
 FILTER_KEYS = PAGE_FILTERS + ROW_FILTERS
 _ID_LIST_IN_SPEC = 50
+#: The scope is stored on the batch in a 4000-character column, so a filter value is a short scalar, never free text or a structure.
+_FILTER_VALUE_MAX = 64
+
+
+def _short_scalar(value: Any) -> bool:
+    if isinstance(value, str):
+        return len(value) <= _FILTER_VALUE_MAX
+    return value is None or isinstance(value, (bool, int, float))
 
 
 @dataclass(frozen=True)
@@ -37,6 +45,10 @@ class Scope:
         unknown = sorted(set(self.filter) - set(FILTER_KEYS))
         if unknown:
             raise RunBatchRefused(f"Unknown filter key(s): {', '.join(unknown)}.", f"Use: {', '.join(FILTER_KEYS)}.")
+        long_or_nested = sorted(k for k, v in self.filter.items() if not _short_scalar(v))
+        if long_or_nested:
+            raise RunBatchRefused(f"Filter value(s) for {', '.join(long_or_nested)} must be short text, a number or true/false.",
+                                  f"Keep each value to {_FILTER_VALUE_MAX} characters.")
         return self
 
 

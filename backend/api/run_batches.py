@@ -32,9 +32,9 @@ router = APIRouter(prefix="/api/v2/run-batches", tags=["runs"])
 class ScopeBody(BaseModel):
     """Which clients: explicit ids, a portfolio filter resolved on the server, or the whole book."""
     kind: Literal["one", "list", "filter", "all"] = "list"
-    client_ids: list[int] = Field(default_factory=list, description="For kinds one and list.")
+    client_ids: list[int] = Field(default_factory=list, max_length=50_000, description="For kinds one and list.")
     filter: dict[str, Any] = Field(
-        default_factory=dict,
+        default_factory=dict, max_length=12,
         description="For kind filter: program, year, outcome, scope, status, near (the portfolio filters), "
                     "and band, state, unassessed, unavailable.",
     )
@@ -44,8 +44,8 @@ class StartBody(BaseModel):
     """A request to run many clients. `dry_run` previews it; confirmation and idempotency fields guard a real start."""
     kind: Literal["assess", "calculate", "assess_and_calculate"] = "calculate"
     scope: ScopeBody
-    program_code: str | None = None
-    tax_years: list[int] = Field(default_factory=list, description="Empty: each client's latest runnable year.")
+    program_code: str | None = Field(None, max_length=64)
+    tax_years: list[int] = Field(default_factory=list, max_length=12, description="Empty: each client's latest runnable year.")
     force: bool = Field(False, description="Run every item even if skip_unchanged is on. Kept for compatibility.")
     skip_unchanged: bool = Field(False, description="Skip clients whose data and rules are unchanged since their last run. Off by default.")
     include_code_commit: bool = False

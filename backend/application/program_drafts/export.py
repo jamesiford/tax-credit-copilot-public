@@ -27,10 +27,20 @@ class LocalWriteRefused(DraftInvalid):
     code = "local_write_refused"
 
 
-def write_into_rules(bundle: Bundle, root: Path) -> list[str]:
-    """Write only the pack and year-pack files, refusing any that already exist; return the paths written."""
+def _targets_inside(bundle: Bundle, root: Path) -> dict[str, Path]:
+    """Where each pack file would land, refusing a path that resolves outside the rules folder (defence in depth)."""
     wanted = [f["path"] for f in bundle.manifest["files"] if f["path"].startswith("rules/")]
     targets = {name: root / name[len("rules/"):] for name in wanted}
+    base = root.resolve()
+    outside = [name for name, target in targets.items() if base not in target.resolve().parents]
+    if outside:
+        raise DraftInvalid(f"{outside[0]} is not a path inside the rules folder; nothing was written")
+    return targets
+
+
+def write_into_rules(bundle: Bundle, root: Path) -> list[str]:
+    """Write only the pack and year-pack files, refusing any that already exist; return the paths written."""
+    targets = _targets_inside(bundle, root)
     clash = [str(p) for p in targets.values() if p.exists()]
     if clash:
         raise DraftConflict(f"{clash[0]} already exists; nothing was written (a bundle never overwrites a file)")

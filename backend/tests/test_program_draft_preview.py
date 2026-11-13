@@ -118,8 +118,29 @@ def test_a_customer_source_is_refused_unless_a_setting_allows_it(api, monkeypatc
     assert refused.status_code == 403 and refused.json()["detail"]["code"] == "customer_data_refused"
     monkeypatch.setenv("PROGRAM_PREVIEW_ALLOW_CUSTOMER_DATA", "true")
     monkeypatch.setattr("application.source_ports.load_pay_periods", lambda account_id=None: sample_rows(dw.STATE))
+    monkeypatch.setattr("application.client_book.clients_checked", lambda: [{"account_id": 7777}])
     allowed = api.post(f"{BASE}/{draft['draft_id']}/preview", json=body)
     assert allowed.status_code == 200 and allowed.json()["dataset"]["kind"] == "client" and allowed.json()["persisted"] is False
+
+
+def test_a_client_preview_needs_a_known_client_the_caller_may_act_for(api, monkeypatch):
+    """Allowing customer data is not permission to read any client: the client authorizer still decides, and an unknown id is no tenant."""
+    draft = _draft(api)
+    monkeypatch.setenv("PROGRAM_PREVIEW_ALLOW_CUSTOMER_DATA", "true")
+    monkeypatch.setattr("application.client_book.clients_checked", lambda: [{"account_id": 7777}, {"account_id": 8888}])
+    reads = []
+    monkeypatch.setattr("application.source_ports.load_pay_periods", lambda account_id=None: reads.append(account_id) or sample_rows(dw.STATE))
+
+    class Denies8888:
+        def is_authorized(self, principal, client_id):
+            return client_id != 8888
+
+    monkeypatch.setattr("application.services.get_client_authorizer", lambda: Denies8888())
+    url = f"{BASE}/{draft['draft_id']}/preview"
+    assert api.post(url, json={"dataset": "client", "client_id": 9999}).status_code == 422
+    assert api.post(url, json={"dataset": "client", "client_id": 8888}).status_code == 403
+    assert reads == [], "no payroll was read for a client that is unknown or not permitted"
+    assert api.post(url, json={"dataset": "client", "client_id": 7777}).status_code == 200
 
 
 def test_the_preview_code_never_writes_to_a_folder():
