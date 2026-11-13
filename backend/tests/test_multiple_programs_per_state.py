@@ -206,3 +206,45 @@ def test_the_base_year_capability_carries_an_optional_program_to_its_command(zz)
     principal = SimpleNamespace(actor="tests")  # `build` reads only the actor
     command = SPECS["base_year_set"].build(principal, {"client_id": CLIENT, "unit_id": "ZZ_001", "base_year": 2024, "program_code": BETA})
     assert command.program_code == BETA
+
+
+# ------------------------------------------------------------------ program-keyed credit math
+
+
+def test_the_program_keyed_credit_equals_the_state_named_one_for_every_registered_state():
+    from tools.credit_math import STATE_TO_PACK, apply_one_zero_state_credit
+    from tools.program_credit import apply_one_zero_program_credit
+    from tools.program_registry import programs_for_state
+
+    for state in STATE_TO_PACK:
+        by_code = apply_one_zero_program_credit(programs_for_state(state)[0].code, 120.5, prior_period_average_headcount=100.0)
+        assert by_code == apply_one_zero_state_credit(state, 120.5, prior_period_average_headcount=100.0)
+
+
+def test_georgia_is_priced_exactly_as_its_statute_pack_says():
+    from tools.credit_math import apply_one_zero_state_credit
+
+    credit = apply_one_zero_state_credit("GA", 112.0, prior_period_average_headcount=100.0)
+    assert (credit["threshold"], credit["amount_per_job_usd"], credit["credit_code"]) == (2.0, 3500.0, "GA_JTC")
+    assert credit["qualifying_jobs"] == 10.0 and credit["annual_credit_usd"] == 35000
+
+
+def test_two_programs_in_one_state_price_the_same_headcount_by_their_own_statute(zz):
+    from tools.credit_math import apply_one_zero_state_credit, state_per_job_usd
+    from tools.program_credit import apply_one_zero_program_credit, combine_program_entity_credits, program_per_job_usd
+
+    alpha = apply_one_zero_program_credit(ALPHA, 110.0, prior_period_average_headcount=100.0)
+    beta = apply_one_zero_program_credit(BETA, 110.0, prior_period_average_headcount=100.0)
+    assert (alpha["credit_code"], alpha["state"], alpha["annual_credit_usd"]) == (ALPHA, STATE, 9 * 1000)
+    assert (beta["credit_code"], beta["state"], beta["annual_credit_usd"]) == (BETA, STATE, 7 * 2500)
+    assert (program_per_job_usd(ALPHA), program_per_job_usd(BETA)) == (1000.0, 2500.0)
+    # The state-named forms are the DEFAULT program's wrappers.
+    assert apply_one_zero_state_credit(STATE, 110.0, prior_period_average_headcount=100.0) == alpha and state_per_job_usd(STATE) == 1000.0
+    split = combine_program_entity_credits(BETA, {"E1": {"average_headcount": 4.0}, "E2": {"average_headcount": 3.0}})
+    assert split["combined_annual_credit_usd"] == 2500 and split["per_fein"]["E1"]["qualifying_jobs"] == 1.0
+
+
+def test_an_unregistered_key_still_answers_no_pack_by_name(zz):
+    from tools.program_credit import apply_one_zero_program_credit, program_per_job_usd
+
+    assert apply_one_zero_program_credit("QQ", 10.0)["no_state_pack"] is True and program_per_job_usd("QQ") == 0.0
