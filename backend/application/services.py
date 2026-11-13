@@ -74,6 +74,10 @@ def get_run_batch_repository() -> Any:
     return resolve("run_batch_repository")
 
 
+def get_program_draft_repository() -> Any:
+    return resolve("program_draft_repository")
+
+
 def get_override_repository() -> Any:
     return resolve("override_repository")
 

@@ -35,6 +35,9 @@ EXCLUDED_WAREHOUSE_TABLES: dict[str, str] = {
     "tcc_ops.lookup_audit": _PLATFORM,
     "tcc_ops.run_batch": _PLATFORM,
     "tcc_ops.run_batch_item": _PLATFORM,
+    "tcc_ops.program_draft": _OPERATIONAL,
+    "tcc_ops.program_draft_document": _OPERATIONAL,
+    "tcc_ops.program_draft_event": _PLATFORM,
 }
 
 EXCLUDED_SOURCE_TABLES: dict[str, str] = {

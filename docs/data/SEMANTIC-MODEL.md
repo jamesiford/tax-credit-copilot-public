@@ -444,6 +444,9 @@ The client's pay codes, with whether each is ACA or FUTA wages and its category.
 | `tcc_ops.lookup_override` | App-owned lookup rows (pay-code mappings, fiscal rules) that configure the engine; not payroll or credit data. |
 | `tcc_ops.manual_override` | Human overrides, with the person who made each; the engine tools report an overridden figure and say so. |
 | `tcc_ops.program_claim` | Claims hold seeded, unverified assertions; client_situation and the book tools own that reading. |
+| `tcc_ops.program_draft` | Operational record written by the platform to run itself; not payroll or credit data. |
+| `tcc_ops.program_draft_document` | Operational record written by the platform to run itself; not payroll or credit data. |
+| `tcc_ops.program_draft_event` | Platform audit or security record. Never exposed to the agent; the audit trail has its own readers. |
 | `tcc_ops.program_engagement` | Operational record written by the platform to run itself; not payroll or credit data. |
 | `tcc_ops.rule_change_audit` | Platform audit or security record. Never exposed to the agent; the audit trail has its own readers. |
 | `tcc_ops.rule_pack_version` | Global statute registry with no client key; the run manifest names the pack used. |
