@@ -28,7 +28,7 @@ from application.capabilities.catalog_programs import PROGRAM_READS
 from application.capabilities.catalog_runs import RUN_READS, RUN_WRITES
 from application.capabilities.catalog_types import (  # noqa: F401 - re-exported
     ACTIONS, CERTIFIED_METHODS, CODE_ONLY, DEBUG, GATEWAY_LOCAL, INTERNAL, KINDS, METHODS, READ, TAX_YEAR, WRITE_COMMIT,
-    WRITE_PREPARE, CapabilitySpec, ReaderOwned, _CLAIM_STATUSES, _CLIENT_ID, _METHOD, _PROGRAM, _STATE, _TAX_YEAR, _TOKEN,
+    WRITE_PREPARE, CapabilitySpec, ReaderOwned, _CLAIM_STATUSES, _CLIENT_ID, _METHOD, _PROGRAM, _PROGRAM_OPT, _STATE, _TAX_YEAR, _TOKEN,
     _marked, _object, _read, _write_pair,
 )
 from application.capabilities.channel_view import (  # noqa: F401 - re-exported
@@ -125,16 +125,16 @@ CATALOG: tuple[CapabilitySpec, ...] = (
     ),
     _marked(_read(
         "client_eligibility", "ONE client (needs a client): the credit figure and headcount for one client-year.",
-        {"client_id": _CLIENT_ID, "tax_year": _TAX_YEAR, "state": _STATE, "method": _METHOD},
+        {"client_id": _CLIENT_ID, "tax_year": _TAX_YEAR, "state": _STATE, "method": _METHOD, "program_code": _PROGRAM_OPT},
         ("client_id", "tax_year"), needs_year=True, chat_intent="eligibility",
     ), both_methods=True),
     _read(
         "client_trend", "ONE client (needs a client): how it has moved across years, and whether it has been eligible since its base year.",
-        {"client_id": _CLIENT_ID}, ("client_id",), chat_intent="trend",
+        {"client_id": _CLIENT_ID, "program_code": _PROGRAM_OPT}, ("client_id",), chat_intent="trend",
     ),
     _read(
         "client_at_risk", "ONE client (needs a client): counted jobs close enough to a statutory floor that they could fall out of the credit.",
-        {"client_id": _CLIENT_ID, "tax_year": _TAX_YEAR, "state": _STATE, "method": _METHOD},
+        {"client_id": _CLIENT_ID, "tax_year": _TAX_YEAR, "state": _STATE, "method": _METHOD, "program_code": _PROGRAM_OPT},
         ("client_id", "tax_year"), needs_year=True, sensitive=True, chat_intent="at_risk",
     ),
     _read(
@@ -154,17 +154,17 @@ CATALOG: tuple[CapabilitySpec, ...] = (
     ),
     _read(
         "calc_walkthrough", "ONE client (needs a client): the calculation trail for a client-year: step, inputs, formula, output, citation, SHA-256.",
-        {"client_id": _CLIENT_ID, "tax_year": _TAX_YEAR, "state": _STATE, "method": _METHOD},
+        {"client_id": _CLIENT_ID, "tax_year": _TAX_YEAR, "state": _STATE, "method": _METHOD, "program_code": _PROGRAM_OPT},
         ("client_id", "tax_year"), needs_year=True, chat_intent="explain",
     ),
     _marked(_read(
         "employee_drill", "One employee's derivation for a client-year, by opaque record token.",
-        {"client_id": _CLIENT_ID, "record_token": _TOKEN, "tax_year": _TAX_YEAR, "state": _STATE},
+        {"client_id": _CLIENT_ID, "record_token": _TOKEN, "tax_year": _TAX_YEAR, "state": _STATE, "program_code": _PROGRAM_OPT},
         ("client_id", "record_token", "tax_year"), needs_year=True, sensitive=True,
     ), CODE_ONLY),
     _read(
         "findings_list", "ONE client (needs a client): open findings for a client-year that need a human decision.",
-        {"client_id": _CLIENT_ID, "tax_year": _TAX_YEAR, "state": _STATE},
+        {"client_id": _CLIENT_ID, "tax_year": _TAX_YEAR, "state": _STATE, "program_code": _PROGRAM_OPT},
         ("client_id", "tax_year"), needs_year=True, sensitive=True,
     ),
     _read(

@@ -86,8 +86,7 @@ def client_eligibility(
     state: str | None = None,
     method: str = "min_max",
     *,
-    window: Any = None,
-    include_population: bool = False,
+    window: Any = None, include_population: bool = False, program_code: str | None = None,
 ) -> ToolResult:
     """The credit figure and headcount for one client-year, read from the run.
 
@@ -99,8 +98,8 @@ def client_eligibility(
     """
     from tools.portfolio import chat_client_context, chat_state_credit
 
-    state = s.derive_state(state, client_id, tax_year)
-    resolved = s.statute(state, client_id, tax_year)  # a state with several programs asks which, rather than answering for one
+    state = s.derive_state(state, client_id, tax_year, program_code)
+    resolved = s.statute(state, client_id, tax_year, program_code)  # a state with several programs asks which, rather than answering for one
     window = window or resolved.window
     capture = s.RunCapture()
     with s.trail_scope() as recorder:
@@ -114,7 +113,7 @@ def client_eligibility(
         )
         provenance = s.run_provenance(capture.run, recorder=recorder, source="tcc_gold")
 
-    facts: dict[str, Any] = {"snapshot": _snapshot(client_id, tax_year, state, context, window), "credit": credit}
+    facts: dict[str, Any] = s.named_program({"snapshot": _snapshot(client_id, tax_year, state, context, window), "credit": credit}, program_code, resolved)
     if include_population:
         facts["population"] = _population(client_id, tax_year, state)
 

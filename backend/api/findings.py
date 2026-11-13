@@ -57,18 +57,30 @@ class ResolveBody(BaseModel):
 
 
 @router.get("/{client_id}/{tax_year}")
-def findings(client_id: int, tax_year: int, state: str | None = None) -> dict[str, Any]:
+def findings(client_id: int, tax_year: int, state: str | None = None, program_code: str | None = None) -> dict[str, Any]:
     """Everything an agent found for one client-year, at the grain it is decided at.
 
     The grain rules live in `application/queries/list_findings`; this maps its
-    one failure onto a status code.
+    one failure onto a status code. Findings are about the payroll rows of a state, so `program_code` only fixes the state (and
+    must agree with `state` when both are given); the answer names the program when one was asked for. [F07.5]
     """
+    from application.program_defaults import ProgramNotRunnable, ProgramStateConflict, check_program_state, program_state
+
+    if program_code:
+        try:
+            check_program_state(state, program_code)
+            state = program_state(program_code)
+        except ProgramStateConflict as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        except ProgramNotRunnable as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
     try:
-        return get_mediator().send(
+        body = get_mediator().send(
             ListFindingsQuery(client_id=client_id, tax_year=tax_year, state=state)
         )
     except FindingsNotAvailable as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
+    return {**body, "program_code": program_code.strip().upper()} if program_code else body
 
 
 @router.post("/{finding_id}/resolve")

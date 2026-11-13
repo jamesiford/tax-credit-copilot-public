@@ -353,9 +353,8 @@ def chat_jobs_at_risk(
     state: str,
     tax_year: int,
     method: str = "min_max",
-    within_weekly_hours: float = 5.0,
-    limit: int = 10,
     on_run: Callable[[dict[str, Any]], None] | None = None,
+    program_code: str | None = None,
 ) -> dict[str, Any]:
     """Which counted jobs sit close enough to a floor to fall out, READ.
 
@@ -372,7 +371,8 @@ def chat_jobs_at_risk(
     from domain.calculation.proximity import fragile_cohort
 
     try:
-        resolved = resolve_statute(account_id=account_id, state=state.upper(), tax_year=tax_year, require_program=True)
+        resolved = resolve_statute(
+            account_id=account_id, state=state.upper(), tax_year=tax_year, program_code=program_code, require_program=True)
     except ClientRunNotAvailable as exc:
         return {"calculated": False, "declined": str(exc)}
 
@@ -408,8 +408,8 @@ def chat_jobs_at_risk(
     cohort = fragile_cohort(
         averages,
         floors=floors,
-        within_weekly_hours=within_weekly_hours,
-        limit=limit,
+        within_weekly_hours=5.0,  # fragile = within five weekly hours of a floor; nobody varied it per call
+        limit=10,
         population={
             "evaluated": int(counts["evaluated"] or 0),
             "eligible": int(counts["eligible_count"] or 0),
@@ -427,9 +427,7 @@ def chat_jobs_at_risk(
 
 
 def chat_client_trend(
-    *,
-    account_id: int,
-    method: str = "pay_period",
+    *, account_id: int, method: str = "pay_period", program_code: str | None = None,
     on_run: Callable[[dict[str, Any]], None] | None = None,
 ) -> dict[str, Any]:
     """How a client has moved across years, READ.
@@ -443,7 +441,7 @@ def chat_client_trend(
     """
     from application.services import get_gold_reader
 
-    series = get_gold_reader().client_year_series(account_id, method=method)
+    series = get_gold_reader().client_year_series(account_id, method=method, program_code=program_code)
     if series.get("run") is not None and on_run is not None:
         on_run(series["run"])
     years = series["years"]
