@@ -1,5 +1,12 @@
 /* Program manager: the catalog, a program's detail, the Add-a-program workflow and its panels. Tokens only (docs/design/DESIGN-SYSTEM.md). */
 
+/* A link in a catalog row is a touch target: 24px high (WCAG 2.2 target size), which the plain text link is not. */
+.prog-catalog .tcc-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--space-10);
+}
+
 .prog-grid-2 {
   display: grid;
   grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);

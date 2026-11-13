@@ -251,13 +251,17 @@ def run_special(browser, results):
 def main() -> int:
     quick = "--quick" in sys.argv
     pages = {k: v for k, v in PAGES.items() if k in ("portfolio", "client", "unit", "rules")} if quick else PAGES
+    only = next((a.split("=", 1)[1].split(",") for a in sys.argv if a.startswith("--only=")), None)
+    if only:  # e.g. --only=programs,program-draft: just those pages, no special states
+        pages = {k: v for k, v in PAGES.items() if k in only}
     results: list[dict] = []
     with sync_playwright() as p:
         browser = p.chromium.launch()
         for state in ("loading", "empty", "error"):
             for name, path in pages.items():
                 run_state(browser, name, path, state, results)
-        run_special(browser, results)
+        if not only:
+            run_special(browser, results)
         browser.close()
 
     failed = [r for r in results if not r["ok"]]

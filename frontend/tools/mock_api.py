@@ -25,6 +25,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
+import mock_programs
 import mock_run_batches
 
 PORT = 8000
@@ -208,12 +209,22 @@ CLIENTS = [
 ]
 
 
+# A second calculable program in a state that already has one, so the Program picker on the trend grid has something to
+# pick (one state, several programs). Fictional code; same keys as `application/client_book.programs()`.
+SECOND_GA_PROGRAM = {
+    "program_code": "ZZ_DEMO_SECOND", "name": "Second demo credit in the same state (fictional)", "citation": "",
+    "jurisdiction": {"level": "state", "code": "GA", "name": "Georgia"}, "authored_years": [2024, 2025], "placeholder_years": [2024, 2025],
+    "year_scoped": True, "calculable": True, "not_calculable_reason": "",
+}
+
+
 def scope_payload():
     body = upstream_json("/api/scope")
     body["clients"] = [c for c in body["clients"] if c["account_id"] == 1001] + [
         {"account_id": cid, "name": name, "billing_state": "GA", "employees": emp, "synthetic": True, "industry": ind}
         for cid, name, emp, ind, *_ in CLIENTS
     ]
+    body["programs"] = body.get("programs", []) + [SECOND_GA_PROGRAM]
     return body
 
 
@@ -224,9 +235,21 @@ def client_scope(client_id: int):
     }
 
 
+PORTFOLIO_ROW_TEMPLATE = {
+    "claim_id": "", "entity_id": None, "program_code": "GA_JTC", "provenance": "computed", "provenance_verified": True,
+    "certified_usd": "0", "variance_usd": "0", "variance_is_computable": True, "average_headcount": None,
+    "base_average_headcount": None, "threshold_jobs": None, "is_base_year": False, "net_new_jobs": None,
+    "jobs_to_threshold": None, "is_exposure": False, "identified_run_id": None, "assumption_set_id": None,
+    "rule_pack_version": None, "filed_on": None, "filing_reference": None, "decided_by": None, "decided_at": None,
+    "decline_reason": None, "effective_from": "2026-01-01T00:00:00+00:00", "effective_to": None,
+    "engagement_scope": "in_scope", "effective_outcome": "unclaimed", "gap_jobs": None,
+}
+
+
 def portfolio_payload(query):
     body = upstream_json("/api/v2/portfolio?limit=200")
-    template = body["items"][0]
+    # A backend with no claims (a clean clone) has no row to copy: fall back to the shape of an unassessed claim.
+    template = body["items"][0] if body.get("items") else PORTFOLIO_ROW_TEMPLATE
     items = []
     for rank, (cid, name, _emp, industry, band, margin, usd) in enumerate(CLIENTS, start=1):
         items.append(template | {
@@ -246,6 +269,9 @@ def route(method: str, path: str, query: dict[str, list[str]], body: bytes):
     batches = mock_run_batches.route(method, path, query, body)
     if batches is not None:
         return batches
+    programs = mock_programs.route(method, path, query, body)
+    if programs is not None:
+        return programs
     if path == "/api/scope":
         return scope_payload()
     m = re.fullmatch(r"/api/scope/client/(\d+)", path)

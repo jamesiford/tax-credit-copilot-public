@@ -29,7 +29,7 @@ from playwright.sync_api import sync_playwright
 
 from _theme import new_page
 
-BASE = "http://localhost:5173"
+BASE = os.environ.get("TCC_WEB_BASE", "http://localhost:5173")  # point at a sandbox preview, never at a live one
 CLIENT = "/c/2001?year=2023"
 
 INK_DISTANCE_MIN = 30.0   # base-year ink vs below-min ink, CIE76

@@ -145,6 +145,13 @@ describe('a program in detail', () => {
     render(<ProgramDetail code="NOPE" onBack={() => {}} />);
     expect(await screen.findByText('No such program')).toBeInTheDocument();
   });
+
+  it('says it is unavailable, never a page of blanks or a crash, when the answer holds no program (the states sweep found a crash on {})', async () => {
+    api.fetchProgram.mockResolvedValue({});
+    render(<ProgramDetail code="ZY_DEMO_JTC" onBack={() => {}} />);
+    expect(await screen.findByText('The program is unavailable')).toBeInTheDocument();
+    expect(screen.getByText(/Nothing was changed/)).toBeInTheDocument();
+  });
 });
 
 describe('the validation panel', () => {
@@ -233,6 +240,14 @@ describe('step 1: the basics', () => {
 });
 
 describe('steps 2 and 3: authoring with validation beside the fields', () => {
+  it('says the draft cannot be opened when the answer holds no draft (the states sweep rendered "undefined" for {})', async () => {
+    api.fetchProgramDraft.mockResolvedValue({});
+    page(['draft', 'd1']);
+    await settle();
+    expect(await screen.findByText('The draft could not be opened')).toBeInTheDocument();
+    expect(document.body.textContent).not.toMatch(/undefined/);
+  });
+
   it('keeps the not-verified notice on and shows a finding beside the field it is about', async () => {
     api.fetchProgramDraft.mockResolvedValue(draft({
       validation: { valid: false, errors: 1, warnings: 0, infos: 0, findings: [{ file: 'pack', severity: 'error', code: 'schema', path: 'thresholds/minimum_new_jobs', message: 'None is not of type number' }] },

@@ -90,6 +90,9 @@ def main() -> int:
     quick = "--quick" in sys.argv
     themes = [os.environ["TCC_THEME"]] if os.environ.get("TCC_THEME") else (["modern"] if quick else ["modern", "classic"])
     pages = {k: v for k, v in PAGES.items() if k in ("portfolio", "client", "rules")} if quick else PAGES
+    only = next((a.split("=", 1)[1].split(",") for a in sys.argv if a.startswith("--only=")), None)
+    if only:  # e.g. --only=programs,program,program-draft: just those pages (no workspace, dialog or evidence scans)
+        pages = {k: v for k, v in PAGES.items() if k in only}
     report: list[dict] = []
     failing = 0
     with sync_playwright() as p:
@@ -101,11 +104,13 @@ def main() -> int:
                 page.goto(BASE + path, wait_until="networkidle", timeout=120_000)
                 page.wait_for_timeout(1200)
                 failing += scan(page, name, theme, report)
-                if page.locator("#ask-launcher").count():
+                if not only and page.locator("#ask-launcher").count():
                     open_workspace(page)
                     failing += scan(page, f"{name} + workspace", theme, report)
                 page.context.close()
 
+            if only:
+                continue
             page = new_page(browser, 1440, 900)
             page.goto(BASE + "/", wait_until="networkidle", timeout=120_000)
             page.wait_for_timeout(1200)

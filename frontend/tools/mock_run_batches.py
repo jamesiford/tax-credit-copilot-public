@@ -68,7 +68,7 @@ def _make(batch_id: str, statuses: list[str], **over: Any) -> dict[str, Any]:
         "program_code": None, "tax_years": [], "force": False, "skip_unchanged": False, "include_code_commit": False,
         "refresh_once": True, "cancel_requested": False, "requested_by": "operator@example.test",
         "requested_at": "2026-09-01T09:59:00Z", "started_at": "2026-09-01T10:00:00Z", "finished_at": "2026-09-01T10:02:00Z",
-        "idempotency_key": None, "dry_run_summary": {}, "idempotent_replay": False, "degraded": [], **over,
+        "idempotency_key": None, "dry_run_summary": {}, "idempotent_replay": False, "degraded": [], "cancelled_now": None, "requeued": None, **over,
     }
     BATCHES[batch_id] = _refresh(batch)
     return BATCHES[batch_id]

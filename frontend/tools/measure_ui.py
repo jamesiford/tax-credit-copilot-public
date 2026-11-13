@@ -9,6 +9,7 @@ browser tool has no viewport control, so this drives a real Chromium at size.
 """
 from __future__ import annotations
 
+import os
 import json
 import sys
 
@@ -16,7 +17,7 @@ from playwright.sync_api import sync_playwright
 
 from _theme import new_page
 
-BASE = "http://localhost:5173"
+BASE = os.environ.get("TCC_WEB_BASE", "http://localhost:5173")  # point at a sandbox preview, never at a live one
 
 PAGES = {
     "portfolio": "/",
@@ -24,6 +25,9 @@ PAGES = {
     "unit": "/c/2001/u/GA_GA-010?year=2023&method=min_max",
     "runs": "/runs",
     "run": "/runs/b-partial",
+    "programs": "/programs",
+    "program": "/programs/ZZ_DEMO_JTC",
+    "program-draft": "/programs/draft/d-1",
 }
 
 PROBE = """

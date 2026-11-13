@@ -30,7 +30,13 @@ export default function useDraft(draftId) {
   const load = useCallback(async () => {
     if (!draftId) return;
     setStatus({ loading: true, error: null });
-    try { adopt(await fetchProgramDraft(draftId)); setStatus({ loading: false, error: null }); setSaveState('idle'); }
+    try {
+      const next = await fetchProgramDraft(draftId);
+      if (!next?.draft_id) throw new Error('The server answered with nothing the page can show.');
+      adopt(next);
+      setStatus({ loading: false, error: null });
+      setSaveState('idle');
+    }
     catch (error) { setStatus({ loading: false, error }); }
   }, [draftId, adopt]);
 

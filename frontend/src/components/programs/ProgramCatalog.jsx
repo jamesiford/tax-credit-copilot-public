@@ -35,7 +35,7 @@ export default function ProgramCatalog({ rows, onOpen }) {
   return (
     <>
       <FilterBar {...table.bar('programs')} />
-      <table className="tbl" aria-label="Program catalog">
+      <table className="tbl prog-catalog" aria-label="Program catalog">
         <thead>
           <tr>
             <SortHeader {...table.head('name')} />

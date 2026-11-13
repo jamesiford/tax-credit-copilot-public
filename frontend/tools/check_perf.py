@@ -32,7 +32,8 @@ DIST = HERE.parent / "dist" / "assets"
 BASE = os.environ.get("TCC_PERF_BASE", "http://localhost:4173")
 CLS_MAX = 0.10
 FONT_DELAY_MS = 6000  # long enough that the page has its data before the fonts land
-PAGES = {"portfolio": "/", "client": "/c/2001?year=2023", "unit": "/c/2001/u/GA_GA-010?year=2023&method=min_max"}
+PAGES = {"portfolio": "/", "client": "/c/2001?year=2023", "unit": "/c/2001/u/GA_GA-010?year=2023&method=min_max",
+         "runs": "/runs", "programs": "/programs", "program-draft": "/programs/draft/d-1"}
 
 OBSERVE = """
 window.__shifts = [];

@@ -5,11 +5,12 @@ live and filters nothing is how a reader trusts a wrong number.
 """
 from __future__ import annotations
 
+import os
 from playwright.sync_api import sync_playwright
 
 from _theme import new_page
 
-BASE = "http://localhost:5173"
+BASE = os.environ.get("TCC_WEB_BASE", "http://localhost:5173")  # point at a sandbox preview, never at a live one
 
 
 def main() -> None:

@@ -30,7 +30,7 @@ TOOLS = Path(__file__).resolve().parent
 FRONTEND = TOOLS.parent
 REPO = FRONTEND.parent
 PY = sys.executable
-BASE = "http://localhost:5173"
+BASE = os.environ.get("TCC_WEB_BASE", "http://localhost:5173")  # point at a sandbox preview, never at a live one
 
 # Measured before the revamp began (docs/design/UI-STATUS.md, "Baseline"). The
 # gate is that none of these gets worse: the partner must still see their data

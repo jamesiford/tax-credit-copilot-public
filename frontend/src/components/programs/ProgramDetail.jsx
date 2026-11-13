@@ -43,7 +43,11 @@ export default function ProgramDetail({ code, onBack }) {
     let cancelled = false;
     setState({ loading: true, data: null, error: null });
     fetchProgram(code)
-      .then((data) => { if (!cancelled) setState({ loading: false, data, error: null }); })
+      .then((data) => {
+        // An answer with no pack or validation is not a program: say so instead of drawing a page of blanks.
+        if (!data?.pack || !data?.validation) throw new Error('The registry answered with nothing the page can show.');
+        if (!cancelled) setState({ loading: false, data, error: null });
+      })
       .catch((error) => { if (!cancelled) setState({ loading: false, data: null, error }); });
     return () => { cancelled = true; };
   }, [code]);
@@ -53,7 +57,7 @@ export default function ProgramDetail({ code, onBack }) {
   if (state.error) {
     return (
       <><PageHeader eyebrow="Program manager" title={code} back={back} />
-        <EmptyState title={state.error.status === 404 ? 'No such program' : 'The program could not be read'}>
+        <EmptyState title={state.error.status === 404 ? 'No such program' : 'The program is unavailable'}>
           {state.error.status === 404 ? `${code} is not in the registry.` : state.error.message} Nothing was changed.
         </EmptyState></>
     );

@@ -22,6 +22,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import './styles/fonts.css';
 import App from './App.jsx';
 import { applyTheme } from './brand.config.js';
+import { APP_ROUTE_PATHS } from './lib/appRoutes.js';
 import './styles/tokens/index.css';
 import './index.css';
 import './styles/chrome-modern.css';
@@ -42,12 +43,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         {Styleguide ? (
           <Route path="/__styleguide" element={<Suspense fallback={null}><Styleguide /></Suspense>} />
         ) : null}
-        <Route path="/" element={<App />} />
-        <Route path="/:view" element={<App />} />
-        <Route path="/c/:clientId" element={<App />} />
-        <Route path="/c/:clientId/:view" element={<App />} />
-        <Route path="/c/:clientId/u/:unitId" element={<App />} />
-        <Route path="/c/:clientId/e/:token" element={<App />} />
+        {/* One entry per path the shell parses (`lib/appRoutes.js`); a pasted or refreshed link must not reach the catch-all. */}
+        {APP_ROUTE_PATHS.map((path) => <Route key={path} path={path} element={<App />} />)}
         <Route path="/golden/*" element={<Navigate to="/" replace />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

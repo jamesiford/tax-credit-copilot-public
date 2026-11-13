@@ -113,6 +113,25 @@ describe('one batch', () => {
     expect(onOpenClient).toHaveBeenCalledWith(1002);
   });
 
+  it('says the batch is unavailable when the answer holds no batch (the states sweep found a crash on {})', async () => {
+    api.fetchRunBatch.mockResolvedValue({});
+    api.fetchRunBatchItems.mockResolvedValue({ items: [], total: 0 });
+    render(<RunsPage batchId="b1" />);
+    await settle();
+    expect(await screen.findByText('This batch is unavailable')).toBeInTheDocument();
+  });
+
+  it('points no tab at a panel that does not exist (the sweep found aria-controls on an empty id)', async () => {
+    detail();
+    const { container } = render(<RunsPage batchId="b1" />);
+    await settle();
+    await screen.findByRole('table', { name: 'Batch items' });
+    for (const tab of screen.getAllByRole('tab')) {
+      const target = tab.getAttribute('aria-controls');
+      if (target) expect(container.ownerDocument.getElementById(target)).not.toBeNull();
+    }
+  });
+
   it('cancels a running batch and shows that it is cancelling', async () => {
     detail({ finishes: false });
     api.cancelRunBatch.mockResolvedValue(batch({ cancel_requested: true }));

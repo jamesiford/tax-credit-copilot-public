@@ -145,6 +145,7 @@ function Detail({ batchId, onOpenClient }) {
 
   const load = useCallback(async () => {
     const batch = await fetchRunBatch(batchId);
+    if (!batch?.counts || !batch?.progress) throw new Error('The batch answered with nothing the page can show.');
     const [page, failed] = await Promise.all([
       fetchRunBatchItems(batchId, { status: filter || undefined, limit: PAGE, offset }),
       batch.counts.failed ? fetchRunBatchItems(batchId, { status: 'failed', limit: 200 }) : Promise.resolve({ items: [] }),
@@ -200,7 +201,7 @@ function Detail({ batchId, onOpenClient }) {
 
       <Failures items={data.failed} />
 
-      <Card flush title="Items" tabs={<Tabs label="Item status" idPrefix="runs-items" variant="segmented" tabs={tabs} active={filter} onChange={(id) => { setFilter(id); setOffset(0); }} />}>
+      <Card flush title="Items" tabs={<Tabs label="Item status" idPrefix="runs-items" controls={false} variant="segmented" tabs={tabs} active={filter} onChange={(id) => { setFilter(id); setOffset(0); }} />}>
         <ItemsTable page={data.page} onOpenClient={onOpenClient} />
         <div className="runs-detail-head" role="navigation" aria-label="Item pages">
           <Button size="sm" variant="ghost" disabled={offset === 0} onClick={() => setOffset(Math.max(0, offset - PAGE))}>Previous</Button>
