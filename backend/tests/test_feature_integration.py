@@ -288,3 +288,18 @@ def test_an_unreachable_claims_store_fails_the_item_with_a_typed_cause_and_the_b
     assert failed["client_id"] == 7002 and failed["error_dependency"] == "claims_store"
     assert "Check the Warehouse connection" in failed["error_message"], "the failure carries its remedy"
     assert failed["attempts"] == 2, "a transient outage was retried, then reported"
+
+
+# ------------------------------------------------------------------ selecting and previewing read no payroll
+
+
+def test_selecting_previewing_and_enqueueing_read_no_payroll(world, monkeypatch):
+    import application.source_ports as ports
+
+    def forbidden(*_a, **_k):
+        raise AssertionError("payroll was read while selecting, previewing or enqueueing")
+
+    monkeypatch.setattr(ports, "load_pay_periods", forbidden)
+    monkeypatch.setattr(ports, "payroll_scope", forbidden)
+    assert _start(world, dry_run=True).json()["preview"]["clients"] == 2
+    assert _start(world, scope={"kind": "all"}, idempotency_key="all").status_code == 202
