@@ -592,3 +592,27 @@ Everything below is additive and off or empty until used. Nothing here is applie
 **Checks that it is healthy**: `check-operational-store.py` clean; `/api/ready` shows no `tables_missing` and no degraded `run_worker`; a
 dry-run batch answers with a preview and creates nothing; a one-client batch ends `succeeded` and its manifest and Gold rows equal a single run;
 `terraform plan -detailed-exitcode` returns 0 after apply.
+
+## 17. Live checks you can script
+
+Every check below runs against a **named non-production** environment, never a customer's. `live-smoke.py` is first after any deploy; the others are
+run when the matching feature is deployed. Nothing here is run by the build. "Human" means a person with a real identity, a publish step or an
+infrastructure change is needed.
+
+| Check | Status | Command or what to do |
+|---|---|---|
+| After any deploy: every read answers | automatable | `python scripts/live-smoke.py --target <name>` |
+| Migrations apply, tables present | automatable | `python scripts/apply-migrations.py --target <name> --dry-run`, then without `--dry-run`; `python scripts/check-operational-store.py` |
+| Input bounds at the real columns (a 422 naming the limit, never a store error) | automatable | `python scripts/live-check-api.py --target <name> bounds` (add `--allow-writes` to also create and withdraw a draft at exactly 200 characters) |
+| The per-caller limit trips | automatable | `python scripts/live-check-api.py --target <name> rate-limit --limit <RATE_LIMIT_PER_MINUTE>` (needs a signed-in caller) |
+| A small batch equals a single run | automatable (sandbox, writes Gold) | `POST /api/v2/run-batches` with `dry_run` first, then one client; compare `calculation_id` and the Gold payload with `POST /api/v2/clients/{id}/runs`; `python backend/tools/verify_gold_reads.py` must be clean |
+| Per-client run time | automatable | read `started_at` and `finished_at` of the items from `GET /api/v2/run-batches/{id}/items` after the batch above |
+| Two workers, one client | automatable (sandbox) | run `python scripts/run-worker.py` twice against the sandbox, start a batch naming one client twice; count 24556, 3960 and 1205 retries and confirm one run per client |
+| `skip_unchanged` | partly | preview and start with `"skip_unchanged": true`; the restated-row case needs a mutable copy of the source (human) |
+| Per-program Gold reads | automatable (sandbox) | `GET /api/eligibility/{year}?state=XX&account_id=N&program_code=A` and `=B`, and without a program (404 listing both) |
+| Client preview authorisation | partly | an unknown client id answers 422 (scriptable); 403 for a client the caller may not act for needs a second identity (human) |
+| Worker identity grants | human | the DENY statements in RUN-ORCHESTRATION.md "A separate worker identity", then confirm the worker identity is refused on `program_draft` |
+| Second reviewer, author cannot approve | human | two real identities in a deployed environment |
+| Queue cost on a Warehouse | human | the scale script measures SQLite only; compare statements per item on the Warehouse's own query statistics |
+| Worker deployment, Teams and Cowork republish, export in a deployed app | human | infrastructure and publish steps (PUBLISHING.md) |
+| Browser sweeps for every page | automatable (offline) | `python frontend/tools/mock_api.py 8010`, a Vite server with `TCC_API_TARGET=http://127.0.0.1:8010` and `TCC_WEB_BASE`, then `check_a11y.py`, `check_states.py`, `check_brand.py`, `measure_ui.py`, `check_perf.py` (frontend/tools/README.md) |
