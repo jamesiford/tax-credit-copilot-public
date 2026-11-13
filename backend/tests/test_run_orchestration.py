@@ -61,14 +61,20 @@ def test_batch_status_comes_from_the_item_counts(counts, expected):
     assert batch_status(counts) is expected
 
 
-FULL = Fingerprint("calc", "s1", "oz", "rules/x/2025.json", "abc", 2025)
+FULL = Fingerprint("calc", "s1", "oz", "rules/x/2025.json", "abc", 2025, "snap")
+
+
+@pytest.fixture(autouse=True)
+def _authored_windows(monkeypatch):
+    """The fake runs have no source to resolve windows from; one authored year is enough to fingerprint."""
+    monkeypatch.setattr("application.runs.fingerprint.authored_windows", lambda *a: [("2025-01-01", "2025-12-31")])
 
 
 def test_unchanged_only_when_everything_known_and_equal():
     assert unchanged_decision(FULL, FULL)[0] is True
 
 
-@pytest.mark.parametrize("blank", ["calculation_id", "step1_assumption_sha256", "onezero_assumption_sha256", "rule_pack_version"])
+@pytest.mark.parametrize("blank", ["calculation_id", "step1_assumption_sha256", "onezero_assumption_sha256", "rule_pack_version", "source_snapshot_id"])
 def test_a_missing_value_on_either_side_means_run(blank):
     from dataclasses import replace
 
@@ -81,6 +87,7 @@ def test_any_difference_or_no_earlier_run_means_run():
 
     assert unchanged_decision(None, FULL)[0] is False
     assert unchanged_decision(FULL, replace(FULL, calculation_id="other"))[0] is False
+    assert unchanged_decision(FULL, replace(FULL, source_snapshot_id="moved"))[0] is False
     assert unchanged_decision(FULL, replace(FULL, tax_year=2024))[0] is False
 
 
@@ -159,7 +166,7 @@ class _Manifests:
             return None
         return type("M", (), {
             "run_id": "r", "tax_year": 2025, "run_completed_at": NOW, "calculation_id": "c", "rule_pack_version": "p",
-            "step1_assumption_sha256": "s", "onezero_assumption_sha256": "o"})()
+            "step1_assumption_sha256": "s", "onezero_assumption_sha256": "o", "source_snapshot_id": "snap"})()
 
 
 def _request(**kw):
@@ -178,11 +185,12 @@ def test_preview_states_an_upper_bound_and_writes_nothing(monkeypatch):
     m = _Manifests()
     monkeypatch.setattr(selection, "_book", lambda: BOOK)
     monkeypatch.setattr(selection, "_portfolio_page", _page())
-    out = preview(_request(), SETTINGS, manifests=lambda: m, assumptions=lambda: [{"set_id": "a", "sha256": "s"}, {"set_id": "b", "sha256": "o"}])
+    out = preview(_request(skip_unchanged=True), SETTINGS, manifests=lambda: m, assumptions=lambda: [{"set_id": "a", "sha256": "s"}, {"set_id": "b", "sha256": "o"}])
     assert out["clients"] == 3 and out["items"] == 3 and out["never_run"] == 1
     assert out["skip_candidates_upper_bound"] == 2
     assert any("upper bound" in n for n in out["notes"])
     assert out["first_items"][0]["last_run"]["state"] == "never_run"
+    assert out["skip_coverage"] == "all_years" and out["skip_unchanged"] is True
 
 
 def test_preview_names_unavailable_clients_with_the_reason_and_never_calls_them_not_assessed(monkeypatch):
@@ -345,6 +353,9 @@ class _Run:
     program_code = "GA_JTC"
 
 
+_ROW = {"Employee_ID": "e1", "Worksite_ID": "GA_A", "Pay_Date": "2025-03-01", "Hours_Worked": 40, "Gross_Wages": 900}
+
+
 class _Env:
     """Fake collaborators: records every command and lets a test script failures per client."""
 
@@ -362,6 +373,7 @@ class _Env:
     def resolve_run(self, *, account_id, state, tax_year):
         run = type("R", (), {})()
         run.account_id, run.program_code, run.tax_year, run.rows = account_id, "GA_JTC", tax_year, []
+        run.state, run.state_rows = "GA", [_ROW]
         from datetime import date
 
         run.window = type("W", (), {"begin": date(2025, 1, 1), "end": date(2025, 12, 31)})()
@@ -432,13 +444,14 @@ def test_an_unchanged_client_is_skipped_with_the_reason_and_force_overrides(repo
     f = current_fingerprint(run, env.collaborators().assumptions(), "abc")
     env.manifest = type("M", (), {
         "calculation_id": f.calculation_id, "step1_assumption_sha256": "s", "onezero_assumption_sha256": "o",
-        "rule_pack_version": f.rule_pack_version, "code_commit": "abc", "tax_year": 2025})()
-    view = _enqueue(client_ids=(1,))
+        "rule_pack_version": f.rule_pack_version, "code_commit": "abc", "tax_year": 2025,
+        "source_snapshot_id": f.source_snapshot_id})()
+    view = _enqueue(client_ids=(1,), skip_unchanged=True)
     _worker(repo, env).drain()
     item = _statuses(repo, view["batch_id"])[1]
     assert item.status is ItemStatus.SKIPPED_UNCHANGED and "identical" in item.skip_reason and env.sent == []
     assert repo.get(view["batch_id"]).status is BatchStatus.SUCCEEDED
-    forced = _enqueue(client_ids=(1,), force=True)
+    forced = _enqueue(client_ids=(1,), skip_unchanged=True, force=True)
     _worker(repo, env).drain()
     assert _statuses(repo, forced["batch_id"])[1].status is ItemStatus.SUCCEEDED and len(env.sent) == 1
 
@@ -447,7 +460,7 @@ def test_a_manifest_without_what_is_needed_to_compare_runs_the_item(repo):
     env = _Env()
     env.manifest = type("M", (), {"calculation_id": None, "step1_assumption_sha256": None, "onezero_assumption_sha256": None,
                                   "rule_pack_version": "", "code_commit": "", "tax_year": 2025})()
-    _enqueue(client_ids=(1,))
+    _enqueue(client_ids=(1,), skip_unchanged=True)
     _worker(repo, env).drain()
     assert len(env.sent) == 1
 
@@ -599,3 +612,69 @@ def test_a_waiting_batch_with_no_worker_reports_a_degraded_run_worker(repo):
 
     entry = worker_degraded(old, 300, datetime.now(timezone.utc) + timedelta(hours=1))
     assert entry and entry[0]["dependency"] == "run_worker" and "run_worker" in entry[0]["remedy"] + entry[0]["dependency"]
+
+
+# ------------------------------------------------------------------ F04b.1: skipping is opt-in and covers every year
+
+
+def _matching_manifest(env, **over):
+    from application.runs.fingerprint import current_fingerprint
+
+    f = current_fingerprint(env.resolve_run(account_id=1, state="GA", tax_year=2025), env.collaborators().assumptions(), "abc")
+    fields = {"calculation_id": f.calculation_id, "step1_assumption_sha256": "s", "onezero_assumption_sha256": "o",
+              "rule_pack_version": f.rule_pack_version, "code_commit": "abc", "tax_year": 2025,
+              "source_snapshot_id": f.source_snapshot_id, **over}
+    return type("M", (), fields)()
+
+
+def test_the_default_batch_skips_nothing_even_when_the_last_run_matches(repo):
+    env = _Env()
+    env.manifest = _matching_manifest(env)
+    view = _enqueue(client_ids=(1,))
+    _worker(repo, env).drain()
+    assert _statuses(repo, view["batch_id"])[1].status is ItemStatus.SUCCEEDED and len(env.sent) == 1
+    assert repo.get(view["batch_id"]).skip_unchanged is False
+
+
+def test_opting_in_skips_only_a_client_whose_client_wide_fingerprint_matches(repo):
+    env = _Env()
+    env.manifest = _matching_manifest(env)
+    skipped = _enqueue(client_ids=(1,), skip_unchanged=True)
+    _worker(repo, env).drain()
+    assert _statuses(repo, skipped["batch_id"])[1].status is ItemStatus.SKIPPED_UNCHANGED and env.sent == []
+    env.manifest = _matching_manifest(env, source_snapshot_id="a-prior-year-was-restated")
+    reran = _enqueue(client_ids=(1,), skip_unchanged=True, idempotency_key="again")
+    _worker(repo, env).drain()
+    assert _statuses(repo, reran["batch_id"])[1].status is ItemStatus.SUCCEEDED and len(env.sent) == 1
+
+
+def test_a_manifest_without_the_fingerprint_means_cannot_tell_so_run(repo):
+    env = _Env()
+    env.manifest = _matching_manifest(env, source_snapshot_id=None)
+    _enqueue(client_ids=(1,), skip_unchanged=True)
+    _worker(repo, env).drain()
+    assert len(env.sent) == 1
+
+
+def test_a_prior_year_restatement_moves_the_fingerprint_and_a_non_authored_year_does_not():
+    from application.runs.fingerprint import client_data_fingerprint
+
+    prior = {**_ROW, "Pay_Date": "2024-06-01"}
+    unauthored = {**_ROW, "Pay_Date": "2010-06-01"}
+    windows = [("2024-01-01", "2024-12-31"), ("2025-01-01", "2025-12-31")]
+    base = client_data_fingerprint([_ROW, prior, unauthored], windows)
+    assert base == client_data_fingerprint([unauthored, prior, _ROW], windows), "independent of row order"
+    assert base != client_data_fingerprint([_ROW, {**prior, "Gross_Wages": 901}, unauthored], windows), "prior year restated"
+    assert base == client_data_fingerprint([_ROW, prior, {**unauthored, "Gross_Wages": 1}], windows), "unauthored year ignored"
+    assert client_data_fingerprint([_ROW], []) is None, "nothing authored: cannot tell"
+
+
+def test_the_default_preview_names_no_skip_candidates_and_says_nothing_is_skipped(monkeypatch):
+    monkeypatch.setattr(selection, "_book", lambda: BOOK)
+    monkeypatch.setattr(selection, "_portfolio_page", _page())
+    old = type("M", (), {"run_id": "r", "tax_year": 2025, "run_completed_at": NOW, "calculation_id": "c", "rule_pack_version": "p",
+                         "step1_assumption_sha256": "s", "onezero_assumption_sha256": "o"})()
+    out = preview(_request(), SETTINGS, manifests=lambda: type("R", (), {"latest": lambda self, c, program_code=None: old})(),
+                  assumptions=lambda: [{"set_id": "a", "sha256": "s"}])
+    assert out["skip_unchanged"] is False and out["skip_candidates_upper_bound"] == 0
+    assert out["skip_coverage"] == "cannot_tell_yet" and "Nothing is skipped" in out["notes"][0]

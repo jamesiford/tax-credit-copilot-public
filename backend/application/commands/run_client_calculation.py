@@ -455,9 +455,8 @@ def handle_run_client_calculation(command: RunClientCalculationCommand) -> dict[
         step1_assumption_sha256=assumptions[0]["sha256"] if assumptions else None,
         onezero_assumption_set_id=assumptions[1]["set_id"] if len(assumptions) > 1 else None,
         onezero_assumption_sha256=assumptions[1]["sha256"] if len(assumptions) > 1 else None,
-        rule_pack_version=identity.rule_pack_version,
         code_commit=_code_commit(),
-        calculation_id=identity.calculation_id,
+        **identity.manifest_fields(),
         triggered_by=command.actor,
     )
 

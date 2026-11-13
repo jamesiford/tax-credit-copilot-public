@@ -31,7 +31,8 @@ RUN_WRITES: tuple[CapabilitySpec, ...] = (
          "tax_years": {"type": "array", "items": _TAX_YEAR, "maxItems": 12,
                        "description": "Empty: each client's latest runnable year."},
          "options": _object(
-             {"force": {"type": "boolean", "description": "Run even if the last run already answers it."},
+             {"skip_unchanged": {"type": "boolean", "description": "Skip clients whose data and rules are unchanged since their last run. Off unless the person asks."},
+              "force": {"type": "boolean", "description": "Run every item even when skipping is on."},
               "refresh_once": {"type": "boolean", "default": True}}, ()),
          "confirm_items": {"type": "integer", "description": "The run count the person confirmed, when the preview asks for it."}},
         ("scope",), needs_client=False,

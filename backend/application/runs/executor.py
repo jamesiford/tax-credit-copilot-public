@@ -157,7 +157,7 @@ class ItemExecutor:
                                              actor=batch.requested_by))
             return ItemOutcome(ItemStatus.SUCCEEDED, tax_year=year, program_code=program)
         run = self._c.resolve_run(account_id=item.client_id, state=state, tax_year=year)
-        if not batch.force:
+        if batch.skip_unchanged and not batch.force:
             same, why = unchanged_decision(
                 manifest_fingerprint(self._c.latest_manifest(item.client_id, run.program_code)),
                 current_fingerprint(run, self._c.assumptions(), self._c.code_commit()),

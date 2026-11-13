@@ -14,7 +14,7 @@ is safe to show a client.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 
 from application.program_defaults import derive_run_state
@@ -58,6 +58,8 @@ class ClientRun:
     pack: Any
     window: Any
     rows: list[dict[str, Any]]
+    #: The client's payroll in this state before the window trim: what a client-wide fingerprint digests. [F04b.1]
+    state_rows: list[dict[str, Any]] = field(default_factory=list, repr=False)
 
     def engine_kwargs(self) -> dict[str, Any]:
         """The arguments both certified methods take, so neither can drift."""
@@ -154,9 +156,9 @@ def resolve_client_run(
     window = statute.window
 
     source = load_pay_periods(account_id) if rows is None else rows
-    rows = [r for r in source if row_state(r) == state]
+    state_rows = [r for r in source if row_state(r) == state]
     rows = [
-        r for r in rows
+        r for r in state_rows
         if window.begin.isoformat() <= str(r.get("Pay_Date") or "")[:10] <= window.end.isoformat()
     ]
     if not rows:
@@ -173,5 +175,5 @@ def resolve_client_run(
         floors=statute.floors,
         pack=statute.pack,
         window=window,
-        rows=rows,
+        rows=rows, state_rows=state_rows,
     )

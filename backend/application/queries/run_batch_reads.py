@@ -67,6 +67,7 @@ class PreviewRunBatchQuery(Query):
     program_code: str | None = None
     tax_years: tuple[int, ...] = ()
     force: bool = False
+    skip_unchanged: bool = False
     include_code_commit: bool = False
     refresh_once: bool = True
 
@@ -106,6 +107,6 @@ def handle_preview_run_batch(query: PreviewRunBatchQuery) -> dict[str, Any]:
     request = BatchRequest(
         kind=BatchKind(query.kind), scope=Scope(ScopeKind(query.scope_kind), tuple(query.client_ids), dict(query.filter)),
         program_code=query.program_code, tax_years=tuple(query.tax_years), force=query.force,
-        include_code_commit=query.include_code_commit, refresh_once=query.refresh_once,
+        skip_unchanged=query.skip_unchanged, include_code_commit=query.include_code_commit, refresh_once=query.refresh_once,
     )
     return preview(request, get_settings().runs)

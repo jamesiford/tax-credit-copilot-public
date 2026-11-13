@@ -49,7 +49,7 @@ def build_run_batch(principal: Principal, a: Mapping[str, Any]) -> Command:
     command = EnqueueRunBatchCommand(
         actor=principal.actor, kind=kind, scope_kind=scope["kind"], client_ids=_ints(scope, "account_ids"),
         filter=dict(scope.get("filter") or {}), program_code=a.get("program_code"), tax_years=_ints(a, "tax_years"),
-        force=bool(options.get("force", False)), refresh_once=bool(options.get("refresh_once", True)),
+        force=bool(options.get("force", False)), skip_unchanged=bool(options.get("skip_unchanged", False)), refresh_once=bool(options.get("refresh_once", True)),
         confirm_items=confirm if isinstance(confirm, int) and not isinstance(confirm, bool) else None,
     )
     try:
@@ -73,7 +73,7 @@ def preview_run_batch(c: Any) -> dict[str, Any]:
     try:
         p = get_mediator().send(PreviewRunBatchQuery(
             kind=c.kind, scope_kind=c.scope_kind, client_ids=c.client_ids, filter=c.filter, program_code=c.program_code,
-            tax_years=c.tax_years, force=c.force, refresh_once=c.refresh_once))
+            tax_years=c.tax_years, force=c.force, skip_unchanged=c.skip_unchanged, refresh_once=c.refresh_once))
     except RunBatchRefused as exc:
         raise InvalidWrite(str(exc)) from exc
     if p["over_size_limit"]:
@@ -82,11 +82,17 @@ def preview_run_batch(c: Any) -> dict[str, Any]:
         raise InvalidWrite(
             f"This would queue {p['items']} runs for {p['clients']} clients, above {p['confirm_above']}, so the person "
             f"must confirm the count. Tell them these numbers; if they agree, prepare again with confirm_items={p['items']}.")
-    return {"before": None, "after": {
+    return {"before": None, "after": _after(c, p)}
+
+
+def _after(c: Any, p: dict[str, Any]) -> dict[str, Any]:
+    """The facts the person is shown before confirming."""
+    return {
         "kind": c.kind.replace("_", " "), "clients": p["clients"], "runs to queue": p["items"],
         "tax years": ", ".join(str(y) for y in p["years"]) if isinstance(p["years"], list) else p["years"],
         "never calculated": p["never_run"], "may be skipped (an upper bound, decided as each run starts)": (
             p["skip_candidates_upper_bound"]),
-        "unavailable clients": len(p["unavailable"]), "re-run even if unchanged": "yes" if p["force"] else "no",
+        "unavailable clients": len(p["unavailable"]), "skip unchanged clients": "yes" if p["skip_unchanged"] and not p["force"] else "no (every item runs)",
+        "programs": ", ".join(f"{k}: {v}" for k, v in sorted(p["programs"].items())),
         "first clients": ", ".join(str(i["client_name"] or i["client_id"]) for i in p["first_items"][:_FIRST_CLIENTS]),
-    }}
+    }

@@ -18,6 +18,7 @@ from typing import Any
 from application.identity import Policy
 from application.mediator import Command
 from application.runs.errors import ConfirmationRequired
+from application.runs.pairs import client_pairs
 from application.runs.plan import BatchRequest, check_size, item_count, make_items, preview, spec_for
 from application.runs.selection import Scope, resolve_clients
 from application.runs.views import batch_view
@@ -34,6 +35,7 @@ class EnqueueRunBatchCommand(Command):
     program_code: str | None = None
     tax_years: tuple[int, ...] = ()
     force: bool = False
+    skip_unchanged: bool = False
     include_code_commit: bool = False
     refresh_once: bool = True
     idempotency_key: str | None = None
@@ -45,7 +47,7 @@ class EnqueueRunBatchCommand(Command):
         return BatchRequest(
             kind=BatchKind(self.kind), scope=Scope(ScopeKind(self.scope_kind), tuple(self.client_ids), dict(self.filter)),
             program_code=self.program_code, tax_years=tuple(self.tax_years), force=self.force,
-            include_code_commit=self.include_code_commit, refresh_once=self.refresh_once,
+            skip_unchanged=self.skip_unchanged, include_code_commit=self.include_code_commit, refresh_once=self.refresh_once,
             idempotency_key=self.idempotency_key, override_size_limit=self.override_size_limit,
             confirm_items=self.confirm_items,
         ).validated()
@@ -69,12 +71,13 @@ def handle_enqueue_run_batch(command: EnqueueRunBatchCommand) -> dict[str, Any]:
             return batch_view(earlier, replay=True)
 
     resolution = resolve_clients(request.scope)
-    items = item_count(len(resolution.client_ids), request)
+    pairs = client_pairs(resolution.client_ids, request.program_code)
+    items = item_count(pairs, request)
     check_size(items, request, settings)
     if items > settings.confirm_above and request.confirm_items != items:
         raise ConfirmationRequired(items, settings.confirm_above)
 
-    spec = spec_for(request, resolution.client_ids)
+    spec = spec_for(request, resolution.client_ids, pairs)
     open_twin = repo.find_open_identical(request.kind.value, json.dumps(spec, sort_keys=True), command.actor)
     if open_twin is not None:
         return batch_view(open_twin, replay=True)
@@ -82,9 +85,9 @@ def handle_enqueue_run_batch(command: EnqueueRunBatchCommand) -> dict[str, Any]:
     batch = RunBatch(
         batch_id=uuid.uuid4().hex, kind=request.kind, scope_kind=request.scope.kind, scope_spec=spec,
         requested_by=command.actor, requested_at=datetime.now(timezone.utc), program_code=request.program_code,
-        tax_years=request.tax_years, force=request.force, include_code_commit=request.include_code_commit,
-        refresh_once=request.refresh_once, idempotency_key=request.idempotency_key,
+        tax_years=request.tax_years, force=request.force, skip_unchanged=request.skip_unchanged,
+        include_code_commit=request.include_code_commit, refresh_once=request.refresh_once, idempotency_key=request.idempotency_key,
         dry_run_summary=_stored_summary(preview(request, settings, resolution=resolution)),
     )
-    created = repo.create(batch, make_items(batch.batch_id, resolution.client_ids, request))
+    created = repo.create(batch, make_items(batch.batch_id, pairs, request))
     return batch_view(created)

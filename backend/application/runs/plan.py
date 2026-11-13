@@ -6,9 +6,12 @@ carries no year and resolves to the client's latest runnable year when it starts
 `refresh_once` off with explicit years, makes one item per client-year: each of them replays every year, so the cost
 is N times higher, and the preview says so.
 
-**The preview never promises a skip.** Whether data changed is decided when an item starts, because that needs the
-year's rows. What is known cheaply (book, manifests) gives an upper bound: a client with no earlier run, or whose
-recorded assumption hashes no longer match, cannot be skipped; the rest are candidates only.
+**Skipping is opt-in (`skip_unchanged`, default off) and the preview never promises one.** Whether data changed is
+decided when an item starts, because that needs the client's payroll. What is known cheaply (book, manifests) gives an
+upper bound: a client with no earlier run, whose manifest carries no client-wide fingerprint (`source_snapshot_id`), or
+whose recorded assumption hashes no longer match, cannot be skipped; the rest are candidates only. [F04b.1]
+
+**One item per (client, program).** A client with payroll in several calculable programs is run for each. [F04b.4]
 """
 from __future__ import annotations
 
@@ -17,6 +20,7 @@ from dataclasses import dataclass, field
 from typing import Any, Callable
 
 from application.runs.errors import BatchTooLarge, RunBatchRefused
+from application.runs.pairs import client_pairs, pair_summary
 from application.runs.selection import Resolution, Scope, resolve_clients, scope_spec, unavailable_among
 from config import RunSettings
 from domain.runs import BatchKind, RunBatchItem
@@ -35,6 +39,7 @@ class BatchRequest:
     program_code: str | None = None
     tax_years: tuple[int, ...] = ()
     force: bool = False
+    skip_unchanged: bool = False
     include_code_commit: bool = False
     refresh_once: bool = True
     idempotency_key: str | None = None
@@ -54,8 +59,9 @@ class BatchRequest:
         return self
 
 
-def item_count(clients: int, request: BatchRequest) -> int:
-    return clients * (len(request.tax_years) if request.tax_years else 1)
+def item_count(pairs: list[tuple[int, str | None]], request: BatchRequest) -> int:
+    """Items a batch queues: one per (client, program), times the explicit years if any."""
+    return len(pairs) * (len(request.tax_years) if request.tax_years else 1)
 
 
 def check_size(items: int, request: BatchRequest, settings: RunSettings) -> None:
@@ -67,23 +73,24 @@ def check_size(items: int, request: BatchRequest, settings: RunSettings) -> None
             raise BatchTooLarge(items, settings.max_items, can_override=can)
 
 
-def make_items(batch_id: str, client_ids: tuple[int, ...], request: BatchRequest) -> list[RunBatchItem]:
+def make_items(batch_id: str, pairs: list[tuple[int, str | None]], request: BatchRequest) -> list[RunBatchItem]:
     years: tuple[int | None, ...] = tuple(request.tax_years) or (None,)
     items: list[RunBatchItem] = []
-    for client_id in client_ids:
+    for client_id, program in pairs:
         for year in years:
             items.append(RunBatchItem(
                 item_id=uuid.uuid4().hex, batch_id=batch_id, client_id=client_id, seq=len(items),
-                program_code=request.program_code, tax_year=year,
+                program_code=program, tax_year=year,
             ))
     return items
 
 
-def spec_for(request: BatchRequest, ids: tuple[int, ...]) -> dict[str, Any]:
+def spec_for(request: BatchRequest, ids: tuple[int, ...], pairs: list[tuple[int, str | None]] | None = None) -> dict[str, Any]:
     spec = scope_spec(request.scope, ids)
     spec.update(
         kind=request.kind.value, program_code=request.program_code, tax_years=list(request.tax_years),
-        force=request.force, include_code_commit=request.include_code_commit, refresh_once=request.refresh_once,
+        force=request.force, skip_unchanged=request.skip_unchanged, include_code_commit=request.include_code_commit,
+        refresh_once=request.refresh_once, **({"program_items": len(pairs)} if pairs is not None else {}),
     )
     return spec
 
@@ -94,14 +101,16 @@ def _last_run(client_id: int, assumptions: list[dict[str, str]], repo: Any) -> d
         return {"state": "never_run", "can_skip": False, "reason": "no earlier successful run"}
     hashes = {a["sha256"] for a in assumptions}
     recorded = {manifest.step1_assumption_sha256, manifest.onezero_assumption_sha256} - {None, ""}
-    known = bool(manifest.calculation_id and manifest.rule_pack_version and recorded)
+    covers_all_years = bool(getattr(manifest, "source_snapshot_id", None))
+    known = bool(manifest.calculation_id and manifest.rule_pack_version and recorded and covers_all_years)
     matches = known and recorded <= hashes
     return {
         "state": "has_run", "run_id": manifest.run_id, "tax_year": manifest.tax_year,
         "completed_at": manifest.run_completed_at.isoformat() if manifest.run_completed_at else None,
-        "can_skip": bool(matches),
+        "can_skip": bool(matches), "coverage": "all_years" if covers_all_years else "cannot_tell_yet",
         "reason": ("assumption hashes match the last run; the data is checked when the item starts" if matches
-                   else "the last run does not record what is needed to compare, or the assumptions changed"),
+                   else "the last run does not record a client-wide data fingerprint or what is needed to compare, "
+                        "or the assumptions changed"),
     }
 
 
@@ -113,18 +122,21 @@ def _reads(ids: tuple[int, ...], current: list[dict[str, str]], repo: Any) -> di
 def preview(
     request: BatchRequest, settings: RunSettings, *, resolution: Resolution | None = None,
     manifests: Callable[[], Any] | None = None, assumptions: Callable[[], list[dict[str, str]]] | None = None,
-    portfolio_page: Callable[[], dict[str, Any]] | None = None,
+    portfolio_page: Callable[[], dict[str, Any]] | None = None, footprint: Callable[[], Any] | None = None,
 ) -> dict[str, Any]:
     """What a start would do. Writes nothing and reads no payroll."""
     from application.services import get_run_manifest_repository
 
     request = request.validated()
     found = resolution or resolve_clients(request.scope)
-    items = item_count(len(found.client_ids), request)
+    pairs = client_pairs(found.client_ids, request.program_code, footprint)
+    items = item_count(pairs, request)
     reads = _reads(found.client_ids, (assumptions or _assumptions)(), (manifests or get_run_manifest_repository)())
     complete = len(reads) == len(found.client_ids)
-    candidates = 0 if request.force else sum(1 for r in reads.values() if r["can_skip"])
+    skipping = request.skip_unchanged and not request.force
+    candidates = sum(1 for r in reads.values() if r["can_skip"]) if skipping else 0
     out = _summary(request, settings, found, reads, items, candidates, complete)
+    out.update(pair_summary(pairs), program_items=len(pairs))
     checked = unavailable_among(found.client_ids, found.names, portfolio_page)
     out.update(unavailable=checked["items"], unavailable_checked=checked["checked"])
     if not checked["checked"]:
@@ -140,7 +152,8 @@ def _summary(
     return {
         "kind": request.kind.value, "clients": len(found.client_ids), "items": items,
         "years": list(request.tax_years) or "latest runnable year per client",
-        "refresh_once": request.refresh_once, "force": request.force,
+        "refresh_once": request.refresh_once, "force": request.force, "skip_unchanged": request.skip_unchanged,
+        "skip_coverage": _coverage(reads),
         "per_client_year_items": len(request.tax_years) > 1,
         "skip_candidates_upper_bound": candidates if complete else None,
         "never_run": sum(1 for r in reads.values() if r["state"] == "never_run"),
@@ -152,10 +165,17 @@ def _summary(
             for cid in found.client_ids[:PREVIEW_ITEMS] if cid in reads
         ],
         "notes": [
-            "Whether a client is skipped as unchanged is decided when its item starts; this is an upper bound, not a promise.",
+            "Whether a client is skipped as unchanged is decided when its item starts; this is an upper bound, not a promise."
+            if request.skip_unchanged and not request.force else "Nothing is skipped: every item runs.",
             _COST_NOTE,
         ],
     }
+
+
+def _coverage(reads: dict[int, dict[str, Any]]) -> str:
+    """`all_years` when every earlier run recorded the client-wide fingerprint, `cannot_tell_yet` when none did, else `mixed`."""
+    found = {r["coverage"] for r in reads.values() if "coverage" in r}
+    return "none_yet" if not found else found.pop() if len(found) == 1 else "mixed"
 
 
 def _assumptions() -> list[dict[str, str]]:
