@@ -447,6 +447,8 @@ The client's pay codes, with whether each is ACA or FUTA wages and its category.
 | `tcc_ops.program_engagement` | Operational record written by the platform to run itself; not payroll or credit data. |
 | `tcc_ops.rule_change_audit` | Platform audit or security record. Never exposed to the agent; the audit trail has its own readers. |
 | `tcc_ops.rule_pack_version` | Global statute registry with no client key; the run manifest names the pack used. |
+| `tcc_ops.run_batch` | Platform audit or security record. Never exposed to the agent; the audit trail has its own readers. |
+| `tcc_ops.run_batch_item` | Platform audit or security record. Never exposed to the agent; the audit trail has its own readers. |
 | `tcc_ops.schema_migration` | Schema bookkeeping with no client key. |
 | `tcc_ops.source_file_manifest` | Per-file hashes and counts for a snapshot; carries no client key to scope by. |
 | `tcc_ops.source_snapshot` | Lineage of the payroll a run consumed; reproducibility metadata, not an analytic dataset. |
