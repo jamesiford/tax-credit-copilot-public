@@ -97,7 +97,21 @@ def apply_one_zero_program_credit(
     if pack_file is None:
         return credit_math._no_state_pack_result(state)
 
-    pack = credit_math._load_pack(pack_file)
+    return credit_from_pack(credit_math._load_pack(pack_file), (key, state, pack_file), average_headcount,
+                            prior_period_average_headcount, threshold_override)
+
+
+def credit_from_pack(
+    pack: dict[str, Any], names: tuple[str, str, str], average_headcount: float, prior_period_average_headcount: float = 0.0,
+    threshold_override: float | None = None,
+) -> dict[str, Any]:
+    """The benefit step over a pack document already in hand: `names` is `(key, state, pack file)`.
+
+    The one body behind `apply_one_zero_program_credit` (which loads the pack from the rules folder) and the portal's draft
+    preview (which holds a draft's document in memory and must not write it anywhere), so a preview prices with the engine's
+    own formula and not a second copy of it.
+    """
+    key, state, pack_file = names
     average, prior = float(average_headcount), float(prior_period_average_headcount)
     threshold = float(threshold_override) if threshold_override is not None else float(pack["thresholds"]["minimum_new_jobs"])
     years = int(pack["benefit"]["benefit_period_years"])

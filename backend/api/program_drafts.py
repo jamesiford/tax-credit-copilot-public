@@ -7,150 +7,31 @@ A refusal is a 4xx whose `detail` carries `code` and `reason`, so the portal can
 """
 from __future__ import annotations
 
-from typing import Any, Literal
+from typing import Any
 
 from fastapi import APIRouter, HTTPException, Query, Request
-from pydantic import BaseModel, Field
 
 from api.auth import attributed
+from api.program_draft_models import (
+    DraftOut, DraftsPage, CreateBody, EditBody, ActorBody, ReviewBody, PreviewBody, PreviewOut, WithdrawBody,
+)
 from application.commands.create_program_draft import CreateProgramDraftCommand
 from application.commands.edit_program_draft import EditProgramDraftCommand
 from application.commands.request_program_review import RequestProgramReviewCommand
 from application.commands.review_program_draft import ReviewProgramDraftCommand
 from application.commands.validate_program_draft import ValidateProgramDraftCommand
 from application.commands.withdraw_program_draft import WithdrawProgramDraftCommand
+from application.queries.preview_program_draft import PreviewProgramDraftQuery
 from application.queries.program_draft_reads import GetProgramDraftQuery, ListProgramDraftsQuery
 from application.services import get_mediator
 from domain.program_drafts import (
-    DraftConflict, DraftError, DraftInvalid, DraftNotFound, InvalidTransition, ReviewRefused,
+    CustomerDataRefused, DraftConflict, DraftError, DraftInvalid, DraftNotFound, InvalidTransition, PreviewRefused, ReviewRefused,
 )
 
 router = APIRouter(prefix="/api/v2/program-drafts", tags=["program-drafts"])
 
-_STATUS = {DraftNotFound: 404, DraftConflict: 409, InvalidTransition: 409, DraftInvalid: 422, ReviewRefused: 422}
-
-
-class Finding(BaseModel):
-    """One validation finding, addressed to a field: `file` names the document, `path` the place inside it."""
-    file: str
-    severity: str
-    code: str
-    path: str
-    message: str
-
-
-class ValidationOut(BaseModel):
-    """A validation result. `valid` means well-formed, never verified; `content_sha256` says which documents it covered."""
-    content_sha256: str
-    valid: bool
-    errors: int
-    warnings: int
-    infos: int
-    findings: list[Finding]
-    truncated: bool
-    verification: str
-
-
-class ReviewRecord(BaseModel):
-    """Who asked for review, who decided, and what they said."""
-    requested_by: str | None
-    reviewer: str | None
-    decision: str | None
-    comment: str | None
-    decided_at: str | None
-    approved_sha256: str | None
-
-
-class ExportRecord(BaseModel):
-    """When the bundle was first exported and its SHA-256."""
-    exported_at: str | None
-    bundle_sha256: str | None
-
-
-class EventOut(BaseModel):
-    """One append-only audit row."""
-    seq: int
-    event_type: str
-    actor: str
-    at: str | None
-    from_status: str | None
-    to_status: str | None
-    detail: dict[str, Any]
-
-
-class DraftSummary(BaseModel):
-    """A draft without its documents, as the list shows it."""
-    draft_id: str
-    proposed_code: str
-    name: str
-    jurisdiction_level: str
-    state: str | None
-    status: str
-    version: int
-    created_by: str
-    created_at: str | None
-    updated_by: str
-    updated_at: str | None
-    pack_file: str
-    validation_errors: int | None
-    verification: str
-    has_runtime_authority: bool
-
-
-class DraftOut(DraftSummary):
-    """A draft in full. `allowed_actions` is what may be done now, so the portal enables exactly those."""
-    documents: dict[str, Any]
-    content_sha256: str
-    validation: ValidationOut | None
-    validation_current: bool
-    review: ReviewRecord
-    export: ExportRecord
-    allowed_actions: list[str]
-    events: list[EventOut] = Field(default_factory=list)
-
-
-class DraftsPage(BaseModel):
-    """One page of drafts, most recently changed first."""
-    items: list[DraftSummary]
-    total: int
-    limit: int
-    offset: int
-
-
-class CreateBody(BaseModel):
-    """Propose a program. A federal program is not runnable yet, so a draft needs a two-letter state."""
-    code: str
-    name: str
-    state: str
-    years: list[int] = Field(default_factory=list, description="Tax years to scaffold as empty, flagged year packs.")
-    actor: str | None = Field(None, description="Used only when the caller is not signed in (local development).")
-
-
-class EditBody(BaseModel):
-    """A full replace of the documents. `expected_version` is the version the editor read."""
-    expected_version: int
-    pack: dict[str, Any] | None
-    years: dict[str, dict[str, Any]] = Field(default_factory=dict)
-    name: str | None = None
-    actor: str | None = None
-
-
-class ActorBody(BaseModel):
-    """A request with no fields of its own."""
-    actor: str | None = None
-
-
-class ReviewBody(BaseModel):
-    """A reviewer's decision. A request for changes needs a comment."""
-    decision: Literal["approve", "request_changes"]
-    comment: str | None = None
-    actor: str | None = None
-
-
-class WithdrawBody(BaseModel):
-    """Why the draft is being withdrawn (optional)."""
-    reason: str | None = None
-    actor: str | None = None
+_STATUS = {DraftNotFound: 404, DraftConflict: 409, InvalidTransition: 409, DraftInvalid: 422, ReviewRefused: 422,
+           PreviewRefused: 422, CustomerDataRefused: 403}
 
 
 def _send(request: Any) -> Any:
@@ -203,6 +84,13 @@ def request_review(draft_id: str, request: Request, body: ActorBody | None = Non
 def review_draft(draft_id: str, body: ReviewBody, request: Request) -> Any:
     """Approve for export or request changes. Approval activates nothing and verifies nothing."""
     return _send(ReviewProgramDraftCommand(actor=_who(request, body.actor), draft_id=draft_id, decision=body.decision, comment=body.comment))
+
+
+@router.post("/{draft_id}/preview", response_model=PreviewOut)
+def preview_draft(draft_id: str, body: PreviewBody | None = None) -> Any:
+    """Price the draft's year packs on synthetic data with the engine's own functions. Reads only: nothing is written or stored."""
+    body = body or PreviewBody()
+    return _send(PreviewProgramDraftQuery(draft_id=draft_id, dataset=body.dataset, client_id=body.client_id, tax_years=tuple(body.tax_years)))
 
 
 @router.post("/{draft_id}/withdraw", response_model=DraftOut)

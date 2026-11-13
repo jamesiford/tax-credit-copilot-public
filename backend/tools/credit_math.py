@@ -280,7 +280,7 @@ def load_pack_one_zero(state_or_code: str, tax_year: int | None = None):
     The flat `min_weekly_hours` / `min_weekly_wages` fields remain the
     default-year fallback (and satisfy the rule-pack schema tests).
     """
-    from domain.calculation.onezero import OneZeroMethodology, OneZeroPack  # local import: avoid load-time cycle
+    from tools.one_zero_pack import build_one_zero_pack  # local import: avoid load-time cycle
 
     s = state_or_code.upper()
     pack_file = pack_file_for(s)
@@ -305,10 +305,6 @@ def load_pack_one_zero(state_or_code: str, tax_year: int | None = None):
             year_block = tby.get(str(tax_year))
             if year_block:
                 resolved.update(year_block)
-
-    pt_band = resolved.get("pt_band_hours")
-    pt_band_tuple = (float(pt_band[0]), float(pt_band[1])) if pt_band else None
-    pt_weight = resolved.get("pt_weight")
 
     # [L5] CALC-11 — pay-code inclusion/suppression for the weekly-wage test.
     pcp = oz.get("pay_code_policy") or {}
@@ -345,25 +341,7 @@ def load_pack_one_zero(state_or_code: str, tax_year: int | None = None):
         if ing.get("excluded_pay_codes"):
             exc = ing["excluded_pay_codes"]
 
-    return OneZeroPack(
-        min_weekly_hours=float(resolved["min_weekly_hours"]),
-        min_weekly_wages=float(resolved.get("min_weekly_wages", 0.0)),
-        wage_basis=str(resolved.get("wage_basis", oz.get("wage_basis", "regular"))),
-        geographic_granularity=str(oz.get("geographic_granularity", "unit")),
-        pt_aggregation=bool(oz.get("pt_aggregation", False)),
-        headcount_unit_field=str(oz.get("headcount_unit_field", "Worksite_ID")),
-        citation=str(pack.get("credit", {}).get("statutory_citation", "")),
-        pt_band_hours=pt_band_tuple,                                   # [H2]
-        pt_weight=float(pt_weight) if pt_weight else None,             # [H2]
-        measuring_date=str(resolved.get("measuring_date", oz.get("measuring_date", "last_day"))),  # [H3]
-        entity_combination=str(oz.get("entity_combination", "permitted")),  # [I2]
-        included_pay_codes=tuple(inc) if inc else None,               # [L5]
-        excluded_pay_codes=tuple(exc) if exc else None,               # [L5]
-        tax_year=tax_year,
-        # Optional `methodology` block; absent means the certified v7 defaults,
-        # so existing packs need no edit. See ENGINE-CONVERGENCE.md.
-        methodology=OneZeroMethodology.from_pack_json(oz.get("methodology")),
-    )
+    return build_one_zero_pack(pack, resolved, (inc, exc), tax_year)
 
 
 def apply_one_zero_state_credit(

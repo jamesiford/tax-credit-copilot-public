@@ -75,6 +75,18 @@ class ReviewRefused(DraftError):
     code = "review_refused"
 
 
+class PreviewRefused(DraftError):
+    """A preview cannot run: the documents do not validate, there is no year to price, or the data is not allowed."""
+
+    code = "preview_refused"
+
+
+class CustomerDataRefused(PreviewRefused):
+    """A preview was asked to read a customer-classified source and nothing allows it."""
+
+    code = "customer_data_refused"
+
+
 def canonical_json(document: Any) -> str:
     """Compact, key-sorted JSON: the one text a document is stored, hashed and exported as, so equal content is equal bytes."""
     return json.dumps(document, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
