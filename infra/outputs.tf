@@ -139,6 +139,11 @@ output "mock_ai_gateway_url" {
   value       = module.mock_ai_gateway.default_hostname == "" ? "" : "https://${module.mock_ai_gateway.default_hostname}"
 }
 
+output "RUN_WORKER_APP_NAME" {
+  description = "Name of the run worker App Service; empty unless enable_run_worker. Deploy the backend package to it (docs/architecture/RUN-ORCHESTRATION.md)."
+  value       = module.run_worker.app_name
+}
+
 output "CHANNEL_APP_NAME" {
   description = "Name of the channel gateway App Service; empty unless enable_m365_channel. azd deploys the `channel` service to it."
   value       = module.channel.app_name

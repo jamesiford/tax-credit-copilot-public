@@ -203,29 +203,8 @@ module "azure_sql" {
   log_analytics_workspace_id = module.monitoring.log_analytics_workspace_id
 }
 
-module "app_service" {
-  source                         = "./modules/app_service"
-  name_suffix                    = local.token
-  resource_group_name            = azurerm_resource_group.this.name
-  location                       = var.location
-  tags                           = local.tags
-  sku_name                       = var.app_service_sku
-  app_subnet_id                  = module.network.app_subnet_id
-  private_endpoint_subnet_id     = module.network.private_endpoint_subnet_id
-  sites_private_dns_zone_id      = lookup(module.network.private_dns_zone_ids, "sites", "")
-  web_inbound                    = local.web_inbound
-  web_allowed_ip_ranges          = var.web_allowed_ip_ranges
-  api_identity                   = { id = module.identity.api.id, client_id = module.identity.api.client_id }
-  web_identity                   = { id = module.identity.web.id, client_id = module.identity.web.client_id }
-  app_insights_connection_string = module.monitoring.app_insights_connection_string
-  log_analytics_workspace_id     = module.monitoring.log_analytics_workspace_id
-
-  easy_auth = local.easy_auth ? {
-    tenant_id     = local.tenant_id
-    web_client_id = var.web_client_id
-    api_scope     = "${local.api_audience}/user_impersonation"
-  } : null
-
+# The API's settings. Local so the run worker can start from the same ones. None is a secret.
+locals {
   # HOST-5: every setting the API reads, from Terraform. None is a secret.
   api_app_settings = merge({
     ENVIRONMENT                               = "azure"
@@ -261,6 +240,33 @@ module "app_service" {
       { CHANNEL_WRITER_SOURCE = var.channel_writer_source },
       trimspace(var.channel_writer_group_id) != "" ? { CHANNEL_WRITER_GROUP_ID = trimspace(var.channel_writer_group_id) } : {},
   ) : {}, local.api_ai_settings, local.api_data_query_settings)
+}
+
+module "app_service" {
+  source                         = "./modules/app_service"
+  name_suffix                    = local.token
+  resource_group_name            = azurerm_resource_group.this.name
+  location                       = var.location
+  tags                           = local.tags
+  sku_name                       = var.app_service_sku
+  app_subnet_id                  = module.network.app_subnet_id
+  private_endpoint_subnet_id     = module.network.private_endpoint_subnet_id
+  sites_private_dns_zone_id      = lookup(module.network.private_dns_zone_ids, "sites", "")
+  web_inbound                    = local.web_inbound
+  web_allowed_ip_ranges          = var.web_allowed_ip_ranges
+  api_identity                   = { id = module.identity.api.id, client_id = module.identity.api.client_id }
+  web_identity                   = { id = module.identity.web.id, client_id = module.identity.web.client_id }
+  app_insights_connection_string = module.monitoring.app_insights_connection_string
+  log_analytics_workspace_id     = module.monitoring.log_analytics_workspace_id
+
+  easy_auth = local.easy_auth ? {
+    tenant_id     = local.tenant_id
+    web_client_id = var.web_client_id
+    api_scope     = "${local.api_audience}/user_impersonation"
+  } : null
+
+  # HOST-5: every setting the API reads, from Terraform (see local.api_app_settings).
+  api_app_settings = local.api_app_settings
 
   web_app_settings = {}
 }
@@ -279,6 +285,24 @@ module "mock_ai_gateway" {
   integration_subnet_id = module.network.app_subnet_id
   mock_auth             = var.mock_ai_gateway_auth
   entra_audience        = var.mock_ai_gateway_entra_audience
+}
+
+# ADR-012: the run orchestration worker. Count 0 unless enable_run_worker, so the default plan is unchanged. It runs as
+# the API's identity with the API's settings (the same commands need the same access), plus its own.
+module "run_worker" {
+  source                         = "./modules/run_worker"
+  enabled                        = var.enable_run_worker
+  name_suffix                    = local.token
+  resource_group_name            = azurerm_resource_group.this.name
+  location                       = var.location
+  tags                           = local.tags
+  service_plan_id                = module.app_service.plan_id
+  integration_subnet_id          = module.network.app_subnet_id
+  identity                       = { id = module.identity.api.id, client_id = module.identity.api.client_id }
+  api_app_settings               = local.api_app_settings
+  concurrency                    = var.run_worker_concurrency
+  app_insights_connection_string = module.monitoring.app_insights_connection_string
+  log_analytics_workspace_id     = module.monitoring.log_analytics_workspace_id
 }
 
 # CH-07: the Microsoft 365 channel gateway. Count 0 unless enable_m365_channel,
