@@ -216,11 +216,9 @@ def resolve_statutory_floors(program_code: str, tax_year: int) -> StatutoryFloor
 
 
 def _avg_state_wage(state: str) -> float:
-    from .payroll import _load_rows
-    rows = [r for r in _load_rows() if r["location_state"] == state]
-    if not rows:
-        return 0.0
-    return sum(r["annual_wage"] for r in rows) / len(rows)
+    from tools.program_credit import avg_program_wage
+
+    return avg_program_wage(state)
 
 
 def _no_state_pack_result(state: str) -> dict[str, Any]:
@@ -375,117 +373,27 @@ def apply_one_zero_state_credit(
     prior_period_average_headcount: float = 0.0,
     threshold_override: float | None = None,
 ) -> dict[str, Any]:
-    """Apply a rule pack's benefit math on top of an already-computed One/Zero
-    Average Headcount.
+    """The state-named entry point: prices a state's DEFAULT program. Takes a program code too. [F04c.4]
 
-    `average_headcount` is the engine's `annual_average` (mean of 12 monthly
-    unit headcounts, summed across units). `prior_period_average_headcount`
-    is the comparable figure for the prior tax year — net-new qualifying jobs
-    are the year-over-year delta minus the rule pack's statutory threshold.
-
-    `threshold_override` ([L4] CALC-10) replaces the statutory minimum-new-jobs
-    threshold with a NEGOTIATED value (e.g. an incentive agreement requiring
-    "100 jobs at $18/hr"). None = use the pack's statutory threshold.
-
-    This is the ONLY state-credit benefit entry point: the statutory One/Zero
-    Average Headcount drives every dollar figure the UI shows.
+    The body lives in `tools/program_credit.py`, keyed by program, so a state with several programs can price each.
     """
-    state_u = state.upper()
-    pack_file = STATE_TO_PACK.get(state_u)
-    if pack_file is None:
-        return _no_state_pack_result(state_u)
+    from tools.program_credit import apply_one_zero_program_credit
 
-    pack = _load_pack(pack_file)
-    threshold = float(threshold_override) if threshold_override is not None else float(pack["thresholds"]["minimum_new_jobs"])
-    years = int(pack["benefit"]["benefit_period_years"])
-    citation = pack["credit"]["statutory_citation"]
-    benefit = pack["benefit"]
-    net_new = max(0.0, float(average_headcount) - float(prior_period_average_headcount))
-    qualifying = round(max(0.0, net_new - threshold), 2)
-
-    if "amount_per_qualifying_job_usd" in benefit:
-        per_job = float(benefit["amount_per_qualifying_job_usd"])
-        annual = round(qualifying * per_job)
-    elif "amount_per_qualifying_job_pct_of_wages" in benefit:
-        pct = float(benefit["amount_per_qualifying_job_pct_of_wages"])
-        avg_wage = _avg_state_wage(state_u)
-        per_job = round(avg_wage * pct)
-        annual = round(qualifying * per_job)
-    else:
-        raise ValueError(f"pack {pack_file} has no recognized benefit shape")
-
-    lifetime = annual * years
-    recorder = current_recorder()
-    if recorder is not None:
-        recorder.record(
-            step=f"Apply One/Zero Average Headcount to {pack['credit']['name']} benefit math",
-            inputs={
-                "average_headcount": float(average_headcount),
-                "prior_period_average_headcount": float(prior_period_average_headcount),
-                "threshold": threshold,
-            },
-            formula="qualifying = max(0, avg_headcount - prior_avg_headcount - threshold)",
-            output={"qualifying_jobs": qualifying, "annual_credit_usd": annual, "lifetime_credit_usd": lifetime},
-            citation=citation,
-        )
-
-    return {
-        "state": state_u,
-        "no_state_pack": False,
-        "credit_code": pack["credit"]["code"],
-        "credit_name": pack["credit"]["name"],
-        "jurisdiction": pack["jurisdiction"]["code"],
-        "citation": citation,
-        "threshold": threshold,
-        "qualifying_jobs": qualifying,
-        "amount_per_job_usd": per_job,
-        "annual_credit_usd": annual,
-        "benefit_period_years": years,
-        "lifetime_credit_usd": lifetime,
-        "basis": "one_zero",
-        "average_headcount": float(average_headcount),
-        "prior_period_average_headcount": float(prior_period_average_headcount),
-    }
+    return apply_one_zero_program_credit(
+        state, average_headcount,
+        prior_period_average_headcount=prior_period_average_headcount, threshold_override=threshold_override,
+    )
 
 
 def state_per_job_usd(state: str) -> float:
-    """[O3] UX-06 — the statutory dollars-per-qualifying-job for a state.
+    """[O3] UX-06: dollars per qualifying job for a state's default program (or a program code); see `program_credit`."""
+    from tools.program_credit import program_per_job_usd
 
-    Returns 0.0 for a pct-of-wages program (e.g. NY) or a state with no pack,
-    where a flat per-job figure isn't meaningful.
-    """
-    pack_file = STATE_TO_PACK.get(state.upper())
-    if pack_file is None:
-        return 0.0
-    benefit = _load_pack(pack_file).get("benefit", {})
-    return float(benefit.get("amount_per_qualifying_job_usd") or 0.0)
+    return program_per_job_usd(state)
 
 
 def combine_entity_credits(state: str, fein_breakdown: dict[str, dict[str, Any]]) -> dict[str, Any]:
-    """[I2] CALC-06 — credit for a program that PROHIBITS entity combination.
+    """[I2] CALC-06: per-entity credit for a no-combination program; see `program_credit.combine_program_entity_credits`."""
+    from tools.program_credit import combine_program_entity_credits
 
-    Each legal entity (FEIN) is its own taxpayer: the statutory threshold is
-    applied to each entity's Average Headcount independently and the resulting
-    credits are summed — entities never merge. Returns the per-FEIN breakdown
-    plus the combined totals so the route can surface both.
-    """
-    per_fein: dict[str, Any] = {}
-    sum_annual = sum_lifetime = sum_qualifying = 0.0
-    for fcode, agg in fein_breakdown.items():
-        entity_credit = apply_one_zero_state_credit(state, agg["average_headcount"])
-        per_fein[fcode] = {
-            "average_headcount": agg["average_headcount"],
-            "qualifying_jobs": entity_credit["qualifying_jobs"],
-            "annual_credit_usd": entity_credit["annual_credit_usd"],
-            "lifetime_credit_usd": entity_credit["lifetime_credit_usd"],
-        }
-        sum_annual += entity_credit["annual_credit_usd"]
-        sum_lifetime += entity_credit["lifetime_credit_usd"]
-        sum_qualifying += entity_credit["qualifying_jobs"]
-    return {
-        "per_fein": per_fein,
-        "combined_annual_credit_usd": round(sum_annual),
-        "combined_lifetime_credit_usd": round(sum_lifetime),
-        "combined_qualifying_jobs": round(sum_qualifying, 2),
-    }
-
+    return combine_program_entity_credits(state, fein_breakdown)
