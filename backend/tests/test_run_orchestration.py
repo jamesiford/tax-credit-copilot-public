@@ -376,7 +376,7 @@ class _Env:
             latest_manifest=lambda cid, program: self.manifest,
             assumptions=lambda: [{"set_id": "a", "sha256": "s"}, {"set_id": "b", "sha256": "o"}], code_commit=lambda: "abc")
 
-    def resolve_run(self, *, account_id, state, tax_year):
+    def resolve_run(self, *, account_id, state, tax_year, program_code=None):
         run = type("R", (), {})()
         run.account_id, run.program_code, run.tax_year, run.rows = account_id, "GA_JTC", tax_year, []
         run.state, run.state_rows = "GA", [_ROW]

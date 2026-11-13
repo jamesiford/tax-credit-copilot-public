@@ -69,7 +69,7 @@ _WRITES: tuple[CapabilitySpec, ...] = (
     ),
     *_write_pair(
         "base_year_set", "Set a location's base year and recalculate the client from it.",
-        {"client_id": _CLIENT_ID, "unit_id": {"type": "string"}, "base_year": _TAX_YEAR},
+        {"client_id": _CLIENT_ID, "unit_id": {"type": "string"}, "base_year": _TAX_YEAR, "program_code": _PROGRAM},
         ("client_id", "unit_id", "base_year"),
     ),
     *_write_pair(

@@ -98,6 +98,7 @@ def install(tmp_path: Path, monkeypatch, *, second_authored: bool = True) -> dic
     rows = zz_payroll()
     assert rows, "the synthetic fixture should hold Georgia rows to relabel"
     monkeypatch.setattr(source_ports, "load_pay_periods", lambda account_id=None: rows)
-    monkeypatch.setattr(source_ports, "payroll_scope",
-                        lambda account_id: type("S", (), {"states": [STATE], "tax_years": list(YEARS)})())
+    scope = type("S", (), {"states": [STATE], "tax_years": list(YEARS), "total_rows": len(rows),
+                           "pay_dates": sorted({str(r["Pay_Date"])[:10] for r in rows})})()
+    monkeypatch.setattr(source_ports, "payroll_scope", lambda account_id: scope)
     return {"rules": rules, "rows": rows}
