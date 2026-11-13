@@ -72,5 +72,11 @@
   "POST /api/workspace/onezero/contributors",
   "POST /api/workspace/refresh",
   "POST /api/workspace/source/search",
-  "PUT /api/claims/engagement"
+  "PUT /api/claims/engagement",
+  "GET /api/v2/run-batches",
+  "POST /api/v2/run-batches",
+  "GET /api/v2/run-batches/{batch_id}",
+  "GET /api/v2/run-batches/{batch_id}/items",
+  "POST /api/v2/run-batches/{batch_id}/cancel",
+  "POST /api/v2/run-batches/{batch_id}/retry-failed"
 ]

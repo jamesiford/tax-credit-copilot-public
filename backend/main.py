@@ -34,9 +34,11 @@ from api.summary import router as summary_router  # noqa: E402
 from api.ingestion import router as ingestion_router  # noqa: E402
 from api.findings import router as findings_router  # noqa: E402
 from api.proximity import router as proximity_router  # noqa: E402
+from api.run_batches import router as run_batches_router  # noqa: E402
 from api.scope import router as scope_router  # noqa: E402
 from api.trend import router as trend_router  # noqa: E402
 from api.workspace import router as workspace_router  # noqa: E402
+from bootstrap.run_worker import start_inline_worker  # noqa: E402
 
 logging.basicConfig(level=get_settings().runtime.log_level)
 log = logging.getLogger("tax-credit-copilot")
@@ -86,16 +88,9 @@ async def lifespan(app: FastAPI):
     app.state.agent_metrics = {}
     app.state.agent_spans = []
     app.state.audit_events = []
-    # Model access: settings are validated NOW (a gateway with no auth scheme must
-    # stop startup, not the first question), publishing is warmed in the
-    # background so Foundry being slow or down never blocks the API. A provider
-    # that cannot warm leaves the scripted stream in place.
-    from bootstrap.wiring import get_agent_catalog, get_ai_settings, get_model_router
+    from bootstrap.startup import start_ai
 
-    settings = get_ai_settings()
-    log.info("AI provider chain: %s", ", ".join(settings.provider_chain))
-    get_model_router().statuses()
-    get_agent_catalog().warm()
+    start_ai(log)
 
     # Pay the cold-lakehouse cost off the request path. Never blocks startup, and
     # a lakehouse that is unreachable degrades to a slow first request.
@@ -134,9 +129,10 @@ async def lifespan(app: FastAPI):
     from application.source_validation import start_source_schema_check
     schema_task = await start_source_schema_check(app.state)
     app.state.started = True
+    inline_worker = start_inline_worker()
     yield
     app.state.started = False
-    for task in (warm_task, keepalive_task, stores_task, schema_task):
+    for task in (warm_task, keepalive_task, stores_task, schema_task, inline_worker):
         if task is not None and not task.done():
             task.cancel()
     log.info("API shutting down.")
@@ -243,6 +239,7 @@ app.include_router(summary_router)
 app.include_router(ingestion_router)
 app.include_router(findings_router)
 app.include_router(proximity_router)
+app.include_router(run_batches_router)
 app.include_router(scope_router)
 app.include_router(trend_router)
 app.include_router(workspace_router)
