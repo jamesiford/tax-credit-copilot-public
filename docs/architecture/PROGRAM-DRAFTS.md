@@ -80,6 +80,30 @@ assessment of the same documents installed as a program, and that it reaches no 
 
 The read-only catalog (`GET /api/v2/programs`, `GET /api/v2/programs/{code}`) is open to any authenticated caller.
 
+## In the portal
+
+**Program manager** (navigation: Prove it) sits beside the rule library. `/programs` has two tabs: the **catalog** (every registered
+program with its lifecycle badge, authored years, a "Not verified" mark, whether it is calculable and the reason when not, and
+engagement counts; sortable and filterable) and the **drafts** list. `/programs/<code>` is one program: its pack, each authored year
+with whether it is still flagged and its source, the validator's findings and what blocks calculation. A program that becomes
+calculable through a normal deployment appears in the catalog, the run dialog, the scope filters and the engagement controls with no
+frontend change, because they all read the registry-derived program list.
+
+**Add a program** (`/programs/new`, then `/programs/draft/<id>`) is a guided flow with a stepper that never blocks and says why a step
+is unavailable:
+
+1. **Basics**: code, name, state and optional starting years, with the programs already registered for that state (programs in one
+   state are independent: each is calculated and assessed on its own program code). A federal program is shown as not runnable yet.
+2. **Program pack**: structured fields for the supported model (a flat per-job credit over a One/Zero headcount) beside a validation
+   panel, plus an advanced JSON editor that applies only what parses. Citations are required; an empty number stays `null`.
+3. **Year packs**: add a tax year (an empty, flagged skeleton for the program's identity; nothing is copied from another year).
+4. **Preview**: the labelled, no-write calculation on the synthetic sample.
+5. **Review**: validate, request review, and the reviewer's decision (with the second-reviewer rule).
+6. **Export**: the deterministic bundle, its manifest and hash, and the next steps for a person.
+
+The draft **autosaves** after each edit naming the version it read; a conflict stops and says so rather than overwriting. The history
+(who did what, and when) is on every step. Every step carries the "Not verified, and not live" notice.
+
 ## Storage
 
 Migration `0005` adds `tcc_ops.program_draft`, `program_draft_document` (one row per pack or year, at most 8000 characters each, so
