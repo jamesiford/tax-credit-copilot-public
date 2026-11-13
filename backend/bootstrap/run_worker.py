@@ -14,13 +14,15 @@ Two ways to run it, and the difference matters:
 from __future__ import annotations
 
 import argparse
+import json
 import logging
 import signal
 import threading
-from typing import Any
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 import bootstrap.wiring  # noqa: F401 - binds every service the worker's commands ask for
 from application.deployment import is_deployed, store_choice
+from application.runs import metrics
 from application.runs.executor import ItemExecutor
 from application.runs.worker import RunWorker
 from bootstrap.run_batch_wiring import get_run_batch_repository
@@ -63,6 +65,28 @@ def start_inline_worker() -> InlineWorker | None:
     return InlineWorker(thread, stop)
 
 
+class _Health(BaseHTTPRequestHandler):
+    """`GET /healthz`: alive, with this process's counters. The platform only needs the 200."""
+
+    def do_GET(self) -> None:  # noqa: N802 - the stdlib's name
+        body = json.dumps({"status": "ok", "counters": metrics.snapshot()}).encode()
+        self.send_response(200 if self.path.rstrip("/") == "/healthz" else 404)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+    def log_message(self, *args: object) -> None:
+        """Probes every few seconds would drown the worker's own log."""
+
+
+def serve_health(port: int) -> ThreadingHTTPServer:
+    """Answer the platform's health probe on `port` in a daemon thread; the worker has no other HTTP surface."""
+    server = ThreadingHTTPServer(("0.0.0.0", port), _Health)
+    threading.Thread(target=server.serve_forever, name="run-worker-health", daemon=True).start()
+    return server
+
+
 def _warn_if_private_queue() -> None:
     if store_choice("RUN_MANIFEST_STORE") == "memory":
         log.warning(
@@ -75,10 +99,13 @@ def main(argv: list[str] | None = None) -> int:
     """Run until stopped (SIGINT or SIGTERM), or with `--once` until the queue is empty."""
     parser = argparse.ArgumentParser(description="Run orchestration worker: leases and runs queued client runs.")
     parser.add_argument("--once", action="store_true", help="work until nothing is claimable, then exit")
+    parser.add_argument("--health-port", type=int, default=0, help="serve /healthz on this port (App Service's PORT)")
     args = parser.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
     _warn_if_private_queue()
     worker = build_worker()
+    if args.health_port:
+        serve_health(args.health_port)
     if args.once:
         done = worker.drain()
         log.info("run worker drained: %d item(s) claimed", done)

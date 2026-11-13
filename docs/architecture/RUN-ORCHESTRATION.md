@@ -113,5 +113,22 @@ Settings are in [ENV-VARS.md](ENV-VARS.md) section 4a.
 
 ## Deploying the worker (Terraform, default off)
 
-Set `enable_run_worker` to deploy the worker as a second App Service on the same plan, code-deployed like the API. It is off
-by default and `terraform apply` is never run by the build: the module is validated and tested only.
+`enable_run_worker = true` (default `false`) adds one App Service on the same plan, `app-tcc-worker-<suffix>`, in the same integration
+subnet, running **as the API's identity** with the API's settings plus `RUN_WORKER_INLINE=false` and `RUN_WORKER_CONCURRENCY`
+(`run_worker_concurrency`, 1 to 8, default 2). It needs no new grants: it calls the same commands, so it needs the API's access. With it
+off the plan is unchanged (a Terraform test proves it). `RUN_WORKER_APP_NAME` is the output that names it.
+
+The build only validates and tests the module (`terraform validate`, `terraform test`); it never applies it. Deploying is yours:
+
+```powershell
+azd env set TCC_ENABLE_RUN_WORKER true      # then add enable_run_worker to infra/main.tfvars.json's mapping, or set TF_VAR_enable_run_worker=true
+azd provision
+python scripts/package-app.py backend worker.zip
+az webapp deploy -g <resource group> -n <RUN_WORKER_APP_NAME output> --src-path worker.zip --type zip
+```
+
+The worker is not an azd service for the reason the channel gateway is not: azd cannot make a service conditional. It starts
+`worker-startup.sh`, which runs `python -m bootstrap.run_worker --health-port $PORT`, so the platform's probe has something to ask.
+
+A **single-instance trial** without a second app: set `RUN_WORKER_INLINE=true` on the API. It logs a warning, and it is unsafe the
+moment the API scales out (every instance would work the queue; the leases keep correctness, but the load is multiplied).

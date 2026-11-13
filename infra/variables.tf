@@ -500,6 +500,22 @@ variable "foundry_allow_any_ip" {
 
 # ==== 9. Microsoft 365 channel gateway (proof of concept) ======================
 
+variable "enable_run_worker" {
+  description = "Create the run orchestration worker: another App Service on the existing plan, running as the API's identity, that leases and runs queued batch items. Off by default; with it off the plan is unchanged. Code is deployed separately (docs/architecture/RUN-ORCHESTRATION.md)."
+  type        = bool
+  default     = false
+}
+
+variable "run_worker_concurrency" {
+  description = "RUN_WORKER_CONCURRENCY for the worker: items in flight at once, never two for one client. Use 1 if Warehouse write conflicts are logged."
+  type        = number
+  default     = 2
+  validation {
+    condition     = var.run_worker_concurrency >= 1 && var.run_worker_concurrency <= 8
+    error_message = "run_worker_concurrency must be between 1 and 8."
+  }
+}
+
 variable "enable_m365_channel" {
   description = "Create the channel gateway: a third App Service on the existing plan, its identity and its settings. Off by default; with it off the plan is unchanged. Public profile only (PoC): the gateway is the one new public surface."
   type        = bool
