@@ -9,6 +9,7 @@ from fastapi.testclient import TestClient
 
 from tests import draft_world as dw
 from tests.test_agent_principal import _agent, acting_header, entra  # noqa: F401 - fixture
+from tests.test_auth import mint
 
 BASE = "/api/v2/program-drafts"
 
@@ -184,3 +185,44 @@ def test_nothing_a_draft_does_reaches_the_registry_or_the_rules_folder(api):
 
 def test_an_agent_cannot_write_drafts(entra, api):
     assert api.post(BASE, headers=_agent(acting_header()), json={"code": dw.CODE, "name": "x", "state": dw.STATE}).status_code == 403
+
+
+def test_a_signed_in_person_reads_the_catalog_and_is_the_actor_on_every_event(entra, api):
+    headers = {"Authorization": f"Bearer {mint()}"}
+    assert api.get("/api/v2/programs", headers=headers).status_code == 200
+    created = api.post(BASE, headers=headers, json={"code": dw.CODE, "name": "x", "state": dw.STATE})
+    assert created.status_code == 201
+    events = api.get(f"{BASE}/{created.json()['draft_id']}", headers=headers).json()["events"]
+    me = api.get("/api/me", headers=headers).json()
+    assert events[0]["actor"] not in ("anonymous", "system") and events[0]["actor"] in (me.get("upn"), me.get("oid"))
+
+
+def test_an_agent_cannot_read_drafts_either(entra, api):
+    assert api.get(BASE, headers=_agent(acting_header())).status_code == 403
+
+
+def test_a_caller_who_is_not_a_writer_is_refused_and_nothing_is_stored():
+    from application.authorization import WriterPolicy
+    from application.commands.create_program_draft import CreateProgramDraftCommand
+    from application.identity import NotAuthorized, Principal
+    from application.mediator import Mediator
+    from bootstrap.program_handlers import register_program_handlers
+    from bootstrap import program_draft_wiring
+    from infrastructure.persistence.sqlite_program_drafts import SqliteProgramDraftRepository
+
+    class Nobody:
+        def is_writer(self, oid):
+            return False
+
+    repo = SqliteProgramDraftRepository(":memory:")
+    program_draft_wiring.set_program_draft_repository(repo)
+    try:
+        mediator = register_program_handlers(Mediator(authorizer=WriterPolicy(Nobody(), enforce_for_users=True)))
+        with pytest.raises(NotAuthorized):
+            mediator.send(CreateProgramDraftCommand(actor="eve", code=dw.CODE, name="x", state=dw.STATE),
+                          Principal(oid="oid-1", upn="eve", authenticated=True))
+        assert repo.list_drafts()[1] == 0
+        assert mediator.audit.records[-1].outcome == "refused"
+    finally:
+        program_draft_wiring.set_program_draft_repository(None)
+        repo.close()
