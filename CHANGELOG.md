@@ -13,6 +13,8 @@ All notable changes to this project are recorded here, so changes can be followe
 
 ## [Unreleased]
 
+> Note: this branch carries the backend, scripts, infrastructure and documentation changes. The frontend parts of the items below (the portfolio degraded banner, the "Unavailable" display, the data-driven guided tour) and the UI revamp itself live on the `feat/ui-modern-theme` branch.
+
 ### Added
 - `SOURCE_READ_MODE=onelake|sql` (default `onelake`): a SPIKE that reads payroll rows over the lakehouse SQL analytics endpoint (for a Viewer plus object-level `SELECT`) instead of Delta files, through the same mapping, coercion and cache. Off by default and not adopted: the endpoint is emulated offline and the datasets, engine rows and engine results are identical in both modes, but no live endpoint was measured and no data version is recorded. `docs/architecture/SQL-READ-PATH.md`; `scripts/fabric/spike-sql-read.py`.
 - `docs/architecture/RUNBOOK-PRIVATE-LINK-AND-IDENTITY.md`: a customer-neutral runbook for running the app behind private link with your own identity, with the errors already seen.
