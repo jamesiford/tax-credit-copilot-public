@@ -99,10 +99,11 @@ export const fetchWorkspaceComparisonStage = (stage) => workspaceRequest('/compa
  */
 export async function fetchEligibility(taxYear, {
   state = 'GA', accountId, status = 'all', nearFloor = false, q = '', limit = 50, offset = 0,
-  sort, order,
+  sort, order, programCode,
 } = {}) {
   const params = new URLSearchParams({ state, status, limit: String(limit), offset: String(offset) });
   if (accountId != null) params.set('account_id', String(accountId));
+  if (programCode) params.set('program_code', programCode); // needed when the state holds several programs
   if (nearFloor) params.set('near_floor', 'true');
   if (q) params.set('q', q);
   // Ordered in SQL before the page is cut (29 Sep); a page sorted in the
@@ -120,9 +121,10 @@ export async function fetchEligibility(taxYear, {
  * Resolves the same fiscal window as `fetchEligibility`, so the two views
  * cannot disagree about the denominator period for one client-year.
  */
-export async function fetchOneZeroMatrix(taxYear, { state = 'GA', accountId, method = 'min_max' } = {}) {
+export async function fetchOneZeroMatrix(taxYear, { state = 'GA', accountId, method = 'min_max', programCode } = {}) {
   const params = new URLSearchParams({ state, method });
   if (accountId != null) params.set('account_id', String(accountId));
+  if (programCode) params.set('program_code', programCode);
   const r = await fetch(`${BASE}/api/onezero/matrix/${encodeURIComponent(taxYear)}${qs(params)}`);
   if (!r.ok) throw new Error(`onezero matrix ${r.status}`);
   return r.json();
@@ -226,11 +228,12 @@ export async function fetchUnitRebase(clientId, unitId, { baseYear, method = 'mi
 
 /** Every location for one client, read from `unit_year_master`. */
 export async function fetchClientUnits(clientId, {
-  year, state, method = 'min_max', limit = 200, offset = 0,
+  year, state, method = 'min_max', limit = 200, offset = 0, programCode,
 } = {}) {
   const params = new URLSearchParams({ method, limit: String(limit), offset: String(offset) });
   if (year != null) params.set('year', String(year));
   if (state) params.set('state', state);
+  if (programCode) params.set('program_code', programCode); // a client run for several programs mixes their rows without it
   return v2Request(`/clients/${encodeURIComponent(clientId)}/units${qs(params)}`);
 }
 
@@ -279,10 +282,11 @@ export async function fetchEmployeeV2(recordToken, { clientId, year, state, meth
 }
 
 /** Trigger a calculation for one client-year. Per client by design — no sweep. */
-export async function runClientCalculation(clientId, { year, state = 'GA', triggeredBy } = {}) {
+export async function runClientCalculation(clientId, { year, state = 'GA', triggeredBy, programCode } = {}) {
   return v2Request(`/clients/${encodeURIComponent(clientId)}/runs`, jsonPost({
     year: Number(year),
     state,
+    ...(programCode ? { program_code: programCode } : {}),
     ...(triggeredBy ? { triggered_by: triggeredBy } : {}),
   }));
 }

@@ -11,6 +11,8 @@ import { PORTFOLIO, placeholderYears } from '../lib/scopeDimension.js';
 import { USD, money } from '../lib/coverage.js';
 import { NUM } from '../lib/reference.js';
 import { trendFromGold } from '../lib/goldTrend.js';
+import { chosenProgram } from '../lib/programChoice.js';
+import ProgramPicker from './ProgramPicker.jsx';
 import InsightBar, { provenanceLine } from './InsightBar.jsx';
 import MethodTabs from './MethodTabs.jsx';
 import EmptyState from './ui/EmptyState.jsx';
@@ -491,17 +493,20 @@ export default function TrendGridView({
     () => trendState(scope, scopeOptions, clientScope),
     [scope, scopeOptions, clientScope],
   );
+  // A state with several programs: show the program, and pass it to the grid read and the run. Nothing for one program.
+  const [pickedProgram, setPickedProgram] = useState('');
+  const programCode = chosenProgram(scopeOptions, state, scope?.programCode, pickedProgram);
 
   // The key a payload belongs to. Rendering is guarded on it, so a slow fetch
   // for the previous client can never paint under the new client's name.
-  const scopeKey = `${scope?.clientId ?? ''}|${state ?? ''}|${method}`;
+  const scopeKey = `${scope?.clientId ?? ''}|${state ?? ''}|${method}|${programCode ?? ''}`;
 
   const load = useCallback(async () => {
     if (isPortfolio || !state) { setLoaded(null); return; }
     setLoading(true);
     setError(null);
     try {
-      const body = await fetchClientUnits(scope.clientId, { state, method });
+      const body = await fetchClientUnits(scope.clientId, { state, method, ...(programCode ? { programCode } : {}) });
       setLoaded({ key: scopeKey, data: body });
     } catch (err) {
       setLoaded(null);
@@ -509,7 +514,7 @@ export default function TrendGridView({
     } finally {
       setLoading(false);
     }
-  }, [isPortfolio, scope?.clientId, state, method, scopeKey]);
+  }, [isPortfolio, scope?.clientId, state, method, scopeKey, programCode]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -538,17 +543,17 @@ export default function TrendGridView({
     setError(null);
     try {
       if (goTo && runAsBatchEnabled()) {
-        goTo(batchPath(await queueOneClient({ kind: 'calculate', clientId: scope.clientId, year: scope.year })));
+        goTo(batchPath(await queueOneClient({ kind: 'calculate', clientId: scope.clientId, year: scope.year, programCode })));
         return;
       }
-      await runClientCalculation(scope.clientId, { year: scope.year, state });
+      await runClientCalculation(scope.clientId, { year: scope.year, state, ...(programCode ? { programCode } : {}) });
       await load();
     } catch (err) {
       setError(String(err.message || err));
     } finally {
       setRunning(false);
     }
-  }, [isPortfolio, scope?.clientId, scope?.year, state, load, goTo]);
+  }, [isPortfolio, scope?.clientId, scope?.year, state, load, goTo, programCode]);
 
   const blocks = useMemo(() => buildBlocks(data), [data]);
 
@@ -820,6 +825,7 @@ export default function TrendGridView({
               || `Payroll is held for this client, but TY${scope?.year} has not been
                   assessed yet. It carries no figure — not a zero.`}
           </p>
+          <ProgramPicker scopeOptions={scopeOptions} state={state} value={programCode} onChange={setPickedProgram} disabled={running} />
           <button
             type="button"
             className="tcc-btn tcc-btn-primary"
@@ -828,7 +834,7 @@ export default function TrendGridView({
           >
             {running
               ? <><Loader2 size={14} className="spin" /> Running…</>
-              : <>Run TY{scope?.year} now</>}
+              : <>Run TY{scope?.year}{programCode ? ` · ${programCode}` : ''} now</>}
           </button>
         </div>
       ) : null}

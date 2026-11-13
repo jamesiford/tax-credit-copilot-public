@@ -14,6 +14,7 @@ import {
 } from '../api.js';
 import { assumptionEntries, eligibilityLabel, MONEY, monthLabel, NUM, shortHash, stageLabel, statusTone } from '../lib/reference.js';
 import { PORTFOLIO } from '../lib/scopeDimension.js';
+import { scopeProgram } from '../lib/programChoice.js';
 import PageHeader from './PageHeader.jsx';
 import KpiTile from './ui/KpiTile.jsx';
 import EmptyState from './ui/EmptyState.jsx';
@@ -93,7 +94,7 @@ export function EligibilityView({ summary, openEmployee, scope, header = null })
     const timer = setTimeout(() => {
       setError(null);
       fetchEligibility(year, {
-        state: jurisdiction, accountId: clientId, status, nearFloor: proximity === 'near_floor',
+        state: jurisdiction, accountId: clientId, status, nearFloor: proximity === 'near_floor', programCode: scopeProgram(scope) || undefined,
         q: query, limit, offset, sort: sort[0]?.key, order: sort[0]?.desc ? 'desc' : 'asc',
       }).then(setData).catch((err) => { setData(null); setError(err.message); });
     }, 180);
@@ -182,7 +183,7 @@ export function OneZeroView({ openEmployee, scope }) {
     if (isPortfolio) { setData(null); setContributors(null); setError(null); return undefined; }
     let live = true; setData(null); setContributors(null); setError(null);
     const load = perClient
-      ? fetchOneZeroMatrix(year, { state: jurisdiction, accountId: clientId, method })
+      ? fetchOneZeroMatrix(year, { state: jurisdiction, accountId: clientId, method, programCode: scopeProgram(scope) || undefined })
       : fetchWorkspaceOneZero(method);
     load.then((body) => { if (live) setData(body); }).catch((err) => { if (live) setError(err.message); });
     return () => { live = false; };

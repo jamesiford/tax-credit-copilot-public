@@ -111,6 +111,21 @@ describe('v2 — the warehouse-backed read surface', () => {
     expect(JSON.parse(init.body)).toEqual({ year: 2023, state: 'GA' });
   });
 
+  it('names the program on the run, the grid and the eligibility read when one is given, and only then', async () => {
+    const { runClientCalculation, fetchClientUnits, fetchEligibility, fetchOneZeroMatrix } = await import('./api.js');
+    fetchMock.mockResolvedValue(ok({}));
+    await runClientCalculation(1001, { year: 2023, state: 'ZZ', programCode: 'ZZ_BETA' });
+    expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual({ year: 2023, state: 'ZZ', program_code: 'ZZ_BETA' });
+    await fetchClientUnits(1001, { programCode: 'ZZ_BETA' });
+    expect(fetchMock.mock.calls[1][0]).toContain('program_code=ZZ_BETA');
+    await fetchEligibility(2023, { state: 'ZZ', accountId: 1001, programCode: 'ZZ_BETA' });
+    expect(fetchMock.mock.calls[2][0]).toContain('program_code=ZZ_BETA');
+    await fetchOneZeroMatrix(2023, { state: 'ZZ', accountId: 1001, programCode: 'ZZ_BETA' });
+    expect(fetchMock.mock.calls[3][0]).toContain('program_code=ZZ_BETA');
+    await fetchEligibility(2023, { state: 'GA', accountId: 1001 });
+    expect(fetchMock.mock.calls[4][0]).not.toContain('program_code');
+  });
+
   it('fetchLatestRun returns null for a client that has never been calculated', async () => {
     const { fetchLatestRun } = await import('./api.js');
     fetchMock.mockResolvedValueOnce({ ok: false, status: 404, json: async () => ({}) });

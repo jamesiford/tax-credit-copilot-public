@@ -470,3 +470,17 @@ describe('empty is stated, not implied', () => {
     expect(await screen.findByText(/store unavailable/)).toBeInTheDocument();
   });
 });
+
+describe('Run assessment names and passes the program the scope names', () => {
+  it('narrows the assessment to the scope program and says so on the button', async () => {
+    render(<PositionView scope={{ ...scopeFor(1001), programCode: 'GA_JTC' }} scopeWindow={[2023]} scopeOptions={SCOPE_OPTIONS} />);
+    await userEvent.click(await screen.findByRole('button', { name: /Run assessment · GA_JTC/ }));
+    await waitFor(() => expect(api.assessClient).toHaveBeenCalledWith(1001, { program_code: 'GA_JTC' }));
+  });
+
+  it('assesses every program, with no program named, at all-programs scope', async () => {
+    render(<PositionView scope={scopeFor(1001)} scopeWindow={[2023]} scopeOptions={SCOPE_OPTIONS} />);
+    await userEvent.click(await screen.findByRole('button', { name: 'Run assessment' }));
+    await waitFor(() => expect(api.assessClient).toHaveBeenCalledWith(1001));
+  });
+});

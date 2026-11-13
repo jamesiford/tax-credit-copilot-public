@@ -1,4 +1,5 @@
 import { batchPath, queueOneClient, runAsBatchEnabled, useBatchNavigate } from '../lib/singleRun.js';
+import { scopeProgram } from '../lib/programChoice.js';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
@@ -357,7 +358,7 @@ export default function PositionView({
   const goTo = useBatchNavigate();
   const queueInstead = async (clientId) => {
     if (!goTo || !runAsBatchEnabled()) return false;
-    goTo(batchPath(await queueOneClient({ kind: 'assess', clientId })));
+    goTo(batchPath(await queueOneClient({ kind: 'assess', clientId, programCode: clientId === scope.clientId ? scopeProgram(scope) : null })));
     return true;
   };
 
@@ -367,7 +368,8 @@ export default function PositionView({
     setError(null);
     try {
       if (await queueInstead(scope.clientId)) return;
-      const result = await assessClient(scope.clientId);
+      // The scope's program narrows the assessment to it; with none, every program of the client's states is assessed.
+      const result = await (scopeProgram(scope) ? assessClient(scope.clientId, { program_code: scopeProgram(scope) }) : assessClient(scope.clientId));
       setDeclined(result.declined || []);
       await load();
     } catch (reason) {
@@ -410,7 +412,7 @@ export default function PositionView({
           actions={!isPortfolio ? (
             <button className="btn btn-primary" disabled={assessing} onClick={runAssessment}>
               {assessing ? <Loader2 size={15} className="spin" /> : <RefreshCw size={15} />}
-              {assessing ? 'Assessing…' : 'Run assessment'}
+              {assessing ? 'Assessing…' : `Run assessment${scopeProgram(scope) ? ` · ${scopeProgram(scope)}` : ''}`}
             </button>
           ) : null}
         />
@@ -422,7 +424,7 @@ export default function PositionView({
         <div className="tcc-header-actions tcc-embedded-actions">
           <button className="btn btn-secondary" disabled={assessing} onClick={runAssessment}>
             {assessing ? <Loader2 size={15} className="spin" /> : <RefreshCw size={15} />}
-            {assessing ? 'Assessing…' : 'Run assessment'}
+            {assessing ? 'Assessing…' : `Run assessment${scopeProgram(scope) ? ` · ${scopeProgram(scope)}` : ''}`}
           </button>
         </div>
       ) : null}

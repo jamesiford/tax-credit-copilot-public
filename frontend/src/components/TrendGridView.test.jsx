@@ -416,3 +416,35 @@ describe('the base-year picker (WI-21)', () => {
     expect(screen.getByRole('combobox', { name: 'Base year for GA_GA-001' })).toHaveValue('2020');
   });
 });
+
+describe('a state with several programs shows and passes the program', () => {
+  const twoPrograms = {
+    programs: [
+      { program_code: 'GA_JTC', name: 'GA_JTC', calculable: true, authored_years: [2023], jurisdiction: { code: 'GA', level: 'state' } },
+      { program_code: 'GA_ALT', name: 'GA_ALT', calculable: true, authored_years: [2023], jurisdiction: { code: 'GA', level: 'state' } },
+    ],
+    clients: [{ id: 2001, name: 'Cascade' }],
+  };
+  const notCalculated = { calculation_state: 'not_calculated', message: 'Not assessed yet.', items: [] };
+
+  it('reads the grid for the program and runs that program, not whichever the state resolves to first', async () => {
+    api.fetchClientUnits.mockResolvedValue(notCalculated);
+    api.runClientCalculation.mockResolvedValue({ run_id: 'abc' });
+    render(<TrendGridView scope={{ clientId: 2001, programCode: null, year: 2023 }} scopeOptions={twoPrograms} />);
+
+    const picker = await screen.findByRole('combobox', { name: 'Program' });
+    expect(picker).toHaveValue('GA_JTC');
+    expect(api.fetchClientUnits).toHaveBeenCalledWith(2001, expect.objectContaining({ programCode: 'GA_JTC' }));
+
+    await userEvent.selectOptions(picker, 'GA_ALT');
+    await userEvent.click(await screen.findByRole('button', { name: /Run TY2023 · GA_ALT now/i }));
+    await waitFor(() => expect(api.runClientCalculation).toHaveBeenCalledWith(2001, { year: 2023, state: 'GA', programCode: 'GA_ALT' }));
+  });
+
+  it('shows no picker for a single-program state', async () => {
+    api.fetchClientUnits.mockResolvedValue(notCalculated);
+    render(<TrendGridView scope={scope} scopeOptions={scopeOptions} />);
+    await screen.findByRole('button', { name: /Run TY2023 now/i });
+    expect(screen.queryByRole('combobox', { name: 'Program' })).not.toBeInTheDocument();
+  });
+});

@@ -1,6 +1,7 @@
 import { Play, X } from 'lucide-react';
 import { useMemo, useRef, useState, useEffect } from 'react';
 import { previewRunBatch, startRunBatch } from '../../api.js';
+import { programName } from '../../lib/programChoice.js';
 import useModal from '../ask/useModal.js';
 import Button from '../ui/Button.jsx';
 import Callout from '../ui/Callout.jsx';
@@ -105,7 +106,11 @@ function Options({ o, set, programs, authoredYears }) {
         <span>Program</span>
         <select value={o.programCode} onChange={(e) => set.programCode(e.target.value)}>
           <option value="">Automatic (every program with statute for the client)</option>
-          {programs.map((p) => <option key={p.program_code} value={p.program_code}>{p.name || p.program_code}</option>)}
+          {programs.map((p) => (
+            <option key={p.program_code} value={p.program_code}>
+              {programs.filter((q) => q.jurisdiction?.code === p.jurisdiction?.code).length > 1 ? programName(p) : (p.name || p.program_code)}
+            </option>
+          ))}
         </select>
       </label>
       <fieldset className="runs-field">

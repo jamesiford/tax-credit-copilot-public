@@ -253,3 +253,34 @@ describe('the start dialog', () => {
     expect(within(dialog).getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
   });
 });
+
+describe('the start dialog with several programs in one state', () => {
+  const several = {
+    years: { authored: [2025] },
+    programs: [
+      { program_code: 'ZZ_ALPHA_JTC', name: 'Alpha credit', authored_years: [2025], jurisdiction: { code: 'ZZ' } },
+      { program_code: 'ZZ_BETA_JTC', name: 'Beta credit', authored_years: [2025], jurisdiction: { code: 'ZZ' } },
+      { program_code: 'GA_JTC', name: 'Georgia JTC', authored_years: [2025], jurisdiction: { code: 'GA' } },
+    ],
+  };
+
+  it('names the program by code where two share a state, and by name where one does not', async () => {
+    api.previewRunBatch.mockResolvedValue(PREVIEW);
+    open({ scopeOptions: several });
+    const select = await screen.findByLabelText('Program');
+    const labels = [...select.querySelectorAll('option')].map((o) => o.textContent);
+    expect(labels).toEqual(expect.arrayContaining(['Alpha credit (ZZ_ALPHA_JTC)', 'Beta credit (ZZ_BETA_JTC)', 'Georgia JTC']));
+  });
+
+  it('starts the batch for the chosen program', async () => {
+    api.previewRunBatch.mockResolvedValue(PREVIEW);
+    api.startRunBatch.mockResolvedValue({ batch_id: 'b1' });
+    open({ scopeOptions: several });
+    await userEvent.selectOptions(await screen.findByLabelText('Program'), 'ZZ_BETA_JTC');
+    await waitFor(() => expect(api.previewRunBatch).toHaveBeenLastCalledWith(expect.objectContaining({ program_code: 'ZZ_BETA_JTC' })));
+    const start = await screen.findByRole('button', { name: 'Start 3 runs' });
+    await waitFor(() => expect(start).toBeEnabled());
+    await userEvent.click(start);
+    await waitFor(() => expect(api.startRunBatch).toHaveBeenCalledWith(expect.objectContaining({ program_code: 'ZZ_BETA_JTC' })));
+  });
+});

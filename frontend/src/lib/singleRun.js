@@ -25,10 +25,11 @@ export function runAsBatchEnabled() {
  * controls always run; skipping "unchanged" is a decision a person makes for a group, not for the one client
  * they just asked about.
  */
-export function queueOneClient({ kind, clientId, year = null }) {
+export function queueOneClient({ kind, clientId, year = null, programCode = null }) {
   return startRunBatch({
     kind,
     scope: { kind: 'one', client_ids: [clientId] },
+    ...(programCode ? { program_code: programCode } : {}),
     tax_years: year ? [year] : [],
     force: true,
     refresh_once: true,
