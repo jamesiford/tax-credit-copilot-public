@@ -34,7 +34,8 @@ def base_pack(code: str, state: str, name: str) -> dict[str, Any]:
         "thresholds": _flagged(minimum_new_jobs=None),
         "benefit": _flagged(amount_per_qualifying_job_usd=None, benefit_period_years=None, carryforward_years=None, currency="USD"),
         "one_zero": _flagged(min_weekly_hours=None, min_weekly_wages=None, wage_basis="regular", geographic_granularity="statewide",
-                             pt_aggregation=False, headcount_unit_field="Worksite_ID", entity_combination="permitted"),
+                             pt_aggregation=False, headcount_unit_field="Worksite_ID", entity_combination="permitted",
+                             wage_floor_basis=_flagged(source_tax_year=None, annualized_wage_usd=None)),
     }
 
 
