@@ -30,14 +30,14 @@ from domain.calculation.onezero import (
     fiscal_window_start,
 )
 from tools.credit_math import STATE_TO_PACK, load_pack_one_zero, apply_one_zero_state_credit
+from tools.program_registry import rules_dir
 
-_RULES = Path(__file__).resolve().parent.parent / "rules"
 _PAYROLL_CSV = Path(__file__).resolve().parent.parent / "data" / "payroll.csv"
 _FEDERAL_PACK_FILE = "federal_wotc_lite.json"
 
 
 def _load_pack_json(filename: str) -> dict[str, Any]:
-    path = _RULES / filename
+    path = rules_dir() / filename
     return json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
 
 

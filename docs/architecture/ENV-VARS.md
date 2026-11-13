@@ -170,6 +170,18 @@ in the same store as the run manifest: there is no separate store setting, `RUN_
 | `RUN_WORKER_STALE_SECONDS` | `backend/application/queries/run_batch_reads.py` | Queued work with no live lease for this long shows a degraded `run_worker` entry. Default `300` | not set | — | not set | No |
 | `RUN_BACKOFF_BASE_SECONDS` | `backend/application/runs/worker.py` | First retry delay; doubles per attempt up to two minutes, with jitter. Default `5` | not set | — | not set | No |
 
+## 4b. Program registry and rules folder
+
+Read through `backend/config_programs.py` (`Settings.programs`). Both are optional: the defaults are the folder that ships with the
+backend, so a deployment that sets neither behaves exactly as before. They let a test or a deployment add a program (a registry entry plus
+a pack) without editing the source tree. Guide: [ADDING-A-PROGRAM.md](ADDING-A-PROGRAM.md). Statute still arrives only as an authored year
+pack under version control; pointing these elsewhere moves where the files are read from, it does not let a database or the portal activate one.
+
+| Variable | Read by | Meaning | Deployed value | TF output | v1 Bicep | Required (deployed) |
+|---|---|---|---|---|---|---|
+| `RULES_DIR` | `backend/config_programs.py` | Folder holding the rule packs (`<program>.json`) and year packs (`<program>/<year>.json`). Default the packaged `backend/rules` | not set | — | not set | No |
+| `PROGRAM_REGISTRY_FILE` | `backend/config_programs.py` | The program manifest. Default `<RULES_DIR>/registry/programs.json` | not set | — | not set | No |
+
 ## 5. Artifacts (Blob Storage)
 
 | Variable | Read by | Purpose / default | Deployed value | TF output | v1 Bicep | Required (deployed) |

@@ -1,0 +1,164 @@
+{
+  "schema_version": 1,
+  "programs": [
+    {
+      "code": "GA_JTC",
+      "name": "Georgia Jobs Tax Credit",
+      "jurisdiction": {
+        "level": "state",
+        "code": "GA"
+      },
+      "state": "GA",
+      "pack_file": "ga_jtc.json",
+      "lifecycle": "described",
+      "engine_profile": {
+        "credit_model": "per_net_new_job",
+        "headcount_model": "one_zero"
+      },
+      "notes": ""
+    },
+    {
+      "code": "NY_EXCELSIOR",
+      "name": "New York Excelsior Jobs Program \u2014 Jobs Credit",
+      "jurisdiction": {
+        "level": "state",
+        "code": "NY"
+      },
+      "state": "NY",
+      "pack_file": "ny_excelsior.json",
+      "lifecycle": "described",
+      "engine_profile": {
+        "credit_model": "per_net_new_job",
+        "headcount_model": "one_zero"
+      },
+      "notes": ""
+    },
+    {
+      "code": "SC_JTC",
+      "name": "South Carolina Jobs Tax Credit",
+      "jurisdiction": {
+        "level": "state",
+        "code": "SC"
+      },
+      "state": "SC",
+      "pack_file": "sc_jtc.json",
+      "lifecycle": "described",
+      "engine_profile": {
+        "credit_model": "per_net_new_job",
+        "headcount_model": "one_zero"
+      },
+      "notes": ""
+    },
+    {
+      "code": "NC_JTEC",
+      "name": "North Carolina Job Expansion Tax Credit",
+      "jurisdiction": {
+        "level": "state",
+        "code": "NC"
+      },
+      "state": "NC",
+      "pack_file": "nc_jtec.json",
+      "lifecycle": "described",
+      "engine_profile": {
+        "credit_model": "per_net_new_job",
+        "headcount_model": "one_zero"
+      },
+      "notes": ""
+    },
+    {
+      "code": "TN_JTC",
+      "name": "Tennessee Job Tax Credit",
+      "jurisdiction": {
+        "level": "state",
+        "code": "TN"
+      },
+      "state": "TN",
+      "pack_file": "tn_jtc.json",
+      "lifecycle": "described",
+      "engine_profile": {
+        "credit_model": "per_net_new_job",
+        "headcount_model": "one_zero"
+      },
+      "notes": ""
+    },
+    {
+      "code": "FL_QTI",
+      "name": "Florida Qualified Target Industry Tax Refund",
+      "jurisdiction": {
+        "level": "state",
+        "code": "FL"
+      },
+      "state": "FL",
+      "pack_file": "fl_qti.json",
+      "lifecycle": "described",
+      "engine_profile": {
+        "credit_model": "per_net_new_job",
+        "headcount_model": "one_zero"
+      },
+      "notes": ""
+    },
+    {
+      "code": "OH_JCTC",
+      "name": "Ohio Job Creation Tax Credit",
+      "jurisdiction": {
+        "level": "state",
+        "code": "OH"
+      },
+      "state": "OH",
+      "pack_file": "oh_jctc.json",
+      "lifecycle": "described",
+      "engine_profile": {
+        "credit_model": "per_net_new_job",
+        "headcount_model": "one_zero"
+      },
+      "notes": ""
+    },
+    {
+      "code": "CO_EZ",
+      "name": "Colorado Enterprise Zone Job Credit",
+      "jurisdiction": {
+        "level": "state",
+        "code": "CO"
+      },
+      "state": "CO",
+      "pack_file": "co_ez.json",
+      "lifecycle": "described",
+      "engine_profile": {
+        "credit_model": "per_net_new_job",
+        "headcount_model": "one_zero"
+      },
+      "notes": ""
+    },
+    {
+      "code": "VA_MBJF",
+      "name": "Virginia Major Business Facility Job Tax Credit",
+      "jurisdiction": {
+        "level": "state",
+        "code": "VA"
+      },
+      "state": "VA",
+      "pack_file": "va_mbjf.json",
+      "lifecycle": "described",
+      "engine_profile": {
+        "credit_model": "per_net_new_job",
+        "headcount_model": "one_zero"
+      },
+      "notes": ""
+    },
+    {
+      "code": "FED_WOTC",
+      "name": "Federal Work Opportunity Tax Credit (lite)",
+      "jurisdiction": {
+        "level": "federal",
+        "code": "US"
+      },
+      "pack_file": "federal_wotc_lite.json",
+      "lifecycle": "described",
+      "engine_profile": {
+        "credit_model": "per_net_new_job",
+        "headcount_model": "one_zero"
+      },
+      "notes": ""
+    }
+  ]
+}

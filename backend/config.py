@@ -43,6 +43,7 @@ from config_sections import (
     parse_source_schema, parse_stores, parse_warehouse, parse_webiq,
 )
 from config_platform import PlatformSettings, parse_platform
+from config_programs import ProgramSettings, parse_programs
 from config_runs import RunSettings, parse_runs
 from config_source_model import SourceModelSettings, parse_source_model
 
@@ -98,6 +99,10 @@ class Settings:
     @cached_property
     def runs(self) -> RunSettings:
         return parse_runs(self.environ)
+
+    @cached_property
+    def programs(self) -> ProgramSettings:
+        return parse_programs(self.environ)
 
     @cached_property
     def warehouse(self) -> WarehouseSettings:
