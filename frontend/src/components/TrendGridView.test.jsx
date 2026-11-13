@@ -423,7 +423,7 @@ describe('a state with several programs shows and passes the program', () => {
       { program_code: 'GA_JTC', name: 'GA_JTC', calculable: true, authored_years: [2023], jurisdiction: { code: 'GA', level: 'state' } },
       { program_code: 'GA_ALT', name: 'GA_ALT', calculable: true, authored_years: [2023], jurisdiction: { code: 'GA', level: 'state' } },
     ],
-    clients: [{ id: 2001, name: 'Cascade' }],
+    clients: [{ id: 2001, name: 'Sample Client' }],
   };
   const notCalculated = { calculation_state: 'not_calculated', message: 'Not assessed yet.', items: [] };
 
