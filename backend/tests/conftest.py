@@ -40,6 +40,9 @@ if str(TESTS_ROOT) not in sys.path:
 # this pin the certified figures could not be verified on a pull request.
 # Set before `main` is imported so its load_dotenv(override=False) can't flip it.
 os.environ["DATA_SOURCE"] = "csv"
+# The same rule for the read path: a dev's `SOURCE_READ_MODE=sql` (the fast lakehouse reads) would otherwise
+# send the local-lakehouse tests to a SQL endpoint that does not exist. The tests that exercise `sql` set it themselves.
+os.environ["SOURCE_READ_MODE"] = "onelake"
 
 # The CSV fixture holds exactly one tenant and says which, here, because no production default
 # names one. The suite is also generated data end to end, so it says so.

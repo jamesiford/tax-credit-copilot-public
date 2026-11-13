@@ -51,6 +51,18 @@ def test_the_other_sealed_endpoints_still_refuse_rather_than_invent_a_run(source
     assert source_without_the_reference_client.get("/api/workspace/assumptions").status_code in (500, 503)
 
 
+def test_no_reference_account_configured_still_opens_the_front_door(source_without_the_reference_client, monkeypatch):
+    monkeypatch.delenv("REFERENCE_ACCOUNT_ID", raising=False)
+    for response in (
+        source_without_the_reference_client.get("/api/workspace"),
+        source_without_the_reference_client.post("/api/workspace/refresh"),
+    ):
+        assert response.status_code == 200, response.text
+        body = response.json()
+        assert body["available"] is False and body["workspace"] is None
+        assert "REFERENCE_ACCOUNT_ID" in body["reason"] and body["remedy"]
+
+
 def test_a_source_that_is_not_configured_is_still_a_503_with_the_settings_to_set(monkeypatch):
     from api import workspace
     from main import app
