@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tax-credit-copilot.invalid/schemas/rule-pack.schema.json",
+  "title": "Rule pack and year pack",
+  "description": "Structure of a program's base pack (rules/<program>.json) and of a year pack (rules/<program>/<year>.json). It checks SHAPE only: it cannot and does not say whether a value is legally correct. Unknown keys are allowed so a pack can carry notes and provenance; a key the engine reads is typed here. ADR-013.",
+  "schema_version": 1,
+  "$defs": {
+    "flaggable_note": { "type": "string" },
+    "jurisdiction": {
+      "type": "object",
+      "required": ["level", "code", "name"],
+      "properties": {
+        "level": { "enum": ["federal", "state", "local"] },
+        "code": { "type": "string", "minLength": 2 },
+        "name": { "type": "string", "minLength": 1 }
+      }
+    },
+    "credit": {
+      "type": "object",
+      "required": ["code", "name", "statutory_citation"],
+      "properties": {
+        "code": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
+        "name": { "type": "string", "minLength": 1 },
+        "statutory_citation": { "type": "string", "minLength": 1 }
+      }
+    },
+    "thresholds": {
+      "type": "object",
+      "required": ["minimum_new_jobs"],
+      "properties": { "minimum_new_jobs": { "type": "number", "minimum": 0 } }
+    },
+    "benefit": {
+      "type": "object",
+      "required": ["benefit_period_years"],
+      "properties": {
+        "benefit_period_years": { "type": "number", "minimum": 1 },
+        "carryforward_years": { "type": "number", "minimum": 0 },
+        "amount_per_qualifying_job_usd": { "type": "number", "minimum": 0 },
+        "amount_per_qualifying_job_pct_of_wages": { "type": "number", "minimum": 0 }
+      },
+      "oneOf": [
+        { "required": ["amount_per_qualifying_job_usd"] },
+        { "required": ["amount_per_qualifying_job_pct_of_wages"] }
+      ]
+    },
+    "filing": {
+      "type": "object",
+      "required": ["window", "cycle"],
+      "properties": {
+        "window": { "type": "string", "minLength": 1, "pattern": "\\S" },
+        "cycle": { "enum": ["annual", "quarterly", "pre-application", "per-hire"] }
+      }
+    },
+    "tax_year_convention": {
+      "type": "object",
+      "properties": { "label": { "enum": ["begins", "ends"] } }
+    },
+    "floor_block": {
+      "type": "object",
+      "required": ["min_weekly_hours"],
+      "properties": {
+        "min_weekly_hours": { "type": "number", "exclusiveMinimum": 0 },
+        "min_weekly_wages": { "type": "number", "minimum": 0 },
+        "pt_weight": { "type": ["number", "null"], "exclusiveMinimum": 0, "maximum": 1 }
+      }
+    },
+    "one_zero": {
+      "type": "object",
+      "required": ["min_weekly_hours", "min_weekly_wages", "wage_basis", "geographic_granularity", "pt_aggregation", "headcount_unit_field"],
+      "properties": {
+        "min_weekly_hours": { "type": "number", "exclusiveMinimum": 0 },
+        "min_weekly_wages": { "type": "number", "minimum": 0 },
+        "wage_basis": { "enum": ["regular", "gross", "all_remuneration"] },
+        "geographic_granularity": { "enum": ["unit", "state", "statewide", "county", "national"] },
+        "pt_aggregation": { "type": "boolean" },
+        "headcount_unit_field": { "type": "string", "minLength": 1 },
+        "entity_combination": { "enum": ["required", "permitted", "prohibited"] },
+        "measuring_date": { "type": "string" },
+        "methodology": { "type": "object" },
+        "thresholds_by_year": {
+          "type": "object",
+          "propertyNames": { "pattern": "^[0-9]{4}$" },
+          "additionalProperties": { "$ref": "#/$defs/floor_block" }
+        }
+      }
+    },
+    "base_pack": {
+      "type": "object",
+      "required": ["_prototype_verification", "rule_pack_version", "jurisdiction", "credit", "thresholds", "benefit", "filing", "one_zero"],
+      "properties": {
+        "_prototype_verification": { "type": "string", "minLength": 1 },
+        "rule_pack_version": { "type": "string", "pattern": "^v?[0-9]+\\.[0-9]+\\.[0-9]+(\\+[0-9A-Za-z.-]+)?$" },
+        "jurisdiction": { "$ref": "#/$defs/jurisdiction" },
+        "credit": { "$ref": "#/$defs/credit" },
+        "thresholds": { "$ref": "#/$defs/thresholds" },
+        "benefit": { "$ref": "#/$defs/benefit" },
+        "filing": { "$ref": "#/$defs/filing" },
+        "tax_year_convention": { "$ref": "#/$defs/tax_year_convention" },
+        "one_zero": { "$ref": "#/$defs/one_zero" }
+      }
+    },
+    "year_pack": {
+      "description": "A year pack is a complete pack for one tax year. It must not inherit from another year or from the base pack. ADR-005.",
+      "allOf": [{ "$ref": "#/$defs/base_pack" }],
+      "required": ["tax_year", "_year_provenance"],
+      "properties": {
+        "tax_year": { "type": "integer", "minimum": 1990, "maximum": 2100 },
+        "_year_provenance": { "type": "object", "required": ["source"], "properties": { "source": { "type": "string", "minLength": 1 } } },
+        "extends": false,
+        "inherits": false,
+        "base": false,
+        "base_year": false
+      }
+    }
+  },
+  "$ref": "#/$defs/base_pack"
+}
