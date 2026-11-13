@@ -62,3 +62,4 @@ verification; no new calculation models; no extension of the ingestion agent.
   through the Gold read port. No migration. Limits: capability tool inputs other than `base_year_set` do not yet take a program,
   and the client-wide trend still reads the latest run (open-questions).
 - See [ADDING-A-PROGRAM.md](ADDING-A-PROGRAM.md).
+- **Portal drafts (F05).** Decision 5 is implemented as option A: drafts live in 	cc_ops.program_draft* (migration 0005), are validated in memory by the same validator, previewed on synthetic data with the engine's own functions and no writes, reviewed by a second person, and exported as a deterministic bundle for a human to commit. The registry still says nothing is calculable until the files are in git. The read capability program_catalog exposes the catalog (never a draft) to Teams and Cowork. See [PROGRAM-DRAFTS.md](PROGRAM-DRAFTS.md).

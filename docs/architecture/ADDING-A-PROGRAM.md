@@ -101,3 +101,5 @@ them wrongly.
 | Credits not based on net new jobs, or several simultaneous credit computations per location | The headcount-delta model is the only one | `domain/calculation/onezero.py` |
 | Ingesting statute with the rules-ingestion agent for a state other than Georgia | The agent and its API are Georgia-only by design; statute arrives as an authored year pack | `tools/rules_ingestion.py` |
 | Read endpoints, chat and demo surfaces that default `state` to `GA` | The run, base-year, location-level read and client-grain capability paths derive the state from data. The portfolio reads (`GetEligibilityQuery` and friends) already require a state, chat keyword scope detection and the demo simulators still assume Georgia. Their handling of a state with several programs is described under "Several programs in one state" | `api/chat/scope.py`, `api/chat/pipelines_core.py`, `tools/simulation.py`, `api/simulate.py` |
+
+- **From the portal.** The Program manager's Add-a-program flow scaffolds, validates, previews, reviews and exports a draft as a bundle you commit as above; it never writes into the source tree when deployed. See [PROGRAM-DRAFTS.md](PROGRAM-DRAFTS.md).
