@@ -152,7 +152,7 @@ def statute(state: str, client_id: int, tax_year: int):
     from application.queries._client_run import ClientRunNotAvailable, resolve_statute
 
     try:
-        return resolve_statute(account_id=client_id, state=state.upper(), tax_year=tax_year)
+        return resolve_statute(account_id=client_id, state=state.upper(), tax_year=tax_year, require_program=True)
     except ClientRunNotAvailable as exc:
         raise YearNotAuthored(str(exc)) from exc
 

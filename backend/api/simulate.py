@@ -20,11 +20,7 @@ from application.queries.simulate_portfolio import (
     SimulatePortfolioQuery,
 )
 from application.queries.simulate_unit import SimulateUnitQuery, UnitSimulationNotAvailable
-from application.queries.simulate_employee import (
-    EmployeeChange,
-    EmployeeSimulationNotAvailable,
-    SimulateEmployeeQuery,
-)
+from application.queries.simulate_employee import EmployeeChange, EmployeeSimulationNotAvailable, SimulateEmployeeQuery
 from application.services import get_mediator
 
 router = APIRouter(prefix="/api", tags=["simulation"])
@@ -37,6 +33,7 @@ def simulate_portfolio(
     action: str = "add_headcount",
     magnitude: float = 5.0,
     limit: int = 50,
+    program_code: str | None = None,
 ) -> dict[str, Any]:
     """One lever, applied across every client operating in this state-year.
 
@@ -51,7 +48,7 @@ def simulate_portfolio(
             state=state,
             action=action,
             magnitude=magnitude,
-            limit=limit,
+            limit=limit, program_code=program_code,
         )
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
@@ -69,6 +66,7 @@ class UnitSimulateRequest(BaseModel):
     worksite_id: str
     tax_year: int
     state: str = "GA"
+    program_code: str | None = None
     method: str = Field("min_max", pattern="^(min_max|pay_period)$")
     action: str = Field(
         "add_headcount",
@@ -107,6 +105,7 @@ class EmployeeSimulateRequest(BaseModel):
     tax_year: int
     employees: list[EmployeeChangeRequest] = Field(min_length=1, max_length=25)
     state: str = "GA"
+    program_code: str | None = None
     method: str = Field("min_max", pattern="^(min_max|pay_period)$")
 
 
@@ -117,7 +116,7 @@ def run_employee_simulation(payload: EmployeeSimulateRequest) -> dict[str, Any]:
         query = SimulateEmployeeQuery(
             client_id=payload.client_id,
             tax_year=payload.tax_year,
-            state=payload.state,
+            state=payload.state, program_code=payload.program_code,
             method=payload.method,
             changes=tuple(EmployeeChange(**e.model_dump()) for e in payload.employees),
         )
@@ -133,9 +132,9 @@ class OneZeroSimulateRequest(BaseModel):
     """[J2] UX-02 — entity-level what-if against the statutory One/Zero engine."""
     tax_year: int = 2025
     state: str
+    program_code: str | None = None  # a state with several programs needs it
     fein: str | None = None  # scope to a single legal entity (cost-center proxy)
-    # Which tenant. Scope is a dimension of the request, so a what-if run while
-    # looking at one client must not silently evaluate another's payroll.
+    # Which tenant: a what-if run while looking at one client must not silently evaluate another's payroll.
     client_id: int | None = None
     action: str = Field(
         "adjust_hours",
@@ -162,37 +161,26 @@ def run_onezero_simulation(payload: OneZeroSimulateRequest) -> dict[str, Any]:
     a programme-year with no authored statute rather than quietly using a
     neighbouring year's rules [ADR-005].
     """
-    from tools.credit_math import STATE_TO_PACK, authored_years, load_pack_one_zero
+    from tools.credit_math import authored_years, load_pack_one_zero
     from tools.simulation import onezero_snapshot, apply_onezero_lever
     from application.assessment_inputs import average_headcount, client_window as _client_window, rows_for_state_year
+    from application.program_defaults import ProgramNotRunnable, priced_program
 
-    st = payload.state.upper()
-    pack_file = STATE_TO_PACK.get(st)
-    if pack_file is None:
-        raise HTTPException(status_code=400, detail=f"No rule pack for state {st}")
+    try:  # the program names the statute; a state with several asks which [F04c.6]
+        st, code, pack_file = priced_program(payload.client_id, payload.state, payload.program_code, payload.tax_year)
+    except ProgramNotRunnable as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
 
     # Same source of truth the scope selector and the assessment path use, so
     # all three agree about what can be priced. Without this the simulator
     # happily returns a figure for a programme the UI has disabled.
     priceable = authored_years(pack_file)
     if not priceable:
-        raise HTTPException(
-            status_code=422,
-            detail=(
-                f"{st} has no year-scoped rule packs, so a projection would run "
-                f"under no particular year's statute. ADR-005."
-            ),
-        )
+        raise HTTPException(status_code=422, detail=f"{st} has no year-scoped rule packs, so a projection would run under no particular year's statute. ADR-005.")
     if payload.tax_year not in priceable:
-        raise HTTPException(
-            status_code=422,
-            detail=(
-                f"No rule pack for {st} tax year {payload.tax_year}. "
-                f"Authored: {', '.join(str(y) for y in priceable)}."
-            ),
-        )
+        raise HTTPException(status_code=422, detail=f"No rule pack for {st} tax year {payload.tax_year}. Authored: {', '.join(str(y) for y in priceable)}.")
 
-    pack = load_pack_one_zero(st, tax_year=payload.tax_year)
+    pack = load_pack_one_zero(code, tax_year=payload.tax_year)
     if pack is None:
         raise HTTPException(status_code=400, detail=f"State {st} has no one_zero block")
 
@@ -201,7 +189,7 @@ def run_onezero_simulation(payload: OneZeroSimulateRequest) -> dict[str, Any]:
     # assessment path — INCLUDING the client's own fiscal window. Leaving this
     # on the calendar year while the assessment moved to the real window is how
     # Position and Plan came to quote different figures for one client-year.
-    window = _client_window(payload.client_id, st, payload.tax_year)
+    window = _client_window(payload.client_id, code, payload.tax_year)
     base_rows = rows_for_state_year(all_rows, st, payload.tax_year, window)
     if payload.fein:
         base_rows = [r for r in base_rows if r.get("Entity_FEIN") == payload.fein]
@@ -219,12 +207,12 @@ def run_onezero_simulation(payload: OneZeroSimulateRequest) -> dict[str, Any]:
         if payload.fein:
             prior_rows = [r for r in prior_rows if r.get("Entity_FEIN") == payload.fein]
         prior_average = average_headcount(
-            prior_rows, st, prior_year, load_pack_one_zero(st, tax_year=prior_year),
-            _client_window(payload.client_id, st, prior_year),
+            prior_rows, st, prior_year, load_pack_one_zero(code, tax_year=prior_year),
+            _client_window(payload.client_id, code, prior_year),
         )
 
     baseline = onezero_snapshot(
-        base_rows, tax_year=payload.tax_year, state=st, pack=pack,
+        base_rows, tax_year=payload.tax_year, state=code, pack=pack,
         prior_average_headcount=prior_average,
     )
     sim_rows, detail = apply_onezero_lever(
@@ -233,7 +221,7 @@ def run_onezero_simulation(payload: OneZeroSimulateRequest) -> dict[str, Any]:
         hire_weekly_hours=payload.hire_weekly_hours, hire_hourly_rate=payload.hire_hourly_rate,
     )
     projected = onezero_snapshot(
-        sim_rows, tax_year=payload.tax_year, state=st, pack=pack,
+        sim_rows, tax_year=payload.tax_year, state=code, pack=pack,
         prior_average_headcount=prior_average,
     )
 
@@ -248,6 +236,7 @@ def run_onezero_simulation(payload: OneZeroSimulateRequest) -> dict[str, Any]:
         "as_of": date.today().isoformat(),
         "scope": {
             "state": st,
+            "program_code": code,
             "fein": payload.fein,
             "tax_year": payload.tax_year,
             "client_id": payload.client_id,

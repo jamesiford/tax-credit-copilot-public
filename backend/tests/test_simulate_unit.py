@@ -104,7 +104,7 @@ def wired(monkeypatch, cascade):
     monkeypatch.setattr(wiring, "get_gold_reader", lambda: _Reader(gold))
     monkeypatch.setattr(
         client_run, "resolve_client_run",
-        lambda *, account_id, state, tax_year, rows=None: _Run(by_year[tax_year], tax_year),
+        lambda *, account_id, state, tax_year, rows=None, program_code=None, require_program=False: _Run(by_year[tax_year], tax_year),
     )
     return gold
 

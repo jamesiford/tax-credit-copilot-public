@@ -56,6 +56,7 @@ def v2_client_units(
     method: str = FastAPIQuery("min_max", description="min_max | pay_period"),
     limit: int = FastAPIQuery(25, ge=1),
     offset: int = FastAPIQuery(0, ge=0),
+    program_code: str | None = FastAPIQuery(None, description="Program; a client run for several needs it, else its rows mix"),
 ) -> dict[str, object]:
     """Unit listing for one client-year, READ FROM `tcc_gold`.
 
@@ -78,10 +79,9 @@ def v2_client_units(
         raise HTTPException(status_code=422, detail="method must be min_max | pay_period")
 
     reader = get_gold_reader()
-    # One connection, and two round trips for the whole page. Six reads issued
-    # separately was ~2.3s, almost all of it the per-trip floor.
+    # One connection, two round trips for the whole page (six separate reads were ~2.3s, almost all per-trip floor).
     with reader.scope():
-        program_code = _program_code_for_state(state)
+        program_code = program_code or _program_code_for_state(state)
         page = reader.unit_page(
             client_id, method=method, tax_year=year,
             program_code=program_code, limit=limit, offset=offset,

@@ -39,9 +39,7 @@ from typing import Any
 from application.mediator import Query
 
 _METHODS = ("min_max", "pay_period")
-#: The most employees one projection stacks. A what-if is a conversation about
-#: a handful of named people; a stack of hundreds is a different lever (Hours).
-MAX_STACK = 25
+MAX_STACK = 25  # a what-if is a conversation about a handful of named people; a stack of hundreds is a different lever (Hours)
 MAX_EXTRA_WEEKLY_HOURS = 40.0
 MAX_HOURLY_RAISE = 100.0
 
@@ -69,6 +67,7 @@ class SimulateEmployeeQuery(Query):
     tax_year: int
     changes: tuple[EmployeeChange, ...]
     state: str | None = None
+    program_code: str | None = None  # a state with several programs needs it [F04c.6]
     method: str = "min_max"
     as_of: date | None = None
 
@@ -235,7 +234,7 @@ def _designation(grid: dict[str, Any] | None) -> dict[str, Any]:
 
 
 def handle_simulate_employee(query: SimulateEmployeeQuery) -> dict[str, Any]:
-    from application.queries._client_run import ClientRunNotAvailable, derive_run_state, resolve_client_run
+    from application.queries._client_run import ClientRunNotAvailable, resolve_client_run, run_state
     from application.queries.simulate_unit import (
         _signed_margin, _unit_reading, location_series, open_year_months, price_location_year,
         run_rate_credit, RUN_RATE_BASIS,
@@ -244,10 +243,10 @@ def handle_simulate_employee(query: SimulateEmployeeQuery) -> dict[str, Any]:
     from domain.calculation.onezero import run_min_max_method, run_pay_period_method
     from tools.tokens import record_token
 
-    state = derive_run_state(query.client_id, query.tax_year, query.state)
+    state = run_state(query.client_id, query.tax_year, query.state, query.program_code)
     as_of = query.resolved_as_of()
     try:
-        run = resolve_client_run(account_id=query.client_id, state=state, tax_year=query.tax_year)
+        run = resolve_client_run(account_id=query.client_id, state=state, tax_year=query.tax_year, program_code=query.program_code, require_program=True)
     except ClientRunNotAvailable as exc:
         raise EmployeeSimulationNotAvailable(str(exc)) from exc
     if as_of >= run.window.end:

@@ -53,7 +53,7 @@ def _request_scope(req: ChatRequest) -> dict[str, Any]:
     # NOT `resolve_client_run`. Every field below is statute or calendar; the
     # payroll it used to load was never read — `scope["run"]` had no consumer —
     # so every chat message paid a full client payroll read for metadata.
-    run = resolve_statute(account_id=req.client_id, state=state, tax_year=req.tax_year)
+    run = resolve_statute(account_id=req.client_id, state=state, tax_year=req.tax_year, require_program=True)
     return {
         "state": run.state,
         "account_id": run.account_id,

@@ -186,7 +186,7 @@ def onezero_snapshot(
     rows: list[dict[str, Any]],
     *,
     tax_year: int,
-    state: str,
+    state: str,  # a state, or a program code to price that program rather than the state's default [F04c.6]
     pack: Any,
     prior_average_headcount: float = 0.0,
 ) -> dict[str, Any]:

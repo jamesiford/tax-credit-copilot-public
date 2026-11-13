@@ -30,6 +30,9 @@ from domain.calculation.onezero import (
     fiscal_window_start,
 )
 from tools.credit_math import STATE_TO_PACK, load_pack_one_zero, apply_one_zero_state_credit
+from application.program_defaults import state_programs
+from tools.pack_lookup import pack_file_for
+from tools.program_credit import credit_key
 from tools.program_registry import rules_dir
 
 _PAYROLL_CSV = Path(__file__).resolve().parent.parent / "data" / "payroll.csv"
@@ -92,22 +95,22 @@ def _state_tile(
     state: str,
     tax_year: int,
     fy_end_month: int,
+    program_code: str | None = None,
 ) -> dict[str, Any] | None:
-    """Build a statutory tile for one state pack via the One/Zero engine."""
-    pack = load_pack_one_zero(state, tax_year=tax_year)
+    """Build a statutory tile for one PROGRAM of a state (its default program unless `program_code` names another)."""
+    pack = load_pack_one_zero(key := credit_key(program_code, state), tax_year=tax_year)
     if pack is None:
         return None
     cur = _state_avg_headcount(rows_cur, tax_year=tax_year, state=state, pack=pack, fy_end_month=fy_end_month)
     if cur is None:
         return None
 
-    prior_pack = load_pack_one_zero(state, tax_year=tax_year - 1)
+    prior_pack = load_pack_one_zero(key, tax_year=tax_year - 1)
     prior = _state_avg_headcount(rows_prior, tax_year=tax_year - 1, state=state, pack=prior_pack, fy_end_month=fy_end_month) if prior_pack else None
     prior_avg = prior.annual_average if prior is not None else 0.0
 
-    credit = apply_one_zero_state_credit(state, cur.annual_average, prior_period_average_headcount=prior_avg)
-
-    pack_json = _load_pack_json(STATE_TO_PACK[state])
+    credit = apply_one_zero_state_credit(key, cur.annual_average, prior_period_average_headcount=prior_avg)
+    pack_json = _load_pack_json(pack_file_for(key))
     threshold = float(pack_json["thresholds"]["minimum_new_jobs"])
     net_new = round(max(0.0, cur.annual_average - prior_avg), 2)
     trend = _monthly_trend(cur)
@@ -320,8 +323,8 @@ def build_portfolio(
     tiles: list[dict[str, Any]] = []
     state_packs_seen: set[str] = set()
 
-    for state in sorted(STATE_TO_PACK.keys()):
-        tile = _state_tile(rows_cur, rows_prior, state=state, tax_year=tax_year, fy_end_month=fy_end_month)
+    for state, code in state_programs():  # one tile per program
+        tile = _state_tile(rows_cur, rows_prior, state=state, tax_year=tax_year, fy_end_month=fy_end_month, program_code=code)
         if tile:
             tiles.append(tile)
             state_packs_seen.add(state)
@@ -369,9 +372,7 @@ def chat_jobs_at_risk(
     from domain.calculation.proximity import fragile_cohort
 
     try:
-        resolved = resolve_statute(
-            account_id=account_id, state=state.upper(), tax_year=tax_year
-        )
+        resolved = resolve_statute(account_id=account_id, state=state.upper(), tax_year=tax_year, require_program=True)
     except ClientRunNotAvailable as exc:
         return {"calculated": False, "declined": str(exc)}
 
@@ -382,6 +383,7 @@ def chat_jobs_at_risk(
         method=method,
         min_weekly_hours=float(floors.min_weekly_hours),
         min_weekly_wages=float(floors.min_weekly_wages),
+        program_code=resolved.program_code,
     )
     counts = read["counts"]
     if read["run"] is not None and on_run is not None:
@@ -485,14 +487,12 @@ def chat_client_context(
     tax_year: int,
     method: str = "pay_period",
     on_run: Callable[[dict[str, Any]], None] | None = None,
+    program_code: str | None = None,
 ) -> dict[str, Any]:
-    """What the run concluded about this client-year, READ.
+    """What the run concluded about this client-year, READ. `program_code` picks the run of one program of a client run for several.
 
-    The chat used to narrate `load_payroll_snapshot`, which reads a synthetic
-    CSV and says so in its own citation — so the answer described 9,477
-    invented employees while the question was about a client with 10,236. Same
-    class of defect as the ingestion view counting Fabric rows and then running
-    the next three stages over the fixture.
+    The chat used to narrate `load_payroll_snapshot`, a synthetic CSV, so the answer described 9,477 invented employees
+    while the question was about a client with 10,236.
 
     Returns `calculated: False` rather than zeroes when no run has reached this
     client-year. A chat answer of "$0" and "we have not looked" are different
@@ -501,13 +501,13 @@ def chat_client_context(
     from application.services import get_gold_reader
 
     reader = get_gold_reader()
-    current = reader.headcount_series(account_id, tax_year=tax_year, method=method)
+    current = reader.headcount_series(account_id, tax_year=tax_year, method=method, program_code=program_code)
     if current["run"] is None or current["annual_average"] is None:
         return {"calculated": False, "client_id": account_id, "tax_year": tax_year}
 
     if on_run is not None:
         on_run(current["run"])
-    prior = reader.headcount_series(account_id, tax_year=tax_year - 1, method=method)
+    prior = reader.headcount_series(account_id, tax_year=tax_year - 1, method=method, program_code=program_code)
     return {
         "calculated": True,
         "client_id": account_id,
@@ -530,12 +530,12 @@ def chat_state_credit(
     account_id: int | None = None,
     current_average: float | None = None,
     prior_average: float | None = None,
+    program_code: str | None = None,
 ) -> dict[str, Any]:
-    """Single-state statutory credit for the chat eligibility intent.
+    """Single-state statutory credit for the chat eligibility intent (`program_code`: that program of the state).
 
-    Applies the rule-pack benefit math (net-new) to the year's average headcount
-    and the prior year's. Returns the `apply_one_zero_state_credit` dict, or a
-    `no_state_pack` dict for states with no rule pack (e.g. TX).
+    Applies the rule-pack benefit math (net-new) to the year's average headcount and the prior year's. Returns the
+    `apply_one_zero_state_credit` dict, or a `no_state_pack` dict for states with no rule pack (e.g. TX).
 
     Both averages may be supplied by a caller that has READ them from the run
     that computed them, in which case no payroll is replayed. Without them this
@@ -574,4 +574,4 @@ def chat_state_credit(
         prior = _state_avg_headcount(rows_prior, tax_year=tax_year - 1, state=state_u, pack=prior_pack, fy_end_month=fy_end_month) if prior_pack else None
         prior_avg = prior.annual_average if prior is not None else 0.0
 
-    return apply_one_zero_state_credit(state_u, cur_avg, prior_period_average_headcount=prior_avg)
+    return apply_one_zero_state_credit(credit_key(program_code, state_u), cur_avg, prior_period_average_headcount=prior_avg)

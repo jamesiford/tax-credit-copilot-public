@@ -22,6 +22,7 @@ from application.program_defaults import (  # noqa: F401 - re-exported for the r
     ProgramStateConflict,
     derive_run_state,
     resolve_program,
+    run_state,
     state_for_location,
 )
 
@@ -141,22 +142,19 @@ def resolve_client_run(
     tax_year: int,
     rows: list[dict[str, Any]] | None = None,
     program_code: str | None = None,
+    require_program: bool = False,
 ) -> ClientRun:
-    """Resolve statute, fiscal window and payroll for one client-programme-year.
+    """Resolve statute, fiscal window and payroll for one client-programme-year (the compute path; a Gold read wants
+    `resolve_statute`, which stops before the payroll).
 
-    The compute path. A read answering from Gold wants `resolve_statute`
-    instead, which stops before the payroll.
-
-    `rows` lets a caller resolving several years for one client hand in the
-    payroll it already loaded. Resolution is unchanged — the same state filter
-    and the same window trim still apply — so a multi-year read cannot drift
-    from a single-year one by taking a shortcut around this function.
+    `rows` lets a caller resolving several years hand in the payroll it already loaded; the same state filter and window
+    trim apply, so a multi-year read cannot drift from a single-year one.
     """
     from application.payroll_rows import program_rows
     from application.source_ports import load_pay_periods
 
     statute = resolve_statute(
-        account_id=account_id, state=state, tax_year=tax_year, program_code=program_code
+        account_id=account_id, state=state, tax_year=tax_year, program_code=program_code, require_program=require_program
     )
     state, window = statute.state, statute.window
 

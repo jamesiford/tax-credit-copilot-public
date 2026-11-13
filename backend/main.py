@@ -21,6 +21,7 @@ from api.capabilities import router as capabilities_router  # noqa: E402
 from api.auth import request_guard, router as auth_router  # noqa: E402
 from application.errors import DependencyUnavailable  # noqa: E402
 from application.identity import NotAuthorized  # noqa: E402
+from api.error_handlers import install as install_error_handlers  # noqa: E402
 from api.chat import router as chat_router  # noqa: E402
 from api.claims import router as claims_router, v2_router as claims_v2_router  # noqa: E402
 from api.eligibility import router as eligibility_router  # noqa: E402
@@ -166,6 +167,9 @@ async def _dependency_unavailable(_request: Request, exc: DependencyUnavailable)
     """A named dependency that cannot answer is a 503 that says which one and what to do. [03.3]"""
     log.warning("dependency unavailable: %s (%s)", exc.dependency, exc.reason)
     return JSONResponse(status_code=503, content=exc.as_detail())
+
+
+install_error_handlers(app)
 
 # Must run here, before the app serves: middleware cannot be added once the
 # stack is built, and the lifespan runs inside the first call that builds it.

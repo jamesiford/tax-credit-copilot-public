@@ -83,11 +83,11 @@ def calc_walkthrough(
     if client_id is None or tax_year is None:
         raise InvalidArguments("client_id and tax_year are required to build a walkthrough")
     state = s.derive_state(state, client_id, tax_year)
-    s.statute(state, client_id, tax_year)
+    resolved = s.statute(state, client_id, tax_year)
     capture = s.RunCapture()
     with s.trail_scope() as recorder:
         context = chat_client_context(
-            account_id=client_id, tax_year=tax_year, method=s.read_method(method), on_run=capture,
+            account_id=client_id, tax_year=tax_year, method=s.read_method(method), on_run=capture, program_code=resolved.program_code,
         )
         if not context.get("calculated"):
             raise NotCalculated(
@@ -96,7 +96,7 @@ def calc_walkthrough(
         credit = chat_state_credit(
             state, tax_year=tax_year, account_id=client_id,
             current_average=context.get("current_average"),
-            prior_average=context.get("prior_average"),
+            prior_average=context.get("prior_average"), program_code=resolved.program_code,
         )
         if credit.get("no_state_pack"):
             raise YearNotAuthored(str(credit["message"]))
