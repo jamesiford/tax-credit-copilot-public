@@ -103,6 +103,7 @@ python scripts/run-worker.py --once     # from the repo root: drain the queue an
 |---|---|---|
 | Degraded `run_worker` on a batch | Items are waiting and no worker holds a lease | Start a worker (above) |
 | Item `failed`, dependency `operational_store`, `source_lakehouse` or `source_sql` | The store or source was unreachable and attempts ran out | Fix connectivity, then retry-failed |
+| Item `failed`, dependency `gold_write` | The Gold write did not validate (section 9: for example more than one current run for a client and program) | The worker retries it once with no other worker on the client; a second failure stays failed. Run the client alone, then check section 9 (`python backend/tools/verify_gold_reads.py`) before trusting its figures |
 | Item `failed`, dependency `conflict` | A Warehouse write conflict persisted | Lower `RUN_WORKER_CONCURRENCY`, then retry-failed |
 | Item `failed`, dependency `lookup:<name>` | The client needs a lookup authored (pay codes, fiscal rules) | Author it; not retried automatically |
 | Item `failed`, dependency `validation` | The request or the client is ambiguous (for example several programmes) | Name the `program_code` |
