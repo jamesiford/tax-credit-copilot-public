@@ -45,7 +45,27 @@ All routes need the writer role and are person-only (an agent token is refused a
 | `POST /api/v2/program-drafts/{id}/request-review` | submit for review |
 | `POST /api/v2/program-drafts/{id}/review` | `approve` or `request_changes` |
 | `POST /api/v2/program-drafts/{id}/preview` | price the draft's year packs on synthetic data; writes nothing |
+| `POST /api/v2/program-drafts/{id}/export` | download the deterministic bundle of an approved draft (zip); records the export |
+| `GET /api/v2/program-drafts/{id}/export/manifest` | the bundle's manifest and hash, with no status change |
 | `POST /api/v2/program-drafts/{id}/withdraw` | close the draft |
+
+## Export bundle
+
+Export needs an **approved** draft and moves it to `exported`, recording who took it. The bundle is a zip, **byte-for-byte the
+same every time** for the same draft (sorted names, fixed timestamps, canonical JSON; the response carries `X-Bundle-Sha256`, and
+`manifest.json` lists every file's SHA-256). It holds:
+
+- `rules/<program>.json` and `rules/<program>/<year>.json` at their final repository paths (under `backend/`);
+- `registry-patch.json`: the registry entry to add, with lifecycle `described` (`calculable` is derived, never typed);
+- `validation-report.json` and `review-record.json` (who requested, who decided, the comment, the history);
+- `COMMIT-CHECKLIST.md`: who must verify the statute (a person who is neither author nor reviewer, against the primary source), the
+  files to place, the tests to add, the changelog line and the gates.
+
+The app **never writes into the source tree in a deployed environment**. For developers only, `ENVIRONMENT=local` together with
+`PROGRAM_EXPORT_ALLOW_LOCAL_WRITE=true` lets `write_local: true` write the pack and year-pack files into the rules folder; it never
+edits the registry (adding the entry is the human step) and never overwrites a file. Committing the bundle is what makes the
+program calculable, for its authored years only: `tests/test_program_draft_export.py` proves it by extracting a bundle into a copy
+of the rules folder.
 
 ## Preview (no writes)
 

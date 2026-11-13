@@ -9,20 +9,21 @@ from __future__ import annotations
 
 from typing import Any
 
-from fastapi import APIRouter, HTTPException, Query, Request
+from fastapi import APIRouter, HTTPException, Query, Request, Response
 
 from api.auth import attributed
 from api.program_draft_models import (
-    DraftOut, DraftsPage, CreateBody, EditBody, ActorBody, ReviewBody, PreviewBody, PreviewOut, WithdrawBody,
+    ActorBody, CreateBody, DraftOut, DraftsPage, EditBody, ExportBody, ManifestOut, PreviewBody, PreviewOut, ReviewBody, WithdrawBody,
 )
 from application.commands.create_program_draft import CreateProgramDraftCommand
 from application.commands.edit_program_draft import EditProgramDraftCommand
+from application.commands.export_program_draft import ExportProgramDraftCommand
 from application.commands.request_program_review import RequestProgramReviewCommand
 from application.commands.review_program_draft import ReviewProgramDraftCommand
 from application.commands.validate_program_draft import ValidateProgramDraftCommand
 from application.commands.withdraw_program_draft import WithdrawProgramDraftCommand
 from application.queries.preview_program_draft import PreviewProgramDraftQuery
-from application.queries.program_draft_reads import GetProgramDraftQuery, ListProgramDraftsQuery
+from application.queries.program_draft_reads import GetProgramDraftManifestQuery, GetProgramDraftQuery, ListProgramDraftsQuery
 from application.services import get_mediator
 from domain.program_drafts import (
     CustomerDataRefused, DraftConflict, DraftError, DraftInvalid, DraftNotFound, InvalidTransition, PreviewRefused, ReviewRefused,
@@ -97,3 +98,21 @@ def preview_draft(draft_id: str, body: PreviewBody | None = None) -> Any:
 def withdraw_draft(draft_id: str, request: Request, body: WithdrawBody | None = None) -> Any:
     return _send(WithdrawProgramDraftCommand(actor=_who(request, body.actor if body else None), draft_id=draft_id,
                                              reason=body.reason if body else None))
+
+
+@router.post("/{draft_id}/export", response_class=Response, responses={200: {"content": {"application/zip": {}}}})
+def export_draft(draft_id: str, request: Request, body: ExportBody | None = None) -> Response:
+    """Download the deterministic bundle of an approved draft (pack and year packs at their final paths, registry entry, validation,
+    review record, commit checklist). Records the export; verifies nothing and activates nothing."""
+    body = body or ExportBody()
+    out = _send(ExportProgramDraftCommand(actor=_who(request, body.actor), draft_id=draft_id, write_local=body.write_local))
+    code = out["draft"]["proposed_code"].lower()
+    return Response(content=out["bundle"], media_type="application/zip", headers={
+        "Content-Disposition": f'attachment; filename="{code}-bundle.zip"', "X-Bundle-Sha256": out["bundle_sha256"],
+        "X-Verification": "not_verified", "X-Wrote-Local-Files": str(len(out["written_files"]))})
+
+
+@router.get("/{draft_id}/export/manifest", response_model=ManifestOut)
+def export_manifest(draft_id: str) -> Any:
+    """The manifest of the bundle an approved or exported draft produces, with no status change."""
+    return _send(GetProgramDraftManifestQuery(draft_id=draft_id))

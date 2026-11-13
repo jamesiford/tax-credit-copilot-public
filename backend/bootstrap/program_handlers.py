@@ -6,6 +6,7 @@ size standard. `register_handlers` calls `register_program_handlers`, so the one
 from __future__ import annotations
 
 from application.commands.create_program_draft import CreateProgramDraftCommand, handle_create_program_draft
+from application.commands.export_program_draft import ExportProgramDraftCommand, handle_export_program_draft
 from application.commands.edit_program_draft import EditProgramDraftCommand, handle_edit_program_draft
 from application.commands.request_program_review import RequestProgramReviewCommand, handle_request_program_review
 from application.commands.review_program_draft import ReviewProgramDraftCommand, handle_review_program_draft
@@ -16,7 +17,8 @@ from application.queries.program_catalog_reads import (
     GetProgramDetailQuery, ListProgramCatalogQuery, handle_get_program_detail, handle_list_program_catalog,
 )
 from application.queries.program_draft_reads import (
-    GetProgramDraftQuery, ListProgramDraftsQuery, handle_get_program_draft, handle_list_program_drafts,
+    GetProgramDraftManifestQuery, GetProgramDraftQuery, ListProgramDraftsQuery, handle_get_program_draft,
+    handle_get_program_draft_manifest, handle_list_program_drafts,
 )
 from application.queries.preview_program_draft import PreviewProgramDraftQuery, handle_preview_program_draft
 from bootstrap import program_draft_wiring  # noqa: F401 - binds the draft repository for the draft handlers
@@ -28,10 +30,12 @@ def register_program_handlers(mediator: Mediator) -> Mediator:
     mediator.register(ListProgramDraftsQuery, handle_list_program_drafts)
     mediator.register(GetProgramDraftQuery, handle_get_program_draft)
     mediator.register(PreviewProgramDraftQuery, handle_preview_program_draft)
+    mediator.register(GetProgramDraftManifestQuery, handle_get_program_draft_manifest)
     for request, handler in (
         (CreateProgramDraftCommand, handle_create_program_draft), (EditProgramDraftCommand, handle_edit_program_draft),
         (ValidateProgramDraftCommand, handle_validate_program_draft), (RequestProgramReviewCommand, handle_request_program_review),
         (ReviewProgramDraftCommand, handle_review_program_draft), (WithdrawProgramDraftCommand, handle_withdraw_program_draft),
+        (ExportProgramDraftCommand, handle_export_program_draft),
     ):
         mediator.register(request, handler)
     return mediator
