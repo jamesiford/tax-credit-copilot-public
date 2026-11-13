@@ -31,6 +31,12 @@ CREATE TABLE IF NOT EXISTS run_batch_item (
     program_code TEXT, tax_year INTEGER, status TEXT NOT NULL, attempts INTEGER NOT NULL, lease_owner TEXT,
     lease_expires_at TEXT, heartbeat_at TEXT, not_before TEXT, run_id TEXT, skip_reason TEXT, error_dependency TEXT,
     error_message TEXT, started_at TEXT, finished_at TEXT);
+-- The claim, the per-client lock check, the reaper and the counters all filter these ways; without them every statement scans
+-- the whole item table, which is why a 3000-item batch cost more per item than a 300-item one. (A Fabric Warehouse has no
+-- secondary indexes, and the Azure SQL tables are not changed here: see the F07 report.)
+CREATE INDEX IF NOT EXISTS ix_run_batch_item_batch ON run_batch_item (batch_id, status, seq, item_id);
+CREATE INDEX IF NOT EXISTS ix_run_batch_item_status ON run_batch_item (status, lease_expires_at);
+CREATE INDEX IF NOT EXISTS ix_run_batch_item_client ON run_batch_item (client_id, status);
 """
 
 
@@ -39,11 +45,19 @@ class _Result:
         self.rows, self.rowcount = rows, rowcount
 
 
+class Statements:
+    """How many statements and transactions the queue has issued: on a Warehouse each is a round trip, so this is its cost."""
+    def __init__(self) -> None:
+        self.statements = 0
+        self.transactions = 0
+
+
 class _Tx:
-    def __init__(self, conn: sqlite3.Connection) -> None:
-        self._conn = conn
+    def __init__(self, conn: sqlite3.Connection, counter: Statements) -> None:
+        self._conn, self._counter = conn, counter
 
     def execute(self, sql: str, params: list[Any] | tuple = ()) -> _Result:
+        self._counter.statements += 1
         cursor = self._conn.execute(sql, list(params))
         rows = [dict(r) for r in cursor.fetchall()] if cursor.description else []
         return _Result(rows, cursor.rowcount)
@@ -58,6 +72,7 @@ class SqliteBackend:
         if str(chosen) != ":memory:":
             Path(chosen).parent.mkdir(parents=True, exist_ok=True)
         self._lock = threading.RLock()
+        self.counter = Statements()
         self._conn = sqlite3.connect(str(chosen), check_same_thread=False, isolation_level=None, timeout=30)
         self._conn.row_factory = sqlite3.Row
         self._conn.executescript(schema)
@@ -81,8 +96,9 @@ class SqliteBackend:
     def transact(self, work: Callable[[_Tx], T]) -> T:
         with self._lock:
             self._conn.execute("BEGIN IMMEDIATE")
+            self.counter.transactions += 1
             try:
-                result = work(_Tx(self._conn))
+                result = work(_Tx(self._conn, self.counter))
                 self._conn.execute("COMMIT")
                 return result
             except BaseException:
@@ -98,6 +114,10 @@ class SqliteRunBatchRepository(RunBatchRepository):
     def __init__(self, path: str | Path | None = None) -> None:
         self._backend = SqliteBackend(path)
         super().__init__(self._backend)
+
+    @property
+    def statement_counter(self) -> Statements:
+        return self._backend.counter
 
     def close(self) -> None:
         self._backend.close()

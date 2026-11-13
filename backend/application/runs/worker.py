@@ -45,6 +45,10 @@ class RunWorker:
         self._pool = ThreadPoolExecutor(max_workers=settings.worker_concurrency, thread_name_prefix="run-item")
         self._inflight: dict[str, Future] = {}
         self._lock = threading.Lock()
+        self._last_reap: datetime | None = None
+        # A lease only lapses after `lease_seconds`, so looking for lapsed ones on every tick is a statement per item for
+        # nothing; a quarter of the lease (never more often than the heartbeat) adds at most that to a dead worker's recovery.
+        self._reap_every = timedelta(seconds=max(1, min(settings.heartbeat_seconds, settings.lease_seconds // 4)))
 
     # ------------------------------------------------------------------ one cycle
 
@@ -52,9 +56,11 @@ class RunWorker:
         """Reap lapsed leases, claim into free slots, start them. Returns how many items were claimed."""
         now = self._clock()
         self._collect()
-        for batch_id in self._repo.reap_expired(now, self._s.item_max_attempts):
-            self._repo.refresh(batch_id, now)
-            metrics.event("leases.reaped")
+        if self._last_reap is None or now - self._last_reap >= self._reap_every:
+            self._last_reap = now
+            for batch_id in self._repo.reap_expired(now, self._s.item_max_attempts):
+                self._repo.refresh(batch_id, now)
+                metrics.event("leases.reaped")
         free = self._s.worker_concurrency - len(self._inflight)
         claimed = self._repo.claim(self.owner, free, self._s.lease_seconds, now) if free > 0 else []
         for item in claimed:
@@ -137,7 +143,7 @@ class RunWorker:
 
     def _finish(self, item: RunBatchItem, outcome: ItemOutcome, started: float) -> None:
         now = self._clock()
-        kept = self._repo.finish(item.item_id, self.owner, now, outcome.result())
+        kept = self._repo.finish(item.item_id, self.owner, now, outcome.result(), refresh_batch=item.batch_id)
         seconds = time.monotonic() - started
         metrics.record(outcome.status.value, seconds=seconds,
                        dependency=outcome.error_dependency if outcome.status is ItemStatus.FAILED else None)
@@ -147,4 +153,3 @@ class RunWorker:
                 "outcome": outcome.status.value, "seconds": round(seconds, 2), "dependency": outcome.error_dependency,
                 "lease_kept": kept, "transient": outcome.transient,
             })
-        self._repo.refresh(item.batch_id, now)

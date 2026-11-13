@@ -13,6 +13,7 @@ while the client has a young `running` manifest, and the section 9 sweep catches
 """
 from __future__ import annotations
 
+from dataclasses import replace
 from datetime import datetime, timedelta
 from typing import Any, Callable, Protocol, TypeVar
 
@@ -132,28 +133,34 @@ class RunBatchStore:
         read the counts, then write in the opposite order, leaving the older counts (and a `running` status) on a batch
         whose items had all finished.
         """
-        def work(tx: Tx) -> None:
-            """Read the batch and its counts, derive the status, write it back: one transaction."""
-            found = tx.execute(
-                f"SELECT {', '.join(rows.BATCH_COLUMNS)} FROM {self._batch} WHERE batch_id = ?", [batch_id]).rows
-            batch = rows.to_batch(found[0], self._b.parse)
-            status_counts = {r["status"]: int(r["n"]) for r in tx.execute(
-                f"SELECT status, COUNT(*) AS n FROM {self._item} WHERE batch_id = ? GROUP BY status", [batch_id]).rows}
-            status = batch_status(status_counts, cancel_requested=batch.cancel_requested)
-            c = rows.counters(status_counts)
-            done = status.value in ("succeeded", "partial", "failed", "cancelled")
-            started = batch.started_at or (now if status.value != "queued" else None)
-            finished = (batch.finished_at or now) if done else None
-            tx.execute(
-                f"UPDATE {self._batch} SET status = ?, items_total = ?, items_queued = ?, items_running = ?, "
-                "items_succeeded = ?, items_skipped = ?, items_failed = ?, items_cancelled = ?, started_at = ?, "
-                "finished_at = ? WHERE batch_id = ?",
-                [status.value, c["items_total"], c["items_queued"], c["items_running"], c["items_succeeded"],
-                 c["items_skipped"], c["items_failed"], c["items_cancelled"], self._b.bind(started),
-                 self._b.bind(finished), batch_id])
+        updated = self._b.transact(lambda tx: self.refresh_in(tx, batch_id, now))
+        return updated
 
-        self._b.transact(work)
-        return self.get(batch_id)  # type: ignore[return-value]
+    def refresh_in(self, tx: Tx, batch_id: str, now: datetime) -> RunBatch:
+        """`refresh` inside a transaction the caller already holds, returning the batch as it was just written.
+
+        Returning it saves the read-back every caller used to make; the instants are round-tripped through the store's own
+        encoding so the result equals what a read would have returned.
+        """
+        found = tx.execute(
+            f"SELECT {', '.join(rows.BATCH_COLUMNS)} FROM {self._batch} WHERE batch_id = ?", [batch_id]).rows
+        batch = rows.to_batch(found[0], self._b.parse)
+        status_counts = {r["status"]: int(r["n"]) for r in tx.execute(
+            f"SELECT status, COUNT(*) AS n FROM {self._item} WHERE batch_id = ? GROUP BY status", [batch_id]).rows}
+        status = batch_status(status_counts, cancel_requested=batch.cancel_requested)
+        c = rows.counters(status_counts)
+        done = status.value in ("succeeded", "partial", "failed", "cancelled")
+        started = batch.started_at or (now if status.value != "queued" else None)
+        finished = (batch.finished_at or now) if done else None
+        tx.execute(
+            f"UPDATE {self._batch} SET status = ?, items_total = ?, items_queued = ?, items_running = ?, "
+            "items_succeeded = ?, items_skipped = ?, items_failed = ?, items_cancelled = ?, started_at = ?, "
+            "finished_at = ? WHERE batch_id = ?",
+            [status.value, c["items_total"], c["items_queued"], c["items_running"], c["items_succeeded"],
+             c["items_skipped"], c["items_failed"], c["items_cancelled"], self._b.bind(started),
+             self._b.bind(finished), batch_id])
+        return replace(batch, status=status, counts=dict(c), started_at=self._b.parse(self._b.bind(started)),
+                       finished_at=self._b.parse(self._b.bind(finished)))
 
     def cancel(self, batch_id: str, now: datetime) -> int:
         """Stop what has not started. A leased or running item finishes: a half-written run is never abandoned."""

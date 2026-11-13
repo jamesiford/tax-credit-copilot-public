@@ -90,6 +90,7 @@ All notable changes to this project are recorded here, so changes can be followe
 - `docs/data/SOURCE-LAYOUT-GUIDANCE.md`: layout recommendations for the customer's lakehouse (recommended, not applied).
 
 ### Changed
+- Run queue cost per item fell from 13 statements in 8 transactions to 10 in 4 (measured on the SQLite stand-in by `scripts/run-batch-scale-check.py`, which now prints both): the batch counters are recomputed in the transaction that finishes the item, a claim returns its items from its own transaction, the per-client busy check is part of the candidate query, and the worker looks for lapsed leases every quarter of a lease instead of every tick (a dead worker's items return at most that much later). Leases and the one-run-per-client rule are unchanged; the local SQLite queue gains three indexes. No setting changes; nothing to run on a Warehouse.
 - The program draft second-reviewer rule compares Entra object ids (with the tenant id), recorded as `actor_oid` and `actor_tenant` on every draft event, so one person with two UPNs cannot approve their own draft. Local development (no token) keeps comparing names.
 - A run item's stored error is a typed cause plus a fixed remedy; the raw message (which could echo a request value) is kept only in the worker's log (logger `tcc.runs`) and no longer appears in the stored item or the API response.
 - The local export (`write_local`) is all or nothing: files are staged in a temporary folder inside the rules folder and moved into place, and a failure part-way removes what was placed.
