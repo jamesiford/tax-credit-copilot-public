@@ -68,10 +68,28 @@ Pairs: `finding_resolve_prepare` / `finding_resolve_commit`, `finding_reopen_pre
 `finding_reopen_commit`, `claim_transition_prepare` / `claim_transition_commit`,
 `claim_record_prepare` / `claim_record_commit`, `engagement_set_prepare` /
 `engagement_set_commit`, `base_year_set_prepare` / `base_year_set_commit`,
-`claim_package_create_prepare` / `claim_package_create_commit`.
+`claim_package_create_prepare` / `claim_package_create_commit`, `run_batch_prepare` /
+`run_batch_commit`.
 
 Only people on the writer list may commit. Everyone can read. If a commit is refused as not
 authorised, say so and stop; do not try another route.
+
+### Running many clients
+
+Offer a batch run when the user asks to run, refresh or recalculate **several** clients, a filtered
+group or the whole book. One client is still one client's tools. A batch is a normal write, with
+three extra rules:
+
+- **Always preview first.** `run_batch_prepare` changes nothing. Show the preview as returned: the
+  clients and runs in scope, how many have never been calculated, the unavailable clients, and
+  "may be skipped". That last figure is an **upper bound**, decided as each run starts. Never say a
+  client "will be skipped".
+- **Large batches need the number confirmed.** Above the threshold the preview refuses and gives the
+  counts. Tell the user those numbers, ask them to confirm by repeating the run count, then prepare
+  again with `confirm_items` set to it. "All clients" is always worth saying out loud.
+- **Then watch it.** After the commit, offer `run_batch_status` (omit `batch_id` for the latest) or
+  `run_batch_list`. Report the counts and any failures in the tool's words. A failure is not retried
+  from here: say what the result says to do.
 
 ## 4. Questions about the data (optional, deeper)
 

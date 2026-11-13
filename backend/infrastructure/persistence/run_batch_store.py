@@ -126,16 +126,24 @@ class RunBatchStore:
     # ------------------------------------------------------------------ batch status
 
     def refresh(self, batch_id: str, now: datetime) -> RunBatch:
-        """Recompute the stored counters and the status from the items. Idempotent."""
-        batch = self.get(batch_id)
-        status_counts = self.status_counts(batch_id)
-        status = batch_status(status_counts, cancel_requested=batch.cancel_requested)
-        c = rows.counters(status_counts)
-        done = status.value in ("succeeded", "partial", "failed", "cancelled")
-        started = batch.started_at or (now if status.value != "queued" else None)
-        finished = (batch.finished_at or now) if done else None
+        """Recompute the stored counters and the status from the items. Idempotent.
 
+        Read and write happen in ONE transaction. Done as separate steps, two workers finishing items at once could each
+        read the counts, then write in the opposite order, leaving the older counts (and a `running` status) on a batch
+        whose items had all finished.
+        """
         def work(tx: Tx) -> None:
+            """Read the batch and its counts, derive the status, write it back: one transaction."""
+            found = tx.execute(
+                f"SELECT {', '.join(rows.BATCH_COLUMNS)} FROM {self._batch} WHERE batch_id = ?", [batch_id]).rows
+            batch = rows.to_batch(found[0], self._b.parse)
+            status_counts = {r["status"]: int(r["n"]) for r in tx.execute(
+                f"SELECT status, COUNT(*) AS n FROM {self._item} WHERE batch_id = ? GROUP BY status", [batch_id]).rows}
+            status = batch_status(status_counts, cancel_requested=batch.cancel_requested)
+            c = rows.counters(status_counts)
+            done = status.value in ("succeeded", "partial", "failed", "cancelled")
+            started = batch.started_at or (now if status.value != "queued" else None)
+            finished = (batch.finished_at or now) if done else None
             tx.execute(
                 f"UPDATE {self._batch} SET status = ?, items_total = ?, items_queued = ?, items_running = ?, "
                 "items_succeeded = ?, items_skipped = ?, items_failed = ?, items_cancelled = ?, started_at = ?, "

@@ -17,7 +17,7 @@ from dataclasses import dataclass, field
 from typing import Any, Callable
 
 from application.runs.errors import BatchTooLarge, RunBatchRefused
-from application.runs.selection import Resolution, Scope, resolve_clients, scope_spec
+from application.runs.selection import Resolution, Scope, resolve_clients, scope_spec, unavailable_among
 from config import RunSettings
 from domain.runs import BatchKind, RunBatchItem
 
@@ -113,6 +113,7 @@ def _reads(ids: tuple[int, ...], current: list[dict[str, str]], repo: Any) -> di
 def preview(
     request: BatchRequest, settings: RunSettings, *, resolution: Resolution | None = None,
     manifests: Callable[[], Any] | None = None, assumptions: Callable[[], list[dict[str, str]]] | None = None,
+    portfolio_page: Callable[[], dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """What a start would do. Writes nothing and reads no payroll."""
     from application.services import get_run_manifest_repository
@@ -123,7 +124,12 @@ def preview(
     reads = _reads(found.client_ids, (assumptions or _assumptions)(), (manifests or get_run_manifest_repository)())
     complete = len(reads) == len(found.client_ids)
     candidates = 0 if request.force else sum(1 for r in reads.values() if r["can_skip"])
-    return _summary(request, settings, found, reads, items, candidates, complete)
+    out = _summary(request, settings, found, reads, items, candidates, complete)
+    checked = unavailable_among(found.client_ids, found.names, portfolio_page)
+    out.update(unavailable=checked["items"], unavailable_checked=checked["checked"])
+    if not checked["checked"]:
+        out["notes"].append(f"Which clients are unavailable could not be checked: {checked['reason']}")
+    return out
 
 
 def _summary(

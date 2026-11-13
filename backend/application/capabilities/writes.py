@@ -199,3 +199,26 @@ def claim_package_create_commit(
     principal: Principal, confirmation_token: str, idempotency_key: str, arguments: Mapping[str, Any],
 ) -> ToolResult:
     return _commit("claim_package_create", principal, arguments, confirmation_token, idempotency_key)
+
+
+# ------------------------------------------------------------------ run batches
+
+
+def run_batch_prepare(
+    principal: Principal, scope: Mapping[str, Any], kind: str | None = None, program_code: str | None = None,
+    tax_years: list[int] | None = None, options: Mapping[str, Any] | None = None, confirm_items: int | None = None,
+) -> ToolResult:
+    """Preview a batch of runs: counts in scope, what is known cheaply about last runs, writes nothing.
+
+    Defaults are None, not their values: the confirmation binds to the arguments exactly as the caller sent them, so a
+    default filled in here would make the commit's identical arguments look changed.
+    """
+    return _prepare("run_batch", principal, dict(
+        scope=scope, kind=kind, program_code=program_code, tax_years=tax_years, options=options,
+        confirm_items=confirm_items))
+
+
+def run_batch_commit(
+    principal: Principal, confirmation_token: str, idempotency_key: str, arguments: Mapping[str, Any],
+) -> ToolResult:
+    return _commit("run_batch", principal, arguments, confirmation_token, idempotency_key)

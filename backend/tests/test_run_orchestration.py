@@ -168,9 +168,16 @@ def _request(**kw):
     return BatchRequest(**base)
 
 
+def _page(unavailable=()):
+    rows = [{"client_id": i, "data_unavailable": i in unavailable, "unavailable_dependency": "claims_store" if i in unavailable else None}
+            for i in range(1, 8)]
+    return lambda: {"items": rows, "degraded": [{"dependency": "claims_store", "impact": "claim figures are unavailable."}] if unavailable else []}
+
+
 def test_preview_states_an_upper_bound_and_writes_nothing(monkeypatch):
     m = _Manifests()
     monkeypatch.setattr(selection, "_book", lambda: BOOK)
+    monkeypatch.setattr(selection, "_portfolio_page", _page())
     out = preview(_request(), SETTINGS, manifests=lambda: m, assumptions=lambda: [{"set_id": "a", "sha256": "s"}, {"set_id": "b", "sha256": "o"}])
     assert out["clients"] == 3 and out["items"] == 3 and out["never_run"] == 1
     assert out["skip_candidates_upper_bound"] == 2
@@ -178,8 +185,29 @@ def test_preview_states_an_upper_bound_and_writes_nothing(monkeypatch):
     assert out["first_items"][0]["last_run"]["state"] == "never_run"
 
 
+def test_preview_names_unavailable_clients_with_the_reason_and_never_calls_them_not_assessed(monkeypatch):
+    monkeypatch.setattr(selection, "_book", lambda: BOOK)
+    out = preview(_request(), SETTINGS, manifests=lambda: _Manifests(), assumptions=lambda: [], portfolio_page=_page(unavailable={2}))
+    assert out["unavailable_checked"] is True
+    assert out["unavailable"] == [{"client_id": 2, "client_name": "Client 2", "dependency": "claims_store",
+                                   "reason": "claim figures are unavailable."}]
+
+
+def test_preview_says_so_when_it_cannot_find_out_which_clients_are_unavailable(monkeypatch):
+    from application.errors import DependencyUnavailable
+
+    def down():
+        raise DependencyUnavailable("claims_store", "the store cannot be read.", "Run the migration.")
+
+    monkeypatch.setattr(selection, "_book", lambda: BOOK)
+    out = preview(_request(), SETTINGS, manifests=lambda: _Manifests(), assumptions=lambda: [], portfolio_page=down)
+    assert out["unavailable_checked"] is False and out["unavailable"] == []
+    assert any("could not be checked" in n for n in out["notes"])
+
+
 def test_preview_with_force_names_no_candidates(monkeypatch):
     monkeypatch.setattr(selection, "_book", lambda: BOOK)
+    monkeypatch.setattr(selection, "_portfolio_page", _page())
     out = preview(_request(force=True), SETTINGS, manifests=lambda: _Manifests(), assumptions=lambda: [])
     assert out["skip_candidates_upper_bound"] == 0
 
@@ -198,6 +226,7 @@ def repo(monkeypatch):
     wiring.set_run_batch_repository(r)
     monkeypatch.setattr(selection, "_book", lambda: BOOK)
     monkeypatch.setattr(selection, "_portfolio", _portfolio)
+    monkeypatch.setattr(selection, "_portfolio_page", _page())
     monkeypatch.setattr("application.runs.plan._assumptions", lambda: [])
     monkeypatch.setattr("application.services.get_run_manifest_repository", lambda: _Manifests())
     yield r
@@ -253,6 +282,13 @@ def test_the_size_cap_needs_an_explicit_override_and_only_for_all(monkeypatch, r
     with pytest.raises(errors.BatchTooLarge):
         _enqueue(client_ids=(1, 2, 3, 4, 5))
     assert _enqueue(scope_kind="all", client_ids=(), override_size_limit=True)["counts"]["total"] == 7
+
+
+def test_capability_edge_authorizes_every_client_in_a_list():
+    from application.capabilities.invoke import client_ids
+
+    assert client_ids({"client_ids": [1, 2], "arguments": {"client_ids": [3], "client_id": 4}}) == {1, 2, 3, 4}
+    assert client_ids({"client_ids": [True, "5"]}) == set()
 
 
 def test_commands_declare_the_writer_policy():

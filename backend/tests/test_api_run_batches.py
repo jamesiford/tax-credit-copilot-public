@@ -23,6 +23,7 @@ def api(monkeypatch):
     repo = SqliteRunBatchRepository(":memory:")
     run_batch_wiring.set_run_batch_repository(repo)
     monkeypatch.setattr(selection, "_book", lambda: BOOK)
+    monkeypatch.setattr(selection, "_portfolio_page", lambda: {"items": [], "degraded": []})
     monkeypatch.setattr("application.runs.plan._assumptions", lambda: [])
     monkeypatch.setattr("application.services.get_run_manifest_repository", lambda: type("M", (), {"latest": lambda s, c, **k: None})())
     monkeypatch.setenv("RUN_BATCH_CONFIRM_ABOVE", "3")
@@ -109,3 +110,35 @@ def test_an_agent_token_is_refused_on_every_write_route_and_may_read(entra, api)
     assert api.post("/api/v2/run-batches/x/cancel", headers=header).status_code == 403
     assert api.post("/api/v2/run-batches/x/retry-failed", headers=header).status_code == 403
     assert api.get("/api/v2/run-batches", headers=header).status_code == 200
+
+
+class _DeniesClient:
+    """An authorizer that refuses one client, the way an employer binding would."""
+
+    def is_authorized(self, principal, client_id):
+        return client_id != 2
+
+
+def test_a_list_naming_a_client_the_caller_may_not_touch_is_refused_at_the_edge(api):
+    from bootstrap import wiring
+
+    wiring.set_client_authorizer(_DeniesClient())
+    try:
+        refused = _start(api, scope={"kind": "list", "client_ids": [1, 2]})
+        assert refused.status_code == 403 and "client 2" in refused.json()["detail"]
+        assert api.get("/api/v2/run-batches").json()["total"] == 0, "nothing was queued"
+        assert _start(api, scope={"kind": "list", "client_ids": [1, 3]}).status_code == 202
+    finally:
+        wiring.set_client_authorizer(None)
+
+
+def test_a_group_quietly_narrows_to_the_clients_the_caller_may_touch(api):
+    from bootstrap import wiring
+
+    wiring.set_client_authorizer(_DeniesClient())
+    try:
+        out = _start(api, scope={"kind": "all"}, confirm_items=4).json()
+        assert out["counts"]["total"] == 4, "client 2 is not in 'all'"
+        assert 2 not in out["scope_spec"].get("client_ids", [])
+    finally:
+        wiring.set_client_authorizer(None)

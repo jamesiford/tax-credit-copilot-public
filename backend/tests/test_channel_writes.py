@@ -99,7 +99,7 @@ def test_every_write_capability_has_a_prepare_and_a_commit_in_the_registry():
         assert registry.get(f"{base}_prepare") and registry.get(f"{base}_commit")
     from application.capabilities.write_specs import SPECS
 
-    assert set(SPECS) == set(WRITES) | {"claim_package_create"}
+    assert set(SPECS) == set(WRITES) | {"claim_package_create", "run_batch"}
 
 
 def test_the_commit_schema_carries_the_arguments_it_must_match():

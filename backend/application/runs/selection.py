@@ -53,12 +53,40 @@ def _book() -> list[dict[str, Any]]:
     return client_book.clients_checked()
 
 
-def _portfolio(**kwargs: Any) -> list[dict[str, Any]]:
+def _portfolio_page(**kwargs: Any) -> dict[str, Any]:
     from application.queries.get_portfolio_page import GetPortfolioPageQuery
     from application.services import get_mediator
 
-    page = get_mediator().send(GetPortfolioPageQuery(limit=10_000_000, offset=0, **kwargs))
-    return list(page["items"])
+    return get_mediator().send(GetPortfolioPageQuery(limit=10_000_000, offset=0, **kwargs))
+
+
+def _portfolio(**kwargs: Any) -> list[dict[str, Any]]:
+    return list(_portfolio_page(**kwargs)["items"])
+
+
+def unavailable_among(
+    ids: tuple[int, ...], names: dict[int, Any], read_page: Callable[[], dict[str, Any]] | None = None,
+) -> dict[str, Any]:
+    """Which of these clients the portfolio cannot read claims for right now, and why.
+
+    "Unavailable" is a different statement from "not assessed": the store could not answer, so whether the client was
+    assessed is unknown. A preview that cannot find out says so (`checked: false`) instead of reporting none.
+    """
+    from application.errors import DependencyUnavailable
+
+    try:
+        page = (read_page or _portfolio_page)()
+    except DependencyUnavailable as failure:
+        return {"checked": False, "items": [], "reason": failure.reason}
+    why = {d["dependency"]: d.get("impact") for d in page.get("degraded") or []}
+    wanted = set(ids)
+    items = [
+        {"client_id": int(r["client_id"]), "client_name": names.get(int(r["client_id"])),
+         "dependency": r.get("unavailable_dependency"),
+         "reason": why.get(r.get("unavailable_dependency")) or "the claim figures cannot be loaded right now"}
+        for r in page.get("items") or [] if r.get("data_unavailable") and int(r["client_id"]) in wanted
+    ]
+    return {"checked": True, "items": items}
 
 
 #: One check per row filter, so adding a filter is one line and no function grows.
@@ -90,6 +118,23 @@ def _filtered(scope: Scope, names: dict[int, Any], portfolio: Callable[..., list
     ))
 
 
+def _entitled(ids: tuple[int, ...], scope: Scope) -> tuple[int, ...]:
+    """The clients the caller may act for. A named client they may not is refused; a group quietly excludes them.
+
+    A person who asks for "all clients" means all they may see, so the group is narrowed. A person who names a client
+    they may not touch has asked for something specific, and a silent skip would hide that it was refused.
+    """
+    from application.identity import ANONYMOUS, NotAuthorized, ambient_principal
+    from application.services import get_client_authorizer
+
+    authorizer, principal = get_client_authorizer(), ambient_principal() or ANONYMOUS
+    allowed = tuple(i for i in ids if authorizer.is_authorized(principal, i))
+    if len(allowed) != len(ids) and scope.kind in (ScopeKind.ONE, ScopeKind.LIST):
+        refused = sorted(set(ids) - set(allowed))
+        raise NotAuthorized(f"not authorized for client {refused[0]}")
+    return allowed
+
+
 def resolve_clients(
     scope: Scope, *, book: Callable[[], list[dict[str, Any]]] | None = None,
     portfolio: Callable[..., list[dict[str, Any]]] | None = None,
@@ -103,6 +148,7 @@ def resolve_clients(
         ids = tuple(sorted(names))
     else:
         ids = _filtered(scope, names, portfolio)
+    ids = _entitled(ids, scope)
     if not ids:
         raise EmptyScope()
     return Resolution(ids, {i: names.get(i) for i in ids})
