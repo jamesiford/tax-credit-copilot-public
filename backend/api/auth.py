@@ -90,6 +90,16 @@ def _as_client_id(value: Any) -> int | None:
     return None
 
 
+def _listed_client_ids(body: dict[str, Any]) -> list[Any]:
+    """The clients a run batch names in a list, at the top of the body or inside its `scope`."""
+    out: list[Any] = []
+    for holder in (body, body.get("scope")):
+        if isinstance(holder, dict):
+            for listed in (holder.get("client_ids"), holder.get("account_ids")):
+                out.extend(listed if isinstance(listed, list) else [])
+    return out
+
+
 async def _client_ids(request: Request) -> set[int]:
     found: list[Any] = []
     for key in _CLIENT_KEYS:
@@ -103,6 +113,7 @@ async def _client_ids(request: Request) -> set[int]:
             body = None
         if isinstance(body, dict):
             found.extend(body.get(key) for key in _CLIENT_KEYS)
+            found.extend(_listed_client_ids(body))
     return {cid for cid in (_as_client_id(v) for v in found) if cid is not None}
 
 

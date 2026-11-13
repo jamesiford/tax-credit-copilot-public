@@ -19,6 +19,7 @@ from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from typing import Any
 
+from application.capabilities.write_runs import build_run_batch, preview_run_batch
 from application.identity import Principal
 from application.mediator import Command
 from domain.claims import ClaimStatus, EngagementScope, Provenance
@@ -240,4 +241,5 @@ SPECS: dict[str, WriteSpec] = {spec.base: spec for spec in (
     WriteSpec("engagement_set", "Set the engagement for a programme.", _build_engagement, _preview_engagement),
     WriteSpec("base_year_set", "Set a location's base year.", _build_base_year, _preview_base_year),
     WriteSpec("claim_package_create", "Build the claim package.", _build_package, _preview_package),
+    WriteSpec("run_batch", "Run assessments or calculations for many clients.", build_run_batch, preview_run_batch),
 )}

@@ -210,6 +210,33 @@ Not carried over from the API's stack, and why: the token budget, breaker, bulkh
 (`bootstrap/ai_wiring._decorate`) wrap `AgentRuntime`, which has no tool calls; here a call has a timeout
 (`AI_TOTAL_DEADLINE_SECONDS`) and the chain's fallback. A shared budget is the follow-up if a customer needs it.
 
+## Running many clients (ADR-012)
+
+`run_batch_prepare` / `run_batch_commit` start a tracked batch of assessments or calculations for one client, a list of
+accounts, a filtered group or all clients; `run_batch_status` and `run_batch_list` read progress. Nothing here is a new
+way to compute: the commit sends the same `EnqueueRunBatchCommand` the portal sends, authored by the person the
+gateway acts for, and the worker (`docs/architecture/RUN-ORCHESTRATION.md`) calls the existing run and assess commands.
+
+- **The preview is the dry run.** It writes nothing and reads no payroll: clients and runs in scope, how many have never
+  been calculated, the unavailable clients, and "may be skipped" as an **upper bound** that is decided as each run starts,
+  never a promise. It always comes first; a batch cannot be committed without a token minted by it.
+- **The typed confirmation, in two steps.** Above `RUN_BATCH_CONFIRM_ABOVE` runs the preview *refuses* and states the counts.
+  The person is told them; if they agree, the agent prepares again with `confirm_items` set to the count, which becomes part
+  of the arguments the token binds. "All clients" follows the same rule and is also said out loud.
+- **Who.** Only a listed writer gets a token, like every write; the commit goes through the mediator, where the writer policy
+  decides again. Every account a request names is authorized at the API edge, and a group ("all", a filter) is narrowed to
+  the accounts the person may act for. The old run and assess routes stay refused to an agent token.
+- **The model never names the reader's client.** No schema carries `client_id`; the accounts of a batch are
+  `scope.account_ids`, which the hosted orchestrator's model cannot know, so there it uses a filter or "all". Cowork's model
+  can pass the ids of clients it has resolved.
+- **Reads.** `run_batch_status` (omit `batch_id` for the latest) gives status, counts and failures by cause, and any degraded
+  `run_worker` warning; `run_batch_list` gives the most recent. Figures are the queue's own counts, rendered like every other
+  tool result and held to the same numeric guard.
+
+Adding these four capabilities changed the catalog (36 tools), the gateway's tool list, the vendored orchestrator copy
+(`python scripts/vendor-orchestrator.py`) and the Cowork skill `tcc-figures-and-writes`. The orchestrator and the Cowork
+plugin have to be republished before a live Teams or Cowork session sees them; nothing is published from the repository build.
+
 ## Claim packages
 
 "Send me the claim package for <client> <year>" is a write like any other: the model prepares

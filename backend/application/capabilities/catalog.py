@@ -24,6 +24,7 @@ from __future__ import annotations
 
 from application.capabilities.catalog_data import DATA_TOOLS, LOOKUP  # noqa: F401 - re-exported
 from application.capabilities.catalog_intents import CAPABILITIES, CHAT_INTENT_TOOL, NEEDS_CLIENT  # noqa: F401
+from application.capabilities.catalog_runs import RUN_READS, RUN_WRITES
 from application.capabilities.catalog_types import (  # noqa: F401 - re-exported
     ACTIONS, CERTIFIED_METHODS, CODE_ONLY, DEBUG, GATEWAY_LOCAL, INTERNAL, KINDS, METHODS, READ, TAX_YEAR, WRITE_COMMIT,
     WRITE_PREPARE, CapabilitySpec, ReaderOwned, _CLAIM_STATUSES, _CLIENT_ID, _METHOD, _PROGRAM, _STATE, _TAX_YEAR, _TOKEN,
@@ -184,8 +185,10 @@ CATALOG: tuple[CapabilitySpec, ...] = (
             ("draft_text",),
         ),
     ),
+    *RUN_READS,
     *_PACKAGE_TOOLS,
     *_WRITES,
+    *RUN_WRITES,
 )
 
 BY_NAME: dict[str, CapabilitySpec] = {spec.name: spec for spec in CATALOG}

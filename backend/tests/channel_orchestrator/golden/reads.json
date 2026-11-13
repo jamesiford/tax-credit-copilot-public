@@ -84,6 +84,22 @@
     }]
   },
   {
+    "name": "how_is_the_latest_run_batch_going",
+    "turns": [{
+      "say": "How is the batch run going?",
+      "model": [{"tools": [{"tool": "run_batch_status", "args": {}}]}, {"text": "The table shows the counts."}],
+      "expect": {"kind": "answer", "gateway": ["run_batch_status"], "guard": "pass"}
+    }]
+  },
+  {
+    "name": "recent_run_batches_need_no_client",
+    "turns": [{
+      "say": "What runs have been started lately?",
+      "model": [{"tools": [{"tool": "run_batch_list", "args": {"limit": 5}}]}, {"text": "The most recent batches are listed."}],
+      "expect": {"kind": "answer", "gateway": ["run_batch_list"], "args": {"run_batch_list": {"limit": 5}}, "guard": "pass"}
+    }]
+  },
+  {
     "name": "history_of_one_claim_cell",
     "turns": [{
       "say": "What has happened to Cascade's GA_JTC claim for 2023?",

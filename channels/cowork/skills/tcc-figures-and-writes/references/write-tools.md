@@ -13,6 +13,7 @@ Ask for what you are missing; never guess a client, programme, year or unit.
 | `engagement_set_prepare` / `engagement_set_commit` | `client_id`, `program_code`, `scope` (`in_scope`, `out_of_scope` or `prospective`), optional `note` | Whether the programme is the firm's mandate for that client, and the previous value. |
 | `base_year_set_prepare` / `base_year_set_commit` | `client_id`, `unit_id`, `base_year` | The location and the base year it would move to. It recalculates the client from that year. |
 | `claim_package_create_prepare` / `claim_package_create_commit` | `client_id`, `tax_year` | The package that would be built for the client-year. |
+| `run_batch_prepare` / `run_batch_commit` | `scope` (`kind`: `one`, `list`, `filter` or `all`; `account_ids` for `one` and `list`; `filter` for `filter`: `band`, `state`, `program`, `year`, `outcome`, `status`, `unassessed`, `unavailable`), optional `kind` (`assess`, `calculate` or `assess_and_calculate`), `program_code`, `tax_years`, `options` (`force`, `refresh_once`), `confirm_items` | The clients and runs in scope, never-calculated and unavailable counts, and an upper bound on skips (decided as each run starts). Above the threshold the preview refuses and states the counts: ask the person to confirm the count, then prepare again with `confirm_items`. |
 
 After `claim_package_create_commit`, call `claim_package_link` with the same `client_id` and
 `tax_year`. It returns a download address that works once, for the person who asked, for a few
@@ -21,3 +22,6 @@ been used or has expired, call `claim_package_link` again.
 
 Status values for the two claim tools: `not_assessed`, `assessed`, `proposed`, `declined`,
 `claimed`, `certified`, `amended`.
+
+Two reads follow a batch: `run_batch_status` (one batch; omit `batch_id` for the latest) and
+`run_batch_list` (the most recent). Neither names a client.

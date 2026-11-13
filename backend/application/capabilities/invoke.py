@@ -150,6 +150,17 @@ def timeout_seconds(env: Mapping[str, str] | None = None) -> float:
     return seconds
 
 
+def _listed_ids(source: Mapping[str, Any]) -> set[int]:
+    """Clients a run batch names in a list, at the top or inside its scope: every one of them is authorized."""
+    found: set[int] = set()
+    for holder in (source, source.get("scope")):
+        if isinstance(holder, Mapping):
+            for listed in (holder.get("client_ids"), holder.get("account_ids")):
+                if isinstance(listed, list):
+                    found.update(v for v in listed if isinstance(v, int) and not isinstance(v, bool))
+    return found
+
+
 def client_ids(args: Mapping[str, Any]) -> set[int]:
     """Every client id a request names, including inside a commit's `arguments`."""
     found: set[int] = set()
@@ -159,6 +170,7 @@ def client_ids(args: Mapping[str, Any]) -> set[int]:
                 value = source.get(key)
                 if isinstance(value, int) and not isinstance(value, bool):
                     found.add(value)
+            found.update(_listed_ids(source))
     return found
 
 

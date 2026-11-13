@@ -158,7 +158,7 @@ def _marked(spec: CapabilitySpec, *tags: str, both_methods: bool = False) -> Cap
 
 def _write_pair(
     name: str, description: str, properties: dict[str, Any], required: tuple[str, ...],
-    *, needs_year: bool = False, implemented: bool = True,
+    *, needs_year: bool = False, implemented: bool = True, needs_client: bool = True,
 ) -> tuple[CapabilitySpec, CapabilitySpec]:
     """A write is two steps: a preview bound to the caller, then a commit.
 
@@ -169,7 +169,7 @@ def _write_pair(
     prepare = CapabilitySpec(
         name=f"{name}_prepare",
         description=f"Preview: {description} Changes nothing; returns a confirmation token.",
-        kind=WRITE_PREPARE, needs_client=True, needs_year=needs_year,
+        kind=WRITE_PREPARE, needs_client=needs_client, needs_year=needs_year,
         schema=_object(properties, required), implemented=implemented,
     )
     commit = CapabilitySpec(
@@ -177,7 +177,7 @@ def _write_pair(
         description=(
             f"Commit: {description} Requires the token from the preview and the same arguments."
         ),
-        kind=WRITE_COMMIT, needs_client=True, needs_year=needs_year,
+        kind=WRITE_COMMIT, needs_client=needs_client, needs_year=needs_year,
         schema=_object(
             {"confirmation_token": {"type": "string"}, "idempotency_key": {"type": "string"},
              "arguments": _object(properties, required)},
