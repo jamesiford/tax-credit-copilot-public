@@ -169,3 +169,27 @@ class WithdrawBody(BaseModel):
     """Why the draft is being withdrawn (optional)."""
     reason: str | None = None
     actor: str | None = None
+
+
+class ExportBody(BaseModel):
+    """`write_local` writes the pack files into the rules folder: developers only, local development with the setting on."""
+    write_local: bool = False
+    actor: str | None = None
+
+
+class ManifestOut(BaseModel):
+    """The bundle a draft produces: every file with its SHA-256, the checklist line for the changelog and the bundle's own hash."""
+    kind: str
+    schema_version: int
+    draft_id: str
+    proposed_code: str
+    name: str
+    state: str | None
+    content_sha256: str
+    approved_sha256: str | None
+    verification: str
+    has_runtime_authority: bool
+    changelog_line: str
+    files: list[dict[str, Any]]
+    bundle_sha256: str
+    bundle_bytes: int

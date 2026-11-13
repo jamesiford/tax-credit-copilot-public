@@ -82,6 +82,8 @@
   "POST /api/v2/program-drafts/{draft_id}/validate",
   "POST /api/v2/program-drafts/{draft_id}/request-review",
   "POST /api/v2/program-drafts/{draft_id}/preview",
+  "POST /api/v2/program-drafts/{draft_id}/export",
+  "GET /api/v2/program-drafts/{draft_id}/export/manifest",
   "POST /api/v2/program-drafts/{draft_id}/review",
   "POST /api/v2/program-drafts/{draft_id}/withdraw",
   "GET /api/v2/run-batches",

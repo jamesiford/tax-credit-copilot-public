@@ -28,6 +28,13 @@ class GetProgramDraftQuery(Query):
     policy = Policy.WRITER
 
 
+@dataclass(frozen=True)
+class GetProgramDraftManifestQuery(Query):
+    """The manifest of the bundle an approved or exported draft produces (file paths and hashes); no status change, no event."""
+    draft_id: str = ""
+    policy = Policy.WRITER
+
+
 def handle_list_program_drafts(query: ListProgramDraftsQuery) -> dict[str, Any]:
     from application.program_drafts.views import summary_view
     from application.services import get_program_draft_repository
@@ -44,3 +51,10 @@ def handle_get_program_draft(query: GetProgramDraftQuery) -> dict[str, Any]:
     repo = get_program_draft_repository()
     draft = lifecycle.load(repo, query.draft_id)
     return {**draft_view(draft), "events": [event_view(e) for e in repo.events(draft.draft_id)]}
+
+
+def handle_get_program_draft_manifest(query: GetProgramDraftManifestQuery) -> dict[str, Any]:
+    from application.program_drafts import export
+    from application.services import get_program_draft_repository
+
+    return export.manifest(get_program_draft_repository(), query.draft_id)
