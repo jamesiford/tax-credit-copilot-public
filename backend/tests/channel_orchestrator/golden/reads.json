@@ -100,6 +100,22 @@
     }]
   },
   {
+    "name": "which_programs_can_we_calculate_needs_no_client",
+    "turns": [{
+      "say": "Which programs can we calculate today?",
+      "model": [{"tools": [{"tool": "program_catalog", "args": {}}]}, {"text": "The table lists each program and says none is verified."}],
+      "expect": {"kind": "answer", "gateway": ["program_catalog"], "guard": "pass"}
+    }]
+  },
+  {
+    "name": "one_program_in_detail",
+    "turns": [{
+      "say": "What blocks calculating the South Carolina credit?",
+      "model": [{"tools": [{"tool": "program_catalog", "args": {"program_code": "SC_JTC"}}]}, {"text": "The blockers are listed."}],
+      "expect": {"kind": "answer", "gateway": ["program_catalog"], "args": {"program_catalog": {"program_code": "SC_JTC"}}, "guard": "pass"}
+    }]
+  },
+  {
     "name": "history_of_one_claim_cell",
     "turns": [{
       "say": "What has happened to Cascade's GA_JTC claim for 2023?",

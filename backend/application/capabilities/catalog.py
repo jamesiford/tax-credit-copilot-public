@@ -24,6 +24,7 @@ from __future__ import annotations
 
 from application.capabilities.catalog_data import DATA_TOOLS, LOOKUP  # noqa: F401 - re-exported
 from application.capabilities.catalog_intents import CAPABILITIES, CHAT_INTENT_TOOL, NEEDS_CLIENT  # noqa: F401
+from application.capabilities.catalog_programs import PROGRAM_READS
 from application.capabilities.catalog_runs import RUN_READS, RUN_WRITES
 from application.capabilities.catalog_types import (  # noqa: F401 - re-exported
     ACTIONS, CERTIFIED_METHODS, CODE_ONLY, DEBUG, GATEWAY_LOCAL, INTERNAL, KINDS, METHODS, READ, TAX_YEAR, WRITE_COMMIT,
@@ -186,6 +187,7 @@ CATALOG: tuple[CapabilitySpec, ...] = (
         ),
     ),
     *RUN_READS,
+    *PROGRAM_READS,
     *_PACKAGE_TOOLS,
     *_WRITES,
     *RUN_WRITES,

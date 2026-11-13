@@ -11,7 +11,7 @@ from collections.abc import Callable
 from typing import Any
 
 from application.capabilities import (
-    book, catalog, claims, client, data_catalog, data_query, findings, package, runs, simulate, verify, walkthrough,
+    book, catalog, claims, client, data_catalog, data_query, findings, package, program_reads, runs, simulate, verify, walkthrough,
     writes,
 )
 from application.capabilities.envelope import ToolResult
@@ -32,6 +32,7 @@ FUNCTIONS: dict[str, Callable[..., ToolResult]] = {
     "verify_figures": verify.verify_figures,
     "run_batch_status": runs.run_batch_status,
     "run_batch_list": runs.run_batch_list,
+    "program_catalog": program_reads.program_catalog,
     # Data tools take `principal` first: it picks the budget a query is spent against and decides
     # whether Copilot Cowork may be handed employee-level rows.
     "data_catalog": data_catalog.data_catalog,
