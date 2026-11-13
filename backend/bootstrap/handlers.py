@@ -33,6 +33,7 @@ from application.commands.set_engagement import SetEngagementCommand, handle_set
 from application.commands.transition_claim import TransitionClaimCommand, handle_transition_claim
 from application.mediator import Mediator
 from bootstrap import run_batch_wiring  # noqa: F401 - binds the run batch repository for the handlers below
+from bootstrap.program_handlers import register_program_handlers
 from application.queries.get_channel_audit import GetChannelAuditQuery, handle_get_channel_audit
 from application.queries.get_client_situation import GetClientSituationQuery, handle_get_client_situation
 from application.queries.get_coverage import (
@@ -146,4 +147,5 @@ def register_handlers(mediator: Mediator) -> Mediator:
     _register_queries(mediator)
     _register_streaming_queries(mediator)
     _register_commands(mediator)
+    register_program_handlers(mediator)
     return mediator

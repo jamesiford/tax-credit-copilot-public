@@ -35,6 +35,7 @@ from api.summary import router as summary_router  # noqa: E402
 from api.ingestion import router as ingestion_router  # noqa: E402
 from api.findings import router as findings_router  # noqa: E402
 from api.proximity import router as proximity_router  # noqa: E402
+from api.programs import router as programs_router  # noqa: E402
 from api.run_batches import router as run_batches_router  # noqa: E402
 from api.scope import router as scope_router  # noqa: E402
 from api.trend import router as trend_router  # noqa: E402
@@ -171,8 +172,7 @@ async def _dependency_unavailable(_request: Request, exc: DependencyUnavailable)
 
 install_error_handlers(app)
 
-# Must run here, before the app serves: middleware cannot be added once the
-# stack is built, and the lifespan runs inside the first call that builds it.
+# Must run here, before the app serves: middleware cannot be added once the stack is built.
 instrument_fastapi(app)
 
 
@@ -243,6 +243,7 @@ app.include_router(summary_router)
 app.include_router(ingestion_router)
 app.include_router(findings_router)
 app.include_router(proximity_router)
+app.include_router(programs_router)
 app.include_router(run_batches_router)
 app.include_router(scope_router)
 app.include_router(trend_router)
