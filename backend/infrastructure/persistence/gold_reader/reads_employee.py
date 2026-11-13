@@ -1,14 +1,22 @@
 """Who qualifies, and one employee's derivation."""
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Unpack
 
+from application.gold_read_port import EligibilityOptions
 from infrastructure.persistence.fabric_warehouse import GOLD_SCHEMA
 from infrastructure.persistence.gold_reader.columns import _rows, month_ends_of
 from infrastructure.persistence.gold_reader.reader_base import ReaderBase
 from infrastructure.persistence.gold_reader.stmt_drill import _stmt_drill_periods, _stmt_drill_segments, _stmt_drill_verdicts
 from infrastructure.persistence.gold_reader.stmt_eligibility import _stmt_eligibility_matching, _stmt_eligibility_page, _stmt_eligibility_summary
 from infrastructure.persistence.gold_reader.stmt_run_summary import _stmt_method_summary
+
+
+#: What an eligibility page asks for when it asks for nothing, in the order `eligibility_population` unpacks them.
+_ELIGIBILITY_DEFAULTS: dict[str, Any] = {
+    "band": 0.05, "status": "all", "near_floor": False, "q": "", "limit": 50, "offset": 0,
+    "sort": "employee_id", "order": "asc", "program_code": None,
+}
 
 
 class EmployeeReads(ReaderBase):
@@ -21,14 +29,7 @@ class EmployeeReads(ReaderBase):
         tax_year: int,
         min_weekly_hours: float,
         min_weekly_wages: float,
-        band: float = 0.05,
-        status: str = "all",
-        near_floor: bool = False,
-        q: str = "",
-        limit: int = 50,
-        offset: int = 0,
-        sort: str = "employee_id",
-        order: str = "asc",
+        **options: Unpack[EligibilityOptions],
     ) -> dict[str, Any]:
         """Who qualifies, READ from the run that decided it.
 
@@ -41,7 +42,8 @@ class EmployeeReads(ReaderBase):
         Three statements in one round trip: the summary, which the filters must
         never move, the page, and how many rows the filter matched.
         """
-        run = self.latest_run(client_id)
+        band, status, near_floor, q, limit, offset, sort, order, program_code = {**_ELIGIBILITY_DEFAULTS, **options}.values()
+        run = self.latest_run(client_id, program_code)
         if run is None:
             return {"run": None, "summary": None, "rows": [], "matching": 0}
 
@@ -74,7 +76,7 @@ class EmployeeReads(ReaderBase):
         }
 
     def employee_drill(
-        self, client_id: int, *, tax_year: int, record_token: str
+        self, client_id: int, *, tax_year: int, record_token: str, program_code: str | None = None
     ) -> dict[str, Any]:
         """One employee's derivation, READ, in a single round trip.
 
@@ -83,7 +85,7 @@ class EmployeeReads(ReaderBase):
         client-year and matched — on top of loading the payroll twice and
         replaying both certified methods, per click.
         """
-        run = self.latest_run(client_id)
+        run = self.latest_run(client_id, program_code)
         if run is None:
             return {"run": None, "verdicts": [], "segments": [], "periods": []}
 

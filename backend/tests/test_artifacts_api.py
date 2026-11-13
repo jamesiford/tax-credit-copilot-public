@@ -42,7 +42,7 @@ class FakeSource:
     def __init__(self, run=RUN):
         self.run = run
 
-    def latest_run(self, client_id):
+    def latest_run(self, client_id, program_code=None):
         return self.run
 
     def coverage(self, client_id, tax_year):

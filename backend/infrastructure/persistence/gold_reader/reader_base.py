@@ -103,7 +103,7 @@ class ReaderBase:
 
         return self._retrying(work)
 
-    def latest_run(self, client_id: int) -> dict[str, Any] | None:
+    def latest_run(self, client_id: int, program_code: str | None = None) -> dict[str, Any] | None:
         """The live run for a client, or None when it has never been calculated.
 
         Live means completed successfully and not yet superseded. `None` is the
@@ -112,7 +112,7 @@ class ReaderBase:
         Takes no tax year: a run is current for a client, and the year selects
         ROWS rather than runs. See `_stmt_latest_run`.
         """
-        return self._one(_stmt_latest_run(client_id))
+        return self._one(_stmt_latest_run(client_id, program_code))
 
     def run_in_flight(self, client_id: int) -> dict[str, Any] | None:
         """A run that has started and not finished, or None.

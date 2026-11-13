@@ -29,6 +29,7 @@ class RiskReads(ReaderBase):
         min_weekly_hours: float,
         min_weekly_wages: float,
         band: float = 0.10,
+        program_code: str | None = None,
     ) -> dict[str, Any]:
         """Qualified employees sitting barely above a floor, READ.
 
@@ -36,7 +37,7 @@ class RiskReads(ReaderBase):
         it" is a question about the people already INSIDE, and no near-miss
         read can answer it: that cohort is everybody outside.
         """
-        run = self.latest_run(client_id)
+        run = self.latest_run(client_id, program_code)
         if run is None:
             return {"run": None, "rows": [], "counts": None}
 
@@ -58,6 +59,7 @@ class RiskReads(ReaderBase):
         min_weekly_hours: float,
         min_weekly_wages: float,
         widest_band_hours: float,
+        program_code: str | None = None,
     ) -> dict[str, Any]:
         """Everyone who could still reach the band, and the counts they sit in.
 
@@ -71,7 +73,7 @@ class RiskReads(ReaderBase):
         separate statements so that a denominator can never be quietly taken
         over the filtered set.
         """
-        run = self.latest_run(client_id)
+        run = self.latest_run(client_id, program_code)
         if run is None:
             return {"run": None, "rows": [], "counts": None}
 

@@ -185,14 +185,16 @@ def fiscal_window_for_state_year(account_id: int | None, state: str, tax_year: i
     client's own. Only a state with no programme to take a convention from gives None; a typed dependency failure
     (`strict` policy, an unavailable lookup) propagates.
     """
-    from tools.credit_math import PROGRAM_CODE_TO_PACK, STATE_TO_PACK, resolve_tax_year_convention
+    from tools.credit_math import resolve_tax_year_convention
+    from tools.program_registry import program_for_code, programs_for_state
 
-    pack_file = STATE_TO_PACK.get((state or "").upper())
-    code = next((c for c, f in PROGRAM_CODE_TO_PACK.items() if f == pack_file), None) if pack_file else None
-    if not code:
+    # `state` may also be a PROGRAM code, which names its own convention; a state names its default program's. [F04c.6]
+    key = (state or "").upper()
+    entry = program_for_code(key) or next(iter(programs_for_state(key)), None)
+    if entry is None:
         return None
     try:
-        convention = resolve_tax_year_convention(code, tax_year)
+        convention = resolve_tax_year_convention(entry.code, tax_year)
     except (FileNotFoundError, ValueError, KeyError):  # a year with no authored statute has no window
         return None
     return client_fiscal_window(account_id, tax_year, convention["label"])

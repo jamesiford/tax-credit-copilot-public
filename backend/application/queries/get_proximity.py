@@ -30,6 +30,7 @@ class GetProximityQuery(Query):
     within_weekly_hours: float = 5.0
     limit: int = 100
     account_id: int | None = None
+    program_code: str | None = None  # a state with several programs needs it [F04c.6]
     #: WI-19. Add what each person needs over the REST of the year, as of the
     #: in-year checkpoint (31 August unless `as_of` says otherwise).
     rest_of_year: bool = False
@@ -84,9 +85,7 @@ def handle_get_proximity(query: GetProximityQuery) -> dict[str, Any]:
     # the programme, not about the client, and they decline by name whether or
     # not a client was named.
     try:
-        resolved = resolve_statute(
-            account_id=query.account_id, state=query.state, tax_year=query.tax_year
-        )
+        resolved = resolve_statute(account_id=query.account_id, state=query.state, tax_year=query.tax_year, program_code=query.program_code, require_program=True)
     except LookupError as exc:
         raise ProximityNotAvailable(str(exc)) from exc
 
@@ -108,6 +107,7 @@ def handle_get_proximity(query: GetProximityQuery) -> dict[str, Any]:
         min_weekly_hours=float(resolved.floors.min_weekly_hours),
         min_weekly_wages=float(resolved.floors.min_weekly_wages),
         widest_band_hours=widest_band,
+        program_code=resolved.program_code,
     )
     run = population["run"]
     rows = population["rows"]

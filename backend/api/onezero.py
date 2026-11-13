@@ -17,10 +17,11 @@ from __future__ import annotations
 
 from typing import Any
 
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi import Query as FastAPIQuery
 from pydantic import BaseModel, Field
 
+from api._client_program import ClientProgram, client_program
 from api._payperiods import payroll_errors_as_http
 from api.auth import attributed
 from application.commands.review_employee import ReviewEmployeeCommand
@@ -41,7 +42,7 @@ router = APIRouter(prefix="/api", tags=["onezero"])
 def onezero_matrix(
     tax_year: int,
     state: str = FastAPIQuery("GA", description="Two-letter state code"),
-    account_id: int | None = FastAPIQuery(None, description="Client; defaults to the tenant"),
+    scope: ClientProgram = Depends(client_program),
     method: str = FastAPIQuery("min_max", description="min_max | pay_period"),
 ) -> dict[str, Any]:
     """The monthly one/zero allocation for one client, at unit x legal entity.
@@ -53,7 +54,7 @@ def onezero_matrix(
     """
     try:
         query = GetOneZeroMatrixQuery(
-            tax_year=tax_year, state=state, account_id=account_id, method=method,
+            tax_year=tax_year, state=state, account_id=scope.account_id, method=method, program_code=scope.program_code,
         )
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc

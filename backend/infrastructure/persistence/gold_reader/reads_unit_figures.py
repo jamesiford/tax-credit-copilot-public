@@ -36,10 +36,10 @@ class UnitFigureReads(ReaderBase):
         return items, int(counted[0]["total"]) if counted else 0
 
     def unit(
-        self, client_id: int, worksite_id: str, *, tax_year: int, method: str
+        self, client_id: int, worksite_id: str, *, tax_year: int, method: str, program_code: str | None = None
     ) -> dict[str, Any] | None:
         """One unit-year row, or None when the run holds no such unit."""
-        return self._one(_stmt_unit(client_id, worksite_id, tax_year, method))
+        return self._one(_stmt_unit(client_id, worksite_id, tax_year, method, program_code))
 
     def unit_months(
         self, client_id: int, worksite_id: str, *, tax_year: int, method: str, run_id: str

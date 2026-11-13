@@ -85,12 +85,12 @@ class ClientRun:
 
 
 def resolve_statute(
-    *, account_id: int | None, state: str | None = None, tax_year: int, program_code: str | None = None
+    *, account_id: int | None, state: str | None = None, tax_year: int, program_code: str | None = None, require_program: bool = False,
 ) -> ResolvedStatute:
     """Programme, floors, rule pack and fiscal window — no payroll.
 
     The programme is the key, the state a convenience that resolves to it (`resolve_program`); the chosen
-    `program_code` is always on the result. [F04c.2]
+    `program_code` is always on the result. A READ passes `require_program=True` so a state with several programs asks which. [F04c.2, F04c.6]
 
     Declines exactly as `resolve_client_run` does, and for the same reasons: an
     unmapped state and an unauthored year are both real gaps in coverage, and
@@ -105,7 +105,7 @@ def resolve_statute(
     )
 
     try:
-        state, program_code = resolve_program(account_id, state, program_code, tax_year)
+        state, program_code = resolve_program(account_id, state, program_code, tax_year, require_program=require_program)
     except ProgramNotRunnable as exc:
         raise ClientRunNotAvailable(str(exc)) from exc
     if program_code is None:

@@ -11,8 +11,10 @@ from __future__ import annotations
 
 from typing import Any
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi import Query as QueryParam
+
+from api._client_program import ClientProgram, client_program
 
 from application.queries.get_eligibility import (
     EligibilityNotAvailable,
@@ -27,7 +29,7 @@ router = APIRouter(prefix="/api/eligibility", tags=["eligibility"])
 def eligibility(
     tax_year: int,
     state: str = QueryParam(..., description="Two-letter state code, e.g. GA"),
-    account_id: int | None = QueryParam(None, description="Client; defaults to the tenant"),
+    scope: ClientProgram = Depends(client_program),
     status: str = QueryParam("all", description="all | both | min_max_only | pay_period_only | neither"),
     near_floor: bool = QueryParam(False, description="Only employees within 5% of a floor"),
     q: str = QueryParam("", description="Employee id substring"),
@@ -46,7 +48,7 @@ def eligibility(
         query = GetEligibilityQuery(
             tax_year=tax_year,
             state=state,
-            account_id=account_id,
+            account_id=scope.account_id, program_code=scope.program_code,
             status=status,
             near_floor=near_floor,
             q=q,

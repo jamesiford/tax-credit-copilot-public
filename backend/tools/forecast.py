@@ -23,6 +23,7 @@ from typing import Any
 
 from domain.calculation.onezero import run_pay_period_method, fiscal_window_start, _twelve_month_ends
 from tools.credit_math import load_pack_one_zero, apply_one_zero_state_credit
+from tools.program_credit import state_of
 from domain.calculation.trail import current_recorder
 
 _ROADMAP_TAG = "N2"
@@ -83,8 +84,8 @@ def project_state_year_end(
     practice: the average is a sum over N months, and reporting a different N
     beside it makes the denominator note describe a calculation nobody did.
     """
-    state_u = state.upper()
-    pack = load_pack_one_zero(state_u, tax_year=tax_year)
+    key, state_u = state.upper(), state_of(state)  # `state` may be a program code: it then prices that program [F04c.6]
+    pack = load_pack_one_zero(key, tax_year=tax_year)
     if pack is None:
         return None
 
@@ -100,8 +101,7 @@ def project_state_year_end(
         ytd_avg = _ytd_average_headcount(full.summary, months_elapsed)
     else:
         ytd_avg = round(float(ytd_average_headcount), 2)
-    # Linear run-rate: the projected full-year Average Headcount == the YTD
-    # run-rate (the current monthly headcount, assumed to hold through year-end).
+    # Linear run-rate: projected full-year Average Headcount == the YTD run-rate, assumed to hold through year-end.
     projected_avg = ytd_avg
 
     # Prior-year Average Headcount (the frozen comparison base for net-new).
@@ -109,7 +109,7 @@ def project_state_year_end(
         prior_avg = float(prior_average_headcount)
     else:
         prior_avg = 0.0
-        prior_pack = load_pack_one_zero(state_u, tax_year=tax_year - 1)
+        prior_pack = load_pack_one_zero(key, tax_year=tax_year - 1)
         state_prior_rows = [r for r in prior_rows if str(r["Worksite_ID"]).startswith(f"{state_u}_")]
         if prior_pack is not None and state_prior_rows:
             prior_res = run_pay_period_method(
@@ -119,10 +119,9 @@ def project_state_year_end(
             )
             prior_avg = prior_res.annual_average
 
-    credit = apply_one_zero_state_credit(state_u, projected_avg, prior_period_average_headcount=prior_avg)
+    credit = apply_one_zero_state_credit(key, projected_avg, prior_period_average_headcount=prior_avg)
     threshold = float(credit.get("threshold") or 0.0)
-    # The "finish line" = the Average Headcount at which net-new first clears the
-    # statutory minimum (prior-year base + threshold).
+    # The "finish line": the Average Headcount at which net-new first clears the statutory minimum.
     finish_line = round(prior_avg + threshold, 2)
     gap_to_finish = round(max(0.0, finish_line - projected_avg), 2)
     projected_net_new = round(max(0.0, projected_avg - prior_avg), 2)
@@ -157,6 +156,7 @@ def project_state_year_end(
         "_roadmap_tag": _ROADMAP_TAG,
         "_story": _STORY,
         "state": state_u,
+        "program_code": credit.get("credit_code"),
         "tax_year": tax_year,
         "as_of": as_of.isoformat(),
         "months_elapsed": months_elapsed,

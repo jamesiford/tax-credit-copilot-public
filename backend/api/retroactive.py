@@ -17,9 +17,35 @@ from api._payperiods import (
     require_pay_periods,
     unauthored_state_years,
 )
+from application.program_defaults import program_code_for_state, program_state
 from data.claims import get_all_claims
+from tools.credit_math import apply_one_zero_state_credit
 
 router = APIRouter(prefix="/api", tags=["retroactive"])
+
+
+def _already_filed(existing: set, state: str, program_code: str, tax_year: int) -> bool:
+    """The demo claims are keyed by jurisdiction only, so they speak for a state's default program alone."""
+    return (state, tax_year) in existing and program_code == program_code_for_state(state)
+
+
+def _tranche_analysis(avg_by_program_year: dict[tuple[str, int], float]) -> list[dict[str, Any]]:
+    """Frozen-base-year tranche reconstruction per PROGRAM across the years the payroll covers. [N1]"""
+    from tools.baseyear import compute_base_year_tranches
+
+    out: list[dict[str, Any]] = []
+    for code in sorted({c for (c, _ty) in avg_by_program_year}):
+        yearly_avg = {ty: avg_by_program_year[(c, ty)] for (c, ty) in avg_by_program_year if c == code}
+        if len(yearly_avg) < 2:
+            continue
+        sample = apply_one_zero_state_credit(code, yearly_avg[max(yearly_avg)])
+        per_job, threshold = float(sample.get("amount_per_job_usd") or 0.0), float(sample.get("threshold") or 0.0)
+        if per_job > 0:
+            result = compute_base_year_tranches(
+                program_state(code), yearly_avg, base_year=min(yearly_avg), threshold=threshold, per_job_usd=per_job,
+            )
+            out.append(result.to_dict())
+    return out
 
 
 @router.get("/onezero/retroactive/scan")
@@ -29,7 +55,7 @@ def one_zero_retroactive_scan(account_id: int | None = None) -> dict[str, Any]:
     stakeholders' #1 quick win.
     """
     from domain.calculation.onezero import run_pay_period_method, fiscal_window_start, fiscal_year_of
-    from tools.credit_math import load_pack_one_zero, apply_one_zero_state_credit
+    from tools.credit_math import load_pack_one_zero
     from config import get_fiscal_year_end_month
 
     fy_end_month = get_fiscal_year_end_month()
@@ -62,7 +88,8 @@ def one_zero_retroactive_scan(account_id: int | None = None) -> dict[str, Any]:
     avg_by_state_year: dict[tuple[str, int], float] = {}
     for ty in tax_years:
         ty_rows = rows_by_fy.get(ty, [])
-        for st, pack, state_rows in iter_state_packs(ty_rows, tax_year=ty, on_unauthored="skip"):
+        for item in iter_state_packs(ty_rows, tax_year=ty, on_unauthored="skip"):
+            _st, pack, state_rows = item
             if len(state_rows) < 50:  # ignore tiny windows
                 continue
             pp = run_pay_period_method(
@@ -70,23 +97,26 @@ def one_zero_retroactive_scan(account_id: int | None = None) -> dict[str, Any]:
                 analysis_start_month=fiscal_window_start(ty, fy_end_month), pack=pack,
                 fiscal_year_end_month=fy_end_month,
             )
-            avg_by_state_year[(st, ty)] = pp.annual_average
+            avg_by_state_year[(item.program_code, ty)] = pp.annual_average  # keyed by PROGRAM: a state may hold several
 
     opportunities: list[dict[str, Any]] = []
     for ty in tax_years:
         ty_rows = rows_by_fy.get(ty, [])
-        for st, pack, state_rows in iter_state_packs(ty_rows, tax_year=ty, on_unauthored="skip"):
+        for item in iter_state_packs(ty_rows, tax_year=ty, on_unauthored="skip"):
+            st, _pack, state_rows = item
+            code = item.program_code
             if len(state_rows) < 50:  # ignore tiny windows (Q4-only retros)
                 continue
-            avg = avg_by_state_year.get((st, ty), 0.0)
-            prior_avg = avg_by_state_year.get((st, ty - 1), 0.0)
-            credit = apply_one_zero_state_credit(st, avg, prior_period_average_headcount=prior_avg)
+            avg = avg_by_state_year.get((code, ty), 0.0)
+            prior_avg = avg_by_state_year.get((code, ty - 1), 0.0)
+            credit = apply_one_zero_state_credit(code, avg, prior_period_average_headcount=prior_avg)
             if credit.get("annual_credit_usd", 0) <= 0:
                 continue
-            already_filed = (st, ty) in existing
+            already_filed = _already_filed(existing, st, code, ty)
             opportunities.append({
                 "tax_year": ty,
                 "state": st,
+                "program_code": code,
                 "credit_code": credit["credit_code"],
                 "credit_name": credit["credit_name"],
                 "citation": credit["citation"],
@@ -107,23 +137,7 @@ def one_zero_retroactive_scan(account_id: int | None = None) -> dict[str, Any]:
     # an early year still surfaces its current/out-year claimable installments
     # (GA: refund 1 year back, but a 5-year-old creation still throws an
     # installment within its tranche window — the reason to scan years back).
-    from tools.baseyear import compute_base_year_tranches
-    tranche_analysis: list[dict[str, Any]] = []
-    states_seen = sorted({st for (st, _ty) in avg_by_state_year})
-    for st in states_seen:
-        yearly_avg = {ty: avg_by_state_year[(s, ty)] for (s, ty) in avg_by_state_year if s == st}
-        if len(yearly_avg) < 2:
-            continue
-        base_year = min(yearly_avg)
-        sample = apply_one_zero_state_credit(st, yearly_avg[max(yearly_avg)])
-        per_job = float(sample.get("amount_per_job_usd") or 0.0)
-        threshold = float(sample.get("threshold") or 0.0)
-        if per_job <= 0:
-            continue
-        result = compute_base_year_tranches(
-            st, yearly_avg, base_year=base_year, threshold=threshold, per_job_usd=per_job,
-        )
-        tranche_analysis.append(result.to_dict())
+    tranche_analysis = _tranche_analysis(avg_by_state_year)
 
     return {
         "as_of": date.today().isoformat(),

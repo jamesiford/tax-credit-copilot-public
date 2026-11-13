@@ -13,7 +13,7 @@ _MANIFEST_COLUMNS: tuple[str, ...] = (
 )
 
 
-def _stmt_latest_run(client_id: int) -> Statement:
+def _stmt_latest_run(client_id: int, program_code: str | None = None) -> Statement:
     """The live run for a CLIENT. Deliberately not narrowed by tax year.
 
     A run writes every year the payroll covers, so `run_manifest.tax_year` is
@@ -24,13 +24,17 @@ def _stmt_latest_run(client_id: int) -> Statement:
 
     The year belongs on the `tcc_gold` read instead, where `tax_year` and
     `is_current` already live.
+
+    Supersession is per (client, PROGRAM), so a client with two programs has two live runs. `program_code` names which
+    one; omitted, the latest of any program answers, which is right for a client with one. [F04c.7]
     """
+    narrow, values = ("AND program_code = ? ", [client_id, program_code]) if program_code else ("", [client_id])
     return (
         f"SELECT TOP 1 {', '.join(_MANIFEST_COLUMNS)} FROM {OPS_SCHEMA}.run_manifest "
-        f"WHERE client_id = ? AND run_status = 'success' "
+        f"WHERE client_id = ? AND run_status = 'success' {narrow}"
         f"AND superseded_by_run_id IS NULL AND run_completed_at IS NOT NULL "
         f"ORDER BY run_started_at DESC",
-        [client_id],
+        values,
     )
 
 

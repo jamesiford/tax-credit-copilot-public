@@ -44,6 +44,7 @@ class GetOneZeroMatrixQuery(Query):
     state: str
     account_id: int | None = None
     method: str = "min_max"
+    program_code: str | None = None  # a state with several programs needs it [F04c.6]
 
     def __post_init__(self) -> None:
         if self.method not in _METHODS:
@@ -72,14 +73,12 @@ def handle_get_onezero_matrix(query: GetOneZeroMatrixQuery) -> dict[str, Any]:
             "a One/Zero matrix is a fact about one client; select one"
         )
 
-    resolved = resolve_statute(
-        account_id=query.account_id, state=query.state, tax_year=query.tax_year
-    )
+    resolved = resolve_statute(account_id=query.account_id, state=query.state, tax_year=query.tax_year, program_code=query.program_code, require_program=True)
 
     reader = get_gold_reader()
     with reader.scope():
         read = reader.onezero_matrix(
-            query.account_id, tax_year=query.tax_year, method=query.method
+            query.account_id, tax_year=query.tax_year, method=query.method, program_code=resolved.program_code
         )
 
     base = {

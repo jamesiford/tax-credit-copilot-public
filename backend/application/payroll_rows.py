@@ -107,16 +107,19 @@ def unauthored_state_years(
     honest middle ground between failing the whole report and quietly omitting a
     year so the output merely *looks* complete.
     """
+    from application.program_defaults import programs_to_price
     from tools.credit_math import STATE_TO_PACK, load_pack_one_zero
 
     states = [state.upper()] if state else sorted(STATE_TO_PACK.keys())
     gaps: dict[int, dict[str, str]] = {}
     for year in tax_years:
         for st in states:
-            try:
-                load_pack_one_zero(st, tax_year=year)
-            except FileNotFoundError as exc:
-                gaps.setdefault(year, {})[st] = str(exc)
+            # Keyed by the state for its default program, by the program code for any further program of it. [F04c.6]
+            for i, code in enumerate(programs_to_price(st) or [st]):
+                try:
+                    load_pack_one_zero(code, tax_year=year)
+                except FileNotFoundError as exc:
+                    gaps.setdefault(year, {})[st if i == 0 else code] = str(exc)
     return gaps
 
 
@@ -132,41 +135,53 @@ def _pack_for(st: str, tax_year: int, on_unauthored: str) -> Any:
         return None
 
 
+class StatePack(tuple):
+    """`(state, pack, state_rows)`, which also says WHICH program of the state the pack belongs to.
+
+    Still a 3-tuple so every existing `for st, pack, rows in iter_state_packs(...)` is unchanged; a caller that prices or
+    labels by program reads `.program_code`. [F04c.6]
+    """
+
+    program_code: str
+
+    def __new__(cls, state: str, pack: Any, rows: list[dict[str, Any]], program_code: str) -> "StatePack":
+        item = super().__new__(cls, (state, pack, rows))
+        item.program_code = program_code
+        return item
+
+
 def iter_state_packs(
     rows: list[dict[str, Any]],
     *,
     tax_year: int,
     state: str | None = None,
     on_unauthored: str = "raise",
-) -> Iterator[tuple[str, Any, list[dict[str, Any]]]]:
-    """Yield ``(state_code, OneZeroPack, state_rows)`` for each rule pack that has
-    rows in ``rows``.
+) -> Iterator[StatePack]:
+    """Yield ``(state_code, OneZeroPack, state_rows)`` for each PROGRAM that has rows in ``rows``.
 
-    Skips states with no `one_zero` block (pack is None) and states with no
-    matching worksite rows. The state of a row is resolved by `row_state`,
-    which prefers an explicit `Work_State` and falls back to the `Worksite_ID`
-    prefix — one reading, so a row cannot be visible to one caller and invisible
-    to another.
+    A state with one program yields once, as it always did; a state with several yields once per program that can be priced
+    (the default program always, others when they have an authored year), each carrying `.program_code`. Programs of a
+    state share `state_rows` (`program_rows`) and differ only by pack. States with no `one_zero` block and states with no
+    matching worksite rows are skipped. The state of a row is resolved by `row_state`, which prefers an explicit
+    `Work_State` and falls back to the `Worksite_ID` prefix: one reading, so a row cannot be visible to one caller and
+    invisible to another.
 
-    `on_unauthored` decides what happens when a state has no rule pack for
-    `tax_year` [ADR-005]:
+    `on_unauthored` decides what happens when a program has no rule pack for `tax_year` [ADR-005]:
 
-    - ``"raise"`` (default) — the caller named this year, so answering under a
-      different year's statute would be wrong and silence would be worse.
-    - ``"skip"`` — the caller is sweeping a range it derived from data. Yield
-      nothing for that state and let the caller report it; pair with
-      `unauthored_state_years` so the omission is disclosed rather than hidden.
+    - ``"raise"`` (default): the caller named this year, so answering under a different year's statute would be wrong and
+      silence would be worse.
+    - ``"skip"``: the caller is sweeping a range it derived from data. Yield nothing for that program and let the caller
+      report it; pair with `unauthored_state_years` so the omission is disclosed rather than hidden.
     """
+    from application.program_defaults import programs_to_price
     from tools.credit_math import STATE_TO_PACK
 
     if on_unauthored not in ("raise", "skip"):
         raise ValueError("on_unauthored must be 'raise' or 'skip'")
 
-    states = [state.upper()] if state else sorted(STATE_TO_PACK.keys())
-    for st in states:
-        pack = _pack_for(st, tax_year, on_unauthored)
-        if pack is None:
-            continue
+    for st in [state.upper()] if state else sorted(STATE_TO_PACK.keys()):
         state_rows = program_rows(rows, st)
-        if state_rows:
-            yield st, pack, state_rows
+        for code in programs_to_price(st) or [st]:
+            pack = _pack_for(code, tax_year, on_unauthored)
+            if pack is not None and state_rows:
+                yield StatePack(st, pack, state_rows, code)

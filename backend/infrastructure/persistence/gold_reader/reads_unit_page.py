@@ -91,7 +91,7 @@ class UnitPageReads(ReaderBase):
         a resolved run id, so nothing here waits for the first result.
         """
         run_rows, in_flight_rows, grid, credits = self._batch([
-            _stmt_latest_run(client_id),
+            _stmt_latest_run(client_id, program_code),
             _stmt_run_in_flight(client_id),
             _stmt_unit_grid(client_id, method, program_code, limit, offset),
             _stmt_credit_grid(client_id, method, program_code),
@@ -139,7 +139,7 @@ class UnitPageReads(ReaderBase):
             return self._unit_page_whole(client_id, method, program_code, limit, offset)
 
         run_rows, in_flight_rows = self._batch([
-            _stmt_latest_run(client_id),
+            _stmt_latest_run(client_id, program_code),
             _stmt_run_in_flight(client_id),
         ])
         run, in_flight = _first(run_rows), _first(in_flight_rows)

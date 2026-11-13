@@ -253,7 +253,7 @@ class _Gold:
         "step1_assumption_set_id": "GDS-STEP1-TEST", "onezero_assumption_set_id": "GDS-ONEZERO-TEST",
     }
 
-    def headcount_series(self, client_id, *, tax_year, method="pay_period"):
+    def headcount_series(self, client_id, *, tax_year, method="pay_period", program_code=None):
         average = {2023: 120.5, 2022: 100.25}.get(tax_year)
         return {
             "run": self.RUN if average is not None else None,
@@ -261,7 +261,7 @@ class _Gold:
             "month_ends": [f"{tax_year}-{m:02d}-28" for m in range(1, 13)],
         }
 
-    def client_year_series(self, client_id, *, method="pay_period"):
+    def client_year_series(self, client_id, *, method="pay_period", program_code=None):
         years = [
             {"tax_year": 2021, "annual_average": 80.0, "eligible_employees": 60, "employees_evaluated": 90,
              "annual_credit_usd": "0", "is_base_year": True, "qualified_units": 0, "units": 3},
@@ -270,7 +270,7 @@ class _Gold:
         ]
         return {"run": self.RUN, "years": years, "method": method}
 
-    def at_risk(self, client_id, *, tax_year, method, min_weekly_hours, min_weekly_wages):
+    def at_risk(self, client_id, *, tax_year, method, min_weekly_hours, min_weekly_wages, program_code=None):
         def row(i, hours, wages):
             return {
                 "employee_id": f"E{i}", "record_token": f"{i:08d}" * 2, "weeks_worked": 52,
