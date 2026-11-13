@@ -20,6 +20,6 @@ Forward-only changes to the Warehouse schema after the DDL v2.0 bootstrap (D22).
 
 The set is `0001_channel_audit.sql` (the Microsoft 365 channel's audit trail, writer
 allow-list and write confirmations) and `0002_engagement_actor.sql` (who set a
-programme engagement). Keys are declared `NOT ENFORCED`, as in the bootstrap;
+programme engagement), `0003_lookup_override.sql` (app-owned lookups) and `0004_run_batches.sql` (the run batch queue: `run_batch`, `run_batch_item`). Keys are declared `NOT ENFORCED`, as in the bootstrap;
 `scripts/generate-schema-variants.py` strips that for SQL Server, and the same one-line strip
 makes a migration run there.

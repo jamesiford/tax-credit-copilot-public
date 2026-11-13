@@ -33,6 +33,8 @@ EXCLUDED_WAREHOUSE_TABLES: dict[str, str] = {
     "tcc_ops.channel_confirmation": _PLATFORM,
     "tcc_ops.lookup_override": "App-owned lookup rows (pay-code mappings, fiscal rules) that configure the engine; not payroll or credit data.",
     "tcc_ops.lookup_audit": _PLATFORM,
+    "tcc_ops.run_batch": _PLATFORM,
+    "tcc_ops.run_batch_item": _PLATFORM,
 }
 
 EXCLUDED_SOURCE_TABLES: dict[str, str] = {
