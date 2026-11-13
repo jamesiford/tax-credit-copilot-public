@@ -57,7 +57,7 @@ def _trail_blocks(trail: Mapping[str, Any]) -> list:
 def calc_walkthrough(
     client_id: int | None = None,
     tax_year: int | None = None,
-    state: str = "GA",
+    state: str | None = None,
     method: str = "min_max",
     *,
     trail: Mapping[str, Any] | None = None,
@@ -82,7 +82,7 @@ def calc_walkthrough(
 
     if client_id is None or tax_year is None:
         raise InvalidArguments("client_id and tax_year are required to build a walkthrough")
-    state = state.upper()
+    state = s.derive_state(state, client_id, tax_year)
     s.statute(state, client_id, tax_year)
     capture = s.RunCapture()
     with s.trail_scope() as recorder:
@@ -111,7 +111,7 @@ def employee_drill(
     client_id: int,
     record_token: str,
     tax_year: int,
-    state: str = "GA",
+    state: str | None = None,
 ) -> ToolResult:
     """One employee's derivation for a client-year, keyed by opaque handle.
 

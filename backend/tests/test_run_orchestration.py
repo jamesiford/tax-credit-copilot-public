@@ -736,3 +736,61 @@ def test_a_conflict_then_a_mixed_state_each_get_their_own_one_retry_and_never_ov
         clock.advance(600)
     assert env.max_active[1] == 1, "no other worker ever held the client while its item ran"
     assert {i.status for i in _statuses(repo, first["batch_id"]).values()} | {i.status for i in _statuses(repo, second["batch_id"]).values()} <= {ItemStatus.SUCCEEDED, ItemStatus.FAILED}
+
+
+# ------------------------------------------------------------------ F04b.4: one item per (client, program)
+
+
+@pytest.fixture()
+def two_programs(tmp_path, monkeypatch):
+    """The shipped rules plus the fictional ZZ_DEMO_JTC, calculable for 2025, from a temporary RULES_DIR."""
+    import json
+    import shutil
+
+    import test_fictional_program_end_to_end as fx
+
+    rules = tmp_path / "rules"
+    shutil.copytree(fx.RULES, rules)
+    fx._write(rules / "zz_demo_jtc.json", fx._fictional_pack("ZZ_DEMO_JTC", "ZZ", None))
+    fx._write(rules / "zz_demo_jtc" / "2025.json", fx._fictional_pack("ZZ_DEMO_JTC", "ZZ", 2025))
+    manifest = rules / "registry" / "programs.json"
+    data = json.loads(manifest.read_text(encoding="utf-8"))
+    data["programs"].append({"code": "ZZ_DEMO_JTC", "name": "ZZ (fictional)", "jurisdiction": {"level": "state", "code": "ZZ"},
+                             "state": "ZZ", "pack_file": "zz_demo_jtc.json", "lifecycle": "described"})
+    manifest.write_text(json.dumps(data), encoding="utf-8")
+    monkeypatch.setenv("RULES_DIR", str(rules))
+    monkeypatch.setattr("application.runs.pairs._footprint", lambda: {1: ["GA", "ZZ"], 2: ["GA"], 3: ["ZZ"], 4: ["TX"]})
+
+
+def test_a_multi_state_client_gets_one_item_per_calculable_program(two_programs):
+    from application.runs.pairs import client_pairs, pair_summary
+
+    pairs = client_pairs((1, 2, 3, 4), None)
+    assert pairs == [(1, "GA_JTC"), (1, "ZZ_DEMO_JTC"), (2, "GA_JTC"), (3, "ZZ_DEMO_JTC"), (4, None)]
+    assert pair_summary(pairs) == {"programs": {"GA_JTC": 2, "ZZ_DEMO_JTC": 2, "none": 1}, "multi_program_clients": 1}
+    assert client_pairs((1, 2), "ZZ_DEMO_JTC") == [(1, "ZZ_DEMO_JTC"), (2, "ZZ_DEMO_JTC")]
+
+
+def test_a_georgia_only_client_is_unchanged(two_programs):
+    from application.runs.pairs import client_pairs
+
+    assert client_pairs((2,), None) == [(2, "GA_JTC")]
+
+
+def test_the_preview_counts_programs_not_just_clients(two_programs, monkeypatch):
+    monkeypatch.setattr(selection, "_book", lambda: BOOK)
+    monkeypatch.setattr(selection, "_portfolio_page", _page())
+    out = preview(_request(scope=Scope(ScopeKind.LIST, (1, 2, 3))), SETTINGS, manifests=lambda: _Manifests(), assumptions=lambda: [])
+    assert out["clients"] == 3 and out["items"] == 4 and out["program_items"] == 4
+    assert out["programs"] == {"GA_JTC": 2, "ZZ_DEMO_JTC": 2} and out["multi_program_clients"] == 1
+
+
+def test_enqueue_creates_the_items_with_their_program_and_the_executor_honours_it(two_programs, repo):
+    view = _enqueue(client_ids=(1, 2))
+    items, _ = repo.list_items(view["batch_id"], None, 10, 0)
+    assert [(i.client_id, i.program_code) for i in items] == [(1, "GA_JTC"), (1, "ZZ_DEMO_JTC"), (2, "GA_JTC")]
+    scope = _scope()
+    scope["programs"].append({"program_code": "ZZ_DEMO_JTC", "jurisdiction": {"level": "state", "code": "ZZ"}, "authored_years": [2025]})
+    batch = repo.get(view["batch_id"])
+    assert choose_target(scope, batch, items[1]) == ("ZZ", "ZZ_DEMO_JTC", 2025), "no 'name one' refusal once the item names it"
+    assert choose_target(scope, batch, items[0])[1] == "GA_JTC"

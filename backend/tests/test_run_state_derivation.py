@@ -42,6 +42,23 @@ def test_the_state_comes_from_the_payroll_the_client_holds(monkeypatch):
     assert pick_state(["NY", "TX"], 2023) is None
 
 
+def test_the_program_chosen_is_logged_so_the_choice_is_visible(monkeypatch, caplog):
+    _payroll_states(monkeypatch, ["TX", "GA"])
+    with caplog.at_level(logging.INFO, logger="application.program_defaults"):
+        derive_run_state(5, 2023)
+    assert "state derived from payroll: GA (GA_JTC)" in caplog.text
+
+
+def test_a_location_read_takes_its_state_from_the_location_then_the_registry(monkeypatch):
+    from application.program_defaults import state_for_location
+
+    _payroll_states(monkeypatch, ["GA"])
+    assert state_for_location(1, "GA_GA-010", 2023) == "GA" and state_for_location(1, "x", 2023, "ny") == "NY"
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        assert state_for_location(1, "unprefixed", 2023) == "GA"
+
+
 def test_a_named_state_is_never_second_guessed(monkeypatch):
     _payroll_states(monkeypatch, ["GA"])
     assert derive_run_state(5, 2023, "ny") == "NY"
@@ -51,7 +68,7 @@ def test_nothing_derivable_falls_back_with_a_deprecation_warning(monkeypatch, ca
     _payroll_states(monkeypatch, ["NY"])
     with caplog.at_level(logging.WARNING), pytest.warns(DeprecationWarning, match="deprecated"):
         assert derive_run_state(5, 2023) == "GA"
-    assert "falling back" in caplog.text
+    assert "falling back to 'GA' (GA_JTC)" in caplog.text
 
 
 def test_an_unreadable_footprint_also_falls_back_visibly(monkeypatch):

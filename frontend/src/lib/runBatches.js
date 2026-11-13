@@ -90,7 +90,7 @@ export function scopeFor(sel) {
 // ---------------------------------------------------------------- the request
 
 export function startBody({
-  selection, kind = 'calculate', programCode = null, taxYears = [], force = false, refreshOnce = true,
+  selection, kind = 'calculate', programCode = null, taxYears = [], force = false, skipUnchanged = false, refreshOnce = true,
   idempotencyKey = null, confirmItems = null, dryRun = false,
 }) {
   return {
@@ -99,6 +99,7 @@ export function startBody({
     ...(programCode ? { program_code: programCode } : {}),
     tax_years: taxYears,
     force,
+    skip_unchanged: skipUnchanged,
     refresh_once: refreshOnce,
     ...(idempotencyKey ? { idempotency_key: idempotencyKey } : {}),
     ...(confirmItems != null ? { confirm_items: confirmItems } : {}),
@@ -117,6 +118,34 @@ export const parseYears = (text) => String(text || '')
 
 // ---------------------------------------------------------------- the preview, in words
 
+const COVERAGE_NOTE = {
+  all_years: 'Every earlier run recorded a fingerprint of all the client\u2019s authored-year payroll, so a restated prior year is caught.',
+  mixed: 'Some earlier runs do not record a client-wide data fingerprint yet; those clients will run.',
+};
+
+/** Skipping is opt-in: say plainly when nothing is skipped, and when earlier runs cannot support a skip yet. */
+function skipLines(p) {
+  if (p.force) return ['Re-run is forced: every client will run.'];
+  if (!p.skip_unchanged) return ['Nothing is skipped: every run starts.'];
+  if (['cannot_tell_yet', 'none_yet'].includes(p.skip_coverage)) {
+    return ['Skipping is on, but earlier runs do not record a client-wide data fingerprint yet, so nothing can be skipped this time.'];
+  }
+  const lines = COVERAGE_NOTE[p.skip_coverage] ? [COVERAGE_NOTE[p.skip_coverage]] : [];
+  if (p.skip_candidates_upper_bound != null) {
+    lines.unshift(`Up to ${p.skip_candidates_upper_bound} may be skipped as unchanged. That is an upper bound: it is decided when each run starts, by comparing the data, the assumptions and the rule pack with the last run.`);
+  } else {
+    lines.unshift(`Skips as unchanged are decided when each run starts. This preview read the last runs of the first ${p.manifests_read_for} clients only, so it gives no upper bound for the whole selection.`);
+  }
+  return lines;
+}
+
+/** One item is one client and program: say so when a client runs for several. */
+function programLines(p) {
+  const names = Object.keys(p.programs || {}).filter((k) => k !== 'none');
+  if (!p.multi_program_clients && names.length < 2) return [];
+  return [`Programs: ${names.map((k) => `${k} (${p.programs[k]})`).join(', ')}. ${p.multi_program_clients} client${p.multi_program_clients === 1 ? ' is' : 's are'} run for more than one program.`];
+}
+
 /** The sentences the dialog shows. Every figure is the API's; none is derived here. */
 export function previewLines(p) {
   if (!p) return [];
@@ -126,12 +155,8 @@ export function previewLines(p) {
     ? `Tax years: ${p.years.map((y) => `TY${y}`).join(', ')}.`
     : 'Tax year: each client\u2019s latest runnable year, chosen when its run starts.');
   if (p.never_run) lines.push(`${p.never_run} ha${p.never_run === 1 ? 's' : 've'} never been calculated, so ${p.never_run === 1 ? 'it' : 'they'} will run.`);
-  if (p.force) lines.push('Re-run even if unchanged is on: every client will run.');
-  else if (p.skip_candidates_upper_bound != null) {
-    lines.push(`Up to ${p.skip_candidates_upper_bound} may be skipped as unchanged. That is an upper bound: it is decided when each run starts, by comparing the data, the assumptions and the rule pack with the last run.`);
-  } else {
-    lines.push(`Skips as unchanged are decided when each run starts. This preview read the last runs of the first ${p.manifests_read_for} clients only, so it gives no upper bound for the whole selection.`);
-  }
+  lines.push(...programLines(p));
+  lines.push(...skipLines(p));
   return lines;
 }
 

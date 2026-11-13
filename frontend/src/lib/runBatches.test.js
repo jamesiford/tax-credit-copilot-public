@@ -64,7 +64,7 @@ describe('the request', () => {
   it('builds the typed body and omits what was not chosen', () => {
     const body = startBody({ selection: { ids: [1, 2], matching: null }, idempotencyKey: 'k', dryRun: true });
     expect(body).toEqual({
-      kind: 'calculate', scope: { kind: 'list', client_ids: [1, 2] }, tax_years: [], force: false,
+      kind: 'calculate', scope: { kind: 'list', client_ids: [1, 2] }, tax_years: [], force: false, skip_unchanged: false,
       refresh_once: true, idempotency_key: 'k', dry_run: true,
     });
     const full = startBody({
@@ -86,7 +86,7 @@ describe('the request', () => {
 
 describe('the preview in words', () => {
   const base = { clients: 3, items: 3, years: 'latest runnable year per client', never_run: 1, force: false,
-    skip_candidates_upper_bound: 2, manifests_read_for: 3 };
+    skip_unchanged: true, skip_coverage: 'all_years', skip_candidates_upper_bound: 2, manifests_read_for: 3 };
 
   it('states skips as an upper bound decided when each run starts, never a promise', () => {
     const text = previewLines(base).join(' ');
@@ -104,6 +104,18 @@ describe('the preview in words', () => {
 
   it('says every client will run when forced', () => {
     expect(previewLines({ ...base, force: true }).join(' ')).toMatch(/every client will run/);
+  });
+
+  it('says nothing is skipped by default, and when earlier runs cannot support a skip yet', () => {
+    expect(previewLines({ ...base, skip_unchanged: false, skip_candidates_upper_bound: 0 }).join(' ')).toMatch(/Nothing is skipped/);
+    const text = previewLines({ ...base, skip_coverage: 'cannot_tell_yet', skip_candidates_upper_bound: 0 }).join(' ');
+    expect(text).toMatch(/nothing can be skipped this time/);
+    expect(text).not.toMatch(/Up to/);
+  });
+
+  it('names the programs when a client runs for more than one', () => {
+    const text = previewLines({ ...base, programs: { GA_JTC: 2, ZZ_DEMO_JTC: 1 }, multi_program_clients: 1 }).join(' ');
+    expect(text).toMatch(/Programs: GA_JTC \(2\), ZZ_DEMO_JTC \(1\)\. 1 client is run for more than one program/);
   });
 
   it('names the years when they were chosen', () => {

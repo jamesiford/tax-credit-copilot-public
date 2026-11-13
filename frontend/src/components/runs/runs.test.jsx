@@ -25,6 +25,7 @@ const PREVIEW = {
   dry_run: true,
   preview: {
     kind: 'calculate', clients: 3, items: 3, years: 'latest runnable year per client', refresh_once: true, force: false,
+    skip_unchanged: true, skip_coverage: 'all_years', programs: { GA_JTC: 3 }, multi_program_clients: 0,
     per_client_year_items: false, skip_candidates_upper_bound: 2, never_run: 1, manifests_read_for: 3,
     requires_confirmation: false, confirm_above: 25, max_items: 5000, over_size_limit: false,
     first_items: [
@@ -150,10 +151,12 @@ describe('the start dialog', () => {
     api.previewRunBatch.mockResolvedValue(PREVIEW);
     open();
     await screen.findByText(/Up to 2/);
-    await userEvent.click(screen.getByRole('checkbox', { name: /Re-run even if unchanged/ }));
-    await waitFor(() => expect(api.previewRunBatch).toHaveBeenLastCalledWith(expect.objectContaining({ force: true })));
+    const skip = screen.getByRole('checkbox', { name: /Skip clients whose data and rules are unchanged/ });
+    expect(skip).not.toBeChecked();
+    await userEvent.click(skip);
+    await waitFor(() => expect(api.previewRunBatch).toHaveBeenLastCalledWith(expect.objectContaining({ skip_unchanged: true })));
     await userEvent.click(screen.getByRole('radio', { name: /Assess/ }));
-    await waitFor(() => expect(api.previewRunBatch).toHaveBeenLastCalledWith(expect.objectContaining({ kind: 'assess', force: true })));
+    await waitFor(() => expect(api.previewRunBatch).toHaveBeenLastCalledWith(expect.objectContaining({ kind: 'assess', skip_unchanged: true })));
   });
 
   it('turns on one-run-per-client-and-year only once years are chosen, and says the cost multiplies', async () => {

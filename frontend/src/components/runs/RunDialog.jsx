@@ -104,7 +104,7 @@ function Options({ o, set, programs, authoredYears }) {
       <label className="runs-field">
         <span>Program</span>
         <select value={o.programCode} onChange={(e) => set.programCode(e.target.value)}>
-          <option value="">Automatic (the one program with statute for the client)</option>
+          <option value="">Automatic (every program with statute for the client)</option>
           {programs.map((p) => <option key={p.program_code} value={p.program_code}>{p.name || p.program_code}</option>)}
         </select>
       </label>
@@ -120,8 +120,8 @@ function Options({ o, set, programs, authoredYears }) {
         </div>
       </fieldset>
       <label className="runs-choice">
-        <input type="checkbox" checked={o.force} onChange={(e) => set.force(e.target.checked)} />
-        <span><b>Re-run even if unchanged</b> <span className="muted small">Off by default: a client whose data, assumptions and rules match its last run is skipped.</span></span>
+        <input type="checkbox" checked={o.skipUnchanged} onChange={(e) => set.skipUnchanged(e.target.checked)} />
+        <span><b>Skip clients whose data and rules are unchanged</b> <span className="muted small">Off by default, so every client runs. When on, a client is skipped only if all its authored-year payroll, the assumptions and the rule pack match its last run.</span></span>
       </label>
       <label className="runs-choice">
         <input type="checkbox" checked={!o.refreshOnce} disabled={!o.years.length} onChange={(e) => set.refreshOnce(!e.target.checked)} />
@@ -131,7 +131,7 @@ function Options({ o, set, programs, authoredYears }) {
   );
 }
 
-const DEFAULTS = { kind: 'calculate', programCode: '', years: [], force: false, refreshOnce: true };
+const DEFAULTS = { kind: 'calculate', programCode: '', years: [], skipUnchanged: false, refreshOnce: true };
 
 /**
  * "Run for N clients". The preview comes first and is never skipped: it is requested as soon as the dialog opens
@@ -159,7 +159,7 @@ export default function RunDialog({ open, selection, scopeOptions, onClose, onSt
   }, [open]);
 
   const body = useMemo(() => startBody({
-    selection, kind: o.kind, programCode: o.programCode || null, taxYears: o.years, force: o.force,
+    selection, kind: o.kind, programCode: o.programCode || null, taxYears: o.years, skipUnchanged: o.skipUnchanged,
     refreshOnce: o.years.length ? o.refreshOnce : true,
   }), [selection, o]);
 

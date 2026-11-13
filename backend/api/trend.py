@@ -176,7 +176,7 @@ def rebase_client_unit(
     unit_id: str,
     base_year: int = FastAPIQuery(..., description="The base year the reader chose"),
     method: str = FastAPIQuery("min_max"),
-    state: str = FastAPIQuery("GA"),
+    state: str | None = FastAPIQuery(None),
 ) -> dict[str, Any]:
     """WI-21. One location re-priced against a chosen base year. Thin [ADR-003].
 
@@ -564,7 +564,7 @@ class EmployeeDrillRequest(BaseModel):
 
     record_token: str = Field(min_length=8, max_length=128)
     tax_year: int
-    state: str = "GA"
+    state: str | None = None
     account_id: int | None = None
 
 

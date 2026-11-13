@@ -58,14 +58,25 @@ def derive_run_state(client_id: int, tax_year: int | None, requested: str | None
         states = []
     derived = pick_state(states, tax_year)
     if derived is not None:
+        logger.info("client %s: state derived from payroll: %s (%s)", client_id, derived, program_code_for_state(derived))
         return derived
     message = (
         f"no state given and none could be derived for client {client_id} (payroll states {states or 'unknown'}); "
-        f"falling back to {DEPRECATED_DEFAULT_STATE!r}. This default is deprecated: pass state explicitly."
+        f"falling back to {DEPRECATED_DEFAULT_STATE!r} ({DEPRECATED_DEFAULT_PROGRAM}). This default is deprecated: pass state explicitly."
     )
     warnings.warn(message, DeprecationWarning, stacklevel=2)
     logger.warning(message)
     return DEPRECATED_DEFAULT_STATE
+
+
+def state_for_location(client_id: int, worksite_id: str, tax_year: int | None, requested: str | None = None) -> str:
+    """The state for a location-level read: the caller's, else the location's own state prefix, else derived from payroll."""
+    from tools.program_registry import load_registry
+
+    if requested:
+        return requested.upper()
+    prefix = worksite_id.split("_", 1)[0].upper()
+    return prefix if prefix in load_registry().state_to_pack() else derive_run_state(client_id, tax_year)
 
 
 def program_code_for_state(state: str) -> str | None:

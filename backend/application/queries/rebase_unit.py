@@ -21,6 +21,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
+from application.program_defaults import state_for_location
+
 from application.mediator import Query
 
 _METHODS = ("min_max", "pay_period")
@@ -32,7 +34,7 @@ class RebaseUnitQuery(Query):
     worksite_id: str
     base_year: int
     method: str = "min_max"
-    state: str = "GA"
+    state: str | None = None
 
     def __post_init__(self) -> None:
         if self.method not in _METHODS:
@@ -82,7 +84,7 @@ def handle_rebase_unit(query: RebaseUnitQuery) -> dict[str, Any]:
             f"a lower baseline"
         )
 
-    trend = location_trend(rows_by_year, state=query.state.upper(), base_year=query.base_year)
+    trend = location_trend(rows_by_year, state=state_for_location(query.client_id, query.worksite_id, None, query.state), base_year=query.base_year)
     stairs = {y.year: y for y in trend.years}
 
     years = []

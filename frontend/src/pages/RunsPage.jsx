@@ -102,13 +102,14 @@ function ItemsTable({ page, onOpenClient }) {
   if (!page.items.length) return <EmptyState title="No items match">Nothing has this status in the batch.</EmptyState>;
   return (
     <table className="tbl-compact" aria-label="Batch items">
-      <thead><tr><th>Client</th><th>Year</th><th>Status</th><th>Detail</th><th className="num">Tries</th><th className="num">Seconds</th></tr></thead>
+      <thead><tr><th>Client</th><th>Program</th><th>Year</th><th>Status</th><th>Detail</th><th className="num">Tries</th><th className="num">Seconds</th></tr></thead>
       <tbody>
         {page.items.map((i) => (
           <tr key={i.item_id}>
             <td>
               <button type="button" className="runs-row-link" onClick={() => onOpenClient?.(i.client_id)}>Account {i.client_id}</button>
             </td>
+            <td>{i.program_code || 'automatic'}</td>
             <td>{i.tax_year ? `TY${i.tax_year}` : 'latest'}</td>
             <td><StatusPill status={i.status} /></td>
             <td className="small">{i.skip_reason || i.error_message || ''}</td>

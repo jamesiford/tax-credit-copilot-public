@@ -42,7 +42,7 @@ class GetEmployeeDrillQuery(Query):
 
     record_token: str
     tax_year: int
-    state: str
+    state: str | None
     account_id: int | None = None
 
     def __post_init__(self) -> None:

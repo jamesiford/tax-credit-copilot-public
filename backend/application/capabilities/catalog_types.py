@@ -131,7 +131,7 @@ def _object(properties: dict[str, Any], required: tuple[str, ...] = ()) -> dict[
 
 _CLIENT_ID = {"type": "integer", "description": "The client's account id."}
 _TAX_YEAR = {"type": "integer", "minimum": 1900, "maximum": 2100, "description": "Tax year, labelled per the programme's statute."}
-_STATE = {"type": "string", "minLength": 2, "maxLength": 2, "default": "GA", "description": "Two-letter work state; selects the programme."}
+_STATE = {"type": "string", "minLength": 2, "maxLength": 2, "description": "Two-letter work state; selects the programme. Omit it to use the client's own calculable state."}
 _METHOD = {"type": "string", "enum": list(METHODS), "default": "min_max", "description": "Certified headcount method."}
 _PROGRAM = {"type": "string", "description": "Programme code, e.g. GA_JTC."}
 _TOKEN = {"type": "string", "minLength": 8, "maxLength": 128, "description": "Opaque employee handle. Never an employee id."}
