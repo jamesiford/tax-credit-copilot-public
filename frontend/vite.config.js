@@ -53,5 +53,8 @@ export default defineConfig({
     setupFiles: ['./src/test-setup.js'],
     // server/ runs under Node (per-file `@vitest-environment node`).
     include: ['src/**/*.test.{js,jsx}', 'server/**/*.test.js'],
+    // Node 25+ ships its own `localStorage`, which is undefined without --localstorage-file and hides jsdom's.
+    // Switching Node's off leaves the jsdom one the tests were written against; no effect on Node 24.
+    poolOptions: { forks: { execArgv: ['--no-experimental-webstorage'] } },
   },
 });

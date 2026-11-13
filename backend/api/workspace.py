@@ -12,7 +12,7 @@ import logging
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
 
-from application.errors import DependencyUnavailable
+from application.errors import DependencyUnavailable, ReferenceNotConfigured
 from tools.reference_workspace import ReferenceWorkspaceService
 
 log = logging.getLogger(__name__)
@@ -54,6 +54,8 @@ def _summary_or_unavailable(*, force: bool = False) -> dict[str, Any]:
     try:
         _service().get(force=force)
         return _service().summary()
+    except ReferenceNotConfigured as exc:
+        return {"available": False, "workspace": None, "reason": exc.reason, "remedy": exc.remedy}
     except DependencyUnavailable:
         raise
     except Exception as exc:  # noqa: BLE001 - the sealed run is one artifact; its failure, whatever the cause, must not blind the shell
