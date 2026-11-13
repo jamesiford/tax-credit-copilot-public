@@ -18,6 +18,7 @@ from application.queries.program_catalog_reads import (
 from application.queries.program_draft_reads import (
     GetProgramDraftQuery, ListProgramDraftsQuery, handle_get_program_draft, handle_list_program_drafts,
 )
+from application.queries.preview_program_draft import PreviewProgramDraftQuery, handle_preview_program_draft
 from bootstrap import program_draft_wiring  # noqa: F401 - binds the draft repository for the draft handlers
 
 
@@ -26,6 +27,7 @@ def register_program_handlers(mediator: Mediator) -> Mediator:
     mediator.register(GetProgramDetailQuery, handle_get_program_detail)
     mediator.register(ListProgramDraftsQuery, handle_list_program_drafts)
     mediator.register(GetProgramDraftQuery, handle_get_program_draft)
+    mediator.register(PreviewProgramDraftQuery, handle_preview_program_draft)
     for request, handler in (
         (CreateProgramDraftCommand, handle_create_program_draft), (EditProgramDraftCommand, handle_edit_program_draft),
         (ValidateProgramDraftCommand, handle_validate_program_draft), (RequestProgramReviewCommand, handle_request_program_review),

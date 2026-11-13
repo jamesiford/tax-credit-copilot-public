@@ -44,7 +44,19 @@ All routes need the writer role and are person-only (an agent token is refused a
 | `POST /api/v2/program-drafts/{id}/validate` | validate and store the result |
 | `POST /api/v2/program-drafts/{id}/request-review` | submit for review |
 | `POST /api/v2/program-drafts/{id}/review` | `approve` or `request_changes` |
+| `POST /api/v2/program-drafts/{id}/preview` | price the draft's year packs on synthetic data; writes nothing |
 | `POST /api/v2/program-drafts/{id}/withdraw` | close the draft |
+
+## Preview (no writes)
+
+`POST .../preview` prices the draft's year packs with the engine's own functions (the Average Headcount from the draft's floors,
+then the benefit step) over the committed synthetic sample payroll relabelled to the draft's state. It builds the pack from the
+draft's documents in memory, touches no repository, run, claim or file, and returns the result without storing it
+(`persisted: false`). Every response is labelled **"Preview, not verified, not for filing"** and counts the pack's unverified
+flags. It refuses a draft that does not validate, and refuses a client's payroll (`dataset: client`) with HTTP 403 unless
+`PROGRAM_PREVIEW_ALLOW_CUSTOMER_DATA=true` or the environment is classified synthetic. A year the sample does not cover is listed
+under `declined`, never priced as zero. `tests/test_program_draft_preview.py` proves the preview agrees to the cent with the real
+assessment of the same documents installed as a program, and that it reaches no service but the draft store.
 
 The read-only catalog (`GET /api/v2/programs`, `GET /api/v2/programs/{code}`) is open to any authenticated caller.
 
