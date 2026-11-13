@@ -6,6 +6,7 @@ size standard. `register_handlers` calls `register_program_handlers`, so the one
 from __future__ import annotations
 
 from application.mediator import Mediator
+from bootstrap import program_draft_wiring  # noqa: F401 - binds the draft repository for the draft handlers
 from application.queries.program_catalog_reads import (
     GetProgramDetailQuery, ListProgramCatalogQuery, handle_get_program_detail, handle_list_program_catalog,
 )

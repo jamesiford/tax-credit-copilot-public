@@ -51,7 +51,7 @@ class _Tx:
 
 class SqliteBackend:
     """SQLite transactions and ISO-string instants."""
-    def __init__(self, path: str | Path | None = None) -> None:
+    def __init__(self, path: str | Path | None = None, schema: str = _SCHEMA) -> None:
         from infrastructure.persistence.sqlite_claims import _DEFAULT_PATH
 
         chosen = path or get_settings().stores.operational_db_or(_DEFAULT_PATH)
@@ -60,7 +60,7 @@ class SqliteBackend:
         self._lock = threading.RLock()
         self._conn = sqlite3.connect(str(chosen), check_same_thread=False, isolation_level=None, timeout=30)
         self._conn.row_factory = sqlite3.Row
-        self._conn.executescript(_SCHEMA)
+        self._conn.executescript(schema)
 
     def table(self, name: str) -> str:
         return name
