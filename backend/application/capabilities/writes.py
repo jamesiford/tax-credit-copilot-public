@@ -178,8 +178,11 @@ def engagement_set_commit(
     return _commit("engagement_set", principal, arguments, confirmation_token, idempotency_key)
 
 
-def base_year_set_prepare(principal: Principal, client_id: int, unit_id: str, base_year: int) -> ToolResult:
-    return _prepare("base_year_set", principal, dict(client_id=client_id, unit_id=unit_id, base_year=base_year))
+def base_year_set_prepare(
+    principal: Principal, client_id: int, unit_id: str, base_year: int, program_code: str | None = None,
+) -> ToolResult:
+    return _prepare("base_year_set", principal, dict(client_id=client_id, unit_id=unit_id, base_year=base_year,
+                                                      program_code=program_code))
 
 
 def base_year_set_commit(

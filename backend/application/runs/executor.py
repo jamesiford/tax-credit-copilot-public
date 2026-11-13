@@ -92,10 +92,10 @@ def _real_scope(client_id: int) -> dict[str, Any]:
     return handle_get_client_scope(GetClientScopeQuery(account_id=client_id))
 
 
-def _real_resolve(*, account_id: int, state: str, tax_year: int) -> Any:
+def _real_resolve(*, account_id: int, state: str, tax_year: int, program_code: str | None = None) -> Any:
     from application.queries._client_run import resolve_client_run
 
-    return resolve_client_run(account_id=account_id, state=state, tax_year=tax_year)
+    return resolve_client_run(account_id=account_id, state=state, tax_year=tax_year, program_code=program_code)
 
 
 def _real_latest(client_id: int, program_code: str) -> Any:
@@ -167,7 +167,7 @@ class ItemExecutor:
             self._c.send(AssessClientCommand(client_id=item.client_id, program_code=program, tax_years=explicit,
                                              actor=batch.requested_by))
             return ItemOutcome(ItemStatus.SUCCEEDED, tax_year=year, program_code=program)
-        run = self._c.resolve_run(account_id=item.client_id, state=state, tax_year=year)
+        run = self._c.resolve_run(account_id=item.client_id, state=state, tax_year=year, program_code=program)
         if batch.skip_unchanged and not batch.force:
             same, why = unchanged_decision(
                 manifest_fingerprint(self._c.latest_manifest(item.client_id, run.program_code)),
@@ -180,7 +180,8 @@ class ItemExecutor:
 
         narrow = (year,) if batch.kind is BatchKind.CALCULATE else ()
         result = self._c.send(RunClientCalculationCommand(
-            client_id=item.client_id, tax_year=year, state=state, actor=batch.requested_by, assess_tax_years=narrow))
+            client_id=item.client_id, tax_year=year, state=state, program_code=program, actor=batch.requested_by,
+            assess_tax_years=narrow))
         return ItemOutcome(ItemStatus.SUCCEEDED, run_id=result.get("run_id"), tax_year=year, program_code=program)
 
 

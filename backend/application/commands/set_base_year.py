@@ -29,6 +29,8 @@ from datetime import datetime, timezone
 from typing import Any
 
 from application.identity import Policy
+from application.program_defaults import check_program_state, rows_of_program
+from application.program_defaults import check_program_state, rows_of_program
 from application.mediator import Command
 
 logger = logging.getLogger(__name__)
@@ -56,16 +58,22 @@ class SetBaseYearCommand(Command):
             raise ValueError("worksite_id is required")
         if self.justification and len(self.justification) > 2000:
             raise ValueError("justification is limited to 2,000 characters")
+        check_program_state(self.state, self.program_code)
 
 
 def resolved(command: SetBaseYearCommand) -> SetBaseYearCommand:
     """The command with its state and program filled in from data when the caller left them out."""
     from dataclasses import replace
 
-    from application.program_defaults import derive_run_state, program_code_for_state
+    from application.program_defaults import ProgramNotRunnable, derive_run_state, program_code_for_state, program_state
     from tools.program_registry import load_registry
 
     state = command.state
+    if command.program_code:  # the program wins and fixes the state; a disagreeing state was refused at construction [F04c.3]
+        try:
+            return replace(command, state=program_state(command.program_code), program_code=command.program_code.upper())
+        except ProgramNotRunnable as exc:
+            raise BaseYearNotAllowed(str(exc)) from exc
     if not state:
         prefix = command.worksite_id.split("_", 1)[0].upper()
         state = prefix if prefix in load_registry().state_to_pack() else derive_run_state(command.client_id, None)
@@ -86,7 +94,7 @@ _AGAIN: dict[int, bool] = {}
 _LOCK = threading.Lock()
 
 
-def _recalculate_in_background(client_id: int, tax_year: int, state: str, actor: str) -> bool:
+def _recalculate_in_background(client_id: int, tax_year: int, state: str, actor: str, program_code: str | None = None) -> bool:
     """Start (or queue) a recalculation. True if a new thread was started."""
     with _LOCK:
         if _RUNNING.get(client_id):
@@ -101,7 +109,7 @@ def _recalculate_in_background(client_id: int, tax_year: int, state: str, actor:
         while True:
             try:
                 get_mediator().send(RunClientCalculationCommand(
-                    client_id=client_id, tax_year=tax_year, state=state, actor=actor,
+                    client_id=client_id, tax_year=tax_year, state=state, program_code=program_code, actor=actor,
                 ))
             except Exception:  # noqa: BLE001 - logged; the manifest records the failed run
                 logger.exception("base-year recalculation failed for client %s", client_id)
@@ -146,7 +154,7 @@ def plan_base_year(command: SetBaseYearCommand) -> BaseYearPlan:
         items, _total = reader.unit_years(command.client_id, method="min_max", limit=5000)
     if run is None:
         raise BaseYearNotAllowed(f"account {command.client_id} has no calculated run to change")
-    rows_by_year, current_base = location_series(items, command.worksite_id)
+    rows_by_year, current_base = location_series(rows_of_program(items, command.program_code), command.worksite_id)
     if not rows_by_year:
         raise BaseYearNotAllowed(f"the run holds no location {command.worksite_id}")
 
@@ -200,7 +208,7 @@ def handle_set_base_year(command: SetBaseYearCommand) -> dict[str, Any]:
     if command.recalculate:
         manifest = get_run_manifest_repository().latest(command.client_id)
         tax_year = int(manifest.tax_year) if manifest is not None else max(rows_by_year)
-        started = _recalculate_in_background(command.client_id, tax_year, command.state, command.actor)
+        started = _recalculate_in_background(command.client_id, tax_year, command.state, command.actor, command.program_code)
         recalculation = "started" if started else "queued"
 
     return {

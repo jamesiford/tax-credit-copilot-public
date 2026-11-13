@@ -170,6 +170,16 @@ def resolve_program(client_id: int | None, state: str | None, program_code: str 
     return state, (candidates[0] if candidates else program_code_for_state(state))
 
 
+def rows_of_program(rows: Sequence[dict], program_code: str | None) -> list[dict]:
+    """Gold rows belonging to a program; rows that carry no program (older fixtures) and an absent code pass through. [F04c.3]"""
+    return [r for r in rows if not program_code or r.get("program_code") in (None, program_code)]
+
+
+def location_state(client_id: int, worksite_id: str, state: str | None, program_code: str | None) -> str:
+    """The state a location-level read prices: the program's own when one is named, else `state_for_location`."""
+    return program_state(program_code) if program_code else state_for_location(client_id, worksite_id, None, state)
+
+
 def program_code_for_state(state: str) -> str | None:
     """The code of the state's DEFAULT program (the first in registry order), or None. See `programs_for_state`."""
     from tools.program_registry import programs_for_state

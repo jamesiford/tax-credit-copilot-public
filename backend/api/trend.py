@@ -141,6 +141,7 @@ class BaseYearRequest(BaseModel):
 
     base_year: int | None = None
     state: str | None = None
+    program_code: str | None = None  # optional; wins over `state` [F04c.3]
     justification: str | None = Field(default=None, max_length=2000)
     triggered_by: str = "system"
 
@@ -156,7 +157,8 @@ def set_client_unit_base_year(
     try:
         command = SetBaseYearCommand(
             client_id=client_id, worksite_id=unit_id, base_year=payload.base_year,
-            state=payload.state.upper() if payload.state else None, justification=payload.justification,
+            state=payload.state.upper() if payload.state else None, program_code=payload.program_code,
+            justification=payload.justification,
             actor=attributed(request, payload.triggered_by, default="system"),
         )
     except ValueError as exc:
@@ -501,9 +503,7 @@ def create_client_run(client_id: int, payload: ClientRunRequest, request: Reques
     Thin [ADR-003]: the engine call, the projection onto the Gold schema, the
     write and the section 9 validation sweep all live in the command.
     """
-    from application.commands.run_client_calculation import (
-        RunClientCalculationCommand,
-    )
+    from application.commands.run_client_calculation import RunClientCalculationCommand
     from application.queries._client_run import ClientRunNotAvailable
     from application.services import get_mediator
 

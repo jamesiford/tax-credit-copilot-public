@@ -21,7 +21,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
-from application.program_defaults import state_for_location
+from application.program_defaults import location_state, rows_of_program
 
 from application.mediator import Query
 
@@ -35,6 +35,7 @@ class RebaseUnitQuery(Query):
     base_year: int
     method: str = "min_max"
     state: str | None = None
+    program_code: str | None = None  # optional: the program whose series is re-priced [F04c.3]
 
     def __post_init__(self) -> None:
         if self.method not in _METHODS:
@@ -62,7 +63,7 @@ def handle_rebase_unit(query: RebaseUnitQuery) -> dict[str, Any]:
         run = reader.latest_run(query.client_id)
         items, _total = reader.unit_years(query.client_id, method=query.method, limit=5000)
 
-    rows_by_year, inferred = location_series(items, query.worksite_id)
+    rows_by_year, inferred = location_series(rows_of_program(items, query.program_code), query.worksite_id)
     if not rows_by_year:
         raise RebaseNotAvailable(
             f"no calculated run holds location {query.worksite_id} for account {query.client_id}"
@@ -84,7 +85,7 @@ def handle_rebase_unit(query: RebaseUnitQuery) -> dict[str, Any]:
             f"a lower baseline"
         )
 
-    trend = location_trend(rows_by_year, state=state_for_location(query.client_id, query.worksite_id, None, query.state), base_year=query.base_year)
+    trend = location_trend(rows_by_year, state=location_state(query.client_id, query.worksite_id, query.state, query.program_code), base_year=query.base_year)
     stairs = {y.year: y for y in trend.years}
 
     years = []
