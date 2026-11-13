@@ -187,10 +187,11 @@ def _build_base_year(principal: Principal, a: Mapping[str, Any]) -> Command:
 
 
 def _preview_base_year(c: Any) -> dict[str, Any]:
-    from application.commands.set_base_year import plan_base_year
+    from application.commands.set_base_year import plan_base_year, resolved
     from application.queries.rebase_unit import RebaseUnitQuery
     from application.services import get_mediator
 
+    c = resolved(c)
     plan = plan_base_year(c)
     rebase = get_mediator().send(RebaseUnitQuery(
         client_id=c.client_id, worksite_id=c.worksite_id, base_year=c.base_year, state=c.state,

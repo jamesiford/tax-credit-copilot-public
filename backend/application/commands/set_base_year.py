@@ -40,8 +40,10 @@ class SetBaseYearCommand(Command):
     worksite_id: str = ""
     #: None clears a saved choice: the run goes back to inferring one.
     base_year: int | None = None
-    state: str = "GA"
-    program_code: str = "GA_JTC"
+    #: None derives both from the location's state prefix, else the client's payroll and the registry
+    #: (`resolved`); the old "GA" / "GA_JTC" defaults survive only as a deprecated fallback. [ADR-013]
+    state: str | None = None
+    program_code: str | None = None
     justification: str | None = None
     #: False in tests, so the command can be checked without starting a run.
     recalculate: bool = True
@@ -54,6 +56,23 @@ class SetBaseYearCommand(Command):
             raise ValueError("worksite_id is required")
         if self.justification and len(self.justification) > 2000:
             raise ValueError("justification is limited to 2,000 characters")
+
+
+def resolved(command: SetBaseYearCommand) -> SetBaseYearCommand:
+    """The command with its state and program filled in from data when the caller left them out."""
+    from dataclasses import replace
+
+    from application.program_defaults import derive_run_state, program_code_for_state
+    from tools.program_registry import load_registry
+
+    state = command.state
+    if not state:
+        prefix = command.worksite_id.split("_", 1)[0].upper()
+        state = prefix if prefix in load_registry().state_to_pack() else derive_run_state(command.client_id, None)
+    program = command.program_code or program_code_for_state(state)
+    if program is None:
+        raise BaseYearNotAllowed(f"no program maps to state {state}")
+    return replace(command, state=state.upper(), program_code=program)
 
 
 class BaseYearNotAllowed(ValueError):
@@ -153,7 +172,7 @@ def handle_set_base_year(command: SetBaseYearCommand) -> dict[str, Any]:
     from application.services import get_override_repository, get_run_manifest_repository
     from domain.warehouse import ManualOverride, base_year_key
 
-    plan = plan_base_year(command)
+    plan = plan_base_year(command := resolved(command))
     run, rows_by_year, current_base, saved = plan.run, plan.rows_by_year, plan.current_base, plan.saved
     repo = get_override_repository()
     if command.base_year == saved:
