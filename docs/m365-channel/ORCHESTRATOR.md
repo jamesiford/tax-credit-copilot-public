@@ -237,6 +237,20 @@ Adding these four capabilities changed the catalog (36 tools), the gateway's too
 (`python scripts/vendor-orchestrator.py`) and the Cowork skill `tcc-figures-and-writes`. The orchestrator and the Cowork
 plugin have to be republished before a live Teams or Cowork session sees them; nothing is published from the repository build.
 
+## The program catalog (F05)
+
+`program_catalog` is a read: omit `program_code` for the list of every registered program (lifecycle, authored years,
+whether each can be calculated and why not, engagement counts), or give it for one program's pack, years, validation summary
+and blockers. It names no client and takes nothing else. It makes the same queries as the portal's Program manager, so the
+channel and the page cannot say different things, and every row carries "not verified": a pack that validates is
+well-formed, not legally correct. Figures (counts, years) are rendered by the format layer and held to the same numeric
+guard as every other tool result. **Drafts are not exposed**: no capability lists, reads or changes a program draft, the draft
+routes refuse an agent token, and a draft has no runtime authority. A program activated by data (its files committed and
+deployed) appears here with no change.
+
+Adding it changed the catalog (37 tools), the gateway's tool list, the vendored orchestrator copy and the Cowork skill
+`tcc-figures-and-writes`; republish the orchestrator and the Cowork plugin as above.
+
 ## Claim packages
 
 "Send me the claim package for <client> <year>" is a write like any other: the model prepares

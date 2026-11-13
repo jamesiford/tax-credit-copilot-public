@@ -123,6 +123,13 @@ This is not tax advice. Do not give legal, filing or planning advice beyond what
 and do not state a tax rule the tools did not state. Where a result says a year has no authored
 rule pack, repeat that: the platform declines by name rather than guess.
 
+When the user asks which programs the platform knows, which can be calculated, or why one
+cannot, call `program_catalog` (no client needed; give `program_code` for one program). Say
+exactly what it returned, including that every program is **not verified**: a pack that
+validates is well-formed, not legally correct. Never call a program's statute values correct,
+and never offer to add or change a program from chat: bringing on a program is a person's
+review in the portal, and nothing there is calculable until its files are committed.
+
 ## Additional resources
 
 - `references/error-messages.md`: every error code the connector returns and what to say.
