@@ -159,10 +159,16 @@ def test_the_delta_log_statistics_give_the_row_count_without_reading_data(tmp_pa
 
 
 class _Cursor:
-    timeout = None
+    """Like pyodbc's: it has no `timeout` attribute, and takes the connection's limit when it is created."""
+
+    __slots__ = ("limit",)
+    seen: tuple | None = None
+
+    def __init__(self, limit):
+        self.limit = limit
 
     def execute(self, sql, params):
-        type(self).seen = (self.timeout, sql)
+        type(self).seen = (self.limit, sql)
 
     def fetchall(self):
         return []
@@ -172,27 +178,57 @@ class _Cursor:
 
 
 class _Live:
+    """Like pyodbc's connection: `timeout` is a connection property, read when a cursor is created."""
+
+    def __init__(self):
+        self.timeout = 0
+        self.history = []
+
     def cursor(self):
-        return _Cursor()
+        self.history.append(self.timeout)
+        return _Cursor(self.timeout)
 
 
 class _Connection:
+    def __init__(self):
+        self.live = _Live()
+
     def connect(self):
         import contextlib
 
         @contextlib.contextmanager
         def ctx():
-            yield _Live()
+            yield self.live
 
         return ctx()
 
 
-def test_the_statement_timeout_is_set_on_the_driver_cursor_so_the_server_cancels_it():
-    reader = source_sql.SourceSqlReader(connection=_Connection())
+def test_the_statement_timeout_is_set_on_the_connection_before_the_cursor_and_reset_after():
+    connection = _Connection()
+    reader = source_sql.SourceSqlReader(connection=connection)
     reader._query("SELECT 1", [], timeout=20)
-    assert _Cursor.seen[0] == 20
+    assert _Cursor.seen[0] == 20, "the cursor was created with the limit, so the driver cancels on the server"
+    assert connection.live.timeout == 0, "the pooled connection must not keep the limit"
     reader._query("SELECT 1", [])
-    assert _Cursor.seen[0] is None, "no timeout unless asked for"
+    assert _Cursor.seen[0] == 0, "no timeout unless asked for"
+
+
+def test_the_connection_limit_is_reset_even_when_the_statement_fails():
+    connection = _Connection()
+
+    class _Boom(_Cursor):
+        __slots__ = ()
+
+        def execute(self, sql, params):
+            raise RuntimeError("HYT00 Query timeout expired")
+
+    connection.live.cursor = lambda: _Boom(connection.live.timeout)
+    reader = source_sql.SourceSqlReader(connection=connection)
+    try:
+        reader._query("SELECT 1", [], timeout=5)
+    except RuntimeError:
+        pass
+    assert connection.live.timeout == 0
 
 
 def test_the_defaults_and_bad_values():

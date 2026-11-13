@@ -113,6 +113,7 @@ All notable changes to this project are recorded here, so changes can be followe
 ### Removed
 
 ### Fixed
+- The footprint guard no longer fails every portfolio read against a live lakehouse SQL endpoint (HTTP 500): it set a timeout on the cursor, which the ODBC driver does not support. The timeout is now set on the connection before the cursor is created and reset afterwards. Found on the first live run; the test fakes now model the driver (a slotted cursor, a connection-level timeout), so they would have caught it. No operator action.
 - The Runs page no longer crashes when the batch list response has no `items`; it shows "Nothing has been run yet". Found by the states sweep once the offline mock API served run batches.
 
 ### Security
