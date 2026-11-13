@@ -19,6 +19,7 @@ run it.
 | Know the rules the code must obey (layering, standards, parity) | [Coding standards](architecture/CODE-STANDARDS.md), [backend/README.md](../backend/README.md), [`.github/copilot-instructions.md`](../.github/copilot-instructions.md) |
 | Deploy it | [DEPLOYMENT-HANDOVER.md](architecture/DEPLOYMENT-HANDOVER.md) |
 | Run it day to day | [RUNBOOK.md](architecture/RUNBOOK.md) and, for the Microsoft 365 channel, [OPERATIONS.md](m365-channel/OPERATIONS.md) |
+| [RUN-ORCHESTRATION.md](architecture/RUN-ORCHESTRATION.md) | Running many clients as tracked batches: how to start, preview, watch, cancel and retry; what skipped means; running and sizing the worker; failure signatures |
 | Review a decision | the [ADR index](#architecture) below; the [build log](m365-channel/DECISIONS.md) for the Microsoft 365 channel |
 | See what the last remediation run fixed, skipped and needs from the owner | [REMEDIATION-FINDINGS.md](m365-channel/REMEDIATION-FINDINGS.md) (Summary) |
 

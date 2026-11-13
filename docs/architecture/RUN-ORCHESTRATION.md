@@ -1,0 +1,117 @@
+# Run orchestration: running many clients
+
+How to recalculate more than one client: one, a list, a filtered group or everyone, as tracked work with progress,
+retry and cancel. The design is [ADR-012](ADR-012-run-orchestration.md). The single-client controls
+(`POST /api/v2/clients/{id}/runs`, `POST /api/claims/assess`, "Run assessment" and "Run TY… now" in the portal) are unchanged.
+
+## The model in one minute
+
+- A **batch** is a request: what to do (`assess`, `calculate`, or `assess_and_calculate`), for which clients, which years.
+- An **item** is one client, and optionally one tax year. With no years given there is **one item per client** and its
+  year is the client's latest runnable year, resolved when the item starts. (A run replays and writes every authored year
+  of the client's payroll whatever year it is asked for, so one item per client does the work once.)
+- A **worker** leases queued items, runs each through the existing commands (`RunClientCalculationCommand`,
+  `AssessClientCommand`), and records the outcome. It does not reimplement a calculation.
+- The queue is two tables in `tcc_ops` (`run_batch`, `run_batch_item`, migration `0004`), beside the run manifest. A run an
+  item produced is linked by `run_id`.
+
+| Kind | What each item does |
+|---|---|
+| `assess` | Records claims for the client (no Gold write). |
+| `calculate` | Runs the calculation and writes Gold, and records the claim for that year. |
+| `assess_and_calculate` | Runs the calculation and records claims for every year (what the single-client endpoint does by default). |
+
+## Start a batch
+
+`POST /api/v2/run-batches` (a person's token; the channel gateway's agent token is refused here, and starts batches through
+the Microsoft 365 capability instead).
+
+```json
+{ "kind": "calculate",
+  "scope": { "kind": "filter", "filter": { "band": "exposed", "state": "GA" } },
+  "dry_run": true }
+```
+
+- `scope.kind`: `one` or `list` (`client_ids`), `filter` (the portfolio filters `program`, `year`, `outcome`, `scope`,
+  `status`, `near`, plus `band`, `state`, `unassessed`, `unavailable`), or `all`. A filter is resolved on the server from the
+  client book, claims and manifests. **No payroll is read to choose clients.**
+- `dry_run: true` previews and writes nothing. Preview first.
+- Above `RUN_BATCH_CONFIRM_ABOVE` items (default 25) the start needs `confirm_items` equal to the item count. Above
+  `RUN_BATCH_MAX_ITEMS` (default 5000) it is refused; only scope `all` may override, with `override_size_limit`.
+- `idempotency_key` makes a repeated request return the first batch. Without a key, an identical request that is still queued
+  or running returns that batch.
+- `tax_years` makes one item per client-year. Each of those replays every year, so the cost is N times higher. `refresh_once:
+  false` requires explicit years for the same reason.
+- `force: true` runs even when the last run still answers (see below).
+
+## What "skipped" means
+
+An item is **`skipped_unchanged`** only when the latest successful manifest for that client and programme is for the same
+year and the calculation fingerprint (`calculation_id`, which digests the year's payroll rows, the floors and the assumption
+ids), both assumption-set hashes and the rule pack version are all recorded and all equal. If any value is missing on
+either side, or the manifest is for a different year, the answer is "cannot tell", and the item **runs**. `code_commit` is
+compared only with `include_code_commit`. The check runs when the item starts (it loads that client-year's rows, which costs
+less than the engine and the Gold write). The preview can only state an **upper bound** on skips; it never promises one.
+
+An item is **`skipped_no_payroll`** when the data or statute cannot support it: no payroll in the fiscal window, no authored
+statute for the year. It is a statement with the reason, never a failure and never a zero.
+
+Limit worth knowing: a run refreshes Gold for every year but records a manifest for one, so "unchanged" speaks for the year
+the manifest names. A change to another year's payroll is picked up the next time that year is the one being run, or by
+`force`.
+
+## Watch, cancel, retry
+
+| To do | Call |
+|---|---|
+| Status and counters, with a degraded `run_worker` entry when nothing is working the queue | `GET /api/v2/run-batches/{id}` |
+| Items, filterable by status | `GET /api/v2/run-batches/{id}/items?status=failed` |
+| Recent batches | `GET /api/v2/run-batches` |
+| Cancel | `POST /api/v2/run-batches/{id}/cancel`: queued items are cancelled; an item already running finishes |
+| Retry | `POST /api/v2/run-batches/{id}/retry-failed`: only `failed` items return to the queue |
+
+Batch status: `queued`, `running`, then `succeeded` (including all-skipped), `partial` (some failed or were cancelled),
+`failed`, or `cancelled`.
+
+## Run the worker
+
+```powershell
+python -m bootstrap.run_worker          # from backend/, until stopped
+python scripts/run-worker.py --once     # from the repo root: drain the queue and exit
+```
+
+- **Locally** the API starts a worker thread by itself (`RUN_WORKER_INLINE` defaults to true only when
+  `ENVIRONMENT=local`). To use a separate local worker, set `RUN_MANIFEST_STORE=sqlite` so both processes share one queue
+  file (`memory` is private to a process).
+- **Deployed**, run the worker as its own process: any number may run. Leases keep two workers off one item, and a per-client
+  rule keeps one client from running twice at once. Terraform can deploy it (default off, see below).
+- `RUN_WORKER_INLINE=true` in a deployed API is for a **single-instance trial only**: when the API scales out every instance
+  would run a worker. The process logs a warning when it is set.
+
+## Sizing and concurrency
+
+- `RUN_WORKER_CONCURRENCY` (default 2, maximum 8) is items in flight per worker. Each run holds one client's payroll in memory and
+  is CPU-bound, so raise it with care. On the Fabric Warehouse, two runs writing Gold at once can conflict (error 24556); the
+  writer retries, and an item that still fails is retried by the job with backoff. If conflicts are logged, use 1. Azure SQL
+  conflicts less. **This has not been measured on a live Warehouse** (see `live-checks.md` in the build analysis).
+- Retries: `RUN_ITEM_MAX_ATTEMPTS` (default 3), only for transient failures, with capped exponential backoff and jitter.
+- A worker that dies loses nothing: its leases lapse (`RUN_LEASE_SECONDS`, default 120) and the items return to the queue.
+
+## Failure signatures
+
+| You see | It means | Do |
+|---|---|---|
+| Degraded `run_worker` on a batch | Items are waiting and no worker holds a lease | Start a worker (above) |
+| Item `failed`, dependency `operational_store`, `source_lakehouse` or `source_sql` | The store or source was unreachable and attempts ran out | Fix connectivity, then retry-failed |
+| Item `failed`, dependency `conflict` | A Warehouse write conflict persisted | Lower `RUN_WORKER_CONCURRENCY`, then retry-failed |
+| Item `failed`, dependency `lookup:<name>` | The client needs a lookup authored (pay codes, fiscal rules) | Author it; not retried automatically |
+| Item `failed`, dependency `validation` | The request or the client is ambiguous (for example several programmes) | Name the `program_code` |
+| Item `failed`, dependency `worker` | The worker died and attempts were spent | Retry-failed |
+| Item `failed`, dependency `internal` | A bug; the log has the trace | Report it |
+
+Settings are in [ENV-VARS.md](ENV-VARS.md) section 4a.
+
+## Deploying the worker (Terraform, default off)
+
+Set `enable_run_worker` to deploy the worker as a second App Service on the same plan, code-deployed like the API. It is off
+by default and `terraform apply` is never run by the build: the module is validated and tested only.

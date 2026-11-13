@@ -153,6 +153,23 @@ Accepted values: `warehouse` (durable; `fabric` is the v1 alias), `sqlite`,
 | `OVERRIDE_STORE` | `backend/application/deployment.py` | Overrides. Default: follows `RUN_MANIFEST_STORE` | TF api: `warehouse` | — | not set (followed `RUN_MANIFEST_STORE`) | Enforced |
 | `OPERATIONAL_DB` *(local)* | `backend/infrastructure/persistence/sqlite_claims.py`, `sqlite_findings.py`, `sqlite_artifacts.py`, `backend/tools/purge_test_claims.py` | SQLite file for the `sqlite` adapters. Default `backend/data/operational.db` | not set | — | not set | No |
 
+## 4a. Run orchestration (batches of client runs)
+
+Read through `backend/config_runs.py` (`Settings.runs`). Operator page: [RUN-ORCHESTRATION.md](RUN-ORCHESTRATION.md). The batch tables live
+in the same store as the run manifest: there is no separate store setting, `RUN_MANIFEST_STORE` decides (migration `0004`).
+
+| Variable | Read by | Meaning | Deployed value | TF output | v1 Bicep | Required (deployed) |
+|---|---|---|---|---|---|---|
+| `RUN_BATCH_MAX_ITEMS` | `backend/application/runs/plan.py` | Largest batch a request may queue. Default `5000`. Only scope `all` may exceed it, with an explicit `override_size_limit` | not set | — | not set | No |
+| `RUN_BATCH_CONFIRM_ABOVE` | `backend/application/commands/enqueue_run_batch.py` | A start above this many items must send `confirm_items` equal to the count. Default `25` | not set | — | not set | No |
+| `RUN_WORKER_CONCURRENCY` | `backend/application/runs/worker.py` | Items one worker runs at once, never two for one client. Default `2`, maximum `8`. Use `1` if Warehouse write conflicts are logged | not set (TF `run_worker_concurrency` when the worker is deployed) | — | not set | No |
+| `RUN_ITEM_MAX_ATTEMPTS` | `backend/application/runs/worker.py` | Attempts for a transient failure (store unreachable, timeout, write conflict). Default `3`. Validation and "no payroll" outcomes are never retried | not set | — | not set | No |
+| `RUN_WORKER_INLINE` | `backend/bootstrap/run_worker.py` | Run a worker thread inside the API process. Default `true` only when `ENVIRONMENT=local`. In a deployed process it is for a single-instance trial: with scale-out every instance would work the queue | not set (TF `run_worker_inline`) | — | not set | No |
+| `RUN_LEASE_SECONDS`, `RUN_HEARTBEAT_SECONDS` | `backend/config_runs.py` | How long an item's lease lasts (default `120`, minimum `15`) and how often a worker extends it (default `30`, at most half the lease). A dead worker's items return to the queue when the lease lapses | not set | — | not set | No |
+| `RUN_WORKER_POLL_SECONDS` | `backend/application/runs/worker.py` | Idle wait between claims. Default `5` | not set | — | not set | No |
+| `RUN_WORKER_STALE_SECONDS` | `backend/application/queries/run_batch_reads.py` | Queued work with no live lease for this long shows a degraded `run_worker` entry. Default `300` | not set | — | not set | No |
+| `RUN_BACKOFF_BASE_SECONDS` | `backend/application/runs/worker.py` | First retry delay; doubles per attempt up to two minutes, with jitter. Default `5` | not set | — | not set | No |
+
 ## 5. Artifacts (Blob Storage)
 
 | Variable | Read by | Purpose / default | Deployed value | TF output | v1 Bicep | Required (deployed) |
