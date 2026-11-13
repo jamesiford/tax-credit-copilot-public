@@ -13,16 +13,18 @@ from contextlib import contextmanager
 
 import pytest
 
+from tests.driver_fidelity import PyodbcCursorModel
 
-class _Cursor:
+
+class _Cursor(PyodbcCursorModel):
     def __init__(self, log, *, fail=False):
-        self.log, self.fail, self.closed = log, fail, False
-        self.description = [("x",)]
-        self.rowcount = 0
+        self._fail, self._closed = fail, False
+        self._description = [("x",)]
+        self._rowcount = 0
         log.append(self)
 
     def execute(self, *_a, **_k):
-        if self.fail:
+        if self._fail:
             raise RuntimeError("statement failed")
 
     def fetchall(self):
@@ -35,7 +37,7 @@ class _Cursor:
         return True
 
     def close(self):
-        self.closed = True
+        self._closed = True
 
 
 class _Conn:
@@ -77,7 +79,7 @@ def test_gold_reader_closes_every_cursor(fail):
             call()
         except RuntimeError:
             assert fail
-    assert pool.cursors and all(c.closed for c in pool.cursors)
+    assert pool.cursors and all(c._closed for c in pool.cursors)
 
 
 @pytest.mark.parametrize("fail", [False, True], ids=["ok", "statement-fails"])
@@ -92,4 +94,4 @@ def test_run_manifest_reads_close_their_cursor(fail):
             call()
         except (RuntimeError, TypeError):
             pass
-    assert pool.cursors and all(c.closed for c in pool.cursors)
+    assert pool.cursors and all(c._closed for c in pool.cursors)

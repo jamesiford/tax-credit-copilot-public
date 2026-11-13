@@ -16,12 +16,13 @@ import pytest
 from infrastructure.persistence import gold_reader
 from infrastructure.persistence.fabric_warehouse import STRANDED_RUN_MINUTES
 from infrastructure.persistence.warehouse_gold import GoldWriter
+from tests.driver_fidelity import PyodbcCursorModel
 
 
-class _FakeCursor:
+class _FakeCursor(PyodbcCursorModel):
     def __init__(self, recorder, rowcount=0):
         self._recorder = recorder
-        self.rowcount = rowcount
+        self._rowcount = rowcount
 
     def execute(self, sql, values=None):
         self._recorder.append((" ".join(sql.split()), list(values or [])))

@@ -13,6 +13,7 @@ from pathlib import Path
 import pytest
 
 from infrastructure.persistence import schema_admin as sa
+from tests.driver_fidelity import PyodbcCursorModel
 
 REPO = Path(__file__).resolve().parents[2]
 DDL = REPO / "docs" / "data" / "schema" / "tcc-schema.fabric.sql"
@@ -24,21 +25,21 @@ SCRIPTS = REPO / "scripts"
 # --------------------------------------------------------------------------
 
 
-class FakeCursor:
+class FakeCursor(PyodbcCursorModel):
     def __init__(self, conn: "FakeConnection") -> None:
-        self.conn = conn
+        self._conn = conn
         self._sets: list[list[tuple]] = []
-        self.description = None
+        self._description = None
 
     def execute(self, sql, *params):
-        self.conn.executed.append((sql, params))
-        sets = self.conn.handler(sql, params)
+        self._conn.executed.append((sql, params))
+        sets = self._conn.handler(sql, params)
         self._sets = list(sets or [])
         self._advance()
         return self
 
     def _advance(self):
-        self.description = [("c",)] if self._sets else None
+        self._description = [("c",)] if self._sets else None
 
     def fetchall(self):
         return self._sets[0] if self._sets else []

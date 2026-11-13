@@ -10,6 +10,7 @@ import sqlite3
 from contextlib import contextmanager
 from typing import Any
 
+from tests.driver_fidelity import PyodbcCursorModel
 from application.data.executor import DataQueryExecutor
 from infrastructure.persistence.lakehouse_data_query import LakehouseDataQueryExecutor
 from infrastructure.persistence.sqlite_data_query import SqliteDataQueryExecutor
@@ -23,16 +24,16 @@ class DriverError(Exception):
     """Shaped like a pyodbc error: the SQLSTATE is `args[0]`."""
 
 
-class FakeCursor:
+class FakeCursor(PyodbcCursorModel):
     def __init__(self, live: "FakeLive") -> None:
-        self._live, self.description, self._rows = live, None, []
+        self._live, self._description, self._rows = live, None, []
 
     def execute(self, sql: str, params: list[Any] | None = None) -> None:
         self._live.executed.append((sql, list(params or [])))
         self._live.timeouts_seen.append(self._live.timeout)
         if self._live.error is not None:
             raise self._live.error
-        self.description = [("v",)]
+        self._description = [("v",)]
         self._rows = [(i,) for i in range(self._live.row_count)]
 
     def fetchmany(self, n: int) -> list[tuple]:

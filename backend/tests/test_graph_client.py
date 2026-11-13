@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import httpx
 import pytest
+from azure.core.credentials import AccessToken
 
 from infrastructure.auth.graph_client import (
     GraphClient,
@@ -39,10 +40,10 @@ class _Tokens:
     def __call__(self):  # the credential factory: returns itself, as a credential
         return self
 
-    def get_token(self, scope, **kwargs):
+    def get_token(self, *scopes, **kwargs):
         if kwargs.get("claims"):
             self.current = "fresh"
-        return type("T", (), {"token": self.current})()
+        return AccessToken(self.current, 4102444800)
 
 
 class _FakeGraph:
@@ -146,9 +147,9 @@ def test_the_default_credential_is_built_lazily_and_asked_normally_until_invalid
     built, asked = [], []
 
     class Credential:
-        def get_token(self, scope, **kwargs):
+        def get_token(self, *scopes, **kwargs):
             asked.append(kwargs)
-            return type("T", (), {"token": "t"})()
+            return AccessToken("t", 4102444800)
 
     provider = GraphTokenProvider(credential_factory=lambda: built.append(1) or Credential())
     assert built == []
@@ -165,10 +166,10 @@ def test_a_credential_that_rejects_claims_is_rebuilt_and_asked_plainly():
     built = []
 
     class Picky:
-        def get_token(self, scope, **kwargs):
+        def get_token(self, *scopes, **kwargs):
             if kwargs.get("claims"):
                 raise RuntimeError("no claims here")
-            return type("T", (), {"token": "plain"})()
+            return AccessToken("plain", 4102444800)
 
     provider = GraphTokenProvider(credential_factory=lambda: built.append(1) or Picky())
     provider()
