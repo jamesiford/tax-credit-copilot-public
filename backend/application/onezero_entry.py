@@ -54,7 +54,7 @@ def run_methods(
 
 
 def prior_year_average(
-    prior_rows: list[dict[str, Any]], state: str, *, tax_year: int, method: str, fy_end_month: int,
+    prior_rows: list[dict[str, Any]], state: str, *, tax_year: int, method: str, fy_end_month: int, program_code: str | None = None,
 ) -> float:
     """[H3] CALC-04 — the prior year's Average Headcount, 0.0 for an establishment year.
 
@@ -67,7 +67,7 @@ def prior_year_average(
     state_rows = [r for r in prior_rows if r["Worksite_ID"].startswith(f"{state}_")]
     if not state_rows:
         return 0.0
-    prior_pack = load_pack_one_zero(state, tax_year=tax_year - 1)
+    prior_pack = load_pack_one_zero(program_code or state, tax_year=tax_year - 1)  # a program of the state, else its default
     if prior_pack is None:
         return 0.0
     runner = run_min_max_method if method == "min_max" else run_pay_period_method

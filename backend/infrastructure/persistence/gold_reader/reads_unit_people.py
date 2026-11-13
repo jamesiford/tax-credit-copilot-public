@@ -1,14 +1,18 @@
 """The people at one location, and the drawer that shows them."""
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Unpack
 
+from application.gold_read_port import UnitDrillOptions
 from infrastructure.persistence.gold_reader.columns import Statement
 from infrastructure.persistence.gold_reader.reader_base import ReaderBase, _first
 from infrastructure.persistence.gold_reader.stmt_run_summary import _stmt_client_year_rows
 from infrastructure.persistence.gold_reader.stmt_runs import _stmt_latest_run, _stmt_run_in_flight
 from infrastructure.persistence.gold_reader.stmt_unit_people import _stmt_unit_employees, _stmt_unit_near_threshold
 from infrastructure.persistence.gold_reader.stmt_units import _stmt_unit, _stmt_unit_months
+
+
+_UNIT_DRILL_OPTIONS = ("month", "sort", "order", "near_min_hours", "limit", "employee_filters", "near_filters", "program_code")
 
 
 def _empty_drill(run: dict[str, Any] | None, in_flight: dict[str, Any] | None, year_held: bool) -> dict[str, Any]:
@@ -87,13 +91,7 @@ class UnitPeopleReads(ReaderBase):
         *,
         tax_year: int,
         method: str,
-        month: int | None = None,
-        sort: str | None = None,
-        order: str | None = None,
-        near_min_hours: float | None = None,
-        limit: int | None = None,
-        employee_filters: str | None = None,
-        near_filters: str | None = None,
+        **options: Unpack[UnitDrillOptions],
     ) -> dict[str, Any]:
         """Everything the unit drawer renders, in TWO round trips.
 
@@ -106,11 +104,14 @@ class UnitPeopleReads(ReaderBase):
         the qualified list silently change the near-miss count under a tab
         nobody was looking at.
         """
+        month, sort, order, near_min_hours, limit, employee_filters, near_filters, program_code = (
+            options.get(k) for k in _UNIT_DRILL_OPTIONS
+        )
         run_rows, in_flight_rows, unit_rows, year_rows = self._batch([
-            _stmt_latest_run(client_id),
+            _stmt_latest_run(client_id, program_code),
             _stmt_run_in_flight(client_id),
-            _stmt_unit(client_id, worksite_id, tax_year, method),
-            _stmt_client_year_rows(client_id, tax_year, method),
+            _stmt_unit(client_id, worksite_id, tax_year, method, program_code),
+            _stmt_client_year_rows(client_id, tax_year, method, program_code),
         ])
         run, in_flight, unit = _first(run_rows), _first(in_flight_rows), _first(unit_rows)
         year_held = bool(year_rows and int(year_rows[0]["total"]) > 0)

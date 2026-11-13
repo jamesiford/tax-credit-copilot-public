@@ -120,6 +120,15 @@ class ProgramNotRunnable(LookupError):
     """The program exists but no run can be priced for it: it is unknown, retired, or has no state (federal). [F04c.5]"""
 
 
+class ProgramChoiceRequired(ProgramNotRunnable):
+    """A state has several calculable programs and the caller (a READ, which must not guess) named none. The message lists
+    them, so the answer to "which program?" is on screen rather than silently the first. [F04c.6]"""
+
+    def __init__(self, state: str, candidates: Sequence[str]) -> None:
+        self.candidates = tuple(candidates)
+        super().__init__(f"state {state} has several calculable programs ({', '.join(candidates)}): pass program_code to choose one")
+
+
 def check_program_state(state: str | None, program_code: str | None) -> None:
     """Raise `ProgramStateConflict` when both are given and the program's registry state is not that state."""
     if not (state and program_code):
@@ -149,7 +158,9 @@ def program_state(program_code: str) -> str:
     return entry.state
 
 
-def resolve_program(client_id: int | None, state: str | None, program_code: str | None, tax_year: int | None) -> tuple[str, str | None]:
+def resolve_program(
+    client_id: int | None, state: str | None, program_code: str | None, tax_year: int | None, *, require_program: bool = False,
+) -> tuple[str, str | None]:
     """`(state, program_code)` for a request: the program first, the state as a convenience that resolves to programs.
 
     An explicit program wins and fixes the state. A state alone resolves to its calculable program for the year; with
@@ -162,6 +173,8 @@ def resolve_program(client_id: int | None, state: str | None, program_code: str 
         return program_state(program_code), program_code.upper()
     state = (state or derive_run_state(client_id, tax_year)).upper()
     candidates = calculable_programs_for_state(state, tax_year)
+    if len(candidates) > 1 and require_program:
+        raise ProgramChoiceRequired(state, candidates)
     if len(candidates) > 1:
         logger.warning(
             "state %s has several calculable programs %s; using %s. Naming a state alone is deprecated here: pass program_code.",
@@ -178,6 +191,15 @@ def rows_of_program(rows: Sequence[dict], program_code: str | None) -> list[dict
 def location_state(client_id: int, worksite_id: str, state: str | None, program_code: str | None) -> str:
     """The state a location-level read prices: the program's own when one is named, else `state_for_location`."""
     return program_state(program_code) if program_code else state_for_location(client_id, worksite_id, None, state)
+
+
+def programs_to_price(state: str) -> list[str]:
+    """The program codes a state-wide sweep prices: the default program ALWAYS (so a single-program state behaves exactly as
+    before, an unauthored year included) plus every other program of the state that has an authored year. [F04c.6]"""
+    from tools.credit_math import authored_years
+    from tools.program_registry import programs_for_state
+
+    return [e.code for i, e in enumerate(programs_for_state(state)) if i == 0 or authored_years(e.pack_file)]
 
 
 def program_code_for_state(state: str) -> str | None:

@@ -40,7 +40,7 @@ class RunSeriesReads(ReaderBase):
     """What the run recorded across months and years: headcount, the year series, the One/Zero matrix."""
 
     def headcount_series(
-        self, client_id: int, *, tax_year: int, method: str
+        self, client_id: int, *, tax_year: int, method: str, program_code: str | None = None
     ) -> dict[str, Any]:
         """The monthly headcount series and the annual average, READ.
 
@@ -50,7 +50,7 @@ class RunSeriesReads(ReaderBase):
         because projecting to an arbitrary as-of date is a genuine derivation
         rather than a re-derivation of a certified figure.
         """
-        run = self.latest_run(client_id)
+        run = self.latest_run(client_id, program_code)
         if run is None:
             return {"run": None, "months": [], "annual_average": None, "month_ends": []}
 
@@ -73,7 +73,7 @@ class RunSeriesReads(ReaderBase):
         }
 
     def client_year_series(
-        self, client_id: int, *, method: str = "pay_period"
+        self, client_id: int, *, method: str = "pay_period", program_code: str | None = None
     ) -> dict[str, Any]:
         """Every year the run holds for a client, and what each concluded.
 
@@ -83,13 +83,13 @@ class RunSeriesReads(ReaderBase):
         single-year read is how a chat ends up describing one year as though it
         were the whole history.
         """
-        run = self.latest_run(client_id)
+        run = self.latest_run(client_id, program_code)
         if run is None:
             return {"run": None, "years": []}
 
         summary_rows, credit_rows = self._batch([
             _stmt_client_year_series(client_id, method, run["run_id"]),
-            _stmt_client_year_credit(client_id, method),
+            _stmt_client_year_credit(client_id, method, program_code),
         ])
         credit_by_year = {int(r["tax_year"]): r for r in credit_rows}
         years = [
@@ -98,7 +98,7 @@ class RunSeriesReads(ReaderBase):
         return {"run": run, "years": years, "method": method}
 
     def onezero_matrix(
-        self, client_id: int, *, tax_year: int, method: str
+        self, client_id: int, *, tax_year: int, method: str, program_code: str | None = None
     ) -> dict[str, Any]:
         """The One/Zero allocation for one client-year-method, READ.
 
@@ -108,7 +108,7 @@ class RunSeriesReads(ReaderBase):
         is deduped before it is written, so a contest leaves no trace in the
         rows it produced.
         """
-        run = self.latest_run(client_id)
+        run = self.latest_run(client_id, program_code)
         if run is None:
             return {"run": None, "summary": None, "matrix": [], "units": []}
 

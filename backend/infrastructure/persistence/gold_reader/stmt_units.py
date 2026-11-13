@@ -158,13 +158,15 @@ def _stmt_credit_grid(client_id: int, method: str, program_code: str | None) -> 
     )
 
 
-def _stmt_unit(client_id: int, worksite_id: str, tax_year: int, method: str) -> Statement:
+def _stmt_unit(client_id: int, worksite_id: str, tax_year: int, method: str, program_code: str | None = None) -> Statement:
+    """One current unit-year row. A client with two programs holds one per program, so `program_code` says which."""
+    narrow, values = (" AND program_code = ?", [program_code]) if program_code else ("", [])
     return (
         f"SELECT TOP 1 {', '.join(UNIT_YEAR_MASTER_COLUMNS)} "
         f"FROM {GOLD_SCHEMA}.unit_year_master "
         f"WHERE client_id = ? AND worksite_id = ? AND tax_year = ? "
-        f"AND method = ? AND is_current = 1",
-        [client_id, worksite_id, tax_year, method],
+        f"AND method = ? AND is_current = 1{narrow}",
+        [client_id, worksite_id, tax_year, method, *values],
     )
 
 

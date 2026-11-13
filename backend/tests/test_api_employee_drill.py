@@ -88,7 +88,7 @@ class _DrillReader:
             "selection_decision": "fiscal_window",
         }]
 
-    def employee_drill(self, client_id, *, tax_year, record_token):
+    def employee_drill(self, client_id, *, tax_year, record_token, program_code=None):
         if record_token != _KNOWN_TOKEN:
             return {"run": self._run, "verdicts": [], "segments": [], "periods": [],
                     "month_ends": []}

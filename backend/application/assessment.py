@@ -35,7 +35,7 @@ from application.assessment_inputs import (
     months_with_payroll,
     rows_for_state_year,
 )
-from application.assessment_claims import priced_claim, program_of, refreshed
+from application.assessment_claims import priced_claim, refreshed
 from application.open_year import is_open
 from application.payroll_rows import row_state
 from domain.claims import ClaimStatus
@@ -43,7 +43,7 @@ from domain.claims import ClaimStatus
 
 @dataclass
 class _Sweep:
-    """Average Headcount per (state, year), and what could not be computed and why.
+    """Average Headcount per (PROGRAM, year), and what could not be computed and why.
 
     Net-new needs the PRIOR year's figure, so every year is averaged first and the
     claims are priced in a second pass; a single pass in year order would have
@@ -60,20 +60,22 @@ class _Sweep:
     assumed: dict[tuple[str, int], str] = field(default_factory=dict)
 
     def run(self, states: list[str]) -> None:
+        """Every registered program of every state the payroll holds, the one asked for only when one was. [F04c.6]"""
+        from tools.program_registry import programs_for_state
+
         for state in states:
-            self._state(state)
+            for entry in programs_for_state(state):
+                if not self.wanted or entry.code == self.wanted:
+                    self._program(state, entry.code, entry.pack_file)
 
     def _decline(self, code: str, year: int | None, reason: str, detail: str, *, only_if_requested: bool = True) -> None:
         if only_if_requested and year not in self.requested:
             return
         self.declined.append({"program_code": code, "tax_year": year, "reason": reason, "detail": detail})
 
-    def _state(self, state: str) -> None:
+    def _program(self, state: str, code: str, pack_file: str) -> None:
         from tools.credit_math import authored_years
 
-        pack_file, code = program_of(state)
-        if not code or (self.wanted and code != self.wanted):
-            return
         # [ADR-005] A program with no authored years is describable, not
         # calculable. `load_pack_one_zero` would still hand back a flat pack and
         # we would compute a confident figure under no particular year's
@@ -102,16 +104,16 @@ class _Sweep:
     def _year(self, state: str, code: str, year: int) -> None:
         from tools.credit_math import load_pack_one_zero
 
-        pack = load_pack_one_zero(state, tax_year=year)
+        pack = load_pack_one_zero(code, tax_year=year)
         if pack is None:
             return
         # The CLIENT's twelve months, not January to December. A non-calendar
         # filer measured over the calendar year scores every month before its
         # first pay date as zero and still divides by 12.
-        resolution = client_window_resolution(self.client_id, state, year)
+        resolution = client_window_resolution(self.client_id, code, year)
         window = (resolution.begin, resolution.end) if resolution is not None else None
         if resolution is not None and resolution.assumed:
-            self.assumed[(state, year)] = resolution.note  # flagged on the claim, never silently a calendar year
+            self.assumed[(code, year)] = resolution.note  # flagged on the claim, never silently a calendar year
         year_rows = rows_for_state_year(self.rows, state, year, window)
         if len(year_rows) < MIN_ROWS_TO_ASSESS:  # too thin to mean anything
             return
@@ -138,16 +140,16 @@ class _Sweep:
                 f"year. A twelve-month average would be mostly zeroes.",
             )
             return
-        self.averages[(state, year)] = average_headcount(self.rows, state, year, pack, window)
+        self.averages[(code, year)] = average_headcount(self.rows, state, year, pack, window)
 
 
 def _assessed_cells(sweep: _Sweep, assessed_by: str, repository: Any) -> list[dict[str, Any]]:
     assessed: list[dict[str, Any]] = []
-    for (state, year), average in sorted(sweep.averages.items()):
+    for (code, year), average in sorted(sweep.averages.items()):
         if year not in sweep.requested:
             continue  # computed only to serve as the next year's base
         claim = priced_claim(
-            sweep.client_id, state, year, average, sweep.averages.get((state, year - 1)), assessed_by,
+            sweep.client_id, code, year, average, sweep.averages.get((code, year - 1)), assessed_by,
         )
         if claim is None:
             continue
@@ -157,7 +159,7 @@ def _assessed_cells(sweep: _Sweep, assessed_by: str, repository: Any) -> list[di
                 claim = refreshed(existing, claim, assessed_by)
             repository.record(claim)
         cell = claim.to_dict()
-        cell["fiscal_window"] = {"assumed": (state, year) in sweep.assumed, "note": sweep.assumed.get((state, year), "")}
+        cell["fiscal_window"] = {"assumed": (code, year) in sweep.assumed, "note": sweep.assumed.get((code, year), "")}
         assessed.append(cell)
     return assessed
 

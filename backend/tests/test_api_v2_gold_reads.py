@@ -97,7 +97,7 @@ class _FakeReader:
         self._unit = unit
         self.unit_years_called = False
 
-    def latest_run(self, client_id):
+    def latest_run(self, client_id, program_code=None):
         return self._run
 
     def run_in_flight(self, client_id):
@@ -133,7 +133,7 @@ class _FakeReader:
             "unit_totals": self.unit_totals(),
         }
 
-    def unit(self, client_id, worksite_id, *, tax_year, method):
+    def unit(self, client_id, worksite_id, *, tax_year, method, program_code=None):
         return self._unit
 
     def unit_drill(self, client_id, worksite_id, *, tax_year, method, month=None):

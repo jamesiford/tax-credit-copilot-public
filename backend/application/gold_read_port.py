@@ -32,6 +32,7 @@ class UnitDrillOptions(TypedDict, total=False):
     limit: int | None
     employee_filters: str | None
     near_filters: str | None
+    program_code: str | None
 
 
 class EligibilityOptions(TypedDict, total=False):
@@ -50,6 +51,7 @@ class EligibilityOptions(TypedDict, total=False):
     offset: int
     sort: str
     order: str
+    program_code: str
 
 
 class GoldConnection(Protocol):
@@ -68,7 +70,7 @@ class RunIdentityPort(Protocol):
 
     def scope(self) -> AbstractContextManager[Any]: ...
 
-    def latest_run(self, client_id: int) -> Row | None: ...
+    def latest_run(self, client_id: int, program_code: str | None = None) -> Row | None: ...
 
     def run_in_flight(self, client_id: int) -> Row | None: ...
 
@@ -86,7 +88,9 @@ class UnitGridPort(Protocol):
         program_code: str | None = None, limit: int = 25, offset: int = 0,
     ) -> tuple[Rows, int]: ...
 
-    def unit(self, client_id: int, worksite_id: str, *, tax_year: int, method: str) -> Row | None: ...
+    def unit(
+        self, client_id: int, worksite_id: str, *, tax_year: int, method: str, program_code: str | None = None,
+    ) -> Row | None: ...
 
     def unit_months(
         self, client_id: int, worksite_id: str, *, tax_year: int, method: str, run_id: str
@@ -124,11 +128,11 @@ class UnitPeoplePort(Protocol):
 class RunSeriesPort(Protocol):
     """What the run recorded across months and years."""
 
-    def headcount_series(self, client_id: int, *, tax_year: int, method: str) -> Row: ...
+    def headcount_series(self, client_id: int, *, tax_year: int, method: str, program_code: str | None = None) -> Row: ...
 
-    def client_year_series(self, client_id: int, *, method: str = "pay_period") -> Row: ...
+    def client_year_series(self, client_id: int, *, method: str = "pay_period", program_code: str | None = None) -> Row: ...
 
-    def onezero_matrix(self, client_id: int, *, tax_year: int, method: str) -> Row: ...
+    def onezero_matrix(self, client_id: int, *, tax_year: int, method: str, program_code: str | None = None) -> Row: ...
 
 
 class RiskPort(Protocol):
@@ -136,12 +140,12 @@ class RiskPort(Protocol):
 
     def at_risk(
         self, client_id: int, *, tax_year: int, method: str, min_weekly_hours: float,
-        min_weekly_wages: float, band: float = 0.10,
+        min_weekly_wages: float, band: float = 0.10, program_code: str | None = None,
     ) -> Row: ...
 
     def proximity_candidates(
         self, client_id: int, *, tax_year: int, method: str, min_weekly_hours: float,
-        min_weekly_wages: float, widest_band_hours: float,
+        min_weekly_wages: float, widest_band_hours: float, program_code: str | None = None,
     ) -> Row: ...
 
     def cohort_periods(
@@ -157,7 +161,7 @@ class EmployeePort(Protocol):
         **options: Unpack[EligibilityOptions],
     ) -> Row: ...
 
-    def employee_drill(self, client_id: int, *, tax_year: int, record_token: str) -> Row: ...
+    def employee_drill(self, client_id: int, *, tax_year: int, record_token: str, program_code: str | None = None) -> Row: ...
 
     def employee(self, record_token: str, *, client_id: int, tax_year: int, run_id: str) -> Rows: ...
 

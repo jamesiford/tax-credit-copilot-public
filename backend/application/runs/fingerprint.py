@@ -47,7 +47,7 @@ def authored_windows(account_id: int | None, state: str, program_code: str) -> l
     pack_file = PROGRAM_CODE_TO_PACK.get(program_code)
     out = []
     for year in authored_years(pack_file) if pack_file else []:
-        window = fiscal_window_for_state_year(account_id, state, year)
+        window = fiscal_window_for_state_year(account_id, program_code, year)
         if window is not None:
             out.append((window.begin.isoformat(), window.end.isoformat()))
     return out

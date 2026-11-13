@@ -16,6 +16,7 @@ from typing import Any
 from application.mediator import Query
 from application.onezero_errors import OneZeroNotFound
 from application.payroll_rows import iter_state_packs, require_pay_periods
+from application.program_defaults import program_code_for_state
 
 _BENCHMARK = Path(__file__).resolve().parents[2] / "data" / "onezero_benchmark_synthetic.json"
 
@@ -32,7 +33,10 @@ def _computed_averages(rows: list[dict[str, Any]], tax_year: int, fy_end_month: 
     from domain.calculation.onezero import fiscal_window_start, run_pay_period_method
 
     computed = []
-    for st, pack, state_rows in iter_state_packs(rows, tax_year=tax_year):
+    for item in iter_state_packs(rows, tax_year=tax_year):
+        st, pack, state_rows = item
+        if item.program_code != program_code_for_state(st):
+            continue  # the partner benchmark is one row per STATE, which is its default program; another program has no row to match
         res = run_pay_period_method(
             state_rows, tax_year=tax_year,
             analysis_start_month=fiscal_window_start(tax_year, fy_end_month),

@@ -85,7 +85,7 @@ class _Reader:
         from contextlib import nullcontext
         return nullcontext()
 
-    def latest_run(self, client_id):
+    def latest_run(self, client_id, program_code=None):
         return {"run_id": "test-run"}
 
     def unit_years(self, client_id, *, method, limit):

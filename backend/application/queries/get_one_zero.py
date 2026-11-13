@@ -63,24 +63,27 @@ def _year_rows(
 
 
 def _state_entry(
-    st: str, pack: Any, state_rows: list[dict[str, Any]], prior_rows: list[dict[str, Any]],
-    *, tax_year: int, method: str, fy_end_month: int,
+    item: Any, prior_rows: list[dict[str, Any]], *, tax_year: int, method: str, fy_end_month: int,
 ) -> dict[str, Any]:
+    """One program's entry: `item` is an `iter_state_packs` item, a `(state, pack, rows)` that knows its program. [F04c.6]"""
     from tools.credit_math import apply_one_zero_state_credit
 
+    st, pack, state_rows = item
+    code = item.program_code
     pack, threshold_override, override = entry.apply_negotiated_override(st, pack)
     pp, mm = entry.run_methods(state_rows, tax_year=tax_year, pack=pack, method=method, fy_end_month=fy_end_month)
     primary = pp or mm  # pay_period preferred for the headline figures
-    prior_avg = entry.prior_year_average(prior_rows, st, tax_year=tax_year, method=method, fy_end_month=fy_end_month)
+    prior_avg = entry.prior_year_average(prior_rows, st, tax_year=tax_year, method=method, fy_end_month=fy_end_month, program_code=code)
     # [Net-new] Credit is computed on the YEAR-OVER-YEAR delta in Average Headcount.
     credit = apply_one_zero_state_credit(
-        st, primary.annual_average, prior_period_average_headcount=prior_avg, threshold_override=threshold_override,
+        code, primary.annual_average, prior_period_average_headcount=prior_avg, threshold_override=threshold_override,
     )
     by_fein, by_site, multi_entity_sites = entry.entity_breakdowns(primary)
-    entity_view, credit = entry.entity_view_and_credit(st, pack, by_fein, credit)
+    entity_view, credit = entry.entity_view_and_credit(code, pack, by_fein, credit)
 
     result: dict[str, Any] = {
         "state": st,
+        "program_code": code,
         "rule_pack_citation": pack.citation,
         "method": method,
         "eligibility_floors": entry.eligibility_floors(pack, tax_year),
@@ -108,11 +111,8 @@ def handle_get_one_zero(query: GetOneZeroQuery) -> dict[str, Any]:
     all_rows = require_pay_periods(drop_qc=True, account_id=query.account_id)
     rows, prior_rows = _year_rows(all_rows, query.tax_year, fy_end_month, query.fein)
     results = [
-        _state_entry(
-            st, pack, state_rows, prior_rows,
-            tax_year=query.tax_year, method=query.method, fy_end_month=fy_end_month,
-        )
-        for st, pack, state_rows in iter_state_packs(rows, tax_year=query.tax_year, state=query.state)
+        _state_entry(item, prior_rows, tax_year=query.tax_year, method=query.method, fy_end_month=fy_end_month)
+        for item in iter_state_packs(rows, tax_year=query.tax_year, state=query.state)
     ]
     return {
         "as_of": date.today().isoformat(),

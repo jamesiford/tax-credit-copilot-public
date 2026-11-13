@@ -9,8 +9,10 @@ from __future__ import annotations
 
 from typing import Any
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi import Query as QueryParam
+
+from api._client_program import ClientProgram, client_program
 
 from application.queries.get_proximity import GetProximityQuery, ProximityNotAvailable
 from application.services import get_mediator
@@ -25,7 +27,7 @@ def proximity(
     method: str = QueryParam("min_max", description="min_max | pay_period"),
     within: float = QueryParam(5.0, ge=0.0, le=40.0, description="Band, extra hrs/week"),
     limit: int = QueryParam(100, ge=1, le=1000),
-    account_id: int | None = QueryParam(None, description="Client; defaults to the tenant"),
+    scope: ClientProgram = Depends(client_program),
     rest_of_year: bool = QueryParam(False, description="Add what the rest of the year needs"),
 ) -> dict[str, Any]:
     """Employees within `within` additional hours per week of qualifying.
@@ -41,7 +43,8 @@ def proximity(
             method=method,
             within_weekly_hours=within,
             limit=limit,
-            account_id=account_id,
+            account_id=scope.account_id,
+            program_code=scope.program_code,
             rest_of_year=rest_of_year,
         )
     except ValueError as exc:

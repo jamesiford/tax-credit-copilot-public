@@ -565,6 +565,7 @@ class EmployeeDrillRequest(BaseModel):
     tax_year: int
     state: str | None = None
     account_id: int | None = None
+    program_code: str | None = None  # needed when the state has several programs [F04c.6]
 
 
 @router.post("/employee/drill")
@@ -576,10 +577,8 @@ def employee_drill(payload: EmployeeDrillRequest) -> dict[str, Any]:
 
     try:
         query = GetEmployeeDrillQuery(
-            record_token=payload.record_token,
-            tax_year=payload.tax_year,
-            state=payload.state,
-            account_id=payload.account_id,
+            record_token=payload.record_token, tax_year=payload.tax_year, state=payload.state,
+            account_id=payload.account_id, program_code=payload.program_code,
         )
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc

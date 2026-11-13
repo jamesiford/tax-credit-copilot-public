@@ -49,21 +49,22 @@ def _stmt_client_year_series(client_id: int, method: str, run_id: str) -> Statem
     )
 
 
-def _stmt_client_year_credit(client_id: int, method: str) -> Statement:
+def _stmt_client_year_credit(client_id: int, method: str, program_code: str | None = None) -> Statement:
     """Credit and base-year flags per year, summed across the client's units.
 
     `qualified` is a BIT, so the count of qualifying units must NOT borrow that
     name: `_coerce` types by column name and would hand back `True`. Same trap
     as the eligible count.
     """
+    narrow, values = (" AND program_code = ?", [program_code]) if program_code else ("", [])
     return (
         f"SELECT tax_year, SUM(annual_credit_usd) AS annual_credit_usd, "
         f"  MAX(CAST(is_base_year AS INT)) AS has_base_year, "
         f"  SUM(CAST(qualified AS INT)) AS qualified_units, COUNT(*) AS units "
         f"FROM {GOLD_SCHEMA}.unit_year_master "
-        f"WHERE client_id = ? AND method = ? AND is_current = 1 "
+        f"WHERE client_id = ? AND method = ? AND is_current = 1{narrow} "
         f"GROUP BY tax_year ORDER BY tax_year",
-        [client_id, method],
+        [client_id, method, *values],
     )
 
 
@@ -115,14 +116,15 @@ def _stmt_unit_fein_summary(client_id: int, tax_year: int, method: str, run_id: 
     )
 
 
-def _stmt_client_year_rows(client_id: int, tax_year: int, method: str) -> Statement:
+def _stmt_client_year_rows(client_id: int, tax_year: int, method: str, program_code: str | None = None) -> Statement:
     """Does Gold hold anything for this client-year at all?
 
     Separates "we never calculated this year" from "that unit id is unknown".
     Both leave the unit row empty, and only the second is a 404.
     """
+    narrow, values = (" AND program_code = ?", [program_code]) if program_code else ("", [])
     return (
         f"SELECT COUNT(*) AS total FROM {GOLD_SCHEMA}.unit_year_master "
-        f"WHERE client_id = ? AND tax_year = ? AND method = ? AND is_current = 1",
-        [client_id, tax_year, method],
+        f"WHERE client_id = ? AND tax_year = ? AND method = ? AND is_current = 1{narrow}",
+        [client_id, tax_year, method, *values],
     )

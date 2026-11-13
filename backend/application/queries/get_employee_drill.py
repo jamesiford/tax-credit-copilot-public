@@ -44,6 +44,7 @@ class GetEmployeeDrillQuery(Query):
     tax_year: int
     state: str | None
     account_id: int | None = None
+    program_code: str | None = None  # a state with several programs needs it [F04c.6]
 
     def __post_init__(self) -> None:
         if not self.record_token.strip():
@@ -124,11 +125,9 @@ def handle_get_employee_drill(query: GetEmployeeDrillQuery) -> dict[str, Any]:
             "a client is required — a handle only resolves where it was minted"
         )
 
-    resolved = resolve_statute(
-        account_id=query.account_id, state=query.state, tax_year=query.tax_year
-    )
+    resolved = resolve_statute(account_id=query.account_id, state=query.state, tax_year=query.tax_year, program_code=query.program_code, require_program=True)
     read = get_gold_reader().employee_drill(
-        query.account_id, tax_year=query.tax_year, record_token=query.record_token
+        query.account_id, tax_year=query.tax_year, record_token=query.record_token, program_code=resolved.program_code
     )
     verdicts = read["verdicts"]
     if read["run"] is None or not verdicts:

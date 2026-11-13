@@ -13,28 +13,23 @@ from decimal import Decimal
 from domain.claims import ClaimStatus, ProgramClaim, Provenance
 
 
-def pack_to_program() -> dict[str, str]:
-    """Rule-pack file to programme code."""
-    from tools.credit_math import PROGRAM_CODE_TO_PACK
+def program_of(program_code: str) -> tuple[str | None, str | None]:
+    """The rule-pack file and the code of a PROGRAM (a state, or a code, resolves to its default program); either may be None."""
+    from tools.pack_lookup import pack_file_for
+    from tools.program_registry import program_for_code
 
-    return {pack: code for code, pack in PROGRAM_CODE_TO_PACK.items()}
-
-
-def program_of(state: str) -> tuple[str | None, str | None]:
-    """The state's rule-pack file and the programme code it prices, either may be None."""
-    from tools.credit_math import STATE_TO_PACK
-
-    pack_file = STATE_TO_PACK.get(state)
-    return pack_file, (pack_to_program().get(pack_file) if pack_file else None)
+    pack_file = pack_file_for(program_code)
+    entry = program_for_code(program_code)
+    return pack_file, (entry.code if entry else None)
 
 
 def priced_claim(
-    client_id: int, state: str, year: int, average: float, prior: float | None, assessed_by: str,
+    client_id: int, program_code: str, year: int, average: float, prior: float | None, assessed_by: str,
 ) -> ProgramClaim | None:
-    """The `assessed` claim for one state-year, or None when no programme prices the state."""
-    from tools.credit_math import apply_one_zero_state_credit
+    """The `assessed` claim for one program-year, or None when the program is not registered."""
+    from tools.program_credit import apply_one_zero_program_credit
 
-    pack_file, code = program_of(state)
+    pack_file, code = program_of(program_code)
     if not code:
         return None
     # Two different reasons the prior year can be missing, and only one of
@@ -46,7 +41,7 @@ def priced_claim(
     # made the entire headcount net-new.
     is_base_year = prior is None
     base = average if is_base_year else prior
-    credit = apply_one_zero_state_credit(state, average, prior_period_average_headcount=base)
+    credit = apply_one_zero_program_credit(code, average, prior_period_average_headcount=base)
     return ProgramClaim(
         client_id=client_id,
         program_code=code,

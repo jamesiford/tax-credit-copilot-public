@@ -53,6 +53,7 @@ class GetEligibilityQuery(Query):
     tax_year: int
     state: str
     account_id: int | None = None
+    program_code: str | None = None  # a state with several programs needs it; the read asks rather than guessing [F04c.6]
     status: str = "all"
     near_floor: bool = False
     q: str = ""
@@ -125,9 +126,7 @@ def handle_get_eligibility(query: GetEligibilityQuery) -> dict[str, Any]:
     from application.services import get_gold_reader
     from application.queries._client_run import resolve_statute
 
-    resolved = resolve_statute(
-        account_id=query.account_id, state=query.state, tax_year=query.tax_year
-    )
+    resolved = resolve_statute(account_id=query.account_id, state=query.state, tax_year=query.tax_year, program_code=query.program_code, require_program=True)
     floors = resolved.floors
 
     if query.account_id is None:
@@ -150,6 +149,7 @@ def handle_get_eligibility(query: GetEligibilityQuery) -> dict[str, Any]:
             offset=query.offset,
             sort=query.sort,
             order=query.order,
+            program_code=resolved.program_code,
         )
 
     base = {

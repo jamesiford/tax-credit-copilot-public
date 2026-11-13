@@ -256,3 +256,51 @@ def test_a_program_prices_only_the_rows_of_its_state_and_two_programs_share_them
     rows = [{"Worksite_ID": "ZZ_001"}, {"Worksite_ID": "GA_001"}, {"Worksite_ID": "ZZ_002", "Work_State": "ZZ"}]
     assert [r["Worksite_ID"] for r in program_rows(rows, "zz")] == ["ZZ_001", "ZZ_002"]
     assert program_rows(rows, "GA") == [rows[1]] and program_rows(rows, "QQ") == []
+
+
+# ------------------------------------------------------------------ claims: one cell per (client, program, year)
+
+
+def test_each_program_gets_its_own_claim_cell_priced_from_its_own_pack(runs):
+    _run(runs, program_code=ALPHA)
+    _run(runs, program_code=BETA)
+    cells = _cells(runs)
+    assert {(ALPHA, 2025), (BETA, 2025)} <= set(cells)
+    a, b = cells[(ALPHA, 2025)], cells[(BETA, 2025)]
+    assert a.program_code != b.program_code and a.threshold_jobs == 1.0 and b.threshold_jobs == 3.0
+    # Same headcount, different statute: the figure is the pack's own per-job amount over its own threshold.
+    assert a.average_headcount == b.average_headcount
+    assert a.identified_usd == round((a.average_headcount - a.base_average_headcount - 1) * 1000) or a.is_base_year
+
+
+def test_running_one_program_never_touches_the_others_claim(runs):
+    _run(runs, program_code=ALPHA)
+    before = _cells(runs)[(ALPHA, 2025)]
+    _run(runs, program_code=BETA)
+    after = _cells(runs)[(ALPHA, 2025)]
+    assert (after.claim_id, after.identified_usd, after.effective_from) == (before.claim_id, before.identified_usd, before.effective_from)
+    assert after.effective_to is None and _cells(runs)[(BETA, 2025)].effective_to is None
+
+
+def test_a_run_naming_only_the_state_prices_the_first_program_and_says_which(runs):
+    result = _run(runs, state=STATE)
+    assert result["program_code"] == ALPHA
+    # The run's own claim is for the program it priced; the assessment of "every program of the state" is a separate call.
+    assert ALPHA in {c.program_code for c in runs.claims.coverage(CLIENT)}
+
+
+def test_an_assessment_with_no_program_covers_every_program_of_the_state(runs):
+    from application.commands.assess_client import AssessClientCommand
+
+    runs.wiring.get_mediator().send(AssessClientCommand(client_id=CLIENT, tax_years=(2025,), actor="tests"))
+    assert {(ALPHA, 2025), (BETA, 2025)} <= set(_cells(runs))
+    runs.wiring.get_mediator().send(AssessClientCommand(client_id=CLIENT, program_code=BETA, tax_years=(2025,), actor="tests"))
+    assert _cells(runs)[(ALPHA, 2025)].effective_to is None
+
+
+def test_the_same_program_run_twice_replaces_only_its_own_claim_cell(runs):
+    _run(runs, program_code=ALPHA)
+    _run(runs, program_code=BETA)
+    first_beta = _cells(runs)[(BETA, 2025)].claim_id
+    _run(runs, program_code=ALPHA)
+    assert _cells(runs)[(BETA, 2025)].claim_id == first_beta

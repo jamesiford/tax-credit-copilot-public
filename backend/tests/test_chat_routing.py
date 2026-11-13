@@ -198,7 +198,7 @@ class _Reader:
     def __init__(self, years):
         self._years = years
 
-    def client_year_series(self, client_id, *, method="pay_period"):
+    def client_year_series(self, client_id, *, method="pay_period", program_code=None):
         return {"run": {"run_id": "r"}, "years": self._years, "method": method}
 
 

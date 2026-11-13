@@ -13,6 +13,7 @@ from typing import Any
 from fastapi import APIRouter, HTTPException
 
 from api._payperiods import iter_state_packs, require_pay_periods
+from application.alert_levers import lever_sentence
 from application.queries.get_in_year_progress import (
     GetInYearProgressQuery,
     ProgressNotAvailable,
@@ -92,9 +93,9 @@ def forecast(
     prior_rows = [r for r in all_rows if _fy(r) == tax_year - 1]
 
     results: list[dict[str, Any]] = []
-    for st, _pack, _state_rows in iter_state_packs(rows, tax_year=tax_year, state=state):
+    for item in iter_state_packs(rows, tax_year=tax_year, state=state):  # one projection per program of a state
         proj = project_state_year_end(
-            st, tax_year, rows, prior_rows, as_of=as_of_date, fiscal_year_end_month=fy_end_month,
+            item.program_code, tax_year, rows, prior_rows, as_of=as_of_date, fiscal_year_end_month=fy_end_month,
         )
         if proj is not None:
             results.append(proj)
@@ -131,7 +132,8 @@ def monthly_alerts(
     employee_levers: list[dict[str, Any]] = []
     status_counts = {"on_track": 0, "at_risk": 0, "exceeding": 0}
 
-    for st, pack, state_rows in iter_state_packs(rows, tax_year=tax_year, state=state):
+    for item in iter_state_packs(rows, tax_year=tax_year, state=state):
+        st, pack, state_rows = item
         perf = run_performance_dashboard(state_rows, tax_year=tax_year, pack=pack)
 
         # Per-unit on_track / at_risk / exceeding classification.
@@ -145,6 +147,7 @@ def monthly_alerts(
             status_counts[ustatus] += 1
             unit_alerts.append({
                 "state": st,
+                "program_code": item.program_code,
                 "Worksite_ID": u["Worksite_ID"],
                 "status": ustatus,
                 "green": u["green"],
@@ -154,28 +157,13 @@ def monthly_alerts(
             })
 
         # Per-employee levers for borderline (yellow) employees.
-        floor_hours = pack.min_weekly_hours
-        floor_wages = pack.min_weekly_wages
         for e in perf["employees"]:
-            if e["status"] != "yellow":
+            lever = lever_sentence(e, st, pack) if e["status"] == "yellow" else None
+            if lever is None:
                 continue
-            parts = []
-            if e["hours_gap_per_week"] > 0:
-                parts.append(
-                    f"add {e['hours_gap_per_week']:.1f} hrs/wk to clear the {st} {floor_hours:.0f}-hr threshold"
-                )
-            if floor_wages > 0 and e["wages_gap_per_week"] > 0:
-                parts.append(
-                    f"raise weekly wages by ${e['wages_gap_per_week']:,.0f} to clear the {st} ${floor_wages:,.0f}/wk floor"
-                )
-            if not parts:
-                continue
-            lever = (
-                f"{e['Employee_ID']} ({e['Worksite_ID']}) is at {e['avg_weekly_hours']:.1f} hrs/wk "
-                f"and ${e['avg_weekly_wages']:,.0f}/wk avg — " + "; ".join(parts) + "."
-            )
             employee_levers.append({
                 "state": st,
+                "program_code": item.program_code,
                 "Employee_ID": e["Employee_ID"],
                 "Worksite_ID": e["Worksite_ID"],
                 "avg_weekly_hours": e["avg_weekly_hours"],
@@ -259,11 +247,10 @@ def performance_dashboard(
         rows = [r for r in rows if r.get("Worksite_ID") == worksite]  # [O1] row scope
 
     by_state: list[dict[str, Any]] = []
-    for st, pack, state_rows in iter_state_packs(rows, tax_year=tax_year, state=state):
-        result = run_performance_dashboard(
-            state_rows, tax_year=tax_year, pack=pack, per_job_usd=state_per_job_usd(st),
-        )
-        result["state"] = st
+    for item in iter_state_packs(rows, tax_year=tax_year, state=state):
+        st, pack, state_rows = item
+        result = run_performance_dashboard(state_rows, tax_year=tax_year, pack=pack, per_job_usd=state_per_job_usd(item.program_code))
+        result["state"], result["program_code"] = st, item.program_code
         result["yellow_credit_at_stake_usd"] = sum(  # [O3]
             e["credit_at_stake_usd"] for e in result["employees"] if e["status"] == "yellow"
         )

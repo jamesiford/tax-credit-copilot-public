@@ -23,6 +23,11 @@ def _resolve(key: str) -> tuple[str, str | None, str]:
     return key_u, credit_math.pack_file_for(key_u), (entry.state if entry and entry.state else key_u)
 
 
+def state_of(program_or_state: str) -> str:
+    """The state a program code is priced in, or the (upper-cased) state itself when given one."""
+    return _resolve(program_or_state)[2]
+
+
 def avg_program_wage(program_or_state: str) -> float:
     """Average annual wage of the payroll rows in the program's state (used by percentage-of-wages benefits)."""
     from .payroll import _load_rows
