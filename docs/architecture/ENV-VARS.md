@@ -181,6 +181,9 @@ pack under version control; pointing these elsewhere moves where the files are r
 |---|---|---|---|---|---|---|
 | `RULES_DIR` | `backend/config_programs.py` | Folder holding the rule packs (`<program>.json`) and year packs (`<program>/<year>.json`). Default the packaged `backend/rules` | not set | — | not set | No |
 | `PROGRAM_REGISTRY_FILE` | `backend/config_programs.py` | The program manifest. Default `<RULES_DIR>/registry/programs.json` | not set | — | not set | No |
+| `PROGRAM_DRAFT_REQUIRE_SECOND_REVIEWER` | `backend/config_programs.py` | A program draft's reviewer must differ from the person who edited it and the person who requested review. Default `true` outside `ENVIRONMENT=local`, `false` locally. A draft has no runtime authority whatever this says | not set | — | not set | No |
+| `PROGRAM_PREVIEW_ALLOW_CUSTOMER_DATA` | `backend/config_programs.py` | Allow a draft's preview calculation to read a customer-classified source. Default `false`: a preview runs on the committed synthetic sample only, and its result is never stored | not set | — | not set | No |
+| `PROGRAM_EXPORT_ALLOW_LOCAL_WRITE` | `backend/config_programs.py` | Developer option, honoured only when `ENVIRONMENT=local`: let an export bundle write its pack files into the rules folder. Default `false`; a deployed app never writes into the source tree | not set | — | not set | No |
 
 ## 5. Artifacts (Blob Storage)
 

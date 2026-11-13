@@ -58,6 +58,12 @@ class DraftConflict(DraftError):
     code = "draft_conflict"
 
 
+class DraftInvalid(DraftError):
+    """The request itself is malformed: a bad code, an unsupported jurisdiction, a document that is not an object or too large."""
+
+    code = "draft_invalid"
+
+
 class InvalidTransition(DraftError):
     """The requested move is not allowed from the draft's current status, or its documents cannot be edited now."""
     code = "invalid_transition"

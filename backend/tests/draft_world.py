@@ -8,7 +8,7 @@ from __future__ import annotations
 import copy
 from typing import Any
 
-CODE, STATE = "ZZ_DRAFT_JTC", "ZY"
+CODE, STATE = "ZY_DRAFT_JTC", "ZY"
 FLAG = {"_prototype_verify": True}
 
 

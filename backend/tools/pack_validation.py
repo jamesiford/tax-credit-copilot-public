@@ -118,35 +118,46 @@ def _check_verified_claim(pack: dict[str, Any], report: Report) -> None:
         report.add("error", "verified_without_citation", "a verified pack needs credit.statutory_citation and _year_provenance.source")
 
 
-def _check_names(path: Path, pack: dict[str, Any], kind: str, report: Report) -> None:
+def _check_names(name: str, pack: dict[str, Any], kind: str, report: Report) -> None:
     j = pack.get("jurisdiction") or {}
     if kind == "year":
-        if path.stem.split(".")[0] != str(pack.get("tax_year")):
-            report.add("error", "filename", f"{path.name} must be named for its tax_year ({pack.get('tax_year')}.json)")
+        if name.split(".")[0] != str(pack.get("tax_year")):
+            report.add("error", "filename", f"{name} must be named for its tax_year ({pack.get('tax_year')}.json)")
         return
     expected = "federal_" if j.get("level") == "federal" else f"{str(j.get('code', '')).lower()}_"
-    if not path.name.startswith(expected):
-        report.add("error", "filename", f"{path.name} must start with {expected!r} for a {j.get('level')} pack")
+    if not name.startswith(expected):
+        report.add("error", "filename", f"{name} must start with {expected!r} for a {j.get('level')} pack")
 
 
-def validate_pack(path: Path, years_authored: bool = False) -> Report:
-    """Validate one base pack or year pack file (a year pack is a `<program>/<year>.json`)."""
-    kind = "year" if path.stem.split(".")[0].isdigit() else "base"
-    report = Report(file=str(path), kind=kind)
-    try:
-        pack = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, ValueError) as exc:
-        report.add("error", "unreadable", f"cannot read as JSON: {exc}")
-        return report
+def validate_document(pack: Any, name: str, kind: str, years_authored: bool = False, file: str = "") -> Report:
+    """Validate one pack held in memory, as it would be named on disk (`name`, e.g. `zz_demo.json` or `2025.json`).
+
+    The portal validates a draft's documents with this and never writes them to a folder; `validate_pack` reads a file
+    and calls it, so a draft and a committed pack are judged by exactly the same rules.
+    """
+    report = Report(file=file or name, kind=kind)
     check_schema(pack, kind, report)
     if isinstance(pack, dict):
-        _check_names(path, pack, kind, report)
+        _check_names(name, pack, kind, report)
         _check_models(pack, kind, years_authored, report)
         _check_thresholds(pack, report)
         _check_verified_claim(pack, report)
         for flagged in _flags(pack):
             report.add("info", "unverified", "carries _prototype_verify: not verified", flagged)
     return report
+
+
+def validate_pack(path: Path, years_authored: bool = False) -> Report:
+    """Validate one base pack or year pack file (a year pack is a `<program>/<year>.json`)."""
+    kind = "year" if path.stem.split(".")[0].isdigit() else "base"
+    try:
+        pack = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        report = Report(file=str(path), kind=kind)
+        report.add("error", "unreadable", f"cannot read as JSON: {exc}")
+        return report
+    return validate_document(pack, path.name, kind, years_authored, str(path))
+
 
 
 def _load_dict(path: Path) -> dict[str, Any] | None:

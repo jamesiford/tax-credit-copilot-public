@@ -71,6 +71,7 @@ AGENT_FORBIDDEN_WRITES = tuple(re.compile(p) for p in (
     r"^POST /api/claims/assess$",
     r"^POST /api/v2/run-batches$",
     r"^POST /api/v2/run-batches/[^/]+/(cancel|retry-failed)$",
+    r"^(POST|PUT) /api/v2/program-drafts(/[^/]+/(documents|validate|request-review|review|withdraw|preview|export))?$",
 ))
 
 
