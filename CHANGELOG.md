@@ -14,6 +14,7 @@ All notable changes to this project are recorded here, so changes can be followe
 ## [Unreleased]
 
 ### Added
+- `docs/architecture/ADR-012-run-orchestration.md` and `ADR-013-program-registry.md`: proposed designs for batch run jobs and for a program registry with an export-only authoring workflow. Design only; nothing changes at runtime and operators need do nothing.
 - `SOURCE_READ_MODE=onelake|sql` (default `onelake`): a SPIKE that reads payroll rows over the lakehouse SQL analytics endpoint (for a Viewer plus object-level `SELECT`) instead of Delta files, through the same mapping, coercion and cache. Off by default and not adopted: the endpoint is emulated offline and the datasets, engine rows and engine results are identical in both modes, but no live endpoint was measured and no data version is recorded. `docs/architecture/SQL-READ-PATH.md`; `scripts/fabric/spike-sql-read.py`.
 - `docs/architecture/RUNBOOK-PRIVATE-LINK-AND-IDENTITY.md`: a customer-neutral runbook for running the app behind private link with your own identity, with the errors already seen.
 - Azure SQL Database can hold `tcc_ops` and `tcc_gold` instead of the Fabric Warehouse. Set `WAREHOUSE_PLATFORM=azure_sql` (default `fabric`, nothing changes without it); the store settings keep the value `warehouse`, with `azure_sql` and `sql` accepted as aliases. See `docs/architecture/ADR-011-azure-sql-operational-store.md`. Not yet run against a live Azure SQL database: the checks to make are listed in the ADR.
