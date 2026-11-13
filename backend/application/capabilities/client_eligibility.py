@@ -100,17 +100,17 @@ def client_eligibility(
     from tools.portfolio import chat_client_context, chat_state_credit
 
     state = s.derive_state(state, client_id, tax_year)
-    if window is None:
-        window = s.statute(state, client_id, tax_year).window
+    resolved = s.statute(state, client_id, tax_year)  # a state with several programs asks which, rather than answering for one
+    window = window or resolved.window
     capture = s.RunCapture()
     with s.trail_scope() as recorder:
         context = chat_client_context(
-            account_id=client_id, tax_year=tax_year, method=s.read_method(method), on_run=capture,
+            account_id=client_id, tax_year=tax_year, method=s.read_method(method), on_run=capture, program_code=resolved.program_code,
         )
         credit = chat_state_credit(
             state, tax_year=tax_year, account_id=client_id,
             current_average=context.get("current_average"),
-            prior_average=context.get("prior_average"),
+            prior_average=context.get("prior_average"), program_code=resolved.program_code,
         )
         provenance = s.run_provenance(capture.run, recorder=recorder, source="tcc_gold")
 

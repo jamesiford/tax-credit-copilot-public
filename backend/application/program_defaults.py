@@ -202,6 +202,29 @@ def programs_to_price(state: str) -> list[str]:
     return [e.code for i, e in enumerate(programs_for_state(state)) if i == 0 or authored_years(e.pack_file)]
 
 
+def state_programs() -> list[tuple[str, str]]:
+    """`(state, program code)` for every state in the registry and each program a sweep prices there, states sorted. [F04c.6]"""
+    from tools.credit_math import STATE_TO_PACK
+
+    return [(state, code) for state in sorted(STATE_TO_PACK.keys()) for code in programs_to_price(state)]
+
+
+def priced_program(client_id: int | None, state: str | None, program_code: str | None, tax_year: int | None) -> tuple[str, str, str]:
+    """`(state, program code, pack file)` a what-if prices; a state with several programs asks which. Raises `ProgramNotRunnable`. [F04c.6]"""
+    from tools.pack_lookup import pack_file_for
+
+    st, code = resolve_program(client_id, state, program_code, tax_year, require_program=True)
+    pack_file = pack_file_for(code) if code else None
+    if pack_file is None:
+        raise ProgramNotRunnable(f"No rule pack for state {st}")
+    return st, code, pack_file
+
+
+def run_state(client_id: int, tax_year: int | None, state: str | None, program_code: str | None) -> str:
+    """The state a run-level read prices: the program's own when one is named, else `derive_run_state`. [F04c.6]"""
+    return program_state(program_code) if program_code else derive_run_state(client_id, tax_year, state)
+
+
 def program_code_for_state(state: str) -> str | None:
     """The code of the state's DEFAULT program (the first in registry order), or None. See `programs_for_state`."""
     from tools.program_registry import programs_for_state

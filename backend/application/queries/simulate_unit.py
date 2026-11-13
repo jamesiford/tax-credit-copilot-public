@@ -46,11 +46,11 @@ class SimulateUnitQuery(Query):
     worksite_id: str
     tax_year: int
     state: str | None = None
+    program_code: str | None = None  # a state with several programs needs it [F04c.6]
     method: str = "min_max"
     action: str = "add_headcount"
     magnitude: float = 1.0
-    #: WI-22. What a hired role is: hours a week and pay. Both optional.
-    hire_weekly_hours: float | None = None
+    hire_weekly_hours: float | None = None  # WI-22: what a hired role is, hours a week and pay; both optional
     hire_hourly_rate: float | None = None
 
     def __post_init__(self) -> None:
@@ -256,21 +256,20 @@ def run_rate_credit(
 
 
 def handle_simulate_unit(query: SimulateUnitQuery) -> dict[str, Any]:
-    from application.queries._client_run import ClientRunNotAvailable, resolve_client_run, state_for_location
+    from application.program_defaults import location_state, rows_of_program
+    from application.queries._client_run import ClientRunNotAvailable, resolve_client_run
     from application.services import get_gold_reader
     from domain.calculation.onezero import run_min_max_method, run_pay_period_method
     from tools.simulation import apply_onezero_lever
 
     site = query.worksite_id
-    state = state_for_location(query.client_id, site, query.tax_year, query.state)
+    state = location_state(query.client_id, site, query.state, query.program_code)
 
     reader = get_gold_reader()
     with reader.scope():
-        run = reader.latest_run(query.client_id)
+        run = reader.latest_run(query.client_id, query.program_code)
         items, _total = reader.unit_years(query.client_id, method=query.method, limit=5000)
-    rows_by_year = {
-        int(row["tax_year"]): row for row in items if row.get("worksite_id") == site
-    }
+    rows_by_year = {int(row["tax_year"]): row for row in rows_of_program(items, query.program_code) if row.get("worksite_id") == site}
     if not rows_by_year:
         raise UnitSimulationNotAvailable(
             f"no calculated run holds location {site} for account {query.client_id}"
@@ -294,7 +293,7 @@ def handle_simulate_unit(query: SimulateUnitQuery) -> dict[str, Any]:
 
     try:
         client_run = resolve_client_run(
-            account_id=query.client_id, state=state, tax_year=query.tax_year,
+            account_id=query.client_id, state=state, tax_year=query.tax_year, program_code=query.program_code, require_program=True,
         )
     except ClientRunNotAvailable as exc:
         raise UnitSimulationNotAvailable(str(exc)) from exc

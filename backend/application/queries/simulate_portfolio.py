@@ -50,6 +50,7 @@ class SimulatePortfolioQuery(Query):
     action: str = "add_headcount"
     magnitude: float = 5.0
     limit: int = 50
+    program_code: str | None = None  # a state with several programs needs it [F04c.6]
 
     def __post_init__(self) -> None:
         if self.action not in _ACTIONS:
@@ -63,24 +64,19 @@ class PortfolioSimulationNotAvailable(LookupError):
 def handle_simulate_portfolio(query: SimulatePortfolioQuery) -> dict[str, Any]:
     from domain.calculation.headcount import average_headcount, rows_for_state_year
     from application.source_ports import load_portfolio_pay_periods, window_for_state_year
-    from tools.credit_math import (
-        PROGRAM_CODE_TO_PACK,
-        STATE_TO_PACK,
-        load_pack_one_zero,
-    )
+    from application.program_defaults import ProgramNotRunnable, resolve_program
+    from tools.credit_math import load_pack_one_zero
     from tools.simulation import apply_onezero_lever, onezero_snapshot
 
-    state = query.state.upper()
-
-    pack_file = STATE_TO_PACK.get(state)
-    program_code = next(
-        (code for code, name in PROGRAM_CODE_TO_PACK.items() if name == pack_file), None
-    )
+    try:
+        state, program_code = resolve_program(None, query.state, query.program_code, query.tax_year, require_program=True)
+    except ProgramNotRunnable as exc:
+        raise PortfolioSimulationNotAvailable(str(exc)) from exc
     if program_code is None:
         raise PortfolioSimulationNotAvailable(f"no programme maps to state {state!r}")
 
     try:
-        pack = load_pack_one_zero(state, tax_year=query.tax_year)
+        pack = load_pack_one_zero(program_code, tax_year=query.tax_year)
     except FileNotFoundError as exc:
         # `load_pack_one_zero` raises for an unauthored year rather than
         # returning None [ADR-005]. Either way the answer is the same: decline
@@ -100,7 +96,7 @@ def handle_simulate_portfolio(query: SimulatePortfolioQuery) -> dict[str, Any]:
         )
 
     try:
-        prior_pack = load_pack_one_zero(state, tax_year=query.tax_year - 1)
+        prior_pack = load_pack_one_zero(program_code, tax_year=query.tax_year - 1)
     except FileNotFoundError:
         # No prior year authored means no frozen base to measure against. That
         # is a real limitation, not an error — the sweep proceeds with a zero
@@ -115,7 +111,7 @@ def handle_simulate_portfolio(query: SimulatePortfolioQuery) -> dict[str, Any]:
         # The CLIENT's twelve months. Leaving this on the calendar year while
         # the assessment moved to the real window is how the sweep and the
         # coverage matrix come to quote different figures for one client-year.
-        window = window_for_state_year(client_id, state, query.tax_year)
+        window = window_for_state_year(client_id, program_code, query.tax_year)
         rows = rows_for_state_year(all_rows, state, query.tax_year, window)
         if not rows:
             continue
@@ -127,7 +123,7 @@ def handle_simulate_portfolio(query: SimulatePortfolioQuery) -> dict[str, Any]:
         base = (
             average_headcount(
                 all_rows, state, query.tax_year - 1, prior_pack,
-                window_for_state_year(client_id, state, query.tax_year - 1),
+                window_for_state_year(client_id, program_code, query.tax_year - 1),
             )
             if prior_pack is not None
             else 0.0
@@ -135,7 +131,7 @@ def handle_simulate_portfolio(query: SimulatePortfolioQuery) -> dict[str, Any]:
 
         try:
             before = onezero_snapshot(
-                rows, tax_year=query.tax_year, state=state, pack=pack,
+                rows, tax_year=query.tax_year, state=program_code, pack=pack,
                 prior_average_headcount=base,
             )
             moved, _detail = apply_onezero_lever(
@@ -146,7 +142,7 @@ def handle_simulate_portfolio(query: SimulatePortfolioQuery) -> dict[str, Any]:
                 state=state,
             )
             after = onezero_snapshot(
-                moved, tax_year=query.tax_year, state=state, pack=pack,
+                moved, tax_year=query.tax_year, state=program_code, pack=pack,
                 prior_average_headcount=base,
             )
         except Exception as exc:  # noqa: BLE001 — one client must not kill the sweep
@@ -202,6 +198,7 @@ def handle_simulate_portfolio(query: SimulatePortfolioQuery) -> dict[str, Any]:
 
     return {
         "state": state,
+        "program_code": program_code,
         "program_code": program_code,
         "tax_year": query.tax_year,
         "action": query.action,

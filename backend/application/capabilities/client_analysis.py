@@ -101,11 +101,11 @@ def client_at_risk(
     return s.result("client_at_risk", facts, blocks, provenance=provenance)
 
 
-def _program_for_state(state: str | None) -> str | None:
-    from tools.credit_math import PROGRAM_CODE_TO_PACK, STATE_TO_PACK
+def _programs_of_state(state: str | None) -> list[str]:
+    """Every program of the state, so "what else" does not list one the client is already assessed for. [F04c.6]"""
+    from tools.program_registry import programs_for_state
 
-    pack = STATE_TO_PACK.get((state or "").upper())
-    return next((code for code, p in PROGRAM_CODE_TO_PACK.items() if p == pack), None) if pack else None
+    return [e.code for e in programs_for_state(state or "")]
 
 
 def client_discovery(
@@ -126,8 +126,7 @@ def client_discovery(
     from tools.discovery import discover_credits
 
     if exclude_codes is None:
-        scoped = _program_for_state(state)
-        exclude_codes = [scoped] if scoped else []
+        exclude_codes = _programs_of_state(state)
 
     with s.trail_scope() as recorder:
         facts = discover_credits(
