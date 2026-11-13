@@ -9,8 +9,9 @@ from __future__ import annotations
 
 from typing import Any
 
-from fastapi import APIRouter, HTTPException, Query, Request, Response
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 
+from api._rate_limit import rate_limited
 from api.auth import attributed
 from api.program_draft_models import (
     ActorBody, CreateBody, DraftOut, DraftsPage, EditBody, ExportBody, ManifestOut, PreviewBody, PreviewOut, ReviewBody, WithdrawBody,
@@ -63,7 +64,7 @@ def get_draft(draft_id: str) -> Any:
     return _send(GetProgramDraftQuery(draft_id=draft_id))
 
 
-@router.put("/{draft_id}/documents", response_model=DraftOut)
+@router.put("/{draft_id}/documents", response_model=DraftOut, dependencies=[Depends(rate_limited("draft_save"))])
 def edit_documents(draft_id: str, body: EditBody, request: Request) -> Any:
     """Replace the documents. A stale `expected_version` is a 409; a draft under review cannot be edited."""
     return _send(EditProgramDraftCommand(actor=_who(request, body.actor), draft_id=draft_id, expected_version=body.expected_version,
@@ -87,7 +88,7 @@ def review_draft(draft_id: str, body: ReviewBody, request: Request) -> Any:
     return _send(ReviewProgramDraftCommand(actor=_who(request, body.actor), draft_id=draft_id, decision=body.decision, comment=body.comment))
 
 
-@router.post("/{draft_id}/preview", response_model=PreviewOut)
+@router.post("/{draft_id}/preview", response_model=PreviewOut, dependencies=[Depends(rate_limited("draft_preview"))])
 def preview_draft(draft_id: str, body: PreviewBody | None = None) -> Any:
     """Price the draft's year packs on synthetic data with the engine's own functions. Reads only: nothing is written or stored."""
     body = body or PreviewBody()
@@ -100,7 +101,8 @@ def withdraw_draft(draft_id: str, request: Request, body: WithdrawBody | None = 
                                              reason=body.reason if body else None))
 
 
-@router.post("/{draft_id}/export", response_class=Response, responses={200: {"content": {"application/zip": {}}}})
+@router.post("/{draft_id}/export", response_class=Response, responses={200: {"content": {"application/zip": {}}}},
+             dependencies=[Depends(rate_limited("draft_export"))])
 def export_draft(draft_id: str, request: Request, body: ExportBody | None = None) -> Response:
     """Download the deterministic bundle of an approved draft (pack and year packs at their final paths, registry entry, validation,
     review record, commit checklist). Records the export; verifies nothing and activates nothing."""

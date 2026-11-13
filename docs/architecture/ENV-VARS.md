@@ -168,6 +168,7 @@ in the same store as the run manifest: there is no separate store setting, `RUN_
 | `RUN_LEASE_SECONDS`, `RUN_HEARTBEAT_SECONDS` | `backend/config_runs.py` | How long an item's lease lasts (default `120`, minimum `15`) and how often a worker extends it (default `30`, at most half the lease). A dead worker's items return to the queue when the lease lapses | not set | — | not set | No |
 | `RUN_WORKER_POLL_SECONDS` | `backend/application/runs/worker.py` | Idle wait between claims. Default `5` | not set | — | not set | No |
 | `RUN_WORKER_STALE_SECONDS` | `backend/application/queries/run_batch_reads.py` | Queued work with no live lease for this long shows a degraded `run_worker` entry. Default `300` | not set | — | not set | No |
+| `RUN_WORKER_IDENTITY_CLIENT_ID` | `backend/bootstrap/run_worker.py` | Optional. Client id of a user-assigned managed identity that the worker PROCESS (`python -m bootstrap.run_worker`) runs as: it is set as `AZURE_CLIENT_ID` for that process before any credential is built. Empty (default): the worker shares the API's identity. Never applied to the inline worker. Grants it needs: [RUN-ORCHESTRATION.md](RUN-ORCHESTRATION.md) "A separate worker identity" | not set | — | not set | No |
 | `RUN_BACKOFF_BASE_SECONDS` | `backend/application/runs/worker.py` | First retry delay; doubles per attempt up to two minutes, with jitter. Default `5` | not set | — | not set | No |
 
 ## 4b. Program registry and rules folder
@@ -183,6 +184,7 @@ pack under version control; pointing these elsewhere moves where the files are r
 | `PROGRAM_REGISTRY_FILE` | `backend/config_programs.py` | The program manifest. Default `<RULES_DIR>/registry/programs.json` | not set | — | not set | No |
 | `PROGRAM_DRAFT_REQUIRE_SECOND_REVIEWER` | `backend/config_programs.py` | A program draft's reviewer must differ from the person who edited it and the person who requested review. Default `true` outside `ENVIRONMENT=local`, `false` locally. A draft has no runtime authority whatever this says | not set | — | not set | No |
 | `PROGRAM_PREVIEW_ALLOW_CUSTOMER_DATA` | `backend/config_programs.py` | Allow a draft's preview calculation to read a customer-classified source. Default `false`: a preview runs on the committed synthetic sample only, and its result is never stored | not set | — | not set | No |
+| `RATE_LIMIT_PER_MINUTE` | `backend/config_limits.py` | Per signed-in caller, per minute, for each of: draft save, draft preview, draft export and batch start (each counted on its own). Default `60`; `0` turns it off. A request over the limit is a 429 with `Retry-After`. Kept per process, so with scale-out the ceiling is this number times the instances. Not applied when nobody is signed in (`AUTH_MODE=none`, local only) | not set | — | not set | No |
 | `PROGRAM_EXPORT_ALLOW_LOCAL_WRITE` | `backend/config_programs.py` | Developer option, honoured only when `ENVIRONMENT=local`: let an export bundle write its pack files into the rules folder. Default `false`; a deployed app never writes into the source tree | not set | — | not set | No |
 
 ## 5. Artifacts (Blob Storage)

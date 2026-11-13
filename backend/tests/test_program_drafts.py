@@ -247,3 +247,43 @@ def test_a_caller_who_is_not_a_writer_is_refused_and_nothing_is_stored():
     finally:
         program_draft_wiring.set_program_draft_repository(None)
         repo.close()
+
+
+def _as(upn, oid=None):
+    extra = {"oid": oid} if oid else {}
+    return {"Authorization": f"Bearer {mint(upn=upn, **extra)}"}
+
+
+def _submitted_by(api, headers):
+    docs = dw.documents()
+    draft = api.post(BASE, headers=headers, json={"code": dw.CODE, "name": "Zedland Two Jobs Credit", "state": dw.STATE, "years": [2024, 2025]}).json()
+    did = draft["draft_id"]
+    api.put(f"{BASE}/{did}/documents", headers=headers, json={"expected_version": draft["version"], "pack": docs["pack"], "years": docs["years"]})
+    assert api.post(f"{BASE}/{did}/validate", headers=headers, json={}).json()["validation"]["valid"] is True
+    assert api.post(f"{BASE}/{did}/request-review", headers=headers, json={}).status_code == 200
+    return did
+
+
+def test_two_accounts_of_one_object_id_cannot_approve_their_own_draft(entra, api):
+    """The second-reviewer rule compares object ids, so a second UPN for the same person does not satisfy it. [F07.3]"""
+    did = _submitted_by(api, _as("first.account@example.com"))
+    same_person = api.post(f"{BASE}/{did}/review", headers=_as("second.account@example.com"), json={"decision": "approve"})
+    assert same_person.status_code == 422 and same_person.json()["detail"]["code"] == "review_refused"
+    assert api.get(f"{BASE}/{did}", headers=_as("first.account@example.com")).json()["status"] == "ready_for_review"
+
+
+def test_a_different_object_id_may_approve_and_both_identities_are_on_the_events(entra, api):
+    did = _submitted_by(api, _as("author@example.com"))
+    other = api.post(f"{BASE}/{did}/review", headers=_as("reviewer@example.com", oid="oid-of-the-second-person"), json={"decision": "approve"})
+    assert other.status_code == 200 and other.json()["status"] == "approved_for_export"
+    events = api.get(f"{BASE}/{did}", headers=_as("author@example.com")).json()["events"]
+    assert all(e["detail"].get("actor_oid") and e["detail"].get("actor_tenant") for e in events)
+    assert events[-1]["detail"]["actor_oid"] == "oid-of-the-second-person"
+    assert events[0]["detail"]["actor_oid"] != events[-1]["detail"]["actor_oid"]
+
+
+def test_events_written_without_a_token_carry_no_identity_and_keep_the_string_rule(api):
+    ready = _ready(api)
+    events = api.get(f"{BASE}/{ready['draft_id']}").json()["events"]
+    assert all("actor_oid" not in e["detail"] for e in events)
+    assert api.post(f"{BASE}/{ready['draft_id']}/review", json={"decision": "approve", "actor": "ann"}).status_code == 422

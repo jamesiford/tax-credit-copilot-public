@@ -11,6 +11,7 @@ import uuid
 from datetime import datetime, timezone
 from typing import Any
 
+from application.program_drafts import customer_data
 from application.program_drafts.validation import for_storage, validate_draft
 from config import get_settings
 from domain.program_drafts import (
@@ -34,7 +35,28 @@ def load(repo: ProgramDraftRepository, draft_id: str) -> ProgramDraft:
     return draft
 
 
+def caller_identity() -> tuple[str, str | None] | None:
+    """The signed-in person's stable identity, `(object id, tenant id)`, or None (local development, no token).
+
+    A display string or a UPN names an account; an object id names the person behind it, so two UPNs of one person share it.
+    For the channel gateway the identity is the person it acts for, never its own service principal.
+    """
+    from application.identity import ambient_principal
+
+    principal = ambient_principal()
+    if principal is None or not principal.authenticated:
+        return None
+    oid = principal.effective_oid
+    if not oid:
+        return None
+    tenant = principal.acting_for.tenant_id if principal.is_agent and principal.acting_for else principal.tenant_id
+    return oid, tenant
+
+
 def _event(draft: ProgramDraft, kind: str, actor: str, at: datetime, to: DraftStatus | None = None, **detail: Any) -> DraftEvent:
+    who = caller_identity()
+    if who is not None:
+        detail = {**detail, "actor_oid": who[0], "actor_tenant": who[1]}
     return DraftEvent(draft_id=draft.draft_id, seq=0, event_type=kind, actor=actor, at=at, from_status=draft.status.value,
                       to_status=(to or draft.status).value, detail=detail)
 
@@ -118,7 +140,10 @@ def edit(repo: ProgramDraftRepository, draft_id: str, expected_version: int, doc
     now = at or _now()
     changed = draft.with_changes(pack=pack, years={str(k): v for k, v in years.items()}, name=(name or draft.name).strip() or draft.name,
                                  status=DraftStatus.DRAFT, version=draft.version + 1, updated_by=actor, updated_at=now)
-    repo.save(changed, draft.version, _event(draft, "edited", actor, now, DraftStatus.DRAFT, content_sha256=changed.content_sha256))
+    # A save is allowed so the author can remove what matched, but the audit trail records that something did (counts only).
+    leaks = len(customer_data.scan_documents(changed))
+    repo.save(changed, draft.version, _event(draft, "edited", actor, now, DraftStatus.DRAFT, content_sha256=changed.content_sha256,
+                                             **({"customer_data_findings": leaks} if leaks else {})))
     return changed
 
 
@@ -156,9 +181,27 @@ def request_review(repo: ProgramDraftRepository, draft_id: str, actor: str, at: 
     return changed
 
 
-def _authors(repo: ProgramDraftRepository, draft: ProgramDraft) -> set[str]:
-    """Everyone who created, edited or submitted the draft: the people who may not review it."""
-    return {e.actor for e in repo.events(draft.draft_id) if e.event_type in ("created", "edited", "review_requested")}
+def _author_events(repo: ProgramDraftRepository, draft: ProgramDraft) -> list[DraftEvent]:
+    """The events by everyone who created, edited or submitted the draft: the people who may not review it."""
+    return [e for e in repo.events(draft.draft_id) if e.event_type in ("created", "edited", "review_requested")]
+
+
+def _is_author(repo: ProgramDraftRepository, draft: ProgramDraft, actor: str) -> bool:
+    """Whether the reviewer is one of the authors: by object id when both sides have one, and by the actor string always.
+
+    The object id is what stops one person with two accounts approving their own draft. A tenant that is recorded on both
+    sides must match (an object id is unique only within its tenant); a missing tenant on either side is compared on the
+    object id alone, which refuses more rather than less. Events written before identities were recorded, and local
+    development, fall back to the string comparison alone.
+    """
+    me = caller_identity()
+    for event in _author_events(repo, draft):
+        if event.actor == actor:
+            return True
+        oid, tenant = event.detail.get("actor_oid"), event.detail.get("actor_tenant")
+        if me is not None and oid and oid == me[0] and (tenant is None or me[1] is None or tenant == me[1]):
+            return True
+    return False
 
 
 def _guard_review(repo: ProgramDraftRepository, draft: ProgramDraft, actor: str, decision: str, comment: str | None) -> None:
@@ -169,7 +212,7 @@ def _guard_review(repo: ProgramDraftRepository, draft: ProgramDraft, actor: str,
         raise DraftInvalid("a decision is approve or request_changes")
     if decision == "request_changes" and not (comment or "").strip():
         raise DraftInvalid("say what must change: a request for changes needs a comment")
-    if get_settings().programs.draft_require_second_reviewer and actor in _authors(repo, draft):
+    if get_settings().programs.draft_require_second_reviewer and _is_author(repo, draft, actor):
         raise ReviewRefused("the reviewer must differ from the people who wrote and submitted the draft (PROGRAM_DRAFT_REQUIRE_SECOND_REVIEWER)")
     if decision == "approve" and not validation_is_current(draft):
         raise ReviewRefused("the documents changed since validation; it cannot be approved")

@@ -156,3 +156,54 @@ def test_a_bundle_path_that_leaves_the_rules_folder_writes_nothing(tmp_path):
     with pytest.raises(DraftInvalid, match="not a path inside the rules folder"):
         write_into_rules(Bundle(data.getvalue(), "0" * 64, manifest), root)
     assert list(tmp_path.rglob("*.json")) == [], "nothing was written, not even the file that was fine"
+
+
+def _bundle(names, data=None):
+    from application.program_drafts.bundle import Bundle
+
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as archive:
+        for name in names:
+            archive.writestr(name, "{}")
+    return Bundle(buf.getvalue(), "0" * 64, {"files": [{"path": n} for n in names]})
+
+
+def test_a_failure_while_placing_files_leaves_the_rules_folder_as_it_was(tmp_path, monkeypatch):
+    """All or nothing: the second move fails, so the first file and the folders made for it are removed. [F07.3]"""
+    import os
+
+    from application.program_drafts import export as ex
+
+    root = tmp_path / "rules"
+    root.mkdir()
+    before = sorted(p.name for p in root.rglob("*"))
+    real, calls = os.rename, []
+
+    def flaky(src, dst):
+        calls.append(dst)
+        if len(calls) == 2:
+            raise OSError("disk full")
+        return real(src, dst)
+
+    monkeypatch.setattr(ex.os, "rename", flaky)
+    with pytest.raises(OSError, match="disk full"):
+        ex.write_into_rules(_bundle(["rules/a.json", "rules/sub/b.json"]), root)
+    assert sorted(p.name for p in root.rglob("*")) == before, "no file, no new folder, no staging folder left"
+
+
+def test_a_successful_local_write_leaves_no_staging_folder(tmp_path):
+    from application.program_drafts import export as ex
+
+    root = tmp_path / "rules"
+    root.mkdir()
+    written = ex.write_into_rules(_bundle(["rules/a.json", "rules/sub/b.json"]), root)
+    assert sorted(p.name for p in root.rglob("*")) == ["a.json", "b.json", "sub"] and len(written) == 2
+
+
+def test_an_export_is_refused_when_the_documents_now_look_like_customer_data(api, monkeypatch):
+    """The book of client names can change after approval, so export scans again. [F07.3]"""
+    did = _approved(api)["draft_id"]
+    monkeypatch.setattr("application.program_drafts.customer_data.book_names", lambda: ["Zedland Two"])
+    refused = api.post(f"{BASE}/{did}/export", json={})
+    assert refused.status_code == 422 and refused.json()["detail"]["code"] == "customer_data_in_draft"
+    assert "Zedland Two" not in refused.text

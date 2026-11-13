@@ -18,6 +18,7 @@ from typing import Any
 
 from application.errors import DependencyUnavailable, PROGRAMMING_ERRORS, as_dependency_failure
 from application.gold_ports import GoldWriteFailed
+from application.runs.item_errors import FIXED_REMEDY, GOLD_WRITE, GOLD_WRITE_MESSAGE, log_raw, remedy_of
 from application.runs.fingerprint import (
     current_assumptions, current_code_commit, current_fingerprint, manifest_fingerprint,
 )
@@ -26,14 +27,6 @@ from domain.runs import BatchKind, ItemResult, ItemStatus, RunBatch, RunBatchIte
 log = logging.getLogger("tcc.runs")
 
 #: Named dependencies whose outage is worth retrying (see `application/errors.py` for the convention).
-#: The named cause of a Gold write that did not hold (a section 9 violation such as more than one current run for a
-#: client and program, or the writer failing). Shown in the batch's failures by cause.
-GOLD_WRITE = "gold_write"
-GOLD_WRITE_MESSAGE = (
-    "The Gold write did not validate ({detail}). Gold may briefly hold rows of more than one run for this client. "
-    "It is retried once with no other worker on the client; if it fails again, run the client alone and check section 9 "
-    "(`python backend/tools/verify_gold_reads.py`) before trusting its figures."
-)
 _TRANSIENT_DEPENDENCIES = frozenset({"source_lakehouse", "source_sql", "operational_store", "claims_store", "warehouse"})
 
 
@@ -192,7 +185,8 @@ def _declined(exc: BaseException, common: dict[str, Any]) -> ItemOutcome | None:
     from application.queries.get_scope import NoPayrollForScope, NoResolvableWorkState, UnknownClient
 
     if isinstance(exc, GoldWriteFailed):
-        return ItemOutcome(ItemStatus.FAILED, error_dependency=GOLD_WRITE, error_message=GOLD_WRITE_MESSAGE.format(detail=str(exc)[:300]),
+        log_raw(GOLD_WRITE, exc)
+        return ItemOutcome(ItemStatus.FAILED, error_dependency=GOLD_WRITE, error_message=GOLD_WRITE_MESSAGE,
                            retry_once=True, **common)
     if isinstance(exc, (ClientHasNoPayroll, ClientRunNotAvailable, NoPayrollForScope, NoResolvableWorkState, UnknownClient)):
         return ItemOutcome(ItemStatus.SKIPPED_NO_PAYROLL, skip_reason=str(exc)[:500], **common)
@@ -206,28 +200,31 @@ def classify(exc: BaseException, year: int | None, program: str | None) -> ItemO
     if declined is not None:
         return declined
     if _is_conflict(exc):
-        return ItemOutcome(ItemStatus.FAILED, error_dependency="conflict", error_message="a write conflict on the warehouse",
+        return ItemOutcome(ItemStatus.FAILED, error_dependency="conflict", error_message=FIXED_REMEDY["conflict"],
                            transient=True, **common)
     if isinstance(exc, DependencyUnavailable):
         transient = type(exc) is DependencyUnavailable and exc.dependency in _TRANSIENT_DEPENDENCIES
-        return ItemOutcome(ItemStatus.FAILED, error_dependency=exc.dependency, error_message=f"{exc.reason} {exc.remedy}",
+        return ItemOutcome(ItemStatus.FAILED, error_dependency=exc.dependency, error_message=remedy_of(exc),
                            transient=transient, **common)
-    if isinstance(exc, (TimeoutError, ConnectionError)):
-        return ItemOutcome(ItemStatus.FAILED, error_dependency="timeout", error_message=f"{type(exc).__name__}",
-                           transient=True, **common)
-    if isinstance(exc, ValueError):
-        return ItemOutcome(ItemStatus.FAILED, error_dependency="validation", error_message=str(exc)[:500], **common)
-    if isinstance(exc, PROGRAMMING_ERRORS):
-        log.exception("run item failed on a programming error")
-        return ItemOutcome(ItemStatus.FAILED, error_dependency="internal", error_message=f"{type(exc).__name__}: see the log",
-                           **common)
+    for kinds, cause, transient in _PLAIN_FAILURES:
+        if isinstance(exc, kinds):
+            log_raw(cause, exc)
+            return ItemOutcome(ItemStatus.FAILED, error_dependency=cause, error_message=FIXED_REMEDY[cause], transient=transient, **common)
     typed = as_dependency_failure("operational_store", exc)
     name = typed.dependency if typed else "internal"
-    message = f"{typed.reason} {typed.remedy}" if typed else type(exc).__name__
+    if typed is None:
+        log_raw("internal", exc)
+    message = remedy_of(typed) if typed else FIXED_REMEDY["internal"]
     return ItemOutcome(ItemStatus.FAILED, error_dependency=name, error_message=message,
                        transient=name in _TRANSIENT_DEPENDENCIES, **common)
 
 
+#: Failures with no dependency to name: what to match, the cause stored, and whether a later attempt could help.
+_PLAIN_FAILURES = (
+    ((TimeoutError, ConnectionError), "timeout", True),
+    ((ValueError,), "validation", False),
+    (PROGRAMMING_ERRORS, "internal", False),
+)
 _CONFLICT_NUMBERS = ("24556", "3960", "1205")
 
 

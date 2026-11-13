@@ -81,6 +81,12 @@ class ReviewRefused(DraftError):
     code = "review_refused"
 
 
+class CustomerDataInDraft(ReviewRefused):
+    """The documents look like they hold customer data (an identifier, an email, a client name); a bundle must not carry it."""
+
+    code = "customer_data_in_draft"
+
+
 class PreviewRefused(DraftError):
     """A preview cannot run: the documents do not validate, there is no year to price, or the data is not allowed."""
 

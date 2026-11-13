@@ -11,9 +11,10 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
-from fastapi import APIRouter, HTTPException, Query, Request
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from pydantic import BaseModel, Field
 
+from api._rate_limit import rate_limited
 from api.auth import attributed
 from application.commands.cancel_run_batch import CancelRunBatchCommand
 from application.commands.enqueue_run_batch import EnqueueRunBatchCommand
@@ -165,7 +166,7 @@ def _send(request: Any) -> Any:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
-@router.post("", response_model=BatchOut | PreviewOut, status_code=202)
+@router.post("", response_model=BatchOut | PreviewOut, status_code=202, dependencies=[Depends(rate_limited("batch_start"))])
 def start_run_batch(body: StartBody, request: Request) -> Any:
     """Queue a batch (202), or with `dry_run` say what it would do (nothing is written)."""
     common = dict(

@@ -26,12 +26,14 @@ class RunSettings:
     poll_seconds: int = 5
     stale_worker_seconds: int = 300
     backoff_base_seconds: int = 5
+    #: Client id of a separate user-assigned managed identity for the worker PROCESS; empty: it shares the API's identity.
+    worker_identity_client_id: str = ""
 
 
 def parse_runs(environ: Mapping[str, str]) -> RunSettings:
     """`RUN_BATCH_MAX_ITEMS`, `RUN_BATCH_CONFIRM_ABOVE`, `RUN_WORKER_CONCURRENCY` (1-8), `RUN_ITEM_MAX_ATTEMPTS`,
     `RUN_WORKER_INLINE`, `RUN_LEASE_SECONDS`, `RUN_HEARTBEAT_SECONDS`, `RUN_WORKER_POLL_SECONDS`,
-    `RUN_WORKER_STALE_SECONDS`, `RUN_BACKOFF_BASE_SECONDS`."""
+    `RUN_WORKER_STALE_SECONDS`, `RUN_BACKOFF_BASE_SECONDS`, `RUN_WORKER_IDENTITY_CLIENT_ID` (optional; the worker process only)."""
     local = (environ.get("ENVIRONMENT") or "local").strip().lower() == "local"
     inline = optional_flag(environ, "RUN_WORKER_INLINE")
     lease = tuned_int(environ, "RUN_LEASE_SECONDS", 120, 15)
@@ -46,4 +48,5 @@ def parse_runs(environ: Mapping[str, str]) -> RunSettings:
         poll_seconds=tuned_int(environ, "RUN_WORKER_POLL_SECONDS", 5, 1),
         stale_worker_seconds=tuned_int(environ, "RUN_WORKER_STALE_SECONDS", 300, 30),
         backoff_base_seconds=tuned_int(environ, "RUN_BACKOFF_BASE_SECONDS", 5, 1),
+        worker_identity_client_id=(environ.get("RUN_WORKER_IDENTITY_CLIENT_ID") or "").strip(),
     )

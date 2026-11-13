@@ -26,7 +26,7 @@ draft ──validate──▶ draft (clean) ──request review──▶ ready_
   `needs_changes`.
 - **Request review** needs a validation of the *current* documents with no errors.
 - **Review** approves for export or requests changes (a comment is required). When `PROGRAM_DRAFT_REQUIRE_SECOND_REVIEWER` is on
-  (default outside `ENVIRONMENT=local`) the reviewer must not be anyone who created, edited or submitted the draft. Approval verifies
+  (default outside `ENVIRONMENT=local`) the reviewer must not be anyone who created, edited or submitted the draft. The comparison is by **object id** (with the tenant id), recorded on every event as `actor_oid` and `actor_tenant`, so one person with two accounts (two UPNs, one object id) cannot approve their own draft; the displayed name is also compared. Without a sign-in (local development) only the name exists, and the rule compares that. Approval verifies
   nothing and activates nothing.
 - **Withdraw** closes a draft; an exported draft cannot be withdrawn (its files may be committed).
 - Every change appends an event (`tcc_ops.program_draft_event`, append-only) with the actor, the time and the statuses.
@@ -48,6 +48,17 @@ All routes need the writer role and are person-only (an agent token is refused a
 | `POST /api/v2/program-drafts/{id}/export` | download the deterministic bundle of an approved draft (zip); records the export |
 | `GET /api/v2/program-drafts/{id}/export/manifest` | the bundle's manifest and hash, with no status change |
 | `POST /api/v2/program-drafts/{id}/withdraw` | close the draft |
+
+## Customer data is refused
+
+A draft holds statute, never a client's records. Every document save, every validation and every export runs a conservative detector over the
+text fields: SSN-like and EIN-like numbers, long digit strings, email addresses, phone numbers, and an exact (case-insensitive, whole-word)
+match of any client or employer name in the book (names under four characters are ignored). A match is a **blocking** validation error
+(`customer_data`) addressed to the field, saying what kind of thing matched and never repeating it; a save is still accepted so the author can
+remove it, and the audit event records the count. Export checks again, because the book of names can change after approval
+(`customer_data_in_draft`, 422). Numbers inside a pack, years, dollar amounts with separators, section numbers and citations are not matched.
+It is a safeguard against the common accident, not a classifier: the reviewer's checklist still says to read the notes. If the book cannot be
+read the name match is skipped (and logged); the pattern checks still run.
 
 ## Export bundle
 
