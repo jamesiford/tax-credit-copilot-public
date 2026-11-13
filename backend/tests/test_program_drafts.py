@@ -163,6 +163,27 @@ def test_a_document_that_does_not_fit_the_column_is_a_422_naming_it(api):
     assert big.status_code == 422 and "pack" in big.json()["detail"]["reason"]
 
 
+def test_a_draft_is_bounded_in_depth_year_count_and_text_so_it_cannot_overrun_a_parser_or_a_column(api):
+    draft = _create(api).json()
+    deep: dict = {}
+    node = deep
+    for _ in range(40):
+        node["n"] = {}
+        node = node["n"]
+    docs = dw.documents()
+    docs["pack"]["_note"] = deep
+    refused = _fill(api, draft, docs=docs)
+    assert refused.status_code == 422 and "deeper" in refused.json()["detail"]["reason"]
+    many = dw.documents()
+    many["years"] = {str(2000 + i): many["years"]["2024"] for i in range(31)}
+    refused = _fill(api, draft, docs=many)
+    assert refused.status_code == 422, "more than 30 year packs is refused (pydantic or the lifecycle, either way by name)"
+    assert api.post(BASE, json={"code": dw.CODE, "name": "n" * 201, "state": dw.STATE}).status_code == 422
+    long_comment = api.post(f"{BASE}/{draft['draft_id']}/review", json={"decision": "request_changes", "comment": "c" * 2001})
+    assert long_comment.status_code == 422
+    assert api.get(f"{BASE}/{draft['draft_id']}").json()["version"] == draft["version"], "a refused edit changed nothing"
+
+
 def test_listing_and_unknown_ids(api):
     _create(api)
     page = api.get(BASE).json()

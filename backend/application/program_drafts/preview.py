@@ -46,8 +46,25 @@ def _rows(draft: ProgramDraft, dataset: str, client_id: int | None) -> tuple[lis
             "PROGRAM_PREVIEW_ALLOW_CUSTOMER_DATA=true (or an environment classified synthetic)")
     from application.source_ports import load_pay_periods
 
+    _authorize_client(client_id)
     rows = [r for r in load_pay_periods(client_id) if (r.get("Work_State") or str(r.get("Worksite_ID", "")).partition("_")[0]).upper() == state]
     return rows, {"kind": CLIENT, "description": "A client's payroll in the draft's state, read for this preview only and never stored", "client_id": client_id}
+
+
+def _authorize_client(client_id: int) -> None:
+    """A client's payroll is read only for a client that exists and that the caller may act for.
+
+    The existence check matters on a single-tenant source, which ignores the account id and would answer with the default
+    tenant's payroll under whatever id was asked for.
+    """
+    from application import client_book
+    from application.identity import ANONYMOUS, NotAuthorized, ambient_principal
+    from application.services import get_client_authorizer
+
+    if client_id not in {int(c["account_id"]) for c in client_book.clients_checked()}:
+        raise PreviewRefused(f"client {client_id} is not in the client book")
+    if not get_client_authorizer().is_authorized(ambient_principal() or ANONYMOUS, client_id):
+        raise NotAuthorized(f"not authorized for client {client_id}")
 
 
 def _year(rows: list[dict[str, Any]], state: str, year: int, doc: dict[str, Any]) -> tuple[float | None, dict[str, Any]]:

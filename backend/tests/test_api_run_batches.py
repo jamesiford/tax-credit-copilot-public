@@ -80,6 +80,15 @@ def test_a_body_that_is_not_the_contract_is_a_422(api):
     assert api.post("/api/v2/run-batches", json={"kind": "calculate"}).status_code == 422
 
 
+def test_inputs_that_would_overrun_a_stored_column_are_refused_not_truncated(api):
+    """The scope and the years are stored in bounded columns, so a long filter value or a long year list is a 4xx, not a store error."""
+    long_value = _start(api, scope={"kind": "filter", "filter": {"state": "G" * 200}})
+    assert long_value.status_code == 422 and long_value.json()["detail"]["code"] == "refused"
+    assert _start(api, scope={"kind": "filter", "filter": {"state": ["GA", "SC"]}}).status_code == 422
+    assert _start(api, tax_years=list(range(2000, 2020))).status_code == 422
+    assert _start(api, program_code="P" * 65).status_code == 422
+
+
 def test_list_items_cancel_and_retry(api):
     batch = _start(api, scope={"kind": "list", "client_ids": [1, 2, 3]}).json()
     bid = batch["batch_id"]

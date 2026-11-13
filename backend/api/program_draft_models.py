@@ -99,39 +99,39 @@ class DraftsPage(BaseModel):
 
 class CreateBody(BaseModel):
     """Propose a program. A federal program is not runnable yet, so a draft needs a two-letter state."""
-    code: str
-    name: str
-    state: str
-    years: list[int] = Field(default_factory=list, description="Tax years to scaffold as empty, flagged year packs.")
-    actor: str | None = Field(None, description="Used only when the caller is not signed in (local development).")
+    code: str = Field(max_length=64)
+    name: str = Field(max_length=200)
+    state: str = Field(max_length=8)
+    years: list[int] = Field(default_factory=list, max_length=30, description="Tax years to scaffold as empty, flagged year packs.")
+    actor: str | None = Field(None, max_length=256, description="Used only when the caller is not signed in (local development).")
 
 
 class EditBody(BaseModel):
     """A full replace of the documents. `expected_version` is the version the editor read."""
     expected_version: int
     pack: dict[str, Any] | None
-    years: dict[str, dict[str, Any]] = Field(default_factory=dict)
-    name: str | None = None
-    actor: str | None = None
+    years: dict[str, dict[str, Any]] = Field(default_factory=dict, max_length=30)
+    name: str | None = Field(None, max_length=200)
+    actor: str | None = Field(None, max_length=256)
 
 
 class ActorBody(BaseModel):
     """A request with no fields of its own."""
-    actor: str | None = None
+    actor: str | None = Field(None, max_length=256)
 
 
 class ReviewBody(BaseModel):
     """A reviewer's decision. A request for changes needs a comment."""
     decision: Literal["approve", "request_changes"]
-    comment: str | None = None
-    actor: str | None = None
+    comment: str | None = Field(None, max_length=2000)
+    actor: str | None = Field(None, max_length=256)
 
 
 class PreviewBody(BaseModel):
     """What to preview on. The default is the committed synthetic sample; a client needs the environment to allow it."""
     dataset: Literal["synthetic_sample", "client"] = "synthetic_sample"
     client_id: int | None = None
-    tax_years: list[int] = Field(default_factory=list, description="Empty: every tax year the draft has a pack for.")
+    tax_years: list[int] = Field(default_factory=list, max_length=30, description="Empty: every tax year the draft has a pack for.")
 
 
 class PreviewYear(BaseModel):
@@ -167,14 +167,14 @@ class PreviewOut(BaseModel):
 
 class WithdrawBody(BaseModel):
     """Why the draft is being withdrawn (optional)."""
-    reason: str | None = None
-    actor: str | None = None
+    reason: str | None = Field(None, max_length=1000)
+    actor: str | None = Field(None, max_length=256)
 
 
 class ExportBody(BaseModel):
     """`write_local` writes the pack files into the rules folder: developers only, local development with the setting on."""
     write_local: bool = False
-    actor: str | None = None
+    actor: str | None = Field(None, max_length=256)
 
 
 class ManifestOut(BaseModel):

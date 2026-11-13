@@ -19,6 +19,12 @@ from typing import Any, Protocol
 #: kilobytes; a document past this is refused by name rather than truncated, because a clipped pack is a wrong pack.
 MAX_DOCUMENT_CHARS = 8000
 
+#: Bounds that keep a draft a small document set: a few dozen year packs at most, nested a few levels. The year count also keeps
+#: an export event's list of written paths inside its `VARCHAR(4000)` column; the depth stops a hostile document recursing a
+#: parser or the canonical-JSON writer into an error.
+MAX_YEAR_DOCUMENTS = 30
+MAX_DOCUMENT_DEPTH = 12
+
 #: A program code: upper case, digits and underscores, starting with a letter (`GA_JTC`, `ZZ_DEMO_JTC`).
 CODE_PATTERN = re.compile(r"^[A-Z][A-Z0-9_]{2,63}$")
 
