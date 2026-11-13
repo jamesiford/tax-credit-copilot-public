@@ -70,6 +70,10 @@ def get_run_manifest_repository() -> Any:
     return resolve("run_manifest_repository")
 
 
+def get_run_batch_repository() -> Any:
+    return resolve("run_batch_repository")
+
+
 def get_override_repository() -> Any:
     return resolve("override_repository")
 

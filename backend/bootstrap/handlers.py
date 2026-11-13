@@ -12,6 +12,8 @@ from application.ai.handlers import handle_channel_narration, handle_narrate_bri
 from application.ai.requests import ChannelNarrationQuery, NarrateBriefQuery, RouteQuestionQuery
 from application.commands.assess_client import AssessClientCommand, handle_assess_client
 from application.commands.create_claim_package import CreateClaimPackageCommand, handle_create_claim_package
+from application.commands.cancel_run_batch import CancelRunBatchCommand, handle_cancel_run_batch
+from application.commands.enqueue_run_batch import EnqueueRunBatchCommand, handle_enqueue_run_batch
 from application.commands.record_claim import RecordClaimCommand, handle_record_claim
 from application.commands.resolve_finding import (
     ReopenFindingCommand,
@@ -20,6 +22,7 @@ from application.commands.resolve_finding import (
     handle_resolve_finding,
 )
 from application.commands.resolve_qc_exception import ResolveQcExceptionCommand, handle_resolve_qc_exception
+from application.commands.retry_failed_items import RetryFailedItemsCommand, handle_retry_failed_items
 from application.commands.review_employee import ReviewEmployeeCommand, handle_review_employee
 from application.commands.run_client_calculation import (
     RunClientCalculationCommand,
@@ -29,6 +32,7 @@ from application.commands.set_base_year import SetBaseYearCommand, handle_set_ba
 from application.commands.set_engagement import SetEngagementCommand, handle_set_engagement
 from application.commands.transition_claim import TransitionClaimCommand, handle_transition_claim
 from application.mediator import Mediator
+from bootstrap import run_batch_wiring  # noqa: F401 - binds the run batch repository for the handlers below
 from application.queries.get_channel_audit import GetChannelAuditQuery, handle_get_channel_audit
 from application.queries.get_client_situation import GetClientSituationQuery, handle_get_client_situation
 from application.queries.get_coverage import (
@@ -65,6 +69,10 @@ from application.queries.get_scope import (
 from application.queries.get_unit_trend import GetUnitTrendQuery, handle_get_unit_trend
 from application.queries.list_findings import ListFindingsQuery, handle_list_findings
 from application.queries.rebase_unit import RebaseUnitQuery, handle_rebase_unit
+from application.queries.run_batch_reads import (
+    GetRunBatchQuery, ListRunBatchesQuery, ListRunBatchItemsQuery, PreviewRunBatchQuery, handle_get_run_batch,
+    handle_list_run_batch_items, handle_list_run_batches, handle_preview_run_batch,
+)
 from application.queries.simulate_employee import SimulateEmployeeQuery, handle_simulate_employee
 from application.queries.simulate_portfolio import SimulatePortfolioQuery, handle_simulate_portfolio
 from application.queries.simulate_unit import SimulateUnitQuery, handle_simulate_unit
@@ -98,6 +106,10 @@ def _register_queries(mediator: Mediator) -> None:
     mediator.register(ListFindingsQuery, handle_list_findings)
     mediator.register(GetFindingHistoryQuery, handle_get_finding_history)
     mediator.register(GetChannelAuditQuery, handle_get_channel_audit)
+    mediator.register(GetRunBatchQuery, handle_get_run_batch)
+    mediator.register(ListRunBatchesQuery, handle_list_run_batches)
+    mediator.register(ListRunBatchItemsQuery, handle_list_run_batch_items)
+    mediator.register(PreviewRunBatchQuery, handle_preview_run_batch)
 
 
 def _register_streaming_queries(mediator: Mediator) -> None:
@@ -120,6 +132,9 @@ def _register_commands(mediator: Mediator) -> None:
     mediator.register(TransitionClaimCommand, handle_transition_claim)
     mediator.register(SetEngagementCommand, handle_set_engagement)
     mediator.register(CreateClaimPackageCommand, handle_create_claim_package)
+    mediator.register(EnqueueRunBatchCommand, handle_enqueue_run_batch)
+    mediator.register(CancelRunBatchCommand, handle_cancel_run_batch)
+    mediator.register(RetryFailedItemsCommand, handle_retry_failed_items)
 
 
 def register_handlers(mediator: Mediator) -> Mediator:
