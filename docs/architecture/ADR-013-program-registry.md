@@ -1,6 +1,6 @@
 # ADR-013 — Program registry and pack validation
 
-**Date** 2026-11-12 · **Status** Proposed (design; implemented in later steps) ·
+**Date** 2026-11-12 · **Status** Proposed (registry, schema, validator, scaffolding and the derived run state are implemented; the portal workflow follows) ·
 **Relates to** [ADR-005](ADR-005-year-versioned-rules.md) (statute is versioned by tax year, authored in git).
 
 ## Context
@@ -41,3 +41,14 @@ unsupported. The rules-ingestion agent stays Georgia-only.
 
 No runtime activation of statute from a database or the portal; no inheritance of statute across years; no automatic
 verification; no new calculation models; no extension of the ingestion agent.
+
+## Implementation notes
+
+- The registry file is `backend/rules/registry/programs.json`, not `backend/rules/programs.json`: packs are discovered with
+  `rules/*.json`, so a manifest in that folder would be read as a pack. `RULES_DIR` and `PROGRAM_REGISTRY_FILE` move it.
+- The stored lifecycle is `draft | described | retired`; `calculable` is derived from authored year packs and a typed one is refused.
+- The state default on the run request, the run command and the base-year command is derived from the client's payroll and the
+  registry; the old `"GA"` survives only as a deprecated fallback that warns. Read queries keep their defaults (follow-up).
+- A year skeleton is written as `<year>.draft.json`, which the engine does not read, so a half-filled file can never make a
+  program look calculable.
+- See [ADDING-A-PROGRAM.md](ADDING-A-PROGRAM.md).
