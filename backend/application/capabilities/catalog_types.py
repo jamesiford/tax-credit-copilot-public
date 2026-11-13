@@ -134,6 +134,7 @@ _TAX_YEAR = {"type": "integer", "minimum": 1900, "maximum": 2100, "description":
 _STATE = {"type": "string", "minLength": 2, "maxLength": 2, "description": "Two-letter work state; selects the programme. Omit it to use the client's own calculable state."}
 _METHOD = {"type": "string", "enum": list(METHODS), "default": "min_max", "description": "Certified headcount method."}
 _PROGRAM = {"type": "string", "description": "Programme code, e.g. GA_JTC."}
+_PROGRAM_OPT = {"type": "string", "maxLength": 64, "description": "Optional programme code, e.g. GA_JTC. Give it when the state has several programmes (the read asks otherwise); the answer then names the programme it used."}
 _TOKEN = {"type": "string", "minLength": 8, "maxLength": 128, "description": "Opaque employee handle. Never an employee id."}
 _CLAIM_STATUSES = ["not_assessed", "assessed", "proposed", "declined", "claimed", "certified", "amended"]
 

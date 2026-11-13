@@ -11,7 +11,7 @@ from application.capabilities.errors import ClientNotFound
 from application.capabilities.envelope import Provenance, ToolResult
 
 
-def findings_list(client_id: int, tax_year: int, state: str | None = None) -> ToolResult:
+def findings_list(client_id: int, tax_year: int, state: str | None = None, program_code: str | None = None) -> ToolResult:
     """Findings for one client-year, open ones first.
 
     Sensitive: instance-grain findings carry an employee id in their evidence.
@@ -21,10 +21,9 @@ def findings_list(client_id: int, tax_year: int, state: str | None = None) -> To
     from application.queries.list_findings import FindingsNotAvailable, ListFindingsQuery
     from application.services import get_mediator
 
+    state = s.derive_state(state, client_id, tax_year, program_code) if program_code else state  # a program fixes its state
     try:
-        facts = get_mediator().send(
-            ListFindingsQuery(client_id=client_id, tax_year=tax_year, state=state)
-        )
+        facts = get_mediator().send(ListFindingsQuery(client_id=client_id, tax_year=tax_year, state=state))
     except FindingsNotAvailable as exc:
         raise ClientNotFound(str(exc)) from exc
 

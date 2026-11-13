@@ -24,7 +24,7 @@ def _trend_line(facts: dict) -> str:
     return f"No eligible employees were found in: {missing}."
 
 
-def client_trend(client_id: int, method: str = "pay_period") -> ToolResult:
+def client_trend(client_id: int, method: str = "pay_period", program_code: str | None = None) -> ToolResult:
     """How a client has moved across years, and whether it has stayed eligible.
 
     A year the run does not hold carries no figure, which is not a zero; and
@@ -34,7 +34,9 @@ def client_trend(client_id: int, method: str = "pay_period") -> ToolResult:
     from tools.portfolio import chat_client_trend
 
     capture = s.RunCapture()
-    facts = chat_client_trend(account_id=client_id, method=method, on_run=capture)
+    facts = chat_client_trend(account_id=client_id, method=method, on_run=capture, program_code=program_code)
+    if program_code:
+        facts = {**facts, "program_code": program_code.strip().upper()}
     provenance = s.run_provenance(capture.run, source="tcc_gold")
 
     if not facts.get("calculated"):
@@ -60,7 +62,7 @@ def client_trend(client_id: int, method: str = "pay_period") -> ToolResult:
 
 
 def client_at_risk(
-    client_id: int, tax_year: int, state: str | None = None, method: str = "min_max",
+    client_id: int, tax_year: int, state: str | None = None, method: str = "min_max", program_code: str | None = None,
 ) -> ToolResult:
     """Counted jobs close enough to a floor that they could fall out of the credit.
 
@@ -70,12 +72,12 @@ def client_at_risk(
     """
     from tools.portfolio import chat_jobs_at_risk
 
-    state = s.derive_state(state, client_id, tax_year)
+    state = s.derive_state(state, client_id, tax_year, program_code)
     if method == "both":
         method = "min_max"
     capture = s.RunCapture()
     facts = chat_jobs_at_risk(
-        account_id=client_id, state=state, tax_year=tax_year, method=method, on_run=capture,
+        account_id=client_id, state=state, tax_year=tax_year, method=method, on_run=capture, program_code=program_code,
     )
     provenance = s.run_provenance(capture.run, source="tcc_gold")
 

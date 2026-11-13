@@ -59,8 +59,7 @@ def calc_walkthrough(
     tax_year: int | None = None,
     state: str | None = None,
     method: str = "min_max",
-    *,
-    trail: Mapping[str, Any] | None = None,
+    *, trail: Mapping[str, Any] | None = None, program_code: str | None = None,
 ) -> ToolResult:
     """The calculation trail for a client-year.
 
@@ -82,8 +81,8 @@ def calc_walkthrough(
 
     if client_id is None or tax_year is None:
         raise InvalidArguments("client_id and tax_year are required to build a walkthrough")
-    state = s.derive_state(state, client_id, tax_year)
-    resolved = s.statute(state, client_id, tax_year)
+    state = s.derive_state(state, client_id, tax_year, program_code)
+    resolved = s.statute(state, client_id, tax_year, program_code)
     capture = s.RunCapture()
     with s.trail_scope() as recorder:
         context = chat_client_context(
@@ -102,7 +101,7 @@ def calc_walkthrough(
             raise YearNotAuthored(str(credit["message"]))
         recorder.title = f"{credit['credit_name']} · TY{tax_year}"
         recorder.citation = str(credit["citation"])
-        facts = recorder.to_dict()
+        facts = s.named_program(recorder.to_dict(), program_code, resolved)
         provenance = s.run_provenance(capture.run, recorder=recorder, source="tcc_gold")
     return s.result("calc_walkthrough", facts, _trail_blocks(facts), provenance=provenance)
 
@@ -112,6 +111,7 @@ def employee_drill(
     record_token: str,
     tax_year: int,
     state: str | None = None,
+    program_code: str | None = None,
 ) -> ToolResult:
     """One employee's derivation for a client-year, keyed by opaque handle.
 
@@ -125,7 +125,7 @@ def employee_drill(
 
     try:
         query = GetEmployeeDrillQuery(
-            record_token=record_token, tax_year=tax_year, state=state, account_id=client_id,
+            record_token=record_token, tax_year=tax_year, state=state, account_id=client_id, program_code=program_code,
         )
         facts = get_mediator().send(query)
     except ClientRunNotAvailable as exc:

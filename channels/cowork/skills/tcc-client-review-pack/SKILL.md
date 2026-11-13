@@ -39,7 +39,7 @@ figure exactly as a tool returned it, never produce one yourself, verify every a
    `client_trend` (movement across years and whether the client has been eligible since its
    base year), `client_at_risk` (counted jobs near a statutory floor) and `client_discovery`
    (other programmes the client may qualify for), plus `client_situation` for the programme and
-   year cells. Pass the `client_id`, `tax_year` and `state`. If the answer is `not_calculated`
+   year cells. Pass the `client_id`, `tax_year` and `state`, and the `program_code` when `client_situation` shows the state has more than one programme (the read asks which otherwise); an answer for a named programme says which programme it used. If the answer is `not_calculated`
    or `year_not_authored`, report that in the tool's words and do not report zero. A year with
    no authored rule pack is declined by name, not estimated.
 3. **What-ifs (only if the user names one).** Call `simulate` with the worksite, the action and

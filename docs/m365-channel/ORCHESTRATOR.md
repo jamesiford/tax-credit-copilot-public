@@ -237,6 +237,15 @@ Adding these four capabilities changed the catalog (36 tools), the gateway's too
 (`python scripts/vendor-orchestrator.py`) and the Cowork skill `tcc-figures-and-writes`. The orchestrator and the Cowork
 plugin have to be republished before a live Teams or Cowork session sees them; nothing is published from the repository build.
 
+## Naming a program on a read (F07)
+
+A state can hold several programs, so the client reads that took only a `state` (`client_eligibility`, `client_trend`, `client_at_risk`, `calc_walkthrough`,
+`employee_drill`, `findings_list`) accept an optional `program_code`. The program fixes the state it is priced in and must agree
+with a `state` when both are given (`invalid_arguments` otherwise); without it a state with several programs asks which, as before. When a program was
+named the answer carries `program_code`, the one it used; when none was named the answer for a single-program state is exactly what it always was. This
+changes the tool schemas and the Cowork skill text, so **the hosted orchestrator and the Cowork plugin must be republished** for chat to offer it
+(`python scripts/vendor-orchestrator.py`, then the publish steps in PUBLISHING.md). The `simulate` tool does not take it yet: its function is at the code-standards argument ceiling and the schema must match its parameters, so adding one is a decision for a person (the portal's what-if route and the underlying query already accept `program_code`).
+
 ## The program catalog (F05)
 
 `program_catalog` is a read: omit `program_code` for the list of every registered program (lifecycle, authored years,

@@ -11,7 +11,7 @@ from typing import Any
 
 from application.capabilities import format as fmt
 from application.capabilities.envelope import Block, Provenance, ToolResult
-from application.capabilities.errors import CapabilityError, NotCalculated, YearNotAuthored
+from application.capabilities.errors import CapabilityError, InvalidArguments, NotCalculated, YearNotAuthored
 from domain.calculation.trail import (
     TrailRecorder,
     current_recorder,
@@ -135,14 +135,28 @@ def read_method(method: str) -> str:
     return method if method in ("min_max", "pay_period") else "pay_period"
 
 
-def derive_state(state: str | None, client_id: int, tax_year: int) -> str:
-    """The caller's state, else the client's own calculable state from its payroll and the registry. [ADR-013]"""
-    from application.program_defaults import derive_run_state
+def derive_state(state: str | None, client_id: int, tax_year: int, program_code: str | None = None) -> str:
+    """The state to price: the named program's own, else the caller's, else the client's calculable state. [ADR-013, F07.5]"""
+    from application.program_defaults import ProgramNotRunnable, ProgramStateConflict, check_program_state, run_state
 
-    return derive_run_state(client_id, tax_year, state)
+    try:
+        check_program_state(state, program_code)  # a named program and a named state must agree
+        return run_state(client_id, tax_year, state, program_code)
+    except ProgramStateConflict as exc:
+        raise InvalidArguments(str(exc)) from exc
+    except ProgramNotRunnable as exc:
+        raise YearNotAuthored(str(exc)) from exc
 
 
-def statute(state: str, client_id: int, tax_year: int):
+def named_program(facts: dict[str, Any], asked: str | None, resolved: Any) -> dict[str, Any]:
+    """Echo the program a read used when the caller NAMED one, so a program-keyed answer says whose it is.
+
+    Omitted when none was named: the answer for a single-program state is then exactly what it always was.
+    """
+    return {**facts, "program_code": resolved.program_code} if asked else facts
+
+
+def statute(state: str, client_id: int, tax_year: int, program_code: str | None = None):
     """The statute and fiscal window for a client-year, or the named refusal.
 
     Resolves no payroll. An unmapped state and an unauthored year are real gaps
@@ -152,7 +166,8 @@ def statute(state: str, client_id: int, tax_year: int):
     from application.queries._client_run import ClientRunNotAvailable, resolve_statute
 
     try:
-        return resolve_statute(account_id=client_id, state=state.upper(), tax_year=tax_year, require_program=True)
+        return resolve_statute(
+            account_id=client_id, state=state.upper(), tax_year=tax_year, program_code=program_code, require_program=True)
     except ClientRunNotAvailable as exc:
         raise YearNotAuthored(str(exc)) from exc
 
