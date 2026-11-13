@@ -32,6 +32,7 @@ from pathlib import Path
 from typing import Any
 
 from application.mediator import Command
+from application.program_defaults import check_program_state
 from config import get_settings
 
 logger = logging.getLogger(__name__)
@@ -55,6 +56,7 @@ class RunClientCalculationCommand(Command):
     client_id: int = 0
     tax_year: int = 0
     state: str | None = None
+    program_code: str | None = None  # optional; wins over `state` and fixes it [F04c.3]
     #: Which years to record a CLAIM for. Empty means every year the payroll
     #: covers, which is the pipeline model: a client that has been run has been
     #: assessed, not assessed for one year. `tax_year` still scopes the Gold
@@ -69,6 +71,7 @@ class RunClientCalculationCommand(Command):
             raise ValueError("client_id is required and must be positive")
         if self.tax_year <= 0:
             raise ValueError("tax_year is required and must be positive")
+        check_program_state(self.state, self.program_code)
 
 
 class RunFailed(RuntimeError):
@@ -183,14 +186,9 @@ def _replay_unit_series(
     """
     from application.queries._client_run import ClientRunNotAvailable, resolve_client_run
     from application.queries.get_unit_trend import (
-        _MIN_REACHABLE_MONTHS,
-        _candidate_years,
-        _designation_at,
-        _year_benefit,
+        _MIN_REACHABLE_MONTHS, _candidate_years, _designation_at, _year_benefit,
     )
-    from domain.calculation.onezero import (
-        run_min_max_method, run_pay_period_method, unreachable_months,
-    )
+    from domain.calculation.onezero import run_min_max_method, run_pay_period_method, unreachable_months
     from domain.calculation.rollups import rollup_matrix_by_two_fields
     from tools import gold_projection as gp
     from application.open_year import MIN_OPEN_MONTHS as _MIN_OPEN_MONTHS, is_open
@@ -225,10 +223,10 @@ def _replay_unit_series(
         # priced into the credit series, never claimed. See application/open_year.
         open_years: set[int] = set()
 
-        for tax_year in _candidate_years(state):
+        for tax_year in _candidate_years(program_code):
             try:
                 run = resolve_client_run(
-                    account_id=client_id, state=state, tax_year=tax_year, rows=payroll,
+                    account_id=client_id, state=state, tax_year=tax_year, rows=payroll, program_code=program_code,
                 )
             except ClientRunNotAvailable as exc:
                 declines[tax_year] = str(exc)
@@ -426,7 +424,7 @@ def handle_run_client_calculation(command: RunClientCalculationCommand) -> dict[
     run_id = uuid.uuid4().hex
 
     run = resolve_client_run(
-        account_id=command.client_id, state=command.state, tax_year=command.tax_year,
+        account_id=command.client_id, state=command.state, tax_year=command.tax_year, program_code=command.program_code,
     )
     engine_kwargs = run.engine_kwargs()
     results = {

@@ -43,12 +43,9 @@ def _program_code_for_state(state: str | None) -> str | None:
     """The programme a state maps to, so a `state` filter cannot cross one."""
     if not state:
         return None
-    from tools.credit_math import PROGRAM_CODE_TO_PACK, STATE_TO_PACK
+    from application.program_defaults import program_code_for_state
 
-    pack_file = STATE_TO_PACK.get(state.upper())
-    return next(
-        (code for code, name in PROGRAM_CODE_TO_PACK.items() if name == pack_file), None
-    )
+    return program_code_for_state(state)
 
 
 @router.get("/v2/clients/{client_id}/units")
@@ -490,6 +487,7 @@ class ClientRunRequest(BaseModel):
 
     year: int
     state: str | None = None
+    program_code: str | None = None  # optional; wins over `state`, and a state with several programs needs it [F04c.3]
     triggered_by: str = "system"
     #: Omitted means assess every year the payroll covers. Name the years for a
     #: targeted recalculation of one.
@@ -514,6 +512,7 @@ def create_client_run(client_id: int, payload: ClientRunRequest, request: Reques
             client_id=client_id,
             tax_year=payload.year,
             state=payload.state.upper() if payload.state else None,
+            program_code=payload.program_code,
             actor=attributed(request, payload.triggered_by, default="system"),
             assess_tax_years=tuple(payload.assess_years or ()),
         )

@@ -46,10 +46,10 @@ class GetUnitTrendQuery(Query):
             raise ValueError(f"method must be one of {_METHODS}, got {self.method!r}")
 
 
-def _candidate_years(state: str) -> list[int]:
-    from tools.credit_math import STATE_TO_PACK, authored_years
+def _candidate_years(state_or_program: str) -> list[int]:  # a program code, or a state's default program [F04c.4]
+    from tools.credit_math import authored_years, pack_file_for
 
-    pack_file = STATE_TO_PACK.get(state.upper())
+    pack_file = pack_file_for(state_or_program)
     return authored_years(pack_file) if pack_file else []
 
 

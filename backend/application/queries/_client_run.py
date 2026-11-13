@@ -17,7 +17,13 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-from application.program_defaults import derive_run_state, state_for_location  # noqa: F401 - re-exported for the read queries
+from application.program_defaults import (  # noqa: F401 - re-exported for the read queries
+    ProgramNotRunnable,
+    ProgramStateConflict,
+    derive_run_state,
+    resolve_program,
+    state_for_location,
+)
 
 
 class ClientRunNotAvailable(LookupError):
@@ -79,9 +85,12 @@ class ClientRun:
 
 
 def resolve_statute(
-    *, account_id: int | None, state: str | None, tax_year: int
+    *, account_id: int | None, state: str | None = None, tax_year: int, program_code: str | None = None
 ) -> ResolvedStatute:
     """Programme, floors, rule pack and fiscal window — no payroll.
+
+    The programme is the key, the state a convenience that resolves to it (`resolve_program`); the chosen
+    `program_code` is always on the result. [F04c.2]
 
     Declines exactly as `resolve_client_run` does, and for the same reasons: an
     unmapped state and an unauthored year are both real gaps in coverage, and
@@ -90,19 +99,15 @@ def resolve_statute(
     """
     from application.source_ports import client_fiscal_window
     from tools.credit_math import (
-        PROGRAM_CODE_TO_PACK,
-        STATE_TO_PACK,
         load_pack_one_zero,
         resolve_statutory_floors,
         resolve_tax_year_convention,
     )
 
-    state = (state or derive_run_state(account_id, tax_year)).upper()
-
-    pack_file = STATE_TO_PACK.get(state)
-    program_code = next(
-        (code for code, name in PROGRAM_CODE_TO_PACK.items() if name == pack_file), None
-    )
+    try:
+        state, program_code = resolve_program(account_id, state, program_code, tax_year)
+    except ProgramNotRunnable as exc:
+        raise ClientRunNotAvailable(str(exc)) from exc
     if program_code is None:
         raise ClientRunNotAvailable(f"no programme maps to state {state!r}")
 
@@ -113,7 +118,7 @@ def resolve_statute(
         # a decline, not a server fault: the year is genuinely uncovered.
         raise ClientRunNotAvailable(str(exc)) from exc
 
-    pack = load_pack_one_zero(state, tax_year=tax_year)
+    pack = load_pack_one_zero(program_code, tax_year=tax_year)
     if pack is None:
         raise ClientRunNotAvailable(f"no rule pack for {state} tax year {tax_year}")
 
@@ -129,12 +134,24 @@ def resolve_statute(
     )
 
 
+def program_rows(rows: list[dict[str, Any]], program_state: str) -> list[dict[str, Any]]:
+    """The payroll rows a state-level program prices: those whose work state is the program's state.
+
+    The one definition of "which rows does a program see". Two programs in the same state therefore see the SAME rows
+    and differ only by their pack. Federal programs have no state and are not runnable (`ProgramNotRunnable`). [F04c.5]
+    """
+    from domain.calculation.headcount import row_state
+
+    return [r for r in rows if row_state(r) == program_state.upper()]
+
+
 def resolve_client_run(
     *,
     account_id: int | None,
-    state: str | None,
+    state: str | None = None,
     tax_year: int,
     rows: list[dict[str, Any]] | None = None,
+    program_code: str | None = None,
 ) -> ClientRun:
     """Resolve statute, fiscal window and payroll for one client-programme-year.
 
@@ -146,17 +163,16 @@ def resolve_client_run(
     and the same window trim still apply — so a multi-year read cannot drift
     from a single-year one by taking a shortcut around this function.
     """
-    from domain.calculation.headcount import row_state
     from application.source_ports import load_pay_periods
 
     statute = resolve_statute(
-        account_id=account_id, state=state, tax_year=tax_year
+        account_id=account_id, state=state, tax_year=tax_year, program_code=program_code
     )
     state = statute.state
     window = statute.window
 
     source = load_pay_periods(account_id) if rows is None else rows
-    state_rows = [r for r in source if row_state(r) == state]
+    state_rows = program_rows(source, state)
     rows = [
         r for r in state_rows
         if window.begin.isoformat() <= str(r.get("Pay_Date") or "")[:10] <= window.end.isoformat()

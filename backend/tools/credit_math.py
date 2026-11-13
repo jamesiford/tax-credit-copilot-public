@@ -11,6 +11,7 @@ from pydantic import Field
 
 from domain.calculation.floors import StatutoryFloors, program_name
 from domain.calculation.trail import current_recorder
+from tools.pack_lookup import pack_file_for
 from tools.program_registry import RegistryView, load_registry, rules_dir
 
 # Two-letter state -> rule pack filename, and program code (as it appears in a pack's `credit.code`) -> pack
@@ -284,21 +285,7 @@ def load_pack_one_zero(state_or_code: str, tax_year: int | None = None):
     from domain.calculation.onezero import OneZeroMethodology, OneZeroPack  # local import: avoid load-time cycle
 
     s = state_or_code.upper()
-    pack_file = STATE_TO_PACK.get(s)
-    if pack_file is None:
-        # Try matching by credit code across all packs.
-        for fname in STATE_TO_PACK.values():
-            pack = _load_pack(fname)
-            if pack.get("credit", {}).get("code") == s:
-                pack_file = fname
-                break
-        else:
-            # Also try federal packs (federal_wotc_lite.json etc., not in STATE_TO_PACK): registry entries
-            # without a state key.
-            for entry in load_registry().federal():
-                if entry.code == s:
-                    pack_file = entry.pack_file
-                    break
+    pack_file = pack_file_for(s)
     if pack_file is None:
         return None
 
