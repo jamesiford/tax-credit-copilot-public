@@ -142,15 +142,21 @@ class SourceSqlReader:
         return self._connection.scope()
 
     def _query(self, sql: str, params: list[Any], timeout: int | None = None) -> list[tuple]:
-        """Run one statement. `timeout` is the ODBC statement timeout: the driver cancels it on the server."""
+        """Run one statement. `timeout` is the ODBC statement timeout: the driver cancels it on the server.
+
+        pyodbc has no cursor timeout: the limit is a property of the CONNECTION, applied to cursors created after it is set,
+        and the connection is pooled, so it is reset afterwards (as `warehouse_data_query` does).
+        """
         with self._connection.connect() as live:
+            if timeout:
+                live.timeout = max(1, int(timeout))
             cursor = live.cursor()
             try:
-                if timeout:
-                    cursor.timeout = int(timeout)
                 cursor.execute(sql, params)
                 return cursor.fetchall()
             finally:
+                if timeout:
+                    live.timeout = 0
                 cursor.close()
 
     def list_accounts(self) -> list[dict[str, Any]]:
