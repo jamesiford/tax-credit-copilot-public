@@ -304,3 +304,32 @@ def test_the_same_program_run_twice_replaces_only_its_own_claim_cell(runs):
     first_beta = _cells(runs)[(BETA, 2025)].claim_id
     _run(runs, program_code=ALPHA)
     assert _cells(runs)[(BETA, 2025)].claim_id == first_beta
+
+
+# ------------------------------------------------------------------ over HTTP
+
+
+def test_the_run_endpoint_refuses_a_disagreeing_state_and_program_with_a_422(zz):
+    from fastapi.testclient import TestClient
+
+    import main
+
+    http = TestClient(main.app)
+    response = http.post(f"/api/v2/clients/{CLIENT}/runs", json={"year": 2025, "state": "GA", "program_code": BETA})
+    assert response.status_code == 422 and "not GA" in response.json()["detail"]
+
+
+def test_a_read_for_a_state_with_several_programs_asks_which_and_a_named_program_is_accepted(zz, monkeypatch):
+    from fastapi.testclient import TestClient
+
+    import main
+    from bootstrap import wiring
+    from tests.data_engine_fixture import SqliteGoldReader, SqliteWarehouse
+
+    monkeypatch.setattr(wiring, "get_gold_reader", lambda: SqliteGoldReader(SqliteWarehouse()))  # an empty store: nothing run yet
+    http = TestClient(main.app)
+    asked = http.get(f"/api/eligibility/2025?state={STATE}&account_id={CLIENT}")
+    assert asked.status_code == 404 and ALPHA in asked.json()["detail"] and BETA in asked.json()["detail"]
+    assert "program_code" in asked.json()["detail"]
+    named = http.get(f"/api/eligibility/2025?state={STATE}&account_id={CLIENT}&program_code={BETA}")
+    assert named.status_code == 200 and named.json()["program_code"] == BETA and named.json()["calculation_state"] == "not_calculated"
