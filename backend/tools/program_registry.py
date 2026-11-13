@@ -58,6 +58,15 @@ class Registry:
                 out[entry.state] = entry.pack_file
         return out
 
+    def for_state(self, state: str) -> tuple[ProgramEntry, ...]:
+        """Every non-retired program of a state, in manifest order.
+
+        The first is the state's DEFAULT program: it is what `state_to_pack` (and so `STATE_TO_PACK`) shows, so
+        reordering the manifest changes the default, and a state with one program is unaffected. [F04c.1]
+        """
+        wanted = (state or "").upper()
+        return tuple(e for e in self.active() if e.state == wanted)
+
     def federal(self) -> tuple[ProgramEntry, ...]:
         """Federal-level programs, which have no state key and are found by jurisdiction level."""
         return tuple(e for e in self.active() if e.level == "federal")
@@ -170,6 +179,17 @@ def load_registry() -> Registry:
         registry = parse_registry(settings.registry_file.read_text(encoding="utf-8"), settings.registry_file, settings.rules_dir)
         _cache[key] = (stamp, registry)
         return registry
+
+
+def programs_for_state(state: str) -> tuple[ProgramEntry, ...]:
+    """The state's programs, calculable and described alike, in stable registry order (first = default)."""
+    return load_registry().for_state(state)
+
+
+def program_for_code(code: str) -> ProgramEntry | None:
+    """The active entry for a program code (case-insensitive); None when unknown or retired."""
+    entry = load_registry().get(code)
+    return entry if entry is not None and entry.lifecycle != "retired" else None
 
 
 def rules_dir() -> Path:
