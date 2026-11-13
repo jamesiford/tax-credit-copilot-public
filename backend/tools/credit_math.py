@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Annotated, Any
@@ -10,43 +11,27 @@ from pydantic import Field
 
 from domain.calculation.floors import StatutoryFloors, program_name
 from domain.calculation.trail import current_recorder
+from tools.program_registry import RegistryView, load_registry, rules_dir
 
-_RULES = Path(__file__).resolve().parent.parent / "rules"
+# Two-letter state -> rule pack filename, and program code (as it appears in a pack's `credit.code`) -> pack
+# filename. Both are READ-ONLY VIEWS over the program registry (`rules/registry/programs.json`, ADR-013): adding a
+# program is a manifest entry plus a pack, with no edit here. They keep their old names and compare equal to the
+# dictionaries they replace, so every import site is unchanged. States with no entry (e.g. TX) flow through
+# apply_one_zero_state_credit() and get a structured "no_state_pack" response. An assumption set names the programme
+# it measures by code, not by state, because a state can run several credits.
+STATE_TO_PACK: Mapping[str, str] = RegistryView("state")
+PROGRAM_CODE_TO_PACK: Mapping[str, str] = RegistryView("code")
 
-# Two-letter state -> rule pack filename. Adding a new state credit is a JSON
-# file plus one line here. States NOT in this map (e.g. TX) flow through
-# apply_one_zero_state_credit() and get a structured "no_state_pack" response.
-STATE_TO_PACK: dict[str, str] = {
-    "GA": "ga_jtc.json",
-    "NY": "ny_excelsior.json",
-    "SC": "sc_jtc.json",
-    # Phase A expansion states
-    "NC": "nc_jtec.json",
-    "TN": "tn_jtc.json",
-    "FL": "fl_qti.json",
-    "OH": "oh_jctc.json",
-    "CO": "co_ez.json",
-    "VA": "va_mbjf.json",
-}
 
-# Program code (as it appears in a pack's `credit.code`) -> pack filename. An
-# assumption set names the programme it measures by code, not by state, because
-# a state can run several credits and a credit can outlive its state's tier map.
-PROGRAM_CODE_TO_PACK: dict[str, str] = {
-    "GA_JTC": "ga_jtc.json",
-    "NY_EXCELSIOR": "ny_excelsior.json",
-    "SC_JTC": "sc_jtc.json",
-    "NC_JTEC": "nc_jtec.json",
-    "TN_JTC": "tn_jtc.json",
-    "FL_QTI": "fl_qti.json",
-    "OH_JCTC": "oh_jctc.json",
-    "CO_EZ": "co_ez.json",
-    "VA_MBJF": "va_mbjf.json",
-}
+def __getattr__(name: str):
+    """`_RULES` stays importable, resolved at read time so `RULES_DIR` is honoured."""
+    if name == "_RULES":
+        return rules_dir()
+    raise AttributeError(name)
 
 
 def _load_pack(filename: str) -> dict[str, Any]:
-    path = _RULES / filename
+    path = rules_dir() / filename
     if not path.exists():
         raise FileNotFoundError(f"rule pack not found: {filename}")
     return json.loads(path.read_text(encoding="utf-8"))
@@ -64,7 +49,7 @@ def is_year_scoped(pack_file: str) -> bool:
     year-scoped and resolution is strict. One without is still flat, and resolves
     the legacy way.
     """
-    return (_RULES / _program_name(pack_file)).is_dir()
+    return (rules_dir() / _program_name(pack_file)).is_dir()
 
 
 def load_year_pack(pack_file: str, tax_year: int | None) -> tuple[dict[str, Any], bool]:
@@ -84,7 +69,7 @@ def load_year_pack(pack_file: str, tax_year: int | None) -> tuple[dict[str, Any]
     program = _program_name(pack_file)
 
     if is_year_scoped(pack_file):
-        authored = sorted(int(p.stem) for p in (_RULES / program).glob("*.json") if p.stem.isdigit())
+        authored = sorted(int(p.stem) for p in (rules_dir() / program).glob("*.json") if p.stem.isdigit())
         if tax_year is None:
             # Describing a program ("what is GA JTC?") is a legitimate call and
             # should not raise. Return the most recent authored year with
@@ -93,9 +78,9 @@ def load_year_pack(pack_file: str, tax_year: int | None) -> tuple[dict[str, Any]
             # statute applies.
             if not authored:
                 return _load_pack(pack_file), False
-            latest = _RULES / program / f"{authored[-1]}.json"
+            latest = rules_dir() / program / f"{authored[-1]}.json"
             return json.loads(latest.read_text(encoding="utf-8")), False
-        path = _RULES / program / f"{tax_year}.json"
+        path = rules_dir() / program / f"{tax_year}.json"
         if not path.exists():
             raise FileNotFoundError(
                 f"no rule pack for {program} tax year {tax_year}. "
@@ -126,7 +111,7 @@ def authored_years(pack_file: str) -> list[int]:
     check will happily compute a number under no particular year's statute.
     """
     program = _program_name(pack_file)
-    directory = _RULES / program
+    directory = rules_dir() / program
     if not directory.is_dir():
         return []
     return sorted(int(p.stem) for p in directory.glob("*.json") if p.stem.isdigit())
@@ -308,11 +293,11 @@ def load_pack_one_zero(state_or_code: str, tax_year: int | None = None):
                 pack_file = fname
                 break
         else:
-            # Also try federal packs (federal_wotc_lite.json etc., not in STATE_TO_PACK).
-            for path in _RULES.glob("*.json"):
-                pack = _load_pack(path.name)
-                if pack.get("credit", {}).get("code") == s:
-                    pack_file = path.name
+            # Also try federal packs (federal_wotc_lite.json etc., not in STATE_TO_PACK): registry entries
+            # without a state key.
+            for entry in load_registry().federal():
+                if entry.code == s:
+                    pack_file = entry.pack_file
                     break
     if pack_file is None:
         return None

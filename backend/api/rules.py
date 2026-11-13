@@ -17,11 +17,11 @@ from fastapi import APIRouter, HTTPException, Request
 from api.auth import attributed
 from pydantic import BaseModel
 
+from application.rule_library import rules_dir
 from data.claims import get_all_claims
 
 router = APIRouter(prefix="/api", tags=["rules"])
 
-_RULES = Path(__file__).resolve().parent.parent / "rules"
 
 # Rule-pack practitioner sign-off store (Phase E P3 #16).
 # Mutable in-memory dict keyed by rule pack code → {verified_by, verified_at, note}.
@@ -56,7 +56,7 @@ def rules() -> dict[str, Any]:
     uses the newest pack file mtime; `recent_changes` lists the 5 most recently
     modified packs; `pinned_claims` counts claims whose `credit_code` matches.
     """
-    pack_files = sorted(_RULES.glob("*.json"))
+    pack_files = sorted(rules_dir().glob("*.json"))
     parsed: list[tuple[Path, float, dict[str, Any]]] = []
     for p in pack_files:
         try:
@@ -147,7 +147,7 @@ def verify_rule_pack(code: str, payload: RuleVerificationRequest, request: Reque
     """Record a tax-practitioner sign-off on a rule pack (in-memory)."""
     code_upper = code.upper()
     pack_codes = set()
-    for p in _RULES.glob("*.json"):
+    for p in rules_dir().glob("*.json"):
         try:
             data = json.loads(p.read_text(encoding="utf-8"))
             c = data.get("credit", {}).get("code")
