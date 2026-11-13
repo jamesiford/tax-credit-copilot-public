@@ -135,6 +135,13 @@ def read_method(method: str) -> str:
     return method if method in ("min_max", "pay_period") else "pay_period"
 
 
+def derive_state(state: str | None, client_id: int, tax_year: int) -> str:
+    """The caller's state, else the client's own calculable state from its payroll and the registry. [ADR-013]"""
+    from application.program_defaults import derive_run_state
+
+    return derive_run_state(client_id, tax_year, state)
+
+
 def statute(state: str, client_id: int, tax_year: int):
     """The statute and fiscal window for a client-year, or the named refusal.
 

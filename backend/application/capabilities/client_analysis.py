@@ -60,7 +60,7 @@ def client_trend(client_id: int, method: str = "pay_period") -> ToolResult:
 
 
 def client_at_risk(
-    client_id: int, tax_year: int, state: str = "GA", method: str = "min_max",
+    client_id: int, tax_year: int, state: str | None = None, method: str = "min_max",
 ) -> ToolResult:
     """Counted jobs close enough to a floor that they could fall out of the credit.
 
@@ -70,6 +70,7 @@ def client_at_risk(
     """
     from tools.portfolio import chat_jobs_at_risk
 
+    state = s.derive_state(state, client_id, tax_year)
     if method == "both":
         method = "min_max"
     capture = s.RunCapture()

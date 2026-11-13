@@ -45,7 +45,7 @@ class SimulateUnitQuery(Query):
     client_id: int
     worksite_id: str
     tax_year: int
-    state: str = "GA"
+    state: str | None = None
     method: str = "min_max"
     action: str = "add_headcount"
     magnitude: float = 1.0
@@ -256,13 +256,13 @@ def run_rate_credit(
 
 
 def handle_simulate_unit(query: SimulateUnitQuery) -> dict[str, Any]:
-    from application.queries._client_run import ClientRunNotAvailable, resolve_client_run
+    from application.queries._client_run import ClientRunNotAvailable, resolve_client_run, state_for_location
     from application.services import get_gold_reader
     from domain.calculation.onezero import run_min_max_method, run_pay_period_method
     from tools.simulation import apply_onezero_lever
 
-    state = query.state.upper()
     site = query.worksite_id
+    state = state_for_location(query.client_id, site, query.tax_year, query.state)
 
     reader = get_gold_reader()
     with reader.scope():

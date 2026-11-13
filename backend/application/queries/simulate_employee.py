@@ -68,7 +68,7 @@ class SimulateEmployeeQuery(Query):
     client_id: int
     tax_year: int
     changes: tuple[EmployeeChange, ...]
-    state: str = "GA"
+    state: str | None = None
     method: str = "min_max"
     as_of: date | None = None
 
@@ -235,7 +235,7 @@ def _designation(grid: dict[str, Any] | None) -> dict[str, Any]:
 
 
 def handle_simulate_employee(query: SimulateEmployeeQuery) -> dict[str, Any]:
-    from application.queries._client_run import ClientRunNotAvailable, resolve_client_run
+    from application.queries._client_run import ClientRunNotAvailable, derive_run_state, resolve_client_run
     from application.queries.simulate_unit import (
         _signed_margin, _unit_reading, location_series, open_year_months, price_location_year,
         run_rate_credit, RUN_RATE_BASIS,
@@ -244,7 +244,7 @@ def handle_simulate_employee(query: SimulateEmployeeQuery) -> dict[str, Any]:
     from domain.calculation.onezero import run_min_max_method, run_pay_period_method
     from tools.tokens import record_token
 
-    state = query.state.upper()
+    state = derive_run_state(query.client_id, query.tax_year, query.state)
     as_of = query.resolved_as_of()
     try:
         run = resolve_client_run(account_id=query.client_id, state=state, tax_year=query.tax_year)

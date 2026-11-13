@@ -27,7 +27,7 @@ def simulate(
     worksite_id: str,
     action: str = "add_headcount",
     magnitude: float = 1.0,
-    state: str = "GA",
+    state: str | None = None,
     method: str = "min_max",
     hire_weekly_hours: float | None = None,
     hire_hourly_rate: float | None = None,

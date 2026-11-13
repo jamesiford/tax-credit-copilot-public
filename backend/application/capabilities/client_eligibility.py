@@ -83,7 +83,7 @@ def _credit_blocks(credit: dict[str, Any], tax_year: int) -> list:
 def client_eligibility(
     client_id: int,
     tax_year: int,
-    state: str = "GA",
+    state: str | None = None,
     method: str = "min_max",
     *,
     window: Any = None,
@@ -99,7 +99,7 @@ def client_eligibility(
     """
     from tools.portfolio import chat_client_context, chat_state_credit
 
-    state = state.upper()
+    state = s.derive_state(state, client_id, tax_year)
     if window is None:
         window = s.statute(state, client_id, tax_year).window
     capture = s.RunCapture()

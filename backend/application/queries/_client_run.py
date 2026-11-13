@@ -17,7 +17,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-from application.program_defaults import derive_run_state
+from application.program_defaults import derive_run_state, state_for_location  # noqa: F401 - re-exported for the read queries
 
 
 class ClientRunNotAvailable(LookupError):
