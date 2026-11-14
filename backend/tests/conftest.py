@@ -40,9 +40,19 @@ if str(TESTS_ROOT) not in sys.path:
 # this pin the certified figures could not be verified on a pull request.
 # Set before `main` is imported so its load_dotenv(override=False) can't flip it.
 os.environ["DATA_SOURCE"] = "csv"
-# The same rule for the read path: a dev's `SOURCE_READ_MODE=sql` (the fast lakehouse reads) would otherwise
-# send the local-lakehouse tests to a SQL endpoint that does not exist. The tests that exercise `sql` set it themselves.
-os.environ["SOURCE_READ_MODE"] = "onelake"
+# The same rule for every other setting: `backend/.env` is a developer's live configuration, and the app modules call
+# `load_dotenv()` when they are imported, which also refills a variable a test has just deleted (AUTH_MODE, the lakehouse
+# SQL endpoint, SOURCE_READ_MODE). The suite runs as CI does, with no `.env`: the pins here and each test's own
+# monkeypatching are the whole configuration. (The opt-in live tests read their connection settings below, not through this.)
+import dotenv as _dotenv  # noqa: E402
+
+_dotenv.load_dotenv = lambda *args, **kwargs: False
+
+# The sqlite stores default to `backend/data/operational.db`, the file a developer's own API writes to. A run of the API
+# (an assessment writes claim rows) would then change what these tests read, so the suite uses a file of its own.
+import tempfile  # noqa: E402
+
+os.environ["OPERATIONAL_DB"] = os.path.join(tempfile.mkdtemp(prefix="tcc-tests-"), "operational.db")
 
 # The CSV fixture holds exactly one tenant and says which, here, because no production default
 # names one. The suite is also generated data end to end, so it says so.
@@ -59,15 +69,16 @@ os.environ["ENVIRONMENT"] = "local"
 os.environ["AUTH_MODE"] = "none"
 
 # The opt-in live-Fabric tests (TCC_FABRIC_TESTS=1) still need somewhere to
-# connect. Take only the connection settings from `.env`, never DATA_SOURCE —
-# which is why this cannot just be `load_dotenv()`. The WAREHOUSE_ pair is the
+# connect. Only then, take just the connection settings from `.env`, never DATA_SOURCE —
+# which is why this cannot just be `load_dotenv()`. Without the opt-in the suite sees no Fabric at all, as in CI: a
+# configured workspace would send tests of an empty or unconfigured source to the live warehouse. The WAREHOUSE_ pair is the
 # SQL endpoint behind tcc_gold; without it a live test errors in its fixture
 # rather than skipping, which reads as a broken suite instead of an absent one.
 for _name in (
     "FABRIC_WORKSPACE", "FABRIC_LAKEHOUSE", "FABRIC_EMPLOYEES_TABLE",
     "WAREHOUSE_SERVER", "WAREHOUSE_DATABASE",
 ):
-    if not os.getenv(_name):
+    if os.getenv("TCC_FABRIC_TESTS") == "1" and not os.getenv(_name):
         _env = BACKEND_ROOT / ".env"
         if _env.exists():
             for _line in _env.read_text(encoding="utf-8").splitlines():
