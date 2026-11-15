@@ -69,6 +69,17 @@ public sealed class PrimitiveParityTests
     }
 
     [Fact]
+    public void Int_of_str_matches_python() =>
+        Run("int_parse", v =>
+        {
+            var ok = PyInt.TryParse(v.GetProperty("t").GetString()!, out var value);
+            var o = v.GetProperty("o");
+            return o.ValueKind == JsonValueKind.Null
+                ? (ok ? $"parsed {value} but Python raises ValueError" : null)
+                : (ok ? Eq("int(str)", value.ToString(System.Globalization.CultureInfo.InvariantCulture), o.GetString()) : "rejected but Python accepts");
+        });
+
+    [Fact]
     public void Round_float_ndigits_matches_python_bit_for_bit() =>
         Run("round", v => Same("round", PyRound.Round(Dbl(v.GetProperty("x")), v.GetProperty("n").GetInt32()), v.GetProperty("o")));
 

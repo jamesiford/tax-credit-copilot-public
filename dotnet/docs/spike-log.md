@@ -26,3 +26,10 @@ et10.0\, \TreatWarningsAsErrors\, analyzers at \latest-recommended\, XML docs re
 - Eight ADRs in \dotnet/docs/adr\. Licences were re-read from the upstream repositories (MediatR = RPL 1.5 / commercial, FluentAssertions = Xceed community licence, xunit = Apache-2.0, Mediator by martinothamar = MIT, NetArchTest = MIT but stale, ArchUnitNET = Apache-2.0).
 - Environment notes: OpenTelemetry 1.12.0 was rejected by NuGet audit (NU1902, moderate vulnerability) and bumped to 1.20.x; Aspire 13.6.5 needs \ASPIRE010\ suppressed (no CLI bundle).
 
+
+## Stages S3 and S4: goldens and engine port
+
+- parity/export_goldens.py + matrix.py + scenarios.py + engine_io.py: 3,939 scenarios, goldens 9.5 MB (engine) + 0.9 MB (datasets). --check passes under PYTHONHASHSEED 5, 11, 12.
+- Domain/Calculation: ~3,500 lines incl. Numerics. **Gate G2: PASSED, 0 mismatches** (50 parity tests, 18 domain, 13 architecture all green).
+- See parity-report.md and findings.md (T-14..T-18, F-01..F-04).
+

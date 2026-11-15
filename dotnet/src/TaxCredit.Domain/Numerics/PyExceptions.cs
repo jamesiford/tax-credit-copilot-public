@@ -24,3 +24,12 @@ public sealed class PyZeroDivisionError(string message) : PyException("ZeroDivis
 
 /// <summary>Mirrors <c>decimal.InvalidOperation</c>.</summary>
 public sealed class PyInvalidOperation(string message) : PyException("InvalidOperation", message);
+
+/// <summary>Mirrors Python <c>KeyError</c> (a missing dictionary key).</summary>
+public sealed class PyKeyError(string key) : PyException("KeyError", key);
+
+/// <summary>Mirrors Python <c>TypeError</c> (for example ordering <c>None</c> against a string).</summary>
+public sealed class PyTypeError(string message) : PyException("TypeError", message);
+
+/// <summary>Raised for an input the port deliberately does not model, so a gap fails loudly instead of diverging silently.</summary>
+public sealed class PyUnsupportedException(string message) : Exception(message);

@@ -355,7 +355,18 @@ def vec_strings(rng, emit):
     emit({"k": "unicode_version", "v": __import__("unicodedata").unidata_version})
 
 
-GENERATORS = [vec_round, vec_quantize, vec_repr, vec_parse, vec_divmod, vec_int_floor_ceil, vec_sum, vec_dates, vec_sort, vec_strings]
+
+def vec_int_parse(rng, emit):
+    texts = ["0", "-0", "+5", "-5", "15", " 15 ", "\t7\n", "007", "00015", "1_0", "1__0", "_1", "1_", "1.5", "1e3", "", " ", "abc", "0x10", "١٥", "٣", "-٣",
+             "1 5", "--1", "+-1", "٠٣", "99999999999999999999", "-99999999999999999999", "1_000_000", "\u00a07\u00a0", "5\x00", "+", "-", "1_2_3",
+             "+٧", "\u2003-8", "١_٥", "१५", "๑๕", "①", "²", "٣.٠"]
+    for t in texts:
+        try:
+            emit({"k": "int_parse", "t": t, "o": str(int(t))})
+        except ValueError:
+            emit({"k": "int_parse", "t": t, "o": None})
+
+GENERATORS = [vec_int_parse, vec_round, vec_quantize, vec_repr, vec_parse, vec_divmod, vec_int_floor_ceil, vec_sum, vec_dates, vec_sort, vec_strings]
 
 
 def build(seed: int) -> bytes:

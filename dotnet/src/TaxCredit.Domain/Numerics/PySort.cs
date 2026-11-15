@@ -15,16 +15,25 @@ public static class PySort
         ArgumentNullException.ThrowIfNull(key);
         ArgumentNullException.ThrowIfNull(comparer);
         var decorated = items.Select((item, index) => (Item: item, Key: key(item), Index: index)).ToList();
-        decorated.Sort((x, y) =>
+        try
         {
-            var c = comparer.Compare(x.Key, y.Key);
-            if (c != 0)
+            decorated.Sort((x, y) =>
             {
-                return reverse ? -c : c;
-            }
+                var c = comparer.Compare(x.Key, y.Key);
+                if (c != 0)
+                {
+                    return reverse ? -c : c;
+                }
 
-            return x.Index.CompareTo(y.Index);
-        });
+                return x.Index.CompareTo(y.Index);
+            });
+        }
+        catch (InvalidOperationException e) when (e.InnerException is PyException inner)
+        {
+            // List.Sort wraps a comparer's exception; Python lets a TypeError from "<" propagate unchanged.
+            System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(inner).Throw();
+        }
+
         return decorated.Select(d => d.Item).ToList();
     }
 

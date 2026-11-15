@@ -124,6 +124,37 @@ public static class PyStr
     /// <summary>An <see cref="IComparer{T}"/> over <see cref="Compare"/>.</summary>
     public static IComparer<string> Comparer { get; } = System.Collections.Generic.Comparer<string>.Create(Compare);
 
+    /// <summary>Python <c>len(s)</c>: the number of code points (not UTF-16 units).</summary>
+    public static int Length(string s)
+    {
+        ArgumentNullException.ThrowIfNull(s);
+        var n = 0;
+        for (var i = 0; i < s.Length; i++)
+        {
+            CodePointAt(s, i, out var width);
+            i += width - 1;
+            n++;
+        }
+
+        return n;
+    }
+
+    /// <summary>Python <c>s[:count]</c>: the first <paramref name="count"/> code points.</summary>
+    public static string Prefix(string s, int count)
+    {
+        ArgumentNullException.ThrowIfNull(s);
+        var taken = 0;
+        var i = 0;
+        while (i < s.Length && taken < count)
+        {
+            CodePointAt(s, i, out var width);
+            i += width;
+            taken++;
+        }
+
+        return s[..i];
+    }
+
     private static int CodePointAt(string s, int index, out int width)
     {
         var c = s[index];

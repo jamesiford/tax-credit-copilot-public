@@ -36,9 +36,14 @@ public readonly record struct PyDecimal(bool Negative, BigInteger Coefficient, i
     /// <summary><c>Decimal(str(x))</c>: the exact decimal of the shortest round-trip repr of a finite double.</summary>
     public static PyDecimal FromFloatViaStr(double x)
     {
+        if (double.IsNaN(x))
+        {
+            throw new PyUnsupportedException("Decimal NaN is not modelled by this port");
+        }
+
         if (!double.IsFinite(x))
         {
-            throw new PyInvalidOperation("non-finite values are not supported by this port");
+            throw new PyInvalidOperation("quantize of an infinity is invalid");
         }
 
         return Parse(PyFloat.Repr(x));
