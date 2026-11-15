@@ -1,34 +1,92 @@
 {
   "session": "persistence",
   "branch": "dotnet/w1-persistence",
-  "head": "b8e17f4",
-  "summary": "Stopped under hard stop 1: mandatory report/log/status paths are outside the fixed writable-path allowlist. Read the complete prompt and confirmed the expected clean worktree and package markers. Only the explicitly required halt report and finish status were created. No persistence implementation, build, format, or test success is claimed. The head identifies the inspected pre-implementation commit.",
+  "head": "ac4cff8",
+  "summary": "P1-P6 implemented and committed: tenant-safe SQL, schema/seed reset, all 25 Gold reads, governed queries, atomic writer, operational histories and competing-worker queue. Build and format pass; whole-solution fast gate passes, including all 152 parity tests on CPython 3.12. Final persistence snapshot passes 125 tests. The real-writer capstone preserves all 12 successful public payloads (390945 rows / 8017010 typed cells). Obsolete halt removed; report and integration contracts supplied. Live Warehouse behavior is explicitly unverified.",
   "stages": {
-    "P1": "skipped",
-    "P2": "skipped",
-    "P3": "skipped",
-    "P4": "skipped",
-    "P5": "skipped",
-    "P6": "skipped"
+    "P1": "done",
+    "P2": "done",
+    "P3": "done",
+    "P4": "done",
+    "P5": "done",
+    "P6": "done"
   },
-  "gates_claimed": {},
+  "gates_claimed": {
+    "no_halt": true,
+    "commits_present": true,
+    "clean_tree": true,
+    "not_pushed": true,
+    "owned_paths": true,
+    "status_json": true,
+    "report_present": true,
+    "dotnet_build": true,
+    "dotnet_format": true,
+    "tests_fast": true
+  },
   "deviations": [
     {
       "id": "DEV-1",
-      "what": "Created only the hard-stop report and finish status outside the implementation allowlist.",
-      "why": "The fixed hard-stop and finish instructions explicitly require these files when stopping; ordinary documentation ownership remains unresolved.",
+      "what": "Required persistence report, log, improvements and status paths were written; the obsolete ownership halt was removed.",
+      "why": "The conductor's repair instruction explicitly required these documentation/status changes, resolving the initial writable-path contradiction.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-2",
+      "what": "Gold publication and complete calculation side effects use database transactions, retaining the prior successful state on failure.",
+      "why": "The Python retirement-before-insert sequence can expose a failed replacement; CAP-06 assessment can fail after Gold writes. No valid calculated value was changed.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-3",
+      "what": "SQLite uses schema-derived STRICT tables and exact decimal text; native parameters use typed SqlDecimal without System.Decimal truncation.",
+      "why": "Numeric fixture rendering, claim exponents and deployed DECIMAL column scales are distinct contracts, not a license to use floating money.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-4",
+      "what": "SQLite operational initialization includes supplemental tcc_ops.finding_audit.",
+      "why": "Finding-resolution audit durability needs a destination absent from the checked-in SQL bootstrap; deployed operator provisioning is documented.",
       "decision_needed": true
     }
   ],
-  "findings": [],
+  "findings": [
+    "F-3: positive Int64 client binding refuses huge identifiers before SQL; W2 maps the refusal to JSON-detail 422.",
+    "F-8: duplicate storage identities are explicit conflicts; legitimate same-cell history append remains supported. HTTP duplicate-create idempotency/409 belongs to W2.",
+    "F-18: Gold reads and manifest writes share one durable destination; an accepted run is visible after restart rather than hidden by a disconnected in-memory profile.",
+    "E-2: DISTINCT TOP is a SQLite recording-harness translation defect; DISTINCT and ordinary paging execute with the native dialect.",
+    "E-7: AddPersistence registers the governed query port; employee-level authorization defaults denied.",
+    "E-9: decompressed content_sha256 is verified separately from shipped gzip sha256.",
+    "The actual money DDL is DECIMAL(19,4), not the contract report's shorthand DECIMAL(18,2). Typed payload equality is checked before storage conversion.",
+    "Six local migration identities represent bootstrap plus five forward migrations; applied content-hash drift and incompatible schema are refused.",
+    "Final gate processes must explicitly set TCC_PYTHON to the designated CPython 3.12 environment; no shared user/global environment was modified.",
+    "SQLite governed monetary SUM is exact; monetary AVG retains Python SQLite native floating arithmetic rather than silently changing a derived figure."
+  ],
   "open_questions": [],
   "needs_human": [
     {
-      "item": "Reconcile documentation ownership and the conductor owned-path gate.",
-      "why": "Mandatory dotnet/docs report, log, improvements, halt, and status files are not covered by the four allowed writable paths; the prompt explicitly mandates hard stop 1 for a necessary out-of-ownership change."
+      "item": "Live Warehouse transport/storage/publication validation",
+      "why": "No live systems were authorized or contacted. Native decimal/date/AVG metadata, pooling/token refresh, cross-replica publication and concurrency remain unmeasured."
+    },
+    {
+      "item": "Provision supplemental finding audit in the deployed schema",
+      "why": "tcc_ops.finding_audit is required for durable resolution/reopen history. Existing operator migrations remain outside this session's ownership."
+    },
+    {
+      "item": "M-01 ingested override of year-resolved values",
+      "why": "Retained as certified; changing wage_basis, measuring_date or pay-code behavior changes calculated figures and requires an owner decision."
+    },
+    {
+      "item": "Multi-program credit_math first-program pricing",
+      "why": "Retained as Python/certified behavior; introducing a new refusal or choosing another program changes valid-request figures."
+    },
+    {
+      "item": "SQLite governed monetary AVG",
+      "why": "Replacing Python-compatible native floating AVG with exact decimal arithmetic may change derived query figures; this is not a parity waiver."
     }
   ],
   "reports": [
-    "dotnet/docs/HALT-persistence.md"
+    "dotnet\\docs\\PERSISTENCE-REPORT.md",
+    "dotnet\\docs\\persistence-log.md",
+    "dotnet\\docs\\improvements\\persistence.json"
   ]
 }
