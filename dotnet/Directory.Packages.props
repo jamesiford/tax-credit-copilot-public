@@ -17,6 +17,9 @@
     <!-- BEGIN skeleton: only this session edits between the markers -->
     <!-- END skeleton -->
     <!-- BEGIN persistence: only this session edits between the markers -->
+    <PackageVersion Include="Microsoft.Data.SqlClient" Version="7.1.2" />
+    <PackageVersion Include="Microsoft.Data.Sqlite" Version="10.0.0" />
+    <PackageVersion Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.13" />
     <!-- END persistence -->
     <!-- BEGIN sources_auth_ai: only this session edits between the markers -->
     <!-- END sources_auth_ai -->

@@ -14,5 +14,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\TaxCredit.Infrastructure.Persistence\TaxCredit.Infrastructure.Persistence.csproj" />
     <ProjectReference Include="..\..\src\TaxCredit.Domain\TaxCredit.Domain.csproj" />
+    <ProjectReference Include="..\..\src\TaxCredit.Infrastructure\TaxCredit.Infrastructure.csproj" />
   </ItemGroup>
 </Project>
