@@ -6,6 +6,7 @@ namespace TaxCredit.Parity.Tests;
 /// Gate CAP (helpers): replays every helper call of <c>gold_payload.jsonl.gz</c> (the production <c>program_defaults</c>, <c>payroll_rows</c>, <c>qc_resolutions</c>,
 /// <c>_client_run</c>, <c>runs/fingerprint</c> and <c>fiscal_source</c> on CPython 3.12) against the C# port, with exceptions compared by type and message.
 /// </summary>
+[Trait("Category", "heavy")]
 public sealed class PayloadHelperParityTests
 {
     private static readonly string[] Functions =

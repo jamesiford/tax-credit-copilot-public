@@ -10,6 +10,7 @@ namespace TaxCredit.Parity.Tests;
 /// <c>domain/calculation/proximity.py</c> on CPython 3.12) against <see cref="Proximity"/>. Trees are compared by type
 /// (int versus float versus bool), key order, double bit pattern and exception type plus message.
 /// </summary>
+[Trait("Category", "heavy")]
 public sealed class ProximityParityTests
 {
     private const string File = "proximity.jsonl.gz";

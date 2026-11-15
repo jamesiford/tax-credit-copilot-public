@@ -3,6 +3,9 @@
     <RootNamespace>TaxCredit.Api</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Contract\*.generated.json" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\TaxCredit.Application\TaxCredit.Application.csproj" />
     <ProjectReference Include="..\TaxCredit.Infrastructure\TaxCredit.Infrastructure.csproj" />
     <ProjectReference Include="..\TaxCredit.ServiceDefaults\TaxCredit.ServiceDefaults.csproj" />

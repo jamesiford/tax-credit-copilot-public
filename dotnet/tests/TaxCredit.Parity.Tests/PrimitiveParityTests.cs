@@ -8,6 +8,7 @@ namespace TaxCredit.Parity.Tests;
 /// Gate G1: replays every Python-exported primitive vector (<c>parity/goldens/primitives.jsonl.gz</c>) against the
 /// C# compatibility layer. Doubles are compared by IEEE-754 bit pattern (all NaNs equal); everything else exactly.
 /// </summary>
+[Trait("Category", "heavy")]
 public sealed class PrimitiveParityTests
 {
     private const string File = "primitives.jsonl.gz";

@@ -19,6 +19,7 @@ public sealed class DifferentialFuzzTests(ITestOutputHelper output)
         int.TryParse(Environment.GetEnvironmentVariable(name), NumberStyles.Integer, CultureInfo.InvariantCulture, out var v) ? v : fallback;
 
     [Fact]
+    [Trait("Category", "heavy")]
     public void Random_scenarios_agree_with_the_python_engine()
     {
         var total = EnvInt("TCC_FUZZ_N", 20000);

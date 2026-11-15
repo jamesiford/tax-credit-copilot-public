@@ -1,0 +1,7702 @@
+{
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/openapi.json",
+      "name": "openapi",
+      "endpoint": "framework.openapi",
+      "typed": false,
+      "group": "framework",
+      "parameters": {},
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "HEAD",
+      "path": "/openapi.json",
+      "name": "openapi",
+      "endpoint": "framework.openapi",
+      "typed": false,
+      "group": "framework",
+      "parameters": {},
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/docs",
+      "name": "swagger_ui_html",
+      "endpoint": "framework.swagger_ui_html",
+      "typed": false,
+      "group": "framework",
+      "parameters": {},
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "HEAD",
+      "path": "/docs",
+      "name": "swagger_ui_html",
+      "endpoint": "framework.swagger_ui_html",
+      "typed": false,
+      "group": "framework",
+      "parameters": {},
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/docs/oauth2-redirect",
+      "name": "swagger_ui_redirect",
+      "endpoint": "framework.swagger_ui_redirect",
+      "typed": false,
+      "group": "framework",
+      "parameters": {},
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "HEAD",
+      "path": "/docs/oauth2-redirect",
+      "name": "swagger_ui_redirect",
+      "endpoint": "framework.swagger_ui_redirect",
+      "typed": false,
+      "group": "framework",
+      "parameters": {},
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/redoc",
+      "name": "redoc_html",
+      "endpoint": "framework.redoc_html",
+      "typed": false,
+      "group": "framework",
+      "parameters": {},
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "HEAD",
+      "path": "/redoc",
+      "name": "redoc_html",
+      "endpoint": "framework.redoc_html",
+      "typed": false,
+      "group": "framework",
+      "parameters": {},
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/ready",
+      "name": "ready",
+      "endpoint": "main.ready",
+      "typed": false,
+      "group": "framework",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/health",
+      "name": "health",
+      "endpoint": "main.health",
+      "typed": false,
+      "group": "framework",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/me",
+      "name": "me",
+      "endpoint": "api.auth.me",
+      "typed": false,
+      "group": "reads_calc",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/clients/{client_id}/packages",
+      "name": "create_claim_package",
+      "endpoint": "api.artifacts.create_claim_package",
+      "typed": false,
+      "group": "claims_artifacts_rules",
+      "parameters": {
+        "path": [
+          {
+            "name": "client_id",
+            "required": true,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "title": "Client Id"
+            }
+          }
+        ],
+        "query": [
+          {
+            "name": "tax_year",
+            "required": true,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "title": "Tax Year"
+            }
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/clients/{client_id}/artifacts/{artifact_id}",
+      "name": "download_artifact",
+      "endpoint": "api.artifacts.download_artifact",
+      "typed": false,
+      "group": "claims_artifacts_rules",
+      "parameters": {
+        "path": [
+          {
+            "name": "client_id",
+            "required": true,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "title": "Client Id"
+            }
+          },
+          {
+            "name": "artifact_id",
+            "required": true,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "title": "Artifact Id"
+            }
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/audit/channel",
+      "name": "channel_audit",
+      "endpoint": "api.audit.channel_audit",
+      "typed": false,
+      "group": "claims_artifacts_rules",
+      "parameters": {
+        "path": [],
+        "query": [
+          {
+            "name": "user_oid",
+            "required": true,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Entra object id of the user",
+              "title": "User Oid"
+            }
+          },
+          {
+            "name": "since",
+            "required": false,
+            "annotation": "datetime.datetime | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Since"
+            }
+          },
+          {
+            "name": "until",
+            "required": false,
+            "annotation": "datetime.datetime | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Until"
+            }
+          },
+          {
+            "name": "tool",
+            "required": false,
+            "annotation": "str | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Tool"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "default": 200,
+              "title": "Limit"
+            }
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/capabilities",
+      "name": "list_capabilities",
+      "endpoint": "api.capabilities.list_capabilities",
+      "typed": false,
+      "group": "ai",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/capabilities/{tool}",
+      "name": "run_capability",
+      "endpoint": "api.capabilities.run_capability",
+      "typed": false,
+      "group": "ai",
+      "parameters": {
+        "path": [
+          {
+            "name": "tool",
+            "required": true,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "title": "Tool"
+            }
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/CapabilityCall"
+          }
+        }
+      },
+      "body_required": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/chat",
+      "name": "chat",
+      "endpoint": "api.chat.chat",
+      "typed": false,
+      "group": "ai",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/ChatRequest"
+          }
+        }
+      },
+      "body_required": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/claims/coverage/{client_id}",
+      "name": "client_coverage",
+      "endpoint": "api.claims.client_coverage",
+      "typed": false,
+      "group": "claims_artifacts_rules",
+      "parameters": {
+        "path": [
+          {
+            "name": "client_id",
+            "required": true,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "title": "Client Id"
+            }
+          }
+        ],
+        "query": [
+          {
+            "name": "program_code",
+            "required": false,
+            "annotation": "str | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Program Code"
+            }
+          },
+          {
+            "name": "tax_year",
+            "required": false,
+            "annotation": "int | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Tax Year"
+            }
+          },
+          {
+            "name": "tax_years",
+            "required": false,
+            "annotation": "list[int] | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Tax Years"
+            }
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/claims/coverage",
+      "name": "portfolio_coverage",
+      "endpoint": "api.claims.portfolio_coverage",
+      "typed": false,
+      "group": "claims_artifacts_rules",
+      "parameters": {
+        "path": [],
+        "query": [
+          {
+            "name": "tax_year",
+            "required": false,
+            "annotation": "int | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Tax Year"
+            }
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/claims/cell/{client_id}/{program_code}/{tax_year}",
+      "name": "cell_history",
+      "endpoint": "api.claims.cell_history",
+      "typed": false,
+      "group": "claims_artifacts_rules",
+      "parameters": {
+        "path": [
+          {
+            "name": "client_id",
+            "required": true,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "title": "Client Id"
+            }
+          },
+          {
+            "name": "program_code",
+            "required": true,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "title": "Program Code"
+            }
+          },
+          {
+            "name": "tax_year",
+            "required": true,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "title": "Tax Year"
+            }
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/claims",
+      "name": "record_claim",
+      "endpoint": "api.claims.record_claim",
+      "typed": false,
+      "group": "claims_artifacts_rules",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/RecordClaimBody"
+          }
+        }
+      },
+      "body_required": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/claims/cell/{client_id}/{program_code}/{tax_year}/transition",
+      "name": "transition_cell",
+      "endpoint": "api.claims.transition_cell",
+      "typed": false,
+      "group": "claims_artifacts_rules",
+      "parameters": {
+        "path": [
+          {
+            "name": "client_id",
+            "required": true,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "title": "Client Id"
+            }
+          },
+          {
+            "name": "program_code",
+            "required": true,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "title": "Program Code"
+            }
+          },
+          {
+            "name": "tax_year",
+            "required": true,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "title": "Tax Year"
+            }
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/TransitionBody"
+          }
+        }
+      },
+      "body_required": true
+    },
+    {
+      "method": "PUT",
+      "path": "/api/claims/engagement",
+      "name": "set_engagement",
+      "endpoint": "api.claims.set_engagement",
+      "typed": false,
+      "group": "claims_artifacts_rules",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/EngagementBody"
+          }
+        }
+      },
+      "body_required": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/claims/assess",
+      "name": "assess",
+      "endpoint": "api.claims.assess",
+      "typed": false,
+      "group": "claims_artifacts_rules",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/AssessBody"
+          }
+        }
+      },
+      "body_required": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/claims/lifecycle",
+      "name": "lifecycle",
+      "endpoint": "api.claims.lifecycle",
+      "typed": false,
+      "group": "claims_artifacts_rules",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/portfolio",
+      "name": "portfolio_v2",
+      "endpoint": "api.claims.portfolio_v2",
+      "typed": false,
+      "group": "claims_artifacts_rules",
+      "parameters": {
+        "path": [],
+        "query": [
+          {
+            "name": "year",
+            "required": false,
+            "annotation": "int | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Year"
+            }
+          },
+          {
+            "name": "program",
+            "required": false,
+            "annotation": "str | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Program"
+            }
+          },
+          {
+            "name": "outcome",
+            "required": false,
+            "annotation": "str | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Outcome"
+            }
+          },
+          {
+            "name": "scope",
+            "required": false,
+            "annotation": "str | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Scope"
+            }
+          },
+          {
+            "name": "near",
+            "required": false,
+            "annotation": "bool | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Near"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "annotation": "str | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "default": "priority",
+              "title": "Sort"
+            }
+          },
+          {
+            "name": "order",
+            "required": false,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "default": "asc",
+              "title": "Order"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 25,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/clients/{client_id}/situation",
+      "name": "client_situation",
+      "endpoint": "api.claims.client_situation",
+      "typed": false,
+      "group": "claims_artifacts_rules",
+      "parameters": {
+        "path": [
+          {
+            "name": "client_id",
+            "required": true,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "title": "Client Id"
+            }
+          }
+        ],
+        "query": [
+          {
+            "name": "year",
+            "required": false,
+            "annotation": "int | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Year"
+            }
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/eligibility/{tax_year}",
+      "name": "eligibility",
+      "endpoint": "api.eligibility.eligibility",
+      "typed": false,
+      "group": "reads_calc",
+      "parameters": {
+        "path": [
+          {
+            "name": "tax_year",
+            "required": true,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "title": "Tax Year"
+            }
+          }
+        ],
+        "query": [
+          {
+            "name": "state",
+            "required": true,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "description": "Two-letter state code, e.g. GA",
+              "title": "State"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "description": "all | both | min_max_only | pay_period_only | neither",
+              "default": "all",
+              "title": "Status"
+            }
+          },
+          {
+            "name": "near_floor",
+            "required": false,
+            "annotation": "bool",
+            "schema": {
+              "type": "boolean",
+              "description": "Only employees within 5% of a floor",
+              "default": false,
+              "title": "Near Floor"
+            }
+          },
+          {
+            "name": "q",
+            "required": false,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "description": "Employee id substring",
+              "default": "",
+              "title": "Q"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "description": "column to order by, before paging",
+              "default": "employee_id",
+              "title": "Sort"
+            }
+          },
+          {
+            "name": "order",
+            "required": false,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "description": "asc | desc",
+              "default": "asc",
+              "title": "Order"
+            }
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/rules",
+      "name": "rules",
+      "endpoint": "api.rules.rules",
+      "typed": false,
+      "group": "claims_artifacts_rules",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/rules/{code}/verify",
+      "name": "verify_rule_pack",
+      "endpoint": "api.rules.verify_rule_pack",
+      "typed": false,
+      "group": "claims_artifacts_rules",
+      "parameters": {
+        "path": [
+          {
+            "name": "code",
+            "required": true,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "title": "Code"
+            }
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/RuleVerificationRequest"
+          }
+        }
+      },
+      "body_required": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/progress/{tax_year}",
+      "name": "in_year_progress",
+      "endpoint": "api.forecast.in_year_progress",
+      "typed": false,
+      "group": "reads_calc",
+      "parameters": {
+        "path": [
+          {
+            "name": "tax_year",
+            "required": true,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "title": "Tax Year"
+            }
+          }
+        ],
+        "query": [
+          {
+            "name": "state",
+            "required": true,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "title": "State"
+            }
+          },
+          {
+            "name": "as_of",
+            "required": false,
+            "annotation": "str | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "As Of"
+            }
+          },
+          {
+            "name": "account_id",
+            "required": false,
+            "annotation": "int | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Account Id"
+            }
+          },
+          {
+            "name": "within",
+            "required": false,
+            "annotation": "float",
+            "schema": {
+              "type": "number",
+              "default": 5.0,
+              "title": "Within"
+            }
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/forecast/{tax_year}",
+      "name": "forecast",
+      "endpoint": "api.forecast.forecast",
+      "typed": false,
+      "group": "reads_calc",
+      "parameters": {
+        "path": [
+          {
+            "name": "tax_year",
+            "required": true,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "title": "Tax Year"
+            }
+          }
+        ],
+        "query": [
+          {
+            "name": "state",
+            "required": false,
+            "annotation": "str | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "State"
+            }
+          },
+          {
+            "name": "as_of",
+            "required": false,
+            "annotation": "str | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "As Of"
+            }
+          },
+          {
+            "name": "account_id",
+            "required": false,
+            "annotation": "int | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Account Id"
+            }
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/alerts/monthly/{tax_year}",
+      "name": "monthly_alerts",
+      "endpoint": "api.forecast.monthly_alerts",
+      "typed": false,
+      "group": "reads_calc",
+      "parameters": {
+        "path": [
+          {
+            "name": "tax_year",
+            "required": true,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "title": "Tax Year"
+            }
+          }
+        ],
+        "query": [
+          {
+            "name": "state",
+            "required": false,
+            "annotation": "str | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "State"
+            }
+          },
+          {
+            "name": "account_id",
+            "required": false,
+            "annotation": "int | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Account Id"
+            }
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/triggers",
+      "name": "triggers",
+      "endpoint": "api.forecast.triggers",
+      "typed": false,
+      "group": "reads_calc",
+      "parameters": {
+        "path": [],
+        "query": [
+          {
+            "name": "account_id",
+            "required": false,
+            "annotation": "int | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Account Id"
+            }
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/performance/{tax_year}",
+      "name": "performance_dashboard",
+      "endpoint": "api.forecast.performance_dashboard",
+      "typed": false,
+      "group": "reads_calc",
+      "parameters": {
+        "path": [
+          {
+            "name": "tax_year",
+            "required": true,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "title": "Tax Year"
+            }
+          }
+        ],
+        "query": [
+          {
+            "name": "state",
+            "required": false,
+            "annotation": "str | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "State"
+            }
+          },
+          {
+            "name": "worksite",
+            "required": false,
+            "annotation": "str | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Worksite"
+            }
+          },
+          {
+            "name": "account_id",
+            "required": false,
+            "annotation": "int | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Account Id"
+            }
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/onezero/matrix/{tax_year}",
+      "name": "onezero_matrix",
+      "endpoint": "api.onezero.onezero_matrix",
+      "typed": false,
+      "group": "reads_calc",
+      "parameters": {
+        "path": [
+          {
+            "name": "tax_year",
+            "required": true,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "title": "Tax Year"
+            }
+          }
+        ],
+        "query": [
+          {
+            "name": "state",
+            "required": false,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "description": "Two-letter state code",
+              "default": "GA",
+              "title": "State"
+            }
+          },
+          {
+            "name": "method",
+            "required": false,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "description": "min_max | pay_period",
+              "default": "min_max",
+              "title": "Method"
+            }
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/onezero/{tax_year}",
+      "name": "one_zero",
+      "endpoint": "api.onezero.one_zero",
+      "typed": false,
+      "group": "reads_calc",
+      "parameters": {
+        "path": [
+          {
+            "name": "tax_year",
+            "required": true,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "title": "Tax Year"
+            }
+          }
+        ],
+        "query": [
+          {
+            "name": "state",
+            "required": false,
+            "annotation": "str | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "State"
+            }
+          },
+          {
+            "name": "method",
+            "required": false,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "default": "both",
+              "title": "Method"
+            }
+          },
+          {
+            "name": "fein",
+            "required": false,
+            "annotation": "str | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Fein"
+            }
+          },
+          {
+            "name": "account_id",
+            "required": false,
+            "annotation": "int | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Account Id"
+            }
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/onezero/{tax_year}/employee/{employee_id}",
+      "name": "one_zero_employee",
+      "endpoint": "api.onezero.one_zero_employee",
+      "typed": false,
+      "group": "reads_calc",
+      "parameters": {
+        "path": [
+          {
+            "name": "tax_year",
+            "required": true,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "title": "Tax Year"
+            }
+          },
+          {
+            "name": "employee_id",
+            "required": true,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "title": "Employee Id"
+            }
+          }
+        ],
+        "query": [
+          {
+            "name": "state",
+            "required": false,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "default": "GA",
+              "title": "State"
+            }
+          },
+          {
+            "name": "account_id",
+            "required": false,
+            "annotation": "int | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Account Id"
+            }
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/onezero/employee/{employee_id}/review",
+      "name": "review_employee",
+      "endpoint": "api.onezero.review_employee",
+      "typed": false,
+      "group": "reads_calc",
+      "parameters": {
+        "path": [
+          {
+            "name": "employee_id",
+            "required": true,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "title": "Employee Id"
+            }
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/EmployeeReviewRequest"
+          }
+        }
+      },
+      "body_required": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/designations/{state}",
+      "name": "designations",
+      "endpoint": "api.onezero.designations",
+      "typed": false,
+      "group": "reads_calc",
+      "parameters": {
+        "path": [
+          {
+            "name": "state",
+            "required": true,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "title": "State"
+            }
+          }
+        ],
+        "query": [
+          {
+            "name": "tax_year",
+            "required": false,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "default": 2025,
+              "title": "Tax Year"
+            }
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/reconcile/{tax_year}",
+      "name": "reconcile_endpoint",
+      "endpoint": "api.onezero.reconcile_endpoint",
+      "typed": false,
+      "group": "reads_calc",
+      "parameters": {
+        "path": [
+          {
+            "name": "tax_year",
+            "required": true,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "title": "Tax Year"
+            }
+          }
+        ],
+        "query": [
+          {
+            "name": "account_id",
+            "required": false,
+            "annotation": "int | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Account Id"
+            }
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/qc/{tax_year}",
+      "name": "qc_exception_report",
+      "endpoint": "api.onezero.qc_exception_report",
+      "typed": false,
+      "group": "reads_calc",
+      "parameters": {
+        "path": [
+          {
+            "name": "tax_year",
+            "required": true,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "title": "Tax Year"
+            }
+          }
+        ],
+        "query": [
+          {
+            "name": "state",
+            "required": false,
+            "annotation": "str | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "State"
+            }
+          },
+          {
+            "name": "min_wages",
+            "required": false,
+            "annotation": "float",
+            "schema": {
+              "type": "number",
+              "default": 50.0,
+              "title": "Min Wages"
+            }
+          },
+          {
+            "name": "min_hours",
+            "required": false,
+            "annotation": "float",
+            "schema": {
+              "type": "number",
+              "default": 4.0,
+              "title": "Min Hours"
+            }
+          },
+          {
+            "name": "account_id",
+            "required": false,
+            "annotation": "int | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Account Id"
+            }
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/onezero/retroactive/scan",
+      "name": "one_zero_retroactive_scan",
+      "endpoint": "api.retroactive.one_zero_retroactive_scan",
+      "typed": false,
+      "group": "reads_calc",
+      "parameters": {
+        "path": [],
+        "query": [
+          {
+            "name": "account_id",
+            "required": false,
+            "annotation": "int | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Account Id"
+            }
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/rules/ingested/{state}",
+      "name": "ingested_rules",
+      "endpoint": "api.rules_ingestion.ingested_rules",
+      "typed": false,
+      "group": "claims_artifacts_rules",
+      "parameters": {
+        "path": [
+          {
+            "name": "state",
+            "required": true,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "title": "State"
+            }
+          }
+        ],
+        "query": [
+          {
+            "name": "tax_year",
+            "required": false,
+            "annotation": "int | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Tax Year"
+            }
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/rules/ingested/{state}/refresh",
+      "name": "refresh_ingested_rules",
+      "endpoint": "api.rules_ingestion.refresh_ingested_rules",
+      "typed": false,
+      "group": "claims_artifacts_rules",
+      "parameters": {
+        "path": [
+          {
+            "name": "state",
+            "required": true,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "title": "State"
+            }
+          }
+        ],
+        "query": [
+          {
+            "name": "live",
+            "required": false,
+            "annotation": "bool",
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Live"
+            }
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/rules/ingested/{state}/proposals",
+      "name": "ingestion_proposals",
+      "endpoint": "api.rules_ingestion.ingestion_proposals",
+      "typed": false,
+      "group": "claims_artifacts_rules",
+      "parameters": {
+        "path": [
+          {
+            "name": "state",
+            "required": true,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "title": "State"
+            }
+          }
+        ],
+        "query": [
+          {
+            "name": "tax_year",
+            "required": false,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "default": 2025,
+              "title": "Tax Year"
+            }
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/rules/ingested/{state}/apply",
+      "name": "apply_ingested_ruleset",
+      "endpoint": "api.rules_ingestion.apply_ingested_ruleset",
+      "typed": false,
+      "group": "claims_artifacts_rules",
+      "parameters": {
+        "path": [
+          {
+            "name": "state",
+            "required": true,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "title": "State"
+            }
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/ApplyRulesetRequest"
+          }
+        }
+      },
+      "body_required": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/rules/ingested/{state}/changelog",
+      "name": "ingestion_changelog",
+      "endpoint": "api.rules_ingestion.ingestion_changelog",
+      "typed": false,
+      "group": "claims_artifacts_rules",
+      "parameters": {
+        "path": [
+          {
+            "name": "state",
+            "required": true,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "title": "State"
+            }
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/simulate/portfolio/{tax_year}",
+      "name": "simulate_portfolio",
+      "endpoint": "api.simulate.simulate_portfolio",
+      "typed": false,
+      "group": "reads_calc",
+      "parameters": {
+        "path": [
+          {
+            "name": "tax_year",
+            "required": true,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "title": "Tax Year"
+            }
+          }
+        ],
+        "query": [
+          {
+            "name": "state",
+            "required": true,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "title": "State"
+            }
+          },
+          {
+            "name": "action",
+            "required": false,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "default": "add_headcount",
+              "title": "Action"
+            }
+          },
+          {
+            "name": "magnitude",
+            "required": false,
+            "annotation": "float",
+            "schema": {
+              "type": "number",
+              "default": 5.0,
+              "title": "Magnitude"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "program_code",
+            "required": false,
+            "annotation": "str | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Program Code"
+            }
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/simulate/unit",
+      "name": "run_unit_simulation",
+      "endpoint": "api.simulate.run_unit_simulation",
+      "typed": false,
+      "group": "reads_calc",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/UnitSimulateRequest"
+          }
+        }
+      },
+      "body_required": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/simulate/employee",
+      "name": "run_employee_simulation",
+      "endpoint": "api.simulate.run_employee_simulation",
+      "typed": false,
+      "group": "reads_calc",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/EmployeeSimulateRequest"
+          }
+        }
+      },
+      "body_required": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/simulate/onezero",
+      "name": "run_onezero_simulation",
+      "endpoint": "api.simulate.run_onezero_simulation",
+      "typed": false,
+      "group": "reads_calc",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/OneZeroSimulateRequest"
+          }
+        }
+      },
+      "body_required": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/summary",
+      "name": "page_summary",
+      "endpoint": "api.summary.page_summary",
+      "typed": false,
+      "group": "ai",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/SummaryRequest"
+          }
+        }
+      },
+      "body_required": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/ingestion/{tax_year}",
+      "name": "ingestion_overview",
+      "endpoint": "api.ingestion.ingestion_overview",
+      "typed": false,
+      "group": "reads_calc",
+      "parameters": {
+        "path": [
+          {
+            "name": "tax_year",
+            "required": true,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "title": "Tax Year"
+            }
+          }
+        ],
+        "query": [
+          {
+            "name": "state",
+            "required": false,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "default": "GA",
+              "title": "State"
+            }
+          },
+          {
+            "name": "account_id",
+            "required": false,
+            "annotation": "int | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Account Id"
+            }
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/ingestion/{tax_year}/exceptions/{exception_id}/resolve",
+      "name": "resolve_exception",
+      "endpoint": "api.ingestion.resolve_exception",
+      "typed": false,
+      "group": "reads_calc",
+      "parameters": {
+        "path": [
+          {
+            "name": "tax_year",
+            "required": true,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "title": "Tax Year"
+            }
+          },
+          {
+            "name": "exception_id",
+            "required": true,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "title": "Exception Id"
+            }
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/ResolveExceptionRequest"
+          }
+        }
+      },
+      "body_required": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/ingestion/{tax_year}/rows",
+      "name": "ingestion_rows",
+      "endpoint": "api.ingestion.ingestion_rows",
+      "typed": false,
+      "group": "reads_calc",
+      "parameters": {
+        "path": [
+          {
+            "name": "tax_year",
+            "required": true,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "title": "Tax Year"
+            }
+          }
+        ],
+        "query": [
+          {
+            "name": "state",
+            "required": false,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "default": "GA",
+              "title": "State"
+            }
+          },
+          {
+            "name": "q",
+            "required": false,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "default": "",
+              "title": "Q"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "account_id",
+            "required": false,
+            "annotation": "int | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Account Id"
+            }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "default": "employee",
+              "title": "Sort"
+            }
+          },
+          {
+            "name": "order",
+            "required": false,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "default": "asc",
+              "title": "Order"
+            }
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/findings/{client_id}/{tax_year}",
+      "name": "findings",
+      "endpoint": "api.findings.findings",
+      "typed": false,
+      "group": "claims_artifacts_rules",
+      "parameters": {
+        "path": [
+          {
+            "name": "client_id",
+            "required": true,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "title": "Client Id"
+            }
+          },
+          {
+            "name": "tax_year",
+            "required": true,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "title": "Tax Year"
+            }
+          }
+        ],
+        "query": [
+          {
+            "name": "state",
+            "required": false,
+            "annotation": "str | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "State"
+            }
+          },
+          {
+            "name": "program_code",
+            "required": false,
+            "annotation": "str | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Program Code"
+            }
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/findings/{finding_id}/resolve",
+      "name": "resolve",
+      "endpoint": "api.findings.resolve",
+      "typed": false,
+      "group": "claims_artifacts_rules",
+      "parameters": {
+        "path": [
+          {
+            "name": "finding_id",
+            "required": true,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "title": "Finding Id"
+            }
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/ResolveBody"
+          }
+        }
+      },
+      "body_required": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/findings/{finding_id}/reopen",
+      "name": "reopen",
+      "endpoint": "api.findings.reopen",
+      "typed": false,
+      "group": "claims_artifacts_rules",
+      "parameters": {
+        "path": [
+          {
+            "name": "finding_id",
+            "required": true,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "title": "Finding Id"
+            }
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/ResolveBody"
+          }
+        }
+      },
+      "body_required": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/findings/{client_id}/{finding_id}/history",
+      "name": "history",
+      "endpoint": "api.findings.history",
+      "typed": false,
+      "group": "claims_artifacts_rules",
+      "parameters": {
+        "path": [
+          {
+            "name": "client_id",
+            "required": true,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "title": "Client Id"
+            }
+          },
+          {
+            "name": "finding_id",
+            "required": true,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "title": "Finding Id"
+            }
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/proximity/{tax_year}",
+      "name": "proximity",
+      "endpoint": "api.proximity.proximity",
+      "typed": false,
+      "group": "reads_calc",
+      "parameters": {
+        "path": [
+          {
+            "name": "tax_year",
+            "required": true,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "title": "Tax Year"
+            }
+          }
+        ],
+        "query": [
+          {
+            "name": "state",
+            "required": true,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "description": "Two-letter state code, e.g. GA",
+              "title": "State"
+            }
+          },
+          {
+            "name": "method",
+            "required": false,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "description": "min_max | pay_period",
+              "default": "min_max",
+              "title": "Method"
+            }
+          },
+          {
+            "name": "within",
+            "required": false,
+            "annotation": "float",
+            "schema": {
+              "type": "number",
+              "maximum": 40.0,
+              "minimum": 0.0,
+              "description": "Band, extra hrs/week",
+              "default": 5.0,
+              "title": "Within"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "maximum": 1000,
+              "minimum": 1,
+              "default": 100,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "rest_of_year",
+            "required": false,
+            "annotation": "bool",
+            "schema": {
+              "type": "boolean",
+              "description": "Add what the rest of the year needs",
+              "default": false,
+              "title": "Rest Of Year"
+            }
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/program-drafts",
+      "name": "list_drafts",
+      "endpoint": "api.program_drafts.list_drafts",
+      "typed": true,
+      "group": "drafts_runs",
+      "parameters": {
+        "path": [],
+        "query": [
+          {
+            "name": "status",
+            "required": false,
+            "annotation": "str | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/v2/program-drafts",
+      "name": "create_draft",
+      "endpoint": "api.program_drafts.create_draft",
+      "typed": true,
+      "group": "drafts_runs",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/CreateBody"
+          }
+        }
+      },
+      "body_required": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/program-drafts/{draft_id}",
+      "name": "get_draft",
+      "endpoint": "api.program_drafts.get_draft",
+      "typed": true,
+      "group": "drafts_runs",
+      "parameters": {
+        "path": [
+          {
+            "name": "draft_id",
+            "required": true,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "title": "Draft Id"
+            }
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v2/program-drafts/{draft_id}/documents",
+      "name": "edit_documents",
+      "endpoint": "api.program_drafts.edit_documents",
+      "typed": true,
+      "group": "drafts_runs",
+      "parameters": {
+        "path": [
+          {
+            "name": "draft_id",
+            "required": true,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "title": "Draft Id"
+            }
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/EditBody"
+          }
+        }
+      },
+      "body_required": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/v2/program-drafts/{draft_id}/validate",
+      "name": "validate_draft",
+      "endpoint": "api.program_drafts.validate_draft",
+      "typed": true,
+      "group": "drafts_runs",
+      "parameters": {
+        "path": [
+          {
+            "name": "draft_id",
+            "required": true,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "title": "Draft Id"
+            }
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ActorBody"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Body"
+          }
+        }
+      },
+      "body_required": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/v2/program-drafts/{draft_id}/request-review",
+      "name": "request_review",
+      "endpoint": "api.program_drafts.request_review",
+      "typed": true,
+      "group": "drafts_runs",
+      "parameters": {
+        "path": [
+          {
+            "name": "draft_id",
+            "required": true,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "title": "Draft Id"
+            }
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ActorBody"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Body"
+          }
+        }
+      },
+      "body_required": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/v2/program-drafts/{draft_id}/review",
+      "name": "review_draft",
+      "endpoint": "api.program_drafts.review_draft",
+      "typed": true,
+      "group": "drafts_runs",
+      "parameters": {
+        "path": [
+          {
+            "name": "draft_id",
+            "required": true,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "title": "Draft Id"
+            }
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/ReviewBody"
+          }
+        }
+      },
+      "body_required": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/v2/program-drafts/{draft_id}/preview",
+      "name": "preview_draft",
+      "endpoint": "api.program_drafts.preview_draft",
+      "typed": true,
+      "group": "drafts_runs",
+      "parameters": {
+        "path": [
+          {
+            "name": "draft_id",
+            "required": true,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "title": "Draft Id"
+            }
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PreviewBody"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Body"
+          }
+        }
+      },
+      "body_required": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/v2/program-drafts/{draft_id}/withdraw",
+      "name": "withdraw_draft",
+      "endpoint": "api.program_drafts.withdraw_draft",
+      "typed": true,
+      "group": "drafts_runs",
+      "parameters": {
+        "path": [
+          {
+            "name": "draft_id",
+            "required": true,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "title": "Draft Id"
+            }
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/WithdrawBody"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Body"
+          }
+        }
+      },
+      "body_required": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/v2/program-drafts/{draft_id}/export",
+      "name": "export_draft",
+      "endpoint": "api.program_drafts.export_draft",
+      "typed": false,
+      "group": "drafts_runs",
+      "parameters": {
+        "path": [
+          {
+            "name": "draft_id",
+            "required": true,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "title": "Draft Id"
+            }
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ExportBody"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Body"
+          }
+        }
+      },
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/program-drafts/{draft_id}/export/manifest",
+      "name": "export_manifest",
+      "endpoint": "api.program_drafts.export_manifest",
+      "typed": true,
+      "group": "drafts_runs",
+      "parameters": {
+        "path": [
+          {
+            "name": "draft_id",
+            "required": true,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "title": "Draft Id"
+            }
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/programs",
+      "name": "list_programs",
+      "endpoint": "api.programs.list_programs",
+      "typed": true,
+      "group": "drafts_runs",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/programs/{code}",
+      "name": "get_program",
+      "endpoint": "api.programs.get_program",
+      "typed": true,
+      "group": "drafts_runs",
+      "parameters": {
+        "path": [
+          {
+            "name": "code",
+            "required": true,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "title": "Code"
+            }
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/v2/run-batches",
+      "name": "start_run_batch",
+      "endpoint": "api.run_batches.start_run_batch",
+      "typed": true,
+      "group": "drafts_runs",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/StartBody"
+          }
+        }
+      },
+      "body_required": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/run-batches",
+      "name": "list_run_batches",
+      "endpoint": "api.run_batches.list_run_batches",
+      "typed": true,
+      "group": "drafts_runs",
+      "parameters": {
+        "path": [],
+        "query": [
+          {
+            "name": "limit",
+            "required": false,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 25,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "annotation": "str | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/run-batches/{batch_id}",
+      "name": "get_run_batch",
+      "endpoint": "api.run_batches.get_run_batch",
+      "typed": true,
+      "group": "drafts_runs",
+      "parameters": {
+        "path": [
+          {
+            "name": "batch_id",
+            "required": true,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "title": "Batch Id"
+            }
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/run-batches/{batch_id}/items",
+      "name": "list_run_batch_items",
+      "endpoint": "api.run_batches.list_run_batch_items",
+      "typed": true,
+      "group": "drafts_runs",
+      "parameters": {
+        "path": [
+          {
+            "name": "batch_id",
+            "required": true,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "title": "Batch Id"
+            }
+          }
+        ],
+        "query": [
+          {
+            "name": "status",
+            "required": false,
+            "annotation": "str | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/v2/run-batches/{batch_id}/cancel",
+      "name": "cancel_run_batch",
+      "endpoint": "api.run_batches.cancel_run_batch",
+      "typed": true,
+      "group": "drafts_runs",
+      "parameters": {
+        "path": [
+          {
+            "name": "batch_id",
+            "required": true,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "title": "Batch Id"
+            }
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/v2/run-batches/{batch_id}/retry-failed",
+      "name": "retry_failed_items",
+      "endpoint": "api.run_batches.retry_failed_items",
+      "typed": true,
+      "group": "drafts_runs",
+      "parameters": {
+        "path": [
+          {
+            "name": "batch_id",
+            "required": true,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "title": "Batch Id"
+            }
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/scope",
+      "name": "scope_options",
+      "endpoint": "api.scope.scope_options",
+      "typed": false,
+      "group": "reads_calc",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/scope/client/{account_id}",
+      "name": "client_scope",
+      "endpoint": "api.scope.client_scope",
+      "typed": false,
+      "group": "reads_calc",
+      "parameters": {
+        "path": [
+          {
+            "name": "account_id",
+            "required": true,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "title": "Account Id"
+            }
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/clients/{client_id}/units",
+      "name": "v2_client_units",
+      "endpoint": "api.trend.v2_client_units",
+      "typed": false,
+      "group": "reads_calc",
+      "parameters": {
+        "path": [
+          {
+            "name": "client_id",
+            "required": true,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "title": "Client Id"
+            }
+          }
+        ],
+        "query": [
+          {
+            "name": "year",
+            "required": false,
+            "annotation": "int | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "tax year to read",
+              "title": "Year"
+            }
+          },
+          {
+            "name": "state",
+            "required": false,
+            "annotation": "str | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "optional state override",
+              "title": "State"
+            }
+          },
+          {
+            "name": "method",
+            "required": false,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "description": "min_max | pay_period",
+              "default": "min_max",
+              "title": "Method"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 25,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "program_code",
+            "required": false,
+            "annotation": "str | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Program; a client run for several needs it, else its rows mix",
+              "title": "Program Code"
+            }
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/v2/clients/{client_id}/units/{unit_id}/base-year",
+      "name": "set_client_unit_base_year",
+      "endpoint": "api.trend.set_client_unit_base_year",
+      "typed": false,
+      "group": "drafts_runs",
+      "parameters": {
+        "path": [
+          {
+            "name": "client_id",
+            "required": true,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "title": "Client Id"
+            }
+          },
+          {
+            "name": "unit_id",
+            "required": true,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "title": "Unit Id"
+            }
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/BaseYearRequest"
+          }
+        }
+      },
+      "body_required": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/clients/{client_id}/units/{unit_id}/rebase",
+      "name": "rebase_client_unit",
+      "endpoint": "api.trend.rebase_client_unit",
+      "typed": false,
+      "group": "drafts_runs",
+      "parameters": {
+        "path": [
+          {
+            "name": "client_id",
+            "required": true,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "title": "Client Id"
+            }
+          },
+          {
+            "name": "unit_id",
+            "required": true,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "title": "Unit Id"
+            }
+          }
+        ],
+        "query": [
+          {
+            "name": "base_year",
+            "required": true,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "description": "The base year the reader chose",
+              "title": "Base Year"
+            }
+          },
+          {
+            "name": "method",
+            "required": false,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "default": "min_max",
+              "title": "Method"
+            }
+          },
+          {
+            "name": "state",
+            "required": false,
+            "annotation": "str | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "State"
+            }
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/clients/{client_id}/units/{unit_id}",
+      "name": "v2_client_unit_detail",
+      "endpoint": "api.trend.v2_client_unit_detail",
+      "typed": false,
+      "group": "reads_calc",
+      "parameters": {
+        "path": [
+          {
+            "name": "client_id",
+            "required": true,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "title": "Client Id"
+            }
+          },
+          {
+            "name": "unit_id",
+            "required": true,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "title": "Unit Id"
+            }
+          }
+        ],
+        "query": [
+          {
+            "name": "year",
+            "required": true,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "description": "tax year to read",
+              "title": "Year"
+            }
+          },
+          {
+            "name": "month",
+            "required": false,
+            "annotation": "int | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "1-based month index",
+              "title": "Month"
+            }
+          },
+          {
+            "name": "state",
+            "required": false,
+            "annotation": "str | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "optional state override",
+              "title": "State"
+            }
+          },
+          {
+            "name": "method",
+            "required": false,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "description": "min_max | pay_period",
+              "default": "min_max",
+              "title": "Method"
+            }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "description": "avg_weekly_hours | avg_weekly_wages | employee_id",
+              "default": "avg_weekly_hours",
+              "title": "Sort"
+            }
+          },
+          {
+            "name": "order",
+            "required": false,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "description": "asc | desc",
+              "default": "desc",
+              "title": "Order"
+            }
+          },
+          {
+            "name": "near_min_hours",
+            "required": false,
+            "annotation": "float | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Narrow the near-threshold cohort to employees at or above this many weekly hours. An ABSOLUTE figure: the caller subtracts the band it wants from the statutory minimum this endpoint already returns in `thresholds`, so no jurisdiction's floor is baked into the query.",
+              "title": "Near Min Hours"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "annotation": "int | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "cap rows per cohort",
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "filter",
+            "required": false,
+            "annotation": "str | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Narrow the counted cohort, as `col:expr;col:expr`. Compiled into SQL against a whitelist, so 10,236 employees are never fetched to be discarded in Python. Terms that do not parse are dropped and reported back in `filters_applied` rather than silently matching everything.",
+              "title": "Filter"
+            }
+          },
+          {
+            "name": "near_filter",
+            "required": false,
+            "annotation": "str | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "The same grammar over the near-threshold cohort. SEPARATE from `filter` because the two are different questions about different populations: one narrowing must not move the other's count under a tab nobody is looking at.",
+              "title": "Near Filter"
+            }
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/employees/{record_token}",
+      "name": "v2_employee_detail",
+      "endpoint": "api.trend.v2_employee_detail",
+      "typed": false,
+      "group": "reads_calc",
+      "parameters": {
+        "path": [
+          {
+            "name": "record_token",
+            "required": true,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "title": "Record Token"
+            }
+          }
+        ],
+        "query": [
+          {
+            "name": "client_id",
+            "required": false,
+            "annotation": "int | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "client scope",
+              "title": "Client Id"
+            }
+          },
+          {
+            "name": "year",
+            "required": false,
+            "annotation": "int | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "tax year",
+              "title": "Year"
+            }
+          },
+          {
+            "name": "state",
+            "required": false,
+            "annotation": "str | None",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "optional state override",
+              "title": "State"
+            }
+          },
+          {
+            "name": "method",
+            "required": false,
+            "annotation": "str",
+            "schema": {
+              "type": "string",
+              "description": "min_max | pay_period",
+              "default": "min_max",
+              "title": "Method"
+            }
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/v2/clients/{client_id}/runs",
+      "name": "create_client_run",
+      "endpoint": "api.trend.create_client_run",
+      "typed": false,
+      "group": "drafts_runs",
+      "parameters": {
+        "path": [
+          {
+            "name": "client_id",
+            "required": true,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "title": "Client Id"
+            }
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/ClientRunRequest"
+          }
+        }
+      },
+      "body_required": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/v2/clients/{client_id}/runs/latest",
+      "name": "latest_client_run",
+      "endpoint": "api.trend.latest_client_run",
+      "typed": false,
+      "group": "drafts_runs",
+      "parameters": {
+        "path": [
+          {
+            "name": "client_id",
+            "required": true,
+            "annotation": "int",
+            "schema": {
+              "type": "integer",
+              "title": "Client Id"
+            }
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/employee/drill",
+      "name": "employee_drill",
+      "endpoint": "api.trend.employee_drill",
+      "typed": false,
+      "group": "reads_calc",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/EmployeeDrillRequest"
+          }
+        }
+      },
+      "body_required": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/workspace",
+      "name": "workspace_summary",
+      "endpoint": "api.workspace.workspace_summary",
+      "typed": false,
+      "group": "workspace_sealed",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/workspace/refresh",
+      "name": "refresh_workspace",
+      "endpoint": "api.workspace.refresh_workspace",
+      "typed": false,
+      "group": "workspace_sealed",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/workspace/source/search",
+      "name": "search_source",
+      "endpoint": "api.workspace.search_source",
+      "typed": false,
+      "group": "workspace_sealed",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/SearchRequest"
+          }
+        }
+      },
+      "body_required": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/workspace/eligibility/search",
+      "name": "search_eligibility",
+      "endpoint": "api.workspace.search_eligibility",
+      "typed": false,
+      "group": "workspace_sealed",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/EligibilitySearchRequest"
+          }
+        }
+      },
+      "body_required": true
+    },
+    {
+      "method": "POST",
+      "path": "/api/workspace/employee",
+      "name": "employee_drill",
+      "endpoint": "api.workspace.employee_drill",
+      "typed": false,
+      "group": "workspace_sealed",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/EmployeeRequest"
+          }
+        }
+      },
+      "body_required": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/workspace/onezero/{method}",
+      "name": "onezero_summary",
+      "endpoint": "api.workspace.onezero_summary",
+      "typed": false,
+      "group": "workspace_sealed",
+      "parameters": {
+        "path": [
+          {
+            "name": "method",
+            "required": true,
+            "annotation": "Literal['min_max', 'pay_period']",
+            "schema": {
+              "enum": [
+                "min_max",
+                "pay_period"
+              ],
+              "type": "string",
+              "title": "Method"
+            }
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/workspace/onezero/contributors",
+      "name": "onezero_contributors",
+      "endpoint": "api.workspace.onezero_contributors",
+      "typed": false,
+      "group": "workspace_sealed",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/ContributorRequest"
+          }
+        }
+      },
+      "body_required": true
+    },
+    {
+      "method": "GET",
+      "path": "/api/workspace/calculation-walk",
+      "name": "calculation_walk",
+      "endpoint": "api.workspace.calculation_walk",
+      "typed": false,
+      "group": "workspace_sealed",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/workspace/assumptions",
+      "name": "assumptions",
+      "endpoint": "api.workspace.assumptions",
+      "typed": false,
+      "group": "workspace_sealed",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/api/workspace/comparison",
+      "name": "comparison",
+      "endpoint": "api.workspace.comparison",
+      "typed": false,
+      "group": "workspace_sealed",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "POST",
+      "path": "/api/workspace/comparison/stage",
+      "name": "comparison_stage",
+      "endpoint": "api.workspace.comparison_stage",
+      "typed": false,
+      "group": "workspace_sealed",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/ComparisonStageRequest"
+          }
+        }
+      },
+      "body_required": true
+    },
+    {
+      "method": "GET",
+      "path": "/channel/health",
+      "name": "health",
+      "endpoint": "gateway.health",
+      "typed": false,
+      "group": "gateway",
+      "parameters": {},
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/channel/ready",
+      "name": "ready",
+      "endpoint": "gateway.ready",
+      "typed": false,
+      "group": "gateway",
+      "parameters": {},
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/channel/v1/tools",
+      "name": "tools",
+      "endpoint": "gateway.tools",
+      "typed": false,
+      "group": "gateway",
+      "parameters": {},
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "POST",
+      "path": "/channel/v1/tools/{tool}",
+      "name": "run_tool",
+      "endpoint": "gateway.run_tool",
+      "typed": false,
+      "group": "gateway",
+      "parameters": {},
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "POST",
+      "path": "/channel/v1/audit/narration",
+      "name": "audit_narration",
+      "endpoint": "gateway.audit_narration",
+      "typed": false,
+      "group": "gateway",
+      "parameters": {},
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/channel/v1/downloads/{ticket}",
+      "name": "download",
+      "endpoint": "gateway.download",
+      "typed": false,
+      "group": "gateway",
+      "parameters": {},
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "POST",
+      "path": "/mcp",
+      "name": "mcp_post",
+      "endpoint": "gateway.mcp_post",
+      "typed": false,
+      "group": "gateway",
+      "parameters": {},
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "GET",
+      "path": "/mcp",
+      "name": "mcp_get",
+      "endpoint": "gateway.mcp_get",
+      "typed": false,
+      "group": "gateway",
+      "parameters": {},
+      "request_body_schema": {},
+      "body_required": false
+    },
+    {
+      "method": "DELETE",
+      "path": "/mcp",
+      "name": "mcp_delete",
+      "endpoint": "gateway.mcp_delete",
+      "typed": false,
+      "group": "gateway",
+      "parameters": {},
+      "request_body_schema": {},
+      "body_required": false
+    }
+  ],
+  "schemas": {
+    "ActorBody": {
+      "properties": {
+        "actor": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 256
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Actor"
+        }
+      },
+      "type": "object",
+      "title": "ActorBody",
+      "description": "A request with no fields of its own."
+    },
+    "ApplyRulesetRequest": {
+      "properties": {
+        "tax_year": {
+          "type": "integer",
+          "title": "Tax Year"
+        },
+        "confirmed_by": {
+          "type": "string",
+          "title": "Confirmed By",
+          "default": "Tax practitioner"
+        },
+        "note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Note"
+        }
+      },
+      "type": "object",
+      "required": [
+        "tax_year"
+      ],
+      "title": "ApplyRulesetRequest",
+      "description": "[CALC-11 / GOV-01] Confirm + apply a year's ingested rulebook."
+    },
+    "AssessBody": {
+      "properties": {
+        "client_id": {
+          "type": "integer",
+          "title": "Client Id"
+        },
+        "program_code": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Program Code"
+        },
+        "tax_years": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "integer"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Tax Years"
+        },
+        "assessed_by": {
+          "type": "string",
+          "minLength": 1,
+          "title": "Assessed By",
+          "default": "engine"
+        }
+      },
+      "type": "object",
+      "required": [
+        "client_id"
+      ],
+      "title": "AssessBody",
+      "description": "Run the engine over a client and record what it computes."
+    },
+    "BaseYearRequest": {
+      "properties": {
+        "base_year": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Base Year"
+        },
+        "state": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "State"
+        },
+        "program_code": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Program Code"
+        },
+        "justification": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 2000
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Justification"
+        },
+        "triggered_by": {
+          "type": "string",
+          "title": "Triggered By",
+          "default": "system"
+        }
+      },
+      "type": "object",
+      "title": "BaseYearRequest",
+      "description": "Save (or, with null, clear) a location's base year."
+    },
+    "BatchOut": {
+      "properties": {
+        "batch_id": {
+          "type": "string",
+          "title": "Batch Id"
+        },
+        "kind": {
+          "type": "string",
+          "title": "Kind"
+        },
+        "scope_kind": {
+          "type": "string",
+          "title": "Scope Kind"
+        },
+        "scope_spec": {
+          "additionalProperties": true,
+          "type": "object",
+          "title": "Scope Spec"
+        },
+        "program_code": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Program Code"
+        },
+        "tax_years": {
+          "items": {
+            "type": "integer"
+          },
+          "type": "array",
+          "title": "Tax Years"
+        },
+        "force": {
+          "type": "boolean",
+          "title": "Force"
+        },
+        "skip_unchanged": {
+          "type": "boolean",
+          "title": "Skip Unchanged",
+          "default": false
+        },
+        "include_code_commit": {
+          "type": "boolean",
+          "title": "Include Code Commit"
+        },
+        "refresh_once": {
+          "type": "boolean",
+          "title": "Refresh Once"
+        },
+        "status": {
+          "type": "string",
+          "title": "Status"
+        },
+        "cancel_requested": {
+          "type": "boolean",
+          "title": "Cancel Requested"
+        },
+        "counts": {
+          "$ref": "#/components/schemas/Counts"
+        },
+        "progress": {
+          "$ref": "#/components/schemas/Progress"
+        },
+        "requested_by": {
+          "type": "string",
+          "title": "Requested By"
+        },
+        "requested_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Requested At"
+        },
+        "started_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Started At"
+        },
+        "finished_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Finished At"
+        },
+        "idempotency_key": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Idempotency Key"
+        },
+        "dry_run_summary": {
+          "additionalProperties": true,
+          "type": "object",
+          "title": "Dry Run Summary"
+        },
+        "idempotent_replay": {
+          "type": "boolean",
+          "title": "Idempotent Replay",
+          "default": false
+        },
+        "degraded": {
+          "items": {
+            "$ref": "#/components/schemas/DegradedEntry"
+          },
+          "type": "array",
+          "title": "Degraded"
+        },
+        "cancelled_now": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Cancelled Now"
+        },
+        "requeued": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Requeued"
+        }
+      },
+      "type": "object",
+      "required": [
+        "batch_id",
+        "kind",
+        "scope_kind",
+        "scope_spec",
+        "program_code",
+        "tax_years",
+        "force",
+        "include_code_commit",
+        "refresh_once",
+        "status",
+        "cancel_requested",
+        "counts",
+        "progress",
+        "requested_by",
+        "requested_at",
+        "started_at",
+        "finished_at",
+        "idempotency_key",
+        "dry_run_summary"
+      ],
+      "title": "BatchOut",
+      "description": "A batch as the portal and the channel read it: status, derived counters and the preview it was started from."
+    },
+    "BatchesPage": {
+      "properties": {
+        "items": {
+          "items": {
+            "$ref": "#/components/schemas/BatchOut"
+          },
+          "type": "array",
+          "title": "Items"
+        },
+        "total": {
+          "type": "integer",
+          "title": "Total"
+        },
+        "limit": {
+          "type": "integer",
+          "title": "Limit"
+        },
+        "offset": {
+          "type": "integer",
+          "title": "Offset"
+        }
+      },
+      "type": "object",
+      "required": [
+        "items",
+        "total",
+        "limit",
+        "offset"
+      ],
+      "title": "BatchesPage",
+      "description": "One page of batches, newest first, with the unfiltered total so a pager can say how many there are."
+    },
+    "CapabilityCall": {
+      "properties": {
+        "args": {
+          "additionalProperties": true,
+          "type": "object",
+          "title": "Args"
+        },
+        "idempotency_key": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 200
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Idempotency Key"
+        },
+        "confirmation_token": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 500
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Confirmation Token"
+        }
+      },
+      "type": "object",
+      "title": "CapabilityCall",
+      "description": "A tool call. The catalog schema validates `args`; the other two serve commits."
+    },
+    "CatalogOut": {
+      "properties": {
+        "programs": {
+          "items": {
+            "$ref": "#/components/schemas/ProgramRow"
+          },
+          "type": "array",
+          "title": "Programs"
+        },
+        "total": {
+          "type": "integer",
+          "title": "Total"
+        },
+        "engagement_available": {
+          "type": "boolean",
+          "title": "Engagement Available"
+        },
+        "verification_note": {
+          "type": "string",
+          "title": "Verification Note"
+        }
+      },
+      "type": "object",
+      "required": [
+        "programs",
+        "total",
+        "engagement_available",
+        "verification_note"
+      ],
+      "title": "CatalogOut",
+      "description": "The catalog: every program, with a note that none is verified."
+    },
+    "ChatRequest": {
+      "properties": {
+        "message": {
+          "type": "string",
+          "title": "Message"
+        },
+        "state": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "State"
+        },
+        "client_id": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Client Id"
+        },
+        "tax_year": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Tax Year"
+        },
+        "method": {
+          "type": "string",
+          "title": "Method",
+          "default": "min_max"
+        },
+        "history": {
+          "items": {
+            "$ref": "#/components/schemas/ChatTurn"
+          },
+          "type": "array",
+          "title": "History",
+          "default": []
+        },
+        "client_confirmed": {
+          "type": "boolean",
+          "title": "Client Confirmed",
+          "default": false
+        }
+      },
+      "type": "object",
+      "required": [
+        "message"
+      ],
+      "title": "ChatRequest"
+    },
+    "ChatTurn": {
+      "properties": {
+        "role": {
+          "type": "string",
+          "title": "Role"
+        },
+        "text": {
+          "type": "string",
+          "title": "Text"
+        }
+      },
+      "type": "object",
+      "required": [
+        "role",
+        "text"
+      ],
+      "title": "ChatTurn"
+    },
+    "ClaimStatus": {
+      "type": "string",
+      "enum": [
+        "not_assessed",
+        "assessed",
+        "proposed",
+        "declined",
+        "claimed",
+        "certified",
+        "amended"
+      ],
+      "title": "ClaimStatus",
+      "description": "Where a client x program x year sits in the claim lifecycle.\n\nnot_assessed -> assessed -> proposed -+-> claimed -> certified\n                                      |                 |\n                                      +-> declined      +-> amended"
+    },
+    "ClientRunRequest": {
+      "properties": {
+        "year": {
+          "type": "integer",
+          "title": "Year"
+        },
+        "state": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "State"
+        },
+        "program_code": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Program Code"
+        },
+        "triggered_by": {
+          "type": "string",
+          "title": "Triggered By",
+          "default": "system"
+        },
+        "assess_years": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "integer"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Assess Years"
+        }
+      },
+      "type": "object",
+      "required": [
+        "year"
+      ],
+      "title": "ClientRunRequest",
+      "description": "Run metadata for one client-year."
+    },
+    "ComparisonStageRequest": {
+      "properties": {
+        "stage": {
+          "type": "string",
+          "enum": [
+            "common_employee_totals",
+            "min_max_eligibility",
+            "pay_period_eligibility",
+            "min_max_onezero_summary",
+            "pay_period_onezero_summary"
+          ],
+          "title": "Stage"
+        }
+      },
+      "type": "object",
+      "required": [
+        "stage"
+      ],
+      "title": "ComparisonStageRequest"
+    },
+    "ContributorRequest": {
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": [
+            "min_max",
+            "pay_period"
+          ],
+          "title": "Method"
+        },
+        "unit_id": {
+          "type": "string",
+          "title": "Unit Id"
+        },
+        "fein": {
+          "type": "string",
+          "title": "Fein"
+        },
+        "month_index": {
+          "type": "integer",
+          "maximum": 11.0,
+          "minimum": 0.0,
+          "title": "Month Index"
+        }
+      },
+      "type": "object",
+      "required": [
+        "method",
+        "unit_id",
+        "fein",
+        "month_index"
+      ],
+      "title": "ContributorRequest"
+    },
+    "Counts": {
+      "properties": {
+        "total": {
+          "type": "integer",
+          "title": "Total"
+        },
+        "queued": {
+          "type": "integer",
+          "title": "Queued"
+        },
+        "running": {
+          "type": "integer",
+          "title": "Running"
+        },
+        "succeeded": {
+          "type": "integer",
+          "title": "Succeeded"
+        },
+        "skipped": {
+          "type": "integer",
+          "title": "Skipped"
+        },
+        "failed": {
+          "type": "integer",
+          "title": "Failed"
+        },
+        "cancelled": {
+          "type": "integer",
+          "title": "Cancelled"
+        }
+      },
+      "type": "object",
+      "required": [
+        "total",
+        "queued",
+        "running",
+        "succeeded",
+        "skipped",
+        "failed",
+        "cancelled"
+      ],
+      "title": "Counts",
+      "description": "Items by outcome. `running` includes leased items: to a person watching, both mean being worked on."
+    },
+    "CreateBody": {
+      "properties": {
+        "code": {
+          "type": "string",
+          "maxLength": 64,
+          "title": "Code"
+        },
+        "name": {
+          "type": "string",
+          "maxLength": 200,
+          "title": "Name"
+        },
+        "state": {
+          "type": "string",
+          "maxLength": 8,
+          "title": "State"
+        },
+        "years": {
+          "items": {
+            "type": "integer"
+          },
+          "type": "array",
+          "maxItems": 30,
+          "title": "Years",
+          "description": "Tax years to scaffold as empty, flagged year packs."
+        },
+        "actor": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 256
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Actor",
+          "description": "Used only when the caller is not signed in (local development)."
+        }
+      },
+      "type": "object",
+      "required": [
+        "code",
+        "name",
+        "state"
+      ],
+      "title": "CreateBody",
+      "description": "Propose a program. A federal program is not runnable yet, so a draft needs a two-letter state."
+    },
+    "DegradedEntry": {
+      "properties": {
+        "dependency": {
+          "type": "string",
+          "title": "Dependency"
+        },
+        "impact": {
+          "type": "string",
+          "title": "Impact"
+        },
+        "remedy": {
+          "type": "string",
+          "title": "Remedy"
+        }
+      },
+      "type": "object",
+      "required": [
+        "dependency",
+        "impact",
+        "remedy"
+      ],
+      "title": "DegradedEntry",
+      "description": "A dependency that is not answering, with what it affects and what to do (the repository-wide degraded shape)."
+    },
+    "DraftOut": {
+      "properties": {
+        "draft_id": {
+          "type": "string",
+          "title": "Draft Id"
+        },
+        "proposed_code": {
+          "type": "string",
+          "title": "Proposed Code"
+        },
+        "name": {
+          "type": "string",
+          "title": "Name"
+        },
+        "jurisdiction_level": {
+          "type": "string",
+          "title": "Jurisdiction Level"
+        },
+        "state": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "State"
+        },
+        "status": {
+          "type": "string",
+          "title": "Status"
+        },
+        "version": {
+          "type": "integer",
+          "title": "Version"
+        },
+        "created_by": {
+          "type": "string",
+          "title": "Created By"
+        },
+        "created_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Created At"
+        },
+        "updated_by": {
+          "type": "string",
+          "title": "Updated By"
+        },
+        "updated_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Updated At"
+        },
+        "pack_file": {
+          "type": "string",
+          "title": "Pack File"
+        },
+        "validation_errors": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Validation Errors"
+        },
+        "verification": {
+          "type": "string",
+          "title": "Verification"
+        },
+        "has_runtime_authority": {
+          "type": "boolean",
+          "title": "Has Runtime Authority"
+        },
+        "documents": {
+          "additionalProperties": true,
+          "type": "object",
+          "title": "Documents"
+        },
+        "content_sha256": {
+          "type": "string",
+          "title": "Content Sha256"
+        },
+        "validation": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/ValidationOut"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "validation_current": {
+          "type": "boolean",
+          "title": "Validation Current"
+        },
+        "review": {
+          "$ref": "#/components/schemas/ReviewRecord"
+        },
+        "export": {
+          "$ref": "#/components/schemas/ExportRecord"
+        },
+        "allowed_actions": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "Allowed Actions"
+        },
+        "events": {
+          "items": {
+            "$ref": "#/components/schemas/EventOut"
+          },
+          "type": "array",
+          "title": "Events"
+        }
+      },
+      "type": "object",
+      "required": [
+        "draft_id",
+        "proposed_code",
+        "name",
+        "jurisdiction_level",
+        "state",
+        "status",
+        "version",
+        "created_by",
+        "created_at",
+        "updated_by",
+        "updated_at",
+        "pack_file",
+        "validation_errors",
+        "verification",
+        "has_runtime_authority",
+        "documents",
+        "content_sha256",
+        "validation",
+        "validation_current",
+        "review",
+        "export",
+        "allowed_actions"
+      ],
+      "title": "DraftOut",
+      "description": "A draft in full. `allowed_actions` is what may be done now, so the portal enables exactly those."
+    },
+    "DraftSummary": {
+      "properties": {
+        "draft_id": {
+          "type": "string",
+          "title": "Draft Id"
+        },
+        "proposed_code": {
+          "type": "string",
+          "title": "Proposed Code"
+        },
+        "name": {
+          "type": "string",
+          "title": "Name"
+        },
+        "jurisdiction_level": {
+          "type": "string",
+          "title": "Jurisdiction Level"
+        },
+        "state": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "State"
+        },
+        "status": {
+          "type": "string",
+          "title": "Status"
+        },
+        "version": {
+          "type": "integer",
+          "title": "Version"
+        },
+        "created_by": {
+          "type": "string",
+          "title": "Created By"
+        },
+        "created_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Created At"
+        },
+        "updated_by": {
+          "type": "string",
+          "title": "Updated By"
+        },
+        "updated_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Updated At"
+        },
+        "pack_file": {
+          "type": "string",
+          "title": "Pack File"
+        },
+        "validation_errors": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Validation Errors"
+        },
+        "verification": {
+          "type": "string",
+          "title": "Verification"
+        },
+        "has_runtime_authority": {
+          "type": "boolean",
+          "title": "Has Runtime Authority"
+        }
+      },
+      "type": "object",
+      "required": [
+        "draft_id",
+        "proposed_code",
+        "name",
+        "jurisdiction_level",
+        "state",
+        "status",
+        "version",
+        "created_by",
+        "created_at",
+        "updated_by",
+        "updated_at",
+        "pack_file",
+        "validation_errors",
+        "verification",
+        "has_runtime_authority"
+      ],
+      "title": "DraftSummary",
+      "description": "A draft without its documents, as the list shows it."
+    },
+    "DraftsPage": {
+      "properties": {
+        "items": {
+          "items": {
+            "$ref": "#/components/schemas/DraftSummary"
+          },
+          "type": "array",
+          "title": "Items"
+        },
+        "total": {
+          "type": "integer",
+          "title": "Total"
+        },
+        "limit": {
+          "type": "integer",
+          "title": "Limit"
+        },
+        "offset": {
+          "type": "integer",
+          "title": "Offset"
+        }
+      },
+      "type": "object",
+      "required": [
+        "items",
+        "total",
+        "limit",
+        "offset"
+      ],
+      "title": "DraftsPage",
+      "description": "One page of drafts, most recently changed first."
+    },
+    "EditBody": {
+      "properties": {
+        "expected_version": {
+          "type": "integer",
+          "title": "Expected Version"
+        },
+        "pack": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Pack"
+        },
+        "years": {
+          "additionalProperties": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "type": "object",
+          "maxProperties": 30,
+          "title": "Years"
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 200
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Name"
+        },
+        "actor": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 256
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Actor"
+        }
+      },
+      "type": "object",
+      "required": [
+        "expected_version",
+        "pack"
+      ],
+      "title": "EditBody",
+      "description": "A full replace of the documents. `expected_version` is the version the editor read."
+    },
+    "EligibilitySearchRequest": {
+      "properties": {
+        "q": {
+          "type": "string",
+          "title": "Q",
+          "default": ""
+        },
+        "limit": {
+          "type": "integer",
+          "maximum": 200.0,
+          "minimum": 1.0,
+          "title": "Limit",
+          "default": 50
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0.0,
+          "title": "Offset",
+          "default": 0
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "all",
+            "both",
+            "min_max_only",
+            "pay_period_only",
+            "neither"
+          ],
+          "title": "Status",
+          "default": "all"
+        },
+        "proximity": {
+          "type": "string",
+          "enum": [
+            "all",
+            "near_floor"
+          ],
+          "title": "Proximity",
+          "default": "all"
+        }
+      },
+      "type": "object",
+      "title": "EligibilitySearchRequest"
+    },
+    "EmployeeChangeRequest": {
+      "properties": {
+        "record_token": {
+          "type": "string",
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Record Token"
+        },
+        "additional_weekly_hours": {
+          "type": "number",
+          "maximum": 40.0,
+          "minimum": 0.0,
+          "title": "Additional Weekly Hours",
+          "default": 0.0
+        },
+        "hourly_raise": {
+          "type": "number",
+          "maximum": 100.0,
+          "minimum": 0.0,
+          "title": "Hourly Raise",
+          "default": 0.0
+        }
+      },
+      "type": "object",
+      "required": [
+        "record_token"
+      ],
+      "title": "EmployeeChangeRequest",
+      "description": "One stacked employee: more hours a week, a raise in $/hr, or both."
+    },
+    "EmployeeDrillRequest": {
+      "properties": {
+        "record_token": {
+          "type": "string",
+          "maxLength": 128,
+          "minLength": 8,
+          "title": "Record Token"
+        },
+        "tax_year": {
+          "type": "integer",
+          "title": "Tax Year"
+        },
+        "state": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "State"
+        },
+        "account_id": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Account Id"
+        },
+        "program_code": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Program Code"
+        }
+      },
+      "type": "object",
+      "required": [
+        "record_token",
+        "tax_year"
+      ],
+      "title": "EmployeeDrillRequest",
+      "description": "The handle stays in the body; an employee never appears in a URL path."
+    },
+    "EmployeeRequest": {
+      "properties": {
+        "record_token": {
+          "type": "string",
+          "maxLength": 128,
+          "minLength": 8,
+          "title": "Record Token"
+        }
+      },
+      "type": "object",
+      "required": [
+        "record_token"
+      ],
+      "title": "EmployeeRequest"
+    },
+    "EmployeeReviewRequest": {
+      "properties": {
+        "status": {
+          "type": "string",
+          "pattern": "^(validated|flagged|cleared)$",
+          "title": "Status",
+          "default": "validated"
+        },
+        "note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Note"
+        },
+        "reviewer": {
+          "type": "string",
+          "title": "Reviewer",
+          "default": "Reviewer"
+        }
+      },
+      "type": "object",
+      "title": "EmployeeReviewRequest",
+      "description": "Human validation/correction annotation for one employee's eligibility."
+    },
+    "EmployeeSimulateRequest": {
+      "properties": {
+        "client_id": {
+          "type": "integer",
+          "title": "Client Id"
+        },
+        "tax_year": {
+          "type": "integer",
+          "title": "Tax Year"
+        },
+        "employees": {
+          "items": {
+            "$ref": "#/components/schemas/EmployeeChangeRequest"
+          },
+          "type": "array",
+          "maxItems": 25,
+          "minItems": 1,
+          "title": "Employees"
+        },
+        "state": {
+          "type": "string",
+          "title": "State",
+          "default": "GA"
+        },
+        "program_code": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Program Code"
+        },
+        "method": {
+          "type": "string",
+          "pattern": "^(min_max|pay_period)$",
+          "title": "Method",
+          "default": "min_max"
+        }
+      },
+      "type": "object",
+      "required": [
+        "client_id",
+        "tax_year",
+        "employees"
+      ],
+      "title": "EmployeeSimulateRequest",
+      "description": "A stack of employees, each working differently for the rest of the year."
+    },
+    "Engagement": {
+      "properties": {
+        "in_scope": {
+          "type": "integer",
+          "title": "In Scope"
+        },
+        "out_of_scope": {
+          "type": "integer",
+          "title": "Out Of Scope"
+        },
+        "prospective": {
+          "type": "integer",
+          "title": "Prospective"
+        },
+        "clients": {
+          "type": "integer",
+          "title": "Clients"
+        }
+      },
+      "type": "object",
+      "required": [
+        "in_scope",
+        "out_of_scope",
+        "prospective",
+        "clients"
+      ],
+      "title": "Engagement",
+      "description": "Clients per engagement scope for the program (live engagements only)."
+    },
+    "EngagementBody": {
+      "properties": {
+        "client_id": {
+          "type": "integer",
+          "title": "Client Id"
+        },
+        "program_code": {
+          "type": "string",
+          "title": "Program Code"
+        },
+        "scope": {
+          "$ref": "#/components/schemas/EngagementScope"
+        },
+        "note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Note"
+        }
+      },
+      "type": "object",
+      "required": [
+        "client_id",
+        "program_code",
+        "scope"
+      ],
+      "title": "EngagementBody"
+    },
+    "EngagementScope": {
+      "type": "string",
+      "enum": [
+        "in_scope",
+        "out_of_scope",
+        "prospective"
+      ],
+      "title": "EngagementScope",
+      "description": "Whether we are engaged to handle this program at all.\n\nWithout it the matrix cannot tell \"unclaimed — an opportunity\" from\n\"unclaimed — not our mandate\". Both render as a gap, and one of them is\nnoise that erodes trust in the other."
+    },
+    "EventOut": {
+      "properties": {
+        "seq": {
+          "type": "integer",
+          "title": "Seq"
+        },
+        "event_type": {
+          "type": "string",
+          "title": "Event Type"
+        },
+        "actor": {
+          "type": "string",
+          "title": "Actor"
+        },
+        "at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "At"
+        },
+        "from_status": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "From Status"
+        },
+        "to_status": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "To Status"
+        },
+        "detail": {
+          "additionalProperties": true,
+          "type": "object",
+          "title": "Detail"
+        }
+      },
+      "type": "object",
+      "required": [
+        "seq",
+        "event_type",
+        "actor",
+        "at",
+        "from_status",
+        "to_status",
+        "detail"
+      ],
+      "title": "EventOut",
+      "description": "One append-only audit row."
+    },
+    "ExportBody": {
+      "properties": {
+        "write_local": {
+          "type": "boolean",
+          "title": "Write Local",
+          "default": false
+        },
+        "actor": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 256
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Actor"
+        }
+      },
+      "type": "object",
+      "title": "ExportBody",
+      "description": "`write_local` writes the pack files into the rules folder: developers only, local development with the setting on."
+    },
+    "ExportRecord": {
+      "properties": {
+        "exported_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Exported At"
+        },
+        "bundle_sha256": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Bundle Sha256"
+        }
+      },
+      "type": "object",
+      "required": [
+        "exported_at",
+        "bundle_sha256"
+      ],
+      "title": "ExportRecord",
+      "description": "When the bundle was first exported and its SHA-256."
+    },
+    "Finding": {
+      "properties": {
+        "file": {
+          "type": "string",
+          "title": "File"
+        },
+        "severity": {
+          "type": "string",
+          "title": "Severity"
+        },
+        "code": {
+          "type": "string",
+          "title": "Code"
+        },
+        "path": {
+          "type": "string",
+          "title": "Path"
+        },
+        "message": {
+          "type": "string",
+          "title": "Message"
+        }
+      },
+      "type": "object",
+      "required": [
+        "file",
+        "severity",
+        "code",
+        "path",
+        "message"
+      ],
+      "title": "Finding",
+      "description": "One validation finding, addressed to a field: `file` names the document, `path` the place inside it."
+    },
+    "HTTPValidationError": {
+      "properties": {
+        "detail": {
+          "items": {
+            "$ref": "#/components/schemas/ValidationError"
+          },
+          "type": "array",
+          "title": "Detail"
+        }
+      },
+      "type": "object",
+      "title": "HTTPValidationError"
+    },
+    "Issue": {
+      "properties": {
+        "severity": {
+          "type": "string",
+          "title": "Severity"
+        },
+        "code": {
+          "type": "string",
+          "title": "Code"
+        },
+        "path": {
+          "type": "string",
+          "title": "Path"
+        },
+        "message": {
+          "type": "string",
+          "title": "Message"
+        }
+      },
+      "type": "object",
+      "required": [
+        "severity",
+        "code",
+        "path",
+        "message"
+      ],
+      "title": "Issue",
+      "description": "One validator finding: severity (error, warning, info), a code, the path inside the pack and a message."
+    },
+    "ItemOut": {
+      "properties": {
+        "item_id": {
+          "type": "string",
+          "title": "Item Id"
+        },
+        "batch_id": {
+          "type": "string",
+          "title": "Batch Id"
+        },
+        "seq": {
+          "type": "integer",
+          "title": "Seq"
+        },
+        "client_id": {
+          "type": "integer",
+          "title": "Client Id"
+        },
+        "program_code": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Program Code"
+        },
+        "tax_year": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Tax Year"
+        },
+        "status": {
+          "type": "string",
+          "title": "Status"
+        },
+        "attempts": {
+          "type": "integer",
+          "title": "Attempts"
+        },
+        "run_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Run Id"
+        },
+        "skip_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Skip Reason"
+        },
+        "error_dependency": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Error Dependency"
+        },
+        "error_message": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Error Message"
+        },
+        "not_before": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Not Before"
+        },
+        "started_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Started At"
+        },
+        "finished_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Finished At"
+        }
+      },
+      "type": "object",
+      "required": [
+        "item_id",
+        "batch_id",
+        "seq",
+        "client_id",
+        "program_code",
+        "tax_year",
+        "status",
+        "attempts",
+        "run_id",
+        "skip_reason",
+        "error_dependency",
+        "error_message",
+        "not_before",
+        "started_at",
+        "finished_at"
+      ],
+      "title": "ItemOut",
+      "description": "One client (and maybe year) in a batch, with why it was skipped or failed."
+    },
+    "ItemsPage": {
+      "properties": {
+        "items": {
+          "items": {
+            "$ref": "#/components/schemas/ItemOut"
+          },
+          "type": "array",
+          "title": "Items"
+        },
+        "total": {
+          "type": "integer",
+          "title": "Total"
+        },
+        "limit": {
+          "type": "integer",
+          "title": "Limit"
+        },
+        "offset": {
+          "type": "integer",
+          "title": "Offset"
+        }
+      },
+      "type": "object",
+      "required": [
+        "items",
+        "total",
+        "limit",
+        "offset"
+      ],
+      "title": "ItemsPage",
+      "description": "One page of a batch's items, in the order they were queued."
+    },
+    "Jurisdiction": {
+      "properties": {
+        "level": {
+          "type": "string",
+          "title": "Level"
+        },
+        "code": {
+          "type": "string",
+          "title": "Code"
+        }
+      },
+      "type": "object",
+      "required": [
+        "level",
+        "code"
+      ],
+      "title": "Jurisdiction",
+      "description": "A program's jurisdiction: level (federal, state, local) and code."
+    },
+    "ManifestOut": {
+      "properties": {
+        "kind": {
+          "type": "string",
+          "title": "Kind"
+        },
+        "schema_version": {
+          "type": "integer",
+          "title": "Schema Version"
+        },
+        "draft_id": {
+          "type": "string",
+          "title": "Draft Id"
+        },
+        "proposed_code": {
+          "type": "string",
+          "title": "Proposed Code"
+        },
+        "name": {
+          "type": "string",
+          "title": "Name"
+        },
+        "state": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "State"
+        },
+        "content_sha256": {
+          "type": "string",
+          "title": "Content Sha256"
+        },
+        "approved_sha256": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Approved Sha256"
+        },
+        "verification": {
+          "type": "string",
+          "title": "Verification"
+        },
+        "has_runtime_authority": {
+          "type": "boolean",
+          "title": "Has Runtime Authority"
+        },
+        "changelog_line": {
+          "type": "string",
+          "title": "Changelog Line"
+        },
+        "files": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "type": "array",
+          "title": "Files"
+        },
+        "bundle_sha256": {
+          "type": "string",
+          "title": "Bundle Sha256"
+        },
+        "bundle_bytes": {
+          "type": "integer",
+          "title": "Bundle Bytes"
+        }
+      },
+      "type": "object",
+      "required": [
+        "kind",
+        "schema_version",
+        "draft_id",
+        "proposed_code",
+        "name",
+        "state",
+        "content_sha256",
+        "approved_sha256",
+        "verification",
+        "has_runtime_authority",
+        "changelog_line",
+        "files",
+        "bundle_sha256",
+        "bundle_bytes"
+      ],
+      "title": "ManifestOut",
+      "description": "The bundle a draft produces: every file with its SHA-256, the checklist line for the changelog and the bundle's own hash."
+    },
+    "OneZeroSimulateRequest": {
+      "properties": {
+        "tax_year": {
+          "type": "integer",
+          "title": "Tax Year",
+          "default": 2025
+        },
+        "state": {
+          "type": "string",
+          "title": "State"
+        },
+        "program_code": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Program Code"
+        },
+        "fein": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Fein"
+        },
+        "client_id": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Client Id"
+        },
+        "action": {
+          "type": "string",
+          "pattern": "^(add_headcount|remove_headcount|adjust_hours|adjust_wages)$",
+          "title": "Action",
+          "default": "adjust_hours"
+        },
+        "magnitude": {
+          "type": "number",
+          "title": "Magnitude",
+          "default": 0.0
+        },
+        "label": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Label"
+        },
+        "hire_weekly_hours": {
+          "anyOf": [
+            {
+              "type": "number",
+              "maximum": 80.0,
+              "exclusiveMinimum": 0.0
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Hire Weekly Hours"
+        },
+        "hire_hourly_rate": {
+          "anyOf": [
+            {
+              "type": "number",
+              "maximum": 500.0,
+              "exclusiveMinimum": 0.0
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Hire Hourly Rate"
+        }
+      },
+      "type": "object",
+      "required": [
+        "state"
+      ],
+      "title": "OneZeroSimulateRequest",
+      "description": "[J2] UX-02 — entity-level what-if against the statutory One/Zero engine."
+    },
+    "PackMeta": {
+      "properties": {
+        "file": {
+          "type": "string",
+          "title": "File"
+        },
+        "present": {
+          "type": "boolean",
+          "title": "Present"
+        },
+        "rule_pack_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Rule Pack Version"
+        },
+        "credit_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Credit Name"
+        },
+        "citation": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Citation"
+        },
+        "engine_profile": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object",
+          "title": "Engine Profile"
+        },
+        "notes": {
+          "type": "string",
+          "title": "Notes"
+        }
+      },
+      "type": "object",
+      "required": [
+        "file",
+        "present",
+        "rule_pack_version",
+        "credit_name",
+        "citation",
+        "engine_profile",
+        "notes"
+      ],
+      "title": "PackMeta",
+      "description": "What the base pack file says about itself."
+    },
+    "PreviewBody": {
+      "properties": {
+        "dataset": {
+          "type": "string",
+          "enum": [
+            "synthetic_sample",
+            "client"
+          ],
+          "title": "Dataset",
+          "default": "synthetic_sample"
+        },
+        "client_id": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Client Id"
+        },
+        "tax_years": {
+          "items": {
+            "type": "integer"
+          },
+          "type": "array",
+          "maxItems": 30,
+          "title": "Tax Years",
+          "description": "Empty: every tax year the draft has a pack for."
+        }
+      },
+      "type": "object",
+      "title": "PreviewBody",
+      "description": "What to preview on. The default is the committed synthetic sample; a client needs the environment to allow it."
+    },
+    "PreviewYear": {
+      "properties": {
+        "tax_year": {
+          "type": "integer",
+          "title": "Tax Year"
+        },
+        "average_headcount": {
+          "type": "number",
+          "title": "Average Headcount"
+        },
+        "prior_average_headcount": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Prior Average Headcount"
+        },
+        "is_base_year": {
+          "type": "boolean",
+          "title": "Is Base Year"
+        },
+        "threshold_jobs": {
+          "type": "number",
+          "title": "Threshold Jobs"
+        },
+        "qualifying_jobs": {
+          "type": "number",
+          "title": "Qualifying Jobs"
+        },
+        "per_job_usd": {
+          "type": "number",
+          "title": "Per Job Usd"
+        },
+        "annual_credit_usd": {
+          "type": "number",
+          "title": "Annual Credit Usd"
+        },
+        "benefit_period_years": {
+          "type": "integer",
+          "title": "Benefit Period Years"
+        },
+        "rows_used": {
+          "type": "integer",
+          "title": "Rows Used"
+        },
+        "months_with_payroll": {
+          "type": "integer",
+          "title": "Months With Payroll"
+        },
+        "window": {
+          "type": "string",
+          "title": "Window"
+        }
+      },
+      "type": "object",
+      "required": [
+        "tax_year",
+        "average_headcount",
+        "prior_average_headcount",
+        "is_base_year",
+        "threshold_jobs",
+        "qualifying_jobs",
+        "per_job_usd",
+        "annual_credit_usd",
+        "benefit_period_years",
+        "rows_used",
+        "months_with_payroll",
+        "window"
+      ],
+      "title": "PreviewYear",
+      "description": "One year priced under the draft's own year pack for that year."
+    },
+    "ProgramDetail": {
+      "properties": {
+        "code": {
+          "type": "string",
+          "title": "Code"
+        },
+        "name": {
+          "type": "string",
+          "title": "Name"
+        },
+        "state": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "State"
+        },
+        "jurisdiction": {
+          "$ref": "#/components/schemas/Jurisdiction"
+        },
+        "lifecycle": {
+          "type": "string",
+          "title": "Lifecycle",
+          "description": "draft | described | calculable | retired. `calculable` is derived from authored year packs."
+        },
+        "authored_years": {
+          "items": {
+            "type": "integer"
+          },
+          "type": "array",
+          "title": "Authored Years"
+        },
+        "unverified_years": {
+          "items": {
+            "type": "integer"
+          },
+          "type": "array",
+          "title": "Unverified Years",
+          "description": "Authored years whose pack still carries _prototype_verify."
+        },
+        "verification": {
+          "type": "string",
+          "title": "Verification"
+        },
+        "calculable": {
+          "type": "boolean",
+          "title": "Calculable"
+        },
+        "not_calculable_reason": {
+          "type": "string",
+          "title": "Not Calculable Reason"
+        },
+        "engagement": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/Engagement"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "None when the claims store could not be read."
+        },
+        "pack": {
+          "$ref": "#/components/schemas/PackMeta"
+        },
+        "years": {
+          "items": {
+            "$ref": "#/components/schemas/YearStatus"
+          },
+          "type": "array",
+          "title": "Years"
+        },
+        "validation": {
+          "$ref": "#/components/schemas/Validation"
+        },
+        "blockers": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "title": "Blockers"
+        }
+      },
+      "type": "object",
+      "required": [
+        "code",
+        "name",
+        "state",
+        "jurisdiction",
+        "lifecycle",
+        "authored_years",
+        "unverified_years",
+        "verification",
+        "calculable",
+        "not_calculable_reason",
+        "pack",
+        "years",
+        "validation",
+        "blockers"
+      ],
+      "title": "ProgramDetail",
+      "description": "One program in full: pack metadata, per-year status, validation and what blocks calculation."
+    },
+    "ProgramRow": {
+      "properties": {
+        "code": {
+          "type": "string",
+          "title": "Code"
+        },
+        "name": {
+          "type": "string",
+          "title": "Name"
+        },
+        "state": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "State"
+        },
+        "jurisdiction": {
+          "$ref": "#/components/schemas/Jurisdiction"
+        },
+        "lifecycle": {
+          "type": "string",
+          "title": "Lifecycle",
+          "description": "draft | described | calculable | retired. `calculable` is derived from authored year packs."
+        },
+        "authored_years": {
+          "items": {
+            "type": "integer"
+          },
+          "type": "array",
+          "title": "Authored Years"
+        },
+        "unverified_years": {
+          "items": {
+            "type": "integer"
+          },
+          "type": "array",
+          "title": "Unverified Years",
+          "description": "Authored years whose pack still carries _prototype_verify."
+        },
+        "verification": {
+          "type": "string",
+          "title": "Verification"
+        },
+        "calculable": {
+          "type": "boolean",
+          "title": "Calculable"
+        },
+        "not_calculable_reason": {
+          "type": "string",
+          "title": "Not Calculable Reason"
+        },
+        "engagement": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/Engagement"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "None when the claims store could not be read."
+        }
+      },
+      "type": "object",
+      "required": [
+        "code",
+        "name",
+        "state",
+        "jurisdiction",
+        "lifecycle",
+        "authored_years",
+        "unverified_years",
+        "verification",
+        "calculable",
+        "not_calculable_reason"
+      ],
+      "title": "ProgramRow",
+      "description": "One program as the catalog lists it. `verification` is always `not_verified`: the catalog reports what is encoded."
+    },
+    "Progress": {
+      "properties": {
+        "done": {
+          "type": "integer",
+          "title": "Done"
+        },
+        "total": {
+          "type": "integer",
+          "title": "Total"
+        }
+      },
+      "type": "object",
+      "required": [
+        "done",
+        "total"
+      ],
+      "title": "Progress",
+      "description": "Items finished (succeeded, skipped, failed or cancelled) out of the total."
+    },
+    "Provenance": {
+      "type": "string",
+      "enum": [
+        "computed",
+        "filed_by_us",
+        "client_asserted",
+        "inherited",
+        "authority_confirmed"
+      ],
+      "title": "Provenance",
+      "description": "How we know. Drives how confidently a cell may render."
+    },
+    "RecordClaimBody": {
+      "properties": {
+        "client_id": {
+          "type": "integer",
+          "title": "Client Id"
+        },
+        "program_code": {
+          "type": "string",
+          "title": "Program Code"
+        },
+        "tax_year": {
+          "type": "integer",
+          "title": "Tax Year"
+        },
+        "status": {
+          "$ref": "#/components/schemas/ClaimStatus"
+        },
+        "provenance": {
+          "$ref": "#/components/schemas/Provenance"
+        },
+        "decided_by": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Decided By"
+        },
+        "identified_usd": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Identified Usd",
+          "default": "0"
+        },
+        "claimed_usd": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Claimed Usd",
+          "default": "0"
+        },
+        "certified_usd": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Certified Usd",
+          "default": "0"
+        },
+        "average_headcount": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Average Headcount"
+        },
+        "base_average_headcount": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Base Average Headcount"
+        },
+        "threshold_jobs": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Threshold Jobs"
+        },
+        "entity_id": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Entity Id"
+        },
+        "filing_reference": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Filing Reference"
+        },
+        "decline_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Decline Reason"
+        },
+        "identified_run_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Identified Run Id"
+        },
+        "assumption_set_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Assumption Set Id"
+        },
+        "rule_pack_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Rule Pack Version"
+        }
+      },
+      "type": "object",
+      "required": [
+        "client_id",
+        "program_code",
+        "tax_year",
+        "status",
+        "provenance"
+      ],
+      "title": "RecordClaimBody",
+      "description": "Assert a claim we did not compute — onboarding, or a prior provider."
+    },
+    "ResolveBody": {
+      "properties": {
+        "client_id": {
+          "type": "integer",
+          "title": "Client Id"
+        },
+        "tax_year": {
+          "type": "integer",
+          "title": "Tax Year"
+        },
+        "resolution": {
+          "type": "string",
+          "pattern": "^(accept|assign|drop|flag)$",
+          "title": "Resolution"
+        },
+        "decided_by": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Decided By"
+        },
+        "keep_worksite": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Keep Worksite"
+        },
+        "note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Note"
+        }
+      },
+      "type": "object",
+      "required": [
+        "client_id",
+        "tax_year",
+        "resolution"
+      ],
+      "title": "ResolveBody"
+    },
+    "ResolveExceptionRequest": {
+      "properties": {
+        "resolution": {
+          "type": "string",
+          "pattern": "^(accept|drop|flag|assign|reopen)$",
+          "title": "Resolution",
+          "default": "accept"
+        },
+        "keep_worksite": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Keep Worksite"
+        },
+        "note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Note"
+        },
+        "reviewer": {
+          "type": "string",
+          "title": "Reviewer",
+          "default": "Reviewer"
+        }
+      },
+      "type": "object",
+      "title": "ResolveExceptionRequest",
+      "description": "Human validation/correction of a QC exception."
+    },
+    "ReviewBody": {
+      "properties": {
+        "decision": {
+          "type": "string",
+          "enum": [
+            "approve",
+            "request_changes"
+          ],
+          "title": "Decision"
+        },
+        "comment": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 2000
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Comment"
+        },
+        "actor": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 256
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Actor"
+        }
+      },
+      "type": "object",
+      "required": [
+        "decision"
+      ],
+      "title": "ReviewBody",
+      "description": "A reviewer's decision. A request for changes needs a comment."
+    },
+    "ReviewRecord": {
+      "properties": {
+        "requested_by": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Requested By"
+        },
+        "reviewer": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Reviewer"
+        },
+        "decision": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Decision"
+        },
+        "comment": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Comment"
+        },
+        "decided_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Decided At"
+        },
+        "approved_sha256": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Approved Sha256"
+        }
+      },
+      "type": "object",
+      "required": [
+        "requested_by",
+        "reviewer",
+        "decision",
+        "comment",
+        "decided_at",
+        "approved_sha256"
+      ],
+      "title": "ReviewRecord",
+      "description": "Who asked for review, who decided, and what they said."
+    },
+    "RuleVerificationRequest": {
+      "properties": {
+        "verified_by": {
+          "type": "string",
+          "title": "Verified By"
+        },
+        "note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Note"
+        }
+      },
+      "type": "object",
+      "required": [
+        "verified_by"
+      ],
+      "title": "RuleVerificationRequest"
+    },
+    "ScopeBody": {
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "one",
+            "list",
+            "filter",
+            "all"
+          ],
+          "title": "Kind",
+          "default": "list"
+        },
+        "client_ids": {
+          "items": {
+            "type": "integer"
+          },
+          "type": "array",
+          "maxItems": 50000,
+          "title": "Client Ids",
+          "description": "For kinds one and list."
+        },
+        "filter": {
+          "additionalProperties": true,
+          "type": "object",
+          "maxProperties": 12,
+          "title": "Filter",
+          "description": "For kind filter: program, year, outcome, scope, status, near (the portfolio filters), and band, state, unassessed, unavailable."
+        }
+      },
+      "type": "object",
+      "title": "ScopeBody",
+      "description": "Which clients: explicit ids, a portfolio filter resolved on the server, or the whole book."
+    },
+    "SearchRequest": {
+      "properties": {
+        "q": {
+          "type": "string",
+          "title": "Q",
+          "default": ""
+        },
+        "limit": {
+          "type": "integer",
+          "maximum": 200.0,
+          "minimum": 1.0,
+          "title": "Limit",
+          "default": 50
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0.0,
+          "title": "Offset",
+          "default": 0
+        }
+      },
+      "type": "object",
+      "title": "SearchRequest"
+    },
+    "StartBody": {
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "assess",
+            "calculate",
+            "assess_and_calculate"
+          ],
+          "title": "Kind",
+          "default": "calculate"
+        },
+        "scope": {
+          "$ref": "#/components/schemas/ScopeBody"
+        },
+        "program_code": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 64
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Program Code"
+        },
+        "tax_years": {
+          "items": {
+            "type": "integer"
+          },
+          "type": "array",
+          "maxItems": 12,
+          "title": "Tax Years",
+          "description": "Empty: each client's latest runnable year."
+        },
+        "force": {
+          "type": "boolean",
+          "title": "Force",
+          "description": "Run every item even if skip_unchanged is on. Kept for compatibility.",
+          "default": false
+        },
+        "skip_unchanged": {
+          "type": "boolean",
+          "title": "Skip Unchanged",
+          "description": "Skip clients whose data and rules are unchanged since their last run. Off by default.",
+          "default": false
+        },
+        "include_code_commit": {
+          "type": "boolean",
+          "title": "Include Code Commit",
+          "default": false
+        },
+        "refresh_once": {
+          "type": "boolean",
+          "title": "Refresh Once",
+          "description": "One item per client. Off needs explicit tax_years.",
+          "default": true
+        },
+        "idempotency_key": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 128
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Idempotency Key"
+        },
+        "override_size_limit": {
+          "type": "boolean",
+          "title": "Override Size Limit",
+          "description": "Allowed for scope kind all only.",
+          "default": false
+        },
+        "confirm_items": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Confirm Items",
+          "description": "Must equal the item count above the confirmation threshold."
+        },
+        "dry_run": {
+          "type": "boolean",
+          "title": "Dry Run",
+          "description": "Preview only: writes nothing and reads no payroll.",
+          "default": false
+        }
+      },
+      "type": "object",
+      "required": [
+        "scope"
+      ],
+      "title": "StartBody",
+      "description": "A request to run many clients. `dry_run` previews it; confirmation and idempotency fields guard a real start."
+    },
+    "SummaryRequest": {
+      "properties": {
+        "page": {
+          "type": "string",
+          "enum": [
+            "portfolio",
+            "client",
+            "unit",
+            "employee"
+          ],
+          "title": "Page"
+        },
+        "client_id": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Client Id"
+        },
+        "tax_year": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Tax Year"
+        },
+        "state": {
+          "type": "string",
+          "title": "State",
+          "default": "GA"
+        },
+        "method": {
+          "type": "string",
+          "pattern": "^(min_max|pay_period)$",
+          "title": "Method",
+          "default": "min_max"
+        },
+        "worksite_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 64
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Worksite Id"
+        },
+        "month": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "maximum": 12.0,
+              "minimum": 1.0
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Month"
+        },
+        "record_token": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 128,
+              "minLength": 8
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Record Token"
+        }
+      },
+      "type": "object",
+      "required": [
+        "page"
+      ],
+      "title": "SummaryRequest",
+      "description": "Which page, and the scope that page was rendered under."
+    },
+    "TransitionBody": {
+      "properties": {
+        "status": {
+          "$ref": "#/components/schemas/ClaimStatus"
+        },
+        "decided_by": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Decided By"
+        },
+        "decline_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Decline Reason"
+        },
+        "claimed_usd": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Claimed Usd"
+        },
+        "certified_usd": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Certified Usd"
+        },
+        "filing_reference": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Filing Reference"
+        },
+        "provenance": {
+          "anyOf": [
+            {
+              "$ref": "#/components/schemas/Provenance"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "type": "object",
+      "required": [
+        "status"
+      ],
+      "title": "TransitionBody",
+      "description": "Move an existing cell along the lifecycle."
+    },
+    "UnitSimulateRequest": {
+      "properties": {
+        "client_id": {
+          "type": "integer",
+          "title": "Client Id"
+        },
+        "worksite_id": {
+          "type": "string",
+          "title": "Worksite Id"
+        },
+        "tax_year": {
+          "type": "integer",
+          "title": "Tax Year"
+        },
+        "state": {
+          "type": "string",
+          "title": "State",
+          "default": "GA"
+        },
+        "program_code": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Program Code"
+        },
+        "method": {
+          "type": "string",
+          "pattern": "^(min_max|pay_period)$",
+          "title": "Method",
+          "default": "min_max"
+        },
+        "action": {
+          "type": "string",
+          "pattern": "^(add_headcount|remove_headcount|adjust_hours|adjust_wages)$",
+          "title": "Action",
+          "default": "add_headcount"
+        },
+        "magnitude": {
+          "type": "number",
+          "title": "Magnitude",
+          "default": 1.0
+        },
+        "hire_weekly_hours": {
+          "anyOf": [
+            {
+              "type": "number",
+              "maximum": 80.0,
+              "exclusiveMinimum": 0.0
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Hire Weekly Hours"
+        },
+        "hire_hourly_rate": {
+          "anyOf": [
+            {
+              "type": "number",
+              "maximum": 500.0,
+              "exclusiveMinimum": 0.0
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Hire Hourly Rate"
+        }
+      },
+      "type": "object",
+      "required": [
+        "client_id",
+        "worksite_id",
+        "tax_year"
+      ],
+      "title": "UnitSimulateRequest",
+      "description": "What-if at one location, priced the way the location grid prices it."
+    },
+    "Validation": {
+      "properties": {
+        "pack": {
+          "items": {
+            "$ref": "#/components/schemas/Issue"
+          },
+          "type": "array",
+          "title": "Pack"
+        },
+        "error_count": {
+          "type": "integer",
+          "title": "Error Count"
+        },
+        "valid": {
+          "type": "boolean",
+          "title": "Valid"
+        }
+      },
+      "type": "object",
+      "required": [
+        "pack",
+        "error_count",
+        "valid"
+      ],
+      "title": "Validation",
+      "description": "The base pack's findings and the error count across the base and year packs; `valid` is not `verified`."
+    },
+    "ValidationError": {
+      "properties": {
+        "loc": {
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              }
+            ]
+          },
+          "type": "array",
+          "title": "Location"
+        },
+        "msg": {
+          "type": "string",
+          "title": "Message"
+        },
+        "type": {
+          "type": "string",
+          "title": "Error Type"
+        },
+        "input": {
+          "title": "Input"
+        },
+        "ctx": {
+          "type": "object",
+          "title": "Context"
+        }
+      },
+      "type": "object",
+      "required": [
+        "loc",
+        "msg",
+        "type"
+      ],
+      "title": "ValidationError"
+    },
+    "ValidationOut": {
+      "properties": {
+        "content_sha256": {
+          "type": "string",
+          "title": "Content Sha256"
+        },
+        "valid": {
+          "type": "boolean",
+          "title": "Valid"
+        },
+        "errors": {
+          "type": "integer",
+          "title": "Errors"
+        },
+        "warnings": {
+          "type": "integer",
+          "title": "Warnings"
+        },
+        "infos": {
+          "type": "integer",
+          "title": "Infos"
+        },
+        "findings": {
+          "items": {
+            "$ref": "#/components/schemas/Finding"
+          },
+          "type": "array",
+          "title": "Findings"
+        },
+        "truncated": {
+          "type": "boolean",
+          "title": "Truncated"
+        },
+        "verification": {
+          "type": "string",
+          "title": "Verification"
+        }
+      },
+      "type": "object",
+      "required": [
+        "content_sha256",
+        "valid",
+        "errors",
+        "warnings",
+        "infos",
+        "findings",
+        "truncated",
+        "verification"
+      ],
+      "title": "ValidationOut",
+      "description": "A validation result. `valid` means well-formed, never verified; `content_sha256` says which documents it covered."
+    },
+    "WithdrawBody": {
+      "properties": {
+        "reason": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 1000
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Reason"
+        },
+        "actor": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 256
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Actor"
+        }
+      },
+      "type": "object",
+      "title": "WithdrawBody",
+      "description": "Why the draft is being withdrawn (optional)."
+    },
+    "YearStatus": {
+      "properties": {
+        "tax_year": {
+          "type": "integer",
+          "title": "Tax Year"
+        },
+        "rule_pack_version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Rule Pack Version"
+        },
+        "unverified": {
+          "type": "boolean",
+          "title": "Unverified"
+        },
+        "source": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Source"
+        },
+        "issues": {
+          "items": {
+            "$ref": "#/components/schemas/Issue"
+          },
+          "type": "array",
+          "title": "Issues"
+        }
+      },
+      "type": "object",
+      "required": [
+        "tax_year",
+        "rule_pack_version",
+        "unverified",
+        "source",
+        "issues"
+      ],
+      "title": "YearStatus",
+      "description": "One authored tax year: its version, whether it is still unverified, its source and its findings."
+    },
+    "api__program_draft_models__PreviewOut": {
+      "properties": {
+        "label": {
+          "type": "string",
+          "title": "Label"
+        },
+        "draft_id": {
+          "type": "string",
+          "title": "Draft Id"
+        },
+        "proposed_code": {
+          "type": "string",
+          "title": "Proposed Code"
+        },
+        "state": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "State"
+        },
+        "dataset": {
+          "additionalProperties": true,
+          "type": "object",
+          "title": "Dataset"
+        },
+        "unverified": {
+          "type": "boolean",
+          "title": "Unverified"
+        },
+        "unverified_flags": {
+          "type": "integer",
+          "title": "Unverified Flags"
+        },
+        "years": {
+          "items": {
+            "$ref": "#/components/schemas/PreviewYear"
+          },
+          "type": "array",
+          "title": "Years"
+        },
+        "declined": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "type": "array",
+          "title": "Declined"
+        },
+        "persisted": {
+          "type": "boolean",
+          "title": "Persisted"
+        },
+        "wrote_nothing": {
+          "type": "boolean",
+          "title": "Wrote Nothing"
+        }
+      },
+      "type": "object",
+      "required": [
+        "label",
+        "draft_id",
+        "proposed_code",
+        "state",
+        "dataset",
+        "unverified",
+        "unverified_flags",
+        "years",
+        "declined",
+        "persisted",
+        "wrote_nothing"
+      ],
+      "title": "PreviewOut",
+      "description": "A preview. `label` is always \"Preview, not verified, not for filing\"; nothing is stored (`persisted` is false)."
+    },
+    "api__run_batches__PreviewOut": {
+      "properties": {
+        "dry_run": {
+          "type": "boolean",
+          "title": "Dry Run",
+          "default": true
+        },
+        "preview": {
+          "additionalProperties": true,
+          "type": "object",
+          "title": "Preview"
+        }
+      },
+      "type": "object",
+      "required": [
+        "preview"
+      ],
+      "title": "PreviewOut",
+      "description": "What a start would do. Carries `dry_run` so a client cannot mistake it for a queued batch."
+    }
+  }
+}

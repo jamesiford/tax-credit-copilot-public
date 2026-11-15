@@ -9,6 +9,7 @@ namespace TaxCredit.Parity.Tests;
 /// C# port bit for bit: result tree (types, key order, double bits), calculation trail including its SHA-256
 /// evidence hash, the independent float-bit digest, and the Python exception type for scenarios that raise.
 /// </summary>
+[Trait("Category", "heavy")]
 public sealed class GoldenEngineTests
 {
     private static readonly Lazy<Dictionary<string, List<PayrollRow>>> Datasets = new(LoadDatasets);

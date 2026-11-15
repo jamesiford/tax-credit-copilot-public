@@ -7,6 +7,7 @@ namespace TaxCredit.Parity.Tests;
 /// Gate DS4 (coverage): replays every call of <c>parity/goldens/coverage.jsonl.gz</c> (production <c>domain/coverage.py</c> on
 /// CPython 3.12) against <see cref="Coverage"/> and <see cref="CoverageSituation"/>, bit for bit.
 /// </summary>
+[Trait("Category", "heavy")]
 public sealed class CoverageParityTests
 {
     private const string File = "coverage.jsonl.gz";

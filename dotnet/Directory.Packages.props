@@ -15,6 +15,8 @@
     <!-- JSON Schema (Draft 2020-12) for rule-pack validation. MIT, version 8.0.5: from 9.0 the binaries are under the json-everything Open Source Maintenance Fee EULA, which is not an acceptable licence here (docs/slice-domain-log.md DS8). -->
     <PackageVersion Include="JsonSchema.Net" Version="8.0.5" />
     <!-- BEGIN skeleton: only this session edits between the markers -->
+    <!-- ASP.NET Core in-process host: MIT (NuGet 10.0.0 licence metadata). -->
+    <PackageVersion Include="Microsoft.AspNetCore.TestHost" Version="10.0.0" />
     <!-- END skeleton -->
     <!-- BEGIN persistence: only this session edits between the markers -->
     <!-- END persistence -->

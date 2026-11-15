@@ -37,6 +37,7 @@ public sealed class CanonicalParityTests
     private static readonly string[] Functions = ["to_canonical", "to_canonical_csv", "collapse_to_employee_period", "_infer_frequency", "_pay_code_classifier", "_is_includable", "_worksite_join", "csv_rows"];
 
     [Fact]
+    [Trait("Category", "heavy")]
     public void Every_golden_call_matches_python_bit_for_bit() => ClaimGolden.AssertAllMatch(File, Invoke, Functions, 1500, 10);
 
     [Fact]
