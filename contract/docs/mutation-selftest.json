@@ -1,302 +1,1060 @@
-[
- {
-  "mode": "strict",
-  "mutation": "status",
-  "case": "boot.unit",
-  "caught": true,
-  "reported": {
-   "scenario": "p1_query_edges",
-   "case": "boot.unit",
-   "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
-   "category": "status",
-   "path": "status",
-   "expected": "201",
-   "actual": "200"
-  }
+{
+ "interpreter": {
+  "python": "3.12.13",
+  "zlib": "1.3.2",
+  "oracle": true,
+  "allow_other_python": false
  },
- {
-  "mode": "strict",
-  "mutation": "lexeme",
-  "case": "boot.unit",
-  "caught": true,
-  "reported": {
-   "scenario": "p1_query_edges",
+ "results": [
+  {
+   "mode": "strict",
+   "mutation": "status",
    "case": "boot.unit",
-   "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
-   "category": "number-lexeme",
-   "path": "run.tax_year",
-   "expected": "2025.0",
-   "actual": "2025"
-  }
- },
- {
-  "mode": "strict",
-  "mutation": "value",
-  "case": "boot.unit",
-  "caught": true,
-  "reported": {
-   "scenario": "p1_query_edges",
+   "caught": true,
+   "reported": {
+    "scenario": "p1_query_edges",
+    "case": "boot.unit",
+    "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+    "category": "status",
+    "path": "status",
+    "expected": "201",
+    "actual": "200"
+   }
+  },
+  {
+   "mode": "strict",
+   "mutation": "lexeme",
    "case": "boot.unit",
-   "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
-   "category": "value",
-   "path": "run.tax_year",
-   "expected": "987654321",
-   "actual": "2025"
-  }
- },
- {
-  "mode": "strict",
-  "mutation": "key_order",
-  "case": "boot.unit",
-  "caught": true,
-  "reported": {
-   "scenario": "p1_query_edges",
+   "caught": true,
+   "reported": {
+    "scenario": "p1_query_edges",
+    "case": "boot.unit",
+    "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+    "category": "number-lexeme",
+    "path": "run.tax_year",
+    "expected": "2025.0",
+    "actual": "2025"
+   }
+  },
+  {
+   "mode": "strict",
+   "mutation": "value",
    "case": "boot.unit",
-   "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
-   "category": "key-order",
-   "path": "$",
-   "expected": "[\"near_total_unfiltered\",\"total_unfiltered\",\"total\",\"thresholds\",\"near_threshold\",\"employees\",\"months\",\"unit\",\"near_filters_applied\",\"filters_applied\",\"month_filter\",\"method\",\"year\",\"state\",\"client_id\",\"message\",\"in_flight\",\"newer_run_in_flight\",\"run\",\"calculation_state\"]",
-   "actual": "[\"calculation_state\",\"run\",\"newer_run_in_flight\",\"in_flight\",\"message\",\"client_id\",\"state\",\"year\",\"method\",\"month_filter\",\"filters_applied\",\"near_filters_applied\",\"unit\",\"months\",\"employees\",\"near_threshold\",\"thresholds\",\"total\",\"total_unfiltered\",\"near_total_unfiltered\"]"
-  }
- },
- {
-  "mode": "strict",
-  "mutation": "header",
-  "case": "boot.unit",
-  "caught": true,
-  "reported": {
-   "scenario": "p1_query_edges",
+   "caught": true,
+   "reported": {
+    "scenario": "p1_query_edges",
+    "case": "boot.unit",
+    "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+    "category": "value",
+    "path": "run.tax_year",
+    "expected": "987654321",
+    "actual": "2025"
+   }
+  },
+  {
+   "mode": "strict",
+   "mutation": "key_order",
    "case": "boot.unit",
-   "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
-   "category": "header",
-   "path": "headers.content-type",
-   "expected": "text/plain",
-   "actual": "application/json"
-  }
- },
- {
-  "mode": "strict",
-  "mutation": "missing",
-  "case": "boot.unit",
-  "caught": true,
-  "reported": {
-   "scenario": "p1_query_edges",
+   "caught": true,
+   "reported": {
+    "scenario": "p1_query_edges",
+    "case": "boot.unit",
+    "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+    "category": "key-order",
+    "path": "$",
+    "expected": "[\"near_total_unfiltered\",\"total_unfiltered\",\"total\",\"thresholds\",\"near_threshold\",\"employees\",\"months\",\"unit\",\"near_filters_applied\",\"filters_applied\",\"month_filter\",\"method\",\"year\",\"state\",\"client_id\",\"message\",\"in_flight\",\"newer_run_in_flight\",\"run\",\"calculation_state\"]",
+    "actual": "[\"calculation_state\",\"run\",\"newer_run_in_flight\",\"in_flight\",\"message\",\"client_id\",\"state\",\"year\",\"method\",\"month_filter\",\"filters_applied\",\"near_filters_applied\",\"unit\",\"months\",\"employees\",\"near_threshold\",\"thresholds\",\"total\",\"total_unfiltered\",\"near_total_unfiltered\"]"
+   }
+  },
+  {
+   "mode": "strict",
+   "mutation": "header",
    "case": "boot.unit",
-   "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
-   "category": "extra-field",
-   "path": "near_total_unfiltered",
-   "expected": "<absent>",
-   "actual": "2"
-  }
- },
- {
-  "mode": "strict",
-  "mutation": "extra",
-  "case": "boot.unit",
-  "caught": true,
-  "reported": {
-   "scenario": "p1_query_edges",
+   "caught": true,
+   "reported": {
+    "scenario": "p1_query_edges",
+    "case": "boot.unit",
+    "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+    "category": "header",
+    "path": "headers.content-type",
+    "expected": "text/plain",
+    "actual": "application/json"
+   }
+  },
+  {
+   "mode": "strict",
+   "mutation": "missing",
    "case": "boot.unit",
-   "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
-   "category": "missing-field",
-   "path": "zz_extra_field",
-   "expected": "true",
-   "actual": "<absent>"
-  }
- },
- {
-  "mode": "strict",
-  "mutation": "message",
-  "case": "eligibility.sort-employee-desc",
-  "caught": true,
-  "reported": {
-   "scenario": "p1_query_edges",
+   "caught": true,
+   "reported": {
+    "scenario": "p1_query_edges",
+    "case": "boot.unit",
+    "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+    "category": "extra-field",
+    "path": "near_total_unfiltered",
+    "expected": "<absent>",
+    "actual": "2"
+   }
+  },
+  {
+   "mode": "strict",
+   "mutation": "extra",
+   "case": "boot.unit",
+   "caught": true,
+   "reported": {
+    "scenario": "p1_query_edges",
+    "case": "boot.unit",
+    "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+    "category": "missing-field",
+    "path": "zz_extra_field",
+    "expected": "true",
+    "actual": "<absent>"
+   }
+  },
+  {
+   "mode": "strict",
+   "mutation": "message",
    "case": "eligibility.sort-employee-desc",
-   "route": "GET /api/eligibility/2025",
-   "category": "value",
-   "path": "detail",
-   "expected": "sort must be one of ('employee_id', 'status', 'near_floor', 'total_hours', 'total_wages', 'mm_weeks', 'mm_hours', 'pp_weeks', 'pp_hours'), got 'employee' (changed)",
-   "actual": "sort must be one of ('employee_id', 'status', 'near_floor', 'total_hours', 'total_wages', 'mm_weeks', 'mm_hours', 'pp_weeks', 'pp_hours'), got 'employee'"
-  }
- },
- {
-  "mode": "strict",
-  "mutation": "array_length",
-  "case": "boot.unit",
-  "caught": true,
-  "reported": {
-   "scenario": "p1_query_edges",
+   "caught": true,
+   "reported": {
+    "scenario": "p1_query_edges",
+    "case": "eligibility.sort-employee-desc",
+    "route": "GET /api/eligibility/2025",
+    "category": "value",
+    "path": "detail",
+    "expected": "sort must be one of ('employee_id', 'status', 'near_floor', 'total_hours', 'total_wages', 'mm_weeks', 'mm_hours', 'pp_weeks', 'pp_hours'), got 'employee' (changed)",
+    "actual": "sort must be one of ('employee_id', 'status', 'near_floor', 'total_hours', 'total_wages', 'mm_weeks', 'mm_hours', 'pp_weeks', 'pp_hours'), got 'employee'"
+   }
+  },
+  {
+   "mode": "strict",
+   "mutation": "array_length",
    "case": "boot.unit",
-   "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
-   "category": "array-length",
-   "path": "employees",
-   "expected": "1",
-   "actual": "2"
-  }
- },
- {
-  "mode": "strict",
-  "mutation": "null_for_value",
-  "case": "boot.unit",
-  "caught": true,
-  "reported": {
-   "scenario": "p1_query_edges",
+   "caught": true,
+   "reported": {
+    "scenario": "p1_query_edges",
+    "case": "boot.unit",
+    "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+    "category": "array-length",
+    "path": "employees",
+    "expected": "1",
+    "actual": "2"
+   }
+  },
+  {
+   "mode": "strict",
+   "mutation": "null_for_value",
    "case": "boot.unit",
-   "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
-   "category": "type",
-   "path": "calculation_state",
-   "expected": "null",
-   "actual": "calculated"
-  }
- },
- {
-  "mode": "semantic",
-  "mutation": "status",
-  "case": "boot.unit",
-  "caught": true,
-  "reported": {
-   "scenario": "p1_query_edges",
+   "caught": true,
+   "reported": {
+    "scenario": "p1_query_edges",
+    "case": "boot.unit",
+    "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+    "category": "type",
+    "path": "calculation_state",
+    "expected": "null",
+    "actual": "calculated"
+   }
+  },
+  {
+   "mode": "semantic",
+   "mutation": "status",
    "case": "boot.unit",
-   "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
-   "category": "status",
-   "path": "status",
-   "expected": "201",
-   "actual": "200"
-  }
- },
- {
-  "mode": "semantic",
-  "mutation": "lexeme",
-  "case": "boot.unit",
-  "caught": true,
-  "reported": {
-   "scenario": "p1_query_edges",
+   "caught": true,
+   "reported": {
+    "scenario": "p1_query_edges",
+    "case": "boot.unit",
+    "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+    "category": "status",
+    "path": "status",
+    "expected": "201",
+    "actual": "200"
+   }
+  },
+  {
+   "mode": "semantic",
+   "mutation": "lexeme",
    "case": "boot.unit",
-   "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
-   "category": "number-lexeme",
-   "path": "run.tax_year",
-   "expected": "2025.0",
-   "actual": "2025"
-  }
- },
- {
-  "mode": "semantic",
-  "mutation": "value",
-  "case": "boot.unit",
-  "caught": true,
-  "reported": {
-   "scenario": "p1_query_edges",
+   "caught": true,
+   "reported": {
+    "scenario": "p1_query_edges",
+    "case": "boot.unit",
+    "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+    "category": "number-lexeme",
+    "path": "run.tax_year",
+    "expected": "2025.0",
+    "actual": "2025"
+   }
+  },
+  {
+   "mode": "semantic",
+   "mutation": "value",
    "case": "boot.unit",
-   "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
-   "category": "value",
-   "path": "run.tax_year",
-   "expected": "987654321",
-   "actual": "2025"
-  }
- },
- {
-  "mode": "semantic",
-  "mutation": "key_order",
-  "case": "boot.unit",
-  "caught": true,
-  "reported": {
-   "scenario": "p1_query_edges",
+   "caught": true,
+   "reported": {
+    "scenario": "p1_query_edges",
+    "case": "boot.unit",
+    "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+    "category": "value",
+    "path": "run.tax_year",
+    "expected": "987654321",
+    "actual": "2025"
+   }
+  },
+  {
+   "mode": "semantic",
+   "mutation": "key_order",
    "case": "boot.unit",
-   "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
-   "category": "key-order",
-   "path": "$",
-   "expected": "[\"near_total_unfiltered\",\"total_unfiltered\",\"total\",\"thresholds\",\"near_threshold\",\"employees\",\"months\",\"unit\",\"near_filters_applied\",\"filters_applied\",\"month_filter\",\"method\",\"year\",\"state\",\"client_id\",\"message\",\"in_flight\",\"newer_run_in_flight\",\"run\",\"calculation_state\"]",
-   "actual": "[\"calculation_state\",\"run\",\"newer_run_in_flight\",\"in_flight\",\"message\",\"client_id\",\"state\",\"year\",\"method\",\"month_filter\",\"filters_applied\",\"near_filters_applied\",\"unit\",\"months\",\"employees\",\"near_threshold\",\"thresholds\",\"total\",\"total_unfiltered\",\"near_total_unfiltered\"]"
-  }
- },
- {
-  "mode": "semantic",
-  "mutation": "header",
-  "case": "boot.unit",
-  "caught": true,
-  "reported": {
-   "scenario": "p1_query_edges",
+   "caught": true,
+   "reported": {
+    "scenario": "p1_query_edges",
+    "case": "boot.unit",
+    "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+    "category": "key-order",
+    "path": "$",
+    "expected": "[\"near_total_unfiltered\",\"total_unfiltered\",\"total\",\"thresholds\",\"near_threshold\",\"employees\",\"months\",\"unit\",\"near_filters_applied\",\"filters_applied\",\"month_filter\",\"method\",\"year\",\"state\",\"client_id\",\"message\",\"in_flight\",\"newer_run_in_flight\",\"run\",\"calculation_state\"]",
+    "actual": "[\"calculation_state\",\"run\",\"newer_run_in_flight\",\"in_flight\",\"message\",\"client_id\",\"state\",\"year\",\"method\",\"month_filter\",\"filters_applied\",\"near_filters_applied\",\"unit\",\"months\",\"employees\",\"near_threshold\",\"thresholds\",\"total\",\"total_unfiltered\",\"near_total_unfiltered\"]"
+   }
+  },
+  {
+   "mode": "semantic",
+   "mutation": "header",
    "case": "boot.unit",
-   "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
-   "category": "header",
-   "path": "headers.content-type",
-   "expected": "text/plain",
-   "actual": "application/json"
-  }
- },
- {
-  "mode": "semantic",
-  "mutation": "missing",
-  "case": "boot.unit",
-  "caught": true,
-  "reported": {
-   "scenario": "p1_query_edges",
+   "caught": true,
+   "reported": {
+    "scenario": "p1_query_edges",
+    "case": "boot.unit",
+    "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+    "category": "header",
+    "path": "headers.content-type",
+    "expected": "text/plain",
+    "actual": "application/json"
+   }
+  },
+  {
+   "mode": "semantic",
+   "mutation": "missing",
    "case": "boot.unit",
-   "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
-   "category": "extra-field",
-   "path": "near_total_unfiltered",
-   "expected": "<absent>",
-   "actual": "2"
-  }
- },
- {
-  "mode": "semantic",
-  "mutation": "extra",
-  "case": "boot.unit",
-  "caught": true,
-  "reported": {
-   "scenario": "p1_query_edges",
+   "caught": true,
+   "reported": {
+    "scenario": "p1_query_edges",
+    "case": "boot.unit",
+    "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+    "category": "extra-field",
+    "path": "near_total_unfiltered",
+    "expected": "<absent>",
+    "actual": "2"
+   }
+  },
+  {
+   "mode": "semantic",
+   "mutation": "extra",
    "case": "boot.unit",
-   "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
-   "category": "missing-field",
-   "path": "zz_extra_field",
-   "expected": "true",
-   "actual": "<absent>"
-  }
- },
- {
-  "mode": "semantic",
-  "mutation": "message",
-  "case": "eligibility.sort-employee-desc",
-  "caught": true,
-  "reported": {
-   "scenario": "p1_query_edges",
+   "caught": true,
+   "reported": {
+    "scenario": "p1_query_edges",
+    "case": "boot.unit",
+    "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+    "category": "missing-field",
+    "path": "zz_extra_field",
+    "expected": "true",
+    "actual": "<absent>"
+   }
+  },
+  {
+   "mode": "semantic",
+   "mutation": "message",
    "case": "eligibility.sort-employee-desc",
-   "route": "GET /api/eligibility/2025",
-   "category": "value",
-   "path": "detail",
-   "expected": "sort must be one of ('employee_id', 'status', 'near_floor', 'total_hours', 'total_wages', 'mm_weeks', 'mm_hours', 'pp_weeks', 'pp_hours'), got 'employee' (changed)",
-   "actual": "sort must be one of ('employee_id', 'status', 'near_floor', 'total_hours', 'total_wages', 'mm_weeks', 'mm_hours', 'pp_weeks', 'pp_hours'), got 'employee'"
-  }
- },
- {
-  "mode": "semantic",
-  "mutation": "array_length",
-  "case": "boot.unit",
-  "caught": true,
-  "reported": {
-   "scenario": "p1_query_edges",
+   "caught": true,
+   "reported": {
+    "scenario": "p1_query_edges",
+    "case": "eligibility.sort-employee-desc",
+    "route": "GET /api/eligibility/2025",
+    "category": "value",
+    "path": "detail",
+    "expected": "sort must be one of ('employee_id', 'status', 'near_floor', 'total_hours', 'total_wages', 'mm_weeks', 'mm_hours', 'pp_weeks', 'pp_hours'), got 'employee' (changed)",
+    "actual": "sort must be one of ('employee_id', 'status', 'near_floor', 'total_hours', 'total_wages', 'mm_weeks', 'mm_hours', 'pp_weeks', 'pp_hours'), got 'employee'"
+   }
+  },
+  {
+   "mode": "semantic",
+   "mutation": "array_length",
    "case": "boot.unit",
-   "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
-   "category": "array-length",
-   "path": "employees",
-   "expected": "1",
-   "actual": "2"
-  }
- },
- {
-  "mode": "semantic",
-  "mutation": "null_for_value",
-  "case": "boot.unit",
-  "caught": true,
-  "reported": {
-   "scenario": "p1_query_edges",
+   "caught": true,
+   "reported": {
+    "scenario": "p1_query_edges",
+    "case": "boot.unit",
+    "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+    "category": "array-length",
+    "path": "employees",
+    "expected": "1",
+    "actual": "2"
+   }
+  },
+  {
+   "mode": "semantic",
+   "mutation": "null_for_value",
    "case": "boot.unit",
-   "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
-   "category": "type",
-   "path": "calculation_state",
-   "expected": "null",
-   "actual": "calculated"
+   "caught": true,
+   "reported": {
+    "scenario": "p1_query_edges",
+    "case": "boot.unit",
+    "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+    "category": "type",
+    "path": "calculation_state",
+    "expected": "null",
+    "actual": "calculated"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "strict",
+   "mutation": "hash_is_a_number",
+   "scenario": "g1_rest",
+   "case": "write.claim-package-commit",
+   "route": "POST /channel/v1/tools/claim_package_create_commit",
+   "caught": true,
+   "reported": {
+    "category": "type",
+    "path": "facts.result.sha256",
+    "expected": "{container.sha256}",
+    "actual": "7"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "semantic",
+   "mutation": "hash_is_a_number",
+   "scenario": "g1_rest",
+   "case": "write.claim-package-commit",
+   "route": "POST /channel/v1/tools/claim_package_create_commit",
+   "caught": true,
+   "reported": {
+    "category": "type",
+    "path": "facts.result.sha256",
+    "expected": "{container.sha256}",
+    "actual": "7"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "strict",
+   "mutation": "displayed_hash_malformed",
+   "scenario": "g1_rest",
+   "case": "write.claim-package-link",
+   "route": "POST /channel/v1/tools/claim_package_link",
+   "caught": true,
+   "reported": {
+    "category": "value",
+    "path": "blocks[1].rows[1][1]",
+    "expected": "{container.sha256}",
+    "actual": "not-a-hash"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "semantic",
+   "mutation": "displayed_hash_malformed",
+   "scenario": "g1_rest",
+   "case": "write.claim-package-link",
+   "route": "POST /channel/v1/tools/claim_package_link",
+   "caught": true,
+   "reported": {
+    "category": "value",
+    "path": "blocks[1].rows[1][1]",
+    "expected": "{container.sha256}",
+    "actual": "not-a-hash"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "strict",
+   "mutation": "neighbour_field_changed",
+   "scenario": "g1_rest",
+   "case": "write.claim-package-link",
+   "route": "POST /channel/v1/tools/claim_package_link",
+   "caught": true,
+   "reported": {
+    "category": "value",
+    "path": "facts.file_name",
+    "expected": "claim-package-1001-TY2025-40000000.xlsx",
+    "actual": "other.xlsx"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "semantic",
+   "mutation": "neighbour_field_changed",
+   "scenario": "g1_rest",
+   "case": "write.claim-package-link",
+   "route": "POST /channel/v1/tools/claim_package_link",
+   "caught": true,
+   "reported": {
+    "category": "value",
+    "path": "facts.file_name",
+    "expected": "claim-package-1001-TY2025-40000000.xlsx",
+    "actual": "other.xlsx"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "strict",
+   "mutation": "download_member_missing",
+   "scenario": "g1_rest",
+   "case": "download.owner",
+   "route": "GET /channel/v1/downloads/AAAAAAAAAAoAAAAAAAAACgAAAAAAAAAKAAAAAAAAAAo",
+   "caught": true,
+   "reported": {
+    "category": "zip-entry",
+    "path": "body.zip_entries[docProps/app.xml]",
+    "expected": "{\"name\":\"docProps/app.xml\",\"size\":205,\"sha256\":\"209fca6b00afe72a5029754b94be5953d8f16d96f67130325566b9366ad4ccc5\"}",
+    "actual": "<absent>"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "semantic",
+   "mutation": "download_member_missing",
+   "scenario": "g1_rest",
+   "case": "download.owner",
+   "route": "GET /channel/v1/downloads/AAAAAAAAAAoAAAAAAAAACgAAAAAAAAAKAAAAAAAAAAo",
+   "caught": true,
+   "reported": {
+    "category": "zip-entry",
+    "path": "body.zip_entries[docProps/app.xml]",
+    "expected": "{\"name\":\"docProps/app.xml\",\"size\":205,\"sha256\":\"209fca6b00afe72a5029754b94be5953d8f16d96f67130325566b9366ad4ccc5\"}",
+    "actual": "<absent>"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "strict",
+   "mutation": "size_is_a_string",
+   "scenario": "p1_artifacts_ai",
+   "case": "package.create",
+   "route": "POST /api/clients/1001/packages",
+   "caught": true,
+   "reported": {
+    "category": "value",
+    "path": "size_bytes",
+    "expected": "{container.size_bytes}",
+    "actual": "10011"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "semantic",
+   "mutation": "size_is_a_string",
+   "scenario": "p1_artifacts_ai",
+   "case": "package.create",
+   "route": "POST /api/clients/1001/packages",
+   "caught": true,
+   "reported": {
+    "category": "value",
+    "path": "size_bytes",
+    "expected": "{container.size_bytes}",
+    "actual": "10011"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "strict",
+   "mutation": "size_is_negative",
+   "scenario": "p1_artifacts_ai",
+   "case": "package.create",
+   "route": "POST /api/clients/1001/packages",
+   "caught": false,
+   "reported": {
+    "category": "type",
+    "path": "size_bytes",
+    "expected": "{container.size_bytes}",
+    "actual": "-5"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "semantic",
+   "mutation": "size_is_negative",
+   "scenario": "p1_artifacts_ai",
+   "case": "package.create",
+   "route": "POST /api/clients/1001/packages",
+   "caught": false,
+   "reported": {
+    "category": "type",
+    "path": "size_bytes",
+    "expected": "{container.size_bytes}",
+    "actual": "-5"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "strict",
+   "mutation": "size_is_a_float",
+   "scenario": "p1_artifacts_ai",
+   "case": "package.create",
+   "route": "POST /api/clients/1001/packages",
+   "caught": false,
+   "reported": {
+    "category": "type",
+    "path": "size_bytes",
+    "expected": "{container.size_bytes}",
+    "actual": "10011.0"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "semantic",
+   "mutation": "size_is_a_float",
+   "scenario": "p1_artifacts_ai",
+   "case": "package.create",
+   "route": "POST /api/clients/1001/packages",
+   "caught": false,
+   "reported": {
+    "category": "type",
+    "path": "size_bytes",
+    "expected": "{container.size_bytes}",
+    "actual": "10011.0"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "strict",
+   "mutation": "hash_is_null",
+   "scenario": "p1_artifacts_ai",
+   "case": "package.create",
+   "route": "POST /api/clients/1001/packages",
+   "caught": true,
+   "reported": {
+    "category": "type",
+    "path": "sha256",
+    "expected": "{container.sha256}",
+    "actual": "null"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "semantic",
+   "mutation": "hash_is_null",
+   "scenario": "p1_artifacts_ai",
+   "case": "package.create",
+   "route": "POST /api/clients/1001/packages",
+   "caught": true,
+   "reported": {
+    "category": "type",
+    "path": "sha256",
+    "expected": "{container.sha256}",
+    "actual": "null"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "strict",
+   "mutation": "hash_wrong_length",
+   "scenario": "p1_artifacts_ai",
+   "case": "package.create",
+   "route": "POST /api/clients/1001/packages",
+   "caught": true,
+   "reported": {
+    "category": "value",
+    "path": "sha256",
+    "expected": "{container.sha256}",
+    "actual": "cdf6b76554dc96b1b0e96c250dd6a9797ce93e39286dc7f9e7bfd8f5d54d655"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "semantic",
+   "mutation": "hash_wrong_length",
+   "scenario": "p1_artifacts_ai",
+   "case": "package.create",
+   "route": "POST /api/clients/1001/packages",
+   "caught": true,
+   "reported": {
+    "category": "value",
+    "path": "sha256",
+    "expected": "{container.sha256}",
+    "actual": "cdf6b76554dc96b1b0e96c250dd6a9797ce93e39286dc7f9e7bfd8f5d54d655"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "strict",
+   "mutation": "hash_uppercase",
+   "scenario": "p1_artifacts_ai",
+   "case": "package.create",
+   "route": "POST /api/clients/1001/packages",
+   "caught": true,
+   "reported": {
+    "category": "value",
+    "path": "sha256",
+    "expected": "{container.sha256}",
+    "actual": "CDF6B76554DC96B1B0E96C250DD6A9797CE93E39286DC7F9E7BFD8F5D54D6555"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "semantic",
+   "mutation": "hash_uppercase",
+   "scenario": "p1_artifacts_ai",
+   "case": "package.create",
+   "route": "POST /api/clients/1001/packages",
+   "caught": true,
+   "reported": {
+    "category": "value",
+    "path": "sha256",
+    "expected": "{container.sha256}",
+    "actual": "CDF6B76554DC96B1B0E96C250DD6A9797CE93E39286DC7F9E7BFD8F5D54D6555"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "strict",
+   "mutation": "hash_field_missing",
+   "scenario": "p1_artifacts_ai",
+   "case": "package.create",
+   "route": "POST /api/clients/1001/packages",
+   "caught": true,
+   "reported": {
+    "category": "missing-field",
+    "path": "sha256",
+    "expected": "{container.sha256}",
+    "actual": "<absent>"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "semantic",
+   "mutation": "hash_field_missing",
+   "scenario": "p1_artifacts_ai",
+   "case": "package.create",
+   "route": "POST /api/clients/1001/packages",
+   "caught": true,
+   "reported": {
+    "category": "missing-field",
+    "path": "sha256",
+    "expected": "{container.sha256}",
+    "actual": "<absent>"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "strict",
+   "mutation": "header_hash_not_the_bytes",
+   "scenario": "p1_artifacts_ai",
+   "case": "artifact.download",
+   "route": "GET /api/clients/1001/artifacts/40000000000040008000000000000009",
+   "caught": true,
+   "reported": {
+    "category": "header",
+    "path": "headers.x-content-sha256",
+    "expected": "{container.sha256}",
+    "actual": "0df6b76554dc96b1b0e96c250dd6a9797ce93e39286dc7f9e7bfd8f5d54d6555"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "semantic",
+   "mutation": "header_hash_not_the_bytes",
+   "scenario": "p1_artifacts_ai",
+   "case": "artifact.download",
+   "route": "GET /api/clients/1001/artifacts/40000000000040008000000000000009",
+   "caught": true,
+   "reported": {
+    "category": "header",
+    "path": "headers.x-content-sha256",
+    "expected": "{container.sha256}",
+    "actual": "0df6b76554dc96b1b0e96c250dd6a9797ce93e39286dc7f9e7bfd8f5d54d6555"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "strict",
+   "mutation": "zip_member_renamed",
+   "scenario": "p1_artifacts_ai",
+   "case": "artifact.download",
+   "route": "GET /api/clients/1001/artifacts/40000000000040008000000000000009",
+   "caught": true,
+   "reported": {
+    "category": "zip-entry",
+    "path": "body.zip_entries[docProps/app.xml]",
+    "expected": "{\"name\":\"docProps/app.xml\",\"size\":205,\"sha256\":\"209fca6b00afe72a5029754b94be5953d8f16d96f67130325566b9366ad4ccc5\"}",
+    "actual": "<absent>"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "semantic",
+   "mutation": "zip_member_renamed",
+   "scenario": "p1_artifacts_ai",
+   "case": "artifact.download",
+   "route": "GET /api/clients/1001/artifacts/40000000000040008000000000000009",
+   "caught": true,
+   "reported": {
+    "category": "zip-entry",
+    "path": "body.zip_entries[docProps/app.xml]",
+    "expected": "{\"name\":\"docProps/app.xml\",\"size\":205,\"sha256\":\"209fca6b00afe72a5029754b94be5953d8f16d96f67130325566b9366ad4ccc5\"}",
+    "actual": "<absent>"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "strict",
+   "mutation": "zip_member_content_changed",
+   "scenario": "p1_artifacts_ai",
+   "case": "artifact.download",
+   "route": "GET /api/clients/1001/artifacts/40000000000040008000000000000009",
+   "caught": true,
+   "reported": {
+    "category": "zip-entry",
+    "path": "body.zip_entries[docProps/core.xml].sha256",
+    "expected": "e73bf532c80f04649333a77b57e650ca8db3fbc44738af668b18e923b7aeff73",
+    "actual": "073bf532c80f04649333a77b57e650ca8db3fbc44738af668b18e923b7aeff73"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "semantic",
+   "mutation": "zip_member_content_changed",
+   "scenario": "p1_artifacts_ai",
+   "case": "artifact.download",
+   "route": "GET /api/clients/1001/artifacts/40000000000040008000000000000009",
+   "caught": true,
+   "reported": {
+    "category": "zip-entry",
+    "path": "body.zip_entries[docProps/core.xml].sha256",
+    "expected": "e73bf532c80f04649333a77b57e650ca8db3fbc44738af668b18e923b7aeff73",
+    "actual": "073bf532c80f04649333a77b57e650ca8db3fbc44738af668b18e923b7aeff73"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "strict",
+   "mutation": "zip_member_size_changed",
+   "scenario": "p1_artifacts_ai",
+   "case": "artifact.download",
+   "route": "GET /api/clients/1001/artifacts/40000000000040008000000000000009",
+   "caught": true,
+   "reported": {
+    "category": "zip-entry",
+    "path": "body.zip_entries[docProps/core.xml].size",
+    "expected": "459",
+    "actual": "460"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "semantic",
+   "mutation": "zip_member_size_changed",
+   "scenario": "p1_artifacts_ai",
+   "case": "artifact.download",
+   "route": "GET /api/clients/1001/artifacts/40000000000040008000000000000009",
+   "caught": true,
+   "reported": {
+    "category": "zip-entry",
+    "path": "body.zip_entries[docProps/core.xml].size",
+    "expected": "459",
+    "actual": "460"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "strict",
+   "mutation": "zip_member_missing",
+   "scenario": "p1_artifacts_ai",
+   "case": "artifact.download",
+   "route": "GET /api/clients/1001/artifacts/40000000000040008000000000000009",
+   "caught": true,
+   "reported": {
+    "category": "zip-entry",
+    "path": "body.zip_entries[[Content_Types].xml]",
+    "expected": "{\"name\":\"[Content_Types].xml\",\"size\":1531,\"sha256\":\"14a3e0f4a63731687aef23e44e1203f99f33052c5e93fd70b2be83a126212d3d\"}",
+    "actual": "<absent>"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "semantic",
+   "mutation": "zip_member_missing",
+   "scenario": "p1_artifacts_ai",
+   "case": "artifact.download",
+   "route": "GET /api/clients/1001/artifacts/40000000000040008000000000000009",
+   "caught": true,
+   "reported": {
+    "category": "zip-entry",
+    "path": "body.zip_entries[[Content_Types].xml]",
+    "expected": "{\"name\":\"[Content_Types].xml\",\"size\":1531,\"sha256\":\"14a3e0f4a63731687aef23e44e1203f99f33052c5e93fd70b2be83a126212d3d\"}",
+    "actual": "<absent>"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "strict",
+   "mutation": "zip_member_extra",
+   "scenario": "p1_artifacts_ai",
+   "case": "artifact.download",
+   "route": "GET /api/clients/1001/artifacts/40000000000040008000000000000009",
+   "caught": true,
+   "reported": {
+    "category": "zip-entry",
+    "path": "body.zip_entries[extra.txt]",
+    "expected": "<absent>",
+    "actual": "{\"name\":\"extra.txt\",\"size\":1,\"sha256\":\"0000000000000000000000000000000000000000000000000000000000000000\"}"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "semantic",
+   "mutation": "zip_member_extra",
+   "scenario": "p1_artifacts_ai",
+   "case": "artifact.download",
+   "route": "GET /api/clients/1001/artifacts/40000000000040008000000000000009",
+   "caught": true,
+   "reported": {
+    "category": "zip-entry",
+    "path": "body.zip_entries[extra.txt]",
+    "expected": "<absent>",
+    "actual": "{\"name\":\"extra.txt\",\"size\":1,\"sha256\":\"0000000000000000000000000000000000000000000000000000000000000000\"}"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "strict",
+   "mutation": "zip_members_reordered",
+   "scenario": "p1_artifacts_ai",
+   "case": "artifact.download",
+   "route": "GET /api/clients/1001/artifacts/40000000000040008000000000000009",
+   "caught": true,
+   "reported": {
+    "category": "zip-entry",
+    "path": "body.zip_entries.$order",
+    "expected": "[\"docProps/app.xml\",\"docProps/core.xml\",\"xl/theme/theme1.xml\",\"xl/worksheets/sheet1.xml\",\"xl/worksheets/sheet2.xml\",\"xl/worksheets/sheet3.xml\",\"xl/worksheets/sheet4.xml\",\"xl/worksheets/sheet5.xml\",\"xl/styles.xml\",\"_rels/.rels\",\"xl/workbook.xml\",\"xl/_rels/workbook.xml.rels\",\"[Content_Types].xml\"]",
+    "actual": "[\"[Content_Types].xml\",\"xl/_rels/workbook.xml.rels\",\"xl/workbook.xml\",\"_rels/.rels\",\"xl/styles.xml\",\"xl/worksheets/sheet5.xml\",\"xl/worksheets/sheet4.xml\",\"xl/worksheets/sheet3.xml\",\"xl/worksheets/sheet2.xml\",\"xl/worksheets/sheet1.xml\",\"xl/theme/theme1.xml\",\"docProps/core.xml\",\"docProps/app.xml\"]"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "semantic",
+   "mutation": "zip_members_reordered",
+   "scenario": "p1_artifacts_ai",
+   "case": "artifact.download",
+   "route": "GET /api/clients/1001/artifacts/40000000000040008000000000000009",
+   "caught": true,
+   "reported": {
+    "category": "zip-entry",
+    "path": "body.zip_entries.$order",
+    "expected": "[\"docProps/app.xml\",\"docProps/core.xml\",\"xl/theme/theme1.xml\",\"xl/worksheets/sheet1.xml\",\"xl/worksheets/sheet2.xml\",\"xl/worksheets/sheet3.xml\",\"xl/worksheets/sheet4.xml\",\"xl/worksheets/sheet5.xml\",\"xl/styles.xml\",\"_rels/.rels\",\"xl/workbook.xml\",\"xl/_rels/workbook.xml.rels\",\"[Content_Types].xml\"]",
+    "actual": "[\"[Content_Types].xml\",\"xl/_rels/workbook.xml.rels\",\"xl/workbook.xml\",\"_rels/.rels\",\"xl/styles.xml\",\"xl/worksheets/sheet5.xml\",\"xl/worksheets/sheet4.xml\",\"xl/worksheets/sheet3.xml\",\"xl/worksheets/sheet2.xml\",\"xl/worksheets/sheet1.xml\",\"xl/theme/theme1.xml\",\"docProps/core.xml\",\"docProps/app.xml\"]"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "strict",
+   "mutation": "response_not_a_zip",
+   "scenario": "p1_artifacts_ai",
+   "case": "artifact.download",
+   "route": "GET /api/clients/1001/artifacts/40000000000040008000000000000009",
+   "caught": true,
+   "reported": {
+    "category": "zip-entry",
+    "path": "body.zip_entries",
+    "expected": "[{\"name\":\"docProps/app.xml\",\"size\":205,\"sha256\":\"209fca6b00afe72a5029754b94be5953d8f16d96f67130325566b9366ad4ccc5\"},{\"name\":\"docProps/core.xml\",\"size\":459,\"sha256\":\"e73bf532c80f04649333a77b57e650ca8db3fbc44738af668b18e923b7aeff73\"},{\"name\":\"xl/theme/theme1.xml\",\"size\":10140,\"sha256\":\"d15e8ebf78ef7b9...(1555 chars)",
+    "actual": "<not a readable zip>"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "semantic",
+   "mutation": "response_not_a_zip",
+   "scenario": "p1_artifacts_ai",
+   "case": "artifact.download",
+   "route": "GET /api/clients/1001/artifacts/40000000000040008000000000000009",
+   "caught": true,
+   "reported": {
+    "category": "zip-entry",
+    "path": "body.zip_entries",
+    "expected": "[{\"name\":\"docProps/app.xml\",\"size\":205,\"sha256\":\"209fca6b00afe72a5029754b94be5953d8f16d96f67130325566b9366ad4ccc5\"},{\"name\":\"docProps/core.xml\",\"size\":459,\"sha256\":\"e73bf532c80f04649333a77b57e650ca8db3fbc44738af668b18e923b7aeff73\"},{\"name\":\"xl/theme/theme1.xml\",\"size\":10140,\"sha256\":\"d15e8ebf78ef7b9...(1555 chars)",
+    "actual": "<not a readable zip>"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "strict",
+   "mutation": "container_bytes_differ_artifact",
+   "scenario": "p1_artifacts_ai",
+   "case": "artifact.download",
+   "route": "GET /api/clients/1001/artifacts/40000000000040008000000000000009",
+   "caught": true,
+   "reported": "no difference (tier D)"
+  },
+  {
+   "group": "container",
+   "mode": "semantic",
+   "mutation": "container_bytes_differ_artifact",
+   "scenario": "p1_artifacts_ai",
+   "case": "artifact.download",
+   "route": "GET /api/clients/1001/artifacts/40000000000040008000000000000009",
+   "caught": true,
+   "reported": "no difference (tier D)"
+  },
+  {
+   "group": "container",
+   "mode": "strict",
+   "mutation": "container_hash_and_size_differ_package",
+   "scenario": "p1_artifacts_ai",
+   "case": "package.create",
+   "route": "POST /api/clients/1001/packages",
+   "caught": true,
+   "reported": "no difference (tier D)"
+  },
+  {
+   "group": "container",
+   "mode": "semantic",
+   "mutation": "container_hash_and_size_differ_package",
+   "scenario": "p1_artifacts_ai",
+   "case": "package.create",
+   "route": "POST /api/clients/1001/packages",
+   "caught": true,
+   "reported": "no difference (tier D)"
+  },
+  {
+   "group": "container",
+   "mode": "strict",
+   "mutation": "manifest_bytes_is_null",
+   "scenario": "p1_program_drafts",
+   "case": "second-manifest",
+   "route": "GET /api/v2/program-drafts/40000000000040008000000000000009/export/manifest",
+   "caught": true,
+   "reported": {
+    "category": "type",
+    "path": "bundle_bytes",
+    "expected": "{container.size_bytes}",
+    "actual": "null"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "semantic",
+   "mutation": "manifest_bytes_is_null",
+   "scenario": "p1_program_drafts",
+   "case": "second-manifest",
+   "route": "GET /api/v2/program-drafts/40000000000040008000000000000009/export/manifest",
+   "caught": true,
+   "reported": {
+    "category": "type",
+    "path": "bundle_bytes",
+    "expected": "{container.size_bytes}",
+    "actual": "null"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "strict",
+   "mutation": "manifest_hash_wrong_type",
+   "scenario": "p1_program_drafts",
+   "case": "second-manifest",
+   "route": "GET /api/v2/program-drafts/40000000000040008000000000000009/export/manifest",
+   "caught": true,
+   "reported": {
+    "category": "type",
+    "path": "bundle_sha256",
+    "expected": "{container.sha256}",
+    "actual": "true"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "semantic",
+   "mutation": "manifest_hash_wrong_type",
+   "scenario": "p1_program_drafts",
+   "case": "second-manifest",
+   "route": "GET /api/v2/program-drafts/40000000000040008000000000000009/export/manifest",
+   "caught": true,
+   "reported": {
+    "category": "type",
+    "path": "bundle_sha256",
+    "expected": "{container.sha256}",
+    "actual": "true"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "strict",
+   "mutation": "header_hash_malformed",
+   "scenario": "p1_program_drafts",
+   "case": "second-export",
+   "route": "POST /api/v2/program-drafts/40000000000040008000000000000009/export",
+   "caught": true,
+   "reported": {
+    "category": "header",
+    "path": "headers.x-bundle-sha256",
+    "expected": "{container.sha256}",
+    "actual": "zz"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "semantic",
+   "mutation": "header_hash_malformed",
+   "scenario": "p1_program_drafts",
+   "case": "second-export",
+   "route": "POST /api/v2/program-drafts/40000000000040008000000000000009/export",
+   "caught": true,
+   "reported": {
+    "category": "header",
+    "path": "headers.x-bundle-sha256",
+    "expected": "{container.sha256}",
+    "actual": "zz"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "strict",
+   "mutation": "export_member_content_changed",
+   "scenario": "p1_program_drafts",
+   "case": "second-export",
+   "route": "POST /api/v2/program-drafts/40000000000040008000000000000009/export",
+   "caught": true,
+   "reported": {
+    "category": "zip-entry",
+    "path": "body.zip_entries[registry-patch.json].sha256",
+    "expected": "eee47c727c070248de2d0ae5150dcbc97934365b7dd12c2c762acd408e16ddac",
+    "actual": "0ee47c727c070248de2d0ae5150dcbc97934365b7dd12c2c762acd408e16ddac"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "semantic",
+   "mutation": "export_member_content_changed",
+   "scenario": "p1_program_drafts",
+   "case": "second-export",
+   "route": "POST /api/v2/program-drafts/40000000000040008000000000000009/export",
+   "caught": true,
+   "reported": {
+    "category": "zip-entry",
+    "path": "body.zip_entries[registry-patch.json].sha256",
+    "expected": "eee47c727c070248de2d0ae5150dcbc97934365b7dd12c2c762acd408e16ddac",
+    "actual": "0ee47c727c070248de2d0ae5150dcbc97934365b7dd12c2c762acd408e16ddac"
+   }
+  },
+  {
+   "group": "container",
+   "mode": "strict",
+   "mutation": "container_bytes_differ_export",
+   "scenario": "p1_program_drafts",
+   "case": "second-export",
+   "route": "POST /api/v2/program-drafts/40000000000040008000000000000009/export",
+   "caught": true,
+   "reported": "no difference (tier D)"
+  },
+  {
+   "group": "container",
+   "mode": "semantic",
+   "mutation": "container_bytes_differ_export",
+   "scenario": "p1_program_drafts",
+   "case": "second-export",
+   "route": "POST /api/v2/program-drafts/40000000000040008000000000000009/export",
+   "caught": true,
+   "reported": "no difference (tier D)"
   }
- }
-]
+ ]
+}

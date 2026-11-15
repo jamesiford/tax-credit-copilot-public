@@ -21,7 +21,7 @@ from typing import Any, Callable
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from contract import exchange, replay  # noqa: E402
+from contract import exchange, oracle, replay  # noqa: E402
 from contract.jsontext import Num  # noqa: E402
 
 
@@ -120,10 +120,108 @@ def mutations(records: list[dict]) -> list[tuple[str, str, str, Callable[[], Non
 out_ids: dict[str, str] = {}
 
 
+def _entry(record: dict, index: int = 0) -> dict:
+    return record["response"]["body"]["zip_entries"][index]
+
+
+def _flip(sha: str) -> str:
+    return ("0" if sha[0] != "0" else "1") + sha[1:]
+
+
+def container_mutations() -> list[tuple[str, str, str, Callable[[dict], None], str | None, str | None]]:
+    """(name, scenario, case, mutate(raw ACTUAL record), expected category, expected path fragment).
+
+    These mutate what the SERVER answered, before normalisation, because the question is whether the container rule masks a real
+    change: a change the rule must not hide is caught, a change in the container's bytes alone (tier D) must not be reported.
+    A `None` category means "must be tolerated: no difference at all".
+    """
+    def val(r: dict) -> dict:
+        return r["response"]["body"]["value"]
+
+    def hdr(name: str) -> Callable[[dict, str], None]:
+        return lambda r, v: r["response"]["headers"].__setitem__(name, v)
+
+    pkg, art, drafts, chan = ("p1_artifacts_ai", "package.create"), ("p1_artifacts_ai", "artifact.download"), ("p1_program_drafts", "second-export"), ("g1_rest", "download.owner")
+    link, commit, manifest = ("g1_rest", "write.claim-package-link"), ("g1_rest", "write.claim-package-commit"), ("p1_program_drafts", "second-manifest")
+    return [
+        ("size_is_a_string", *pkg, lambda r: val(r).__setitem__("size_bytes", "10011"), "value", "size_bytes"),
+        ("size_is_negative", *pkg, lambda r: val(r).__setitem__("size_bytes", Num("-5")), "type", "size_bytes"),
+        ("size_is_a_float", *pkg, lambda r: val(r).__setitem__("size_bytes", Num("10011.0")), "type", "size_bytes"),
+        ("hash_is_null", *pkg, lambda r: val(r).__setitem__("sha256", None), "type", "sha256"),
+        ("hash_wrong_length", *pkg, lambda r: val(r).__setitem__("sha256", val(r)["sha256"][:63]), "value", "sha256"),
+        ("hash_uppercase", *pkg, lambda r: val(r).__setitem__("sha256", val(r)["sha256"].upper()), "value", "sha256"),
+        ("hash_field_missing", *pkg, lambda r: val(r).pop("sha256"), "missing-field", "sha256"),
+        ("hash_is_a_number", *commit, lambda r: val(r)["facts"]["result"].__setitem__("sha256", Num("7")), "type", "facts.result.sha256"),
+        ("displayed_hash_malformed", *link, lambda r: val(r)["blocks"][1]["rows"][1].__setitem__(1, "not-a-hash"), "value", "blocks[1].rows[1][1]"),
+        ("neighbour_field_changed", *link, lambda r: val(r)["facts"].__setitem__("file_name", "other.xlsx"), "value", "facts.file_name"),
+        ("manifest_bytes_is_null", *manifest, lambda r: val(r).__setitem__("bundle_bytes", None), "type", "bundle_bytes"),
+        ("manifest_hash_wrong_type", *manifest, lambda r: val(r).__setitem__("bundle_sha256", True), "type", "bundle_sha256"),
+        ("header_hash_not_the_bytes", *art, lambda r: hdr("x-content-sha256")(r, _flip(r["response"]["headers"]["x-content-sha256"])), "header", "x-content-sha256"),
+        ("header_hash_malformed", *drafts, lambda r: hdr("x-bundle-sha256")(r, "zz"), "header", "x-bundle-sha256"),
+        ("zip_member_renamed", *art, lambda r: _entry(r).__setitem__("name", _entry(r)["name"] + "-renamed"), "zip-entry", "body.zip_entries["),
+        ("zip_member_content_changed", *art, lambda r: _entry(r, 1).__setitem__("sha256", _flip(_entry(r, 1)["sha256"])), "zip-entry", ".sha256"),
+        ("zip_member_size_changed", *art, lambda r: _entry(r, 1).__setitem__("size", Num(str(int(_entry(r, 1)["size"].text) + 1))), "zip-entry", ".size"),
+        ("zip_member_missing", *art, lambda r: r["response"]["body"]["zip_entries"].pop(), "zip-entry", "body.zip_entries["),
+        ("zip_member_extra", *art, lambda r: r["response"]["body"]["zip_entries"].append({"name": "extra.txt", "size": Num("1"), "sha256": "0" * 64}), "zip-entry", "extra.txt"),
+        ("zip_members_reordered", *art, lambda r: r["response"]["body"]["zip_entries"].reverse(), "zip-entry", "$order"),
+        ("export_member_content_changed", *drafts, lambda r: _entry(r, 2).__setitem__("sha256", _flip(_entry(r, 2)["sha256"])), "zip-entry", ".sha256"),
+        ("download_member_missing", *chan, lambda r: r["response"]["body"]["zip_entries"].pop(0), "zip-entry", "body.zip_entries["),
+        ("response_not_a_zip", *art, lambda r: r["response"]["body"].pop("zip_entries"), "zip-entry", "body.zip_entries"),
+        # Tier D: only the container's own bytes change (a different zlib, a .NET writer). Members are identical: nothing may be reported.
+        ("container_bytes_differ_artifact", *art, lambda r: (r["response"]["body"].update(sha256="1" * 64, length=Num("1")), hdr("x-content-sha256")(r, "1" * 64)), None, None),
+        ("container_hash_and_size_differ_package", *pkg, lambda r: (val(r).__setitem__("sha256", "2" * 64), val(r).__setitem__("size_bytes", Num("1"))), None, None),
+        ("container_bytes_differ_export", *drafts, lambda r: (r["response"]["body"].update(sha256="3" * 64, length=Num("9")), hdr("x-bundle-sha256")(r, "3" * 64)), None, None),
+    ]
+
+
+def run_container_mutations() -> list[dict[str, Any]]:
+    """Replay the scenarios once, keep the raw answers, mutate copies of them, normalise, compare with the recording."""
+    import asyncio
+
+    from contract import compare, normalise
+
+    muts = container_mutations()
+    results: list[dict[str, Any]] = []
+    for scenario_name in sorted({m[1] for m in muts}):
+        scenario = json.loads((ROOT / "contract" / "scenarios" / f"{scenario_name}.json").read_text(encoding="utf-8"))
+        proc, url = replay.spawn_server(scenario["profile"], replay.auth_limit(scenario_name))
+        try:
+            raw = asyncio.run(replay.run_against(url, scenario))
+        finally:
+            proc.kill()
+        expected = {r["id"]: r for r in exchange.load_records((ROOT / "contract" / "recordings" / f"{scenario_name}.jsonl").read_text(encoding="utf-8"))}
+        by_id = {r["id"]: r for r in raw}
+        for name, scenario_of, case, mutate, category, fragment in (m for m in muts if m[1] == scenario_name):
+            for mode in ("strict", "semantic"):
+                actual = copy.deepcopy(by_id[case])
+                actual["response"]["body"] = _numify(actual["response"]["body"])
+                mutate(actual)
+                shown = exchange.roundtrip([normalise.apply(actual)])[0]
+                failures, tolerated = compare.split(compare.compare_record(expected[case], shown), mode)
+                hit = next((d for d in failures if d["category"] == category and fragment in d["path"]), None) if category else None
+                ok = (not failures and not tolerated) if category is None else hit is not None
+                route = f"{expected[case]['request']['method']} {expected[case]['request']['path']}"
+                detail = hit or (failures[0] if failures else None)
+                results.append({"group": "container", "mode": mode, "mutation": name, "scenario": scenario_name, "case": case, "route": route, "caught": ok,
+                                "reported": detail if category else "no difference (tier D)" if ok else failures[:1]})
+                print(f"{'CAUGHT' if ok else 'MISSED'} [{mode}] {name} @ {scenario_name}/{case}: {json.dumps(results[-1]['reported'])[:240]}", flush=True)
+    return results
+
+
+def _numify(body: dict) -> dict:
+    """The recorder's raw record carries Python ints for the zip sizes; a recording read back carries `Num`. Mutations assume the latter."""
+    for entry in body.get("zip_entries") or []:
+        if isinstance(entry.get("size"), int):
+            entry["size"] = Num(str(entry["size"]))
+    return body
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--scenario", default="p1_query_edges")
+    parser.add_argument("--allow-other-python", action="store_true", help="cross-check only")
     args = parser.parse_args()
+    oracle.require(args.allow_other_python)
     src = ROOT / "contract" / "recordings" / f"{args.scenario}.jsonl"
     original = exchange.load_records(src.read_text(encoding="utf-8"))
     proc, url = replay.spawn_server("P1")
@@ -154,7 +252,9 @@ def main() -> int:
                 print(f"{'CAUGHT' if ok else 'MISSED'} [{mode}] {name} @ {hit}: {json.dumps(detail)[:260]}", flush=True)
     finally:
         proc.kill()
-    (ROOT / "contract" / "docs" / "mutation-selftest.json").write_text(json.dumps(results, indent=1), encoding="utf-8", newline="\n")
+    results += run_container_mutations()
+    stamp = oracle.describe()
+    (ROOT / "contract" / "docs" / "mutation-selftest.json").write_text(json.dumps({"interpreter": stamp, "results": results}, indent=1), encoding="utf-8", newline="\n")
     missed = [r for r in results if not r["caught"]]
     print(f"{len(results) - len(missed)}/{len(results)} mutations caught")
     return 1 if missed else 0

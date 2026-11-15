@@ -63,6 +63,36 @@ def compare_tree(e: Any, a: Any, path: str, out: list[dict[str, Any]]) -> None:
         out.append(_d(kind, path or "$", e, a))
 
 
+def compare_members(e: Any, a: Any, out: list[dict[str, Any]]) -> None:
+    """A zip response is compared by its MEMBERS (name, uncompressed size, SHA-256 of each), never by the container's bytes: the
+    deflate stream depends on the zlib build and a different host will always write different bytes. One diff per member."""
+    if not isinstance(e, list) or not isinstance(a, list):
+        if e != a:
+            out.append(_d("zip-entry", "body.zip_entries", e, "<not a readable zip>" if a is None else a))
+        return
+    by_e, by_a = {m["name"]: m for m in e}, {m["name"]: m for m in a}
+    if len(by_e) != len(e) or len(by_a) != len(a):  # duplicate member names: compare the lists whole
+        if e != a:
+            out.append(_d("zip-entry", "body.zip_entries", e, a))
+        return
+    for name, member in by_e.items():
+        if name not in by_a:
+            out.append(_d("zip-entry", f"body.zip_entries[{name}]", member, "<absent>"))
+            continue
+        for field in ("size", "sha256"):
+            if member.get(field) != by_a[name].get(field):
+                out.append(_d("zip-entry", f"body.zip_entries[{name}].{field}", member.get(field), by_a[name].get(field)))
+    for name, member in by_a.items():
+        if name not in by_e:
+            out.append(_d("zip-entry", f"body.zip_entries[{name}]", "<absent>", member))
+    if not out_has_member_diff(out) and list(by_e) != list(by_a):
+        out.append(_d("zip-entry", "body.zip_entries.$order", list(by_e), list(by_a)))
+
+
+def out_has_member_diff(out: list[dict[str, Any]]) -> bool:
+    return any(d["path"].startswith("body.zip_entries[") for d in out)
+
+
 def compare_body(e: dict[str, Any], a: dict[str, Any], out: list[dict[str, Any]], normalised: bool) -> None:
     if e["kind"] != a["kind"]:
         out.append(_d("body-kind", "body", e["kind"], a["kind"]))
@@ -89,8 +119,7 @@ def compare_body(e: dict[str, Any], a: dict[str, Any], out: list[dict[str, Any]]
                 diff["category"] = diff["category"] if diff["category"] in TOLERABLE else "event"
     elif kind == "bytes":
         if "zip_entries" in e:
-            if e.get("zip_entries") != a.get("zip_entries"):
-                out.append(_d("zip-entry", "body.zip_entries", e.get("zip_entries"), a.get("zip_entries")))
+            compare_members(e.get("zip_entries"), a.get("zip_entries"), out)
         elif e.get("sha256") != a.get("sha256"):
             out.append(_d("value", "body.sha256", e.get("sha256"), a.get("sha256")))
 
