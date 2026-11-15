@@ -1,0 +1,45 @@
+{
+  "session": "skeleton",
+  "branch": "dotnet/w1-skeleton",
+  "head": "b8e17f4",
+  "summary": "Stopped at fixed hard stop 1 before implementation: mandatory documentation deliverables fall outside the owned-path allowlist. Only explicitly required stopping artifacts were written. Build, format, fast tests, and replay were not run; their gates are not claimed. The head identifies the clean checkout assessed before the stopping-artifacts commit.",
+  "stages": {
+    "preflight": "partial",
+    "stage1": "skipped",
+    "stage2": "skipped",
+    "stage3": "skipped",
+    "stage4": "skipped",
+    "stage5": "skipped"
+  },
+  "gates_claimed": {},
+  "deviations": [
+    {
+      "id": "DEV-1",
+      "what": "Stopped before implementation and validation.",
+      "why": "Fixed hard stop 1 applies because required reports cannot be created within the fixed owned-path allowlist.",
+      "decision_needed": true
+    }
+  ],
+  "findings": [
+    "The fixed owned-path allowlist excludes dotnet/docs/** despite mandatory reports, log, improvements register, and finish status residing there.",
+    "Stage 4 names improvements/W1-skeleton.json, while the fixed rules name improvements/skeleton.json."
+  ],
+  "open_questions": [
+    "Which improvements-register filename is authoritative?"
+  ],
+  "needs_human": [
+    {
+      "item": "Authorize the required skeleton documentation paths in both the task allowlist and the owned_paths gate.",
+      "why": "The mandatory deliverables otherwise trigger fixed hard stop 1; the missing-decision policy cannot change fixed rules."
+    },
+    {
+      "item": "Choose the authoritative improvements-register filename.",
+      "why": "The task specifies two different filenames."
+    }
+  ],
+  "reports": [
+    "dotnet/docs/HALT-skeleton.md",
+    "dotnet/docs/skeleton-log.md",
+    "dotnet/docs/status/skeleton.json"
+  ]
+}
