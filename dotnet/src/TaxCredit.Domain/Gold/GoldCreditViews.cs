@@ -1,4 +1,5 @@
 using System.Numerics;
+using TaxCredit.Domain.BaseYear;
 using TaxCredit.Domain.Numerics;
 
 namespace TaxCredit.Domain.Gold;
@@ -25,14 +26,36 @@ public sealed record StairView(
     object? HighWaterMark,
     object? Backfilled,
     object? AnnualCreditUsd,
-    object? PerJobUsd);
+    object? PerJobUsd)
+{
+    /// <summary>The reading of a real <see cref="TrancheYear"/> (the ported <c>tools/baseyear.py</c> type), each attribute with the type Python holds.</summary>
+    /// <param name="year">The engine's year.</param>
+    /// <returns>The view.</returns>
+    public static StairView From(TrancheYear year)
+    {
+        ArgumentNullException.ThrowIfNull(year);
+        return new StairView(
+            year.NetNew, year.Threshold, year.Qualified, year.EligibleJobs, year.NewJobsCreated, PyNum.Tree(year.HighWaterMark), year.Backfilled,
+            PyNum.IntTree(year.AnnualCreditUsd), year.PerJobUsd);
+    }
+}
 
 /// <summary>One creation event of a <c>BaseYearResult</c>: a tranche opened in <paramref name="CreationYear"/>.</summary>
 /// <param name="CreationYear">The year that opened the window.</param>
 /// <param name="Jobs">The tranche size.</param>
 /// <param name="PerJobUsd">The rate attached to the jobs when they were created.</param>
 /// <param name="Installments">The <c>{year, jobs_maintained, credit_usd}</c> dictionaries.</param>
-public sealed record TrancheEventView(object? CreationYear, object? Jobs, object? PerJobUsd, IReadOnlyList<PyDict> Installments);
+public sealed record TrancheEventView(object? CreationYear, object? Jobs, object? PerJobUsd, IReadOnlyList<PyDict> Installments)
+{
+    /// <summary>The view of a real <see cref="TrancheEvent"/>.</summary>
+    /// <param name="tranche">The event.</param>
+    /// <returns>The view.</returns>
+    public static TrancheEventView From(TrancheEvent tranche)
+    {
+        ArgumentNullException.ThrowIfNull(tranche);
+        return new TrancheEventView(tranche.CreationYear, tranche.Jobs, tranche.PerJobUsd, tranche.Installments.Select(i => i.ToDict()).ToList());
+    }
+}
 
 /// <summary>The attributes of a <c>BaseYearResult</c> the Gold projections read.</summary>
 /// <param name="BaseAverageHeadcount">The frozen base average.</param>
@@ -47,7 +70,19 @@ public sealed record BaseYearView(
     object? TrancheYears,
     object? BaseYearOverridden,
     object? HighWaterMarkOverridden,
-    IReadOnlyList<TrancheEventView> TrancheEvents);
+    IReadOnlyList<TrancheEventView> TrancheEvents)
+{
+    /// <summary>The view of a real <see cref="BaseYearResult"/> (the ported <c>BaseYearResult</c>), each attribute with the type Python holds.</summary>
+    /// <param name="result">The engine result.</param>
+    /// <returns>The view.</returns>
+    public static BaseYearView From(BaseYearResult result)
+    {
+        ArgumentNullException.ThrowIfNull(result);
+        return new BaseYearView(
+            PyNum.Tree(result.BaseAverageHeadcount), PyNum.Tree(result.PerJobUsd), result.TrancheYears, result.BaseYearOverridden, result.HighWaterMarkOverridden,
+            result.TrancheEvents.Select(TrancheEventView.From).ToList());
+    }
+}
 
 /// <summary>The identity, label and provenance arguments of <c>unit_year_master_row</c> that the credit layer does not compute.</summary>
 /// <param name="ClientId">The client.</param>
