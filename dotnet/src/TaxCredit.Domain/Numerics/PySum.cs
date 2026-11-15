@@ -16,13 +16,16 @@ public readonly record struct PyNumber(bool IsInt, long IntValue, double FloatVa
 }
 
 /// <summary>
-/// Python's built-in <c>sum()</c>, including CPython 3.12+'s compensated (Neumaier) float summation.
+/// Python's built-in <c>sum()</c> exactly as CPython 3.12 implements it (the pinned oracle), including its compensated (Neumaier) float summation.
 /// </summary>
 /// <remarks>
 /// Why not <c>+=</c> or LINQ <c>Sum()</c>: since Python 3.12 <c>sum()</c> of floats carries a running error
 /// term and adds it once at the end, so <c>sum([0.1] * 10)</c> is exactly <c>1.0</c> while a naive loop gives
 /// <c>0.9999999999999999</c>. Reproducing the engine's totals therefore requires the same algorithm, in the same
-/// element order. Ints are added exactly until the first float appears, then take the same compensated path as floats.
+/// element order. Ints are added exactly until the first float appears; after that a float takes the compensated path
+/// but an int is added to the running total WITHOUT compensation (<c>f += (double)value</c>). CPython 3.14 compensates those
+/// trailing ints too, which changes 382 of the exported <c>sum</c> vectors; that is deliberately NOT implemented here and is
+/// kept as data in <c>parity/goldens/version-sensitive.jsonl.gz</c> (see findings T-04).
 /// Source: CPython <c>Python/bltinmodule.c</c> (<c>builtin_sum_impl</c>). Ints beyond the <see cref="long"/>
 /// range are not supported (the engine sums small counts and weights).
 /// </remarks>
@@ -49,8 +52,14 @@ public static class PySum
         var c = 0.0;
         for (i++; i < items.Count; i++)
         {
-            // Ints take the same compensated path as floats (verified against CPython 3.14 vectors).
-            var x = items[i].IsInt ? items[i].IntValue : items[i].FloatValue;
+            if (items[i].IsInt)
+            {
+                // CPython 3.12: a trailing int is added to the running total without touching the error term.
+                f += (double)items[i].IntValue;
+                continue;
+            }
+
+            var x = items[i].FloatValue;
             var t = f + x;
             c += Math.Abs(f) >= Math.Abs(x) ? (f - t) + x : (x - t) + f;
             f = t;
