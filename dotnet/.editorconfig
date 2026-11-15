@@ -1,0 +1,36 @@
+root = true
+
+[*]
+charset = utf-8
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+end_of_line = lf
+
+[*.{csproj,props,targets,slnx,json,yml,yaml}]
+indent_size = 2
+
+[*.cs]
+csharp_style_namespace_declarations = file_scoped:error
+csharp_using_directive_placement = outside_namespace:error
+csharp_style_var_for_built_in_types = false:suggestion
+csharp_prefer_braces = true:error
+dotnet_style_qualification_for_field = false:error
+dotnet_sort_system_directives_first = true
+csharp_style_expression_bodied_methods = when_on_single_line:suggestion
+dotnet_diagnostic.IDE0161.severity = error
+dotnet_diagnostic.IDE0160.severity = error
+dotnet_diagnostic.IDE0055.severity = error
+# Public members of production code must carry XML docs (enforced by CS1591 -> error).
+dotnet_diagnostic.CS1591.severity = error
+# Python-compat code is deliberately explicit about culture and comparison.
+dotnet_diagnostic.CA1304.severity = error
+dotnet_diagnostic.CA1305.severity = error
+dotnet_diagnostic.CA1307.severity = error
+dotnet_diagnostic.CA1309.severity = error
+dotnet_diagnostic.CA1310.severity = error
+# Library-style naming is not wanted for test method names.
+[tests/**.cs]
+dotnet_diagnostic.CS1591.severity = none
+dotnet_diagnostic.CA1707.severity = none

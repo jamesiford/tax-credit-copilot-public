@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <RootNamespace>TaxCredit.Api</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TaxCredit.Application\TaxCredit.Application.csproj" />
+    <ProjectReference Include="..\TaxCredit.Infrastructure\TaxCredit.Infrastructure.csproj" />
+    <ProjectReference Include="..\TaxCredit.ServiceDefaults\TaxCredit.ServiceDefaults.csproj" />
+  </ItemGroup>
+</Project>

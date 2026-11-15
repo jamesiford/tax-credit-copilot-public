@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/TaxCredit.Domain/TaxCredit.Domain.csproj" />
+    <Project Path="src/TaxCredit.Application/TaxCredit.Application.csproj" />
+    <Project Path="src/TaxCredit.Infrastructure/TaxCredit.Infrastructure.csproj" />
+    <Project Path="src/TaxCredit.Api/TaxCredit.Api.csproj" />
+    <Project Path="src/TaxCredit.ServiceDefaults/TaxCredit.ServiceDefaults.csproj" />
+    <Project Path="src/TaxCredit.AppHost/TaxCredit.AppHost.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/TaxCredit.Domain.Tests/TaxCredit.Domain.Tests.csproj" />
+    <Project Path="tests/TaxCredit.Parity.Tests/TaxCredit.Parity.Tests.csproj" />
+    <Project Path="tests/TaxCredit.Architecture.Tests/TaxCredit.Architecture.Tests.csproj" />
+  </Folder>
+</Solution>

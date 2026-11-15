@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Pure domain: BCL only. No package or project references - enforced by TaxCredit.Architecture.Tests. -->
+  <PropertyGroup>
+    <RootNamespace>TaxCredit.Domain</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="TaxCredit.Parity.Tests" />
+    <InternalsVisibleTo Include="TaxCredit.Domain.Tests" />
+  </ItemGroup>
+</Project>
