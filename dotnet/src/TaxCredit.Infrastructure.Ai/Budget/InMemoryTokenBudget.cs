@@ -9,8 +9,8 @@ public sealed class InMemoryTokenBudget : ITokenBudget
     private readonly long? _globalLimit;
     private readonly long? _userLimit;
     private readonly TimeProvider _clock;
-    private readonly Dictionary<string, long> _used = [with(StringComparer.Ordinal)];
-    private readonly Dictionary<string, long> _reserved = [with(StringComparer.Ordinal)];
+    private readonly Dictionary<string, long> _used = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, long> _reserved = new(StringComparer.Ordinal);
     private DateOnly _day;
     private long _globalUsed;
     private long _globalReserved;

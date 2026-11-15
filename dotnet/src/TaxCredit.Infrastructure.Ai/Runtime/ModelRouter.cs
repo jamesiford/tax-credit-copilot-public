@@ -6,7 +6,7 @@ namespace TaxCredit.Infrastructure.Ai.Runtime;
 /// <summary>Root-owned provider factories; duplicate labels fail rather than depend on registration order.</summary>
 public sealed class ProviderRegistry
 {
-    private readonly Dictionary<string, Func<IAgentRuntime>> _factories = [with(StringComparer.Ordinal)];
+    private readonly Dictionary<string, Func<IAgentRuntime>> _factories = new(StringComparer.Ordinal);
     /// <summary>Registers without constructing or calling a provider.</summary>
     public void Register(string name, Func<IAgentRuntime> factory)
     {
