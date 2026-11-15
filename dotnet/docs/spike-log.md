@@ -5,6 +5,7 @@ Running log of decisions, findings and gate results for the .NET parity spike (b
 ## Preflight (2026-11-14)
 
 - Worktree `C:\Projects\GitHub\tcc-dotnet-spike` created from `main` (`f9da416`) on branch `dotnet/spike`. The main checkout was not touched.
+- **Superseded:** the oracle is now CPython 3.12 (`C:\Projects\py312-oracle\.venv`), enforced in code; the line below describes the first run.
 - Oracle interpreter: `C:\Projects\GitHub\tax-credit-copilot-public\.venv\Scripts\python.exe` = **CPython 3.14.2** (Unicode 16.0.0), run with cwd `<worktree>\backend` and `PYTHONUTF8=1`.
 - Import check: `python -c "import domain, sys; print(domain.__file__)"` printed `C:\Projects\GitHub\tcc-dotnet-spike\backend\domain\__init__.py` (inside the worktree, so no editable install is shadowing it).
 - Python baseline (`test_onezero`, `test_engine_parity_synthetic`, `test_average_headcount_window`, `test_fiscal_window`, `test_credit_math`, `test_certified_figures_contract`): **82 passed in 5.46 s**.

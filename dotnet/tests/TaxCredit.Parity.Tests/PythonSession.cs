@@ -17,7 +17,7 @@ internal sealed class PythonSession : IDisposable
     public static PythonSession Start()
     {
         var parity = GoldenFiles.ParityDirectory;
-        var info = new ProcessStartInfo(PythonExe, "\"" + Path.Combine(parity, "engine_cli.py") + "\"")
+        var info = new ProcessStartInfo(PythonExe, "\"" + Path.Combine(parity, "engine_cli.py") + "\"" + (OracleInterpreter.AllowOther ? " --allow-other-python" : string.Empty))
         {
             WorkingDirectory = Path.Combine(Directory.GetParent(parity)!.FullName, "backend"),
             RedirectStandardInput = true,

@@ -1,18 +1,20 @@
 # Spike report: can the Python calculation engine be reproduced exactly in C#?
 
-Branch `dotnet/spike` (local only, nothing pushed). Oracle: CPython 3.14.2, `backend/domain/calculation`. Date: 2026-11-14.
+Branch `dotnet/spike` (local only, nothing pushed). Oracle: **CPython 3.12** (3.12.13), the interpreter the product runs on, enforced in code; `backend/domain/calculation`. Date: 2026-11-14. The first run used 3.14.2 by accident and was re-certified on 3.12 (see "Oracle interpreter" below).
 
 ## Recommendation: GO, WITH CONDITIONS
 
-The engine reproduced bit for bit: **zero mismatches** across 398,980 primitive vectors, 3,939 recorded engine scenarios and
+The engine reproduced bit for bit on CPython 3.12: **zero mismatches** across 398,980 primitive vectors, 3,939 recorded engine scenarios and
 520,000 differential-fuzz scenarios (20,000 + 500,000 under two seeds), comparing result trees, calculation trails with
 their SHA-256 evidence hashes, and Python exception types. Nothing was found that cannot be matched, and no tolerance was
 needed beyond treating NaN as NaN.
 
 Conditions for a full port:
 
-1. **The oracle interpreter is part of the contract.** Behaviour such as `sum()` compensation of ints (T-04) is specific to
-   CPython 3.12+/3.14. Pin one Python version for goldens, and regenerate and re-run G1-G3 whenever it changes.
+1. **The oracle interpreter is part of the contract. Resolved: the oracle is CPython 3.12, enforced in code.** Every
+   `parity/*.py` script refuses another interpreter, `PythonSession` has no default (`TCC_PYTHON`) and fails the run unless
+   `python --version` is 3.12, and every golden's meta line is asserted on load. What differs on other interpreters is kept as
+   data (`parity/goldens/version-sensitive.jsonl.gz`), so an upgrade is a deliberate step. Re-run G1-G3 when it changes.
 2. **Keep the compatibility layer and the harness as permanent assets**, not spike scaffolding: every later slice ports more
    Python behaviour through `Numerics`, and G1-G3 are what make each slice certifiable (ADR 0008).
 3. **Decide the Delta read path before the data slice** (ADR 0005). It is the one genuinely open technical risk.
@@ -23,22 +25,34 @@ Conditions for a full port:
 
 | Gate | Result | Evidence |
 |---|---|---|
-| **G1** numeric primitives | **PASS**, 100% identical | 398,980 vectors; 20 parity tests; mutation test shows BCL equivalents diverge |
+| **G1** numeric primitives | **PASS**, 100% identical (on 3.12) | 398,980 vectors regenerated on 3.12.13; mutation test shows BCL equivalents diverge |
 | **G2** goldens | **PASS**, 0 of 3,939 scenarios differ | `parity-report.md`; 13 op groups; trail hashes and float-bit digests match |
 | **G3** differential fuzz | **PASS**, 0 mismatches at N = 20,000 (seed 20261114) and N = 500,000 (seed 7) | 6,735 + 266 scenarios where Python raised were matched by exception type; each batch ran in a fresh Python process (fresh hash seed) |
-| Mutation self-test | **PASS**, 3 of 3 caught | half-up becomes half-even, `>=` becomes `>`, sort tie-break reversed, each in a copy of the port, each failing both goldens and fuzz |
+| Mutation self-test | **PASS**, 4 of 4 caught | half-up becomes half-even, `>=` becomes `>`, sort tie-break reversed, and a 3.14-style `sum` (compensated int after a float, caught by the sum vectors), each in a copy of the port |
 | **G4** rule packs and credit math (S6) | **not run** | stretch stage; `RUN_STRETCH_S6` was not set |
 
 Build quality: `dotnet build -warnaserror` 0 warnings, `dotnet format --verify-no-changes` clean, 18 domain + 13 architecture +
-51 parity tests green.
+63 parity tests green.
+
+## Oracle interpreter: evidence (all on CPython 3.12.13 unless stated)
+
+| Check | Result |
+|---|---|
+| `engine.jsonl.gz` (3,939 scenarios) and `datasets.jsonl.gz` (29 datasets), regenerated on 3.12 | **Byte-identical content** to the 3.14 files; only the `python` field of the meta line differs |
+| `primitives.jsonl.gz` (398,979 vectors, same seed) vs 3.14 | **410 differ**: 382 `sum`, 26 `str`, 1 `case_table`, 1 `unicode_version` |
+| Cause of the 382 `sum` | an int after a float: 3.14 compensates it, 3.12 does not (T-04); `PySum` ported to 3.12, 382/382 verified |
+| Cause of the 28 string vectors | Unicode 15.0 (3.12) vs 16.0 (3.14): 27 new upper-case mappings (T-19); `PyUnicodeTables` regenerated from 3.12, all 1.1M code points verified |
+| G3 fuzz on 3.12 | N = 20,000 (seed 20261114): 0 mismatches; N = 500,000 (seed 7): 0 mismatches (6,735 Python-raised scenarios matched by exception type) |
+| Cross-check on 3.14.2 (`TCC_ALLOW_OTHER_PYTHON=1`, exploratory, not certification) | N = 20,000 (seed 20261114): 0 mismatches. The engine neither sums an int after a float nor upper-cases the affected code points, so no engine result changes across the two interpreters; the documented differences live in the primitives only, which is exactly what `version-sensitive.jsonl.gz` pins |
+| Version-sensitive tests | the port equals `py312` for all 410 vectors, a 3.14-style `sum` equals `py314` for all 382 and fails the oracle on all 382 |
 
 ## Catalogue of Python-to-C# traps (details in `findings.md`)
 
 Found and handled: `round()` half-even on the exact binary value (T-01); `Decimal(str(x))` and the 28-digit
-`InvalidOperation` (T-02); `repr` layout (T-03); **`sum()` Neumaier compensation, including ints after the first float in
+`InvalidOperation` (T-02); `repr` layout (T-03); **`sum()` Neumaier compensation, with ints after the first float uncompensated in 3.12 and compensated in
 3.14 (T-04)**; floor division and modulo (T-05); division by zero (T-06); date overflow and ISO week dates (T-07);
 `min`/`max` with signed zero and NaN (T-08); code point string ordering (T-09); full-Unicode `upper()` and `strip()` (T-10);
-`float(str)` grammar (T-11); NaN sign (T-12); oracle version (T-13); **C# `?:` silently promoting `long` to `double`
+`float(str)` grammar (T-11); NaN sign (T-12); oracle version (T-13) and the Unicode database version (T-19); **C# `?:` silently promoting `long` to `double`
 (T-14)**; `List.Sort` wrapping exceptions (T-15); `None` keys and ordering (T-16); `json.dumps` canonical bytes for the
 evidence hash (T-17); `None` versus absent versus `""` cells (T-18).
 
@@ -73,7 +87,7 @@ observable and is an obvious later optimisation. No performance claim is made be
 
 ## Risks found
 
-- **Oracle drift:** a new Python version can change float and `sum` behaviour (T-04). Mitigation: condition 1.
+- **Oracle drift:** a new Python version can change float, `sum` and Unicode behaviour (T-04, T-19). Mitigation: condition 1 (pinned in code, differences kept as data).
 - **Set iteration order (F-02):** Python sums weeks over a `set` of strings, so order depends on the hash seed. No output
   difference was seen across nine fixed seeds and 520,000 random-seed fuzz scenarios, and the compensated sum explains why
   (benign, not provably impossible). The port sums in first-seen order.
@@ -114,7 +128,8 @@ version" gap as a named risk, and decide on a fingerprint or Silver version mark
   FluentAssertions 8 is under the Xceed community licence; not used (ADR 0004).
 - **What the customer's engineers can operate.** The skeleton uses App Service-friendly defaults and treats Aspire as a
   local tool (ADR 0007); whether Experian's engineers can run containers, Terraform and .NET services is not answered here.
-- **Python interpreter pinning** for the oracle in CI (condition 1).
+- **Hosted orchestrator interpreter (not investigated).** The hosted orchestrator image uses Python 3.13 (`channel_orchestrator/Dockerfile`), so
+  any numeric module vendored into it runs on a third interpreter, neither the 3.12 oracle nor the 3.14 cross-check.
 
 ## Reviewer attention (`NEEDS-HUMAN-REVIEW`)
 

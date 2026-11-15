@@ -16,6 +16,9 @@ internal static class OracleInterpreter
         "    uv venv --python 3.12 C:\\Projects\\py312-oracle\\.venv\n" +
         "then set TCC_PYTHON to C:\\Projects\\py312-oracle\\.venv\\Scripts\\python.exe.";
 
+    /// <summary>True when <c>TCC_ALLOW_OTHER_PYTHON=1</c>: an exploratory cross-check on another interpreter, never certification.</summary>
+    internal static bool AllowOther { get; } = Environment.GetEnvironmentVariable("TCC_ALLOW_OTHER_PYTHON") == "1";
+
     private static readonly Lazy<(string Exe, string Version)> Resolved = new(Resolve);
 
     /// <summary>The verified oracle interpreter path; throws unless <c>TCC_PYTHON</c> names CPython 3.12.</summary>
@@ -38,9 +41,14 @@ internal static class OracleInterpreter
         p.WaitForExit();
         const string prefix = "Python ";
         var version = text.StartsWith(prefix, StringComparison.Ordinal) ? text[prefix.Length..] : text;
+        if (!IsCPython312(version) && !AllowOther)
+        {
+            throw new InvalidOperationException($"TCC_PYTHON ({exe}) is Python {version}, not 3.12. " + HowToCreate + " For a documented cross-check only, set TCC_ALLOW_OTHER_PYTHON=1.");
+        }
+
         if (!IsCPython312(version))
         {
-            throw new InvalidOperationException($"TCC_PYTHON ({exe}) is Python {version}, not 3.12. " + HowToCreate);
+            version += " (EXPLORATORY OVERRIDE, not the oracle)";
         }
 
         return (exe, version);

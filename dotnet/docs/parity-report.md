@@ -1,6 +1,6 @@
 # Parity report
 
-Python (CPython 3.14.2, production engine in `backend/domain/calculation`) is the oracle. Branch `dotnet/spike`.
+Python (**CPython 3.12.13**, production engine in `backend/domain/calculation`) is the oracle; the first run used 3.14.2 and was re-certified on 3.12 (see SPIKE-REPORT.md, "Oracle interpreter: evidence"). Historic notes below that mention 3.14 describe the first run. Branch `dotnet/spike`.
 
 ## Gate G1: numeric primitives. PASSED
 
