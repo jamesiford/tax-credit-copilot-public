@@ -1,0 +1,4199 @@
+{
+  "title": "Tax Credit Copilot API",
+  "version": "0.3.0",
+  "app_level_dependencies": [
+    {
+      "call": "api.auth.request_guard"
+    }
+  ],
+  "middleware": [
+    {
+      "class": "starlette.middleware.cors.CORSMiddleware",
+      "options": {
+        "allow_headers": [
+          "*"
+        ],
+        "allow_methods": [
+          "GET",
+          "POST",
+          "PUT",
+          "OPTIONS"
+        ],
+        "allow_origins": [
+          "*"
+        ]
+      }
+    }
+  ],
+  "exception_handlers": [
+    {
+      "exception": "starlette.exceptions.HTTPException",
+      "handler": "fastapi.exception_handlers.http_exception_handler",
+      "doc": ""
+    },
+    {
+      "exception": "fastapi.exceptions.RequestValidationError",
+      "handler": "fastapi.exception_handlers.request_validation_exception_handler",
+      "doc": ""
+    },
+    {
+      "exception": "fastapi.exceptions.WebSocketRequestValidationError",
+      "handler": "fastapi.exception_handlers.websocket_request_validation_exception_handler",
+      "doc": ""
+    },
+    {
+      "exception": "application.identity.NotAuthorized",
+      "handler": "main._not_authorized",
+      "doc": "A command refused by the Authorization stage is a 403, wherever it was sent from."
+    },
+    {
+      "exception": "application.errors.DependencyUnavailable",
+      "handler": "main._dependency_unavailable",
+      "doc": "A named dependency that cannot answer is a 503 that says which one and what to do. [03.3]"
+    },
+    {
+      "exception": "application.program_defaults.ProgramStateConflict",
+      "handler": "api.error_handlers.install.<locals>._program_state_conflict",
+      "doc": "A request naming a program and a different state is the caller's to fix: a 422."
+    }
+  ],
+  "routes_total": 97,
+  "api_routes": 93,
+  "untyped_routes": 75,
+  "routes": [
+    {
+      "order": 0,
+      "method": [
+        "GET",
+        "HEAD"
+      ],
+      "path": "/openapi.json",
+      "name": "openapi",
+      "framework_route": "Route",
+      "untyped": true
+    },
+    {
+      "order": 1,
+      "method": [
+        "GET",
+        "HEAD"
+      ],
+      "path": "/docs",
+      "name": "swagger_ui_html",
+      "framework_route": "Route",
+      "untyped": true
+    },
+    {
+      "order": 2,
+      "method": [
+        "GET",
+        "HEAD"
+      ],
+      "path": "/docs/oauth2-redirect",
+      "name": "swagger_ui_redirect",
+      "framework_route": "Route",
+      "untyped": true
+    },
+    {
+      "order": 3,
+      "method": [
+        "GET",
+        "HEAD"
+      ],
+      "path": "/redoc",
+      "name": "redoc_html",
+      "framework_route": "Route",
+      "untyped": true
+    },
+    {
+      "order": 4,
+      "method": "GET",
+      "path": "/api/ready",
+      "name": "ready",
+      "tags": [],
+      "endpoint": "main.ready",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 5,
+      "method": "GET",
+      "path": "/api/health",
+      "name": "health",
+      "tags": [],
+      "endpoint": "main.health",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 6,
+      "method": "GET",
+      "path": "/api/me",
+      "name": "me",
+      "tags": [
+        "auth"
+      ],
+      "endpoint": "api.auth.me",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 7,
+      "method": "POST",
+      "path": "/api/clients/{client_id}/packages",
+      "name": "create_claim_package",
+      "tags": [
+        "artifacts"
+      ],
+      "endpoint": "api.artifacts.create_claim_package",
+      "parameters": {
+        "path": [
+          {
+            "name": "client_id",
+            "required": true,
+            "annotation": "<class 'int'>"
+          }
+        ],
+        "query": [
+          {
+            "name": "tax_year",
+            "required": true,
+            "annotation": "<class 'int'>"
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 201,
+      "declared_status_codes": [
+        201,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 8,
+      "method": "GET",
+      "path": "/api/clients/{client_id}/artifacts/{artifact_id}",
+      "name": "download_artifact",
+      "tags": [
+        "artifacts"
+      ],
+      "endpoint": "api.artifacts.download_artifact",
+      "parameters": {
+        "path": [
+          {
+            "name": "client_id",
+            "required": true,
+            "annotation": "<class 'int'>"
+          },
+          {
+            "name": "artifact_id",
+            "required": true,
+            "annotation": "<class 'str'>"
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": null,
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 9,
+      "method": "GET",
+      "path": "/api/audit/channel",
+      "name": "channel_audit",
+      "tags": [
+        "audit"
+      ],
+      "endpoint": "api.audit.channel_audit",
+      "parameters": {
+        "path": [],
+        "query": [
+          {
+            "name": "user_oid",
+            "required": true,
+            "annotation": "<class 'str'>"
+          },
+          {
+            "name": "since",
+            "required": false,
+            "annotation": "contract.harness.freeze.FrozenDatetime | None"
+          },
+          {
+            "name": "until",
+            "required": false,
+            "annotation": "contract.harness.freeze.FrozenDatetime | None"
+          },
+          {
+            "name": "tool",
+            "required": false,
+            "annotation": "str | None"
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "annotation": "<class 'int'>"
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 10,
+      "method": "GET",
+      "path": "/api/capabilities",
+      "name": "list_capabilities",
+      "tags": [
+        "capabilities"
+      ],
+      "endpoint": "api.capabilities.list_capabilities",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 11,
+      "method": "POST",
+      "path": "/api/capabilities/{tool}",
+      "name": "run_capability",
+      "tags": [
+        "capabilities"
+      ],
+      "endpoint": "api.capabilities.run_capability",
+      "parameters": {
+        "path": [
+          {
+            "name": "tool",
+            "required": true,
+            "annotation": "<class 'str'>"
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/CapabilityCall"
+          }
+        }
+      },
+      "response_model": "Any",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 12,
+      "method": "POST",
+      "path": "/api/chat",
+      "name": "chat",
+      "tags": [
+        "chat"
+      ],
+      "endpoint": "api.chat.chat",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/ChatRequest"
+          }
+        }
+      },
+      "response_model": null,
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 13,
+      "method": "GET",
+      "path": "/api/claims/coverage/{client_id}",
+      "name": "client_coverage",
+      "tags": [
+        "claims"
+      ],
+      "endpoint": "api.claims.client_coverage",
+      "parameters": {
+        "path": [
+          {
+            "name": "client_id",
+            "required": true,
+            "annotation": "<class 'int'>"
+          }
+        ],
+        "query": [
+          {
+            "name": "program_code",
+            "required": false,
+            "annotation": "str | None"
+          },
+          {
+            "name": "tax_year",
+            "required": false,
+            "annotation": "int | None"
+          },
+          {
+            "name": "tax_years",
+            "required": false,
+            "annotation": "list[int] | None"
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 14,
+      "method": "GET",
+      "path": "/api/claims/coverage",
+      "name": "portfolio_coverage",
+      "tags": [
+        "claims"
+      ],
+      "endpoint": "api.claims.portfolio_coverage",
+      "parameters": {
+        "path": [],
+        "query": [
+          {
+            "name": "tax_year",
+            "required": false,
+            "annotation": "int | None"
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 15,
+      "method": "GET",
+      "path": "/api/claims/cell/{client_id}/{program_code}/{tax_year}",
+      "name": "cell_history",
+      "tags": [
+        "claims"
+      ],
+      "endpoint": "api.claims.cell_history",
+      "parameters": {
+        "path": [
+          {
+            "name": "client_id",
+            "required": true,
+            "annotation": "<class 'int'>"
+          },
+          {
+            "name": "program_code",
+            "required": true,
+            "annotation": "<class 'str'>"
+          },
+          {
+            "name": "tax_year",
+            "required": true,
+            "annotation": "<class 'int'>"
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 16,
+      "method": "POST",
+      "path": "/api/claims",
+      "name": "record_claim",
+      "tags": [
+        "claims"
+      ],
+      "endpoint": "api.claims.record_claim",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/RecordClaimBody"
+          }
+        }
+      },
+      "response_model": "dict",
+      "status_code": 201,
+      "declared_status_codes": [
+        201,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 17,
+      "method": "POST",
+      "path": "/api/claims/cell/{client_id}/{program_code}/{tax_year}/transition",
+      "name": "transition_cell",
+      "tags": [
+        "claims"
+      ],
+      "endpoint": "api.claims.transition_cell",
+      "parameters": {
+        "path": [
+          {
+            "name": "client_id",
+            "required": true,
+            "annotation": "<class 'int'>"
+          },
+          {
+            "name": "program_code",
+            "required": true,
+            "annotation": "<class 'str'>"
+          },
+          {
+            "name": "tax_year",
+            "required": true,
+            "annotation": "<class 'int'>"
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/TransitionBody"
+          }
+        }
+      },
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 18,
+      "method": "PUT",
+      "path": "/api/claims/engagement",
+      "name": "set_engagement",
+      "tags": [
+        "claims"
+      ],
+      "endpoint": "api.claims.set_engagement",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/EngagementBody"
+          }
+        }
+      },
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 19,
+      "method": "POST",
+      "path": "/api/claims/assess",
+      "name": "assess",
+      "tags": [
+        "claims"
+      ],
+      "endpoint": "api.claims.assess",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/AssessBody"
+          }
+        }
+      },
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 20,
+      "method": "GET",
+      "path": "/api/claims/lifecycle",
+      "name": "lifecycle",
+      "tags": [
+        "claims"
+      ],
+      "endpoint": "api.claims.lifecycle",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 21,
+      "method": "GET",
+      "path": "/api/v2/portfolio",
+      "name": "portfolio_v2",
+      "tags": [
+        "portfolio"
+      ],
+      "endpoint": "api.claims.portfolio_v2",
+      "parameters": {
+        "path": [],
+        "query": [
+          {
+            "name": "year",
+            "required": false,
+            "annotation": "int | None"
+          },
+          {
+            "name": "program",
+            "required": false,
+            "annotation": "str | None"
+          },
+          {
+            "name": "outcome",
+            "required": false,
+            "annotation": "str | None"
+          },
+          {
+            "name": "scope",
+            "required": false,
+            "annotation": "str | None"
+          },
+          {
+            "name": "near",
+            "required": false,
+            "annotation": "bool | None"
+          },
+          {
+            "name": "status",
+            "required": false,
+            "annotation": "str | None"
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "annotation": "<class 'str'>"
+          },
+          {
+            "name": "order",
+            "required": false,
+            "annotation": "<class 'str'>"
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "annotation": "<class 'int'>"
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "annotation": "<class 'int'>"
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 22,
+      "method": "GET",
+      "path": "/api/v2/clients/{client_id}/situation",
+      "name": "client_situation",
+      "tags": [
+        "portfolio"
+      ],
+      "endpoint": "api.claims.client_situation",
+      "parameters": {
+        "path": [
+          {
+            "name": "client_id",
+            "required": true,
+            "annotation": "<class 'int'>"
+          }
+        ],
+        "query": [
+          {
+            "name": "year",
+            "required": false,
+            "annotation": "int | None"
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 23,
+      "method": "GET",
+      "path": "/api/eligibility/{tax_year}",
+      "name": "eligibility",
+      "tags": [
+        "eligibility"
+      ],
+      "endpoint": "api.eligibility.eligibility",
+      "parameters": {
+        "path": [
+          {
+            "name": "tax_year",
+            "required": true,
+            "annotation": "<class 'int'>"
+          }
+        ],
+        "query": [
+          {
+            "name": "state",
+            "required": true,
+            "annotation": "<class 'str'>"
+          },
+          {
+            "name": "status",
+            "required": false,
+            "annotation": "<class 'str'>"
+          },
+          {
+            "name": "near_floor",
+            "required": false,
+            "annotation": "<class 'bool'>"
+          },
+          {
+            "name": "q",
+            "required": false,
+            "annotation": "<class 'str'>"
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "annotation": "<class 'int'>"
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "annotation": "<class 'int'>"
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "annotation": "<class 'str'>"
+          },
+          {
+            "name": "order",
+            "required": false,
+            "annotation": "<class 'str'>"
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        },
+        {
+          "call": "api._client_program.client_program"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 24,
+      "method": "GET",
+      "path": "/api/rules",
+      "name": "rules",
+      "tags": [
+        "rules"
+      ],
+      "endpoint": "api.rules.rules",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 25,
+      "method": "POST",
+      "path": "/api/rules/{code}/verify",
+      "name": "verify_rule_pack",
+      "tags": [
+        "rules"
+      ],
+      "endpoint": "api.rules.verify_rule_pack",
+      "parameters": {
+        "path": [
+          {
+            "name": "code",
+            "required": true,
+            "annotation": "<class 'str'>"
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/RuleVerificationRequest"
+          }
+        }
+      },
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 26,
+      "method": "GET",
+      "path": "/api/progress/{tax_year}",
+      "name": "in_year_progress",
+      "tags": [
+        "forecast"
+      ],
+      "endpoint": "api.forecast.in_year_progress",
+      "parameters": {
+        "path": [
+          {
+            "name": "tax_year",
+            "required": true,
+            "annotation": "<class 'int'>"
+          }
+        ],
+        "query": [
+          {
+            "name": "state",
+            "required": true,
+            "annotation": "<class 'str'>"
+          },
+          {
+            "name": "as_of",
+            "required": false,
+            "annotation": "str | None"
+          },
+          {
+            "name": "account_id",
+            "required": false,
+            "annotation": "int | None"
+          },
+          {
+            "name": "within",
+            "required": false,
+            "annotation": "<class 'float'>"
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 27,
+      "method": "GET",
+      "path": "/api/forecast/{tax_year}",
+      "name": "forecast",
+      "tags": [
+        "forecast"
+      ],
+      "endpoint": "api.forecast.forecast",
+      "parameters": {
+        "path": [
+          {
+            "name": "tax_year",
+            "required": true,
+            "annotation": "<class 'int'>"
+          }
+        ],
+        "query": [
+          {
+            "name": "state",
+            "required": false,
+            "annotation": "str | None"
+          },
+          {
+            "name": "as_of",
+            "required": false,
+            "annotation": "str | None"
+          },
+          {
+            "name": "account_id",
+            "required": false,
+            "annotation": "int | None"
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 28,
+      "method": "GET",
+      "path": "/api/alerts/monthly/{tax_year}",
+      "name": "monthly_alerts",
+      "tags": [
+        "forecast"
+      ],
+      "endpoint": "api.forecast.monthly_alerts",
+      "parameters": {
+        "path": [
+          {
+            "name": "tax_year",
+            "required": true,
+            "annotation": "<class 'int'>"
+          }
+        ],
+        "query": [
+          {
+            "name": "state",
+            "required": false,
+            "annotation": "str | None"
+          },
+          {
+            "name": "account_id",
+            "required": false,
+            "annotation": "int | None"
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 29,
+      "method": "GET",
+      "path": "/api/triggers",
+      "name": "triggers",
+      "tags": [
+        "forecast"
+      ],
+      "endpoint": "api.forecast.triggers",
+      "parameters": {
+        "path": [],
+        "query": [
+          {
+            "name": "account_id",
+            "required": false,
+            "annotation": "int | None"
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 30,
+      "method": "GET",
+      "path": "/api/performance/{tax_year}",
+      "name": "performance_dashboard",
+      "tags": [
+        "forecast"
+      ],
+      "endpoint": "api.forecast.performance_dashboard",
+      "parameters": {
+        "path": [
+          {
+            "name": "tax_year",
+            "required": true,
+            "annotation": "<class 'int'>"
+          }
+        ],
+        "query": [
+          {
+            "name": "state",
+            "required": false,
+            "annotation": "str | None"
+          },
+          {
+            "name": "worksite",
+            "required": false,
+            "annotation": "str | None"
+          },
+          {
+            "name": "account_id",
+            "required": false,
+            "annotation": "int | None"
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 31,
+      "method": "GET",
+      "path": "/api/onezero/matrix/{tax_year}",
+      "name": "onezero_matrix",
+      "tags": [
+        "onezero"
+      ],
+      "endpoint": "api.onezero.onezero_matrix",
+      "parameters": {
+        "path": [
+          {
+            "name": "tax_year",
+            "required": true,
+            "annotation": "<class 'int'>"
+          }
+        ],
+        "query": [
+          {
+            "name": "state",
+            "required": false,
+            "annotation": "<class 'str'>"
+          },
+          {
+            "name": "method",
+            "required": false,
+            "annotation": "<class 'str'>"
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        },
+        {
+          "call": "api._client_program.client_program"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 32,
+      "method": "GET",
+      "path": "/api/onezero/{tax_year}",
+      "name": "one_zero",
+      "tags": [
+        "onezero"
+      ],
+      "endpoint": "api.onezero.one_zero",
+      "parameters": {
+        "path": [
+          {
+            "name": "tax_year",
+            "required": true,
+            "annotation": "<class 'int'>"
+          }
+        ],
+        "query": [
+          {
+            "name": "state",
+            "required": false,
+            "annotation": "str | None"
+          },
+          {
+            "name": "method",
+            "required": false,
+            "annotation": "<class 'str'>"
+          },
+          {
+            "name": "fein",
+            "required": false,
+            "annotation": "str | None"
+          },
+          {
+            "name": "account_id",
+            "required": false,
+            "annotation": "int | None"
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 33,
+      "method": "GET",
+      "path": "/api/onezero/{tax_year}/employee/{employee_id}",
+      "name": "one_zero_employee",
+      "tags": [
+        "onezero"
+      ],
+      "endpoint": "api.onezero.one_zero_employee",
+      "parameters": {
+        "path": [
+          {
+            "name": "tax_year",
+            "required": true,
+            "annotation": "<class 'int'>"
+          },
+          {
+            "name": "employee_id",
+            "required": true,
+            "annotation": "<class 'str'>"
+          }
+        ],
+        "query": [
+          {
+            "name": "state",
+            "required": false,
+            "annotation": "<class 'str'>"
+          },
+          {
+            "name": "account_id",
+            "required": false,
+            "annotation": "int | None"
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 34,
+      "method": "POST",
+      "path": "/api/onezero/employee/{employee_id}/review",
+      "name": "review_employee",
+      "tags": [
+        "onezero"
+      ],
+      "endpoint": "api.onezero.review_employee",
+      "parameters": {
+        "path": [
+          {
+            "name": "employee_id",
+            "required": true,
+            "annotation": "<class 'str'>"
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/EmployeeReviewRequest"
+          }
+        }
+      },
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 35,
+      "method": "GET",
+      "path": "/api/designations/{state}",
+      "name": "designations",
+      "tags": [
+        "onezero"
+      ],
+      "endpoint": "api.onezero.designations",
+      "parameters": {
+        "path": [
+          {
+            "name": "state",
+            "required": true,
+            "annotation": "<class 'str'>"
+          }
+        ],
+        "query": [
+          {
+            "name": "tax_year",
+            "required": false,
+            "annotation": "<class 'int'>"
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 36,
+      "method": "GET",
+      "path": "/api/reconcile/{tax_year}",
+      "name": "reconcile_endpoint",
+      "tags": [
+        "onezero"
+      ],
+      "endpoint": "api.onezero.reconcile_endpoint",
+      "parameters": {
+        "path": [
+          {
+            "name": "tax_year",
+            "required": true,
+            "annotation": "<class 'int'>"
+          }
+        ],
+        "query": [
+          {
+            "name": "account_id",
+            "required": false,
+            "annotation": "int | None"
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 37,
+      "method": "GET",
+      "path": "/api/qc/{tax_year}",
+      "name": "qc_exception_report",
+      "tags": [
+        "onezero"
+      ],
+      "endpoint": "api.onezero.qc_exception_report",
+      "parameters": {
+        "path": [
+          {
+            "name": "tax_year",
+            "required": true,
+            "annotation": "<class 'int'>"
+          }
+        ],
+        "query": [
+          {
+            "name": "state",
+            "required": false,
+            "annotation": "str | None"
+          },
+          {
+            "name": "min_wages",
+            "required": false,
+            "annotation": "<class 'float'>"
+          },
+          {
+            "name": "min_hours",
+            "required": false,
+            "annotation": "<class 'float'>"
+          },
+          {
+            "name": "account_id",
+            "required": false,
+            "annotation": "int | None"
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 38,
+      "method": "GET",
+      "path": "/api/onezero/retroactive/scan",
+      "name": "one_zero_retroactive_scan",
+      "tags": [
+        "retroactive"
+      ],
+      "endpoint": "api.retroactive.one_zero_retroactive_scan",
+      "parameters": {
+        "path": [],
+        "query": [
+          {
+            "name": "account_id",
+            "required": false,
+            "annotation": "int | None"
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 39,
+      "method": "GET",
+      "path": "/api/rules/ingested/{state}",
+      "name": "ingested_rules",
+      "tags": [
+        "rule ingestion"
+      ],
+      "endpoint": "api.rules_ingestion.ingested_rules",
+      "parameters": {
+        "path": [
+          {
+            "name": "state",
+            "required": true,
+            "annotation": "<class 'str'>"
+          }
+        ],
+        "query": [
+          {
+            "name": "tax_year",
+            "required": false,
+            "annotation": "int | None"
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 40,
+      "method": "GET",
+      "path": "/api/rules/ingested/{state}/refresh",
+      "name": "refresh_ingested_rules",
+      "tags": [
+        "rule ingestion"
+      ],
+      "endpoint": "api.rules_ingestion.refresh_ingested_rules",
+      "parameters": {
+        "path": [
+          {
+            "name": "state",
+            "required": true,
+            "annotation": "<class 'str'>"
+          }
+        ],
+        "query": [
+          {
+            "name": "live",
+            "required": false,
+            "annotation": "<class 'bool'>"
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 41,
+      "method": "GET",
+      "path": "/api/rules/ingested/{state}/proposals",
+      "name": "ingestion_proposals",
+      "tags": [
+        "rule ingestion"
+      ],
+      "endpoint": "api.rules_ingestion.ingestion_proposals",
+      "parameters": {
+        "path": [
+          {
+            "name": "state",
+            "required": true,
+            "annotation": "<class 'str'>"
+          }
+        ],
+        "query": [
+          {
+            "name": "tax_year",
+            "required": false,
+            "annotation": "<class 'int'>"
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 42,
+      "method": "POST",
+      "path": "/api/rules/ingested/{state}/apply",
+      "name": "apply_ingested_ruleset",
+      "tags": [
+        "rule ingestion"
+      ],
+      "endpoint": "api.rules_ingestion.apply_ingested_ruleset",
+      "parameters": {
+        "path": [
+          {
+            "name": "state",
+            "required": true,
+            "annotation": "<class 'str'>"
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/ApplyRulesetRequest"
+          }
+        }
+      },
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 43,
+      "method": "GET",
+      "path": "/api/rules/ingested/{state}/changelog",
+      "name": "ingestion_changelog",
+      "tags": [
+        "rule ingestion"
+      ],
+      "endpoint": "api.rules_ingestion.ingestion_changelog",
+      "parameters": {
+        "path": [
+          {
+            "name": "state",
+            "required": true,
+            "annotation": "<class 'str'>"
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 44,
+      "method": "GET",
+      "path": "/api/simulate/portfolio/{tax_year}",
+      "name": "simulate_portfolio",
+      "tags": [
+        "simulation"
+      ],
+      "endpoint": "api.simulate.simulate_portfolio",
+      "parameters": {
+        "path": [
+          {
+            "name": "tax_year",
+            "required": true,
+            "annotation": "<class 'int'>"
+          }
+        ],
+        "query": [
+          {
+            "name": "state",
+            "required": true,
+            "annotation": "<class 'str'>"
+          },
+          {
+            "name": "action",
+            "required": false,
+            "annotation": "<class 'str'>"
+          },
+          {
+            "name": "magnitude",
+            "required": false,
+            "annotation": "<class 'float'>"
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "annotation": "<class 'int'>"
+          },
+          {
+            "name": "program_code",
+            "required": false,
+            "annotation": "str | None"
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 45,
+      "method": "POST",
+      "path": "/api/simulate/unit",
+      "name": "run_unit_simulation",
+      "tags": [
+        "simulation"
+      ],
+      "endpoint": "api.simulate.run_unit_simulation",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/UnitSimulateRequest"
+          }
+        }
+      },
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 46,
+      "method": "POST",
+      "path": "/api/simulate/employee",
+      "name": "run_employee_simulation",
+      "tags": [
+        "simulation"
+      ],
+      "endpoint": "api.simulate.run_employee_simulation",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/EmployeeSimulateRequest"
+          }
+        }
+      },
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 47,
+      "method": "POST",
+      "path": "/api/simulate/onezero",
+      "name": "run_onezero_simulation",
+      "tags": [
+        "simulation"
+      ],
+      "endpoint": "api.simulate.run_onezero_simulation",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/OneZeroSimulateRequest"
+          }
+        }
+      },
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 48,
+      "method": "POST",
+      "path": "/api/summary",
+      "name": "page_summary",
+      "tags": [
+        "summary"
+      ],
+      "endpoint": "api.summary.page_summary",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/SummaryRequest"
+          }
+        }
+      },
+      "response_model": null,
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 49,
+      "method": "GET",
+      "path": "/api/ingestion/{tax_year}",
+      "name": "ingestion_overview",
+      "tags": [
+        "ingestion"
+      ],
+      "endpoint": "api.ingestion.ingestion_overview",
+      "parameters": {
+        "path": [
+          {
+            "name": "tax_year",
+            "required": true,
+            "annotation": "<class 'int'>"
+          }
+        ],
+        "query": [
+          {
+            "name": "state",
+            "required": false,
+            "annotation": "<class 'str'>"
+          },
+          {
+            "name": "account_id",
+            "required": false,
+            "annotation": "int | None"
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 50,
+      "method": "POST",
+      "path": "/api/ingestion/{tax_year}/exceptions/{exception_id}/resolve",
+      "name": "resolve_exception",
+      "tags": [
+        "ingestion"
+      ],
+      "endpoint": "api.ingestion.resolve_exception",
+      "parameters": {
+        "path": [
+          {
+            "name": "tax_year",
+            "required": true,
+            "annotation": "<class 'int'>"
+          },
+          {
+            "name": "exception_id",
+            "required": true,
+            "annotation": "<class 'str'>"
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/ResolveExceptionRequest"
+          }
+        }
+      },
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 51,
+      "method": "GET",
+      "path": "/api/ingestion/{tax_year}/rows",
+      "name": "ingestion_rows",
+      "tags": [
+        "ingestion"
+      ],
+      "endpoint": "api.ingestion.ingestion_rows",
+      "parameters": {
+        "path": [
+          {
+            "name": "tax_year",
+            "required": true,
+            "annotation": "<class 'int'>"
+          }
+        ],
+        "query": [
+          {
+            "name": "state",
+            "required": false,
+            "annotation": "<class 'str'>"
+          },
+          {
+            "name": "q",
+            "required": false,
+            "annotation": "<class 'str'>"
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "annotation": "<class 'int'>"
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "annotation": "<class 'int'>"
+          },
+          {
+            "name": "account_id",
+            "required": false,
+            "annotation": "int | None"
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "annotation": "<class 'str'>"
+          },
+          {
+            "name": "order",
+            "required": false,
+            "annotation": "<class 'str'>"
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 52,
+      "method": "GET",
+      "path": "/api/findings/{client_id}/{tax_year}",
+      "name": "findings",
+      "tags": [
+        "findings"
+      ],
+      "endpoint": "api.findings.findings",
+      "parameters": {
+        "path": [
+          {
+            "name": "client_id",
+            "required": true,
+            "annotation": "<class 'int'>"
+          },
+          {
+            "name": "tax_year",
+            "required": true,
+            "annotation": "<class 'int'>"
+          }
+        ],
+        "query": [
+          {
+            "name": "state",
+            "required": false,
+            "annotation": "str | None"
+          },
+          {
+            "name": "program_code",
+            "required": false,
+            "annotation": "str | None"
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 53,
+      "method": "POST",
+      "path": "/api/findings/{finding_id}/resolve",
+      "name": "resolve",
+      "tags": [
+        "findings"
+      ],
+      "endpoint": "api.findings.resolve",
+      "parameters": {
+        "path": [
+          {
+            "name": "finding_id",
+            "required": true,
+            "annotation": "<class 'str'>"
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/ResolveBody"
+          }
+        }
+      },
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 54,
+      "method": "POST",
+      "path": "/api/findings/{finding_id}/reopen",
+      "name": "reopen",
+      "tags": [
+        "findings"
+      ],
+      "endpoint": "api.findings.reopen",
+      "parameters": {
+        "path": [
+          {
+            "name": "finding_id",
+            "required": true,
+            "annotation": "<class 'str'>"
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/ResolveBody"
+          }
+        }
+      },
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 55,
+      "method": "GET",
+      "path": "/api/findings/{client_id}/{finding_id}/history",
+      "name": "history",
+      "tags": [
+        "findings"
+      ],
+      "endpoint": "api.findings.history",
+      "parameters": {
+        "path": [
+          {
+            "name": "client_id",
+            "required": true,
+            "annotation": "<class 'int'>"
+          },
+          {
+            "name": "finding_id",
+            "required": true,
+            "annotation": "<class 'str'>"
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 56,
+      "method": "GET",
+      "path": "/api/proximity/{tax_year}",
+      "name": "proximity",
+      "tags": [
+        "proximity"
+      ],
+      "endpoint": "api.proximity.proximity",
+      "parameters": {
+        "path": [
+          {
+            "name": "tax_year",
+            "required": true,
+            "annotation": "<class 'int'>"
+          }
+        ],
+        "query": [
+          {
+            "name": "state",
+            "required": true,
+            "annotation": "<class 'str'>"
+          },
+          {
+            "name": "method",
+            "required": false,
+            "annotation": "<class 'str'>"
+          },
+          {
+            "name": "within",
+            "required": false,
+            "annotation": "<class 'float'>"
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "annotation": "<class 'int'>"
+          },
+          {
+            "name": "rest_of_year",
+            "required": false,
+            "annotation": "<class 'bool'>"
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        },
+        {
+          "call": "api._client_program.client_program"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 57,
+      "method": "GET",
+      "path": "/api/v2/program-drafts",
+      "name": "list_drafts",
+      "tags": [
+        "programs",
+        "program-drafts"
+      ],
+      "endpoint": "api.program_drafts.list_drafts",
+      "parameters": {
+        "path": [],
+        "query": [
+          {
+            "name": "status",
+            "required": false,
+            "annotation": "str | None"
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "annotation": "<class 'int'>"
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "annotation": "<class 'int'>"
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "DraftsPage",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": false,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 58,
+      "method": "POST",
+      "path": "/api/v2/program-drafts",
+      "name": "create_draft",
+      "tags": [
+        "programs",
+        "program-drafts"
+      ],
+      "endpoint": "api.program_drafts.create_draft",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/CreateBody"
+          }
+        }
+      },
+      "response_model": "DraftOut",
+      "status_code": 201,
+      "declared_status_codes": [
+        201,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": false,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 59,
+      "method": "GET",
+      "path": "/api/v2/program-drafts/{draft_id}",
+      "name": "get_draft",
+      "tags": [
+        "programs",
+        "program-drafts"
+      ],
+      "endpoint": "api.program_drafts.get_draft",
+      "parameters": {
+        "path": [
+          {
+            "name": "draft_id",
+            "required": true,
+            "annotation": "<class 'str'>"
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "DraftOut",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": false,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 60,
+      "method": "PUT",
+      "path": "/api/v2/program-drafts/{draft_id}/documents",
+      "name": "edit_documents",
+      "tags": [
+        "programs",
+        "program-drafts"
+      ],
+      "endpoint": "api.program_drafts.edit_documents",
+      "parameters": {
+        "path": [
+          {
+            "name": "draft_id",
+            "required": true,
+            "annotation": "<class 'str'>"
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/EditBody"
+          }
+        }
+      },
+      "response_model": "DraftOut",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        },
+        {
+          "call": "api._rate_limit.rate_limited.<locals>.check",
+          "rate_limit_kind": "draft_save"
+        }
+      ],
+      "untyped": false,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 61,
+      "method": "POST",
+      "path": "/api/v2/program-drafts/{draft_id}/validate",
+      "name": "validate_draft",
+      "tags": [
+        "programs",
+        "program-drafts"
+      ],
+      "endpoint": "api.program_drafts.validate_draft",
+      "parameters": {
+        "path": [
+          {
+            "name": "draft_id",
+            "required": true,
+            "annotation": "<class 'str'>"
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ActorBody"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Body"
+          }
+        }
+      },
+      "response_model": "DraftOut",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": false,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 62,
+      "method": "POST",
+      "path": "/api/v2/program-drafts/{draft_id}/request-review",
+      "name": "request_review",
+      "tags": [
+        "programs",
+        "program-drafts"
+      ],
+      "endpoint": "api.program_drafts.request_review",
+      "parameters": {
+        "path": [
+          {
+            "name": "draft_id",
+            "required": true,
+            "annotation": "<class 'str'>"
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ActorBody"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Body"
+          }
+        }
+      },
+      "response_model": "DraftOut",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": false,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 63,
+      "method": "POST",
+      "path": "/api/v2/program-drafts/{draft_id}/review",
+      "name": "review_draft",
+      "tags": [
+        "programs",
+        "program-drafts"
+      ],
+      "endpoint": "api.program_drafts.review_draft",
+      "parameters": {
+        "path": [
+          {
+            "name": "draft_id",
+            "required": true,
+            "annotation": "<class 'str'>"
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/ReviewBody"
+          }
+        }
+      },
+      "response_model": "DraftOut",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": false,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 64,
+      "method": "POST",
+      "path": "/api/v2/program-drafts/{draft_id}/preview",
+      "name": "preview_draft",
+      "tags": [
+        "programs",
+        "program-drafts"
+      ],
+      "endpoint": "api.program_drafts.preview_draft",
+      "parameters": {
+        "path": [
+          {
+            "name": "draft_id",
+            "required": true,
+            "annotation": "<class 'str'>"
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PreviewBody"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Body"
+          }
+        }
+      },
+      "response_model": "PreviewOut",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        },
+        {
+          "call": "api._rate_limit.rate_limited.<locals>.check",
+          "rate_limit_kind": "draft_preview"
+        }
+      ],
+      "untyped": false,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 65,
+      "method": "POST",
+      "path": "/api/v2/program-drafts/{draft_id}/withdraw",
+      "name": "withdraw_draft",
+      "tags": [
+        "programs",
+        "program-drafts"
+      ],
+      "endpoint": "api.program_drafts.withdraw_draft",
+      "parameters": {
+        "path": [
+          {
+            "name": "draft_id",
+            "required": true,
+            "annotation": "<class 'str'>"
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/WithdrawBody"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Body"
+          }
+        }
+      },
+      "response_model": "DraftOut",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": false,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 66,
+      "method": "POST",
+      "path": "/api/v2/program-drafts/{draft_id}/export",
+      "name": "export_draft",
+      "tags": [
+        "programs",
+        "program-drafts"
+      ],
+      "endpoint": "api.program_drafts.export_draft",
+      "parameters": {
+        "path": [
+          {
+            "name": "draft_id",
+            "required": true,
+            "annotation": "<class 'str'>"
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ExportBody"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Body"
+          }
+        }
+      },
+      "response_model": null,
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        },
+        {
+          "call": "api._rate_limit.rate_limited.<locals>.check",
+          "rate_limit_kind": "draft_export"
+        }
+      ],
+      "untyped": true,
+      "response_class": "Response"
+    },
+    {
+      "order": 67,
+      "method": "GET",
+      "path": "/api/v2/program-drafts/{draft_id}/export/manifest",
+      "name": "export_manifest",
+      "tags": [
+        "programs",
+        "program-drafts"
+      ],
+      "endpoint": "api.program_drafts.export_manifest",
+      "parameters": {
+        "path": [
+          {
+            "name": "draft_id",
+            "required": true,
+            "annotation": "<class 'str'>"
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "ManifestOut",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": false,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 68,
+      "method": "GET",
+      "path": "/api/v2/programs",
+      "name": "list_programs",
+      "tags": [
+        "programs"
+      ],
+      "endpoint": "api.programs.list_programs",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "CatalogOut",
+      "status_code": 200,
+      "declared_status_codes": [
+        200
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": false,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 69,
+      "method": "GET",
+      "path": "/api/v2/programs/{code}",
+      "name": "get_program",
+      "tags": [
+        "programs"
+      ],
+      "endpoint": "api.programs.get_program",
+      "parameters": {
+        "path": [
+          {
+            "name": "code",
+            "required": true,
+            "annotation": "<class 'str'>"
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "ProgramDetail",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": false,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 70,
+      "method": "POST",
+      "path": "/api/v2/run-batches",
+      "name": "start_run_batch",
+      "tags": [
+        "runs"
+      ],
+      "endpoint": "api.run_batches.start_run_batch",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/StartBody"
+          }
+        }
+      },
+      "response_model": "Union",
+      "status_code": 202,
+      "declared_status_codes": [
+        202,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        },
+        {
+          "call": "api._rate_limit.rate_limited.<locals>.check",
+          "rate_limit_kind": "batch_start"
+        }
+      ],
+      "untyped": false,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 71,
+      "method": "GET",
+      "path": "/api/v2/run-batches",
+      "name": "list_run_batches",
+      "tags": [
+        "runs"
+      ],
+      "endpoint": "api.run_batches.list_run_batches",
+      "parameters": {
+        "path": [],
+        "query": [
+          {
+            "name": "limit",
+            "required": false,
+            "annotation": "<class 'int'>"
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "annotation": "<class 'int'>"
+          },
+          {
+            "name": "status",
+            "required": false,
+            "annotation": "str | None"
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "BatchesPage",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": false,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 72,
+      "method": "GET",
+      "path": "/api/v2/run-batches/{batch_id}",
+      "name": "get_run_batch",
+      "tags": [
+        "runs"
+      ],
+      "endpoint": "api.run_batches.get_run_batch",
+      "parameters": {
+        "path": [
+          {
+            "name": "batch_id",
+            "required": true,
+            "annotation": "<class 'str'>"
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "BatchOut",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": false,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 73,
+      "method": "GET",
+      "path": "/api/v2/run-batches/{batch_id}/items",
+      "name": "list_run_batch_items",
+      "tags": [
+        "runs"
+      ],
+      "endpoint": "api.run_batches.list_run_batch_items",
+      "parameters": {
+        "path": [
+          {
+            "name": "batch_id",
+            "required": true,
+            "annotation": "<class 'str'>"
+          }
+        ],
+        "query": [
+          {
+            "name": "status",
+            "required": false,
+            "annotation": "str | None"
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "annotation": "<class 'int'>"
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "annotation": "<class 'int'>"
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "ItemsPage",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": false,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 74,
+      "method": "POST",
+      "path": "/api/v2/run-batches/{batch_id}/cancel",
+      "name": "cancel_run_batch",
+      "tags": [
+        "runs"
+      ],
+      "endpoint": "api.run_batches.cancel_run_batch",
+      "parameters": {
+        "path": [
+          {
+            "name": "batch_id",
+            "required": true,
+            "annotation": "<class 'str'>"
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "BatchOut",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": false,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 75,
+      "method": "POST",
+      "path": "/api/v2/run-batches/{batch_id}/retry-failed",
+      "name": "retry_failed_items",
+      "tags": [
+        "runs"
+      ],
+      "endpoint": "api.run_batches.retry_failed_items",
+      "parameters": {
+        "path": [
+          {
+            "name": "batch_id",
+            "required": true,
+            "annotation": "<class 'str'>"
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "BatchOut",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": false,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 76,
+      "method": "GET",
+      "path": "/api/scope",
+      "name": "scope_options",
+      "tags": [
+        "scope"
+      ],
+      "endpoint": "api.scope.scope_options",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 77,
+      "method": "GET",
+      "path": "/api/scope/client/{account_id}",
+      "name": "client_scope",
+      "tags": [
+        "scope"
+      ],
+      "endpoint": "api.scope.client_scope",
+      "parameters": {
+        "path": [
+          {
+            "name": "account_id",
+            "required": true,
+            "annotation": "<class 'int'>"
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 78,
+      "method": "GET",
+      "path": "/api/v2/clients/{client_id}/units",
+      "name": "v2_client_units",
+      "tags": [
+        "trend"
+      ],
+      "endpoint": "api.trend.v2_client_units",
+      "parameters": {
+        "path": [
+          {
+            "name": "client_id",
+            "required": true,
+            "annotation": "<class 'int'>"
+          }
+        ],
+        "query": [
+          {
+            "name": "year",
+            "required": false,
+            "annotation": "int | None"
+          },
+          {
+            "name": "state",
+            "required": false,
+            "annotation": "str | None"
+          },
+          {
+            "name": "method",
+            "required": false,
+            "annotation": "<class 'str'>"
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "annotation": "<class 'int'>"
+          },
+          {
+            "name": "offset",
+            "required": false,
+            "annotation": "<class 'int'>"
+          },
+          {
+            "name": "program_code",
+            "required": false,
+            "annotation": "str | None"
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 79,
+      "method": "POST",
+      "path": "/api/v2/clients/{client_id}/units/{unit_id}/base-year",
+      "name": "set_client_unit_base_year",
+      "tags": [
+        "trend"
+      ],
+      "endpoint": "api.trend.set_client_unit_base_year",
+      "parameters": {
+        "path": [
+          {
+            "name": "client_id",
+            "required": true,
+            "annotation": "<class 'int'>"
+          },
+          {
+            "name": "unit_id",
+            "required": true,
+            "annotation": "<class 'str'>"
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/BaseYearRequest"
+          }
+        }
+      },
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 80,
+      "method": "GET",
+      "path": "/api/v2/clients/{client_id}/units/{unit_id}/rebase",
+      "name": "rebase_client_unit",
+      "tags": [
+        "trend"
+      ],
+      "endpoint": "api.trend.rebase_client_unit",
+      "parameters": {
+        "path": [
+          {
+            "name": "client_id",
+            "required": true,
+            "annotation": "<class 'int'>"
+          },
+          {
+            "name": "unit_id",
+            "required": true,
+            "annotation": "<class 'str'>"
+          }
+        ],
+        "query": [
+          {
+            "name": "base_year",
+            "required": true,
+            "annotation": "<class 'int'>"
+          },
+          {
+            "name": "method",
+            "required": false,
+            "annotation": "<class 'str'>"
+          },
+          {
+            "name": "state",
+            "required": false,
+            "annotation": "str | None"
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 81,
+      "method": "GET",
+      "path": "/api/v2/clients/{client_id}/units/{unit_id}",
+      "name": "v2_client_unit_detail",
+      "tags": [
+        "trend"
+      ],
+      "endpoint": "api.trend.v2_client_unit_detail",
+      "parameters": {
+        "path": [
+          {
+            "name": "client_id",
+            "required": true,
+            "annotation": "<class 'int'>"
+          },
+          {
+            "name": "unit_id",
+            "required": true,
+            "annotation": "<class 'str'>"
+          }
+        ],
+        "query": [
+          {
+            "name": "year",
+            "required": true,
+            "annotation": "<class 'int'>"
+          },
+          {
+            "name": "month",
+            "required": false,
+            "annotation": "int | None"
+          },
+          {
+            "name": "state",
+            "required": false,
+            "annotation": "str | None"
+          },
+          {
+            "name": "method",
+            "required": false,
+            "annotation": "<class 'str'>"
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "annotation": "<class 'str'>"
+          },
+          {
+            "name": "order",
+            "required": false,
+            "annotation": "<class 'str'>"
+          },
+          {
+            "name": "near_min_hours",
+            "required": false,
+            "annotation": "float | None"
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "annotation": "int | None"
+          },
+          {
+            "name": "filter",
+            "required": false,
+            "annotation": "str | None"
+          },
+          {
+            "name": "near_filter",
+            "required": false,
+            "annotation": "str | None"
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 82,
+      "method": "GET",
+      "path": "/api/v2/employees/{record_token}",
+      "name": "v2_employee_detail",
+      "tags": [
+        "trend"
+      ],
+      "endpoint": "api.trend.v2_employee_detail",
+      "parameters": {
+        "path": [
+          {
+            "name": "record_token",
+            "required": true,
+            "annotation": "<class 'str'>"
+          }
+        ],
+        "query": [
+          {
+            "name": "client_id",
+            "required": false,
+            "annotation": "int | None"
+          },
+          {
+            "name": "year",
+            "required": false,
+            "annotation": "int | None"
+          },
+          {
+            "name": "state",
+            "required": false,
+            "annotation": "str | None"
+          },
+          {
+            "name": "method",
+            "required": false,
+            "annotation": "<class 'str'>"
+          }
+        ],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 83,
+      "method": "POST",
+      "path": "/api/v2/clients/{client_id}/runs",
+      "name": "create_client_run",
+      "tags": [
+        "trend"
+      ],
+      "endpoint": "api.trend.create_client_run",
+      "parameters": {
+        "path": [
+          {
+            "name": "client_id",
+            "required": true,
+            "annotation": "<class 'int'>"
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/ClientRunRequest"
+          }
+        }
+      },
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 84,
+      "method": "GET",
+      "path": "/api/v2/clients/{client_id}/runs/latest",
+      "name": "latest_client_run",
+      "tags": [
+        "trend"
+      ],
+      "endpoint": "api.trend.latest_client_run",
+      "parameters": {
+        "path": [
+          {
+            "name": "client_id",
+            "required": true,
+            "annotation": "<class 'int'>"
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 85,
+      "method": "POST",
+      "path": "/api/employee/drill",
+      "name": "employee_drill",
+      "tags": [
+        "trend"
+      ],
+      "endpoint": "api.trend.employee_drill",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/EmployeeDrillRequest"
+          }
+        }
+      },
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 86,
+      "method": "GET",
+      "path": "/api/workspace",
+      "name": "workspace_summary",
+      "tags": [
+        "reference-workspace"
+      ],
+      "endpoint": "api.workspace.workspace_summary",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 87,
+      "method": "POST",
+      "path": "/api/workspace/refresh",
+      "name": "refresh_workspace",
+      "tags": [
+        "reference-workspace"
+      ],
+      "endpoint": "api.workspace.refresh_workspace",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 88,
+      "method": "POST",
+      "path": "/api/workspace/source/search",
+      "name": "search_source",
+      "tags": [
+        "reference-workspace"
+      ],
+      "endpoint": "api.workspace.search_source",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/SearchRequest"
+          }
+        }
+      },
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 89,
+      "method": "POST",
+      "path": "/api/workspace/eligibility/search",
+      "name": "search_eligibility",
+      "tags": [
+        "reference-workspace"
+      ],
+      "endpoint": "api.workspace.search_eligibility",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/EligibilitySearchRequest"
+          }
+        }
+      },
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 90,
+      "method": "POST",
+      "path": "/api/workspace/employee",
+      "name": "employee_drill",
+      "tags": [
+        "reference-workspace"
+      ],
+      "endpoint": "api.workspace.employee_drill",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/EmployeeRequest"
+          }
+        }
+      },
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 91,
+      "method": "GET",
+      "path": "/api/workspace/onezero/{method}",
+      "name": "onezero_summary",
+      "tags": [
+        "reference-workspace"
+      ],
+      "endpoint": "api.workspace.onezero_summary",
+      "parameters": {
+        "path": [
+          {
+            "name": "method",
+            "required": true,
+            "annotation": "typing.Literal['min_max', 'pay_period']"
+          }
+        ],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": null,
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 92,
+      "method": "POST",
+      "path": "/api/workspace/onezero/contributors",
+      "name": "onezero_contributors",
+      "tags": [
+        "reference-workspace"
+      ],
+      "endpoint": "api.workspace.onezero_contributors",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/ContributorRequest"
+          }
+        }
+      },
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 93,
+      "method": "GET",
+      "path": "/api/workspace/calculation-walk",
+      "name": "calculation_walk",
+      "tags": [
+        "reference-workspace"
+      ],
+      "endpoint": "api.workspace.calculation_walk",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 94,
+      "method": "GET",
+      "path": "/api/workspace/assumptions",
+      "name": "assumptions",
+      "tags": [
+        "reference-workspace"
+      ],
+      "endpoint": "api.workspace.assumptions",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 95,
+      "method": "GET",
+      "path": "/api/workspace/comparison",
+      "name": "comparison",
+      "tags": [
+        "reference-workspace"
+      ],
+      "endpoint": "api.workspace.comparison",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {},
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    },
+    {
+      "order": 96,
+      "method": "POST",
+      "path": "/api/workspace/comparison/stage",
+      "name": "comparison_stage",
+      "tags": [
+        "reference-workspace"
+      ],
+      "endpoint": "api.workspace.comparison_stage",
+      "parameters": {
+        "path": [],
+        "query": [],
+        "header": [],
+        "cookie": []
+      },
+      "request_body_schema": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/ComparisonStageRequest"
+          }
+        }
+      },
+      "response_model": "dict",
+      "status_code": 200,
+      "declared_status_codes": [
+        200,
+        422
+      ],
+      "dependencies": [
+        {
+          "call": "api.auth.request_guard"
+        }
+      ],
+      "untyped": true,
+      "response_class": "JSONResponse"
+    }
+  ],
+  "exception_handler_shapes": [
+    {
+      "exception": "application.identity.NotAuthorized",
+      "status": 403,
+      "body": {
+        "detail": "<message or 'not authorized'>"
+      }
+    },
+    {
+      "exception": "application.errors.DependencyUnavailable",
+      "status": 503,
+      "body": "exc.as_detail() (see recordings)"
+    },
+    {
+      "exception": "application.program_defaults.ProgramStateConflict",
+      "status": 422,
+      "body": {
+        "detail": "<message>"
+      }
+    },
+    {
+      "exception": "fastapi.exceptions.RequestValidationError",
+      "status": 422,
+      "body": {
+        "detail": [
+          {
+            "type": "",
+            "loc": [],
+            "msg": "",
+            "input": null
+          }
+        ]
+      }
+    },
+    {
+      "exception": "starlette.exceptions.HTTPException",
+      "status": "any",
+      "body": {
+        "detail": "<str|object>"
+      }
+    }
+  ]
+}
