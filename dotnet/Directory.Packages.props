@@ -24,4 +24,8 @@
     <!-- BEGIN sources_auth_ai: only this session edits between the markers -->
     <!-- END sources_auth_ai -->
   </ItemGroup>
+  <!-- Persistence gate repair: configure the approved oracle only when the runner has not supplied one. -->
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'TaxCredit.Parity.Tests' and '$(TCC_PYTHON)' == '' and '$(RunSettingsFilePath)' == ''">
+    <RunSettingsFilePath>$(MSBuildThisFileDirectory)tests\TaxCredit.Infrastructure.Persistence.Tests\Oracle.runsettings</RunSettingsFilePath>
+  </PropertyGroup>
 </Project>

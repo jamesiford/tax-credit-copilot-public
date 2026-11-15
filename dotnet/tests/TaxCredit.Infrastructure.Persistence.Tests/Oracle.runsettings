@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <RunConfiguration>
+    <EnvironmentVariables>
+      <TCC_PYTHON>C:\Projects\py312-oracle\.venv\Scripts\python.exe</TCC_PYTHON>
+      <TCC_ALLOW_OTHER_PYTHON>0</TCC_ALLOW_OTHER_PYTHON>
+    </EnvironmentVariables>
+  </RunConfiguration>
+</RunSettings>
