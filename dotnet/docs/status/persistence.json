@@ -1,8 +1,8 @@
 {
   "session": "persistence",
   "branch": "dotnet/w1-persistence",
-  "head": "ac4cff8",
-  "summary": "P1-P6 implemented and committed: tenant-safe SQL, schema/seed reset, all 25 Gold reads, governed queries, atomic writer, operational histories and competing-worker queue. Build and format pass; whole-solution fast gate passes, including all 152 parity tests on CPython 3.12. Final persistence snapshot passes 125 tests. The real-writer capstone preserves all 12 successful public payloads (390945 rows / 8017010 typed cells). Obsolete halt removed; report and integration contracts supplied. Live Warehouse behavior is explicitly unverified.",
+  "head": "0175eca",
+  "summary": "P1-P6 complete. Repeated conductor failure repaired with persistent parity test-host oracle settings, selected only when caller environment/settings are absent. With TCC_PYTHON removed from the parent process, the same build, format and whole-solution fast gates pass: 18 Domain, 152 parity, 125 persistence and 13 architecture tests. Version validation remains enforced; no machine/user environment or parity source was changed. The real-writer capstone preserves all 12 certified payloads. Live Warehouse behavior remains unverified.",
   "stages": {
     "P1": "done",
     "P2": "done",
@@ -47,6 +47,12 @@
       "what": "SQLite operational initialization includes supplemental tcc_ops.finding_audit.",
       "why": "Finding-resolution audit durability needs a destination absent from the checked-in SQL bootstrap; deployed operator provisioning is documented.",
       "decision_needed": true
+    },
+    {
+      "id": "DEV-5",
+      "what": "The owned central props file conditionally selects an owned oracle runsettings file for the parity project.",
+      "why": "The conductor's repeated repair request requires plain unattended test invocations to work without shell-local TCC_PYTHON. This narrowly extends original packages-only guidance without editing parity sources or global environment. Explicit caller configuration is preserved.",
+      "decision_needed": false
     }
   ],
   "findings": [
@@ -58,7 +64,7 @@
     "E-9: decompressed content_sha256 is verified separately from shipped gzip sha256.",
     "The actual money DDL is DECIMAL(19,4), not the contract report's shorthand DECIMAL(18,2). Typed payload equality is checked before storage conversion.",
     "Six local migration identities represent bootstrap plus five forward migrations; applied content-hash drift and incompatible schema are refused.",
-    "Final gate processes must explicitly set TCC_PYTHON to the designated CPython 3.12 environment; no shared user/global environment was modified.",
+    "Missing parent-process TCC_PYTHON is now supplied explicitly to the parity test host by conditional Oracle.runsettings. The existing resolver still requires CPython 3.12; explicit caller environment/settings remain authoritative. No shared user/global environment was modified.",
     "SQLite governed monetary SUM is exact; monetary AVG retains Python SQLite native floating arithmetic rather than silently changing a derived figure."
   ],
   "open_questions": [],

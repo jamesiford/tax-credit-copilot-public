@@ -132,3 +132,30 @@ attempt hit MSB3883 on a temporarily locked Domain reference assembly; after
 those processes exited, the exact warning-as-error build passed in 34.46s with
 zero warnings/errors. This was a validation-process collision, not a source
 change or a reason to disable checks.
+
+## Repeated conductor oracle-environment repair
+
+The conductor reran its own process without TCC_PYTHON and reproduced the same
+seven parity configuration failures, while all 125 persistence tests passed.
+Documenting a shell-local variable was therefore insufficient. The repair now
+persists test-host configuration in an owned Oracle.runsettings file, selected
+from Directory.Packages.props for the parity project only when the caller has
+neither TCC_PYTHON nor explicit RunSettingsFilePath. The approved interpreter
+path is explicit in the settings; exploratory override is off.
+
+This narrow central test configuration is recorded as a deviation from the
+original packages-only marker guidance, justified by the repeated conductor
+repair request. No parity source, interpreter resolver, other worktree,
+conductor code or shared machine/user environment was modified.
+
+With both oracle environment variables removed from the parent process, the
+five OracleInterpreterTests pass. MSBuild property probes also prove that an
+explicit TCC_PYTHON prevents automatic settings selection and an explicit
+RunSettingsFilePath remains unchanged. The same whole build/format/fast gate
+is rerun with TCC_PYTHON absent, not manually supplied.
+
+The repeated full conductor commands passed with TCC_PYTHON absent:
+warning-as-error build 16.92s (zero warnings/errors), formatting verification,
+18 Domain tests, 125 persistence tests (1m07s), all 152 parity tests (10m17s)
+and 13 architecture tests. The complete command chain exited zero. The
+configuration repair is committed as 0175eca.

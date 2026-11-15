@@ -321,8 +321,25 @@ including two added real-container integration cases, then passed 125/125.
 The parity project took 12 minutes 23 seconds; final persistence took about
 two minutes under concurrent validation load. No comparison was weakened.
 
-All commands run from `dotnet` with the pinned .NET 10 SDK; the fast
-gate explicitly sets `TCC_PYTHON` to the designated CPython 3.12 environment.
+All commands run from `dotnet` with the pinned .NET 10 SDK. The conductor's
+repeated missing-environment failure is now addressed persistently:
+`Directory.Packages.props` selects the owned `Oracle.runsettings` only for
+`TaxCredit.Parity.Tests`, when both `TCC_PYTHON` and an explicit
+`RunSettingsFilePath` are absent. The settings inject the task-approved
+CPython 3.12 path into the test host and disable exploratory interpreter
+override. Explicit caller environment/settings remain authoritative.
+The interpreter resolver still checks the version and still fails for an
+absent executable or an unsupported interpreter; no resolver/test was weakened
+and no machine/user environment was changed.
+
+This is a narrow cross-project test configuration in the already owned central
+file, required by the conductor's second repair request. It is not a package
+change or an application runtime default. A plain `dotnet test --filter
+'Category!=heavy'` no longer relies on a prior shell's environment.
+The post-repair plain command chain passed with both oracle environment
+variables removed: build 16.92s with zero warnings/errors, format verification,
+18 Domain, 152 parity (10m17s), 125 persistence (1m07s) and 13 architecture
+tests. Its exit code was zero.
 The previously reported missing-oracle failures are configuration failures,
 not justification to weaken the oracle resolver or certify .NET 11.
 
