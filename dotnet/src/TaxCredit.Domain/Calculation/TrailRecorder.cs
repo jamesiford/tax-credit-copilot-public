@@ -25,6 +25,9 @@ public sealed class TrailRecorder(string title = "", string citation = "")
 {
     private readonly List<TrailStep> _steps = [];
 
+    /// <summary>The trail title; the credit tools set it when it is still empty or <c>Pending</c> (Python assigns <c>recorder.title</c>).</summary>
+    public string Title { get; set; } = title;
+
     /// <summary>The recorded steps.</summary>
     public IReadOnlyList<TrailStep> Steps => _steps;
 
@@ -41,7 +44,7 @@ public sealed class TrailRecorder(string title = "", string citation = "")
     /// <returns>The tree.</returns>
     public PyDict ToDict()
     {
-        var d = new PyDict().Add("title", title).Add("citation", citation).Add("steps", _steps.Select(s => (object?)s.ToDict()).ToList());
+        var d = new PyDict().Add("title", Title).Add("citation", citation).Add("steps", _steps.Select(s => (object?)s.ToDict()).ToList());
         return d.Add("evidence_hash", PyJson.EvidenceHash(d));
     }
 }

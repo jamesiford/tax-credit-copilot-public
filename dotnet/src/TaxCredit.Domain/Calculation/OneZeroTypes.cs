@@ -62,6 +62,24 @@ public sealed record OneZeroPack
 
     /// <summary>How the calculation is measured.</summary>
     public OneZeroMethodology Methodology { get; init; } = new();
+
+    /// <summary>The wage basis (<c>regular</c> or <c>all_remuneration</c>); the rule-pack loader fills it, the default is the Python test default.</summary>
+    public string WageBasis { get; init; } = "regular";
+
+    /// <summary>The geographic grain (<c>unit</c>, <c>county</c> or <c>statewide</c>).</summary>
+    public string GeographicGranularity { get; init; } = "unit";
+
+    /// <summary>Whether part-time hour aggregation is allowed.</summary>
+    public bool PtAggregation { get; init; }
+
+    /// <summary>The input column that names a headcount unit.</summary>
+    public string HeadcountUnitField { get; init; } = "Worksite_ID";
+
+    /// <summary>CALC-06: entity (FEIN) combination treatment (<c>required</c>, <c>permitted</c> or <c>prohibited</c>).</summary>
+    public string EntityCombination { get; init; } = "permitted";
+
+    /// <summary>The tax year these floors were resolved for; <c>null</c> means the default or flat pack.</summary>
+    public long? TaxYear { get; init; }
 }
 
 /// <summary>A per-employee totals slot (<c>total_hours_and_wages</c> element); shared by reference like the Python dicts.</summary>

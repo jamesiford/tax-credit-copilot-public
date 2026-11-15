@@ -116,11 +116,12 @@ public sealed record StatutoryFloors(string ProgramCode, long TaxYear, PyNumber 
             .Add("minimum_average_weekly_wages_usd", TrailValues.Of(MinWeeklyWages));
         foreach (var kv in Basis.Where(kv => !kv.Key.StartsWith('_')))
         {
-            d.Add(kv.Key, kv.Value);
+            // A dict display keeps the FIRST position of a repeated key and the LAST value, so a basis key such as `source` or `program_code` overwrites in place.
+            d.Set(kv.Key, kv.Value);
         }
 
-        return d.Add("prototype_verify", PrototypeVerify)
-            .Add("source", $"rules/{ProgramName(PackFile)}/{TaxYear}.json");
+        return d.Set("prototype_verify", PrototypeVerify)
+            .Set("source", $"rules/{ProgramName(PackFile)}/{TaxYear}.json");
     }
 
     private static object? Get(PyDict d, string key) => d.Where(kv => kv.Key == key).Select(kv => kv.Value).FirstOrDefault();

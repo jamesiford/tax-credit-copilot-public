@@ -1,5 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using TaxCredit.Application.Pipeline;
+using TaxCredit.Domain.Programs;
+using TaxCredit.Infrastructure.Rules;
 
 namespace TaxCredit.Infrastructure;
 
@@ -14,6 +16,27 @@ public static class DependencyInjection
         ArgumentNullException.ThrowIfNull(services);
         services.AddSingleton<InMemoryAuditLog>();
         services.AddSingleton<IAuditLog>(sp => sp.GetRequiredService<InMemoryAuditLog>());
+        return services;
+    }
+
+    /// <summary>
+    /// Binds the rules-folder adapters to the Domain's ports: <see cref="IRulePackSource"/> over <paramref name="options"/>, and, when an ingested-config
+    /// folder is configured, the captured ingestion hook. The folder is configuration; no rule file is copied.
+    /// </summary>
+    /// <param name="services">The container.</param>
+    /// <param name="options">Where the rules folder (and optionally the captured ingestion configs) are.</param>
+    /// <returns>The same container, for chaining.</returns>
+    public static IServiceCollection AddRulePackSource(this IServiceCollection services, RulePackOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(services);
+        ArgumentNullException.ThrowIfNull(options);
+        services.AddSingleton<IRulePackSource>(new JsonRulePackSource(options));
+        if (options.IngestedConfigDirectory is { Length: > 0 } ingested)
+        {
+            services.AddSingleton<IIngestedConfigFiles>(new JsonIngestedConfigFiles(ingested));
+            services.AddSingleton<IIngestedOneZeroSource>(sp => new CapturedIngestion(sp.GetRequiredService<IIngestedConfigFiles>()));
+        }
+
         return services;
     }
 }

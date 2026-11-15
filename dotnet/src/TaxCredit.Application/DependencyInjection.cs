@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using TaxCredit.Application.Messaging;
 using TaxCredit.Application.Pipeline;
+using TaxCredit.Application.Rules;
 
 namespace TaxCredit.Application;
 
@@ -15,6 +16,7 @@ public static class DependencyInjection
     {
         ArgumentNullException.ThrowIfNull(services);
         services.TryAddSingleton<IMediator, Mediator>();
+        services.AddRuleLibrary();
         // Registration order is execution order: Audit is outermost so that refusals and validation failures are
         // recorded too, then Authorization, Validation, and finally the handler.
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(AuditBehavior<,>));

@@ -36,3 +36,9 @@ public sealed class PyUnsupportedException(string message) : Exception(message);
 
 /// <summary>Mirrors Python <c>IndexError</c> (for example <c>list index out of range</c>).</summary>
 public sealed class PyIndexError(string message) : PyException("IndexError", message);
+
+/// <summary>Mirrors Python <c>FileNotFoundError</c> (a rule pack that is not there).</summary>
+public sealed class PyFileNotFoundError(string message) : PyException("FileNotFoundError", message);
+
+/// <summary>Mirrors Python <c>AttributeError</c> (for example <c>.get</c> on <c>None</c>).</summary>
+public sealed class PyAttributeError(string message) : PyException("AttributeError", message);
