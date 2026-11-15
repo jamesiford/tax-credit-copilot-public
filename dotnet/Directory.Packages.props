@@ -14,5 +14,11 @@
     <PackageVersion Include="Aspire.Hosting.SqlServer" Version="13.6.5" />
     <!-- JSON Schema (Draft 2020-12) for rule-pack validation. MIT, version 8.0.5: from 9.0 the binaries are under the json-everything Open Source Maintenance Fee EULA, which is not an acceptable licence here (docs/slice-domain-log.md DS8). -->
     <PackageVersion Include="JsonSchema.Net" Version="8.0.5" />
+    <!-- BEGIN skeleton: only this session edits between the markers -->
+    <!-- END skeleton -->
+    <!-- BEGIN persistence: only this session edits between the markers -->
+    <!-- END persistence -->
+    <!-- BEGIN sources_auth_ai: only this session edits between the markers -->
+    <!-- END sources_auth_ai -->
   </ItemGroup>
 </Project>

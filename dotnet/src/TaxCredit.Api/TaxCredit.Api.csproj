@@ -7,4 +7,10 @@
     <ProjectReference Include="..\TaxCredit.Infrastructure\TaxCredit.Infrastructure.csproj" />
     <ProjectReference Include="..\TaxCredit.ServiceDefaults\TaxCredit.ServiceDefaults.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TaxCredit.Infrastructure.Persistence\TaxCredit.Infrastructure.Persistence.csproj" />
+    <ProjectReference Include="..\TaxCredit.Infrastructure.Sources\TaxCredit.Infrastructure.Sources.csproj" />
+    <ProjectReference Include="..\TaxCredit.Infrastructure.Auth\TaxCredit.Infrastructure.Auth.csproj" />
+    <ProjectReference Include="..\TaxCredit.Infrastructure.Ai\TaxCredit.Infrastructure.Ai.csproj" />
+  </ItemGroup>
 </Project>

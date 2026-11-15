@@ -6,10 +6,19 @@
     <Project Path="src/TaxCredit.Api/TaxCredit.Api.csproj" />
     <Project Path="src/TaxCredit.ServiceDefaults/TaxCredit.ServiceDefaults.csproj" />
     <Project Path="src/TaxCredit.AppHost/TaxCredit.AppHost.csproj" />
+    <Project Path="src/TaxCredit.Infrastructure.Persistence/TaxCredit.Infrastructure.Persistence.csproj" />
+    <Project Path="src/TaxCredit.Infrastructure.Sources/TaxCredit.Infrastructure.Sources.csproj" />
+    <Project Path="src/TaxCredit.Infrastructure.Auth/TaxCredit.Infrastructure.Auth.csproj" />
+    <Project Path="src/TaxCredit.Infrastructure.Ai/TaxCredit.Infrastructure.Ai.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/TaxCredit.Domain.Tests/TaxCredit.Domain.Tests.csproj" />
     <Project Path="tests/TaxCredit.Parity.Tests/TaxCredit.Parity.Tests.csproj" />
     <Project Path="tests/TaxCredit.Architecture.Tests/TaxCredit.Architecture.Tests.csproj" />
+    <Project Path="tests/TaxCredit.Infrastructure.Persistence.Tests/TaxCredit.Infrastructure.Persistence.Tests.csproj" />
+    <Project Path="tests/TaxCredit.Infrastructure.Sources.Tests/TaxCredit.Infrastructure.Sources.Tests.csproj" />
+    <Project Path="tests/TaxCredit.Infrastructure.Auth.Tests/TaxCredit.Infrastructure.Auth.Tests.csproj" />
+    <Project Path="tests/TaxCredit.Infrastructure.Ai.Tests/TaxCredit.Infrastructure.Ai.Tests.csproj" />
+    <Project Path="tests/TaxCredit.Api.Tests/TaxCredit.Api.Tests.csproj" />
   </Folder>
 </Solution>
