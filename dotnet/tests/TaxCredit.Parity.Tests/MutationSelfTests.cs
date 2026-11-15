@@ -40,6 +40,29 @@ public sealed class MutationSelfTests(ITestOutputHelper output)
         ("coverage ordering: tax year tie-break reversed", @"src\TaxCredit.Domain\Claims\CoverageSituation.cs", "x.TaxYear.CompareTo(y.TaxYear)", "y.TaxYear.CompareTo(x.TaxYear)"),
         ("coverage ordering: programme totals in insertion order, not sorted", @"src\TaxCredit.Domain\Claims\Coverage.cs", "PySort.Sorted(grouped.Keys, k => k, PyStr.Comparer)", "grouped.Keys"),
         ("coverage netting: opportunity summed from the signed variance", @"src\TaxCredit.Domain\Claims\Coverage.cs", "claims.Select(c => c.OpportunityUsd)", "claims.Select(c => c.VarianceUsd)"),
+        ("performance rounding: weekly average hours rounds half away from zero instead of half even", @"src\TaxCredit.Domain\Calculation\PerformanceDashboard.cs", ".Add(\"avg_weekly_hours\", PyRound.Round(avgHours, 2))", ".Add(\"avg_weekly_hours\", Math.Round(avgHours, 2, MidpointRounding.AwayFromZero))"),
+        ("performance comparison: green needs strictly more than 1 + margin", @"src\TaxCredit.Domain\Calculation\PerformanceDashboard.cs", "worst >= 1.0 + margin ?", "worst > 1.0 + margin ?"),
+        ("performance comparison: yellow needs strictly more than 1 - margin", @"src\TaxCredit.Domain\Calculation\PerformanceDashboard.cs", "worst >= 1.0 - margin ?", "worst > 1.0 - margin ?"),
+        ("performance floor: a one-day span is no longer read as 0.01 weeks", @"src\TaxCredit.Domain\Calculation\PerformanceDashboard.cs", "PyArith.Max((double)days / 7.0, 0.01)", "((double)days / 7.0)"),
+        ("performance ordering: status tie-break reversed within a worksite", @"src\TaxCredit.Domain\Calculation\PerformanceDashboard.cs", "c = PyStr.Compare(x.Status, y.Status);", "c = PyStr.Compare(y.Status, x.Status);"),
+        ("reconciliation comparison: donut hole is inclusive of the tolerance", @"src\TaxCredit.Domain\Calculation\Reconciliation.cs", "if (pw > mw + tolerance)", "if (pw >= mw + tolerance)"),
+        ("reconciliation comparison: the invariant is violated at exactly the tolerance", @"src\TaxCredit.Domain\Calculation\Reconciliation.cs", "if (!(u.PpAverage > u.MmAverage + InvariantTolerance))", "if (!(u.PpAverage >= u.MmAverage + InvariantTolerance))"),
+        ("reconciliation rounding: the annual difference rounds half away from zero", @"src\TaxCredit.Domain\Calculation\Reconciliation.cs", "PyRound.Round(pp.AnnualAverage - mm.AnnualAverage, 2)", "Math.Round(pp.AnnualAverage - mm.AnnualAverage, 2, MidpointRounding.AwayFromZero)"),
+        ("reconciliation rounding: the donut delta rounds half away from zero", @"src\TaxCredit.Domain\Calculation\Reconciliation.cs", ".Add(\"delta\", PyRound.Round(pw - mw, 2))", ".Add(\"delta\", Math.Round(pw - mw, 2, MidpointRounding.AwayFromZero))"),
+        ("reconciliation ordering: units sorted by UTF-16 code unit, not code point", @"src\TaxCredit.Domain\Calculation\Reconciliation.cs", "ppSummary.Keys.Union(mmSummary.Keys, StringComparer.Ordinal), k => k, PyStr.Comparer)", "ppSummary.Keys.Union(mmSummary.Keys, StringComparer.Ordinal), k => k, StringComparer.Ordinal)"),
+        ("rollups rounding: month totals round half away from zero", @"src\TaxCredit.Domain\Calculation\Rollups.cs", "sums.Select(c => PyRound.Round(c, 2))", "sums.Select(c => Math.Round(c, 2, MidpointRounding.AwayFromZero))"),
+        ("rollups sum: totals use a naive running sum instead of Python's compensated sum", @"src\TaxCredit.Domain\Calculation\Rollups.cs", "PyRound.Round(PySum.Sum(cols), 2)", "PyRound.Round(cols.Sum(), 2)"),
+        ("rollups comparison: an empty text key is no longer unattributed", @"src\TaxCredit.Domain\Calculation\Rollups.cs", "|| !ProximityCoerce.Truthy(v))", "|| v is null or 0L or false)"),
+        ("rollups ordering: field keys sorted by UTF-16 code unit, not code point", @"src\TaxCredit.Domain\Calculation\Rollups.cs", "PySort.Sorted(byKey.Keys, k => k, PyStr.Comparer)", "PySort.Sorted(byKey.Keys, k => k, StringComparer.Ordinal)"),
+        ("rollups ordering: the second field tie-break is reversed", @"src\TaxCredit.Domain\Calculation\Rollups.cs", "return c != 0 ? c : PyStr.Compare(x.B, y.B);", "return c != 0 ? c : PyStr.Compare(y.B, x.B);"),
+        ("models comparison: a fiscal window of one day is accepted", @"src\TaxCredit.Domain\Warehouse\RunManifest.cs", "if (FiscalYearEnd <= FiscalYearBegin)", "if (FiscalYearEnd < FiscalYearBegin)"),
+        ("models comparison: the scope check is case-insensitive", @"src\TaxCredit.Domain\Warehouse\ManualOverride.cs", "OverrideScopes.Contains(Scope))", "OverrideScopes.Contains(Scope.ToLowerInvariant()))"),
+        ("models ordering: the allowed statuses are listed unsorted", @"src\TaxCredit.Domain\Warehouse\RunManifest.cs", "PySort.Sorted(set, s => s, PyStr.Comparer).Select(PyStr.Repr)", "set.Select(PyStr.Repr)"),
+        ("models comparison: a draft program is derived like any other", @"src\TaxCredit.Domain\Programs\ProgramEntry.cs", "Lifecycle is \"retired\" or \"draft\"", "Lifecycle is \"retired\""),
+        ("models equality: a finding's detail compares by reference, not as a dict", @"src\TaxCredit.Domain\Findings\FindingResolution.cs", "&& PyEquality.Equal(Detail, other.Detail)", "&& ReferenceEquals(Detail, other.Detail)"),
+        ("open year comparison: a window ending today is still open", @"src\TaxCredit.Domain\Calculation\OpenYear.cs", "return end > (on ?? (today ?? Today)());", "return end >= (on ?? (today ?? Today)());"),
+        ("open year comparison: net new equal to the threshold no longer qualifies", @"src\TaxCredit.Domain\Calculation\OpenYear.cs", "netNew >= yearThreshold && netNew > 0", "netNew > yearThreshold && netNew > 0"),
+        ("open year clamp: net new is no longer clamped at zero", @"src\TaxCredit.Domain\Calculation\OpenYear.cs", "PyArith.Max(0.0, average - ProximityCoerce.ToFloat(trend.BaseAverageHeadcount))", "(average - ProximityCoerce.ToFloat(trend.BaseAverageHeadcount))"),
     ];
 
     [Fact]
@@ -55,7 +78,9 @@ public sealed class MutationSelfTests(ITestOutputHelper output)
         var repo = Directory.GetParent(parity)!.FullName;
         var caught = new List<string>();
         var missed = new List<string>();
-        foreach (var (name, file, oldText, newText) in Mutations)
+        // TCC_MUTATION_FILTER=performance,rollups runs only the mutations whose name contains one of the comma-separated terms.
+        var terms = (Environment.GetEnvironmentVariable("TCC_MUTATION_FILTER") ?? string.Empty).Split(',', StringSplitOptions.RemoveEmptyEntries);
+        foreach (var (name, file, oldText, newText) in Mutations.Where(m => terms.Length == 0 || terms.Any(t => m.Name.Contains(t, StringComparison.OrdinalIgnoreCase))))
         {
             var root = Path.Combine(Path.GetTempPath(), "tcc-mutant-" + Guid.NewGuid().ToString("N")[..8]);
             try
@@ -69,7 +94,7 @@ public sealed class MutationSelfTests(ITestOutputHelper output)
                 File.WriteAllText(target, text.Replace(oldText, newText, StringComparison.Ordinal));
 
                 var env = new Dictionary<string, string> { ["TCC_FUZZ_N"] = "2000", ["TCC_RUN_MUTATION_TESTS"] = "0" };
-                var (exit, log) = Run("dotnet", "test tests\\TaxCredit.Parity.Tests --filter \"FullyQualifiedName~GoldenEngineTests|FullyQualifiedName~DifferentialFuzz|FullyQualifiedName~Sum_matches_python|FullyQualifiedName~ProximityParityTests|FullyQualifiedName~ClaimsParityTests|FullyQualifiedName~CoverageParityTests\"", Path.Combine(root, "dotnet"), env);
+                var (exit, log) = Run("dotnet", "test tests\\TaxCredit.Parity.Tests --filter \"FullyQualifiedName~GoldenEngineTests|FullyQualifiedName~DifferentialFuzz|FullyQualifiedName~Sum_matches_python|FullyQualifiedName~ProximityParityTests|FullyQualifiedName~ClaimsParityTests|FullyQualifiedName~CoverageParityTests|FullyQualifiedName~PerformanceParityTests|FullyQualifiedName~ModelsParityTests\"", Path.Combine(root, "dotnet"), env);
                 var failedLines = log.Split('\n').Count(l => l.Contains("diverged", StringComparison.Ordinal) || l.Contains("mismatches", StringComparison.Ordinal));
                 output.WriteLine($"{name}: exit={exit}, {failedLines} failure summaries");
                 (exit != 0 && failedLines > 0 ? caught : missed).Add(name);

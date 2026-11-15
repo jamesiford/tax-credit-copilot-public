@@ -1,5 +1,4 @@
 using System.Numerics;
-using System.Text;
 using TaxCredit.Domain.Numerics;
 
 namespace TaxCredit.Domain.Calculation;
@@ -97,26 +96,7 @@ internal static class ProximityCoerce
     };
 
     /// <summary>Python <c>repr(str)</c> for the text shown in conversion error messages.</summary>
-    internal static string Repr(string s)
-    {
-        var quote = s.Contains('\'', StringComparison.Ordinal) && !s.Contains('"', StringComparison.Ordinal) ? '"' : '\'';
-        var sb = new StringBuilder().Append(quote);
-        foreach (var c in s)
-        {
-            sb.Append(c switch
-            {
-                '\\' => "\\\\",
-                '\n' => "\\n",
-                '\r' => "\\r",
-                '\t' => "\\t",
-                _ when c == quote => "\\" + c,
-                _ when c < ' ' || c == '\u007f' => "\\x" + ((int)c).ToString("x2", System.Globalization.CultureInfo.InvariantCulture),
-                _ => c.ToString(),
-            });
-        }
-
-        return sb.Append(quote).ToString();
-    }
+    internal static string Repr(string s) => PyStr.Repr(s);
 
     /// <summary>Python <c>int / int</c>: the correctly rounded quotient (CPython <c>long_true_divide</c>), denominator positive.</summary>
     /// <remarks>
@@ -194,7 +174,7 @@ internal static class ProximityCoerce
     };
 
     /// <summary>A <c>KeyError</c> whose message is Python's <c>str(KeyError(key))</c>, the key's repr.</summary>
-    internal static PyKeyError Missing(string key) => new(Repr(key));
+    internal static PyKeyError Missing(string key) => new(key);
 
     // `cond ? (long)i : i` would silently convert the long to BigInteger (conditional-type trap, see slice-domain-log DS2).
 #pragma warning disable CA1859 // the object return is the point: a long when it fits, a BigInteger otherwise

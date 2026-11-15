@@ -168,6 +168,55 @@ public static class PyStr
         return c;
     }
 
+    /// <summary>Python <c>repr(s)</c>: quote choice, backslash escapes, and <c>\x</c>/<c>\u</c>/<c>\U</c> for non-printable characters.</summary>
+    /// <remarks>
+    /// Non-printable is Python's <c>str.isprintable</c> rule (categories Cc, Cf, Cs, Co, Cn, Zl, Zp, Zs other than the space).
+    /// The BCL's Unicode data may be newer than CPython 3.12's (15.0), so a character assigned after 15.0 can differ.
+    /// </remarks>
+    /// <param name="s">The text.</param>
+    /// <returns>The quoted representation.</returns>
+    public static string Repr(string s)
+    {
+        ArgumentNullException.ThrowIfNull(s);
+        var quote = s.Contains('\'', StringComparison.Ordinal) && !s.Contains('"', StringComparison.Ordinal) ? '"' : '\'';
+        var sb = new StringBuilder().Append(quote);
+        for (var i = 0; i < s.Length; i++)
+        {
+            var cp = CodePointAt(s, i, out var width);
+            i += width - 1;
+            if (cp == quote || cp == '\\')
+            {
+                sb.Append('\\').Append((char)cp);
+            }
+            else if (cp is '\t' or '\n' or '\r')
+            {
+                sb.Append(cp == '\t' ? "\\t" : cp == '\n' ? "\\n" : "\\r");
+            }
+            else if (cp < ' ' || cp == 0x7f)
+            {
+                sb.Append("\\x").Append(cp.ToString("x2", System.Globalization.CultureInfo.InvariantCulture));
+            }
+            else if (cp < 0x7f || IsPrintable(cp))
+            {
+                AppendCodePoint(sb, cp);
+            }
+            else
+            {
+                sb.Append(cp <= 0xff ? "\\x" + cp.ToString("x2", System.Globalization.CultureInfo.InvariantCulture)
+                    : cp <= 0xffff ? "\\u" + cp.ToString("x4", System.Globalization.CultureInfo.InvariantCulture)
+                    : "\\U" + cp.ToString("x8", System.Globalization.CultureInfo.InvariantCulture));
+            }
+        }
+
+        return sb.Append(quote).ToString();
+    }
+
+    private static bool IsPrintable(int cp) => System.Globalization.CharUnicodeInfo.GetUnicodeCategory(cp) is not (
+        System.Globalization.UnicodeCategory.Control or System.Globalization.UnicodeCategory.Format or System.Globalization.UnicodeCategory.Surrogate
+        or System.Globalization.UnicodeCategory.PrivateUse or System.Globalization.UnicodeCategory.OtherNotAssigned
+        or System.Globalization.UnicodeCategory.LineSeparator or System.Globalization.UnicodeCategory.ParagraphSeparator
+        or System.Globalization.UnicodeCategory.SpaceSeparator);
+
     private static int CodePointBefore(string s, int endExclusive, out int width)
     {
         var c = s[endExclusive - 1];

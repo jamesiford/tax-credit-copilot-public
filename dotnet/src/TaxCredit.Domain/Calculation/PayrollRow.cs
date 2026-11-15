@@ -68,6 +68,7 @@ public readonly record struct RowCell(CellKind Kind, string? Text = null, long I
 /// <param name="GrossWages">Gross_Wages.</param>
 /// <param name="PayCode">Pay_Code.</param>
 /// <param name="WorkState">Work_State.</param>
+/// <param name="JobTitle">Job_Title (only the performance dashboard reads it; absent unless supplied).</param>
 public sealed record PayrollRow(
     RowCell EmployeeId,
     RowCell WorksiteId,
@@ -78,7 +79,8 @@ public sealed record PayrollRow(
     RowCell HoursWorked,
     RowCell GrossWages,
     RowCell PayCode,
-    RowCell WorkState)
+    RowCell WorkState,
+    RowCell JobTitle = default)
 {
     /// <summary>Python <c>row["Employee_ID"]</c> for a column the port models as text-or-None.</summary>
     /// <param name="cell">The cell.</param>
