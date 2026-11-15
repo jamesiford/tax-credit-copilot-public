@@ -1,4 +1,4 @@
-# TaxCredit .NET spike
+# TaxCredit .NET port (spike and domain slice)
 
 A time-boxed spike that proves, with bit-level evidence, whether the Python calculation engine of this repository can be
 reproduced exactly in C#/.NET, and lays the multi-project solution a full port would use. The **Python engine is the oracle**;
@@ -67,3 +67,13 @@ replayed by `Saved_regression_goldens_still_agree_with_the_python_engine`.
 Dependencies point inward; Domain is the BCL only; warnings are errors; XML docs on every public member of production
 code; no `Math.Round`, `(decimal)someDouble`, culture-sensitive string operations or unstable sorts where Python semantics
 differ. See [ADR 0001](docs/adr/0001-solution-layout-and-dependency-rules.md) and [ADR 0002](docs/adr/0002-coding-standards.md).
+
+### Domain slice harness
+
+Every ported family has a Python exporter (`parity/export_<family>.py [--check]`) that runs the production functions and writes
+`parity/goldens/<family>.jsonl.gz`, a C# replay test comparing bit for bit, and mutation self-tests in
+`MutationSelfTests`. Extra gates: per-family differential fuzz (`FamilyFuzzTests`, N = 20,000 per family, `TCC_FUZZ_N` /
+`TCC_FUZZ_SEED`), and the capstone (`export_gold_payload.py` against `ClientCalculationParityTests`: every row of the seven
+`tcc_gold` tables). Regenerate the port map with `python parity/port_map.py`. Mutation subsets:
+`TCC_RUN_MUTATION_TESTS=1 TCC_MUTATION_FILTER=<text> TCC_MUTATION_TEST_FILTER=<xunit filter>` (a full pass is slow).
+Rule files are read from `backend/rules` through `RulePackOptions` and are never copied.
