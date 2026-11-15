@@ -25,6 +25,21 @@ public sealed class MutationSelfTests(ITestOutputHelper output)
         ("proximity max/min inversion: the smaller cushion no longer binds", @"src\TaxCredit.Domain\Calculation\Proximity.cs", "PyArith.Min(hoursHeadroom, wagesHeadroomHours.Value)", "PyArith.Max(hoursHeadroom, wagesHeadroomHours.Value)"),
         ("proximity ordering: id tie-break reversed", @"src\TaxCredit.Domain\Calculation\ProximityCohorts.cs", "PyStr.Compare(x.Id, y.Id)", "PyStr.Compare(y.Id, x.Id)"),
         ("proximity counting: population no longer overrides the ineligible count", @"src\TaxCredit.Domain\Calculation\ProximityCohorts.cs", ".Add(\"ineligible\", usePopulation ? ProximityCoerce.ToInt(Req(population!, \"ineligible\")) : (long)ineligible.Count)", ".Add(\"ineligible\", (long)ineligible.Count)"),
+        ("decimal rounding: the 28-digit context rounds half up instead of half even", @"src\TaxCredit.Domain\Numerics\PyDecimalOps.cs", "if (cmp > 0 || (cmp == 0 && !q.IsEven))", "if (cmp >= 0)"),
+        ("claims rounding: fallen_by rounds away from zero instead of half even", @"src\TaxCredit.Domain\Claims\ClaimReadings.cs", "PyRound.Round(peak.AverageHeadcount.Value - latest.AverageHeadcount.Value, 2)", "Math.Round(peak.AverageHeadcount.Value - latest.AverageHeadcount.Value, 2, MidpointRounding.AwayFromZero)"),
+        ("claims rounding: jobs_margin truncates instead of rounding", @"src\TaxCredit.Domain\Claims\ProgramClaim.Readings.cs", "PyRound.Round(netNew - threshold, 2)", "Math.Truncate((netNew - threshold) * 100) / 100"),
+        ("claims comparison: materiality <= becomes < (confirmed)", @"src\TaxCredit.Domain\Claims\ProgramClaim.Readings.cs", "PyDecimalOps.Compare(PyDecimalOps.Abs(variance), ClaimMoney.Materiality) <= 0", "PyDecimalOps.Compare(PyDecimalOps.Abs(variance), ClaimMoney.Materiality) < 0"),
+        ("claims comparison: materiality <= becomes < (correctly not claimed)", @"src\TaxCredit.Domain\Claims\ProgramClaim.Readings.cs", "PyDecimalOps.Compare(IdentifiedUsd, ClaimMoney.Materiality) <= 0", "PyDecimalOps.Compare(IdentifiedUsd, ClaimMoney.Materiality) < 0"),
+        ("claims comparison: on the line is exclusive of one whole job", @"src\TaxCredit.Domain\Claims\ProgramClaim.Readings.cs", "Math.Abs(margin) <= OnTheLineJobs", "Math.Abs(margin) < OnTheLineJobs"),
+        ("claims gate: exposure no longer needs a verified claim", @"src\TaxCredit.Domain\Claims\ProgramClaim.Readings.cs", "if (IsExposure && Provenance.Verified())", "if (IsExposure)"),
+        ("claims gate: an unverified claim is netted into the outstanding test", @"src\TaxCredit.Domain\Claims\ProgramClaim.Readings.cs", "var outstanding = Provenance.Verified() ? OpportunityUsd : IdentifiedUsd;", "var outstanding = OpportunityUsd;"),
+        ("claims clamp: jobs_to_threshold no longer clamps at zero", @"src\TaxCredit.Domain\Claims\ProgramClaim.Readings.cs", "PyRound.Round(gap > 0.0 ? gap : 0.0, 2)", "PyRound.Round(gap, 2)"),
+        ("claims comparison: declining peak takes the last maximum instead of the first", @"src\TaxCredit.Domain\Claims\ClaimReadings.cs", "if (c.AverageHeadcount > peak.AverageHeadcount)", "if (c.AverageHeadcount >= peak.AverageHeadcount)"),
+        ("claims ordering: band rank of declining moves below unclaimed", @"src\TaxCredit.Domain\Claims\ClaimEnumExtensions.cs", "PriorityBand.Declining => 2,", "PriorityBand.Declining => 4,"),
+        ("coverage ordering: identified dollars ascending within a band", @"src\TaxCredit.Domain\Claims\CoverageSituation.cs", "-c.IdentifiedUsd.ToDouble()", "c.IdentifiedUsd.ToDouble()"),
+        ("coverage ordering: tax year tie-break reversed", @"src\TaxCredit.Domain\Claims\CoverageSituation.cs", "x.TaxYear.CompareTo(y.TaxYear)", "y.TaxYear.CompareTo(x.TaxYear)"),
+        ("coverage ordering: programme totals in insertion order, not sorted", @"src\TaxCredit.Domain\Claims\Coverage.cs", "PySort.Sorted(grouped.Keys, k => k, PyStr.Comparer)", "grouped.Keys"),
+        ("coverage netting: opportunity summed from the signed variance", @"src\TaxCredit.Domain\Claims\Coverage.cs", "claims.Select(c => c.OpportunityUsd)", "claims.Select(c => c.VarianceUsd)"),
     ];
 
     [Fact]
@@ -54,7 +69,7 @@ public sealed class MutationSelfTests(ITestOutputHelper output)
                 File.WriteAllText(target, text.Replace(oldText, newText, StringComparison.Ordinal));
 
                 var env = new Dictionary<string, string> { ["TCC_FUZZ_N"] = "2000", ["TCC_RUN_MUTATION_TESTS"] = "0" };
-                var (exit, log) = Run("dotnet", "test tests\\TaxCredit.Parity.Tests --filter \"FullyQualifiedName~GoldenEngineTests|FullyQualifiedName~DifferentialFuzz|FullyQualifiedName~Sum_matches_python|FullyQualifiedName~ProximityParityTests\"", Path.Combine(root, "dotnet"), env);
+                var (exit, log) = Run("dotnet", "test tests\\TaxCredit.Parity.Tests --filter \"FullyQualifiedName~GoldenEngineTests|FullyQualifiedName~DifferentialFuzz|FullyQualifiedName~Sum_matches_python|FullyQualifiedName~ProximityParityTests|FullyQualifiedName~ClaimsParityTests|FullyQualifiedName~CoverageParityTests\"", Path.Combine(root, "dotnet"), env);
                 var failedLines = log.Split('\n').Count(l => l.Contains("diverged", StringComparison.Ordinal) || l.Contains("mismatches", StringComparison.Ordinal));
                 output.WriteLine($"{name}: exit={exit}, {failedLines} failure summaries");
                 (exit != 0 && failedLines > 0 ? caught : missed).Add(name);
