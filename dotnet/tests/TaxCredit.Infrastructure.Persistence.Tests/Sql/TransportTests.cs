@@ -8,6 +8,19 @@ namespace TaxCredit.Infrastructure.Persistence.Tests.Sql;
 public sealed class TransportTests
 {
     [Theory]
+    [InlineData("1E+2", "100", 3, 0)]
+    [InlineData("1E-6", "0.000001", 6, 6)]
+    [InlineData("12345678901234567890123456789012345678", "12345678901234567890123456789012345678", 38, 0)]
+    public void Native_decimal_binding_preserves_exponents_and_38_digit_values(string input, string expected, int precision, int scale)
+    {
+        var parameter = new SqlParameter();
+        SqlValues.Bind(parameter, PyDecimal.Parse(input), false);
+        Assert.Equal(expected, parameter.Value.ToString());
+        Assert.Equal(precision, parameter.Precision);
+        Assert.Equal(scale, parameter.Scale);
+    }
+
+    [Theory]
     [InlineData(24556)]
     [InlineData(3960)]
     [InlineData(1205)]
@@ -36,6 +49,38 @@ public sealed class TransportTests
         Assert.Equal(3, connections.Sum(c => c.Rollbacks));
         Assert.Equal(1, connections.Sum(c => c.Commits));
         Assert.All(connections, c => Assert.True(c.WasDisposed));
+    }
+
+    [Fact]
+    public void A_confirmed_conflict_starting_the_transaction_is_retried_without_a_phantom_rollback()
+    {
+        var first = new RecordingConnection { BeginError = new NativeSqlException(1205) };
+        var second = new RecordingConnection();
+        var attempts = 0;
+        var database = new PersistenceDatabase(() => ++attempts == 1 ? first : second,
+            new SqlServerDialect(), delay: _ => { });
+        Assert.Equal(1, database.Transact(session => session.Execute(1, "UPDATE t SET x=1 WHERE {tenant}")));
+        Assert.Empty(first.Commands);
+        Assert.Equal(0, first.Rollbacks);
+        Assert.True(first.WasDisposed);
+        Assert.Equal(1, second.Commits);
+    }
+
+    [Fact]
+    public void Confirmed_commit_conflicts_have_a_bounded_retry_budget()
+    {
+        var connections = new List<RecordingConnection>();
+        var delays = new List<TimeSpan>();
+        var database = new PersistenceDatabase(() =>
+        {
+            var connection = new RecordingConnection { CommitError = new NativeSqlException(3960) };
+            connections.Add(connection);
+            return connection;
+        }, new SqlServerDialect(), delay: delays.Add);
+        Assert.Throws<NativeSqlException>(() => database.Transact(_ => 1));
+        Assert.Equal(5, connections.Count);
+        Assert.Equal(4, delays.Count);
+        Assert.All(connections, c => Assert.Equal(1, c.Rollbacks));
     }
 
     [Fact]

@@ -121,7 +121,8 @@ public sealed class SeedImporter
         {
             using var json = JsonDocument.Parse(line);
             if (json.RootElement.ValueKind != JsonValueKind.Object ||
-                !json.RootElement.EnumerateObject().Select(p => p.Name).SequenceEqual(columns))
+                !json.RootElement.EnumerateObject().Select(p => p.Name).SequenceEqual(columns) ||
+                json.RootElement.EnumerateObject().Any(p => p.Value.ValueKind is JsonValueKind.Array or JsonValueKind.Object))
             {
                 throw new InvalidDataException("Malformed seed row: " + path);
             }

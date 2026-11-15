@@ -13,6 +13,7 @@ internal sealed class RecordingConnection : DbConnection
     internal int Rollbacks { get; private set; }
     internal bool WasDisposed { get; private set; }
     internal Exception? OpenError { get; set; }
+    internal Exception? BeginError { get; set; }
     internal Exception? CommitError { get; set; }
     internal Exception? ExecuteError { get; set; }
     [AllowNull] public override string ConnectionString { get; set; } = string.Empty;
@@ -32,7 +33,8 @@ internal sealed class RecordingConnection : DbConnection
         _state = ConnectionState.Open;
     }
 
-    protected override DbTransaction BeginDbTransaction(IsolationLevel isolationLevel) => new Transaction(this, isolationLevel);
+    protected override DbTransaction BeginDbTransaction(IsolationLevel isolationLevel) =>
+        BeginError is { } error ? throw error : new Transaction(this, isolationLevel);
     protected override DbCommand CreateDbCommand() => new Command(this);
     protected override void Dispose(bool disposing)
     {

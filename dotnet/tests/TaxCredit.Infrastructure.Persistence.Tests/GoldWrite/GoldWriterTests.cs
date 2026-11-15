@@ -126,7 +126,7 @@ public sealed class GoldWriterTests
         using var session = database.Open();
         foreach (var (name, expected) in payload.Tables)
         {
-            var actual = session.Query(payload.ClientId, "SELECT " + string.Join(",", GoldColumns.All[name]) + " FROM tcc_gold." + name + " WHERE {tenant} AND run_id=?", payload.RunId);
+            var actual = session.Query(payload.ClientId, "SELECT " + string.Join(",", GoldColumns.All[name]) + " FROM tcc_gold." + name + " WHERE {tenant} AND run_id=? ORDER BY rowid", payload.RunId);
             Assert.Equal(expected.Count, actual.Count);
             for (var i = 0; i < expected.Count; i++)
             {

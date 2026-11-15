@@ -142,6 +142,35 @@ public sealed class SeedImporterTests
     }
 
     [Fact]
+    public void Forward_nullable_columns_are_applied_to_existing_local_tables()
+    {
+        using var fixture = new PersistenceFixture(initialize: false);
+        using (var session = fixture.Database.Open())
+        {
+            session.ExecuteExempt(SqlExemption.Schema,
+                "CREATE TABLE tcc_ops.program_engagement (client_id INTEGER NOT NULL,program_code TEXT NOT NULL,scope TEXT NOT NULL,effective_from TEXT NOT NULL,effective_to TEXT,note TEXT) STRICT");
+        }
+
+        PersistenceSchema.Initialize(fixture.Database, PersistenceFixture.Root);
+        using var read = fixture.Database.Open();
+        var columns = read.QueryExempt(SqlExemption.Schema, "PRAGMA table_info(tcc_ops_program_engagement)").Select(r => (string)r["name"]!);
+        Assert.Contains("set_by", columns);
+        Assert.Contains("set_at", columns);
+    }
+
+    [Fact]
+    public void Changed_applied_migration_hashes_are_refused()
+    {
+        using var fixture = new PersistenceFixture();
+        using (var session = fixture.Database.Open())
+        {
+            session.ExecuteExempt(SqlExemption.Schema, "UPDATE tcc_ops.schema_migration SET sha256=? WHERE version='0000'", new string('0', 64));
+        }
+
+        Assert.Throws<InvalidOperationException>(() => PersistenceSchema.Initialize(fixture.Database, PersistenceFixture.Root));
+    }
+
+    [Fact]
     public void Schema_preserves_nullability_precision_and_declared_columns()
     {
         using var fixture = new PersistenceFixture();

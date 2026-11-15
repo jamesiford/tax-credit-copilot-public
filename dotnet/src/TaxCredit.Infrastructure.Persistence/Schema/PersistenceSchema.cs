@@ -117,6 +117,7 @@ public static partial class PersistenceSchema
 
                 session.ExecuteExempt(SqlExemption.Schema, "CREATE TABLE IF NOT EXISTS " + session.Dialect.Name(table)
                     + " (" + string.Join(",", columns.Select(SqliteColumn)) + ") STRICT");
+                EnsureColumns(session, table, columns);
             }
 
             foreach (var table in EmployeeTables)
@@ -130,6 +131,31 @@ public static partial class PersistenceSchema
             RecordMigrations(session, repositoryRoot);
             return 0;
         });
+    }
+
+    private static void EnsureColumns(SqlSession session, string table, IReadOnlyList<StorageColumn> expected)
+    {
+        var actual = session.QueryExempt(SqlExemption.Schema, "PRAGMA table_info(" + session.Dialect.Name(table) + ")")
+            .ToDictionary(row => (string)row["name"]!, StringComparer.Ordinal);
+        foreach (var column in expected)
+        {
+            if (!actual.TryGetValue(column.Name, out var row))
+            {
+                if (!column.Nullable)
+                {
+                    throw new InvalidOperationException("An existing table lacks a required column: " + table + "." + column.Name);
+                }
+
+                session.ExecuteExempt(SqlExemption.Schema, "ALTER TABLE " + session.Dialect.Name(table) + " ADD COLUMN " + SqliteColumn(column));
+                continue;
+            }
+
+            var nullable = (long)row["notnull"]! == 0;
+            if ((string)row["type"]! != SqliteType(column) || nullable != column.Nullable)
+            {
+                throw new InvalidOperationException("An existing column has incompatible type/nullability: " + table + "." + column.Name);
+            }
+        }
     }
 
     private static void RecordMigrations(SqlSession session, string root)
@@ -168,12 +194,7 @@ public static partial class PersistenceSchema
     private static string SqliteColumn(StorageColumn column)
     {
         var name = "\"" + column.Name + "\"";
-        var type = column.SqlType switch
-        {
-            "BIGINT" or "INT" or "BIT" => "INTEGER",
-            "FLOAT" => "REAL",
-            _ => "TEXT",
-        };
+        var type = SqliteType(column);
         var check = column.SqlType switch
         {
             "BIT" => $" CHECK ({name} IN (0,1))",
@@ -184,6 +205,13 @@ public static partial class PersistenceSchema
         };
         return name + " " + type + (column.Nullable ? string.Empty : " NOT NULL") + check;
     }
+
+    private static string SqliteType(StorageColumn column) => column.SqlType switch
+    {
+        "BIGINT" or "INT" or "BIT" => "INTEGER",
+        "FLOAT" => "REAL",
+        _ => "TEXT",
+    };
 
     [GeneratedRegex(@"/\*[\s\S]*?\*/|--[^\r\n]*")]
     private static partial Regex Comments();

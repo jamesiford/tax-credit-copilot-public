@@ -2,7 +2,6 @@ using System.Data;
 using System.Data.Common;
 using System.Globalization;
 using System.Numerics;
-using Microsoft.Data.SqlClient;
 using TaxCredit.Domain.Gold;
 using TaxCredit.Domain.Numerics;
 
@@ -29,18 +28,11 @@ internal static class SqlValues
                 parameter.Value = checked((long)integer);
                 break;
             case PyDecimal number when !sqlite:
-                if (parameter is not SqlParameter sqlParameter)
-                {
-                    parameter.DbType = DbType.Decimal;
-                    parameter.Value = decimal.Parse(number.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture);
-                    break;
-                }
-
-                var scale = Math.Max(0, -number.Exponent);
-                sqlParameter.SqlDbType = SqlDbType.Decimal;
-                sqlParameter.Scale = checked((byte)scale);
-                sqlParameter.Precision = checked((byte)Math.Max(scale, number.Coefficient.ToString(CultureInfo.InvariantCulture).Length));
-                sqlParameter.Value = System.Data.SqlTypes.SqlDecimal.Parse(number.ToString());
+                var literal = DecimalLiteral(number);
+                parameter.DbType = DbType.Decimal;
+                parameter.Scale = literal.Scale;
+                parameter.Precision = literal.Precision;
+                parameter.Value = System.Data.SqlTypes.SqlDecimal.Parse(literal.Text);
                 break;
             case PyDecimal number:
                 parameter.DbType = DbType.String;
@@ -58,6 +50,34 @@ internal static class SqlValues
                 parameter.Value = value;
                 break;
         }
+    }
+
+    private static (string Text, byte Scale, byte Precision) DecimalLiteral(PyDecimal number)
+    {
+        if (number.Exponent is < -38 or > 38)
+        {
+            throw new InvalidOperationException("Decimal parameter exceeds SQL Server precision or scale.");
+        }
+
+        var digits = number.Coefficient.ToString(CultureInfo.InvariantCulture);
+        var scale = Math.Max(0, -number.Exponent);
+        var precision = Math.Max(scale, digits.Length + Math.Max(0, number.Exponent));
+        if (precision > 38 || scale > 38)
+        {
+            throw new InvalidOperationException("Decimal parameter exceeds SQL Server precision or scale.");
+        }
+
+        if (number.Exponent > 0)
+        {
+            digits += new string('0', number.Exponent);
+        }
+        else if (scale > 0)
+        {
+            digits = digits.PadLeft(scale + 1, '0');
+            digits = digits.Insert(digits.Length - scale, ".");
+        }
+
+        return ((number.Negative ? "-" : string.Empty) + digits, (byte)scale, (byte)precision);
     }
 
     internal static DateTime ToUtc(PyDateTime time)
