@@ -1,0 +1,570 @@
+{
+  "method": "AST scan of backend/ and channel_orchestrator/ (tests and vendored copies excluded) for os.getenv(NAME), os.environ[NAME], <environ-like>.get(NAME), and any call whose first argument is an environ-like mapping and whose second is the NAME (config helpers such as tuned_int(environ, NAME, ...)); documented names are every back-ticked UPPER_SNAKE token in docs/architecture/ENV-VARS.md",
+  "read_by_code": {
+    "AI_AGENT_VERSION_PINS": [
+      "backend/application/ai/settings.py"
+    ],
+    "AI_BREAKER_FAILURE_THRESHOLD": [
+      "backend/application/ai/settings.py"
+    ],
+    "AI_BREAKER_RESET_SECONDS": [
+      "backend/application/ai/settings.py"
+    ],
+    "AI_BULKHEAD_MAX_CONCURRENT": [
+      "backend/application/ai/settings.py"
+    ],
+    "AI_CALL_TIMEOUT_SECONDS": [
+      "backend/application/ai/settings.py"
+    ],
+    "AI_EGRESS_POLICY": [
+      "backend/application/ai/settings.py"
+    ],
+    "AI_FOUNDRY_CONNECTION_NAME": [
+      "backend/application/ai/settings.py"
+    ],
+    "AI_GATEWAY_API_KEY_PREFIX": [
+      "backend/application/ai/gateway_settings.py"
+    ],
+    "AI_GATEWAY_CONNECT_TIMEOUT_SECONDS": [
+      "backend/application/ai/gateway_settings.py"
+    ],
+    "AI_GATEWAY_STREAMING": [
+      "backend/application/ai/gateway_settings.py"
+    ],
+    "AI_GATEWAY_SUPPORTS_TOOLS": [
+      "backend/application/ai/gateway_settings.py"
+    ],
+    "AI_GATEWAY_TIMEOUT_SECONDS": [
+      "backend/application/ai/gateway_settings.py"
+    ],
+    "AI_GATEWAY_TLS_VERIFY": [
+      "backend/application/ai/gateway_settings.py"
+    ],
+    "AI_INJECTION_GUARD": [
+      "backend/application/ai/safety/settings.py"
+    ],
+    "AI_OUTPUT_ALLOWED_HOSTS": [
+      "backend/application/ai/safety/settings.py"
+    ],
+    "AI_OUTPUT_POLICY": [
+      "backend/application/ai/safety/settings.py"
+    ],
+    "AI_PROVIDER_CHAIN": [
+      "backend/application/ai/settings.py"
+    ],
+    "AI_RETRY_BASE_SECONDS": [
+      "backend/application/ai/settings.py"
+    ],
+    "AI_RETRY_MAX_ATTEMPTS": [
+      "backend/application/ai/settings.py"
+    ],
+    "AI_RETRY_MAX_SECONDS": [
+      "backend/application/ai/settings.py"
+    ],
+    "AI_TOKEN_BUDGET_DAILY": [
+      "backend/application/ai/settings.py"
+    ],
+    "AI_TOKEN_BUDGET_PER_PRINCIPAL_DAILY": [
+      "backend/application/ai/settings.py"
+    ],
+    "AI_TOTAL_DEADLINE_SECONDS": [
+      "backend/application/ai/settings.py"
+    ],
+    "API_AUDIENCE": [
+      "backend/application/auth_policy.py",
+      "backend/channel/config.py"
+    ],
+    "API_BASE_URL": [
+      "backend/channel/config.py"
+    ],
+    "APPLICATIONINSIGHTS_CONNECTION_STRING": [
+      "backend/config_sections.py"
+    ],
+    "ARTIFACT_BLOB_ACCOUNT_URL": [
+      "backend/config_sections.py"
+    ],
+    "ARTIFACT_LOCAL_ROOT": [
+      "backend/config_sections.py"
+    ],
+    "ARTIFACT_REPOSITORY": [
+      "backend/application/deployment.py"
+    ],
+    "ARTIFACT_STORE": [
+      "backend/application/deployment.py"
+    ],
+    "AUTH_MODE": [
+      "backend/application/auth_policy.py",
+      "backend/channel/config.py"
+    ],
+    "AUTH_TENANT_ID": [
+      "backend/application/auth_policy.py"
+    ],
+    "AZURE_AI_MODEL_DEPLOYMENT_NAME": [
+      "channel_orchestrator/app/core/modelprobe.py"
+    ],
+    "AZURE_CLIENT_ID": [
+      "backend/config.py",
+      "backend/config_sections.py"
+    ],
+    "AZURE_TENANT_ID": [
+      "backend/application/auth_policy.py"
+    ],
+    "AZURE_TOKEN_CREDENTIALS": [
+      "backend/config_sections.py"
+    ],
+    "CAPABILITY_TIMEOUT_SECONDS": [
+      "backend/application/capabilities/invoke.py"
+    ],
+    "CHANNEL_ALLOWED_CALLER_APP_IDS": [
+      "backend/channel/config.py"
+    ],
+    "CHANNEL_CALLER_CHANNELS": [
+      "backend/channel/config.py"
+    ],
+    "CHANNEL_CONFIRM_TTL_SECONDS": [
+      "backend/application/deployment.py",
+      "channel_orchestrator/app/core/settings.py"
+    ],
+    "CHANNEL_DEBUG_WHOAMI": [
+      "backend/channel/config.py",
+      "channel_orchestrator/app/core/settings.py"
+    ],
+    "CHANNEL_ENFORCE_WRITER_FOR_USERS": [
+      "backend/application/deployment.py"
+    ],
+    "CHANNEL_GATEWAY_AUDIENCE": [
+      "channel_orchestrator/app/core/settings.py"
+    ],
+    "CHANNEL_GATEWAY_URL": [
+      "channel_orchestrator/app/core/settings.py"
+    ],
+    "CHANNEL_IDENTITY_SOURCES": [
+      "channel_orchestrator/app/core/settings.py"
+    ],
+    "CHANNEL_MAX_TOOL_CALLS": [
+      "channel_orchestrator/app/core/settings.py"
+    ],
+    "CHANNEL_MCP_ALLOWED_ORIGINS": [
+      "backend/channel/config.py"
+    ],
+    "CHANNEL_NAME": [
+      "channel_orchestrator/app/core/settings.py"
+    ],
+    "CHANNEL_RATE_LIMIT_PER_MINUTE": [
+      "backend/channel/config.py"
+    ],
+    "CHANNEL_REQUEST_TIMEOUT_SECONDS": [
+      "backend/channel/config.py",
+      "channel_orchestrator/app/core/settings.py"
+    ],
+    "CHANNEL_RESOLVE_DISPLAY_NAMES": [
+      "backend/channel/config.py"
+    ],
+    "CHANNEL_STATE_TTL_SECONDS": [
+      "channel_orchestrator/app/core/settings.py"
+    ],
+    "CHANNEL_TURN_TIMEOUT_SECONDS": [
+      "channel_orchestrator/app/core/settings.py"
+    ],
+    "CHANNEL_WRITER_GROUP_ID": [
+      "backend/application/deployment.py"
+    ],
+    "CHANNEL_WRITER_SOURCE": [
+      "backend/application/deployment.py"
+    ],
+    "CLAIM_STORE": [
+      "backend/config_sections.py"
+    ],
+    "DATA_CLASSIFICATION": [
+      "backend/application/deployment.py",
+      "backend/config_sections.py"
+    ],
+    "DATA_MIN_GROUP_SIZE": [
+      "backend/bootstrap/data_wiring.py"
+    ],
+    "DATA_QUERY_MAX_CONCURRENCY": [
+      "backend/bootstrap/data_wiring.py"
+    ],
+    "DATA_QUERY_MAX_ROWS": [
+      "backend/bootstrap/data_wiring.py"
+    ],
+    "DATA_QUERY_RATE_PER_MINUTE": [
+      "backend/bootstrap/data_wiring.py"
+    ],
+    "DATA_QUERY_SOURCE_ENABLED": [
+      "backend/bootstrap/data_wiring.py"
+    ],
+    "DATA_QUERY_SQLITE_DIR": [
+      "backend/bootstrap/data_wiring.py"
+    ],
+    "DATA_QUERY_TIMEOUT_SECONDS": [
+      "backend/bootstrap/data_wiring.py"
+    ],
+    "DATA_SOURCE": [
+      "backend/config_sections.py"
+    ],
+    "ENVIRONMENT": [
+      "backend/application/auth_policy.py",
+      "backend/application/deployment.py",
+      "backend/config_programs.py",
+      "backend/config_runs.py",
+      "backend/config_sections.py"
+    ],
+    "FABRIC_EMPLOYEES_TABLE": [
+      "backend/config_sections.py"
+    ],
+    "FABRIC_LAKEHOUSE": [
+      "backend/config_sections.py"
+    ],
+    "FABRIC_WORKSPACE": [
+      "backend/config_sections.py"
+    ],
+    "FIXTURE_ACCOUNT_ID": [
+      "backend/config_sections.py"
+    ],
+    "FOUNDRY_AGENT_NAME": [
+      "channel_orchestrator/app/core/settings.py"
+    ],
+    "FOUNDRY_AGENT_VERSION": [
+      "channel_orchestrator/app/core/settings.py"
+    ],
+    "FOUNDRY_MODEL": [
+      "backend/application/ai/settings.py",
+      "channel_orchestrator/app/core/modelprobe.py"
+    ],
+    "FOUNDRY_PROJECT_ENDPOINT": [
+      "backend/application/ai/settings.py",
+      "backend/config_sections.py",
+      "channel_orchestrator/app/core/modelprobe.py"
+    ],
+    "GATEWAY_AUDIENCE": [
+      "backend/channel/config.py"
+    ],
+    "GIT_COMMIT": [
+      "backend/config_sections.py"
+    ],
+    "KNOWLEDGE_ENABLED": [
+      "backend/application/knowledge/settings.py"
+    ],
+    "KNOWLEDGE_PROVIDER": [
+      "backend/application/knowledge/settings.py"
+    ],
+    "KNOWLEDGE_TOP": [
+      "backend/application/knowledge/settings.py"
+    ],
+    "LAKEHOUSE_SQL_DATABASE": [
+      "backend/config_sections.py"
+    ],
+    "LAKEHOUSE_SQL_SERVER": [
+      "backend/config_sections.py"
+    ],
+    "LOG_LEVEL": [
+      "backend/config_sections.py",
+      "channel_orchestrator/app/main.py"
+    ],
+    "LOOKUP_STORE": [
+      "backend/config_source_model.py"
+    ],
+    "ONELAKE_ENDPOINT": [
+      "backend/config_values.py"
+    ],
+    "ONELAKE_PATH_STYLE": [
+      "backend/config_sections.py"
+    ],
+    "OPERATIONAL_DB": [
+      "backend/config_sections.py"
+    ],
+    "OUTPUTS_RETENTION_DAYS": [
+      "backend/config_sections.py"
+    ],
+    "PORTFOLIO_FOOTPRINT_MAX_ROWS": [
+      "backend/config_sections.py"
+    ],
+    "PORTFOLIO_FOOTPRINT_MODE": [
+      "backend/config_sections.py"
+    ],
+    "PORTFOLIO_FOOTPRINT_TIMEOUT_SECONDS": [
+      "backend/config_sections.py"
+    ],
+    "PROGRAM_DRAFT_REQUIRE_SECOND_REVIEWER": [
+      "backend/config_programs.py"
+    ],
+    "PROGRAM_EXPORT_ALLOW_LOCAL_WRITE": [
+      "backend/config_programs.py"
+    ],
+    "PROGRAM_PREVIEW_ALLOW_CUSTOMER_DATA": [
+      "backend/config_programs.py"
+    ],
+    "PROGRAM_REGISTRY_FILE": [
+      "backend/config_programs.py"
+    ],
+    "RATE_LIMIT_PER_MINUTE": [
+      "backend/config_limits.py"
+    ],
+    "REFERENCE_ACCESS_OUTPUT_PATH": [
+      "backend/config_sections.py"
+    ],
+    "REFERENCE_ACCOUNT_ID": [
+      "backend/config_sections.py"
+    ],
+    "REFERENCE_ACCOUNT_NAME": [
+      "backend/config_sections.py"
+    ],
+    "RULES_DIR": [
+      "backend/config_programs.py"
+    ],
+    "RUN_BACKOFF_BASE_SECONDS": [
+      "backend/config_runs.py"
+    ],
+    "RUN_BATCH_CONFIRM_ABOVE": [
+      "backend/config_runs.py"
+    ],
+    "RUN_BATCH_MAX_ITEMS": [
+      "backend/config_runs.py"
+    ],
+    "RUN_HEARTBEAT_SECONDS": [
+      "backend/config_runs.py"
+    ],
+    "RUN_ITEM_MAX_ATTEMPTS": [
+      "backend/config_runs.py"
+    ],
+    "RUN_LEASE_SECONDS": [
+      "backend/config_runs.py"
+    ],
+    "RUN_WORKER_CONCURRENCY": [
+      "backend/config_runs.py"
+    ],
+    "RUN_WORKER_IDENTITY_CLIENT_ID": [
+      "backend/config_runs.py"
+    ],
+    "RUN_WORKER_INLINE": [
+      "backend/config_runs.py"
+    ],
+    "RUN_WORKER_POLL_SECONDS": [
+      "backend/config_runs.py"
+    ],
+    "RUN_WORKER_STALE_SECONDS": [
+      "backend/config_runs.py"
+    ],
+    "SOURCE_CACHE_ACCOUNTS": [
+      "backend/config_source_model.py"
+    ],
+    "SOURCE_CACHE_MB": [
+      "backend/config_source_model.py"
+    ],
+    "SOURCE_FALLBACK": [
+      "backend/config_sections.py"
+    ],
+    "SOURCE_MAPPING_FILE": [
+      "backend/config_source_model.py"
+    ],
+    "SOURCE_MAX_ACCOUNT_ROWS": [
+      "backend/config_source_model.py"
+    ],
+    "SOURCE_READ_MODE": [
+      "backend/config_source_model.py"
+    ],
+    "SOURCE_SCHEMA": [
+      "backend/application/store_readiness.py",
+      "backend/config_sections.py"
+    ],
+    "SOURCE_SCHEMA_VALIDATION": [
+      "backend/config_source_model.py"
+    ],
+    "SOURCE_SILVER": [
+      "backend/config_source_model.py"
+    ],
+    "SOURCE_TABLE_CASE": [
+      "backend/config_sections.py"
+    ],
+    "SOURCE_TABLE_MAP": [
+      "backend/config_values.py"
+    ],
+    "SOURCE_TABLE_PREFIX": [
+      "backend/config_sections.py"
+    ],
+    "SOURCE_VERSION_CHECK_SECONDS": [
+      "backend/config_source_model.py"
+    ],
+    "TCC_ALLOW_SEED": [
+      "backend/config_sections.py"
+    ],
+    "TCC_KEEPALIVE_SECONDS": [
+      "backend/config_sections.py"
+    ],
+    "TCC_REPO_ROOT": [
+      "backend/tools/verify_reference_independent.py"
+    ],
+    "TCC_STRANDED_RUN_MINUTES": [
+      "backend/config_sections.py"
+    ],
+    "TCC_WARM_CLIENTS": [
+      "backend/config_sections.py"
+    ],
+    "TCC_WARM_ON_START": [
+      "backend/config_sections.py"
+    ],
+    "TELEMETRY_ENABLED": [
+      "backend/config_sections.py"
+    ],
+    "TENANT_ID": [
+      "backend/channel/config.py",
+      "channel_orchestrator/app/core/settings.py"
+    ],
+    "WAREHOUSE_CONNECT_TIMEOUT": [
+      "backend/config_sections.py"
+    ],
+    "WAREHOUSE_DATABASE": [
+      "backend/bootstrap/data_wiring.py",
+      "backend/config_sections.py"
+    ],
+    "WAREHOUSE_ODBC_DRIVER": [
+      "backend/config_sections.py"
+    ],
+    "WAREHOUSE_PLATFORM": [
+      "backend/config_platform.py"
+    ],
+    "WAREHOUSE_SERVER": [
+      "backend/application/store_readiness.py",
+      "backend/bootstrap/data_wiring.py",
+      "backend/config_sections.py"
+    ],
+    "WEBIQ_API_KEY": [
+      "backend/config_sections.py"
+    ],
+    "WEBIQ_BASE_URL": [
+      "backend/config_sections.py"
+    ],
+    "WEBIQ_BEARER_TOKEN": [
+      "backend/config_sections.py"
+    ]
+  },
+  "read_by_code_count": 139,
+  "documented_count": 262,
+  "read_but_not_documented": [],
+  "documented_but_not_read": [
+    "AI_GATEWAY_API_KEY",
+    "AI_GATEWAY_API_KEY_HEADER",
+    "AI_GATEWAY_API_STYLE",
+    "AI_GATEWAY_API_VERSION",
+    "AI_GATEWAY_AUTH",
+    "AI_GATEWAY_ENDPOINT",
+    "AI_GATEWAY_ENTRA_AUDIENCE",
+    "AI_GATEWAY_EXTRA_HEADERS",
+    "AI_GATEWAY_OAUTH_CLIENT_ID",
+    "AI_GATEWAY_OAUTH_CLIENT_SECRET",
+    "AI_GATEWAY_OAUTH_SCOPE",
+    "AI_GATEWAY_OAUTH_TOKEN_URL",
+    "AI_MODEL_ANALYSIS",
+    "AI_MODEL_NARRATOR",
+    "AI_MODEL_NARRATOR__GATEWAY",
+    "AI_MODEL_ROUTER",
+    "AI_PROVIDER_CHAIN__ANALYSIS",
+    "AI_PROVIDER_CHAIN__NARRATOR",
+    "AI_PROVIDER_CHAIN__ROUTER",
+    "ALLOW_ANONYMOUS_SYNTHETIC",
+    "API_APP_NAME",
+    "API_BACKEND_HOST",
+    "API_BACKEND_URL",
+    "API_IDENTITY_CLIENT_ID",
+    "API_IDENTITY_NAME",
+    "API_IDENTITY_PRINCIPAL_ID",
+    "APPLICATIONINSIGHTS_AUTHENTICATION_STRING",
+    "ARM_USE_OIDC",
+    "AZURE_CONTAINER_APPS_ENVIRONMENT_NAME",
+    "AZURE_CONTAINER_REGISTRY_ENDPOINT",
+    "AZURE_CONTAINER_REGISTRY_NAME",
+    "AZURE_ENV_NAME",
+    "AZURE_LOCATION",
+    "AZURE_PRINCIPAL_ID",
+    "AZURE_RESOURCE_GROUP",
+    "AZURE_SUBSCRIPTION_ID",
+    "CHANNEL_APP_NAME",
+    "CHANNEL_BASE_URL",
+    "CHANNEL_STORE",
+    "CONTAINER_APPS_LOCATION",
+    "COSMOS_ACCOUNT_NAME",
+    "COSMOS_DATABASE",
+    "COSMOS_ENDPOINT",
+    "FABRIC_CAPACITY_ADMIN",
+    "FABRIC_CLIENT_ID",
+    "FABRIC_TENANT_ID",
+    "FABRIC_USE_OIDC",
+    "FABRIC_WAREHOUSE_ID",
+    "FABRIC_WORKSPACE_ID",
+    "FINDING_STORE",
+    "FISCAL_RULES_POLICY",
+    "FLEX_ACCOUNT_ID",
+    "FOUNDRY_MODEL_SKU",
+    "FOUNDRY_MODEL_VERSION",
+    "GATEWAY_IDENTITY_NAME",
+    "GOLD_SCHEMA",
+    "INFO",
+    "INSERT",
+    "NULL_PAY_DATE_POLICY",
+    "OPS_SCHEMA",
+    "OVERRIDE_STORE",
+    "OVERRIDE_USE_MI_FIC_ASSERTION_CLIENTID",
+    "PAY_CODE_POLICY",
+    "PORT",
+    "PYTHONNOUSERSITE",
+    "RUN_MANIFEST_STORE",
+    "SCM_DO_BUILD_DURING_DEPLOYMENT",
+    "SELECT",
+    "SERVICE_API_IMAGE_NAME",
+    "SERVICE_WEB_IMAGE_NAME",
+    "SQL_DATABASE_NAME",
+    "SQL_SERVER_FQDN",
+    "TCC_",
+    "TCC_API_AUDIENCE",
+    "TCC_API_CLIENT_ID",
+    "TCC_APP_SERVICE_SKU",
+    "TCC_APP_SUBNET_ID",
+    "TCC_AZURE_TESTS",
+    "TCC_CHANNEL_GATEWAY_AUDIENCE",
+    "TCC_CHANNEL_RESOLVE_DISPLAY_NAMES",
+    "TCC_CHANNEL_WRITER_GROUP_ID",
+    "TCC_CHANNEL_WRITER_SOURCE",
+    "TCC_DATA_QUERY_MAX_CONCURRENCY",
+    "TCC_DATA_QUERY_MAX_ROWS",
+    "TCC_DATA_QUERY_RATE_PER_MINUTE",
+    "TCC_DATA_QUERY_SOURCE_ENABLED",
+    "TCC_DATA_QUERY_TIMEOUT_SECONDS",
+    "TCC_ENABLE_M365_CHANNEL",
+    "TCC_FABRIC_CREATED",
+    "TCC_FABRIC_LAKEHOUSE_NAME",
+    "TCC_FABRIC_TESTS",
+    "TCC_FABRIC_WAREHOUSE_ID",
+    "TCC_FABRIC_WORKSPACE_ID",
+    "TCC_FABRIC_WORKSPACE_NAME",
+    "TCC_FOUNDRY_ALLOWED_IP_RANGES",
+    "TCC_FOUNDRY_PUBLIC_NETWORK_ACCESS",
+    "TCC_LAKEHOUSE_SQL_DATABASE",
+    "TCC_LAKEHOUSE_SQL_SERVER",
+    "TCC_PRIVATE_ENDPOINT_SUBNET_ID",
+    "TCC_PROFILE",
+    "TCC_REQUIRE_PARITY",
+    "TCC_SQL_ADMIN_GROUP_NAME",
+    "TCC_SQL_ADMIN_GROUP_OBJECT_ID",
+    "TCC_SQL_CREATED",
+    "TCC_SQL_TESTS",
+    "TCC_TENANT_ID",
+    "TCC_WAREHOUSE_DATABASE",
+    "TCC_WAREHOUSE_PLATFORM",
+    "TCC_WAREHOUSE_SERVER",
+    "TCC_WEB_CLIENT_ID",
+    "TF_BACKEND_CONTAINER",
+    "TF_BACKEND_RESOURCE_GROUP",
+    "TF_BACKEND_STORAGE_ACCOUNT",
+    "TF_VARS_JSON",
+    "VITE_API_BASE",
+    "WAREHOUSE_POOL_MAX_AGE_SECONDS",
+    "WAREHOUSE_POOL_MAX_IDLE",
+    "WEBSITES_CONTAINER_START_TIME_LIMIT",
+    "WEBSITES_PORT",
+    "WEB_APP_NAME",
+    "WEB_BASE_URL",
+    "WEB_CONCURRENCY",
+    "WORKSITE_LOCATION_SOURCE"
+  ]
+}

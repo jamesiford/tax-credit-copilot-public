@@ -1,0 +1,454 @@
+# Orchestrator specification (model-dependent behaviour)
+
+The orchestrator's model output is not recorded: it is not deterministic and a port must not be held to it. What a port MUST do is specified by these existing pytest tests, which drive the shipped code with a scripted model and a fake gateway (`backend/tests/channel_orchestrator/orch_harness.py`). Port them, or run equivalent cases, and keep them green.
+
+What IS recorded (deterministic, no model): `contract/recordings/orchestrator.json` (keyword planner turns, conversation follow-ups, the confirm-a-change flow, identity refusal, host debug commands) and `contract/recordings/agents.json` (what publishing each agent sends to Foundry). The gateway the orchestrator calls is recorded in `g1_*`.
+
+| Test file | Specifies | Tests |
+|---|---|---|
+| `test_orch_agent_definition.py` | the hosted agent's definition (name, version, instructions) the platform publishes | 14 |
+| `test_orch_catalog_tools.py` | which catalog tools a model may name and the schemas it is shown | 5 |
+| `test_orch_data_goldens.py` | data-tool plans against golden answers (scripted model turns) | 6 |
+| `test_orch_data_lanes.py` | which figures a model may see versus only the reader (the lane rule) | 11 |
+| `test_orch_data_planning.py` | choosing between fixed tools and data tools | 9 |
+| `test_orch_debug_posture.py` | /whoami, /netcheck, /modelprobe only with CHANNEL_DEBUG_WHOAMI | 4 |
+| `test_orch_degraded_planner.py` | the no-model keyword planner (recorded in contract/recordings/orchestrator.json) | 15 |
+| `test_orch_e2e.py` | whole turns through a scripted model and a fake gateway | 4 |
+| `test_orch_exactness.py` | every figure in a reply is a supplied fact (numeric guard) | 3 |
+| `test_orch_folder_map.py` | the module layout the vendoring depends on | 3 |
+| `test_orch_foundry_client.py` | the Foundry model client's request shapes | 22 |
+| `test_orch_golden.py` | golden replies | 2 |
+| `test_orch_host.py` | identity signals, conversation key, debug commands (recorded: host.* in orchestrator.json) | 10 |
+| `test_orch_hosting_seam.py` | the Responses hosting seam | 13 |
+| `test_orch_identity.py` | resolving the acting person from platform signals | 15 |
+| `test_orch_knowledge.py` | the knowledge pack the narrator may cite | 15 |
+| `test_orch_maf.py` | the Microsoft Agent Framework agent loop around the model | 4 |
+| `test_orch_models.py` | model chain, provider fallback, egress policy | 8 |
+| `test_orch_netcheck.py` | the /netcheck diagnostic | 12 |
+| `test_orch_numeric_lanes.py` | numeric lanes for the reader | 17 |
+| `test_orch_placeholders.py` | {{facts.path|format}} placeholder substitution | 4 |
+| `test_orch_planning.py` | planning with a model: tool choice, split questions, whitelist | 6 |
+| `test_orch_requirements.py` | requirements-to-tests traceability | 6 |
+| `test_orch_resilience.py` | timeouts, retries, degraded fallbacks | 7 |
+| `test_orch_review_pack.py` | review-pack construction | 15 |
+| `test_orch_runner.py` | the per-turn tool runner and budget | 15 |
+| `test_orch_structure.py` | architecture rules for the orchestrator package | 10 |
+| `test_orch_tool_rules.py` | client/year/method settling and refusals before a call | 14 |
+| `test_orch_vendor.py` | the vendored shared modules import on their own | 7 |
+| `test_orch_write_flow.py` | prepare, confirm and commit in a conversation | 17 |
+| `test_parity_conformance.py` | portal-versus-Teams parity cases | 9 |
+| `test_parity_figures.py` | portal-versus-Teams figure parity | 11 |
+
+Total: 313 test functions.
+
+## Test names by file
+
+### test_orch_agent_definition.py
+
+- `test_the_reader_understands_the_shapes_the_file_uses`
+- `test_the_project_and_the_agent_are_the_documented_service_hosts`
+- `test_the_extension_floor_is_declared_at_the_documented_minimum`
+- `test_the_code_deployment_is_source_not_an_image_and_points_at_a_real_entry_point`
+- `test_the_container_resources_are_inside_the_documented_range`
+- `test_the_endpoint_authorisation_includes_the_scheme_activity_requires`
+- `test_there_is_no_identity_block_and_no_legacy_manifest`
+- `test_python_startup_is_pinned_as_the_runtime_documentation_requires`
+- `test_no_reserved_platform_variable_and_no_secret_is_declared`
+- `test_the_one_known_exception_is_still_declared_so_the_list_cannot_go_stale`
+- `test_every_value_is_an_azd_reference_or_a_plain_literal`
+- `test_the_file_names_no_endpoint_tenant_or_secret_outside_its_comments`
+- `test_every_declared_variable_is_documented_and_read_somewhere`
+- `test_the_variable_rule_flags_a_reserved_or_secret_name`
+
+### test_orch_catalog_tools.py
+
+- `test_there_is_one_tool_per_tool_a_model_may_name_in_the_catalogs_own_words`
+- `test_no_generated_tool_is_a_commit_a_resolver_or_plumbing`
+- `test_the_tools_are_built_once_and_carry_no_turn`
+- `test_the_body_forwards_as_the_person_the_request_names_and_the_same_tools_serve_two_people`
+- `test_a_body_is_logic_free_and_returns_the_gateways_reply_untouched`
+
+### test_orch_data_goldens.py
+
+- `test_there_are_at_least_twenty_five_nuanced_data_questions`
+- `test_every_kind_the_work_package_names_is_covered`
+- `test_every_turn_asserts_its_tool_sequence_and_a_kind`
+- `test_the_three_data_tools_are_each_asked_for_and_each_lane_is_exercised`
+- `test_a_case_that_says_a_model_never_sees_something_it_does_see_fails`
+- `test_a_case_that_names_the_wrong_tool_sequence_fails`
+
+### test_orch_data_lanes.py
+
+- `test_the_person_gets_the_rows_and_no_model_is_sent_one`
+- `test_what_a_model_is_told_about_the_rows_is_the_count_and_the_column_names`
+- `test_an_aggregate_is_shown_to_the_model_by_name_so_it_can_be_narrated`
+- `test_the_catalog_and_the_distinct_values_are_the_declared_exception_and_nothing_else_is`
+- `test_the_catalog_blocks_are_left_out_of_a_reply_that_something_else_answered`
+- `test_a_catalog_question_is_answered_with_the_catalog`
+- `test_a_names_only_diagnostic_line_says_what_the_model_was_handed`
+- `test_the_diagnostic_for_an_aggregate_reports_no_withheld_lane`
+- `test_the_projection_the_model_reads_drops_the_persons_lane_and_the_reply_keeps_it`
+- `test_every_field_of_every_data_tool_envelope_is_either_the_persons_or_free_of_row_values`
+- `test_a_model_cannot_choose_a_data_tool_that_writes_or_a_commit_and_the_data_tools_are_named_for_it`
+
+### test_orch_data_planning.py
+
+- `test_the_planner_instructions_carry_the_decision_rule`
+- `test_the_planner_orders_the_tools_and_names_the_authority`
+- `test_the_data_tool_descriptions_tell_the_model_when_and_how`
+- `test_the_json_catalogue_and_the_tool_list_carry_the_same_descriptions`
+- `test_json_mode_reads_the_catalog_then_plans_the_query_it_was_shown`
+- `test_json_mode_asks_again_only_once_and_only_after_lookups`
+- `test_json_mode_does_not_ask_again_when_the_plan_already_holds_a_query`
+- `test_json_mode_with_no_lookup_asks_nothing_more`
+- `test_the_planner_says_what_a_location_question_is_and_how_to_name_an_hours_measure`
+
+### test_orch_debug_posture.py
+
+- `test_the_orchestrator_default_is_off_and_says_nothing`
+- `test_the_orchestrator_warns_at_startup_when_the_switch_is_on`
+- `test_every_default_for_the_switch_is_false`
+- `test_the_cleanup_page_exists_and_names_the_switch_and_its_command`
+
+### test_orch_degraded_planner.py
+
+- `test_both_degraded_planners_satisfy_the_one_interface`
+- `test_the_agent_plans_when_a_tool_calling_model_is_reachable_and_no_degraded_planner_is_asked`
+- `test_a_model_without_tool_calling_is_the_json_planner_and_no_model_is_the_keyword_planner`
+- `test_a_message_the_injection_screen_flags_reaches_no_model_and_is_the_keyword_planners`
+- `test_a_model_layer_that_fails_before_any_tool_ran_falls_to_the_keywords_and_says_so`
+- `test_a_model_layer_that_fails_after_tools_ran_keeps_what_they_returned`
+- `test_the_real_degraded_planners_are_the_default_and_answer_through_the_runners_rules`
+- `test_a_json_plan_names_tools_in_order_up_to_the_limit_and_filters_nothing`
+- `test_a_reply_is_composed_once_from_the_turns_results_and_again_only_after_a_new_narration`
+- `test_a_failed_model_layer_forgets_its_narration_and_marks_the_answer_as_the_platforms_own`
+- `test_compose_reply_is_called_by_the_composition_point_and_the_commit_path_and_nothing_else`
+- `test_the_brief_every_path_hands_a_model_names_facts_with_placeholders_and_no_value`
+- `test_the_brief_is_built_in_one_function_not_in_each_planner`
+- `test_every_model_call_is_noted_the_same_way_whichever_planner_made_it`
+- `test_the_facts_a_reply_is_checked_against_are_the_runs_own`
+
+### test_orch_e2e.py
+
+- `test_a_read_is_judged_by_the_real_guard_and_leaves_a_narration_row_under_the_person`
+- `test_prepare_then_confirm_through_the_real_stack_writes_once_and_audits_both_steps`
+- `test_somebody_elses_confirm_reaches_nothing_and_the_owners_still_works`
+- `test_a_person_who_may_not_write_is_refused_by_the_real_gateway_at_the_preview`
+
+### test_orch_exactness.py
+
+- `test_each_narrator_behaviour_gets_exactly_its_outcome`
+- `test_whatever_the_model_did_the_finished_reply_passes_the_guard_on_its_own`
+- `test_a_figure_the_model_types_is_rejected_even_when_it_equals_a_fact`
+
+### test_orch_folder_map.py
+
+- `test_every_module_under_app_is_in_the_folder_map`
+- `test_the_readme_explains_the_two_main_files`
+- `test_the_root_main_is_the_entry_point_the_deployments_name`
+
+### test_orch_foundry_client.py
+
+- `test_a_foundry_only_chain_is_served_by_the_frameworks_own_client`
+- `test_a_chain_that_names_the_gateway_keeps_the_provider_chain`
+- `test_the_narrator_role_chain_decides_not_the_default_chain`
+- `test_a_foundry_chain_without_an_endpoint_fails_at_start_not_at_the_first_question`
+- `test_both_paths_satisfy_one_interface_the_planner_reads`
+- `test_an_unknown_access_object_is_refused_rather_than_given_a_default_client`
+- `test_the_client_is_pointed_at_the_accounts_openai_host_not_the_project_host`
+- `test_a_host_that_is_not_a_public_cloud_foundry_name_keeps_its_own`
+- `test_a_project_endpoint_that_is_not_https_is_refused`
+- `test_the_built_client_carries_that_base_url_and_the_deployment_name`
+- `test_a_turn_runs_the_real_loop_through_the_frameworks_client_and_the_composer_still_speaks`
+- `test_the_wire_is_chat_completions_v1_on_the_accounts_host_with_the_deployment_and_the_tools`
+- `test_a_deployment_that_rejects_sampling_parameters_is_sent_none`
+- `test_the_models_text_is_never_the_replys_text`
+- `test_the_request_is_authenticated_by_the_token_provider_and_by_nothing_else`
+- `test_the_access_description_has_no_key_field_and_the_default_credential_is_the_managed_identity`
+- `test_with_no_credential_given_the_client_asks_for_the_default_credential_once_per_process`
+- `test_an_employee_identifier_never_reaches_the_wire`
+- `test_an_injection_attempt_calls_no_model`
+- `test_a_model_that_does_not_answer_in_time_degrades_to_the_engines_own_answer`
+- `test_a_model_error_degrades_without_hiding_the_engines_answer`
+- `test_the_trace_the_audit_reads_is_filled_by_the_frameworks_client`
+
+### test_orch_golden.py
+
+- `test_there_are_enough_golden_prompts_and_every_read_tool_is_asked_for`
+- `test_golden`
+
+### test_orch_host.py
+
+- `test_the_original_subject_the_platform_sends_becomes_the_acting_user`
+- `test_no_signal_means_a_refusal_and_not_a_single_call`
+- `test_the_conversation_falls_back_to_the_response_chain`
+- `test_the_signals_are_lowercased_and_the_opaque_id_is_carried_but_never_trusted`
+- `test_whoami_is_inert_unless_switched_on`
+- `test_whoami_reports_signals_and_the_resolution_when_switched_on_and_leaks_no_credential`
+- `test_whoami_with_no_identity_says_why_which_is_the_point_of_the_spike`
+- `test_whoami_names_the_person_the_channel_and_the_conversation`
+- `test_a_refused_turn_shows_what_was_received_only_when_debugging`
+- `test_a_correlation_id_is_made_safe_for_the_gateway`
+
+### test_orch_hosting_seam.py
+
+- `test_only_the_seam_imports_a_hosting_package_anywhere_in_the_repository`
+- `test_the_zip_root_entry_point_only_starts_the_seam`
+- `test_the_agent_framework_is_imported_by_the_maf_layer_and_nowhere_else_in_the_orchestrator`
+- `test_the_seam_registers_one_handler_and_hands_everything_to_the_host_and_the_wiring`
+- `test_the_pre_release_hosting_package_is_not_a_requirement_and_no_pre_flag_is_used`
+- `test_the_entry_point_azure_and_the_container_image_all_start_the_same_file`
+- `test_the_import_scan_sees_a_hosting_import_in_any_form`
+- `test_the_import_scan_leaves_ordinary_azure_imports_alone`
+- `test_the_real_azure_yaml_declares_activity_on_the_endpoint_only`
+- `test_the_guard_catches_each_way_teams_goes_silent`
+- `test_the_guard_accepts_the_known_good_shape`
+- `test_a_missing_container_protocols_block_fails_rather_than_passes`
+- `test_the_no_go_and_its_recheck_conditions_are_written_down`
+
+### test_orch_identity.py
+
+- `test_the_original_subject_is_the_first_source_and_is_recorded_as_such`
+- `test_the_next_configured_source_answers_when_the_first_has_nothing`
+- `test_the_opaque_per_user_id_is_never_an_identity`
+- `test_caller_supplied_headers_are_trusted_only_when_asked_for`
+- `test_a_missing_name_is_stated_not_invented`
+- `test_a_malformed_object_id_a_foreign_tenant_or_no_conversation_refuses`
+- `test_the_gateway_headers_carry_exactly_the_acting_user_and_no_credential`
+- `test_state_is_per_person_and_conversation`
+- `test_the_debug_report_names_signals_and_shows_identity_values_never_a_credential`
+- `test_no_identity_means_no_tool_no_model_and_a_plain_refusal`
+- `test_every_gateway_call_carries_the_acting_user_and_nothing_else_identifying`
+- `test_the_agent_user_id_is_a_source_only_when_asked_for_and_only_when_it_is_an_object_id`
+- `test_an_opaque_agent_user_id_is_no_signal_so_the_next_source_still_answers`
+- `test_the_shape_report_shows_an_object_id_and_hides_an_opaque_key`
+- `test_by_default_the_platforms_agent_user_id_is_a_source_after_the_two_platform_signals`
+
+### test_orch_knowledge.py
+
+- `test_with_the_tier_off_the_model_is_told_no_reference_text_and_the_reply_carries_none`
+- `test_the_planner_and_the_agent_builder_default_to_no_knowledge`
+- `test_the_default_wiring_builds_no_knowledge_source`
+- `test_switching_it_on_in_the_environment_builds_the_fake_and_a_bad_setting_stops_the_start`
+- `test_the_model_is_told_the_passages_as_fenced_reference_text_without_their_citations`
+- `test_the_reader_gets_the_quoted_passages_with_their_citations_beside_a_surviving_narration`
+- `test_only_as_many_passages_as_the_setting_allows_are_retrieved_and_shown`
+- `test_a_narration_that_repeats_a_figure_read_only_in_a_passage_is_dropped_and_no_reference_block_is_shown`
+- `test_the_turns_facts_are_the_tools_facts_and_hold_nothing_from_a_passage`
+- `test_a_placeholder_into_reference_text_drops_the_narration`
+- `test_a_knowledge_source_that_fails_leaves_the_turn_exactly_as_it_was`
+- `test_a_turn_with_no_matching_passage_shows_no_reference_block`
+- `test_falling_back_to_the_platforms_own_answer_forgets_the_reference`
+- `test_the_provider_adds_instructions_only_and_keeps_what_it_found`
+- `test_the_provider_with_nothing_found_or_a_failing_source_adds_nothing`
+
+### test_orch_maf.py
+
+- `test_the_agent_result_is_the_composers_output_never_the_models_text`
+- `test_an_agent_with_a_middleware_is_the_shape_that_ships`
+- `test_the_tool_loop_is_bounded_by_the_turn_budget`
+- `test_the_frameworks_stop_message_is_never_handed_to_the_composer_as_narration`
+
+### test_orch_models.py
+
+- `test_a_tool_call_crosses_the_wire_into_the_maf_loop_and_back`
+- `test_a_failing_provider_falls_through_to_the_next_before_any_text`
+- `test_a_provider_without_tool_calling_is_skipped_when_tools_are_needed`
+- `test_every_provider_failing_degrades_to_the_engines_own_answer`
+- `test_a_prompt_carrying_an_employee_identifier_never_reaches_a_model`
+- `test_the_gateway_provider_is_external_so_aggregates_only_refuses_a_free_text_question`
+- `test_a_foundry_project_endpoint_gives_the_accounts_openai_v1_base_on_the_host_the_hosted_runtime_can_resolve`
+- `test_a_host_that_is_not_a_public_cloud_foundry_name_keeps_its_own`
+
+### test_orch_netcheck.py
+
+- `test_addresses_are_classified`
+- `test_a_name_that_does_not_resolve_stops_at_resolve`
+- `test_a_private_address_that_cannot_be_connected_is_reported_as_private_and_failed`
+- `test_a_reachable_host_reports_tls_and_the_httpx_result_separately`
+- `test_the_accounts_other_names_are_derived_from_the_project_endpoint`
+- `test_the_environment_report_gives_names_and_only_the_listed_values`
+- `test_the_full_report_covers_every_target_and_leaks_nothing`
+- `test_modelprobe_reports_success_without_the_reply`
+- `test_modelprobe_reports_a_failure_by_type_and_cause_and_does_not_raise`
+- `test_modelprobe_without_configuration_says_so`
+- `test_the_commands_are_not_offered_without_the_debug_flag`
+- `test_with_the_flag_a_command_is_answered_by_the_diagnostics_and_runs_no_tool`
+
+### test_orch_numeric_lanes.py
+
+- `test_the_wages_exist_only_in_the_persons_lane`
+- `test_the_readers_allowed_numerals_never_include_a_figure_from_the_rows`
+- `test_a_narration_that_types_a_wage_only_the_rows_hold_is_rejected_and_the_person_still_gets_the_rows`
+- `test_a_placeholder_pointing_into_the_persons_lane_is_rejected`
+- `test_the_rejection_is_audited_as_a_code_never_naming_the_path`
+- `test_a_placeholder_for_a_fact_the_model_was_shown_is_still_rendered`
+- `test_the_rule_is_about_the_lane_not_about_rows_an_aggregate_is_narratable`
+- `test_rows_past_the_models_cut_are_not_a_placeholder_target_either`
+- `test_a_path_that_does_not_exist_is_still_the_composers_to_reject`
+- `test_a_reply_with_no_narration_is_unchanged_and_verifies_its_own_blocks`
+- `test_a_figure_a_data_tool_did_not_return_is_rejected`
+- `test_a_figure_a_data_tool_did_return_is_still_not_the_models_to_type`
+- `test_an_invented_path_on_a_data_tool_is_rejected`
+- `test_the_one_way_a_data_tool_figure_reaches_the_reader_is_a_placeholder_the_platform_renders`
+- `test_a_data_tools_facts_are_the_guards_facts`
+- `test_the_composer_is_reached_only_through_compose_reply`
+- `test_every_data_tool_is_an_ordinary_read_the_guard_sees`
+
+### test_orch_placeholders.py
+
+- `test_a_placeholder_names_the_path_and_the_format_hint`
+- `test_entries_keep_their_own_keys_and_gain_a_placeholder`
+- `test_every_placeholder_the_model_is_given_resolves_to_the_engines_figure`
+- `test_the_path_without_the_facts_prefix_is_still_refused_not_loosened`
+
+### test_orch_planning.py
+
+- `test_book_rank_says_it_is_for_the_whole_book_only`
+- `test_the_client_tools_are_found_and_every_one_says_it_needs_a_client`
+- `test_a_tool_that_needs_no_client_does_not_claim_to`
+- `test_the_maf_tools_and_the_json_catalogue_carry_the_same_words`
+- `test_the_planner_instructions_send_one_client_questions_to_client_tools`
+- `test_the_planner_says_how_to_tell_the_two_apart_and_who_resolves_the_client`
+
+### test_orch_requirements.py
+
+- `test_every_shared_dependency_is_pinned_to_the_version_the_platform_runs`
+- `test_the_agent_framework_pin_is_the_one_the_backends_foundry_package_resolves_to`
+- `test_the_frameworks_openai_client_and_its_sdk_are_pinned_to_what_is_installed`
+- `test_the_orchestrator_does_not_install_the_backend_and_names_a_stable_hosting_package`
+- `test_every_variable_the_orchestrator_reads_is_in_the_environment_reference`
+- `test_the_decisions_the_docs_cite_exist`
+
+### test_orch_resilience.py
+
+- `test_a_turn_past_its_deadline_says_so_and_changes_nothing`
+- `test_a_confirm_that_runs_out_of_time_is_unknown_never_retried_and_not_confirmable_again`
+- `test_the_turn_deadline_is_bounded_and_documented_in_the_settings`
+- `test_a_span_per_tool_call_carries_the_tool_and_its_outcome_and_no_payroll`
+- `test_a_failed_call_is_a_span_with_an_error_code_and_still_no_content`
+- `test_the_readers_numbers_are_digits_or_the_words_one_to_twelve`
+- `test_a_what_if_number_the_model_chose_is_dropped_and_the_readers_is_kept`
+
+### test_orch_review_pack.py
+
+- `test_the_pack_is_asked_for_by_name`
+- `test_an_ordinary_question_is_not_the_pack`
+- `test_the_steps_are_catalog_tools_that_only_read_and_the_sequence_has_its_own_budget`
+- `test_the_pack_runs_every_step_in_order_through_the_gateway_with_no_model`
+- `test_the_reply_passes_the_numeric_guard_against_the_runs_own_facts`
+- `test_each_step_sends_the_gateway_what_an_agents_call_for_the_same_words_would`
+- `test_a_configured_tool_calling_model_is_not_asked_for_the_pack`
+- `test_the_sequence_has_its_own_budget_whatever_the_agents_is`
+- `test_the_pack_changes_nothing_and_asks_for_no_confirmation`
+- `test_a_missing_year_is_asked_for_and_the_next_message_may_be_only_the_year`
+- `test_an_ambiguous_client_is_asked_for_and_the_numbered_reply_runs_the_pack_for_the_one_chosen`
+- `test_a_year_is_not_taken_from_a_message_that_is_not_answering_a_pack`
+- `test_a_step_that_fails_is_reported_and_the_others_still_answer`
+- `test_when_nothing_answers_the_check_stops_the_pack_and_the_reader_is_told_so_without_a_figure`
+- `test_the_workflow_is_one_chain_from_resolve_to_compose_with_a_step_per_catalog_tool`
+
+### test_orch_runner.py
+
+- `test_years_are_read_from_the_readers_words`
+- `test_commit_tools_plumbing_and_the_resolver_are_not_tools_a_model_may_name`
+- `test_no_maf_tool_is_a_commit_and_the_model_is_shown_no_client_id`
+- `test_what_the_model_sees_of_a_result_names_the_facts_and_holds_no_value`
+- `test_a_prepared_changes_token_is_kept_by_the_runner_and_never_shown_to_anyone_else`
+- `test_the_tool_budget_is_enforced_and_a_refused_name_is_recorded_not_run`
+- `test_the_client_is_resolved_once_per_turn_not_once_per_tool`
+- `test_one_named_client_selects_it_even_when_the_conversation_was_about_another`
+- `test_the_method_is_the_readers_and_defaults_to_both_certified_methods`
+- `test_the_same_tool_under_two_methods_has_two_labels_so_no_path_collides`
+- `test_an_argument_the_catalog_does_not_know_is_refused_before_the_gateway`
+- `test_the_settings_refuse_half_a_configuration_and_name_every_gap`
+- `test_the_settings_reject_values_that_would_weaken_a_control`
+- `test_a_repeated_identical_call_returns_the_earlier_answer_and_runs_once`
+- `test_a_different_call_is_not_mistaken_for_a_repeat`
+
+### test_orch_structure.py
+
+- `test_there_are_modules_to_check`
+- `test_imports_stay_inside_the_allowed_layers_and_packages`
+- `test_only_main_imports_the_hosting_package`
+- `test_only_the_maf_layer_imports_the_agent_framework`
+- `test_the_model_path_is_chosen_in_one_place_and_each_client_is_built_in_one_module`
+- `test_the_selection_and_the_shared_adapters_import_no_sdk`
+- `test_the_commit_path_is_one_module_called_from_one_place`
+- `test_nothing_logs_a_token_a_header_or_a_secret`
+- `test_nothing_prints_and_nothing_catches_without_saying_why`
+- `test_modules_stay_small_and_documented`
+
+### test_orch_tool_rules.py
+
+- `test_the_rules_run_in_the_order_the_guarantees_need_inside_the_models_loop`
+- `test_every_rule_is_framework_middleware_built_once_and_carrying_no_turn`
+- `test_the_budget_is_counted_by_the_first_rule_and_a_call_over_it_never_reaches_the_gateway`
+- `test_a_commit_the_model_asks_for_is_recorded_and_refused_and_nothing_is_called`
+- `test_an_invented_tool_is_recorded_too_and_a_listed_one_is_not`
+- `test_the_client_the_model_passes_is_written_over_by_the_readers`
+- `test_a_question_back_stops_the_call_and_the_model_is_told_to_wait`
+- `test_a_year_the_reader_did_not_say_is_replaced_and_the_method_defaults_to_both_runs`
+- `test_the_schema_check_stops_what_the_catalog_would_refuse_and_records_it`
+- `test_a_prepared_changes_token_is_held_by_the_turn_and_never_in_what_the_model_reads`
+- `test_the_degraded_modes_run_the_same_middleware_not_a_copy_of_it`
+- `test_a_name_a_model_may_not_call_is_refused_before_any_rule_in_the_degraded_modes_too`
+- `test_what_is_left_of_the_tool_runner_is_the_turns_state_not_its_rules`
+- `test_each_rule_is_written_once_and_only_the_framework_layer_calls_it`
+
+### test_orch_vendor.py
+
+- `test_every_seed_exists_and_the_closure_stays_inside_the_allowed_layers`
+- `test_the_closure_is_standard_library_only_outside_the_model_access_adapters`
+- `test_write_then_check_agree_and_writing_twice_changes_nothing`
+- `test_check_reports_a_changed_a_missing_and_an_unneeded_file`
+- `test_check_says_so_when_there_is_no_copy`
+- `test_a_module_that_reaches_a_forbidden_layer_or_package_stops_the_copy`
+- `test_the_vendored_copy_runs_on_its_own_without_the_backend`
+
+### test_orch_write_flow.py
+
+- `test_the_graph_is_prepare_then_the_request_step_then_commit_and_nothing_else`
+- `test_the_only_thing_that_can_start_the_workflow_is_a_prepare_request_so_commit_is_unreachable_from_outside`
+- `test_the_prepare_step_refuses_anything_that_is_not_a_preview`
+- `test_the_workflow_holds_no_model_and_no_tool_and_stores_nothing_on_disk`
+- `test_a_prepare_pauses_the_workflow_in_memory_and_sends_nothing_but_the_preview`
+- `test_the_confirmation_resumes_on_a_freshly_built_graph_and_the_commit_is_sent_once_as_the_person_who_confirmed`
+- `test_somebody_elses_confirm_finds_nothing_and_does_not_touch_the_owners_preview`
+- `test_a_confirmation_at_the_expiry_is_refused_and_one_second_before_it_is_not`
+- `test_every_refusal_the_gateway_gives_a_commit_is_reported_and_never_retried`
+- `test_cancel_resumes_the_workflow_with_a_refusal_so_it_ends_and_nothing_is_sent`
+- `test_any_other_message_cancels_the_frameworks_pending_request_and_says_the_change_was_dropped`
+- `test_a_framework_fault_while_dropping_never_blocks_the_answer_or_leaves_the_change_confirmable`
+- `test_a_framework_fault_while_confirming_says_the_outcome_is_unknown_and_is_not_retried`
+- `test_a_framework_fault_while_preparing_is_an_error_and_not_a_preview_that_can_be_confirmed`
+- `test_a_refused_preview_never_pauses_a_workflow`
+- `test_the_model_can_name_a_preview_but_never_a_commit_and_a_read_never_starts_a_workflow`
+- `test_the_confirmation_state_is_the_frameworks_checkpoint_and_not_a_second_copy_of_the_change`
+
+### test_parity_conformance.py
+
+- `test_the_catalogs_own_filters_are_exactly_the_declared_ones`
+- `test_the_gateways_rest_list_and_mcp_list_are_the_catalogs_offered_tools_in_its_order`
+- `test_the_api_list_is_the_catalog_less_plumbing`
+- `test_the_maf_tools_are_the_tools_a_model_may_name_sorted_by_name_and_no_commit_is_among_them`
+- `test_every_surface_says_what_the_catalog_says_and_the_differences_are_the_declared_ones`
+- `test_the_one_declared_wording_difference_is_the_write_sentence`
+- `test_a_model_is_shown_the_catalogs_schema_less_exactly_what_the_reader_owns`
+- `test_behaviour_hints_follow_the_kind_and_nothing_else`
+- `test_the_portals_intents_run_catalog_tools_and_the_parity_cases_name_real_ones`
+
+### test_parity_figures.py
+
+- `test_the_matrix_covers_what_the_brief_asks_and_every_gap_says_why`
+- `test_every_door_returns_the_same_envelope`
+- `test_a_capped_result_says_so_and_an_employee_result_travels_in_the_persons_lane`
+- `test_the_text_cowork_reads_is_the_platforms_blocks_and_no_other_number`
+- `test_a_teams_turn_shows_the_platforms_blocks_and_the_engines_figures_only`
+- `test_an_unnamed_method_runs_both_certified_methods_and_each_is_the_rest_answer`
+- `test_a_model_is_shown_the_names_of_the_persons_rows_and_never_the_rows`
+- `test_the_portal_shows_the_same_blocks_and_facts_and_tells_its_narrators_only_those_figures`
+- `test_a_prepared_write_changes_nothing_on_any_door`
+- `test_a_door_that_changes_one_figure_fails_the_check`
+- `test_a_portal_pipeline_that_adds_up_figures_of_its_own_fails_the_check`
+

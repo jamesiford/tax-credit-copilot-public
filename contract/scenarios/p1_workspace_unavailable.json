@@ -1,0 +1,335 @@
+{
+ "name": "p1_workspace_unavailable",
+ "profile": "P1",
+ "variables": {
+  "exception_id": "t2:E00200:2025-02",
+  "draft_id": "00000000-0000-0000-0000-00000000dead",
+  "batch_id": "00000000-0000-0000-0000-00000000beef",
+  "artifact_id": "00000000-0000-0000-0000-00000000cafe"
+ },
+ "steps": [
+  {
+   "id": "boot.unit",
+   "note": "capture an employee token and id from the unit drill",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "limit",
+      2
+     ]
+    ]
+   },
+   "capture": {
+    "token": "body.employees.0.record_token",
+    "employee_id": "body.employees.0.employee_id"
+   }
+  },
+  {
+   "id": "boot.findings",
+   "note": "capture a finding id",
+   "request": {
+    "method": "GET",
+    "path": "/api/findings/1001/2025"
+   },
+   "capture": {
+    "finding_id": "body.findings.0.finding_id"
+   }
+  },
+  {
+   "id": "ok.get-api-workspace",
+   "request": {
+    "method": "GET",
+    "path": "/api/workspace"
+   }
+  },
+  {
+   "id": "ok.post-api-workspace-refresh",
+   "request": {
+    "method": "POST",
+    "path": "/api/workspace/refresh"
+   }
+  },
+  {
+   "id": "ok.post-api-workspace-source-search",
+   "request": {
+    "method": "POST",
+    "path": "/api/workspace/source/search",
+    "json": {
+     "q": "",
+     "limit": 5,
+     "offset": 0
+    }
+   }
+  },
+  {
+   "id": "ok.post-api-workspace-eligibility-search",
+   "request": {
+    "method": "POST",
+    "path": "/api/workspace/eligibility/search",
+    "json": {
+     "q": "",
+     "limit": 5,
+     "offset": 0,
+     "status": "all",
+     "proximity": "all"
+    }
+   }
+  },
+  {
+   "id": "ok.post-api-workspace-employee",
+   "request": {
+    "method": "POST",
+    "path": "/api/workspace/employee",
+    "json": {
+     "record_token": "{{token}}"
+    }
+   }
+  },
+  {
+   "id": "ok.get-api-workspace-onezero-method",
+   "request": {
+    "method": "GET",
+    "path": "/api/workspace/onezero/min_max"
+   }
+  },
+  {
+   "id": "ok.post-api-workspace-onezero-contributors",
+   "request": {
+    "method": "POST",
+    "path": "/api/workspace/onezero/contributors",
+    "json": {
+     "method": "min_max",
+     "unit_id": "GA_ATL_HQ",
+     "fein": "58-1234567",
+     "month_index": 0
+    }
+   }
+  },
+  {
+   "id": "ok.get-api-workspace-calculation-walk",
+   "request": {
+    "method": "GET",
+    "path": "/api/workspace/calculation-walk"
+   }
+  },
+  {
+   "id": "ok.get-api-workspace-assumptions",
+   "request": {
+    "method": "GET",
+    "path": "/api/workspace/assumptions"
+   }
+  },
+  {
+   "id": "ok.get-api-workspace-comparison",
+   "request": {
+    "method": "GET",
+    "path": "/api/workspace/comparison"
+   }
+  },
+  {
+   "id": "ok.post-api-workspace-comparison-stage",
+   "request": {
+    "method": "POST",
+    "path": "/api/workspace/comparison/stage",
+    "json": {
+     "stage": "common_employee_totals"
+    }
+   }
+  },
+  {
+   "id": "onezero-contributors.bad-method",
+   "request": {
+    "method": "POST",
+    "path": "/api/workspace/onezero/contributors",
+    "json": {
+     "method": "x",
+     "unit_id": "u",
+     "fein": "f",
+     "month_index": 0
+    }
+   }
+  },
+  {
+   "id": "onezero-contributors.month-12",
+   "request": {
+    "method": "POST",
+    "path": "/api/workspace/onezero/contributors",
+    "json": {
+     "method": "min_max",
+     "unit_id": "u",
+     "fein": "f",
+     "month_index": 12
+    }
+   }
+  },
+  {
+   "id": "source-search.limit-201",
+   "request": {
+    "method": "POST",
+    "path": "/api/workspace/source/search",
+    "json": {
+     "q": "",
+     "limit": 201
+    }
+   }
+  },
+  {
+   "id": "source-search.limit-0",
+   "request": {
+    "method": "POST",
+    "path": "/api/workspace/source/search",
+    "json": {
+     "q": "",
+     "limit": 0
+    }
+   }
+  },
+  {
+   "id": "comparison-stage.bad",
+   "request": {
+    "method": "POST",
+    "path": "/api/workspace/comparison/stage",
+    "json": {
+     "stage": "bogus"
+    }
+   }
+  },
+  {
+   "id": "onezero-method.bad",
+   "request": {
+    "method": "GET",
+    "path": "/api/workspace/onezero/bogus"
+   }
+  },
+  {
+   "id": "short-token",
+   "request": {
+    "method": "POST",
+    "path": "/api/workspace/employee",
+    "json": {
+     "record_token": "x"
+    }
+   }
+  },
+  {
+   "id": "env.lakehouse-unconfigured",
+   "control": {
+    "op": "env",
+    "args": {
+     "set": {
+      "DATA_SOURCE": "lakehouse"
+     },
+     "unset": [
+      "FABRIC_WORKSPACE",
+      "FABRIC_LAKEHOUSE"
+     ]
+    }
+   }
+  },
+  {
+   "id": "unavailable.workspace",
+   "request": {
+    "method": "GET",
+    "path": "/api/workspace"
+   }
+  },
+  {
+   "id": "unavailable.workspace-refresh",
+   "request": {
+    "method": "POST",
+    "path": "/api/workspace/refresh"
+   }
+  },
+  {
+   "id": "unavailable.scope",
+   "request": {
+    "method": "GET",
+    "path": "/api/scope"
+   }
+  },
+  {
+   "id": "unavailable.portfolio",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio"
+   }
+  },
+  {
+   "id": "unavailable.units",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units",
+    "query": [
+     [
+      "year",
+      2025
+     ]
+    ]
+   }
+  },
+  {
+   "id": "unavailable.eligibility",
+   "request": {
+    "method": "GET",
+    "path": "/api/eligibility/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "unavailable.ingestion",
+   "request": {
+    "method": "GET",
+    "path": "/api/ingestion/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "unavailable.forecast",
+   "request": {
+    "method": "GET",
+    "path": "/api/forecast/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "unavailable.health-still-ok",
+   "request": {
+    "method": "GET",
+    "path": "/api/health"
+   }
+  }
+ ]
+}

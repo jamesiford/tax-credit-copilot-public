@@ -1,0 +1,971 @@
+{
+ "name": "p2_reads_writes",
+ "profile": "P2",
+ "steps": [
+  {
+   "id": "boot.unit",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/2001/units",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "limit",
+      2
+     ]
+    ]
+   },
+   "capture": {
+    "unit": "body.items.0.worksite_id"
+   }
+  },
+  {
+   "id": "portfolio.default",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": []
+   }
+  },
+  {
+   "id": "portfolio.year",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "year",
+      2025
+     ]
+    ]
+   }
+  },
+  {
+   "id": "portfolio.sort-priority-desc",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "sort",
+      "priority"
+     ],
+     [
+      "order",
+      "desc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "portfolio.sort-identified",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "sort",
+      "identified"
+     ],
+     [
+      "order",
+      "desc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "portfolio.limit-2-offset-1",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "limit",
+      2
+     ],
+     [
+      "offset",
+      1
+     ]
+    ]
+   }
+  },
+  {
+   "id": "portfolio.near",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "near",
+      "true"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "portfolio.status-assessed",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "status",
+      "assessed"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "portfolio.program",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "program",
+      "GA_JTC"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "portfolio.limit-0",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "limit",
+      0
+     ]
+    ]
+   }
+  },
+  {
+   "id": "portfolio.offset-past-end",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "offset",
+      99
+     ]
+    ]
+   }
+  },
+  {
+   "id": "portfolio.scope-state",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "scope",
+      "state:GA"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "scope",
+   "request": {
+    "method": "GET",
+    "path": "/api/scope"
+   }
+  },
+  {
+   "id": "claims.coverage",
+   "request": {
+    "method": "GET",
+    "path": "/api/claims/coverage"
+   }
+  },
+  {
+   "id": "claims.coverage-year",
+   "request": {
+    "method": "GET",
+    "path": "/api/claims/coverage",
+    "query": [
+     [
+      "tax_year",
+      2025
+     ]
+    ]
+   }
+  },
+  {
+   "id": "claims.lifecycle",
+   "request": {
+    "method": "GET",
+    "path": "/api/claims/lifecycle"
+   }
+  },
+  {
+   "id": "me",
+   "request": {
+    "method": "GET",
+    "path": "/api/me"
+   }
+  },
+  {
+   "id": "ready",
+   "request": {
+    "method": "GET",
+    "path": "/api/ready"
+   }
+  },
+  {
+   "id": "health",
+   "request": {
+    "method": "GET",
+    "path": "/api/health"
+   }
+  },
+  {
+   "id": "client2001.scope",
+   "request": {
+    "method": "GET",
+    "path": "/api/scope/client/2001"
+   }
+  },
+  {
+   "id": "client2001.situation",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/2001/situation"
+   }
+  },
+  {
+   "id": "client2001.coverage",
+   "request": {
+    "method": "GET",
+    "path": "/api/claims/coverage/2001"
+   }
+  },
+  {
+   "id": "client2001.units",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/2001/units",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "limit",
+      5
+     ]
+    ]
+   }
+  },
+  {
+   "id": "client2001.units-pp",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/2001/units",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "method",
+      "pay_period"
+     ],
+     [
+      "limit",
+      5
+     ]
+    ]
+   }
+  },
+  {
+   "id": "client2001.run-latest",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/2001/runs/latest"
+   }
+  },
+  {
+   "id": "client2001.eligibility",
+   "request": {
+    "method": "GET",
+    "path": "/api/eligibility/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      2001
+     ],
+     [
+      "limit",
+      3
+     ]
+    ]
+   }
+  },
+  {
+   "id": "client2001.progress",
+   "request": {
+    "method": "GET",
+    "path": "/api/progress/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      2001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "client2001.proximity",
+   "request": {
+    "method": "GET",
+    "path": "/api/proximity/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      2001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "client2001.onezero-matrix",
+   "request": {
+    "method": "GET",
+    "path": "/api/onezero/matrix/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      2001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "client2001.forecast",
+   "request": {
+    "method": "GET",
+    "path": "/api/forecast/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      2001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "client2002.scope",
+   "request": {
+    "method": "GET",
+    "path": "/api/scope/client/2002"
+   }
+  },
+  {
+   "id": "client2002.situation",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/2002/situation"
+   }
+  },
+  {
+   "id": "client2002.coverage",
+   "request": {
+    "method": "GET",
+    "path": "/api/claims/coverage/2002"
+   }
+  },
+  {
+   "id": "client2002.units",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/2002/units",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "limit",
+      5
+     ]
+    ]
+   }
+  },
+  {
+   "id": "client2002.units-pp",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/2002/units",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "method",
+      "pay_period"
+     ],
+     [
+      "limit",
+      5
+     ]
+    ]
+   }
+  },
+  {
+   "id": "client2002.run-latest",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/2002/runs/latest"
+   }
+  },
+  {
+   "id": "client2002.eligibility",
+   "request": {
+    "method": "GET",
+    "path": "/api/eligibility/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      2002
+     ],
+     [
+      "limit",
+      3
+     ]
+    ]
+   }
+  },
+  {
+   "id": "client2002.progress",
+   "request": {
+    "method": "GET",
+    "path": "/api/progress/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      2002
+     ]
+    ]
+   }
+  },
+  {
+   "id": "client2002.proximity",
+   "request": {
+    "method": "GET",
+    "path": "/api/proximity/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      2002
+     ]
+    ]
+   }
+  },
+  {
+   "id": "client2002.onezero-matrix",
+   "request": {
+    "method": "GET",
+    "path": "/api/onezero/matrix/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      2002
+     ]
+    ]
+   }
+  },
+  {
+   "id": "client2002.forecast",
+   "request": {
+    "method": "GET",
+    "path": "/api/forecast/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      2002
+     ]
+    ]
+   }
+  },
+  {
+   "id": "client2003.scope",
+   "request": {
+    "method": "GET",
+    "path": "/api/scope/client/2003"
+   }
+  },
+  {
+   "id": "client2003.situation",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/2003/situation"
+   }
+  },
+  {
+   "id": "client2003.coverage",
+   "request": {
+    "method": "GET",
+    "path": "/api/claims/coverage/2003"
+   }
+  },
+  {
+   "id": "client2003.units",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/2003/units",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "limit",
+      5
+     ]
+    ]
+   }
+  },
+  {
+   "id": "client2003.units-pp",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/2003/units",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "method",
+      "pay_period"
+     ],
+     [
+      "limit",
+      5
+     ]
+    ]
+   }
+  },
+  {
+   "id": "client2003.run-latest",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/2003/runs/latest"
+   }
+  },
+  {
+   "id": "client2003.eligibility",
+   "request": {
+    "method": "GET",
+    "path": "/api/eligibility/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      2003
+     ],
+     [
+      "limit",
+      3
+     ]
+    ]
+   }
+  },
+  {
+   "id": "client2003.progress",
+   "request": {
+    "method": "GET",
+    "path": "/api/progress/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      2003
+     ]
+    ]
+   }
+  },
+  {
+   "id": "client2003.proximity",
+   "request": {
+    "method": "GET",
+    "path": "/api/proximity/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      2003
+     ]
+    ]
+   }
+  },
+  {
+   "id": "client2003.onezero-matrix",
+   "request": {
+    "method": "GET",
+    "path": "/api/onezero/matrix/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      2003
+     ]
+    ]
+   }
+  },
+  {
+   "id": "client2003.forecast",
+   "request": {
+    "method": "GET",
+    "path": "/api/forecast/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      2003
+     ]
+    ]
+   }
+  },
+  {
+   "id": "client2004.scope",
+   "request": {
+    "method": "GET",
+    "path": "/api/scope/client/2004"
+   }
+  },
+  {
+   "id": "client2004.situation",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/2004/situation"
+   }
+  },
+  {
+   "id": "client2004.coverage",
+   "request": {
+    "method": "GET",
+    "path": "/api/claims/coverage/2004"
+   }
+  },
+  {
+   "id": "client2004.units",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/2004/units",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "limit",
+      5
+     ]
+    ]
+   }
+  },
+  {
+   "id": "client2004.units-pp",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/2004/units",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "method",
+      "pay_period"
+     ],
+     [
+      "limit",
+      5
+     ]
+    ]
+   }
+  },
+  {
+   "id": "client2004.run-latest",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/2004/runs/latest"
+   }
+  },
+  {
+   "id": "client2004.eligibility",
+   "request": {
+    "method": "GET",
+    "path": "/api/eligibility/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      2004
+     ],
+     [
+      "limit",
+      3
+     ]
+    ]
+   }
+  },
+  {
+   "id": "client2004.progress",
+   "request": {
+    "method": "GET",
+    "path": "/api/progress/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      2004
+     ]
+    ]
+   }
+  },
+  {
+   "id": "client2004.proximity",
+   "request": {
+    "method": "GET",
+    "path": "/api/proximity/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      2004
+     ]
+    ]
+   }
+  },
+  {
+   "id": "client2004.onezero-matrix",
+   "request": {
+    "method": "GET",
+    "path": "/api/onezero/matrix/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      2004
+     ]
+    ]
+   }
+  },
+  {
+   "id": "client2004.forecast",
+   "request": {
+    "method": "GET",
+    "path": "/api/forecast/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      2004
+     ]
+    ]
+   }
+  },
+  {
+   "id": "client2001.unit-detail",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/2001/units/{{unit}}",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "limit",
+      3
+     ]
+    ]
+   }
+  },
+  {
+   "id": "client2001.unit-rebase",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/2001/units/{{unit}}/rebase",
+    "query": [
+     [
+      "base_year",
+      2022
+     ]
+    ]
+   }
+  },
+  {
+   "id": "client2001.unit-other-client",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/2002/units/{{unit}}",
+    "query": [
+     [
+      "year",
+      2025
+     ]
+    ]
+   }
+  },
+  {
+   "id": "client-nonexistent.units",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/3000/units",
+    "query": [
+     [
+      "year",
+      2025
+     ]
+    ]
+   }
+  },
+  {
+   "id": "client-nonexistent.scope",
+   "request": {
+    "method": "GET",
+    "path": "/api/scope/client/3000"
+   }
+  },
+  {
+   "id": "client-nonexistent.situation",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/3000/situation"
+   }
+  },
+  {
+   "id": "client2001.year-uncalculated",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/2001/units",
+    "query": [
+     [
+      "year",
+      2019
+     ]
+    ]
+   }
+  },
+  {
+   "id": "client2001.claims-assess",
+   "request": {
+    "method": "POST",
+    "path": "/api/claims/assess",
+    "json": {
+     "client_id": 2001,
+     "assessed_by": "contract"
+    }
+   }
+  },
+  {
+   "id": "client2002.run",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/clients/2002/runs",
+    "json": {
+     "year": 2025,
+     "state": "GA",
+     "triggered_by": "contract"
+    }
+   }
+  },
+  {
+   "id": "client2002.run-latest-after",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/2002/runs/latest"
+   }
+  },
+  {
+   "id": "portfolio.after-writes",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio"
+   }
+  }
+ ]
+}

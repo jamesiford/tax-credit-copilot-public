@@ -1,0 +1,2741 @@
+{
+ "name": "p1_program_drafts",
+ "profile": "P1",
+ "variables": {
+  "exception_id": "t2:E00200:2025-02",
+  "draft_id": "00000000-0000-0000-0000-00000000dead",
+  "batch_id": "00000000-0000-0000-0000-00000000beef",
+  "artifact_id": "00000000-0000-0000-0000-00000000cafe"
+ },
+ "steps": [
+  {
+   "id": "env.second-reviewer",
+   "control": {
+    "op": "env",
+    "args": {
+     "set": {
+      "PROGRAM_DRAFT_REQUIRE_SECOND_REVIEWER": "true"
+     }
+    }
+   }
+  },
+  {
+   "id": "create",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts",
+    "json": {
+     "code": "ZY_DRAFT_JTC",
+     "name": "Zedland Two Jobs Credit",
+     "state": "ZY",
+     "years": [
+      2024,
+      2025
+     ],
+     "actor": "ann"
+    }
+   },
+   "capture": {
+    "draft_id": "body.draft_id",
+    "version": "body.version"
+   }
+  },
+  {
+   "id": "create-duplicate-code",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts",
+    "json": {
+     "code": "ZY_DRAFT_JTC",
+     "name": "Again",
+     "state": "ZY",
+     "years": [
+      2025
+     ],
+     "actor": "ann"
+    }
+   }
+  },
+  {
+   "id": "create-bad-code",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts",
+    "json": {
+     "code": "bad code!",
+     "name": "x",
+     "state": "ZZ",
+     "years": [
+      2025
+     ]
+    }
+   }
+  },
+  {
+   "id": "create-long-code",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts",
+    "json": {
+     "code": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+     "name": "x",
+     "state": "ZZ"
+    }
+   }
+  },
+  {
+   "id": "get",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts/{{draft_id}}"
+   }
+  },
+  {
+   "id": "list",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts"
+   }
+  },
+  {
+   "id": "list-status",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts",
+    "query": [
+     [
+      "status",
+      "draft"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "list-status-bogus",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts",
+    "query": [
+     [
+      "status",
+      "bogus"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "list-limit-0",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts",
+    "query": [
+     [
+      "limit",
+      0
+     ]
+    ]
+   }
+  },
+  {
+   "id": "list-offset-past",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts",
+    "query": [
+     [
+      "offset",
+      99
+     ]
+    ]
+   }
+  },
+  {
+   "id": "validate-empty-scaffold",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/validate",
+    "json": {
+     "actor": "ann"
+    }
+   },
+   "capture": {
+    "version": "body.version"
+   }
+  },
+  {
+   "id": "request-review-while-invalid",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/request-review",
+    "json": {
+     "actor": "ann"
+    }
+   }
+  },
+  {
+   "id": "documents-stale-version",
+   "request": {
+    "method": "PUT",
+    "path": "/api/v2/program-drafts/{{draft_id}}/documents",
+    "json": {
+     "expected_version": 999,
+     "pack": {
+      "_prototype_verification": "FICTIONAL draft for tests. Every value is invented and flagged; it is not law.",
+      "rule_pack_version": "0.0.1",
+      "jurisdiction": {
+       "level": "state",
+       "code": "ZY",
+       "name": "Zedland Two (fictional)"
+      },
+      "credit": {
+       "code": "ZY_DRAFT_JTC",
+       "name": "ZY_DRAFT_JTC (fictional)",
+       "statutory_citation": "Fictional Code § 0-0-0"
+      },
+      "tax_year_convention": {
+       "label": "begins",
+       "_prototype_verify": true
+      },
+      "filing": {
+       "window": "Fictional filing window",
+       "cycle": "annual",
+       "_prototype_verify": true
+      },
+      "thresholds": {
+       "minimum_new_jobs": 1,
+       "minimum_hours_per_week_full_time": 30,
+       "_prototype_verify": true
+      },
+      "benefit": {
+       "amount_per_qualifying_job_usd": 1200,
+       "benefit_period_years": 3,
+       "carryforward_years": 5,
+       "currency": "USD",
+       "_prototype_verify": true
+      },
+      "one_zero": {
+       "min_weekly_hours": 30.0,
+       "min_weekly_wages": 400.0,
+       "wage_basis": "regular",
+       "geographic_granularity": "statewide",
+       "pt_aggregation": false,
+       "headcount_unit_field": "Worksite_ID",
+       "entity_combination": "permitted",
+       "_prototype_verify": true,
+       "wage_floor_basis": {
+        "note": "invented for tests",
+        "_prototype_verify": true
+       }
+      }
+     },
+     "years": {
+      "2024": {
+       "_prototype_verification": "FICTIONAL draft for tests. Every value is invented and flagged; it is not law.",
+       "rule_pack_version": "0.0.1+ty2024",
+       "jurisdiction": {
+        "level": "state",
+        "code": "ZY",
+        "name": "Zedland Two (fictional)"
+       },
+       "credit": {
+        "code": "ZY_DRAFT_JTC",
+        "name": "ZY_DRAFT_JTC (fictional)",
+        "statutory_citation": "Fictional Code § 0-0-0"
+       },
+       "tax_year_convention": {
+        "label": "begins",
+        "_prototype_verify": true
+       },
+       "filing": {
+        "window": "Fictional filing window",
+        "cycle": "annual",
+        "_prototype_verify": true
+       },
+       "thresholds": {
+        "minimum_new_jobs": 1,
+        "minimum_hours_per_week_full_time": 30,
+        "_prototype_verify": true
+       },
+       "benefit": {
+        "amount_per_qualifying_job_usd": 1200,
+        "benefit_period_years": 3,
+        "carryforward_years": 5,
+        "currency": "USD",
+        "_prototype_verify": true
+       },
+       "one_zero": {
+        "min_weekly_hours": 30.0,
+        "min_weekly_wages": 400.0,
+        "wage_basis": "regular",
+        "geographic_granularity": "statewide",
+        "pt_aggregation": false,
+        "headcount_unit_field": "Worksite_ID",
+        "entity_combination": "permitted",
+        "_prototype_verify": true,
+        "wage_floor_basis": {
+         "note": "invented for tests",
+         "_prototype_verify": true
+        }
+       },
+       "tax_year": 2024,
+       "_year_provenance": {
+        "source": "invented for tests",
+        "adr": "ADR-005"
+       }
+      },
+      "2025": {
+       "_prototype_verification": "FICTIONAL draft for tests. Every value is invented and flagged; it is not law.",
+       "rule_pack_version": "0.0.1+ty2025",
+       "jurisdiction": {
+        "level": "state",
+        "code": "ZY",
+        "name": "Zedland Two (fictional)"
+       },
+       "credit": {
+        "code": "ZY_DRAFT_JTC",
+        "name": "ZY_DRAFT_JTC (fictional)",
+        "statutory_citation": "Fictional Code § 0-0-0"
+       },
+       "tax_year_convention": {
+        "label": "begins",
+        "_prototype_verify": true
+       },
+       "filing": {
+        "window": "Fictional filing window",
+        "cycle": "annual",
+        "_prototype_verify": true
+       },
+       "thresholds": {
+        "minimum_new_jobs": 1,
+        "minimum_hours_per_week_full_time": 30,
+        "_prototype_verify": true
+       },
+       "benefit": {
+        "amount_per_qualifying_job_usd": 1200,
+        "benefit_period_years": 3,
+        "carryforward_years": 5,
+        "currency": "USD",
+        "_prototype_verify": true
+       },
+       "one_zero": {
+        "min_weekly_hours": 30.0,
+        "min_weekly_wages": 400.0,
+        "wage_basis": "regular",
+        "geographic_granularity": "statewide",
+        "pt_aggregation": false,
+        "headcount_unit_field": "Worksite_ID",
+        "entity_combination": "permitted",
+        "_prototype_verify": true,
+        "wage_floor_basis": {
+         "note": "invented for tests",
+         "_prototype_verify": true
+        }
+       },
+       "tax_year": 2025,
+       "_year_provenance": {
+        "source": "invented for tests",
+        "adr": "ADR-005"
+       }
+      }
+     },
+     "actor": "ann"
+    }
+   }
+  },
+  {
+   "id": "documents-wrong-code",
+   "request": {
+    "method": "PUT",
+    "path": "/api/v2/program-drafts/{{draft_id}}/documents",
+    "json": {
+     "expected_version": "{{version}}",
+     "pack": {
+      "_prototype_verification": "FICTIONAL draft for tests. Every value is invented and flagged; it is not law.",
+      "rule_pack_version": "0.0.1",
+      "jurisdiction": {
+       "level": "state",
+       "code": "ZY",
+       "name": "Zedland Two (fictional)"
+      },
+      "credit": {
+       "code": "ZZ_OTHER",
+       "name": "ZY_DRAFT_JTC (fictional)",
+       "statutory_citation": "Fictional Code § 0-0-0"
+      },
+      "tax_year_convention": {
+       "label": "begins",
+       "_prototype_verify": true
+      },
+      "filing": {
+       "window": "Fictional filing window",
+       "cycle": "annual",
+       "_prototype_verify": true
+      },
+      "thresholds": {
+       "minimum_new_jobs": 1,
+       "minimum_hours_per_week_full_time": 30,
+       "_prototype_verify": true
+      },
+      "benefit": {
+       "amount_per_qualifying_job_usd": 1200,
+       "benefit_period_years": 3,
+       "carryforward_years": 5,
+       "currency": "USD",
+       "_prototype_verify": true
+      },
+      "one_zero": {
+       "min_weekly_hours": 30.0,
+       "min_weekly_wages": 400.0,
+       "wage_basis": "regular",
+       "geographic_granularity": "statewide",
+       "pt_aggregation": false,
+       "headcount_unit_field": "Worksite_ID",
+       "entity_combination": "permitted",
+       "_prototype_verify": true,
+       "wage_floor_basis": {
+        "note": "invented for tests",
+        "_prototype_verify": true
+       }
+      }
+     },
+     "years": {
+      "2024": {
+       "_prototype_verification": "FICTIONAL draft for tests. Every value is invented and flagged; it is not law.",
+       "rule_pack_version": "0.0.1+ty2024",
+       "jurisdiction": {
+        "level": "state",
+        "code": "ZY",
+        "name": "Zedland Two (fictional)"
+       },
+       "credit": {
+        "code": "ZY_DRAFT_JTC",
+        "name": "ZY_DRAFT_JTC (fictional)",
+        "statutory_citation": "Fictional Code § 0-0-0"
+       },
+       "tax_year_convention": {
+        "label": "begins",
+        "_prototype_verify": true
+       },
+       "filing": {
+        "window": "Fictional filing window",
+        "cycle": "annual",
+        "_prototype_verify": true
+       },
+       "thresholds": {
+        "minimum_new_jobs": 1,
+        "minimum_hours_per_week_full_time": 30,
+        "_prototype_verify": true
+       },
+       "benefit": {
+        "amount_per_qualifying_job_usd": 1200,
+        "benefit_period_years": 3,
+        "carryforward_years": 5,
+        "currency": "USD",
+        "_prototype_verify": true
+       },
+       "one_zero": {
+        "min_weekly_hours": 30.0,
+        "min_weekly_wages": 400.0,
+        "wage_basis": "regular",
+        "geographic_granularity": "statewide",
+        "pt_aggregation": false,
+        "headcount_unit_field": "Worksite_ID",
+        "entity_combination": "permitted",
+        "_prototype_verify": true,
+        "wage_floor_basis": {
+         "note": "invented for tests",
+         "_prototype_verify": true
+        }
+       },
+       "tax_year": 2024,
+       "_year_provenance": {
+        "source": "invented for tests",
+        "adr": "ADR-005"
+       }
+      },
+      "2025": {
+       "_prototype_verification": "FICTIONAL draft for tests. Every value is invented and flagged; it is not law.",
+       "rule_pack_version": "0.0.1+ty2025",
+       "jurisdiction": {
+        "level": "state",
+        "code": "ZY",
+        "name": "Zedland Two (fictional)"
+       },
+       "credit": {
+        "code": "ZY_DRAFT_JTC",
+        "name": "ZY_DRAFT_JTC (fictional)",
+        "statutory_citation": "Fictional Code § 0-0-0"
+       },
+       "tax_year_convention": {
+        "label": "begins",
+        "_prototype_verify": true
+       },
+       "filing": {
+        "window": "Fictional filing window",
+        "cycle": "annual",
+        "_prototype_verify": true
+       },
+       "thresholds": {
+        "minimum_new_jobs": 1,
+        "minimum_hours_per_week_full_time": 30,
+        "_prototype_verify": true
+       },
+       "benefit": {
+        "amount_per_qualifying_job_usd": 1200,
+        "benefit_period_years": 3,
+        "carryforward_years": 5,
+        "currency": "USD",
+        "_prototype_verify": true
+       },
+       "one_zero": {
+        "min_weekly_hours": 30.0,
+        "min_weekly_wages": 400.0,
+        "wage_basis": "regular",
+        "geographic_granularity": "statewide",
+        "pt_aggregation": false,
+        "headcount_unit_field": "Worksite_ID",
+        "entity_combination": "permitted",
+        "_prototype_verify": true,
+        "wage_floor_basis": {
+         "note": "invented for tests",
+         "_prototype_verify": true
+        }
+       },
+       "tax_year": 2025,
+       "_year_provenance": {
+        "source": "invented for tests",
+        "adr": "ADR-005"
+       }
+      }
+     },
+     "actor": "ann"
+    }
+   },
+   "capture": {
+    "version": "body.version"
+   }
+  },
+  {
+   "id": "documents-fill",
+   "request": {
+    "method": "PUT",
+    "path": "/api/v2/program-drafts/{{draft_id}}/documents",
+    "json": {
+     "expected_version": "{{version}}",
+     "pack": {
+      "_prototype_verification": "FICTIONAL draft for tests. Every value is invented and flagged; it is not law.",
+      "rule_pack_version": "0.0.1",
+      "jurisdiction": {
+       "level": "state",
+       "code": "ZY",
+       "name": "Zedland Two (fictional)"
+      },
+      "credit": {
+       "code": "ZY_DRAFT_JTC",
+       "name": "ZY_DRAFT_JTC (fictional)",
+       "statutory_citation": "Fictional Code § 0-0-0"
+      },
+      "tax_year_convention": {
+       "label": "begins",
+       "_prototype_verify": true
+      },
+      "filing": {
+       "window": "Fictional filing window",
+       "cycle": "annual",
+       "_prototype_verify": true
+      },
+      "thresholds": {
+       "minimum_new_jobs": 1,
+       "minimum_hours_per_week_full_time": 30,
+       "_prototype_verify": true
+      },
+      "benefit": {
+       "amount_per_qualifying_job_usd": 1200,
+       "benefit_period_years": 3,
+       "carryforward_years": 5,
+       "currency": "USD",
+       "_prototype_verify": true
+      },
+      "one_zero": {
+       "min_weekly_hours": 30.0,
+       "min_weekly_wages": 400.0,
+       "wage_basis": "regular",
+       "geographic_granularity": "statewide",
+       "pt_aggregation": false,
+       "headcount_unit_field": "Worksite_ID",
+       "entity_combination": "permitted",
+       "_prototype_verify": true,
+       "wage_floor_basis": {
+        "note": "invented for tests",
+        "_prototype_verify": true
+       }
+      }
+     },
+     "years": {
+      "2024": {
+       "_prototype_verification": "FICTIONAL draft for tests. Every value is invented and flagged; it is not law.",
+       "rule_pack_version": "0.0.1+ty2024",
+       "jurisdiction": {
+        "level": "state",
+        "code": "ZY",
+        "name": "Zedland Two (fictional)"
+       },
+       "credit": {
+        "code": "ZY_DRAFT_JTC",
+        "name": "ZY_DRAFT_JTC (fictional)",
+        "statutory_citation": "Fictional Code § 0-0-0"
+       },
+       "tax_year_convention": {
+        "label": "begins",
+        "_prototype_verify": true
+       },
+       "filing": {
+        "window": "Fictional filing window",
+        "cycle": "annual",
+        "_prototype_verify": true
+       },
+       "thresholds": {
+        "minimum_new_jobs": 1,
+        "minimum_hours_per_week_full_time": 30,
+        "_prototype_verify": true
+       },
+       "benefit": {
+        "amount_per_qualifying_job_usd": 1200,
+        "benefit_period_years": 3,
+        "carryforward_years": 5,
+        "currency": "USD",
+        "_prototype_verify": true
+       },
+       "one_zero": {
+        "min_weekly_hours": 30.0,
+        "min_weekly_wages": 400.0,
+        "wage_basis": "regular",
+        "geographic_granularity": "statewide",
+        "pt_aggregation": false,
+        "headcount_unit_field": "Worksite_ID",
+        "entity_combination": "permitted",
+        "_prototype_verify": true,
+        "wage_floor_basis": {
+         "note": "invented for tests",
+         "_prototype_verify": true
+        }
+       },
+       "tax_year": 2024,
+       "_year_provenance": {
+        "source": "invented for tests",
+        "adr": "ADR-005"
+       }
+      },
+      "2025": {
+       "_prototype_verification": "FICTIONAL draft for tests. Every value is invented and flagged; it is not law.",
+       "rule_pack_version": "0.0.1+ty2025",
+       "jurisdiction": {
+        "level": "state",
+        "code": "ZY",
+        "name": "Zedland Two (fictional)"
+       },
+       "credit": {
+        "code": "ZY_DRAFT_JTC",
+        "name": "ZY_DRAFT_JTC (fictional)",
+        "statutory_citation": "Fictional Code § 0-0-0"
+       },
+       "tax_year_convention": {
+        "label": "begins",
+        "_prototype_verify": true
+       },
+       "filing": {
+        "window": "Fictional filing window",
+        "cycle": "annual",
+        "_prototype_verify": true
+       },
+       "thresholds": {
+        "minimum_new_jobs": 1,
+        "minimum_hours_per_week_full_time": 30,
+        "_prototype_verify": true
+       },
+       "benefit": {
+        "amount_per_qualifying_job_usd": 1200,
+        "benefit_period_years": 3,
+        "carryforward_years": 5,
+        "currency": "USD",
+        "_prototype_verify": true
+       },
+       "one_zero": {
+        "min_weekly_hours": 30.0,
+        "min_weekly_wages": 400.0,
+        "wage_basis": "regular",
+        "geographic_granularity": "statewide",
+        "pt_aggregation": false,
+        "headcount_unit_field": "Worksite_ID",
+        "entity_combination": "permitted",
+        "_prototype_verify": true,
+        "wage_floor_basis": {
+         "note": "invented for tests",
+         "_prototype_verify": true
+        }
+       },
+       "tax_year": 2025,
+       "_year_provenance": {
+        "source": "invented for tests",
+        "adr": "ADR-005"
+       }
+      }
+     },
+     "actor": "ann"
+    }
+   },
+   "capture": {
+    "version": "body.version"
+   }
+  },
+  {
+   "id": "documents-oversize-note",
+   "request": {
+    "method": "PUT",
+    "path": "/api/v2/program-drafts/{{draft_id}}/documents",
+    "json": {
+     "expected_version": "{{version}}",
+     "pack": {
+      "_prototype_verification": "FICTIONAL draft for tests. Every value is invented and flagged; it is not law.",
+      "rule_pack_version": "0.0.1",
+      "jurisdiction": {
+       "level": "state",
+       "code": "ZY",
+       "name": "Zedland Two (fictional)"
+      },
+      "credit": {
+       "code": "ZY_DRAFT_JTC",
+       "name": "ZY_DRAFT_JTC (fictional)",
+       "statutory_citation": "Fictional Code § 0-0-0"
+      },
+      "tax_year_convention": {
+       "label": "begins",
+       "_prototype_verify": true
+      },
+      "filing": {
+       "window": "Fictional filing window",
+       "cycle": "annual",
+       "_prototype_verify": true
+      },
+      "thresholds": {
+       "minimum_new_jobs": 1,
+       "minimum_hours_per_week_full_time": 30,
+       "_prototype_verify": true
+      },
+      "benefit": {
+       "amount_per_qualifying_job_usd": 1200,
+       "benefit_period_years": 3,
+       "carryforward_years": 5,
+       "currency": "USD",
+       "_prototype_verify": true
+      },
+      "one_zero": {
+       "min_weekly_hours": 30.0,
+       "min_weekly_wages": 400.0,
+       "wage_basis": "regular",
+       "geographic_granularity": "statewide",
+       "pt_aggregation": false,
+       "headcount_unit_field": "Worksite_ID",
+       "entity_combination": "permitted",
+       "_prototype_verify": true,
+       "wage_floor_basis": {
+        "note": "invented for tests",
+        "_prototype_verify": true
+       }
+      },
+      "_note": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+     },
+     "years": {
+      "2024": {
+       "_prototype_verification": "FICTIONAL draft for tests. Every value is invented and flagged; it is not law.",
+       "rule_pack_version": "0.0.1+ty2024",
+       "jurisdiction": {
+        "level": "state",
+        "code": "ZY",
+        "name": "Zedland Two (fictional)"
+       },
+       "credit": {
+        "code": "ZY_DRAFT_JTC",
+        "name": "ZY_DRAFT_JTC (fictional)",
+        "statutory_citation": "Fictional Code § 0-0-0"
+       },
+       "tax_year_convention": {
+        "label": "begins",
+        "_prototype_verify": true
+       },
+       "filing": {
+        "window": "Fictional filing window",
+        "cycle": "annual",
+        "_prototype_verify": true
+       },
+       "thresholds": {
+        "minimum_new_jobs": 1,
+        "minimum_hours_per_week_full_time": 30,
+        "_prototype_verify": true
+       },
+       "benefit": {
+        "amount_per_qualifying_job_usd": 1200,
+        "benefit_period_years": 3,
+        "carryforward_years": 5,
+        "currency": "USD",
+        "_prototype_verify": true
+       },
+       "one_zero": {
+        "min_weekly_hours": 30.0,
+        "min_weekly_wages": 400.0,
+        "wage_basis": "regular",
+        "geographic_granularity": "statewide",
+        "pt_aggregation": false,
+        "headcount_unit_field": "Worksite_ID",
+        "entity_combination": "permitted",
+        "_prototype_verify": true,
+        "wage_floor_basis": {
+         "note": "invented for tests",
+         "_prototype_verify": true
+        }
+       },
+       "tax_year": 2024,
+       "_year_provenance": {
+        "source": "invented for tests",
+        "adr": "ADR-005"
+       }
+      },
+      "2025": {
+       "_prototype_verification": "FICTIONAL draft for tests. Every value is invented and flagged; it is not law.",
+       "rule_pack_version": "0.0.1+ty2025",
+       "jurisdiction": {
+        "level": "state",
+        "code": "ZY",
+        "name": "Zedland Two (fictional)"
+       },
+       "credit": {
+        "code": "ZY_DRAFT_JTC",
+        "name": "ZY_DRAFT_JTC (fictional)",
+        "statutory_citation": "Fictional Code § 0-0-0"
+       },
+       "tax_year_convention": {
+        "label": "begins",
+        "_prototype_verify": true
+       },
+       "filing": {
+        "window": "Fictional filing window",
+        "cycle": "annual",
+        "_prototype_verify": true
+       },
+       "thresholds": {
+        "minimum_new_jobs": 1,
+        "minimum_hours_per_week_full_time": 30,
+        "_prototype_verify": true
+       },
+       "benefit": {
+        "amount_per_qualifying_job_usd": 1200,
+        "benefit_period_years": 3,
+        "carryforward_years": 5,
+        "currency": "USD",
+        "_prototype_verify": true
+       },
+       "one_zero": {
+        "min_weekly_hours": 30.0,
+        "min_weekly_wages": 400.0,
+        "wage_basis": "regular",
+        "geographic_granularity": "statewide",
+        "pt_aggregation": false,
+        "headcount_unit_field": "Worksite_ID",
+        "entity_combination": "permitted",
+        "_prototype_verify": true,
+        "wage_floor_basis": {
+         "note": "invented for tests",
+         "_prototype_verify": true
+        }
+       },
+       "tax_year": 2025,
+       "_year_provenance": {
+        "source": "invented for tests",
+        "adr": "ADR-005"
+       }
+      }
+     },
+     "actor": "ann"
+    }
+   }
+  },
+  {
+   "id": "validate",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/validate",
+    "json": {
+     "actor": "ann"
+    }
+   },
+   "capture": {
+    "version": "body.version"
+   }
+  },
+  {
+   "id": "validate-null-body",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/validate",
+    "body_text": "null",
+    "headers": {
+     "content-type": "application/json"
+    }
+   }
+  },
+  {
+   "id": "validate-no-body",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/validate"
+   }
+  },
+  {
+   "id": "preview-synthetic",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/preview",
+    "json": {
+     "dataset": "synthetic_sample"
+    }
+   }
+  },
+  {
+   "id": "preview-client-refused",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/preview",
+    "json": {
+     "dataset": "client",
+     "client_id": 1001,
+     "tax_years": [
+      2025
+     ]
+    }
+   }
+  },
+  {
+   "id": "preview-bad-dataset",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/preview",
+    "json": {
+     "dataset": "bogus"
+    }
+   }
+  },
+  {
+   "id": "export-before-approval",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/export",
+    "json": {
+     "write_local": false,
+     "actor": "ann"
+    }
+   }
+  },
+  {
+   "id": "manifest-before-export",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts/{{draft_id}}/export/manifest"
+   }
+  },
+  {
+   "id": "review-before-request",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/review",
+    "json": {
+     "decision": "approve",
+     "actor": "bob"
+    }
+   }
+  },
+  {
+   "id": "request-review",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/request-review",
+    "json": {
+     "actor": "ann"
+    }
+   }
+  },
+  {
+   "id": "review-self-approve",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/review",
+    "json": {
+     "decision": "approve",
+     "actor": "ann"
+    }
+   }
+  },
+  {
+   "id": "review-bad-decision",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/review",
+    "json": {
+     "decision": "bogus",
+     "actor": "bob"
+    }
+   }
+  },
+  {
+   "id": "review-long-comment",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/review",
+    "json": {
+     "decision": "request_changes",
+     "comment": "ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+     "actor": "bob"
+    }
+   }
+  },
+  {
+   "id": "review-request-changes",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/review",
+    "json": {
+     "decision": "request_changes",
+     "comment": "needs a citation",
+     "actor": "bob"
+    }
+   }
+  },
+  {
+   "id": "documents-after-changes",
+   "request": {
+    "method": "PUT",
+    "path": "/api/v2/program-drafts/{{draft_id}}/documents",
+    "json": {
+     "expected_version": 999,
+     "pack": {
+      "_prototype_verification": "FICTIONAL draft for tests. Every value is invented and flagged; it is not law.",
+      "rule_pack_version": "0.0.1",
+      "jurisdiction": {
+       "level": "state",
+       "code": "ZY",
+       "name": "Zedland Two (fictional)"
+      },
+      "credit": {
+       "code": "ZY_DRAFT_JTC",
+       "name": "ZY_DRAFT_JTC (fictional)",
+       "statutory_citation": "Fictional Code § 0-0-0"
+      },
+      "tax_year_convention": {
+       "label": "begins",
+       "_prototype_verify": true
+      },
+      "filing": {
+       "window": "Fictional filing window",
+       "cycle": "annual",
+       "_prototype_verify": true
+      },
+      "thresholds": {
+       "minimum_new_jobs": 1,
+       "minimum_hours_per_week_full_time": 30,
+       "_prototype_verify": true
+      },
+      "benefit": {
+       "amount_per_qualifying_job_usd": 1200,
+       "benefit_period_years": 3,
+       "carryforward_years": 5,
+       "currency": "USD",
+       "_prototype_verify": true
+      },
+      "one_zero": {
+       "min_weekly_hours": 30.0,
+       "min_weekly_wages": 400.0,
+       "wage_basis": "regular",
+       "geographic_granularity": "statewide",
+       "pt_aggregation": false,
+       "headcount_unit_field": "Worksite_ID",
+       "entity_combination": "permitted",
+       "_prototype_verify": true,
+       "wage_floor_basis": {
+        "note": "invented for tests",
+        "_prototype_verify": true
+       }
+      }
+     },
+     "years": {
+      "2024": {
+       "_prototype_verification": "FICTIONAL draft for tests. Every value is invented and flagged; it is not law.",
+       "rule_pack_version": "0.0.1+ty2024",
+       "jurisdiction": {
+        "level": "state",
+        "code": "ZY",
+        "name": "Zedland Two (fictional)"
+       },
+       "credit": {
+        "code": "ZY_DRAFT_JTC",
+        "name": "ZY_DRAFT_JTC (fictional)",
+        "statutory_citation": "Fictional Code § 0-0-0"
+       },
+       "tax_year_convention": {
+        "label": "begins",
+        "_prototype_verify": true
+       },
+       "filing": {
+        "window": "Fictional filing window",
+        "cycle": "annual",
+        "_prototype_verify": true
+       },
+       "thresholds": {
+        "minimum_new_jobs": 1,
+        "minimum_hours_per_week_full_time": 30,
+        "_prototype_verify": true
+       },
+       "benefit": {
+        "amount_per_qualifying_job_usd": 1200,
+        "benefit_period_years": 3,
+        "carryforward_years": 5,
+        "currency": "USD",
+        "_prototype_verify": true
+       },
+       "one_zero": {
+        "min_weekly_hours": 30.0,
+        "min_weekly_wages": 400.0,
+        "wage_basis": "regular",
+        "geographic_granularity": "statewide",
+        "pt_aggregation": false,
+        "headcount_unit_field": "Worksite_ID",
+        "entity_combination": "permitted",
+        "_prototype_verify": true,
+        "wage_floor_basis": {
+         "note": "invented for tests",
+         "_prototype_verify": true
+        }
+       },
+       "tax_year": 2024,
+       "_year_provenance": {
+        "source": "invented for tests",
+        "adr": "ADR-005"
+       }
+      },
+      "2025": {
+       "_prototype_verification": "FICTIONAL draft for tests. Every value is invented and flagged; it is not law.",
+       "rule_pack_version": "0.0.1+ty2025",
+       "jurisdiction": {
+        "level": "state",
+        "code": "ZY",
+        "name": "Zedland Two (fictional)"
+       },
+       "credit": {
+        "code": "ZY_DRAFT_JTC",
+        "name": "ZY_DRAFT_JTC (fictional)",
+        "statutory_citation": "Fictional Code § 0-0-0"
+       },
+       "tax_year_convention": {
+        "label": "begins",
+        "_prototype_verify": true
+       },
+       "filing": {
+        "window": "Fictional filing window",
+        "cycle": "annual",
+        "_prototype_verify": true
+       },
+       "thresholds": {
+        "minimum_new_jobs": 1,
+        "minimum_hours_per_week_full_time": 30,
+        "_prototype_verify": true
+       },
+       "benefit": {
+        "amount_per_qualifying_job_usd": 1200,
+        "benefit_period_years": 3,
+        "carryforward_years": 5,
+        "currency": "USD",
+        "_prototype_verify": true
+       },
+       "one_zero": {
+        "min_weekly_hours": 30.0,
+        "min_weekly_wages": 400.0,
+        "wage_basis": "regular",
+        "geographic_granularity": "statewide",
+        "pt_aggregation": false,
+        "headcount_unit_field": "Worksite_ID",
+        "entity_combination": "permitted",
+        "_prototype_verify": true,
+        "wage_floor_basis": {
+         "note": "invented for tests",
+         "_prototype_verify": true
+        }
+       },
+       "tax_year": 2025,
+       "_year_provenance": {
+        "source": "invented for tests",
+        "adr": "ADR-005"
+       }
+      }
+     },
+     "actor": "ann"
+    }
+   }
+  },
+  {
+   "id": "get-after-changes",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts/{{draft_id}}"
+   }
+  },
+  {
+   "id": "withdraw",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/withdraw",
+    "json": {
+     "reason": "superseded",
+     "actor": "ann"
+    }
+   }
+  },
+  {
+   "id": "withdraw-again",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/withdraw",
+    "json": {
+     "reason": "again",
+     "actor": "ann"
+    }
+   }
+  },
+  {
+   "id": "get-withdrawn",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts/{{draft_id}}"
+   }
+  },
+  {
+   "id": "second-create",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts",
+    "json": {
+     "code": "ZY_DRAFT_JTC",
+     "name": "Zedland Two Jobs Credit",
+     "state": "ZY",
+     "years": [
+      2024,
+      2025
+     ],
+     "actor": "ann"
+    }
+   },
+   "capture": {
+    "draft2": "body.draft_id",
+    "version2": "body.version"
+   }
+  },
+  {
+   "id": "second-fill",
+   "request": {
+    "method": "PUT",
+    "path": "/api/v2/program-drafts/{{draft2}}/documents",
+    "json": {
+     "expected_version": "{{version2}}",
+     "pack": {
+      "_prototype_verification": "FICTIONAL draft for tests. Every value is invented and flagged; it is not law.",
+      "rule_pack_version": "0.0.1",
+      "jurisdiction": {
+       "level": "state",
+       "code": "ZY",
+       "name": "Zedland Two (fictional)"
+      },
+      "credit": {
+       "code": "ZY_DRAFT_JTC",
+       "name": "ZY_DRAFT_JTC (fictional)",
+       "statutory_citation": "Fictional Code § 0-0-0"
+      },
+      "tax_year_convention": {
+       "label": "begins",
+       "_prototype_verify": true
+      },
+      "filing": {
+       "window": "Fictional filing window",
+       "cycle": "annual",
+       "_prototype_verify": true
+      },
+      "thresholds": {
+       "minimum_new_jobs": 1,
+       "minimum_hours_per_week_full_time": 30,
+       "_prototype_verify": true
+      },
+      "benefit": {
+       "amount_per_qualifying_job_usd": 1200,
+       "benefit_period_years": 3,
+       "carryforward_years": 5,
+       "currency": "USD",
+       "_prototype_verify": true
+      },
+      "one_zero": {
+       "min_weekly_hours": 30.0,
+       "min_weekly_wages": 400.0,
+       "wage_basis": "regular",
+       "geographic_granularity": "statewide",
+       "pt_aggregation": false,
+       "headcount_unit_field": "Worksite_ID",
+       "entity_combination": "permitted",
+       "_prototype_verify": true,
+       "wage_floor_basis": {
+        "note": "invented for tests",
+        "_prototype_verify": true
+       }
+      }
+     },
+     "years": {
+      "2024": {
+       "_prototype_verification": "FICTIONAL draft for tests. Every value is invented and flagged; it is not law.",
+       "rule_pack_version": "0.0.1+ty2024",
+       "jurisdiction": {
+        "level": "state",
+        "code": "ZY",
+        "name": "Zedland Two (fictional)"
+       },
+       "credit": {
+        "code": "ZY_DRAFT_JTC",
+        "name": "ZY_DRAFT_JTC (fictional)",
+        "statutory_citation": "Fictional Code § 0-0-0"
+       },
+       "tax_year_convention": {
+        "label": "begins",
+        "_prototype_verify": true
+       },
+       "filing": {
+        "window": "Fictional filing window",
+        "cycle": "annual",
+        "_prototype_verify": true
+       },
+       "thresholds": {
+        "minimum_new_jobs": 1,
+        "minimum_hours_per_week_full_time": 30,
+        "_prototype_verify": true
+       },
+       "benefit": {
+        "amount_per_qualifying_job_usd": 1200,
+        "benefit_period_years": 3,
+        "carryforward_years": 5,
+        "currency": "USD",
+        "_prototype_verify": true
+       },
+       "one_zero": {
+        "min_weekly_hours": 30.0,
+        "min_weekly_wages": 400.0,
+        "wage_basis": "regular",
+        "geographic_granularity": "statewide",
+        "pt_aggregation": false,
+        "headcount_unit_field": "Worksite_ID",
+        "entity_combination": "permitted",
+        "_prototype_verify": true,
+        "wage_floor_basis": {
+         "note": "invented for tests",
+         "_prototype_verify": true
+        }
+       },
+       "tax_year": 2024,
+       "_year_provenance": {
+        "source": "invented for tests",
+        "adr": "ADR-005"
+       }
+      },
+      "2025": {
+       "_prototype_verification": "FICTIONAL draft for tests. Every value is invented and flagged; it is not law.",
+       "rule_pack_version": "0.0.1+ty2025",
+       "jurisdiction": {
+        "level": "state",
+        "code": "ZY",
+        "name": "Zedland Two (fictional)"
+       },
+       "credit": {
+        "code": "ZY_DRAFT_JTC",
+        "name": "ZY_DRAFT_JTC (fictional)",
+        "statutory_citation": "Fictional Code § 0-0-0"
+       },
+       "tax_year_convention": {
+        "label": "begins",
+        "_prototype_verify": true
+       },
+       "filing": {
+        "window": "Fictional filing window",
+        "cycle": "annual",
+        "_prototype_verify": true
+       },
+       "thresholds": {
+        "minimum_new_jobs": 1,
+        "minimum_hours_per_week_full_time": 30,
+        "_prototype_verify": true
+       },
+       "benefit": {
+        "amount_per_qualifying_job_usd": 1200,
+        "benefit_period_years": 3,
+        "carryforward_years": 5,
+        "currency": "USD",
+        "_prototype_verify": true
+       },
+       "one_zero": {
+        "min_weekly_hours": 30.0,
+        "min_weekly_wages": 400.0,
+        "wage_basis": "regular",
+        "geographic_granularity": "statewide",
+        "pt_aggregation": false,
+        "headcount_unit_field": "Worksite_ID",
+        "entity_combination": "permitted",
+        "_prototype_verify": true,
+        "wage_floor_basis": {
+         "note": "invented for tests",
+         "_prototype_verify": true
+        }
+       },
+       "tax_year": 2025,
+       "_year_provenance": {
+        "source": "invented for tests",
+        "adr": "ADR-005"
+       }
+      }
+     },
+     "actor": "ann"
+    }
+   }
+  },
+  {
+   "id": "second-validate",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft2}}/validate",
+    "json": {
+     "actor": "ann"
+    }
+   }
+  },
+  {
+   "id": "second-request-review",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft2}}/request-review",
+    "json": {
+     "actor": "ann"
+    }
+   }
+  },
+  {
+   "id": "second-approve",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft2}}/review",
+    "json": {
+     "decision": "approve",
+     "actor": "bob",
+     "comment": "ok"
+    }
+   }
+  },
+  {
+   "id": "second-export",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft2}}/export",
+    "json": {
+     "write_local": false,
+     "actor": "ann"
+    }
+   }
+  },
+  {
+   "id": "second-export-write-local",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft2}}/export",
+    "json": {
+     "write_local": true,
+     "actor": "ann"
+    }
+   }
+  },
+  {
+   "id": "second-manifest",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts/{{draft2}}/export/manifest"
+   }
+  },
+  {
+   "id": "list-final",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts"
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts.query-limit-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts",
+    "query": [
+     [
+      "limit",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts.query-limit-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts",
+    "query": [
+     [
+      "limit",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts.query-limit-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts",
+    "query": [
+     [
+      "limit",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts.query-limit-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts",
+    "query": [
+     [
+      "limit",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts.query-offset-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts",
+    "query": [
+     [
+      "offset",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts.query-offset-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts",
+    "query": [
+     [
+      "offset",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts.query-offset-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts",
+    "query": [
+     [
+      "offset",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts.query-offset-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts",
+    "query": [
+     [
+      "offset",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts/"
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/v2/program-drafts"
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/v2/program-drafts"
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts",
+    "json": {}
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts.unknown-query",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts.wrong-method-get",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts"
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts.wrong-method-delete",
+   "request": {
+    "method": "DELETE",
+    "path": "/api/v2/program-drafts"
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts.body-empty-body",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts"
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts.body-not-json",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts",
+    "body_text": "{not json",
+    "headers": {
+     "content-type": "application/json"
+    }
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts.body-json-array",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts",
+    "json": []
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts.body-json-string",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts",
+    "json": "text"
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts.body-json-null",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts",
+    "json": null
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts.body-empty-object",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts",
+    "json": {}
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts.body-wrong-content-type",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts",
+    "body_text": "a=b",
+    "headers": {
+     "content-type": "text/plain"
+    }
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts.body-wrong-type-code",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts",
+    "json": {
+     "code": {
+      "nested": true
+     },
+     "name": "Contract draft",
+     "state": "XX",
+     "years": [
+      2025
+     ],
+     "actor": "contract"
+    }
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts.body-missing-code",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts",
+    "json": {
+     "name": "Contract draft",
+     "state": "XX",
+     "years": [
+      2025
+     ],
+     "actor": "contract"
+    }
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts.body-long-string-code",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts",
+    "json": {
+     "code": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+     "name": "Contract draft",
+     "state": "XX",
+     "years": [
+      2025
+     ],
+     "actor": "contract"
+    }
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts.body-unicode-code",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts",
+    "json": {
+     "code": "Zoë ☃ 😀 ‮RTL \"q\" \\ \t",
+     "name": "Contract draft",
+     "state": "XX",
+     "years": [
+      2025
+     ],
+     "actor": "contract"
+    }
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts-draft-id.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts/{{draft_id}}",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts-draft-id.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts/{{draft_id}}/"
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts-draft-id.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/v2/program-drafts/{{draft_id}}"
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts-draft-id.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/v2/program-drafts/{{draft_id}}"
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts-draft-id.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}",
+    "json": {}
+   }
+  },
+  {
+   "id": "put-api-v2-program-drafts-draft-id-documents.unknown-query",
+   "request": {
+    "method": "PUT",
+    "path": "/api/v2/program-drafts/{{draft_id}}/documents",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "put-api-v2-program-drafts-draft-id-documents.wrong-method-get",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts/{{draft_id}}/documents"
+   }
+  },
+  {
+   "id": "put-api-v2-program-drafts-draft-id-documents.wrong-method-delete",
+   "request": {
+    "method": "DELETE",
+    "path": "/api/v2/program-drafts/{{draft_id}}/documents"
+   }
+  },
+  {
+   "id": "put-api-v2-program-drafts-draft-id-documents.body-empty-body",
+   "request": {
+    "method": "PUT",
+    "path": "/api/v2/program-drafts/{{draft_id}}/documents"
+   }
+  },
+  {
+   "id": "put-api-v2-program-drafts-draft-id-documents.body-not-json",
+   "request": {
+    "method": "PUT",
+    "path": "/api/v2/program-drafts/{{draft_id}}/documents",
+    "body_text": "{not json",
+    "headers": {
+     "content-type": "application/json"
+    }
+   }
+  },
+  {
+   "id": "put-api-v2-program-drafts-draft-id-documents.body-json-array",
+   "request": {
+    "method": "PUT",
+    "path": "/api/v2/program-drafts/{{draft_id}}/documents",
+    "json": []
+   }
+  },
+  {
+   "id": "put-api-v2-program-drafts-draft-id-documents.body-json-string",
+   "request": {
+    "method": "PUT",
+    "path": "/api/v2/program-drafts/{{draft_id}}/documents",
+    "json": "text"
+   }
+  },
+  {
+   "id": "put-api-v2-program-drafts-draft-id-documents.body-json-null",
+   "request": {
+    "method": "PUT",
+    "path": "/api/v2/program-drafts/{{draft_id}}/documents",
+    "json": null
+   }
+  },
+  {
+   "id": "put-api-v2-program-drafts-draft-id-documents.body-empty-object",
+   "request": {
+    "method": "PUT",
+    "path": "/api/v2/program-drafts/{{draft_id}}/documents",
+    "json": {}
+   }
+  },
+  {
+   "id": "put-api-v2-program-drafts-draft-id-documents.body-wrong-content-type",
+   "request": {
+    "method": "PUT",
+    "path": "/api/v2/program-drafts/{{draft_id}}/documents",
+    "body_text": "a=b",
+    "headers": {
+     "content-type": "text/plain"
+    }
+   }
+  },
+  {
+   "id": "put-api-v2-program-drafts-draft-id-documents.body-wrong-type-expected_version",
+   "request": {
+    "method": "PUT",
+    "path": "/api/v2/program-drafts/{{draft_id}}/documents",
+    "json": {
+     "expected_version": "abc",
+     "name": "Contract draft",
+     "actor": "contract",
+     "years": {}
+    }
+   }
+  },
+  {
+   "id": "put-api-v2-program-drafts-draft-id-documents.body-missing-expected_version",
+   "request": {
+    "method": "PUT",
+    "path": "/api/v2/program-drafts/{{draft_id}}/documents",
+    "json": {
+     "name": "Contract draft",
+     "actor": "contract",
+     "years": {}
+    }
+   }
+  },
+  {
+   "id": "put-api-v2-program-drafts-draft-id-documents.body-long-string-name",
+   "request": {
+    "method": "PUT",
+    "path": "/api/v2/program-drafts/{{draft_id}}/documents",
+    "json": {
+     "expected_version": 1,
+     "name": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+     "actor": "contract",
+     "years": {}
+    }
+   }
+  },
+  {
+   "id": "put-api-v2-program-drafts-draft-id-documents.body-unicode-name",
+   "request": {
+    "method": "PUT",
+    "path": "/api/v2/program-drafts/{{draft_id}}/documents",
+    "json": {
+     "expected_version": 1,
+     "name": "Zoë ☃ 😀 ‮RTL \"q\" \\ \t",
+     "actor": "contract",
+     "years": {}
+    }
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-validate.unknown-query",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/validate",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-validate.wrong-method-get",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts/{{draft_id}}/validate"
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-validate.wrong-method-delete",
+   "request": {
+    "method": "DELETE",
+    "path": "/api/v2/program-drafts/{{draft_id}}/validate"
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-validate.body-empty-body",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/validate"
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-validate.body-not-json",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/validate",
+    "body_text": "{not json",
+    "headers": {
+     "content-type": "application/json"
+    }
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-validate.body-json-array",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/validate",
+    "json": []
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-validate.body-json-string",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/validate",
+    "json": "text"
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-validate.body-json-null",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/validate",
+    "json": null
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-validate.body-empty-object",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/validate",
+    "json": {}
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-validate.body-wrong-content-type",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/validate",
+    "body_text": "a=b",
+    "headers": {
+     "content-type": "text/plain"
+    }
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-validate.body-wrong-type-actor",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/validate",
+    "json": {
+     "actor": {
+      "nested": true
+     }
+    }
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-validate.body-long-string-actor",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/validate",
+    "json": {
+     "actor": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    }
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-validate.body-unicode-actor",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/validate",
+    "json": {
+     "actor": "Zoë ☃ 😀 ‮RTL \"q\" \\ \t"
+    }
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-request-review.unknown-query",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/request-review",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-request-review.wrong-method-get",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts/{{draft_id}}/request-review"
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-request-review.wrong-method-delete",
+   "request": {
+    "method": "DELETE",
+    "path": "/api/v2/program-drafts/{{draft_id}}/request-review"
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-request-review.body-empty-body",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/request-review"
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-request-review.body-not-json",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/request-review",
+    "body_text": "{not json",
+    "headers": {
+     "content-type": "application/json"
+    }
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-request-review.body-json-array",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/request-review",
+    "json": []
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-request-review.body-json-string",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/request-review",
+    "json": "text"
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-request-review.body-json-null",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/request-review",
+    "json": null
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-request-review.body-empty-object",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/request-review",
+    "json": {}
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-request-review.body-wrong-content-type",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/request-review",
+    "body_text": "a=b",
+    "headers": {
+     "content-type": "text/plain"
+    }
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-request-review.body-wrong-type-actor",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/request-review",
+    "json": {
+     "actor": {
+      "nested": true
+     }
+    }
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-request-review.body-long-string-actor",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/request-review",
+    "json": {
+     "actor": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    }
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-request-review.body-unicode-actor",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/request-review",
+    "json": {
+     "actor": "Zoë ☃ 😀 ‮RTL \"q\" \\ \t"
+    }
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-review.unknown-query",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/review",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-review.wrong-method-get",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts/{{draft_id}}/review"
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-review.wrong-method-delete",
+   "request": {
+    "method": "DELETE",
+    "path": "/api/v2/program-drafts/{{draft_id}}/review"
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-review.body-empty-body",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/review"
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-review.body-not-json",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/review",
+    "body_text": "{not json",
+    "headers": {
+     "content-type": "application/json"
+    }
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-review.body-json-array",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/review",
+    "json": []
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-review.body-json-string",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/review",
+    "json": "text"
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-review.body-json-null",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/review",
+    "json": null
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-review.body-empty-object",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/review",
+    "json": {}
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-review.body-wrong-content-type",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/review",
+    "body_text": "a=b",
+    "headers": {
+     "content-type": "text/plain"
+    }
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-review.body-wrong-type-decision",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/review",
+    "json": {
+     "decision": {
+      "nested": true
+     },
+     "comment": "c",
+     "actor": "reviewer"
+    }
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-review.body-missing-decision",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/review",
+    "json": {
+     "comment": "c",
+     "actor": "reviewer"
+    }
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-review.body-long-string-decision",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/review",
+    "json": {
+     "decision": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+     "comment": "c",
+     "actor": "reviewer"
+    }
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-review.body-unicode-decision",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/review",
+    "json": {
+     "decision": "Zoë ☃ 😀 ‮RTL \"q\" \\ \t",
+     "comment": "c",
+     "actor": "reviewer"
+    }
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-preview.unknown-query",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/preview",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-preview.wrong-method-get",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts/{{draft_id}}/preview"
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-preview.wrong-method-delete",
+   "request": {
+    "method": "DELETE",
+    "path": "/api/v2/program-drafts/{{draft_id}}/preview"
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-preview.body-empty-body",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/preview"
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-preview.body-not-json",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/preview",
+    "body_text": "{not json",
+    "headers": {
+     "content-type": "application/json"
+    }
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-preview.body-json-array",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/preview",
+    "json": []
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-preview.body-json-string",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/preview",
+    "json": "text"
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-preview.body-json-null",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/preview",
+    "json": null
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-preview.body-empty-object",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/preview",
+    "json": {}
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-preview.body-wrong-content-type",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/preview",
+    "body_text": "a=b",
+    "headers": {
+     "content-type": "text/plain"
+    }
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-preview.body-wrong-type-dataset",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/preview",
+    "json": {
+     "dataset": {
+      "nested": true
+     }
+    }
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-preview.body-long-string-dataset",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/preview",
+    "json": {
+     "dataset": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    }
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-preview.body-unicode-dataset",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/preview",
+    "json": {
+     "dataset": "Zoë ☃ 😀 ‮RTL \"q\" \\ \t"
+    }
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-withdraw.unknown-query",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/withdraw",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-withdraw.wrong-method-get",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts/{{draft_id}}/withdraw"
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-withdraw.wrong-method-delete",
+   "request": {
+    "method": "DELETE",
+    "path": "/api/v2/program-drafts/{{draft_id}}/withdraw"
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-withdraw.body-empty-body",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/withdraw"
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-withdraw.body-not-json",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/withdraw",
+    "body_text": "{not json",
+    "headers": {
+     "content-type": "application/json"
+    }
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-withdraw.body-json-array",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/withdraw",
+    "json": []
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-withdraw.body-json-string",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/withdraw",
+    "json": "text"
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-withdraw.body-json-null",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/withdraw",
+    "json": null
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-withdraw.body-empty-object",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/withdraw",
+    "json": {}
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-withdraw.body-wrong-content-type",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/withdraw",
+    "body_text": "a=b",
+    "headers": {
+     "content-type": "text/plain"
+    }
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-withdraw.body-wrong-type-reason",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/withdraw",
+    "json": {
+     "reason": {
+      "nested": true
+     },
+     "actor": "contract"
+    }
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-withdraw.body-long-string-reason",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/withdraw",
+    "json": {
+     "reason": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+     "actor": "contract"
+    }
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-withdraw.body-unicode-reason",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/withdraw",
+    "json": {
+     "reason": "Zoë ☃ 😀 ‮RTL \"q\" \\ \t",
+     "actor": "contract"
+    }
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-export.unknown-query",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/export",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-export.wrong-method-get",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts/{{draft_id}}/export"
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-export.wrong-method-delete",
+   "request": {
+    "method": "DELETE",
+    "path": "/api/v2/program-drafts/{{draft_id}}/export"
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-export.body-empty-body",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/export"
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-export.body-not-json",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/export",
+    "body_text": "{not json",
+    "headers": {
+     "content-type": "application/json"
+    }
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-export.body-json-array",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/export",
+    "json": []
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-export.body-json-string",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/export",
+    "json": "text"
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-export.body-json-null",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/export",
+    "json": null
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-export.body-empty-object",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/export",
+    "json": {}
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-export.body-wrong-content-type",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/export",
+    "body_text": "a=b",
+    "headers": {
+     "content-type": "text/plain"
+    }
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-export.body-wrong-type-write_local",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/export",
+    "json": {
+     "write_local": "maybe",
+     "actor": "contract"
+    }
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-export.body-long-string-actor",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/export",
+    "json": {
+     "write_local": false,
+     "actor": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    }
+   }
+  },
+  {
+   "id": "post-api-v2-program-drafts-draft-id-export.body-unicode-actor",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/export",
+    "json": {
+     "write_local": false,
+     "actor": "Zoë ☃ 😀 ‮RTL \"q\" \\ \t"
+    }
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts-draft-id-export-manifest.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts/{{draft_id}}/export/manifest",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts-draft-id-export-manifest.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts/{{draft_id}}/export/manifest/"
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts-draft-id-export-manifest.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/v2/program-drafts/{{draft_id}}/export/manifest"
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts-draft-id-export-manifest.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/v2/program-drafts/{{draft_id}}/export/manifest"
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts-draft-id-export-manifest.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/export/manifest",
+    "json": {}
+   }
+  }
+ ]
+}
