@@ -21,6 +21,9 @@ def main() -> int:
     parser.add_argument("--port", type=int, required=True)
     parser.add_argument("--auth-rate-limit", type=int, default=0, help="serve with Entra sign-in and this per-minute limit (stage C4)")
     args = parser.parse_args()
+    from contract import oracle
+
+    oracle.require()
     hermetic.apply()
     from contract.harness import world
 

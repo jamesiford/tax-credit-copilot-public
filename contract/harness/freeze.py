@@ -107,9 +107,12 @@ def install() -> None:
     _dt.date = FrozenDate  # type: ignore[misc]
     import sqlite3
 
-    # Python 3.12 deprecated sqlite3's default date/datetime adapters and 3.14 removed them, so the product (which targets 3.12) binds
-    # plain dates only where the interpreter still supplies them. Register the 3.12 behaviour for the stdlib types and the frozen
-    # subclasses; this is what the product was written against. (FINDING F-2.)
+    # The harness replaces `date`/`datetime` with frozen subclasses, and sqlite3 looks an adapter up by EXACT type: measured on 3.12.13
+    # and 3.14.2 alike, binding a subclass raises "type ... is not supported" even though both interpreters still ship (deprecated)
+    # default adapters for the base types. So the frozen subclasses need adapters, and the base types get explicit ones so nothing
+    # depends on the deprecated defaults (which a later release may drop). On 3.12, the oracle, they reproduce the defaults' output
+    # exactly, asserted just below so the claim cannot rot. (FINDINGS F-2 / E-1.)
+    _assert_matches_default_adapters(sqlite3)
     sqlite3.register_adapter(_REAL_DATE, lambda d: d.isoformat())
     sqlite3.register_adapter(_REAL_DATETIME, lambda d: d.isoformat(" "))
     sqlite3.register_adapter(FrozenDate, lambda d: d.isoformat())
@@ -128,6 +131,22 @@ def install() -> None:
     _freeze_mtimes()
     _freeze_threads()
     _installed = True
+
+
+def _assert_matches_default_adapters(sqlite3) -> None:
+    """Where the interpreter still ships sqlite3's default date adapters (3.12), ours must write the same text."""
+    defaults = {k: v for k, v in sqlite3.adapters.items() if k[0] in (_REAL_DATE, _REAL_DATETIME)}
+    if not defaults:
+        return
+    import warnings
+
+    samples = {_REAL_DATE: _REAL_DATE(2026, 1, 15), _REAL_DATETIME: _REAL_DATETIME(2026, 1, 15, 12, 0, 0, 250000)}
+    ours = {_REAL_DATE: lambda d: d.isoformat(), _REAL_DATETIME: lambda d: d.isoformat(" ")}
+    for (cls, _proto), adapter in defaults.items():
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            theirs = adapter(samples[cls])
+        assert theirs == ours[cls](samples[cls]), f"sqlite3 default adapter for {cls.__name__} no longer matches the harness's"
 
 
 def _freeze_mtimes() -> None:

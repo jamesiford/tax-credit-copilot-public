@@ -26,10 +26,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from contract import compare, exchange, normalise  # noqa: E402
+from contract import compare, exchange, normalise, oracle  # noqa: E402
 
 SCENARIOS = ROOT / "contract" / "scenarios"
-PYTHON = os.environ.get("CONTRACT_PYTHON", r"C:\Projects\GitHub\tax-credit-copilot-public\.venv\Scripts\python.exe")
 
 
 def free_port() -> int:
@@ -41,8 +40,9 @@ def free_port() -> int:
 def spawn_server(profile: str, auth_rate_limit: int = 0) -> tuple[subprocess.Popen, str]:
     port = free_port()
     env = {**os.environ, "PYTHONUTF8": "1", "PYTHONPATH": str(ROOT), "PYTHONDONTWRITEBYTECODE": "1"}
-    proc = subprocess.Popen([PYTHON, "-m", "contract.harness.server", "--profile", profile, "--port", str(port)] + (["--auth-rate-limit", str(auth_rate_limit)] if auth_rate_limit else []), cwd=ROOT / "backend", env=env,
-                            stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True)
+    log = open(os.environ["CONTRACT_SERVER_LOG"], "a", encoding="utf-8") if os.environ.get("CONTRACT_SERVER_LOG") else subprocess.DEVNULL  # debugging aid
+    proc = subprocess.Popen([oracle.python_path(), "-m", "contract.harness.server", "--profile", profile, "--port", str(port)] + (["--auth-rate-limit", str(auth_rate_limit)] if auth_rate_limit else []), cwd=ROOT / "backend", env=env,
+                            stdout=subprocess.PIPE, stderr=log, text=True)
     deadline = time.time() + 600
     while time.time() < deadline:
         line = proc.stdout.readline()
@@ -62,7 +62,10 @@ def auth_limit(name: str) -> int:
 async def run_against(base_url: str, scenario: dict) -> list[dict]:
     import httpx
 
-    async with httpx.AsyncClient(base_url=base_url, timeout=300) as http:
+    # No connection reuse: after an unhandled exception uvicorn closes the socket once the 500 has been sent, so a pooled connection
+    # can be closed by the server just as the next request is written ("Server disconnected without sending a response").
+    limits = httpx.Limits(max_keepalive_connections=0)
+    async with httpx.AsyncClient(base_url=base_url, timeout=300, limits=limits) as http:
         return await exchange.run_scenario(http, scenario)
 
 
@@ -85,7 +88,7 @@ def replay_one(name: str, base_url: str, mode: str) -> dict:
 
 
 def markdown(report: dict) -> str:
-    lines = [f"# Replay report ({report['mode']})", "", f"- scenarios: {len(report['scenarios'])}", f"- exchanges compared: {report['exchanges']}",
+    lines = [f"# Replay report ({report['mode']})", "", f"- server interpreter: {report['interpreter']['python']} (zlib {report['interpreter']['zlib']}), oracle: {report['interpreter']['oracle']}", f"- scenarios: {len(report['scenarios'])}", f"- exchanges compared: {report['exchanges']}",
              f"- failures: {report['failure_count']}", f"- tolerated (semantic mode only): {report['tolerated_count']}", ""]
     for s in report["scenarios"]:
         lines.append(f"## {s['scenario']}: {s['exchanges']} exchanges, {len(s['failures'])} failures, {len(s['tolerated'])} tolerated")
@@ -107,7 +110,13 @@ def main() -> int:
     parser.add_argument("--mode", choices=["strict", "semantic"], default="strict")
     parser.add_argument("--recordings", help="a directory of recordings to use instead of contract/recordings (the mutation self-test)")
     parser.add_argument("--out", default=None, help="write <out>.json and <out>.md")
+    parser.add_argument("--allow-other-python", action="store_true", help="cross-check only: serve from an interpreter that is not the 3.12 oracle")
     args = parser.parse_args()
+    served = args.spawn_python or args.in_process
+    if served:
+        oracle.require(args.allow_other_python)
+    stamp = oracle.describe() if served else {"python": "external server", "zlib": "n/a", "oracle": None, "allow_other_python": False}
+    print(f"server interpreter: {stamp['python']} (zlib {stamp['zlib']})" + ("  ** NOT THE ORACLE (--allow-other-python) **" if stamp["oracle"] is False else ""), flush=True)
     if args.recordings:
         os.environ["CONTRACT_RECORDINGS"] = args.recordings
     names = []
@@ -135,7 +144,7 @@ def main() -> int:
                 proc.kill()
         r = results[-1]
         print(f"{name}: {r['exchanges']} exchanges, {len(r['failures'])} failures, {len(r['tolerated'])} tolerated", flush=True)
-    report = {"mode": args.mode, "scenarios": results, "exchanges": sum(r["exchanges"] for r in results),
+    report = {"mode": args.mode, "interpreter": stamp, "scenarios": results, "exchanges": sum(r["exchanges"] for r in results),
               "failure_count": sum(len(r["failures"]) for r in results), "tolerated_count": sum(len(r["tolerated"]) for r in results)}
     if args.out:
         Path(args.out + ".json").write_text(json.dumps(report, indent=1), encoding="utf-8")
@@ -149,7 +158,7 @@ def run_in_process(name: str, mode: str) -> dict:
     import tempfile
 
     out = Path(tempfile.mkdtemp()) / f"{name}.jsonl"
-    cmd = [PYTHON, "-m", "contract.harness.run_scenario", "--scenario", str(SCENARIOS / f"{name}.json"), "--out", str(out)]
+    cmd = [oracle.python_path(), "-m", "contract.harness.run_scenario", "--scenario", str(SCENARIOS / f"{name}.json"), "--out", str(out)]
     env = {**os.environ, "PYTHONUTF8": "1", "PYTHONPATH": str(ROOT), "PYTHONDONTWRITEBYTECODE": "1"}
     subprocess.run(cmd, cwd=ROOT / "backend", env=env, check=True, capture_output=True)
     actual = normalise.apply_all(exchange.load_records(out.read_text(encoding="utf-8")))

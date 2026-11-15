@@ -22,9 +22,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+from contract import oracle  # noqa: E402
+
 SCENARIOS = ROOT / "contract" / "scenarios"
 RECORDINGS = ROOT / "contract" / "recordings"
-PYTHON = os.environ.get("CONTRACT_PYTHON", r"C:\Projects\GitHub\tax-credit-copilot-public\.venv\Scripts\python.exe")
 
 
 def scenario_files(names: list[str] | None) -> list[Path]:
@@ -34,7 +35,7 @@ def scenario_files(names: list[str] | None) -> list[Path]:
 
 def run_one(scenario: Path, out: Path, base_url: str | None = None) -> tuple[str, float, str]:
     started = time.time()
-    cmd = [PYTHON, "-m", "contract.harness.run_scenario", "--scenario", str(scenario), "--out", str(out)]
+    cmd = [oracle.python_path(), "-m", "contract.harness.run_scenario", "--scenario", str(scenario), "--out", str(out)]
     if base_url:
         cmd += ["--base-url", base_url]
     env = {**os.environ, "PYTHONUTF8": "1", "PYTHONPATH": str(ROOT), "PYTHONDONTWRITEBYTECODE": "1"}
@@ -73,7 +74,11 @@ def main() -> int:
     parser.add_argument("--check", action="store_true")
     parser.add_argument("--scenario", action="append")
     parser.add_argument("--jobs", type=int, default=4)
+    parser.add_argument("--allow-other-python", action="store_true", help="cross-check only: run on an interpreter that is not the 3.12 oracle")
     args = parser.parse_args()
+    oracle.require(args.allow_other_python)
+    stamp = oracle.describe()
+    print(f"interpreter: Python {stamp['python']} (zlib {stamp['zlib']})" + ("" if stamp["oracle"] else "  ** NOT THE ORACLE (--allow-other-python) **"), flush=True)
     files = scenario_files(args.scenario)
     if args.check:
         with tempfile.TemporaryDirectory(prefix="tcc-contract-check-") as tmp:
@@ -86,7 +91,7 @@ def main() -> int:
             if failures or changed:
                 print("recordings differ from what the Python code now produces: " + ", ".join(changed or ["(a scenario failed to run)"]))
                 return 1
-            print(f"--check: {len(files)} recordings identical")
+            print(f"--check: {len(files)} recordings identical" + ("" if stamp["oracle"] else f" (cross-check on Python {stamp['python']}, not the oracle)"))
             return 0
     if args.command == "record":
         return 1 if record(files, args.jobs, RECORDINGS) else 0

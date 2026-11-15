@@ -38,7 +38,7 @@ async def _remote(scenario: dict, base_url: str) -> list[dict]:
 
     from contract import exchange
 
-    async with httpx.AsyncClient(base_url=base_url, timeout=300) as http:
+    async with httpx.AsyncClient(base_url=base_url, timeout=300, limits=httpx.Limits(max_keepalive_connections=0)) as http:  # see replay.run_against
         return await exchange.run_scenario(http, scenario)
 
 
@@ -48,6 +48,9 @@ def main() -> int:
     parser.add_argument("--out", required=True)
     parser.add_argument("--base-url")
     args = parser.parse_args()
+    from contract import oracle
+
+    oracle.require()
     scenario = json.loads(Path(args.scenario).read_text(encoding="utf-8"))
     if args.base_url:
         records = asyncio.run(_remote(scenario, args.base_url))
