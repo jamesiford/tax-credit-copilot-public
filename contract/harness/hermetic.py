@@ -30,6 +30,9 @@ PINNED = {
     "AUTH_MODE": "none",
     "TCC_WARM_ON_START": "0",
     "PYTHONUTF8": "1",
+    "GIT_COMMIT": "0000000000000000000000000000000000c0ffee",
+    "LOG_LEVEL": "WARNING",
+    "RUN_WORKER_INLINE": "0",
 }
 
 #: Prefixes of live-service configuration that must never reach a hermetic run.
@@ -56,11 +59,21 @@ class NetworkBlocked(RuntimeError):
 def _guard_sockets() -> None:
     real_connect = socket.socket.connect
     real_connect_ex = socket.socket.connect_ex
+    real_listen = socket.socket.listen
+    listening: set[int] = set()
+
+    def listen(self, *args):
+        result = real_listen(self, *args)
+        try:
+            listening.add(self.getsockname()[1])
+        except OSError:
+            pass
+        return result
 
     def _allowed(address) -> bool:
-        # asyncio's self-pipe and the in-process ASGI transport use socketpair (AF_UNIX / loopback pair);
-        # the real-server run of stage C6 is the only thing that binds loopback, and it does so in another process.
-        return isinstance(address, tuple) and address and address[0] in ("127.0.0.1", "::1", "localhost") and os.environ.get("CONTRACT_ALLOW_LOOPBACK") == "1"
+        # Windows' asyncio builds its self-pipe with a loopback socketpair, which connects to a port this very process is
+        # listening on. Only those are allowed: anything else, including other loopback ports, is an outbound connection.
+        return isinstance(address, tuple) and len(address) >= 2 and address[0] in ("127.0.0.1", "::1") and address[1] in listening
 
     def connect(self, address):
         if _allowed(address):
@@ -78,6 +91,7 @@ def _guard_sockets() -> None:
         raise NetworkBlocked(f"name resolution blocked by the contract harness: {host!r}")
 
     _real_getaddrinfo = socket.getaddrinfo
+    socket.socket.listen = listen  # type: ignore[method-assign]
     socket.socket.connect = connect  # type: ignore[method-assign]
     socket.socket.connect_ex = connect_ex  # type: ignore[method-assign]
     socket.getaddrinfo = getaddrinfo  # type: ignore[assignment]
@@ -104,6 +118,8 @@ def apply(workdir: Path | None = None) -> Path:
     work = Path(workdir) if workdir else Path(tempfile.mkdtemp(prefix="tcc-contract-"))
     work.mkdir(parents=True, exist_ok=True)
     os.environ["OPERATIONAL_DB"] = str(work / "operational.db")
+    os.environ["ARTIFACT_LOCAL_ROOT"] = str(work / "artifacts")
+    os.environ["PROGRAM_EXPORT_ALLOW_LOCAL_WRITE"] = "false"
     if not _installed:
         _guard_sockets()
         from . import freeze

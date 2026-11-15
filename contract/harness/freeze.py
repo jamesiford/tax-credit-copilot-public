@@ -19,6 +19,7 @@ import uuid
 #: depend on how many times the product happened to ask, and a background task would perturb it.
 FROZEN_UTC = _dt.datetime(2026, 1, 15, 12, 0, 0, tzinfo=_dt.timezone.utc)
 FROZEN_EPOCH = FROZEN_UTC.timestamp()
+_REAL_DATE, _REAL_DATETIME = _dt.date, _dt.datetime
 
 _uuid_counter = itertools.count(1)
 _bytes_counter = itertools.count(1)
@@ -95,6 +96,15 @@ def install() -> None:
         return
     _dt.datetime = FrozenDatetime  # type: ignore[misc]
     _dt.date = FrozenDate  # type: ignore[misc]
+    import sqlite3
+
+    # Python 3.12 deprecated sqlite3's default date/datetime adapters and 3.14 removed them, so the product (which targets 3.12) binds
+    # plain dates only where the interpreter still supplies them. Register the 3.12 behaviour for the stdlib types and the frozen
+    # subclasses; this is what the product was written against. (FINDING F-2.)
+    sqlite3.register_adapter(_REAL_DATE, lambda d: d.isoformat())
+    sqlite3.register_adapter(_REAL_DATETIME, lambda d: d.isoformat(" "))
+    sqlite3.register_adapter(FrozenDate, lambda d: d.isoformat())
+    sqlite3.register_adapter(FrozenDatetime, lambda d: d.isoformat(" "))
     uuid.uuid4 = _uuid4  # type: ignore[assignment]
     uuid.uuid1 = _uuid1  # type: ignore[assignment]
     secrets.token_bytes = _token_bytes  # type: ignore[assignment]
@@ -104,4 +114,35 @@ def install() -> None:
     time.time_ns = lambda: int(FROZEN_EPOCH * 1_000_000_000)  # type: ignore[assignment]
     time.perf_counter = _perf_counter  # type: ignore[assignment]
     reset_counters()
+    _freeze_git()
+    _freeze_zip()
     _installed = True
+
+
+def _freeze_zip() -> None:
+    """`ZipFile.write(path)` stamps each member with the source file's mtime; openpyxl spools a worksheet through a temp file."""
+    import zipfile
+
+    real = zipfile.ZipInfo.from_file.__func__
+
+    def from_file(cls, filename, arcname=None, *, strict_timestamps=True):
+        info = real(cls, filename, arcname, strict_timestamps=strict_timestamps)
+        info.date_time = time.localtime(FROZEN_EPOCH)[:6]
+        return info
+
+    zipfile.ZipInfo.from_file = classmethod(from_file)  # type: ignore[method-assign]
+
+
+def _freeze_git() -> None:
+    """`git rev-parse HEAD` is read by the run commands for `code_commit`; the worktree HEAD moves with every commit."""
+    import subprocess
+
+    real_check_output = subprocess.check_output
+
+    def check_output(args, *a, **kw):
+        if isinstance(args, (list, tuple)) and list(args[:3]) == ["git", "rev-parse", "HEAD"]:
+            text = "0000000000000000000000000000000000c0ffee\n"
+            return text if kw.get("text") or kw.get("universal_newlines") else text.encode()
+        return real_check_output(args, *a, **kw)
+
+    subprocess.check_output = check_output  # type: ignore[assignment]

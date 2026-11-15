@@ -1,0 +1,739 @@
+{
+ "name": "p2_run_batches",
+ "profile": "P2",
+ "variables": {
+  "batch_id": "00000000-0000-0000-0000-00000000beef"
+ },
+ "steps": [
+  {
+   "id": "list-empty",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches"
+   }
+  },
+  {
+   "id": "dry-run",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches",
+    "json": {
+     "kind": "assess",
+     "scope": {
+      "kind": "one",
+      "client_ids": [
+       2001
+      ]
+     },
+     "tax_years": [
+      2025
+     ],
+     "dry_run": true
+    }
+   }
+  },
+  {
+   "id": "dry-run-all",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches",
+    "json": {
+     "kind": "assess_and_calculate",
+     "scope": {
+      "kind": "all"
+     },
+     "dry_run": true
+    }
+   }
+  },
+  {
+   "id": "dry-run-list",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches",
+    "json": {
+     "kind": "calculate",
+     "scope": {
+      "kind": "list",
+      "client_ids": [
+       2001,
+       2002,
+       2003
+      ]
+     },
+     "tax_years": [
+      2025
+     ],
+     "dry_run": true
+    }
+   }
+  },
+  {
+   "id": "dry-run-filter",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches",
+    "json": {
+     "kind": "assess",
+     "scope": {
+      "kind": "filter",
+      "filter": {
+       "state": "GA"
+      }
+     },
+     "dry_run": true
+    }
+   }
+  },
+  {
+   "id": "create",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches",
+    "json": {
+     "kind": "assess",
+     "scope": {
+      "kind": "one",
+      "client_ids": [
+       2001
+      ]
+     },
+     "tax_years": [
+      2025
+     ],
+     "idempotency_key": "contract-1"
+    }
+   },
+   "capture": {
+    "batch_id": "body.batch_id"
+   }
+  },
+  {
+   "id": "create-replay",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches",
+    "json": {
+     "kind": "assess",
+     "scope": {
+      "kind": "one",
+      "client_ids": [
+       2001
+      ]
+     },
+     "tax_years": [
+      2025
+     ],
+     "idempotency_key": "contract-1"
+    }
+   }
+  },
+  {
+   "id": "create-same-key-different-body",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches",
+    "json": {
+     "kind": "calculate",
+     "scope": {
+      "kind": "one",
+      "client_ids": [
+       2002
+      ]
+     },
+     "tax_years": [
+      2025
+     ],
+     "idempotency_key": "contract-1"
+    }
+   }
+  },
+  {
+   "id": "get-queued",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches/{{batch_id}}"
+   }
+  },
+  {
+   "id": "items-queued",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches/{{batch_id}}/items"
+   }
+  },
+  {
+   "id": "drain",
+   "control": {
+    "op": "drain",
+    "args": {}
+   }
+  },
+  {
+   "id": "get-done",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches/{{batch_id}}"
+   }
+  },
+  {
+   "id": "items-done",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches/{{batch_id}}/items"
+   }
+  },
+  {
+   "id": "items-status",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches/{{batch_id}}/items",
+    "query": [
+     [
+      "status",
+      "succeeded"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "items-status-bogus",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches/{{batch_id}}/items",
+    "query": [
+     [
+      "status",
+      "bogus"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "items-limit-0",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches/{{batch_id}}/items",
+    "query": [
+     [
+      "limit",
+      0
+     ]
+    ]
+   }
+  },
+  {
+   "id": "items-offset-past",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches/{{batch_id}}/items",
+    "query": [
+     [
+      "offset",
+      99
+     ]
+    ]
+   }
+  },
+  {
+   "id": "cancel-finished",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches/{{batch_id}}/cancel"
+   }
+  },
+  {
+   "id": "retry-nothing-failed",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches/{{batch_id}}/retry-failed"
+   }
+  },
+  {
+   "id": "skip-unchanged",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches",
+    "json": {
+     "kind": "assess",
+     "scope": {
+      "kind": "one",
+      "client_ids": [
+       2001
+      ]
+     },
+     "tax_years": [
+      2025
+     ],
+     "skip_unchanged": true,
+     "idempotency_key": "contract-2"
+    }
+   },
+   "capture": {
+    "batch2": "body.batch_id"
+   }
+  },
+  {
+   "id": "drain-2",
+   "control": {
+    "op": "drain",
+    "args": {}
+   }
+  },
+  {
+   "id": "get-skip-unchanged",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches/{{batch2}}"
+   }
+  },
+  {
+   "id": "items-skip-unchanged",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches/{{batch2}}/items"
+   }
+  },
+  {
+   "id": "create-calculate-all",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches",
+    "json": {
+     "kind": "assess_and_calculate",
+     "scope": {
+      "kind": "all"
+     },
+     "tax_years": [
+      2025
+     ],
+     "idempotency_key": "contract-3",
+     "confirm_items": 4,
+     "force": true
+    }
+   },
+   "capture": {
+    "batch3": "body.batch_id"
+   }
+  },
+  {
+   "id": "get-calculate-queued",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches/{{batch3}}"
+   }
+  },
+  {
+   "id": "cancel-queued",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches/{{batch3}}/cancel"
+   }
+  },
+  {
+   "id": "get-cancelled",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches/{{batch3}}"
+   }
+  },
+  {
+   "id": "items-cancelled",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches/{{batch3}}/items"
+   }
+  },
+  {
+   "id": "retry-after-cancel",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches/{{batch3}}/retry-failed"
+   }
+  },
+  {
+   "id": "unknown-client",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches",
+    "json": {
+     "kind": "assess",
+     "scope": {
+      "kind": "one",
+      "client_ids": [
+       999999
+      ]
+     },
+     "dry_run": true
+    }
+   }
+  },
+  {
+   "id": "empty-list",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches",
+    "json": {
+     "kind": "assess",
+     "scope": {
+      "kind": "list",
+      "client_ids": []
+     },
+     "dry_run": true
+    }
+   }
+  },
+  {
+   "id": "bad-kind",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches",
+    "json": {
+     "kind": "bogus",
+     "scope": {
+      "kind": "one",
+      "client_ids": [
+       2001
+      ]
+     }
+    }
+   }
+  },
+  {
+   "id": "bad-scope-kind",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches",
+    "json": {
+     "kind": "assess",
+     "scope": {
+      "kind": "bogus"
+     }
+    }
+   }
+  },
+  {
+   "id": "long-idempotency-key",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches",
+    "json": {
+     "kind": "assess",
+     "scope": {
+      "kind": "one",
+      "client_ids": [
+       2001
+      ]
+     },
+     "tax_years": [
+      2025
+     ],
+     "idempotency_key": "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk"
+    }
+   }
+  },
+  {
+   "id": "list-status",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches",
+    "query": [
+     [
+      "status",
+      "succeeded"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "list-status-bogus",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches",
+    "query": [
+     [
+      "status",
+      "bogus"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "list-after",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches"
+   }
+  },
+  {
+   "id": "list-limit-1",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches",
+    "query": [
+     [
+      "limit",
+      1
+     ]
+    ]
+   }
+  },
+  {
+   "id": "list-offset-past",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches",
+    "query": [
+     [
+      "offset",
+      99
+     ]
+    ]
+   }
+  },
+  {
+   "id": "list-limit-0",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches",
+    "query": [
+     [
+      "limit",
+      0
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-unknown",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches/00000000-0000-0000-0000-000000000000"
+   }
+  },
+  {
+   "id": "cancel-unknown",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches/00000000-0000-0000-0000-000000000000/cancel"
+   }
+  },
+  {
+   "id": "retry-unknown",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches/00000000-0000-0000-0000-000000000000/retry-failed"
+   }
+  },
+  {
+   "id": "items-unknown",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches/00000000-0000-0000-0000-000000000000/items"
+   }
+  },
+  {
+   "id": "post-api-v2-run-batches.wrong-method-get",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches"
+   }
+  },
+  {
+   "id": "post-api-v2-run-batches.wrong-method-delete",
+   "request": {
+    "method": "DELETE",
+    "path": "/api/v2/run-batches"
+   }
+  },
+  {
+   "id": "post-api-v2-run-batches.body-empty-body",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches"
+   }
+  },
+  {
+   "id": "post-api-v2-run-batches.body-not-json",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches",
+    "body_text": "{not json",
+    "headers": {
+     "content-type": "application/json"
+    }
+   }
+  },
+  {
+   "id": "post-api-v2-run-batches.body-json-array",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches",
+    "json": []
+   }
+  },
+  {
+   "id": "post-api-v2-run-batches.body-json-string",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches",
+    "json": "text"
+   }
+  },
+  {
+   "id": "post-api-v2-run-batches.body-json-null",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches",
+    "json": null
+   }
+  },
+  {
+   "id": "post-api-v2-run-batches.body-empty-object",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches",
+    "json": {}
+   }
+  },
+  {
+   "id": "post-api-v2-run-batches.body-wrong-content-type",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches",
+    "body_text": "a=b",
+    "headers": {
+     "content-type": "text/plain"
+    }
+   }
+  },
+  {
+   "id": "post-api-v2-run-batches.body-wrong-type-kind",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches",
+    "json": {
+     "kind": {
+      "nested": true
+     },
+     "scope": {
+      "kind": "one",
+      "client_ids": [
+       1001
+      ]
+     },
+     "tax_years": [
+      2025
+     ],
+     "dry_run": true
+    }
+   }
+  },
+  {
+   "id": "post-api-v2-run-batches.body-missing-scope",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches",
+    "json": {
+     "kind": "assess",
+     "tax_years": [
+      2025
+     ],
+     "dry_run": true
+    }
+   }
+  },
+  {
+   "id": "post-api-v2-run-batches.body-long-string-kind",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches",
+    "json": {
+     "kind": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+     "scope": {
+      "kind": "one",
+      "client_ids": [
+       1001
+      ]
+     },
+     "tax_years": [
+      2025
+     ],
+     "dry_run": true
+    }
+   }
+  },
+  {
+   "id": "post-api-v2-run-batches.body-unicode-kind",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches",
+    "json": {
+     "kind": "Zoë ☃ 😀 ‮RTL \"q\" \\ \t",
+     "scope": {
+      "kind": "one",
+      "client_ids": [
+       1001
+      ]
+     },
+     "tax_years": [
+      2025
+     ],
+     "dry_run": true
+    }
+   }
+  },
+  {
+   "id": "get-api-v2-run-batches.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches",
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-v2-run-batches-batch-id.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches/{{batch_id}}",
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-v2-run-batches-batch-id-items.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches/{{batch_id}}/items",
+    "json": {}
+   }
+  },
+  {
+   "id": "post-api-v2-run-batches-batch-id-cancel.wrong-method-get",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches/{{batch_id}}/cancel"
+   }
+  },
+  {
+   "id": "post-api-v2-run-batches-batch-id-cancel.wrong-method-delete",
+   "request": {
+    "method": "DELETE",
+    "path": "/api/v2/run-batches/{{batch_id}}/cancel"
+   }
+  },
+  {
+   "id": "post-api-v2-run-batches-batch-id-retry-failed.wrong-method-get",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches/{{batch_id}}/retry-failed"
+   }
+  },
+  {
+   "id": "post-api-v2-run-batches-batch-id-retry-failed.wrong-method-delete",
+   "request": {
+    "method": "DELETE",
+    "path": "/api/v2/run-batches/{{batch_id}}/retry-failed"
+   }
+  }
+ ]
+}
