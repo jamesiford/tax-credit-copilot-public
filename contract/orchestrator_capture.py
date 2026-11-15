@@ -126,7 +126,11 @@ def build() -> dict[str, str]:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--check", action="store_true")
+    parser.add_argument("--allow-other-python", action="store_true", help="cross-check only")
     args = parser.parse_args()
+    from contract import oracle
+
+    oracle.require(args.allow_other_python)
     outputs = build()
     bad = []
     for name, text in outputs.items():
