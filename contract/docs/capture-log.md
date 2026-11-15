@@ -54,3 +54,9 @@ Running log of decisions, findings and gate results. Newest at the bottom of eac
 
 - The first `--check` runs found real sources of volatility; each was frozen at its source (see `normalisation.md`). The most instructive: a background recalculation thread whose id draws raced the next request only under CPU load.
 - `magnitude=999999999` on `/api/simulate/portfolio` hangs the recorder (F-1); the case is excluded and logged.
+
+### Revision 2: Python 3.12 oracle
+
+- Recordings re-made on CPython 3.12.13 (zlib 1.3.2); 8 records changed, all container size/hash fields (normalisation rule 2). Seeds regenerated: decompressed content identical, 13 .gz files differ in bytes only; manifests gained `content_sha256`.
+- **G3** `capture --check` identical twice in a row on 3.12.13, and once on 3.14.2 (cross-check). **G4** strict replay 1,769/1,769 against a real uvicorn (3.12.13), in-process 1,769/1,769, cross-check on 3.14.2 1,769/1,769. Mutation self-test 72/72 (20 recording mutations + 52 container mutations) on both interpreters.
+- Inventory `--check` passes on 3.12 and 3.14 from the one committed file.

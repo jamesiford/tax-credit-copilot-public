@@ -35,3 +35,7 @@ SQLite: `CREATE TABLE` from the column list in `manifest.json` (types are not re
 
 * The values are **not** the certified reference dataset (10,236 / 539 / 656); that is private data and absent. The synthetic parity figures are the committed 81 / 51 / 49.
 * Only the data the harness serves is exported; the sealed reference workspace (`/api/workspace/*`) has no hermetic seed (FINDINGS, `COVERAGE.md`).
+
+## Integrity
+
+`manifest.json` lists per table `rows`, `columns`, `content_sha256` (SHA-256 of the decompressed JSON Lines: the identity of the table, identical on every interpreter) and `sha256` (of the committed `.gz`; gzip bytes depend on the zlib build, so verify `content_sha256` after decompressing and use `sha256` only for the file as shipped).
