@@ -107,6 +107,9 @@ internal sealed class ScratchGuard(string sourceSchema, IEnumerable<string> sour
         public override void ExplicitVisit(OpenRowsetTableReference node) =>
             throw new GuardRefusal("External rowsets are forbidden.");
 
+        public override void ExplicitVisit(BulkOpenRowset node) =>
+            throw new GuardRefusal("External bulk rowsets are forbidden.");
+
         public override void ExplicitVisit(FunctionCall node)
         {
             if (node.CallTarget is not null)
@@ -146,8 +149,13 @@ internal sealed class ScratchGuard(string sourceSchema, IEnumerable<string> sour
         ];
         foreach (var sql in denied)
         {
-            try { guard.Check(sql); throw new InvalidOperationException("Guard self-test failed."); }
-            catch (GuardRefusal) { }
+            try { guard.Check(sql); }
+            catch (GuardRefusal)
+            {
+                Console.WriteLine($"REFUSED case {Array.IndexOf(denied, sql) + 1}: {sql}");
+                continue;
+            }
+            throw new InvalidOperationException($"Guard accepted forbidden self-test case {Array.IndexOf(denied, sql) + 1}: {sql}");
         }
         string[] allowed =
         [

@@ -25,18 +25,24 @@ try
     guard.Check("SELECT 1");
     await using var probe = new SqlCommand("SELECT 1", connection) { CommandTimeout = 90 };
     _ = await probe.ExecuteScalarAsync();
+    watch.Stop();
     Console.WriteLine($"Warehouse SELECT 1 succeeded in {watch.Elapsed.TotalSeconds:F3}s.");
     await Cleanup.Run(connection, guard);
-    if (command == "cleanup") return 0;
+    if (command == "cleanup")
+    {
+        File.Delete(Path.Combine(root, "HALT.md"));
+        return 0;
+    }
     Directory.CreateDirectory(root);
     var report = new { phase = "PS1", first_connection_and_probe_seconds = watch.Elapsed.TotalSeconds };
     await File.WriteAllTextAsync(Path.Combine(root, "platform-connectivity.json"), JsonSerializer.Serialize(report));
+    File.Delete(Path.Combine(root, "HALT.md"));
     return 0;
 }
 catch (Exception error) when (error is SqlException or Azure.Identity.AuthenticationFailedException
     or Azure.Identity.CredentialUnavailableException or GuardRefusal or InvalidOperationException)
 {
-    var safe = config?.Redact(error.Message) ?? error.GetType().Name;
+    var safe = config?.Redact(error.Message) ?? (command == "selftest" ? error.Message : error.GetType().Name);
     Console.Error.WriteLine($"{error.GetType().Name}: {safe}");
     if (error is SqlException sql) Console.Error.WriteLine($"SqlException.Number={sql.Number}");
     Directory.CreateDirectory(root);

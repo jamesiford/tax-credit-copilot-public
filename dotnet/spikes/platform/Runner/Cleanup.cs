@@ -26,14 +26,15 @@ internal static class Cleanup
         guard.Check(schemaSql);
         await using var schemas = new SqlCommand(schemaSql, connection) { CommandTimeout = 90 };
         schemas.Parameters.AddWithValue("@schema", ScratchGuard.Schema);
-        if (Convert.ToInt32(await schemas.ExecuteScalarAsync(), System.Globalization.CultureInfo.InvariantCulture) != 0)
+        var schemaCount = Convert.ToInt32(await schemas.ExecuteScalarAsync(), System.Globalization.CultureInfo.InvariantCulture);
+        if (schemaCount != 0)
             await Execute($"DROP SCHEMA [{ScratchGuard.Schema}]");
         await using var proof = new SqlCommand(list, connection) { CommandTimeout = 90 };
         proof.Parameters.AddWithValue("@schema", ScratchGuard.Schema);
         guard.Check(list);
         await using var remaining = await proof.ExecuteReaderAsync();
         if (await remaining.ReadAsync()) throw new InvalidOperationException("Cleanup proof failed.");
-        Console.WriteLine($"Cleanup proven: {tables.Count} scratch tables dropped; zero scratch objects remain.");
+        Console.WriteLine($"Cleanup proven: {tables.Count} scratch tables dropped; {schemaCount} scratch schemas dropped; zero scratch objects remain.");
 
         async Task Execute(string sql)
         {
