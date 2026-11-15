@@ -22,6 +22,35 @@ class ContractControl:
     def __init__(self, app: Any) -> None:
         self.app = app
 
+    async def _gated(self, scope: dict, receive: Any, send: Any) -> None:
+        """One product request at a time, with deferred background work finished before the next is accepted."""
+        from . import freeze
+
+        if self._idle is None:
+            self._idle = asyncio.Event()
+            self._idle.set()
+        await self._idle.wait()
+        pending: list[Any] = []
+
+        async def gated_send(message: dict) -> None:
+            if message["type"] == "http.response.body" and not message.get("more_body"):
+                pending.extend(freeze.take_deferred())
+                if pending:
+                    self._idle.clear()
+            await send(message)
+
+        await self.app(scope, receive, gated_send)
+        pending.extend(freeze.take_deferred())
+        if pending:
+            self._idle.clear()
+            try:
+                for thread in pending:
+                    await asyncio.to_thread(thread.run)
+            finally:
+                self._idle.set()
+
+    _idle: Any = None
+
     async def settle(self, timeout: float = 120.0) -> None:
         """Wait for the start-up work the app runs in the background (store check, source-schema check).
 
@@ -29,6 +58,8 @@ class ContractControl:
         once they have finished; an implementation under test should do the same before it accepts the replay.
         """
         state = self.app.state
+        if hasattr(state, "services"):  # the channel gateway: it has no store check of its own (its API settles before it starts)
+            return
         waited = 0.0
         while waited < timeout:
             stores = getattr(state, "stores", {"status": "running"}).get("status")
@@ -48,7 +79,7 @@ class ContractControl:
             await self.app(scope, receive, gated)
             return
         if scope["type"] != "http" or not scope["path"].startswith(PREFIX):
-            await self.app(scope, receive, send)
+            await self._gated(scope, receive, send)
             return
         body = b""
         while True:
@@ -69,6 +100,10 @@ class ContractControl:
 
             drained = await asyncio.to_thread(build_worker().drain)
             return 200, {"drained": drained}
+        if name == "mint":
+            from contract.harness import auth
+
+            return 200, {"token": auth.mint(json.loads(body or b"{}"))}
         if name == "env":
             spec = json.loads(body or b"{}")
             for key, value in (spec.get("set") or {}).items():

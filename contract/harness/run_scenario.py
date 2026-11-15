@@ -23,6 +23,10 @@ async def _in_process(scenario: dict) -> list[dict]:
     from contract.harness import world
 
     built = world.build(scenario["profile"])
+    if scenario.get("auth"):
+        from contract.harness import auth
+
+        auth.install(int((scenario["auth"] if isinstance(scenario["auth"], dict) else {}).get("rate_limit_per_minute", 3)))
     for name, value in (scenario.get("env") or {}).items():  # after the build: hermetic pins would otherwise win
         os.environ[name] = str(value)
     async with built.client() as http:

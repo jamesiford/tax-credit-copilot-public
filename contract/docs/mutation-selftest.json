@@ -1,0 +1,302 @@
+[
+ {
+  "mode": "strict",
+  "mutation": "status",
+  "case": "boot.unit",
+  "caught": true,
+  "reported": {
+   "scenario": "p1_query_edges",
+   "case": "boot.unit",
+   "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+   "category": "status",
+   "path": "status",
+   "expected": "201",
+   "actual": "200"
+  }
+ },
+ {
+  "mode": "strict",
+  "mutation": "lexeme",
+  "case": "boot.unit",
+  "caught": true,
+  "reported": {
+   "scenario": "p1_query_edges",
+   "case": "boot.unit",
+   "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+   "category": "number-lexeme",
+   "path": "run.tax_year",
+   "expected": "2025.0",
+   "actual": "2025"
+  }
+ },
+ {
+  "mode": "strict",
+  "mutation": "value",
+  "case": "boot.unit",
+  "caught": true,
+  "reported": {
+   "scenario": "p1_query_edges",
+   "case": "boot.unit",
+   "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+   "category": "value",
+   "path": "run.tax_year",
+   "expected": "987654321",
+   "actual": "2025"
+  }
+ },
+ {
+  "mode": "strict",
+  "mutation": "key_order",
+  "case": "boot.unit",
+  "caught": true,
+  "reported": {
+   "scenario": "p1_query_edges",
+   "case": "boot.unit",
+   "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+   "category": "key-order",
+   "path": "$",
+   "expected": "[\"near_total_unfiltered\",\"total_unfiltered\",\"total\",\"thresholds\",\"near_threshold\",\"employees\",\"months\",\"unit\",\"near_filters_applied\",\"filters_applied\",\"month_filter\",\"method\",\"year\",\"state\",\"client_id\",\"message\",\"in_flight\",\"newer_run_in_flight\",\"run\",\"calculation_state\"]",
+   "actual": "[\"calculation_state\",\"run\",\"newer_run_in_flight\",\"in_flight\",\"message\",\"client_id\",\"state\",\"year\",\"method\",\"month_filter\",\"filters_applied\",\"near_filters_applied\",\"unit\",\"months\",\"employees\",\"near_threshold\",\"thresholds\",\"total\",\"total_unfiltered\",\"near_total_unfiltered\"]"
+  }
+ },
+ {
+  "mode": "strict",
+  "mutation": "header",
+  "case": "boot.unit",
+  "caught": true,
+  "reported": {
+   "scenario": "p1_query_edges",
+   "case": "boot.unit",
+   "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+   "category": "header",
+   "path": "headers.content-type",
+   "expected": "text/plain",
+   "actual": "application/json"
+  }
+ },
+ {
+  "mode": "strict",
+  "mutation": "missing",
+  "case": "boot.unit",
+  "caught": true,
+  "reported": {
+   "scenario": "p1_query_edges",
+   "case": "boot.unit",
+   "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+   "category": "extra-field",
+   "path": "near_total_unfiltered",
+   "expected": "<absent>",
+   "actual": "2"
+  }
+ },
+ {
+  "mode": "strict",
+  "mutation": "extra",
+  "case": "boot.unit",
+  "caught": true,
+  "reported": {
+   "scenario": "p1_query_edges",
+   "case": "boot.unit",
+   "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+   "category": "missing-field",
+   "path": "zz_extra_field",
+   "expected": "true",
+   "actual": "<absent>"
+  }
+ },
+ {
+  "mode": "strict",
+  "mutation": "message",
+  "case": "eligibility.sort-employee-desc",
+  "caught": true,
+  "reported": {
+   "scenario": "p1_query_edges",
+   "case": "eligibility.sort-employee-desc",
+   "route": "GET /api/eligibility/2025",
+   "category": "value",
+   "path": "detail",
+   "expected": "sort must be one of ('employee_id', 'status', 'near_floor', 'total_hours', 'total_wages', 'mm_weeks', 'mm_hours', 'pp_weeks', 'pp_hours'), got 'employee' (changed)",
+   "actual": "sort must be one of ('employee_id', 'status', 'near_floor', 'total_hours', 'total_wages', 'mm_weeks', 'mm_hours', 'pp_weeks', 'pp_hours'), got 'employee'"
+  }
+ },
+ {
+  "mode": "strict",
+  "mutation": "array_length",
+  "case": "boot.unit",
+  "caught": true,
+  "reported": {
+   "scenario": "p1_query_edges",
+   "case": "boot.unit",
+   "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+   "category": "array-length",
+   "path": "employees",
+   "expected": "1",
+   "actual": "2"
+  }
+ },
+ {
+  "mode": "strict",
+  "mutation": "null_for_value",
+  "case": "boot.unit",
+  "caught": true,
+  "reported": {
+   "scenario": "p1_query_edges",
+   "case": "boot.unit",
+   "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+   "category": "type",
+   "path": "calculation_state",
+   "expected": "null",
+   "actual": "calculated"
+  }
+ },
+ {
+  "mode": "semantic",
+  "mutation": "status",
+  "case": "boot.unit",
+  "caught": true,
+  "reported": {
+   "scenario": "p1_query_edges",
+   "case": "boot.unit",
+   "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+   "category": "status",
+   "path": "status",
+   "expected": "201",
+   "actual": "200"
+  }
+ },
+ {
+  "mode": "semantic",
+  "mutation": "lexeme",
+  "case": "boot.unit",
+  "caught": true,
+  "reported": {
+   "scenario": "p1_query_edges",
+   "case": "boot.unit",
+   "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+   "category": "number-lexeme",
+   "path": "run.tax_year",
+   "expected": "2025.0",
+   "actual": "2025"
+  }
+ },
+ {
+  "mode": "semantic",
+  "mutation": "value",
+  "case": "boot.unit",
+  "caught": true,
+  "reported": {
+   "scenario": "p1_query_edges",
+   "case": "boot.unit",
+   "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+   "category": "value",
+   "path": "run.tax_year",
+   "expected": "987654321",
+   "actual": "2025"
+  }
+ },
+ {
+  "mode": "semantic",
+  "mutation": "key_order",
+  "case": "boot.unit",
+  "caught": true,
+  "reported": {
+   "scenario": "p1_query_edges",
+   "case": "boot.unit",
+   "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+   "category": "key-order",
+   "path": "$",
+   "expected": "[\"near_total_unfiltered\",\"total_unfiltered\",\"total\",\"thresholds\",\"near_threshold\",\"employees\",\"months\",\"unit\",\"near_filters_applied\",\"filters_applied\",\"month_filter\",\"method\",\"year\",\"state\",\"client_id\",\"message\",\"in_flight\",\"newer_run_in_flight\",\"run\",\"calculation_state\"]",
+   "actual": "[\"calculation_state\",\"run\",\"newer_run_in_flight\",\"in_flight\",\"message\",\"client_id\",\"state\",\"year\",\"method\",\"month_filter\",\"filters_applied\",\"near_filters_applied\",\"unit\",\"months\",\"employees\",\"near_threshold\",\"thresholds\",\"total\",\"total_unfiltered\",\"near_total_unfiltered\"]"
+  }
+ },
+ {
+  "mode": "semantic",
+  "mutation": "header",
+  "case": "boot.unit",
+  "caught": true,
+  "reported": {
+   "scenario": "p1_query_edges",
+   "case": "boot.unit",
+   "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+   "category": "header",
+   "path": "headers.content-type",
+   "expected": "text/plain",
+   "actual": "application/json"
+  }
+ },
+ {
+  "mode": "semantic",
+  "mutation": "missing",
+  "case": "boot.unit",
+  "caught": true,
+  "reported": {
+   "scenario": "p1_query_edges",
+   "case": "boot.unit",
+   "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+   "category": "extra-field",
+   "path": "near_total_unfiltered",
+   "expected": "<absent>",
+   "actual": "2"
+  }
+ },
+ {
+  "mode": "semantic",
+  "mutation": "extra",
+  "case": "boot.unit",
+  "caught": true,
+  "reported": {
+   "scenario": "p1_query_edges",
+   "case": "boot.unit",
+   "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+   "category": "missing-field",
+   "path": "zz_extra_field",
+   "expected": "true",
+   "actual": "<absent>"
+  }
+ },
+ {
+  "mode": "semantic",
+  "mutation": "message",
+  "case": "eligibility.sort-employee-desc",
+  "caught": true,
+  "reported": {
+   "scenario": "p1_query_edges",
+   "case": "eligibility.sort-employee-desc",
+   "route": "GET /api/eligibility/2025",
+   "category": "value",
+   "path": "detail",
+   "expected": "sort must be one of ('employee_id', 'status', 'near_floor', 'total_hours', 'total_wages', 'mm_weeks', 'mm_hours', 'pp_weeks', 'pp_hours'), got 'employee' (changed)",
+   "actual": "sort must be one of ('employee_id', 'status', 'near_floor', 'total_hours', 'total_wages', 'mm_weeks', 'mm_hours', 'pp_weeks', 'pp_hours'), got 'employee'"
+  }
+ },
+ {
+  "mode": "semantic",
+  "mutation": "array_length",
+  "case": "boot.unit",
+  "caught": true,
+  "reported": {
+   "scenario": "p1_query_edges",
+   "case": "boot.unit",
+   "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+   "category": "array-length",
+   "path": "employees",
+   "expected": "1",
+   "actual": "2"
+  }
+ },
+ {
+  "mode": "semantic",
+  "mutation": "null_for_value",
+  "case": "boot.unit",
+  "caught": true,
+  "reported": {
+   "scenario": "p1_query_edges",
+   "case": "boot.unit",
+   "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+   "category": "type",
+   "path": "calculation_state",
+   "expected": "null",
+   "actual": "calculated"
+  }
+ }
+]

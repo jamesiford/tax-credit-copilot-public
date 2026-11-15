@@ -327,4 +327,124 @@ def build_all(b: Any) -> None:
             rb += [s for s in b.variants(r, include_writes=True) if "body-" in s["id"] or "wrong-method" in s["id"]]
     made.append(write("p2_run_batches", "P2", rb, variables={"batch_id": "00000000-0000-0000-0000-00000000beef"}))
 
+    made.append(_auth(b))
+    from contract.scenarios import flows_channel
+
+    made += flows_channel.build_all(b)
+
     print(f"wrote {len(made)} scenarios, {sum(len(m['steps']) for m in made)} steps")
+
+
+def _auth(b: Any) -> dict[str, Any]:
+    """Stage C4: sign-in and policy. Tokens are minted at run time (`tokens` below); the recordings hold placeholders."""
+    from application.acting_user import encode
+
+    S, write = b.S, b.write
+    tenant = "00000000-0000-0000-0000-0000000000aa"
+    reader, writer = "00000000-0000-0000-0000-0000000000a1", "00000000-0000-0000-0000-0000000000a2"
+
+    def acting(oid: str, **kw: Any) -> str:
+        return encode({"oid": oid, "tid": tenant, "name": "Acting Person", "upn": "acting@example.test", "channel": "teams", **kw})
+
+    tokens = {
+        "reader": {"kind": "user", "oid": reader}, "writer": {"kind": "user", "oid": writer},
+        "restricted": {"kind": "user", "oid": "00000000-0000-0000-0000-0000000000a3"},
+        "expired": {"exp_in": -7200}, "not_yet_valid": {"nbf_in": 7200}, "wrong_audience": {"aud": "api://some-other-api"},
+        "wrong_tenant": {"iss": "https://login.microsoftonline.com/00000000-0000-0000-0000-0000000000ff/v2.0"},
+        "wrong_issuer_v1": {"iss": f"https://sts.windows.net/{tenant}/"}, "forged": {"key": "other"},
+        "no_scope": {"scp": "openid profile"}, "no_role": {"roles": []}, "wrong_role": {"roles": ["Reader"]},
+        "user_with_agent_role": {"roles": ["TCC.User", "TCC.Agent"]}, "missing_exp": {"drop": ["exp"]}, "missing_iat": {"drop": ["iat"]},
+        "bare_audience": {"aud": "11111111-2222-3333-4444-555555555555"},
+        "agent": {"kind": "agent"}, "agent_with_scope": {"kind": "agent", "claims": {"scp": "user_impersonation"}},
+        "agent_wrong_role": {"kind": "agent", "roles": ["TCC.User"]}, "agent_no_role": {"kind": "agent", "roles": []},
+        "agent_named": {"kind": "agent", "claims": {"preferred_username": "x@example.test"}},
+    }
+    bearer = lambda name: {"authorization": f"Bearer {{{{token.{name}}}}}"}  # noqa: E731
+    steps: list[dict[str, Any]] = []
+    # --- no or malformed proof
+    steps += [S("public.health-no-token", "GET", "/api/health"), S("public.ready-no-token", "GET", "/api/ready"), S("none.me", "GET", "/api/me"),
+              S("none.portfolio", "GET", "/api/v2/portfolio"), S("none.post-claims", "POST", "/api/claims", json=b.GOOD_BODY["POST /api/claims"]),
+              S("none.unknown-path", "GET", "/api/nope"), S("none.docs", "GET", "/docs"), S("none.openapi", "GET", "/openapi.json"),
+              S("none.trailing-slash", "GET", "/api/me/"), S("none.options", "OPTIONS", "/api/me")]
+    for sid, header in [("garbage", "Bearer garbage"), ("basic", "Basic dXNlcjpwYXNz"), ("empty-bearer", "Bearer"), ("bearer-space", "Bearer "), ("no-scheme", "abc"),
+                        ("lower-scheme", "bearer garbage"), ("two-parts", "Bearer a b"), ("jwt-shaped", "Bearer a.b.c")]:
+        steps.append(S(f"malformed.{sid}", "GET", "/api/me", headers={"authorization": header}))
+    # --- each way a token can be wrong
+    for name in ("expired", "not_yet_valid", "wrong_audience", "wrong_tenant", "wrong_issuer_v1", "forged", "missing_exp", "missing_iat"):
+        steps.append(S(f"token.{name}", "GET", "/api/me", headers=bearer(name)))
+    for name in ("no_scope", "no_role", "wrong_role", "user_with_agent_role", "agent_with_scope", "agent_wrong_role", "agent_no_role", "agent_named"):
+        steps.append(S(f"token.{name}", "GET", "/api/me", headers=bearer(name)))
+    steps += [S("token.bare-audience-ok", "GET", "/api/me", headers=bearer("bare_audience")), S("token.reader-me", "GET", "/api/me", headers=bearer("reader")),
+              S("token.writer-me", "GET", "/api/me", headers=bearer("writer")), S("token.expired-on-public-health", "GET", "/api/health", headers=bearer("expired"))]
+    # --- reader versus writer
+    body = b.GOOD_BODY
+    writes = [("claims-create", "POST", "/api/claims", body["POST /api/claims"]), ("engagement", "PUT", "/api/claims/engagement", body["PUT /api/claims/engagement"]),
+              ("assess", "POST", "/api/claims/assess", body["POST /api/claims/assess"]),
+              ("transition", "POST", "/api/claims/cell/1001/GA_JTC/2025/transition", body["POST /api/claims/cell/{client_id}/{program_code}/{tax_year}/transition"]),
+              ("run", "POST", "/api/v2/clients/1001/runs", body["POST /api/v2/clients/{client_id}/runs"]),
+              ("base-year", "POST", "/api/v2/clients/1001/units/GA_ATL_HQ/base-year", body["POST /api/v2/clients/{client_id}/units/{unit_id}/base-year"]),
+              ("draft-create", "POST", "/api/v2/program-drafts", body["POST /api/v2/program-drafts"]),
+              ("finding-resolve", "POST", "/api/findings/policy:test_of_twos:ALL:2025/resolve", body["POST /api/findings/{finding_id}/resolve"]),
+              ("rules-verify", "POST", "/api/rules/GA_JTC/verify", body["POST /api/rules/{code}/verify"]),
+              ("batch-dry-run", "POST", "/api/v2/run-batches", body["POST /api/v2/run-batches"])]
+    for who in ("reader", "writer"):
+        for sid, method, path, payload in writes:
+            steps.append(S(f"{who}.{sid}", method, path, json=payload, headers=bearer(who)))
+    steps += [S("reader.read-portfolio", "GET", "/api/v2/portfolio", headers=bearer("reader")), S("reader.read-units", "GET", "/api/v2/clients/1001/units", query=[["year", 2025]], headers=bearer("reader"))]
+    # --- the per-caller limit: 3 a minute, per kind, per caller; Retry-After from a frozen clock
+    for i in range(1, 6):
+        steps.append(S(f"ratelimit.writer-batch-{i}", "POST", "/api/v2/run-batches", json=body["POST /api/v2/run-batches"], headers=bearer("writer")))
+    steps.append(S("ratelimit.reader-batch-1-own-bucket", "POST", "/api/v2/run-batches", json=body["POST /api/v2/run-batches"], headers=bearer("reader")))
+    steps.append(S("ratelimit.writer-other-kind", "POST", "/api/v2/program-drafts/00000000-0000-0000-0000-000000000000/preview", json={"dataset": "synthetic_sample"}, headers=bearer("writer")))
+    steps.append(S("ratelimit.writer-reads-unaffected", "GET", "/api/v2/portfolio", headers=bearer("writer")))
+    # --- the client authorizer: another client's data is 403, an unknown batch is 404 and never 403
+    r = bearer("restricted")
+    steps += [S("client-authz.coverage", "GET", "/api/claims/coverage/1001", headers=r), S("client-authz.units", "GET", "/api/v2/clients/1001/units", headers=r),
+              S("client-authz.query-account", "GET", "/api/eligibility/2025", query=[["state", "GA"], ["account_id", 1001]], headers=r),
+              S("client-authz.body-client", "POST", "/api/claims/assess", json={"client_id": 1001, "assessed_by": "x"}, headers=r),
+              S("client-authz.batch-names-client", "POST", "/api/v2/run-batches", json={"kind": "assess", "scope": {"kind": "list", "client_ids": [1001]}, "dry_run": True}, headers=r),
+              S("client-authz.batch-scope-all", "POST", "/api/v2/run-batches", json={"kind": "assess", "scope": {"kind": "all"}, "dry_run": True}, headers=r),
+              S("client-authz.unknown-batch-is-404", "GET", "/api/v2/run-batches/00000000-0000-0000-0000-000000000000", headers=r),
+              S("client-authz.unknown-batch-items-is-404", "GET", "/api/v2/run-batches/00000000-0000-0000-0000-000000000000/items", headers=r),
+              S("client-authz.artifact-self-authorizing", "GET", "/api/clients/1001/artifacts/00000000-0000-0000-0000-000000000000", headers=r),
+              S("client-authz.portfolio-names-no-client", "GET", "/api/v2/portfolio", headers=r), S("client-authz.scope", "GET", "/api/scope", headers=r)]
+    # --- agent tokens and the acting-user header
+    ag = bearer("agent")
+    steps += [S("agent.no-acting-header", "GET", "/api/me", headers=ag), S("agent.me-acting", "GET", "/api/me", headers={**ag, "x-tcc-acting-user": acting(writer)}),
+              S("agent.acting-reader", "GET", "/api/me", headers={**ag, "x-tcc-acting-user": acting(reader, assurance="delegated")}),
+              S("agent.header-empty", "GET", "/api/me", headers={**ag, "x-tcc-acting-user": " "}),
+              S("agent.header-not-base64", "GET", "/api/me", headers={**ag, "x-tcc-acting-user": "not base64!"}),
+              S("agent.header-not-json", "GET", "/api/me", headers={**ag, "x-tcc-acting-user": "YWJj"}),
+              S("agent.header-wrong-tenant", "GET", "/api/me", headers={**ag, "x-tcc-acting-user": encode({"oid": writer, "tid": "00000000-0000-0000-0000-0000000000ff"})}),
+              S("agent.header-bad-oid", "GET", "/api/me", headers={**ag, "x-tcc-acting-user": encode({"oid": "nope", "tid": tenant})}),
+              S("agent.header-bad-channel", "GET", "/api/me", headers={**ag, "x-tcc-acting-user": acting(writer, channel="fax")}),
+              S("agent.header-bad-assurance", "GET", "/api/me", headers={**ag, "x-tcc-acting-user": acting(writer, assurance="trust-me")}),
+              S("agent.header-too-large", "GET", "/api/me", headers={**ag, "x-tcc-acting-user": "A" * 3000}),
+              S("agent.header-long-name", "GET", "/api/me", headers={**ag, "x-tcc-acting-user": acting(writer, name="n" * 300)}),
+              S("user.acting-header-ignored", "GET", "/api/me", headers={**bearer("reader"), "x-tcc-acting-user": acting(writer)}),
+              S("agent.forbidden-assess", "POST", "/api/claims/assess", json=body["POST /api/claims/assess"], headers={**ag, "x-tcc-acting-user": acting(writer)}),
+              S("agent.forbidden-run", "POST", "/api/v2/clients/1001/runs", json=body["POST /api/v2/clients/{client_id}/runs"], headers={**ag, "x-tcc-acting-user": acting(writer)}),
+              S("agent.forbidden-batch", "POST", "/api/v2/run-batches", json=body["POST /api/v2/run-batches"], headers={**ag, "x-tcc-acting-user": acting(writer)}),
+              S("agent.forbidden-draft-create", "POST", "/api/v2/program-drafts", json=body["POST /api/v2/program-drafts"], headers={**ag, "x-tcc-acting-user": acting(writer)}),
+              S("agent.forbidden-draft-put", "PUT", "/api/v2/program-drafts/x/documents", json={"expected_version": 1, "pack": None}, headers={**ag, "x-tcc-acting-user": acting(writer)}),
+              S("agent.forbidden-rules-verify", "POST", "/api/rules/GA_JTC/verify", json=body["POST /api/rules/{code}/verify"], headers={**ag, "x-tcc-acting-user": acting(writer)}),
+              S("agent.forbidden-workspace-refresh", "POST", "/api/workspace/refresh", headers={**ag, "x-tcc-acting-user": acting(writer)}),
+              S("agent.forbidden-checked-before-header", "POST", "/api/claims/assess", json=body["POST /api/claims/assess"], headers=ag),
+              S("agent.read-allowed", "GET", "/api/v2/portfolio", headers={**ag, "x-tcc-acting-user": acting(reader)}),
+              S("agent.read-draft-list", "GET", "/api/v2/program-drafts", headers={**ag, "x-tcc-acting-user": acting(reader)}),
+              S("agent.write-claims-as-writer", "POST", "/api/claims", json=body["POST /api/claims"], headers={**ag, "x-tcc-acting-user": acting(writer)}),
+              S("agent.write-transition-as-writer", "POST", "/api/claims/cell/1001/GA_JTC/2025/transition", json={**body["POST /api/claims/cell/{client_id}/{program_code}/{tax_year}/transition"], "decided_by": "acting@example.test"}, headers={**ag, "x-tcc-acting-user": acting(writer)}),
+              S("agent.write-transition-as-reader", "POST", "/api/claims/cell/1001/GA_JTC/2025/transition", json={**body["POST /api/claims/cell/{client_id}/{program_code}/{tax_year}/transition"], "decided_by": "acting@example.test"}, headers={**ag, "x-tcc-acting-user": acting(reader)}),
+              S("agent.capabilities-list", "GET", "/api/capabilities", headers={**ag, "x-tcc-acting-user": acting(reader)}),
+              S("agent.capabilities-book-rank", "POST", "/api/capabilities/book_rank", json={"args": {}}, headers={**ag, "x-tcc-acting-user": acting(reader)}),
+              S("agent.audit-channel", "GET", "/api/audit/channel", query=[["user_oid", reader]], headers={**ag, "x-tcc-acting-user": acting(reader)})]
+    # --- CORS with and without proof
+    steps += [S("cors.preflight-no-token", "OPTIONS", "/api/claims", headers={"origin": "https://example.test", "access-control-request-method": "POST", "access-control-request-headers": "authorization,content-type,x-tcc-acting-user"}),
+              S("cors.simple-with-token", "GET", "/api/me", headers={**bearer("reader"), "origin": "https://example.test"}),
+              S("cors.simple-401", "GET", "/api/me", headers={"origin": "https://example.test"}),
+              S("cors.simple-403", "GET", "/api/me", headers={**bearer("no_role"), "origin": "https://example.test"}),
+              S("cors.preflight-put", "OPTIONS", "/api/claims/engagement", headers={"origin": "https://example.test", "access-control-request-method": "PUT"}),
+              S("cors.preflight-patch-disallowed", "OPTIONS", "/api/claims", headers={"origin": "https://example.test", "access-control-request-method": "PATCH"}),
+              S("cors.preflight-delete-disallowed", "OPTIONS", "/api/claims", headers={"origin": "https://example.test", "access-control-request-method": "DELETE"})]
+    return write("p1_auth", "P1", steps, auth={"rate_limit_per_minute": 3}, tokens=tokens, variables=VARS_P1)
+

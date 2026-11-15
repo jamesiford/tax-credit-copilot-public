@@ -9,6 +9,7 @@ A rule is `(scenario glob, exchange id glob, JSON path, placeholder)`; a record 
 from __future__ import annotations
 
 import fnmatch
+import re
 from typing import Any
 
 from .jsontext import Num
@@ -47,6 +48,10 @@ def apply(record: dict[str, Any]) -> dict[str, Any]:
     response = record.get("response")
     if not response:
         return record
+    location = response["headers"].get("location")
+    if location and re.match(r"^https?://[^/]+", location):
+        response["headers"]["location"] = re.sub(r"^https?://[^/]+", "{origin}", location)
+        record.setdefault("normalised", []).append("headers.location origin={origin}")
     body = response.get("body") or {}
     for scenario, step, path, placeholder in RULES:
         if not (fnmatch.fnmatch(record["scenario"], scenario) and fnmatch.fnmatch(record["id"], step)):

@@ -22,7 +22,7 @@ from typing import Any, AsyncIterator
 
 from . import hermetic
 
-PROFILES = ("P1", "P2")
+PROFILES = ("P1", "P2", "G1")
 
 
 @dataclass

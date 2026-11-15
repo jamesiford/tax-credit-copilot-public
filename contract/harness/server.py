@@ -19,11 +19,16 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--profile", required=True)
     parser.add_argument("--port", type=int, required=True)
+    parser.add_argument("--auth-rate-limit", type=int, default=0, help="serve with Entra sign-in and this per-minute limit (stage C4)")
     args = parser.parse_args()
     hermetic.apply()
     from contract.harness import world
 
     built = world.build(args.profile)
+    if args.auth_rate_limit:
+        from contract.harness import auth
+
+        auth.install(args.auth_rate_limit)
     from contract.harness.control import ContractControl
 
     import uvicorn

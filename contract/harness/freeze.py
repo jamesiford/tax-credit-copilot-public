@@ -24,6 +24,7 @@ _REAL_DATE, _REAL_DATETIME = _dt.date, _dt.datetime
 _uuid_counter = itertools.count(1)
 _bytes_counter = itertools.count(1)
 _installed = False
+_TRACE = __import__("os").environ.get("CONTRACT_UUID_TRACE")
 
 
 class FrozenDate(_dt.date):
@@ -59,7 +60,15 @@ def reset_counters() -> None:
 
 
 def _uuid4() -> uuid.UUID:
-    return uuid.UUID(int=(0x4000_0000_0000_4000_8000_0000_0000_0000 | next(_uuid_counter)))
+    n = next(_uuid_counter)
+    if _TRACE:
+        import threading
+        import traceback
+
+        frames = traceback.extract_stack(limit=6)[:-1]
+        with open(_TRACE, "a", encoding="utf-8") as fh:
+            fh.write(f"{n} {threading.current_thread().name} " + " < ".join(f"{f.filename.split('backend')[-1]}:{f.lineno}" for f in reversed(frames)) + "\n")
+    return uuid.UUID(int=(0x4000_0000_0000_4000_8000_0000_0000_0000 | n))
 
 
 def _uuid1(*_args, **_kwargs) -> uuid.UUID:
@@ -116,7 +125,37 @@ def install() -> None:
     reset_counters()
     _freeze_git()
     _freeze_zip()
+    _freeze_threads()
     _installed = True
+
+
+def _freeze_threads() -> None:
+    """Background recalculation after a base-year save runs on a daemon thread the response does not wait for.
+
+    Its id and clock draws interleave with the next request's, and what the next read says (`newer_run_in_flight`) depends on how fast
+    it ran. The harness runs it deterministically: deferred until the response has been sent, finished before the next request is
+    accepted (`ContractControl`). The product's own semantics (a response that does not wait for the recalculation) are unchanged.
+    """
+    import threading
+
+    real_start = threading.Thread.start
+
+    def start(self):
+        if self.name.startswith("rebase-recalc-"):
+            _deferred.append(self)
+            return None
+        return real_start(self)
+
+    threading.Thread.start = start  # type: ignore[method-assign]
+
+
+_deferred: list[Any] = []
+
+
+def take_deferred() -> list[Any]:
+    taken = list(_deferred)
+    _deferred.clear()
+    return taken
 
 
 def _freeze_zip() -> None:

@@ -81,4 +81,8 @@ def _p2(work: Path) -> World:
 
 
 def build(profile: str, work: Path) -> World:
+    if profile == "G1":
+        from . import gateway
+
+        return gateway.build(work)
     return {"P1": _p1, "P2": _p2}[profile](work)

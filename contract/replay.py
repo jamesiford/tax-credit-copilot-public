@@ -38,10 +38,10 @@ def free_port() -> int:
         return s.getsockname()[1]
 
 
-def spawn_server(profile: str) -> tuple[subprocess.Popen, str]:
+def spawn_server(profile: str, auth_rate_limit: int = 0) -> tuple[subprocess.Popen, str]:
     port = free_port()
     env = {**os.environ, "PYTHONUTF8": "1", "PYTHONPATH": str(ROOT), "PYTHONDONTWRITEBYTECODE": "1"}
-    proc = subprocess.Popen([PYTHON, "-m", "contract.harness.server", "--profile", profile, "--port", str(port)], cwd=ROOT / "backend", env=env,
+    proc = subprocess.Popen([PYTHON, "-m", "contract.harness.server", "--profile", profile, "--port", str(port)] + (["--auth-rate-limit", str(auth_rate_limit)] if auth_rate_limit else []), cwd=ROOT / "backend", env=env,
                             stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True)
     deadline = time.time() + 600
     while time.time() < deadline:
@@ -54,6 +54,11 @@ def spawn_server(profile: str) -> tuple[subprocess.Popen, str]:
     raise RuntimeError("the Python server did not become ready")
 
 
+def auth_limit(name: str) -> int:
+    auth = json.loads((SCENARIOS / f"{name}.json").read_text(encoding="utf-8")).get("auth")
+    return 0 if not auth else int((auth if isinstance(auth, dict) else {}).get("rate_limit_per_minute", 3))
+
+
 async def run_against(base_url: str, scenario: dict) -> list[dict]:
     import httpx
 
@@ -63,7 +68,7 @@ async def run_against(base_url: str, scenario: dict) -> list[dict]:
 
 def replay_one(name: str, base_url: str, mode: str) -> dict:
     scenario = json.loads((SCENARIOS / f"{name}.json").read_text(encoding="utf-8"))
-    actual = normalise.apply_all(asyncio.run(run_against(base_url, scenario)))
+    actual = exchange.roundtrip(normalise.apply_all(asyncio.run(run_against(base_url, scenario))))
     expected = exchange.load_records((recordings_dir() / f"{name}.jsonl").read_text(encoding="utf-8"))
     failures, tolerated = [], []
     if len(expected) != len(actual):
@@ -117,7 +122,7 @@ def main() -> int:
         proc = None
         try:
             if args.spawn_python:
-                proc, url = spawn_server(profile)
+                proc, url = spawn_server(profile, auth_limit(name))
                 results.append(replay_one(name, url, args.mode))
             elif args.in_process:
                 results.append(run_in_process(name, args.mode))

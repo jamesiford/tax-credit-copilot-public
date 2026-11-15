@@ -84,6 +84,8 @@ def build_request(step_request: dict[str, Any], variables: dict[str, Any]) -> di
     path = substitute(step_request["path"], variables)
     query = _query(step_request, variables)
     headers = {k: str(v) for k, v in substitute(step_request.get("headers") or {}, variables).items()}
+    # A minted token is a run-time throwaway: the recording keeps the template (`Bearer {{token.reader}}`), never the token.
+    shown = {k: (str(step_request["headers"][k]) if "{{token." in str(step_request["headers"][k]) else v) for k, v in headers.items()} if step_request.get("headers") else {}
     content: bytes | None = None
     body_record: dict[str, Any] = {"kind": "none"}
     if "json" in step_request:
@@ -105,7 +107,7 @@ def build_request(step_request: dict[str, Any], variables: dict[str, Any]) -> di
         headers.setdefault("content-type", "application/x-www-form-urlencoded")
     return {
         "wire": {"method": method, "url": path + (f"?{query}" if query else ""), "headers": headers, "content": content},
-        "record": {"method": method, "path": path, "query": query, "headers": dict(sorted((k.lower(), v) for k, v in headers.items())), "body": body_record},
+        "record": {"method": method, "path": path, "query": query, "headers": dict(sorted((k.lower(), shown.get(k, v)) for k, v in headers.items())), "body": body_record},
     }
 
 
@@ -193,10 +195,16 @@ async def run_control(http: Any, step: dict[str, Any]) -> dict[str, Any]:
 
 async def run_scenario(http: Any, scenario: dict[str, Any]) -> list[dict[str, Any]]:
     variables: dict[str, Any] = dict(scenario.get("variables") or {})
+    for name, spec in (scenario.get("tokens") or {}).items():
+        minted = await http.post("/__contract__/mint", content=json.dumps(spec).encode(), headers={"content-type": "application/json"})
+        variables[f"token.{name}"] = minted.json()["token"]
     out: list[dict[str, Any]] = []
     for index, step in enumerate(scenario["steps"]):
         started = time.time()
-        record = await (run_control(http, step) if "control" in step else run_step(http, step, variables))
+        try:
+            record = await (run_control(http, step) if "control" in step else run_step(http, step, variables))
+        except Exception as exc:  # noqa: BLE001 - name the step that failed
+            raise ScenarioError(f"step {index} ({step['id']}): {type(exc).__name__}: {exc}") from exc
         record["scenario"], record["step"], record["profile"] = scenario["name"], index, scenario["profile"]
         out.append(record)
         if os.environ.get("CONTRACT_PROGRESS") or time.time() - started > 20:
@@ -211,3 +219,8 @@ def dump_record(record: dict[str, Any]) -> str:
 
 def load_records(text: str) -> list[dict[str, Any]]:
     return [jsontext.loads(line) for line in text.splitlines() if line.strip()]
+
+
+def roundtrip(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """What a record looks like after it has been written to a recording and read back (numbers as `Num`)."""
+    return load_records("".join(dump_record(r) + "\n" for r in records))
