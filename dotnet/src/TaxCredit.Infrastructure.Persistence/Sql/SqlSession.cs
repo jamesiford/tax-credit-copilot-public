@@ -51,6 +51,20 @@ public sealed class SqlSession : IDisposable
     public IReadOnlyList<IReadOnlyDictionary<string, object?>> Query(long clientId, string sql, params object?[] values) =>
         Read(new TenantBinding(clientId, _sourceColumns).Bind(sql, values));
 
+    /// <summary>Bounds governed reads without returning an incomplete collection as success.</summary>
+    public IReadOnlyList<IReadOnlyDictionary<string, object?>> QueryBounded(
+        long clientId, string sql, int maximumRows, int timeoutSeconds, CancellationToken cancellationToken, params object?[] values)
+    {
+        ArgumentOutOfRangeException.ThrowIfLessThan(maximumRows, 1);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(maximumRows, 10001);
+        ArgumentOutOfRangeException.ThrowIfLessThan(timeoutSeconds, 1);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(timeoutSeconds, 600);
+        cancellationToken.ThrowIfCancellationRequested();
+        using var command = Command(new TenantBinding(clientId, _sourceColumns).Bind(sql, values));
+        command.CommandTimeout = timeoutSeconds;
+        return BoundedRead.Read(_connection, command, maximumRows, timeoutSeconds, _log, cancellationToken);
+    }
+
     /// <summary>Executes a tenant-bound mutation.</summary>
     public int Execute(long clientId, string sql, params object?[] values) =>
         Run(new TenantBinding(clientId, _sourceColumns).Bind(sql, values));
