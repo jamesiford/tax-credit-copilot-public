@@ -1,6 +1,7 @@
 using Azure.Core;
 using Azure.Identity;
 using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using Microsoft.Extensions.DependencyInjection;
 using TaxCredit.Application.Ports.Ai.Artifacts;
 
@@ -29,8 +30,11 @@ public static class ArtifactByteRegistration
         {
             throw new ArgumentException("Blob storage requires an HTTPS account URL without credentials.", nameof(accountUrl));
         }
+        options ??= new BlobClientOptions();
+        string audience = (options.Audience ?? BlobAudience.DefaultAudience).ToString().TrimEnd('/');
         services.AddSingleton<IArtifactByteStore>(new BlobArtifactByteStore(
-            new BlobServiceClient(accountUrl, credential ?? new DefaultAzureCredential(), options)));
+            new BlobServiceClient(accountUrl,
+                new BlobTokenCredential(credential ?? new DefaultAzureCredential(), audience), options)));
         return services;
     }
 }

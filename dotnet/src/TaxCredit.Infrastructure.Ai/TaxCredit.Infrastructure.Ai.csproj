@@ -10,4 +10,7 @@
   <ItemGroup>
     <ProjectReference Include="..\TaxCredit.Application\TaxCredit.Application.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Safety\unicode-fold.json.gz" LogicalName="TaxCredit.Ai.UnicodeFold" />
+  </ItemGroup>
 </Project>

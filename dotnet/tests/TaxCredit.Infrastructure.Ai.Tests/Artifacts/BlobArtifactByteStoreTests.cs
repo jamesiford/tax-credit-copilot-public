@@ -3,6 +3,7 @@ using Azure.Core;
 using Azure.Core.Pipeline;
 using Azure.Identity;
 using Azure.Storage.Blobs;
+using Microsoft.Extensions.DependencyInjection;
 using TaxCredit.Application.Ports.Ai.Artifacts;
 using TaxCredit.Infrastructure.Ai.Artifacts;
 
@@ -91,20 +92,42 @@ public sealed class BlobArtifactByteStoreTests
             Create(http, new FakeCredential()).GetAsync("outputs", "run/file.bin", cancellation.Token).AsTask());
     }
 
+    [Fact]
+    public async Task A_storage_challenge_cannot_acquire_a_token_for_another_resource()
+    {
+        using var handler = new BlobHandler
+        {
+            ForcedStatus = 401,
+            ForcedCode = "NoAuthenticationInformation",
+            Challenge = "Bearer authorization_uri=\"https://login.microsoftonline.com/common/oauth2/authorize\", resource_id=\"https://unexpected.invalid/\""
+        };
+        using var http = new HttpClient(handler);
+        var credential = new FakeCredential();
+        var error = await Assert.ThrowsAsync<ArtifactByteException>(() =>
+            Create(http, credential).GetAsync("outputs", "run/file.bin").AsTask());
+        Assert.Equal("artifact_store_unavailable", error.Code);
+        Assert.Equal(1, credential.Calls);
+        Assert.Equal(new[] { "https://storage.azure.com/.default" }, credential.Scopes);
+    }
+
     private static BlobArtifactByteStore Create(HttpClient http, TokenCredential credential)
     {
         var options = new BlobClientOptions { Transport = new HttpClientTransport(http) };
         options.Retry.MaxRetries = 0;
-        return new BlobArtifactByteStore(new BlobServiceClient(new Uri("https://storage.invalid"), credential, options));
+        var services = new ServiceCollection();
+        services.AddBlobArtifactBytes(new Uri("https://storage.invalid"), credential, options);
+        return Assert.IsType<BlobArtifactByteStore>(Assert.Single(services).ImplementationInstance);
     }
 
     private sealed class FakeCredential : TokenCredential
     {
         internal string[] Scopes { get; private set; } = [];
+        internal int Calls { get; private set; }
 
         public override AccessToken GetToken(TokenRequestContext requestContext, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
+            Calls++;
             Scopes = requestContext.Scopes;
             return new AccessToken(Guid.NewGuid().ToString("N"), DateTimeOffset.UtcNow.AddHours(1));
         }
@@ -127,6 +150,7 @@ public sealed class BlobArtifactByteStoreTests
         internal int? ForcedStatus { get; init; }
         internal string ForcedCode { get; init; } = "InternalError";
         internal bool NetworkFailure { get; init; }
+        internal string? Challenge { get; init; }
         internal byte[]? StoredBytes { get; private set; }
         internal string? IfNoneMatch { get; private set; }
         internal string? ContentType { get; private set; }
@@ -142,7 +166,12 @@ public sealed class BlobArtifactByteStoreTests
             BearerPresent = request.Headers.Authorization?.Scheme == "Bearer";
             if (ForcedStatus is { } status)
             {
-                return Error(status, ForcedCode);
+                var response = Error(status, ForcedCode);
+                if (Challenge is not null)
+                {
+                    response.Headers.TryAddWithoutValidation("WWW-Authenticate", Challenge);
+                }
+                return response;
             }
             if (request.Method == HttpMethod.Put)
             {

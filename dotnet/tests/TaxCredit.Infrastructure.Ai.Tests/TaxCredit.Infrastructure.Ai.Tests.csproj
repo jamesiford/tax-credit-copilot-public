@@ -10,6 +10,7 @@
   </ItemGroup>
   <ItemGroup>
     <Using Include="Xunit" />
+    <None Include="..\..\..\backend\tests\ai_evals\datasets\injection.jsonl" Link="injection.jsonl" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\TaxCredit.Infrastructure.Ai\TaxCredit.Infrastructure.Ai.csproj" />

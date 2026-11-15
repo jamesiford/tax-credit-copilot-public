@@ -40,7 +40,7 @@ public sealed class LocalArtifactByteStoreTests : IDisposable
             }
         });
         var results = await Task.WhenAll(attempts);
-        var winner = Assert.Single(results.Where(r => r.Won));
+        var winner = Assert.Single(results, r => r.Won);
         Assert.Equal(winner.Payload, await store.GetAsync("outputs", "run/package.bin"));
         Assert.Empty(Directory.EnumerateFiles(Path.Combine(root, "outputs", "run"), "*.pending"));
     }
