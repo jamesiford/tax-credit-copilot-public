@@ -175,7 +175,7 @@
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200
@@ -202,21 +202,21 @@
           {
             "name": "client_id",
             "required": true,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           }
         ],
         "query": [
           {
             "name": "tax_year",
             "required": true,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           }
         ],
         "header": [],
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 201,
       "declared_status_codes": [
         201,
@@ -244,12 +244,12 @@
           {
             "name": "client_id",
             "required": true,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           },
           {
             "name": "artifact_id",
             "required": true,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           }
         ],
         "query": [],
@@ -286,17 +286,17 @@
           {
             "name": "user_oid",
             "required": true,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           },
           {
             "name": "since",
             "required": false,
-            "annotation": "contract.harness.freeze.FrozenDatetime | None"
+            "annotation": "datetime.datetime | None"
           },
           {
             "name": "until",
             "required": false,
-            "annotation": "contract.harness.freeze.FrozenDatetime | None"
+            "annotation": "datetime.datetime | None"
           },
           {
             "name": "tool",
@@ -306,14 +306,14 @@
           {
             "name": "limit",
             "required": false,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           }
         ],
         "header": [],
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -343,7 +343,7 @@
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200
@@ -370,7 +370,7 @@
           {
             "name": "tool",
             "required": true,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           }
         ],
         "query": [],
@@ -448,7 +448,7 @@
           {
             "name": "client_id",
             "required": true,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           }
         ],
         "query": [
@@ -472,7 +472,7 @@
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -508,7 +508,7 @@
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -536,17 +536,17 @@
           {
             "name": "client_id",
             "required": true,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           },
           {
             "name": "program_code",
             "required": true,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           },
           {
             "name": "tax_year",
             "required": true,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           }
         ],
         "query": [],
@@ -554,7 +554,7 @@
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -590,7 +590,7 @@
           }
         }
       },
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 201,
       "declared_status_codes": [
         201,
@@ -618,17 +618,17 @@
           {
             "name": "client_id",
             "required": true,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           },
           {
             "name": "program_code",
             "required": true,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           },
           {
             "name": "tax_year",
             "required": true,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           }
         ],
         "query": [],
@@ -642,7 +642,7 @@
           }
         }
       },
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -678,7 +678,7 @@
           }
         }
       },
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -714,7 +714,7 @@
           }
         }
       },
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -744,7 +744,7 @@
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200
@@ -802,29 +802,29 @@
           {
             "name": "sort",
             "required": false,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           },
           {
             "name": "order",
             "required": false,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           },
           {
             "name": "limit",
             "required": false,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           },
           {
             "name": "offset",
             "required": false,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           }
         ],
         "header": [],
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -852,7 +852,7 @@
           {
             "name": "client_id",
             "required": true,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           }
         ],
         "query": [
@@ -866,7 +866,7 @@
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -894,56 +894,56 @@
           {
             "name": "tax_year",
             "required": true,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           }
         ],
         "query": [
           {
             "name": "state",
             "required": true,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           },
           {
             "name": "status",
             "required": false,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           },
           {
             "name": "near_floor",
             "required": false,
-            "annotation": "<class 'bool'>"
+            "annotation": "bool"
           },
           {
             "name": "q",
             "required": false,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           },
           {
             "name": "limit",
             "required": false,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           },
           {
             "name": "offset",
             "required": false,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           },
           {
             "name": "sort",
             "required": false,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           },
           {
             "name": "order",
             "required": false,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           }
         ],
         "header": [],
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -976,7 +976,7 @@
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200
@@ -1003,7 +1003,7 @@
           {
             "name": "code",
             "required": true,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           }
         ],
         "query": [],
@@ -1017,7 +1017,7 @@
           }
         }
       },
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -1045,14 +1045,14 @@
           {
             "name": "tax_year",
             "required": true,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           }
         ],
         "query": [
           {
             "name": "state",
             "required": true,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           },
           {
             "name": "as_of",
@@ -1067,14 +1067,14 @@
           {
             "name": "within",
             "required": false,
-            "annotation": "<class 'float'>"
+            "annotation": "float"
           }
         ],
         "header": [],
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -1102,7 +1102,7 @@
           {
             "name": "tax_year",
             "required": true,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           }
         ],
         "query": [
@@ -1126,7 +1126,7 @@
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -1154,7 +1154,7 @@
           {
             "name": "tax_year",
             "required": true,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           }
         ],
         "query": [
@@ -1173,7 +1173,7 @@
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -1209,7 +1209,7 @@
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -1237,7 +1237,7 @@
           {
             "name": "tax_year",
             "required": true,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           }
         ],
         "query": [
@@ -1261,7 +1261,7 @@
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -1289,26 +1289,26 @@
           {
             "name": "tax_year",
             "required": true,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           }
         ],
         "query": [
           {
             "name": "state",
             "required": false,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           },
           {
             "name": "method",
             "required": false,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           }
         ],
         "header": [],
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -1339,7 +1339,7 @@
           {
             "name": "tax_year",
             "required": true,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           }
         ],
         "query": [
@@ -1351,7 +1351,7 @@
           {
             "name": "method",
             "required": false,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           },
           {
             "name": "fein",
@@ -1368,7 +1368,7 @@
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -1396,19 +1396,19 @@
           {
             "name": "tax_year",
             "required": true,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           },
           {
             "name": "employee_id",
             "required": true,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           }
         ],
         "query": [
           {
             "name": "state",
             "required": false,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           },
           {
             "name": "account_id",
@@ -1420,7 +1420,7 @@
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -1448,7 +1448,7 @@
           {
             "name": "employee_id",
             "required": true,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           }
         ],
         "query": [],
@@ -1462,7 +1462,7 @@
           }
         }
       },
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -1490,21 +1490,21 @@
           {
             "name": "state",
             "required": true,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           }
         ],
         "query": [
           {
             "name": "tax_year",
             "required": false,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           }
         ],
         "header": [],
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -1532,7 +1532,7 @@
           {
             "name": "tax_year",
             "required": true,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           }
         ],
         "query": [
@@ -1546,7 +1546,7 @@
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -1574,7 +1574,7 @@
           {
             "name": "tax_year",
             "required": true,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           }
         ],
         "query": [
@@ -1586,12 +1586,12 @@
           {
             "name": "min_wages",
             "required": false,
-            "annotation": "<class 'float'>"
+            "annotation": "float"
           },
           {
             "name": "min_hours",
             "required": false,
-            "annotation": "<class 'float'>"
+            "annotation": "float"
           },
           {
             "name": "account_id",
@@ -1603,7 +1603,7 @@
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -1639,7 +1639,7 @@
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -1667,7 +1667,7 @@
           {
             "name": "state",
             "required": true,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           }
         ],
         "query": [
@@ -1681,7 +1681,7 @@
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -1709,21 +1709,21 @@
           {
             "name": "state",
             "required": true,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           }
         ],
         "query": [
           {
             "name": "live",
             "required": false,
-            "annotation": "<class 'bool'>"
+            "annotation": "bool"
           }
         ],
         "header": [],
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -1751,21 +1751,21 @@
           {
             "name": "state",
             "required": true,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           }
         ],
         "query": [
           {
             "name": "tax_year",
             "required": false,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           }
         ],
         "header": [],
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -1793,7 +1793,7 @@
           {
             "name": "state",
             "required": true,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           }
         ],
         "query": [],
@@ -1807,7 +1807,7 @@
           }
         }
       },
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -1835,7 +1835,7 @@
           {
             "name": "state",
             "required": true,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           }
         ],
         "query": [],
@@ -1843,7 +1843,7 @@
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -1871,29 +1871,29 @@
           {
             "name": "tax_year",
             "required": true,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           }
         ],
         "query": [
           {
             "name": "state",
             "required": true,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           },
           {
             "name": "action",
             "required": false,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           },
           {
             "name": "magnitude",
             "required": false,
-            "annotation": "<class 'float'>"
+            "annotation": "float"
           },
           {
             "name": "limit",
             "required": false,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           },
           {
             "name": "program_code",
@@ -1905,7 +1905,7 @@
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -1941,7 +1941,7 @@
           }
         }
       },
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -1977,7 +1977,7 @@
           }
         }
       },
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -2013,7 +2013,7 @@
           }
         }
       },
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -2077,14 +2077,14 @@
           {
             "name": "tax_year",
             "required": true,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           }
         ],
         "query": [
           {
             "name": "state",
             "required": false,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           },
           {
             "name": "account_id",
@@ -2096,7 +2096,7 @@
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -2124,12 +2124,12 @@
           {
             "name": "tax_year",
             "required": true,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           },
           {
             "name": "exception_id",
             "required": true,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           }
         ],
         "query": [],
@@ -2143,7 +2143,7 @@
           }
         }
       },
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -2171,29 +2171,29 @@
           {
             "name": "tax_year",
             "required": true,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           }
         ],
         "query": [
           {
             "name": "state",
             "required": false,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           },
           {
             "name": "q",
             "required": false,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           },
           {
             "name": "limit",
             "required": false,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           },
           {
             "name": "offset",
             "required": false,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           },
           {
             "name": "account_id",
@@ -2203,19 +2203,19 @@
           {
             "name": "sort",
             "required": false,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           },
           {
             "name": "order",
             "required": false,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           }
         ],
         "header": [],
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -2243,12 +2243,12 @@
           {
             "name": "client_id",
             "required": true,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           },
           {
             "name": "tax_year",
             "required": true,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           }
         ],
         "query": [
@@ -2267,7 +2267,7 @@
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -2295,7 +2295,7 @@
           {
             "name": "finding_id",
             "required": true,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           }
         ],
         "query": [],
@@ -2309,7 +2309,7 @@
           }
         }
       },
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -2337,7 +2337,7 @@
           {
             "name": "finding_id",
             "required": true,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           }
         ],
         "query": [],
@@ -2351,7 +2351,7 @@
           }
         }
       },
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -2379,12 +2379,12 @@
           {
             "name": "client_id",
             "required": true,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           },
           {
             "name": "finding_id",
             "required": true,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           }
         ],
         "query": [],
@@ -2392,7 +2392,7 @@
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -2420,41 +2420,41 @@
           {
             "name": "tax_year",
             "required": true,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           }
         ],
         "query": [
           {
             "name": "state",
             "required": true,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           },
           {
             "name": "method",
             "required": false,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           },
           {
             "name": "within",
             "required": false,
-            "annotation": "<class 'float'>"
+            "annotation": "float"
           },
           {
             "name": "limit",
             "required": false,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           },
           {
             "name": "rest_of_year",
             "required": false,
-            "annotation": "<class 'bool'>"
+            "annotation": "bool"
           }
         ],
         "header": [],
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -2492,12 +2492,12 @@
           {
             "name": "limit",
             "required": false,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           },
           {
             "name": "offset",
             "required": false,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           }
         ],
         "header": [],
@@ -2570,7 +2570,7 @@
           {
             "name": "draft_id",
             "required": true,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           }
         ],
         "query": [],
@@ -2607,7 +2607,7 @@
           {
             "name": "draft_id",
             "required": true,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           }
         ],
         "query": [],
@@ -2654,7 +2654,7 @@
           {
             "name": "draft_id",
             "required": true,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           }
         ],
         "query": [],
@@ -2705,7 +2705,7 @@
           {
             "name": "draft_id",
             "required": true,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           }
         ],
         "query": [],
@@ -2756,7 +2756,7 @@
           {
             "name": "draft_id",
             "required": true,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           }
         ],
         "query": [],
@@ -2799,7 +2799,7 @@
           {
             "name": "draft_id",
             "required": true,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           }
         ],
         "query": [],
@@ -2854,7 +2854,7 @@
           {
             "name": "draft_id",
             "required": true,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           }
         ],
         "query": [],
@@ -2905,7 +2905,7 @@
           {
             "name": "draft_id",
             "required": true,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           }
         ],
         "query": [],
@@ -2960,7 +2960,7 @@
           {
             "name": "draft_id",
             "required": true,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           }
         ],
         "query": [],
@@ -3025,7 +3025,7 @@
           {
             "name": "code",
             "required": true,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           }
         ],
         "query": [],
@@ -3069,7 +3069,7 @@
           }
         }
       },
-      "response_model": "Union",
+      "response_model": "BatchOut | PreviewOut",
       "status_code": 202,
       "declared_status_codes": [
         202,
@@ -3102,12 +3102,12 @@
           {
             "name": "limit",
             "required": false,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           },
           {
             "name": "offset",
             "required": false,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           },
           {
             "name": "status",
@@ -3147,7 +3147,7 @@
           {
             "name": "batch_id",
             "required": true,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           }
         ],
         "query": [],
@@ -3183,7 +3183,7 @@
           {
             "name": "batch_id",
             "required": true,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           }
         ],
         "query": [
@@ -3195,12 +3195,12 @@
           {
             "name": "limit",
             "required": false,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           },
           {
             "name": "offset",
             "required": false,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           }
         ],
         "header": [],
@@ -3235,7 +3235,7 @@
           {
             "name": "batch_id",
             "required": true,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           }
         ],
         "query": [],
@@ -3271,7 +3271,7 @@
           {
             "name": "batch_id",
             "required": true,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           }
         ],
         "query": [],
@@ -3309,7 +3309,7 @@
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200
@@ -3336,7 +3336,7 @@
           {
             "name": "account_id",
             "required": true,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           }
         ],
         "query": [],
@@ -3344,7 +3344,7 @@
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -3372,7 +3372,7 @@
           {
             "name": "client_id",
             "required": true,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           }
         ],
         "query": [
@@ -3389,17 +3389,17 @@
           {
             "name": "method",
             "required": false,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           },
           {
             "name": "limit",
             "required": false,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           },
           {
             "name": "offset",
             "required": false,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           },
           {
             "name": "program_code",
@@ -3411,7 +3411,7 @@
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, object]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -3439,12 +3439,12 @@
           {
             "name": "client_id",
             "required": true,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           },
           {
             "name": "unit_id",
             "required": true,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           }
         ],
         "query": [],
@@ -3458,7 +3458,7 @@
           }
         }
       },
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -3486,24 +3486,24 @@
           {
             "name": "client_id",
             "required": true,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           },
           {
             "name": "unit_id",
             "required": true,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           }
         ],
         "query": [
           {
             "name": "base_year",
             "required": true,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           },
           {
             "name": "method",
             "required": false,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           },
           {
             "name": "state",
@@ -3515,7 +3515,7 @@
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -3543,19 +3543,19 @@
           {
             "name": "client_id",
             "required": true,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           },
           {
             "name": "unit_id",
             "required": true,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           }
         ],
         "query": [
           {
             "name": "year",
             "required": true,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           },
           {
             "name": "month",
@@ -3570,17 +3570,17 @@
           {
             "name": "method",
             "required": false,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           },
           {
             "name": "sort",
             "required": false,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           },
           {
             "name": "order",
             "required": false,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           },
           {
             "name": "near_min_hours",
@@ -3607,7 +3607,7 @@
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, object]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -3635,7 +3635,7 @@
           {
             "name": "record_token",
             "required": true,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           }
         ],
         "query": [
@@ -3657,14 +3657,14 @@
           {
             "name": "method",
             "required": false,
-            "annotation": "<class 'str'>"
+            "annotation": "str"
           }
         ],
         "header": [],
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, object]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -3692,7 +3692,7 @@
           {
             "name": "client_id",
             "required": true,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           }
         ],
         "query": [],
@@ -3706,7 +3706,7 @@
           }
         }
       },
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -3734,7 +3734,7 @@
           {
             "name": "client_id",
             "required": true,
-            "annotation": "<class 'int'>"
+            "annotation": "int"
           }
         ],
         "query": [],
@@ -3742,7 +3742,7 @@
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -3778,7 +3778,7 @@
           }
         }
       },
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -3808,7 +3808,7 @@
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200
@@ -3837,7 +3837,7 @@
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200
@@ -3872,7 +3872,7 @@
           }
         }
       },
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -3908,7 +3908,7 @@
           }
         }
       },
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -3944,7 +3944,7 @@
           }
         }
       },
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -3972,7 +3972,7 @@
           {
             "name": "method",
             "required": true,
-            "annotation": "typing.Literal['min_max', 'pay_period']"
+            "annotation": "Literal['min_max', 'pay_period']"
           }
         ],
         "query": [],
@@ -4016,7 +4016,7 @@
           }
         }
       },
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,
@@ -4046,7 +4046,7 @@
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200
@@ -4075,7 +4075,7 @@
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200
@@ -4104,7 +4104,7 @@
         "cookie": []
       },
       "request_body_schema": {},
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200
@@ -4139,7 +4139,7 @@
           }
         }
       },
-      "response_model": "dict",
+      "response_model": "dict[str, Any]",
       "status_code": 200,
       "declared_status_codes": [
         200,

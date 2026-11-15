@@ -24,6 +24,7 @@ ROOT = HERE.parents[1]
 sys.path.insert(0, str(ROOT))
 
 from contract.harness import hermetic  # noqa: E402
+from contract.inventory import typenames  # noqa: E402`nfrom contract.inventory import typenames  # noqa: E402
 
 hermetic.apply()
 os.environ["CHANNEL_DEBUG_WHOAMI"] = "0"
@@ -74,7 +75,7 @@ def _params(route: Any) -> dict[str, list[dict[str, Any]]]:
     d = route.dependant
     for bucket, fields in (("path", d.path_params), ("query", d.query_params), ("header", d.header_params), ("cookie", d.cookie_params)):
         for f in fields:
-            out[bucket].append({"name": f.alias or f.name, "required": f.field_info.is_required(), "annotation": str(f.field_info.annotation)})
+            out[bucket].append({"name": f.alias or f.name, "required": f.field_info.is_required(), "annotation": typenames.canonical(f.field_info.annotation)})
     return out
 
 
@@ -90,16 +91,13 @@ def _is_model(model: Any) -> bool:
     """
     if model is None or model in (dict, list, Any):
         return False
-    text = repr(model)
-    return text not in ("dict[str, typing.Any]", "list[dict[str, typing.Any]]", "typing.Any") and (
-        hasattr(model, "model_fields") or "BaseModel" in text or any(hasattr(a, "model_fields") for a in getattr(model, "__args__", ()))
-    )
+    return typenames.has_model(model)
 
 
 def _model_name(model: Any) -> str | None:
     if model is None:
         return None
-    return getattr(model, "__name__", None) or str(model)
+    return typenames.canonical(model, short=True)
 
 
 def build_app_surface() -> tuple[dict[str, Any], dict[str, Any]]:
