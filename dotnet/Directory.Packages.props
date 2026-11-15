@@ -12,5 +12,7 @@
     <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.20.1" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.20.0" />
     <PackageVersion Include="Aspire.Hosting.SqlServer" Version="13.6.5" />
+    <!-- JSON Schema (Draft 2020-12) for rule-pack validation. MIT, version 8.0.5: from 9.0 the binaries are under the json-everything Open Source Maintenance Fee EULA, which is not an acceptable licence here (docs/slice-domain-log.md DS8). -->
+    <PackageVersion Include="JsonSchema.Net" Version="8.0.5" />
   </ItemGroup>
 </Project>

@@ -23,4 +23,20 @@ public static class RuleLibraryRegistration
             sp.GetService<IProgramWageSource>()));
         return services;
     }
+
+    /// <summary>
+    /// Registers one <see cref="PackValidator"/> (Python <c>tools/pack_validation.py</c>) over <see cref="IRulePackSource"/>, <see cref="IJsonSchemaValidator"/> and the
+    /// registered <see cref="RuleLibrary"/>; call <see cref="AddRuleLibrary"/> first.
+    /// </summary>
+    /// <param name="services">The container.</param>
+    /// <returns>The same container, for chaining.</returns>
+    public static IServiceCollection AddPackValidator(this IServiceCollection services)
+    {
+        ArgumentNullException.ThrowIfNull(services);
+        services.TryAddSingleton(sp => new PackValidator(
+            sp.GetRequiredService<IRulePackSource>(),
+            sp.GetRequiredService<IJsonSchemaValidator>(),
+            sp.GetRequiredService<RuleLibrary>()));
+        return services;
+    }
 }

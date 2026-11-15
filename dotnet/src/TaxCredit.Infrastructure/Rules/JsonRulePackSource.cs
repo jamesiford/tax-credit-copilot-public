@@ -15,6 +15,9 @@ public sealed record RulePackOptions
 
     /// <summary>The captured ingestion configs (<c>backend/data/rules_ingested</c>); <c>null</c> means the ingestion hook is "none".</summary>
     public string? IngestedConfigDirectory { get; init; }
+
+    /// <summary>The JSON Schema file of rule packs; <c>null</c> means <c>schema/rule-pack.schema.json</c> inside <see cref="RulesDirectory"/> (Python reads it beside the module, which is the same file).</summary>
+    public string? SchemaFile { get; init; }
 }
 
 /// <summary>

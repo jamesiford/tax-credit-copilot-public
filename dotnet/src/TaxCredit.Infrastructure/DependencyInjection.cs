@@ -21,7 +21,7 @@ public static class DependencyInjection
 
     /// <summary>
     /// Binds the rules-folder adapters to the Domain's ports: <see cref="IRulePackSource"/> over <paramref name="options"/>, and, when an ingested-config
-    /// folder is configured, the captured ingestion hook. The folder is configuration; no rule file is copied.
+    /// folder is configured, the captured ingestion hook, and the JSON Schema step of pack validation (<see cref="IJsonSchemaValidator"/>). The folder is configuration; no rule file is copied.
     /// </summary>
     /// <param name="services">The container.</param>
     /// <param name="options">Where the rules folder (and optionally the captured ingestion configs) are.</param>
@@ -31,6 +31,7 @@ public static class DependencyInjection
         ArgumentNullException.ThrowIfNull(services);
         ArgumentNullException.ThrowIfNull(options);
         services.AddSingleton<IRulePackSource>(new JsonRulePackSource(options));
+        services.AddSingleton<IJsonSchemaValidator>(_ => JsonSchemaPackValidator.FromOptions(options));
         if (options.IngestedConfigDirectory is { Length: > 0 } ingested)
         {
             services.AddSingleton<IIngestedConfigFiles>(new JsonIngestedConfigFiles(ingested));
