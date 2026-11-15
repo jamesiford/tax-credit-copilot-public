@@ -17,3 +17,12 @@ Running log of decisions, findings and gate results for the .NET parity spike (b
 - C# compatibility layer: `TaxCredit.Domain.Numerics` (`PyRound`, `PyDecimal`, `PyFloat`, `PyArith`, `PySum`, `PySort`, `PyStr`, `PyDate`, generated `PyUnicodeTables`).
 - **Gate G1: PASSED. 36/36 tests, every vector bit-identical** (second run after two fixes, see findings.md traps T-04 and T-07).
 - Mutation self-test (`Built_in_dotnet_calls_diverge_from_python_so_the_harness_can_fail`): `Math.Round`, `Math.Floor(a/b)` and `(decimal)x` each diverge on a measurable number of vectors, so the comparison can fail.
+
+## Stage S2: skeleton and standards
+
+- Solution \dotnet/TaxCredit.slnx\ with six src projects and three test projects, central package management, \
+et10.0\, \TreatWarningsAsErrors\, analyzers at \latest-recommended\, XML docs required on production public members.
+- \dotnet build -warnaserror\: 0 warnings, 0 errors. \dotnet format --verify-no-changes\: clean. Tests: 13 architecture + 18 domain + 36 parity, all green.
+- Eight ADRs in \dotnet/docs/adr\. Licences were re-read from the upstream repositories (MediatR = RPL 1.5 / commercial, FluentAssertions = Xceed community licence, xunit = Apache-2.0, Mediator by martinothamar = MIT, NetArchTest = MIT but stale, ArchUnitNET = Apache-2.0).
+- Environment notes: OpenTelemetry 1.12.0 was rejected by NuGet audit (NU1902, moderate vulnerability) and bumped to 1.20.x; Aspire 13.6.5 needs \ASPIRE010\ suppressed (no CLI bundle).
+

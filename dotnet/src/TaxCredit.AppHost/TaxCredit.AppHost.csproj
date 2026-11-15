@@ -3,6 +3,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>TaxCredit.AppHost</RootNamespace>
     <IsAspireHost>true</IsAspireHost>
+    <NoWarn>$(NoWarn);ASPIRE010</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Aspire.Hosting.SqlServer" />

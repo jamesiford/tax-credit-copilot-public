@@ -13,5 +13,9 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\TaxCredit.Domain\TaxCredit.Domain.csproj" />
+    <ProjectReference Include="..\..\src\TaxCredit.Application\TaxCredit.Application.csproj" />
+    <ProjectReference Include="..\..\src\TaxCredit.Infrastructure\TaxCredit.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\TaxCredit.ServiceDefaults\TaxCredit.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\..\src\TaxCredit.Api\TaxCredit.Api.csproj" />
   </ItemGroup>
 </Project>
