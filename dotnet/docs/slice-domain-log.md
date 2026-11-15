@@ -20,3 +20,12 @@ Running log of decisions, findings and gates for branch `dotnet/domain` (from `d
 - Layering finding F-DS1-01: `tools.*` imports `config`, `data.*` (`data.designations`, `data.sites`) and `application.*` (portfolio only). Pure tools that reach for `data.*` or `config.get_settings` (`program_registry`) need their inputs injected in C#.
 - Finding F-DS1-02: `tools.credit_math` and `tools.simulation` import `pydantic.Field` (request models). Only the computation ports.
 - Python-test mapping in the map is by import regex; modules exercised only through other modules show `-`.
+
+## DS2 foundations (gate: met for PyJson)
+
+- `PyDict` moved to `Numerics` with a key index and Python dict semantics (`Set` keeps first position, last value; `Add` rejects duplicates).
+- `PyJson.Loads`: port of CPython's C scanner (`Modules/_json.c`): ints are `long`/`BigInteger` (one CLR type per magnitude), floats `double`, `NaN`/`Infinity`/`-Infinity` accepted, duplicate keys last-wins-first-position, 4300-digit int limit as `ValueError`, BOM message, and `JSONDecodeError` messages with line/column/char offsets counted in code points.
+- `PyJson.Dumps(value, sortKeys, compact)` added beside the canonical overload; `BigInteger` supported.
+- `parity/export_json.py` -> `goldens/json.jsonl.gz` (about 6,200 vectors: handcrafted edge cases, all 38 `backend/rules` files, seeded mutations). C# replays `Loads` then both `Dumps` configurations, and error type+message, bit for bit: 0 mismatches. Mutation self-test (`IntsAsFloats`) proves the int/float comparison can fail.
+- Trap found while porting: `cond ? long : BigInteger` in C# silently converts the long to BigInteger (conditional type). Cast to `object`.
+- Not ported: `Counter`/`defaultdict` helpers; insertion-ordered `PyDict` suffices until DS3 shows otherwise.

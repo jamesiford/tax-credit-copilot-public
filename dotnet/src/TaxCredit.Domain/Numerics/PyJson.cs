@@ -1,58 +1,36 @@
-using System.Collections;
 using System.Globalization;
+using System.Numerics;
 using System.Security.Cryptography;
 using System.Text;
-using TaxCredit.Domain.Numerics;
 
-namespace TaxCredit.Domain.Calculation;
-
-/// <summary>
-/// An insertion-ordered string-keyed mapping: the shape of a Python <c>dict</c> in the calculation trail and in
-/// the golden comparison trees. Values are <c>null</c>, <c>bool</c>, <c>long</c>, <c>double</c>, <c>string</c>,
-/// <c>IReadOnlyList&lt;object?&gt;</c> or another <see cref="PyDict"/>.
-/// </summary>
-public sealed class PyDict : IEnumerable<KeyValuePair<string, object?>>
-{
-    private readonly List<KeyValuePair<string, object?>> _items = [];
-
-    /// <summary>The number of entries.</summary>
-    public int Count => _items.Count;
-
-    /// <summary>Appends an entry (Python dict literal order is preserved; keys are unique by construction).</summary>
-    /// <param name="key">The key.</param>
-    /// <param name="value">The value.</param>
-    /// <returns>This dictionary, for chaining.</returns>
-    public PyDict Add(string key, object? value)
-    {
-        _items.Add(new KeyValuePair<string, object?>(key, value));
-        return this;
-    }
-
-    /// <inheritdoc />
-    public IEnumerator<KeyValuePair<string, object?>> GetEnumerator() => _items.GetEnumerator();
-
-    /// <inheritdoc />
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-}
+namespace TaxCredit.Domain.Numerics;
 
 /// <summary>
-/// Python <c>json.dumps(value, sort_keys=True, separators=(',', ':'))</c> over <see cref="PyDict"/> trees.
+/// Python's <c>json</c> module: <c>dumps</c> with <c>ensure_ascii</c> and <c>loads</c> with CPython's C scanner semantics.
 /// </summary>
 /// <remarks>
-/// Why a port: the calculation trail's evidence hash is SHA-256 over these exact bytes, so every character matters.
-/// <c>System.Text.Json</c> escapes differently and writes doubles with its own rules (<c>1E+16</c>). Python's default
-/// <c>ensure_ascii</c> escapes everything outside 0x20-0x7E, including DEL, as lowercase <c>\uXXXX</c> per UTF-16
-/// unit, and formats floats with <c>repr</c>. Source: CPython <c>Lib/json/encoder.py</c>.
+/// Why a port: a rule pack's <c>35</c> is an <c>int</c> and <c>35.0</c> a <c>float</c>, and the two take different
+/// paths through <c>Decimal(str(x))</c>, so the reader decides the type from the lexeme. <c>System.Text.Json</c>
+/// reads every number as a double-capable token and writes its own float layout; the calculation trail's evidence
+/// hash is SHA-256 over these exact bytes. Sources: CPython <c>Lib/json/encoder.py</c>, <c>Modules/_json.c</c>.
+/// Writer limit: ints beyond 4300 digits are not subject to Python's <c>str()</c> conversion limit here.
 /// </remarks>
-public static class PyJson
+public static partial class PyJson
 {
-    /// <summary>Serialises a tree canonically (sorted keys, no whitespace, ASCII only).</summary>
+    /// <summary>Serialises a tree canonically: <c>sort_keys=True, separators=(',', ':')</c>, ASCII only.</summary>
     /// <param name="value">The tree.</param>
     /// <returns>The JSON text.</returns>
-    public static string Dumps(object? value)
+    public static string Dumps(object? value) => Dumps(value, sortKeys: true, compact: true);
+
+    /// <summary>Serialises a tree like <c>json.dumps</c> with <c>ensure_ascii=True</c>.</summary>
+    /// <param name="value">The tree.</param>
+    /// <param name="sortKeys">Python <c>sort_keys</c>.</param>
+    /// <param name="compact"><c>true</c> for separators <c>(',', ':')</c>; <c>false</c> for the default <c>(', ', ': ')</c>.</param>
+    /// <returns>The JSON text.</returns>
+    public static string Dumps(object? value, bool sortKeys, bool compact)
     {
         var sb = new StringBuilder();
-        Write(sb, value);
+        Write(sb, value, sortKeys, compact ? "," : ", ", compact ? ":" : ": ");
         return sb.ToString();
     }
 
@@ -62,7 +40,7 @@ public static class PyJson
     public static string EvidenceHash(object? value) =>
         "sha256:" + Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(Dumps(value)))).ToLowerInvariant();
 
-    private static void Write(StringBuilder sb, object? value)
+    private static void Write(StringBuilder sb, object? value, bool sortKeys, string itemSep, string keySep)
     {
         switch (value)
         {
@@ -78,6 +56,9 @@ public static class PyJson
             case int i:
                 sb.Append(i.ToString(CultureInfo.InvariantCulture));
                 break;
+            case BigInteger big:
+                sb.Append(big.ToString(CultureInfo.InvariantCulture));
+                break;
             case double d:
                 sb.Append(double.IsNaN(d) ? "NaN" : double.IsPositiveInfinity(d) ? "Infinity" : double.IsNegativeInfinity(d) ? "-Infinity" : PyFloat.Repr(d));
                 break;
@@ -85,22 +66,7 @@ public static class PyJson
                 WriteString(sb, s);
                 break;
             case PyDict dict:
-                sb.Append('{');
-                var first = true;
-                foreach (var kv in dict.OrderBy(k => k.Key, PyStr.Comparer))
-                {
-                    if (!first)
-                    {
-                        sb.Append(',');
-                    }
-
-                    first = false;
-                    WriteString(sb, kv.Key);
-                    sb.Append(':');
-                    Write(sb, kv.Value);
-                }
-
-                sb.Append('}');
+                WriteObject(sb, dict, sortKeys, itemSep, keySep);
                 break;
             case IReadOnlyList<object?> list:
                 sb.Append('[');
@@ -108,10 +74,10 @@ public static class PyJson
                 {
                     if (k > 0)
                     {
-                        sb.Append(',');
+                        sb.Append(itemSep);
                     }
 
-                    Write(sb, list[k]);
+                    Write(sb, list[k], sortKeys, itemSep, keySep);
                 }
 
                 sb.Append(']');
@@ -119,6 +85,27 @@ public static class PyJson
             default:
                 throw new PyUnsupportedException("Unsupported JSON value type " + value.GetType().Name);
         }
+    }
+
+    private static void WriteObject(StringBuilder sb, PyDict dict, bool sortKeys, string itemSep, string keySep)
+    {
+        sb.Append('{');
+        var first = true;
+        IEnumerable<KeyValuePair<string, object?>> items = sortKeys ? dict.OrderBy(k => k.Key, PyStr.Comparer) : dict;
+        foreach (var kv in items)
+        {
+            if (!first)
+            {
+                sb.Append(itemSep);
+            }
+
+            first = false;
+            WriteString(sb, kv.Key);
+            sb.Append(keySep);
+            Write(sb, kv.Value, sortKeys, itemSep, keySep);
+        }
+
+        sb.Append('}');
     }
 
     private static void WriteString(StringBuilder sb, string s)

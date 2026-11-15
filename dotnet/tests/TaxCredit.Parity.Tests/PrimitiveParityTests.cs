@@ -23,12 +23,12 @@ public sealed class PrimitiveParityTests
         EqualityComparer<T>.Default.Equals(actual, expected) ? null : $"{what}: got '{actual}' expected '{expected}'";
 
     /// <summary>Runs <paramref name="check"/> over every vector of <paramref name="kind"/> and fails with the first mismatches.</summary>
-    internal static int Run(string kind, Func<JsonElement, string?> check)
+    internal static int Run(string kind, Func<JsonElement, string?> check, string file = File)
     {
         var count = 0;
         var failures = new List<string>();
         var failed = 0;
-        foreach (var v in GoldenFiles.Read(File, kind))
+        foreach (var v in GoldenFiles.Read(file, kind))
         {
             count++;
             string? error;
