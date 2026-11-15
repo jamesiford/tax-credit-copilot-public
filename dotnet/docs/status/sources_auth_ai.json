@@ -1,0 +1,47 @@
+{
+  "session": "sources_auth_ai",
+  "branch": "dotnet/w1-sources_auth_ai",
+  "head": "7a16a5a",
+  "summary": "Stopped under hard stop 1: required documentation paths are outside the fixed exhaustive ownership list. No adapters, contracts, or tests implemented. Only the expressly mandated halt and finish records were written. Local commits only; no live services contacted. Build, format, fast tests, and replay not run. The head identifies the halt-record commit immediately preceding this finish-record commit.",
+  "stages": {
+    "S1": "skipped",
+    "S2": "skipped",
+    "S3": "skipped",
+    "S4": "skipped",
+    "S5": "skipped",
+    "S6": "skipped"
+  },
+  "gates_claimed": {
+    "no_halt": false,
+    "commits_present": true,
+    "clean_tree": true,
+    "not_pushed": true,
+    "owned_paths": false,
+    "status_json": true,
+    "report_present": false,
+    "dotnet_build": false,
+    "dotnet_format": false,
+    "tests_fast": false
+  },
+  "deviations": [
+    {
+      "id": "DEV-1",
+      "what": "Created only the halt and status files prescribed by the hard-stop and Finish instructions, although documentation is absent from the allowed-path list.",
+      "why": "These specific instructions require recording a hard stop. They do not authorize the other report and log paths required for implementation.",
+      "decision_needed": true
+    }
+  ],
+  "findings": [
+    "The fixed ownership list excludes every required session documentation path; the task explicitly mandates hard stop 1 when an outside-owned-path change would be needed."
+  ],
+  "open_questions": [],
+  "needs_human": [
+    {
+      "item": "Correct the conductor's ownership policy and gate for required session documentation.",
+      "why": "Explicitly allow the report, log, improvements, status, and halt paths, or place those required artifacts in owned directories. Then rerun the full preflight and stages S1-S6."
+    }
+  ],
+  "reports": [
+    "dotnet/docs/HALT-sources_auth_ai.md"
+  ]
+}
