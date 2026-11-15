@@ -33,3 +33,18 @@ et10.0\, \TreatWarningsAsErrors\, analyzers at \latest-recommended\, XML docs re
 - Domain/Calculation: ~3,500 lines incl. Numerics. **Gate G2: PASSED, 0 mismatches** (50 parity tests, 18 domain, 13 architecture all green).
 - See parity-report.md and findings.md (T-14..T-18, F-01..F-04).
 
+
+## Stage S5: differential fuzzing
+
+- parity/engine_cli.py, FuzzGenerator/PythonSession/DifferentialFuzzTests, ddmin shrinker, regression goldens folder, mutation self-test (3/3 caught).
+- **Gate G3: PASSED.** N=20,000 (seed 20261114): 0 mismatches, 36 s. N=500,000 (seed 7): 0 mismatches, 13 min.
+- Benchmarks recorded in SPIKE-REPORT.md (C# 2-4x faster than Python, unoptimised).
+
+## Stage S6
+
+- Not run: RUN_STRETCH_S6 was not set (stretch only). G4 is therefore untested.
+
+## Stage S7
+
+- SPIKE-REPORT.md and dotnet/README.md written. Recommendation: go with conditions.
+
