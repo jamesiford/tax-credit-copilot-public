@@ -463,7 +463,7 @@
    "scenario": "p1_artifacts_ai",
    "case": "package.create",
    "route": "POST /api/clients/1001/packages",
-   "caught": false,
+   "caught": true,
    "reported": {
     "category": "type",
     "path": "size_bytes",
@@ -478,7 +478,7 @@
    "scenario": "p1_artifacts_ai",
    "case": "package.create",
    "route": "POST /api/clients/1001/packages",
-   "caught": false,
+   "caught": true,
    "reported": {
     "category": "type",
     "path": "size_bytes",
@@ -493,7 +493,7 @@
    "scenario": "p1_artifacts_ai",
    "case": "package.create",
    "route": "POST /api/clients/1001/packages",
-   "caught": false,
+   "caught": true,
    "reported": {
     "category": "type",
     "path": "size_bytes",
@@ -508,7 +508,7 @@
    "scenario": "p1_artifacts_ai",
    "case": "package.create",
    "route": "POST /api/clients/1001/packages",
-   "caught": false,
+   "caught": true,
    "reported": {
     "category": "type",
     "path": "size_bytes",
