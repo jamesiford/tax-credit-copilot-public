@@ -95,6 +95,10 @@ public static class PyDate
     }
 
     /// <summary>Python <c>date.fromisoformat(text)</c> (3.11+ formats: calendar and week dates, basic and extended).</summary>
+    /// <remarks>
+    /// CPython 3.12 gates on the UTF-8 BYTE length (7, 8 or 10) and then parses the leading components without requiring that the whole text was consumed, so
+    /// <c>"20230101.0"</c> and <c>"2023W011xx"</c> are dates and a lone surrogate is "invalid". The message quotes the text with <c>repr</c>.
+    /// </remarks>
     /// <exception cref="PyValueError">For any other text.</exception>
     public static DateOnly FromIsoFormat(string text)
     {
@@ -108,7 +112,7 @@ public static class PyDate
                 Make(y, m, d);
             }
 
-            throw new PyValueError($"Invalid isoformat string: '{text}'");
+            throw new PyValueError($"Invalid isoformat string: {PyStr.Repr(text)}");
         }
 
         return result;
@@ -117,27 +121,30 @@ public static class PyDate
     /// <summary>The year, month and day of a syntactically valid calendar date (<c>YYYY-MM-DD</c> or <c>YYYYMMDD</c>) whose values may be impossible.</summary>
     private static bool TryCalendarParts(string text, out int year, out int month, out int day)
     {
-        month = 0;
-        day = 0;
-        year = 0;
-        var p = 0;
-        if (text.Length is not (8 or 10) || !Digits(text, ref p, 4, out year))
+        (year, month, day) = (0, 0, 0);
+        if (!HasIsoLength(text))
         {
             return false;
         }
 
-        var separator = text[p] == '-';
+        var p = 0;
+        if (!Digits(text, ref p, 4, out year))
+        {
+            return false;
+        }
+
+        var separator = At(text, p) == '-';
         if (separator)
         {
             p++;
         }
 
-        if (!Digits(text, ref p, 2, out month) || (separator && (p >= text.Length || text[p++] != '-')))
+        if (At(text, p) == 'W' || !Digits(text, ref p, 2, out month) || (separator && At(text, p++) != '-'))
         {
             return false;
         }
 
-        return Digits(text, ref p, 2, out day) && p == text.Length;
+        return Digits(text, ref p, 2, out day);
     }
 
     /// <summary>Non-throwing form of <see cref="FromIsoFormat"/>.</summary>
@@ -145,7 +152,7 @@ public static class PyDate
     {
         ArgumentNullException.ThrowIfNull(text);
         result = default;
-        if (text.Length is not (7 or 8 or 10))
+        if (!HasIsoLength(text, out var length))
         {
             return false;
         }
@@ -156,33 +163,18 @@ public static class PyDate
             return false;
         }
 
-        var separator = p < text.Length && text[p] == '-';
+        var separator = At(text, p) == '-';
         if (separator)
         {
             p++;
         }
 
-        if (p < text.Length && text[p] == 'W')
+        if (At(text, p) == 'W')
         {
-            return TryParseWeekDate(text, p + 1, separator, year, out result);
+            return TryParseWeekDate(text, length, p + 1, separator, year, out result);
         }
 
-        if (text.Length == 7 || !Digits(text, ref p, 2, out var month))
-        {
-            return false;
-        }
-
-        if (separator)
-        {
-            if (p >= text.Length || text[p] != '-')
-            {
-                return false;
-            }
-
-            p++;
-        }
-
-        if (!Digits(text, ref p, 2, out var day) || p != text.Length)
+        if (!TryCalendarParts(text, out year, out var month, out var day))
         {
             return false;
         }
@@ -196,7 +188,7 @@ public static class PyDate
         return true;
     }
 
-    private static bool TryParseWeekDate(string text, int p, bool separator, int year, out DateOnly result)
+    private static bool TryParseWeekDate(string text, int length, int p, bool separator, int year, out DateOnly result)
     {
         result = default;
         if (!Digits(text, ref p, 2, out var week))
@@ -205,11 +197,11 @@ public static class PyDate
         }
 
         var day = 1;
-        if (p < text.Length)
+        if (p < length)
         {
             if (separator)
             {
-                if (text[p] != '-')
+                if (At(text, p) != '-')
                 {
                     return false;
                 }
@@ -223,7 +215,7 @@ public static class PyDate
             }
         }
 
-        if (p != text.Length || year < 1 || week is < 1 or > 53 || day is < 1 or > 7)
+        if (year < 1 || week is < 1 or > 53 || day is < 1 or > 7)
         {
             return false;
         }
@@ -242,6 +234,27 @@ public static class PyDate
         result = DateOnly.FromDayNumber((int)ordinal);
         return true;
     }
+
+    private static bool HasIsoLength(string text) => HasIsoLength(text, out _);
+
+    /// <summary>CPython's gate: the UTF-8 length is 7, 8 or 10; text with a lone surrogate has no UTF-8 form and is not a date.</summary>
+    private static bool HasIsoLength(string text, out int length)
+    {
+        length = 0;
+        try
+        {
+            length = new System.Text.UTF8Encoding(false, true).GetByteCount(text);
+        }
+        catch (System.Text.EncoderFallbackException)
+        {
+            return false;
+        }
+
+        return length is 7 or 8 or 10;
+    }
+
+    /// <summary>The character at <paramref name="p"/>, or NUL past the end (CPython reads the string's terminator).</summary>
+    private static char At(string text, int p) => p < text.Length ? text[p] : '\0';
 
     private static bool Digits(string text, ref int p, int count, out int value)
     {
