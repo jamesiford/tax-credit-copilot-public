@@ -1,0 +1,303 @@
+{
+ "api_checks": {
+  "api_eligibility_by_client": {
+   "1001": {
+    "employees_evaluated": 107,
+    "min_max_eligible": 77,
+    "pay_period_eligible": 72
+   }
+  },
+  "api_portfolio_cells": 1,
+  "api_scope_clients": 1
+ },
+ "g2_mismatches": [],
+ "gold_row_counts": {
+  "employee_eligibility": 376,
+  "employee_period_fact": 5281,
+  "onezero_matrix": 2898,
+  "run_method_summary": 4,
+  "unit_credit_installment": 40,
+  "unit_month_summary": 16,
+  "unit_year_master": 16
+ },
+ "notes": {
+  "client": 1001,
+  "year": 2025
+ },
+ "profile": "P1",
+ "seed_employee_rows_min_max_2025": {
+  "1001": 107
+ },
+ "source_origin": "backend/data/payroll_pay_periods.csv (committed synthetic fixture), DATA_SOURCE=csv, account 1001",
+ "tables": {
+  "gold/employee_eligibility.jsonl.gz": {
+   "columns": [
+    "client_id",
+    "tax_year",
+    "method",
+    "run_id",
+    "employee_id",
+    "record_token",
+    "total_hours",
+    "total_wages",
+    "first_start",
+    "last_end",
+    "days",
+    "weeks_worked",
+    "avg_weekly_hours",
+    "avg_weekly_wages",
+    "eligible",
+    "weight"
+   ],
+   "rows": 376,
+   "sha256": "f585f0dc2b10676e770694fd04466621afd8cf0dc542138ab3759c72c9d45ef4"
+  },
+  "gold/employee_period_fact.jsonl.gz": {
+   "columns": [
+    "client_id",
+    "tax_year",
+    "run_id",
+    "employee_id",
+    "record_token",
+    "worksite_id",
+    "entity_fein",
+    "job_title",
+    "pay_period_start",
+    "pay_period_end",
+    "pay_date",
+    "period_days",
+    "pay_frequency_code",
+    "hours",
+    "wages",
+    "pay_code",
+    "included",
+    "selection_decision",
+    "qc_flag"
+   ],
+   "rows": 5281,
+   "sha256": "610560ec9e14d8a93b71b09a13d2a970699552d69df5bf8d3a7152e006eb6325"
+  },
+  "gold/onezero_matrix.jsonl.gz": {
+   "columns": [
+    "client_id",
+    "tax_year",
+    "method",
+    "run_id",
+    "employee_id",
+    "record_token",
+    "worksite_id",
+    "entity_fein",
+    "first_pps",
+    "last_ppe",
+    "weight",
+    "month_01",
+    "month_02",
+    "month_03",
+    "month_04",
+    "month_05",
+    "month_06",
+    "month_07",
+    "month_08",
+    "month_09",
+    "month_10",
+    "month_11",
+    "month_12"
+   ],
+   "rows": 2898,
+   "sha256": "78ad534f6da87532b7dd2ca7465f85e91dc97b2414a098801499f82e093973b6"
+  },
+  "gold/run_method_summary.jsonl.gz": {
+   "columns": [
+    "client_id",
+    "tax_year",
+    "method",
+    "run_id",
+    "program_code",
+    "annual_average",
+    "eligible_employees",
+    "employees_evaluated",
+    "matrix_rows",
+    "unit_fein_rows",
+    "contested_months",
+    "month_ends",
+    "appended_at"
+   ],
+   "rows": 4,
+   "sha256": "ee709b9f0b33e65d5ddbb937e28ece5fd32a36ee14ee095f935652c2fb2f8a56"
+  },
+  "gold/unit_credit_installment.jsonl.gz": {
+   "columns": [
+    "client_id",
+    "worksite_id",
+    "program_code",
+    "method",
+    "creation_year",
+    "tax_year",
+    "tranche_jobs",
+    "jobs_maintained",
+    "per_job_usd",
+    "claimable_usd",
+    "projected",
+    "run_id",
+    "is_current",
+    "appended_at"
+   ],
+   "rows": 40,
+   "sha256": "3979a52152c45f9a0b187e73941ac7d63440ab34cb0758034b13665ee751a8d1"
+  },
+  "gold/unit_month_summary.jsonl.gz": {
+   "columns": [
+    "client_id",
+    "tax_year",
+    "method",
+    "run_id",
+    "worksite_id",
+    "month_01",
+    "month_02",
+    "month_03",
+    "month_04",
+    "month_05",
+    "month_06",
+    "month_07",
+    "month_08",
+    "month_09",
+    "month_10",
+    "month_11",
+    "month_12",
+    "total",
+    "average_headcount",
+    "months_with_headcount",
+    "unreachable_months"
+   ],
+   "rows": 16,
+   "sha256": "897170d1968fde959a22d47cce579d48377c65cc2fa7e86c45e4307bf266f87c"
+  },
+  "gold/unit_year_master.jsonl.gz": {
+   "columns": [
+    "client_id",
+    "worksite_id",
+    "entity_fein",
+    "program_code",
+    "method",
+    "tax_year",
+    "average_headcount",
+    "is_base_year",
+    "base_average_headcount",
+    "base_year_source",
+    "net_new_vs_base",
+    "months_reachable",
+    "year_complete",
+    "declined",
+    "decline_reason",
+    "threshold",
+    "threshold_source",
+    "qualified",
+    "status",
+    "tier",
+    "designation",
+    "tier_source",
+    "eligible_jobs",
+    "new_jobs_created",
+    "high_water_mark",
+    "backfilled",
+    "per_job_usd",
+    "tranche_years",
+    "annual_credit_usd",
+    "base_year_overridden",
+    "high_water_mark_overridden",
+    "run_id",
+    "is_current",
+    "appended_at"
+   ],
+   "rows": 16,
+   "sha256": "501a5407116cdc4ff4be227861ee1c41a955d81ccef28bf83a37e333dca8fbef"
+  },
+  "operational/program_claim.jsonl.gz": {
+   "columns": [
+    "claim_id",
+    "client_id",
+    "entity_id",
+    "program_code",
+    "tax_year",
+    "status",
+    "provenance",
+    "identified_usd",
+    "claimed_usd",
+    "certified_usd",
+    "average_headcount",
+    "base_average_headcount",
+    "threshold_jobs",
+    "is_base_year",
+    "identified_run_id",
+    "assumption_set_id",
+    "rule_pack_version",
+    "filed_on",
+    "filing_reference",
+    "decided_by",
+    "decided_at",
+    "decline_reason",
+    "effective_from",
+    "effective_to"
+   ],
+   "rows": 2,
+   "sha256": "5daaadec0cfcbe9392e2b9881e7d19c52b705a635bc8a287eb9e04ca1b2801e9"
+  },
+  "operational/program_engagement.jsonl.gz": {
+   "columns": [
+    "client_id",
+    "program_code",
+    "scope",
+    "effective_from",
+    "effective_to",
+    "note",
+    "set_by",
+    "set_at"
+   ],
+   "rows": 0,
+   "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
+  },
+  "ops/run_manifest.jsonl.gz": {
+   "columns": [
+    "run_id",
+    "client_id",
+    "entity_id",
+    "program_code",
+    "tax_year",
+    "fiscal_year_begin",
+    "fiscal_year_end",
+    "source_snapshot_id",
+    "step1_assumption_set_id",
+    "step1_assumption_sha256",
+    "onezero_assumption_set_id",
+    "onezero_assumption_sha256",
+    "rule_pack_version",
+    "code_commit",
+    "calculation_id",
+    "run_started_at",
+    "run_completed_at",
+    "run_status",
+    "superseded_by_run_id",
+    "triggered_by"
+   ],
+   "rows": 1,
+   "sha256": "b597c0de4041b2df7140265c49d20be586845f4974e5013421cddec9c8649baf"
+  },
+  "source/pay_periods.jsonl.gz": {
+   "columns": [
+    "Tax_Year",
+    "Employee_ID",
+    "Job_Title",
+    "Worksite_ID",
+    "Pay_Period_Start",
+    "Pay_Period_End",
+    "Pay_Date",
+    "Entity_FEIN",
+    "Hours_Worked",
+    "Gross_Wages",
+    "Pay_Code"
+   ],
+   "rows": 9477,
+   "sha256": "ab120a8052a0e4dccee8668c5c2c778cebd67d5dffe069e5c4cafc0a92ecb136"
+  }
+ }
+}

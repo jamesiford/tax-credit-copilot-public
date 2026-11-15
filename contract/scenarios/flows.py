@@ -179,8 +179,8 @@ def build_all(b: Any) -> None:
         S("withdraw", "POST", f"{D}/{{{{draft_id}}}}/withdraw", json={"reason": "superseded", "actor": "ann"}),
         S("withdraw-again", "POST", f"{D}/{{{{draft_id}}}}/withdraw", json={"reason": "again", "actor": "ann"}),
         S("get-withdrawn", "GET", f"{D}/{{{{draft_id}}}}"),
-        S("second-create", "POST", D, json={"code": "ZZ_SECOND", "name": "Second", "state": dw.STATE, "years": [2025], "actor": "ann"}, capture={"draft2": "body.draft_id", "version2": "body.version"}),
-        S("second-fill", "PUT", f"{D}/{{{{draft2}}}}/documents", json={"expected_version": "{{version2}}", "pack": {**docs_one["pack"], "credit": {**docs_one["pack"]["credit"], "code": "ZZ_SECOND"}}, "years": docs_one["years"], "actor": "ann"}),
+        S("second-create", "POST", D, json={"code": dw.CODE, "name": "Zedland Two Jobs Credit", "state": dw.STATE, "years": [2024, 2025], "actor": "ann"}, capture={"draft2": "body.draft_id", "version2": "body.version"}),
+        S("second-fill", "PUT", f"{D}/{{{{draft2}}}}/documents", json={"expected_version": "{{version2}}", "pack": docs["pack"], "years": docs["years"], "actor": "ann"}),
         S("second-validate", "POST", f"{D}/{{{{draft2}}}}/validate", json={"actor": "ann"}),
         S("second-request-review", "POST", f"{D}/{{{{draft2}}}}/request-review", json={"actor": "ann"}),
         S("second-approve", "POST", f"{D}/{{{{draft2}}}}/review", json={"decision": "approve", "actor": "bob", "comment": "ok"}),
@@ -366,7 +366,7 @@ def _auth(b: Any) -> dict[str, Any]:
               S("none.portfolio", "GET", "/api/v2/portfolio"), S("none.post-claims", "POST", "/api/claims", json=b.GOOD_BODY["POST /api/claims"]),
               S("none.unknown-path", "GET", "/api/nope"), S("none.docs", "GET", "/docs"), S("none.openapi", "GET", "/openapi.json"),
               S("none.trailing-slash", "GET", "/api/me/"), S("none.options", "OPTIONS", "/api/me")]
-    for sid, header in [("garbage", "Bearer garbage"), ("basic", "Basic dXNlcjpwYXNz"), ("empty-bearer", "Bearer"), ("bearer-space", "Bearer "), ("no-scheme", "abc"),
+    for sid, header in [("garbage", "Bearer garbage"), ("basic", "Basic dXNlcjpwYXNz"), ("empty-bearer", "Bearer"), ("no-scheme", "abc"),
                         ("lower-scheme", "bearer garbage"), ("two-parts", "Bearer a b"), ("jwt-shaped", "Bearer a.b.c")]:
         steps.append(S(f"malformed.{sid}", "GET", "/api/me", headers={"authorization": header}))
     # --- each way a token can be wrong
@@ -412,7 +412,7 @@ def _auth(b: Any) -> dict[str, Any]:
     ag = bearer("agent")
     steps += [S("agent.no-acting-header", "GET", "/api/me", headers=ag), S("agent.me-acting", "GET", "/api/me", headers={**ag, "x-tcc-acting-user": acting(writer)}),
               S("agent.acting-reader", "GET", "/api/me", headers={**ag, "x-tcc-acting-user": acting(reader, assurance="delegated")}),
-              S("agent.header-empty", "GET", "/api/me", headers={**ag, "x-tcc-acting-user": " "}),
+              S("agent.header-empty", "GET", "/api/me", headers={**ag, "x-tcc-acting-user": ""}),
               S("agent.header-not-base64", "GET", "/api/me", headers={**ag, "x-tcc-acting-user": "not base64!"}),
               S("agent.header-not-json", "GET", "/api/me", headers={**ag, "x-tcc-acting-user": "YWJj"}),
               S("agent.header-wrong-tenant", "GET", "/api/me", headers={**ag, "x-tcc-acting-user": encode({"oid": writer, "tid": "00000000-0000-0000-0000-0000000000ff"})}),

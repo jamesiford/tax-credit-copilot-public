@@ -125,8 +125,36 @@ def install() -> None:
     reset_counters()
     _freeze_git()
     _freeze_zip()
+    _freeze_mtimes()
     _freeze_threads()
     _installed = True
+
+
+def _freeze_mtimes() -> None:
+    """The rule-pack files' modification times reach `/api/rules` (`last_update_iso`, each rule's `updated`).
+
+    They are the checkout time of whoever cloned the repository, so a recording would only hold on one machine. Each rule file is given a
+    fixed time derived from its path (so the 'most recently updated' ordering is stable and not all equal). (FINDING F-10.)
+    """
+    import os
+    import zlib
+
+    real = os.stat
+    base = int(FROZEN_EPOCH) - 30 * 86400
+
+    def stat(path, *args, **kwargs):
+        result = real(path, *args, **kwargs)
+        text = os.fspath(path) if not isinstance(path, int) else ""
+        if isinstance(text, bytes):
+            text = text.decode("utf-8", "replace")
+        normalised = text.replace("\\", "/")
+        if normalised.endswith(".json") and "/backend/rules/" in normalised:
+            when = base + zlib.crc32(normalised.split("/backend/rules/", 1)[1].encode()) % (20 * 86400)
+            fields = list(result)[:7] + [when, when, when]
+            return os.stat_result(fields + [float(when), float(when), float(when), when * 10**9, when * 10**9, when * 10**9])
+        return result
+
+    os.stat = stat  # type: ignore[assignment]
 
 
 def _freeze_threads() -> None:

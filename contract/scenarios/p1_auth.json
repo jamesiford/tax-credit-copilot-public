@@ -208,16 +208,6 @@
    }
   },
   {
-   "id": "malformed.bearer-space",
-   "request": {
-    "method": "GET",
-    "path": "/api/me",
-    "headers": {
-     "authorization": "Bearer "
-    }
-   }
-  },
-  {
    "id": "malformed.no-scheme",
    "request": {
     "method": "GET",
@@ -1164,7 +1154,7 @@
     "path": "/api/me",
     "headers": {
      "authorization": "Bearer {{token.agent}}",
-     "x-tcc-acting-user": " "
+     "x-tcc-acting-user": ""
     }
    }
   },

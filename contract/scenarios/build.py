@@ -98,7 +98,7 @@ GOOD_BODY: dict[str, Any] = {
     "POST /api/onezero/employee/{employee_id}/review": {"status": "validated", "note": "n", "reviewer": "contract"},
     "POST /api/rules/ingested/{state}/apply": {"tax_year": YEAR, "confirmed_by": "contract"},
     "POST /api/simulate/unit": {"client_id": CLIENT, "worksite_id": UNIT, "tax_year": YEAR, "state": STATE, "action": "add_headcount", "magnitude": 2},
-    "POST /api/simulate/employee": {"client_id": CLIENT, "tax_year": YEAR, "state": STATE, "employees": [{"employee_id": "{{employee_id}}"}]},
+    "POST /api/simulate/employee": {"client_id": CLIENT, "tax_year": YEAR, "state": STATE, "employees": [{"record_token": "{{token}}", "additional_weekly_hours": 4, "hourly_raise": 1.5}]},
     "POST /api/simulate/onezero": {"tax_year": YEAR, "state": STATE, "client_id": CLIENT, "action": "add_headcount", "magnitude": 2},
     "POST /api/summary": {"page": "portfolio"},
     "POST /api/ingestion/{tax_year}/exceptions/{exception_id}/resolve": {"resolution": "accept", "reviewer": "contract"},

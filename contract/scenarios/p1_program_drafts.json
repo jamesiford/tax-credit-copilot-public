@@ -1221,10 +1221,11 @@
     "method": "POST",
     "path": "/api/v2/program-drafts",
     "json": {
-     "code": "ZZ_SECOND",
-     "name": "Second",
+     "code": "ZY_DRAFT_JTC",
+     "name": "Zedland Two Jobs Credit",
      "state": "ZY",
      "years": [
+      2024,
       2025
      ],
      "actor": "ann"
@@ -1251,7 +1252,7 @@
        "name": "Zedland Two (fictional)"
       },
       "credit": {
-       "code": "ZZ_SECOND",
+       "code": "ZY_DRAFT_JTC",
        "name": "ZY_DRAFT_JTC (fictional)",
        "statutory_citation": "Fictional Code § 0-0-0"
       },
@@ -1292,6 +1293,60 @@
       }
      },
      "years": {
+      "2024": {
+       "_prototype_verification": "FICTIONAL draft for tests. Every value is invented and flagged; it is not law.",
+       "rule_pack_version": "0.0.1+ty2024",
+       "jurisdiction": {
+        "level": "state",
+        "code": "ZY",
+        "name": "Zedland Two (fictional)"
+       },
+       "credit": {
+        "code": "ZY_DRAFT_JTC",
+        "name": "ZY_DRAFT_JTC (fictional)",
+        "statutory_citation": "Fictional Code § 0-0-0"
+       },
+       "tax_year_convention": {
+        "label": "begins",
+        "_prototype_verify": true
+       },
+       "filing": {
+        "window": "Fictional filing window",
+        "cycle": "annual",
+        "_prototype_verify": true
+       },
+       "thresholds": {
+        "minimum_new_jobs": 1,
+        "minimum_hours_per_week_full_time": 30,
+        "_prototype_verify": true
+       },
+       "benefit": {
+        "amount_per_qualifying_job_usd": 1200,
+        "benefit_period_years": 3,
+        "carryforward_years": 5,
+        "currency": "USD",
+        "_prototype_verify": true
+       },
+       "one_zero": {
+        "min_weekly_hours": 30.0,
+        "min_weekly_wages": 400.0,
+        "wage_basis": "regular",
+        "geographic_granularity": "statewide",
+        "pt_aggregation": false,
+        "headcount_unit_field": "Worksite_ID",
+        "entity_combination": "permitted",
+        "_prototype_verify": true,
+        "wage_floor_basis": {
+         "note": "invented for tests",
+         "_prototype_verify": true
+        }
+       },
+       "tax_year": 2024,
+       "_year_provenance": {
+        "source": "invented for tests",
+        "adr": "ADR-005"
+       }
+      },
       "2025": {
        "_prototype_verification": "FICTIONAL draft for tests. Every value is invented and flagged; it is not law.",
        "rule_pack_version": "0.0.1+ty2025",

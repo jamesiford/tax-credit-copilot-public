@@ -55,6 +55,11 @@ def _wire_gold(warehouse: Any) -> None:
 
     wiring.set_gold_writer(OfflineGoldWriter(warehouse))
     wiring.set_gold_reader(ContractGoldReader(warehouse))
+    # The governed data query (`data_catalog`, `data_query`, `data_distinct_values`) reads the same store through the SQLite adapter.
+    from bootstrap import data_wiring
+    from tests.data_engine_fixture import data_service
+
+    data_wiring.set_data_query_service(data_service(warehouse))
 
 
 def build(profile: str, workdir: Path | None = None) -> World:

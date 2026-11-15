@@ -34,3 +34,23 @@ Running log of decisions, findings and gate results. Newest at the bottom of eac
 - First run exposed a real defect in the generator: `response_class` printed a `DefaultPlaceholder` object address, so two runs
   differed. Fixed (unwrap `.value`), then two consecutive runs gave identical SHA-256 for all 7 JSON files and the Markdown.
 - `--check` negative test: appending a byte to `inventory/data.json` made `--check` exit 1 naming the file.
+
+### Decisions added during the run
+
+- D4. Each scenario runs in a fresh process. A P2 build takes ~80 s (four synthetic clients through the engine), so scenarios are few and coherent and `capture` runs them 4-wide.
+- D5. Harness-only seams (never edits to product files): `harness/gold.py` (SQLite `SELECT DISTINCT TOP n`), `harness/freeze.py` (clock, ids, secrets, git commit, rule mtimes, zip member times, background recalculation thread, sqlite date adapters), `harness/control.py` (`/__contract__/drain|env|mint`, one request at a time, deferred work finished before the next request), `harness/auth.py` (Entra with a run-time RSA key), `harness/gateway.py` (profile G1/G1L).
+- D6. Scenario variables and a `{{token.<name>}}` placeholder keep minted tokens out of every file.
+- D7. Over a real socket two header values cannot be sent by an HTTP client (`Bearer ` with a trailing space, a blank acting-user header); the cases were changed/dropped rather than faked.
+
+### Gates (final)
+
+- **G1** inventory regenerates byte-identically; `--check` exits 1 when the product or the file differs: PASS (8 files).
+- **G2** two builds of each profile give identical seed manifests (P1 18,111 rows, P2 390,660); API figures equal seed rows: PASS.
+- **G3** every route has at least one recording (93/93; 82 with a success, 11 explained in `COVERAGE.md`); `capture --check` identical twice in a row, three-wide, all 12 recordings: PASS. Orchestrator recording `--check` identical.
+- **G4** strict replay against a real `uvicorn` in a separate process: 1,769/1,769 identical; in-process: identical. Mutation self-test 20/20.
+- Baseline tests (preflight) were not re-run at the end because no product file changed (`git status` outside `contract/` is empty).
+
+### Process findings worth keeping
+
+- The first `--check` runs found real sources of volatility; each was frozen at its source (see `normalisation.md`). The most instructive: a background recalculation thread whose id draws raced the next request only under CPU load.
+- `magnitude=999999999` on `/api/simulate/portfolio` hangs the recorder (F-1); the case is excluded and logged.
