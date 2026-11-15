@@ -1,0 +1,19 @@
+{
+  "improvements": [
+    {
+      "id": "IMP-sources_auth_ai-1",
+      "kind": "defect_fix",
+      "route": "POST /api/clients/{id}/packages",
+      "case": "p1_artifacts_ai:package.create-again",
+      "finding": "F-5",
+      "reason": "Immutable byte stores expose artifact_exists as a typed 409 conflict for the W2 handler rather than an unhandled duplicate-path 500. Existing artifact bytes are preserved."
+    },
+    {
+      "id": "IMP-sources_auth_ai-2",
+      "kind": "defect_fix",
+      "route": "POST /api/clients/{id}/packages",
+      "finding": "",
+      "reason": "Local byte publication is atomically create-only under concurrent callers instead of Python's racy exists-then-write sequence. Windows drive, UNC, alternate-stream and backslash escapes are refused."
+    }
+  ]
+}

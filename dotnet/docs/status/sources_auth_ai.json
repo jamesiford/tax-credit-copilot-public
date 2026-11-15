@@ -1,24 +1,24 @@
 {
   "session": "sources_auth_ai",
   "branch": "dotnet/w1-sources_auth_ai",
-  "head": "7a16a5a",
-  "summary": "Stopped under hard stop 1: required documentation paths are outside the fixed exhaustive ownership list. No adapters, contracts, or tests implemented. Only the expressly mandated halt and finish records were written. Local commits only; no live services contacted. Build, format, fast tests, and replay not run. The head identifies the halt-record commit immediately preceding this finish-record commit.",
+  "head": "203e113",
+  "summary": "Implementation resumed after the conductor explicitly requested removal of the halt and the required report/status. S1-S6 adapters and hermetic tests are in progress. CPython3.12.13 imports verified against this worktree; parity commands explicitly set TCC_PYTHON. No live services or pushes. This intermediate status does not claim final build/test gates.",
   "stages": {
-    "S1": "skipped",
-    "S2": "skipped",
-    "S3": "skipped",
-    "S4": "skipped",
-    "S5": "skipped",
-    "S6": "skipped"
+    "S1": "partial",
+    "S2": "partial",
+    "S3": "partial",
+    "S4": "partial",
+    "S5": "partial",
+    "S6": "partial"
   },
   "gates_claimed": {
-    "no_halt": false,
+    "no_halt": true,
     "commits_present": true,
-    "clean_tree": true,
+    "clean_tree": false,
     "not_pushed": true,
-    "owned_paths": false,
+    "owned_paths": true,
     "status_json": true,
-    "report_present": false,
+    "report_present": true,
     "dotnet_build": false,
     "dotnet_format": false,
     "tests_fast": false
@@ -26,22 +26,33 @@
   "deviations": [
     {
       "id": "DEV-1",
-      "what": "Created only the halt and status files prescribed by the hard-stop and Finish instructions, although documentation is absent from the allowed-path list.",
-      "why": "These specific instructions require recording a hard stop. They do not authorize the other report and log paths required for implementation.",
-      "decision_needed": true
+      "what": "The conductor's follow-up explicitly authorizes the required session documentation and removal of the original halt.",
+      "why": "Implementation proceeds within the owned adapter folders and the session-specific report, log, improvements and status paths.",
+      "decision_needed": false
     }
   ],
   "findings": [
-    "The fixed ownership list excludes every required session documentation path; the task explicitly mandates hard stop 1 when an outside-owned-path change would be needed."
+    "The original missing TCC_PYTHON gate failure requires explicit oracle configuration in the test process, not a user/machine-wide environment change.",
+    "The newest Azure SDK graph conflicts with the shared DI10.0.0 package baseline; compatible stable MIT versions are used without changing another session's package declarations."
   ],
   "open_questions": [],
   "needs_human": [
     {
-      "item": "Correct the conductor's ownership policy and gate for required session documentation.",
-      "why": "Explicitly allow the report, log, improvements, status, and halt paths, or place those required artifacts in owned directories. Then rerun the full preflight and stages S1-S6."
+      "item": "M-01: captured ingestion overrides year-resolved wage basis, measuring date and pay codes.",
+      "why": "The design says ingestion may fill but not override authored statute. This path affects calculated figures and remains unchanged in the certified RuleLibrary pending the owner's decision."
+    },
+    {
+      "item": "Credit math prices the first program when a state has several programs.",
+      "why": "The certified credit math retains Python's numeric path; typed multi-program refusals remain upstream. Adding another refusal here would change figures and needs owner review."
+    },
+    {
+      "item": "Reconcile the Azure SDK/SqlClient package graph with the integration branches.",
+      "why": "Shared DI remains pinned at 10.0.0. Newer Blob/credential versions require later shared .NET package patches; compatible stable MIT SDK versions were selected locally."
     }
   ],
   "reports": [
-    "dotnet/docs/HALT-sources_auth_ai.md"
+    "dotnet/docs/SOURCES-AUTH-AI-REPORT.md",
+    "dotnet/docs/sources_auth_ai-log.md",
+    "dotnet/docs/improvements/sources_auth_ai.json"
   ]
 }

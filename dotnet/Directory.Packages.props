@@ -19,6 +19,10 @@
     <!-- BEGIN persistence: only this session edits between the markers -->
     <!-- END persistence -->
     <!-- BEGIN sources_auth_ai: only this session edits between the markers -->
+    <!-- Azure SDK and SqlClient are MIT; versions match stable installed packages, not previews. -->
+    <PackageVersion Include="Microsoft.Data.SqlClient" Version="7.1.2" />
+    <PackageVersion Include="Azure.Identity" Version="1.17.1" />
+    <PackageVersion Include="Azure.Storage.Blobs" Version="12.26.0" />
     <!-- END sources_auth_ai -->
   </ItemGroup>
 </Project>
