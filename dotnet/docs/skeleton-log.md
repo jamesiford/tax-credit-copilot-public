@@ -112,3 +112,29 @@ after the fix. The board does not accept missing reports as a successful replay.
 Final status records verified gates and the inherited figure-changing fix
 candidates. Local implementation and finish commits include the required
 trailers; no branch is pushed or remote changed.
+
+## Conductor replay launch correction
+
+The resumed gate still returned reset 404 because its actual `dotnet run`
+launcher sets `TCC_CONTRACT_DIR` but does not set `TCC_CONTRACT_HOOKS=1`.
+The earlier manual replay supplied the hook flag itself and therefore did not
+exercise that launch configuration. Read the unmodified gate to establish
+the exact command/environment; no conductor file or shared environment changed.
+
+Added an API-project `ComputeRunArguments` bridge: a supplied contract directory
+containing `inventory/routes.json` adds the explicit startup hook argument only
+when the hook environment variable is absent. Explicit `0`, no marker, invalid
+markers, and direct DLL/deployed execution retain disabled hooks.
+Three focused launch tests pass, and the actual conductor-style socket launch
+returns health 200 and empty-object reset 200.
+
+Reran whole-solution build (zero warnings/errors, 18.57s), format verification,
+and all **141 fast tests**: passed. Then ran the conductor's **unmodified
+`g_replay`**, using its actual policy and default launch command while redirecting
+its diagnostic outputs to ignored artifacts inside this worktree.
+It produced all **1,769 exchanges**, passed framework **11/19 (57.9%)** with
+zero framework waivers, and returned **CONDUCTOR_REPLAY_GATE=PASS**.
+Its exact-template classifier differs from the local wrapper's 29/39; no
+threshold or comparison changed. Registered corrections waive 3.4% of reads and
+3.1% of sealed workspace cases, both below the policy's 10% cap.
+The gate stopped its own specifically identified host; no helper remains.

@@ -2,6 +2,13 @@
   <PropertyGroup>
     <RootNamespace>TaxCredit.Api</RootNamespace>
   </PropertyGroup>
+  <!-- The conductor marks its hermetic launch with the inventory directory, not the hook flag. -->
+  <Target Name="ConfigureContractReplayLaunch" BeforeTargets="ComputeRunArguments"
+          Condition="'$(TCC_CONTRACT_DIR)' != '' and '$(TCC_CONTRACT_HOOKS)' == '' and Exists('$(TCC_CONTRACT_DIR)\inventory\routes.json')">
+    <PropertyGroup>
+      <RunArguments>$(RunArguments) --TCC_CONTRACT_HOOKS=1</RunArguments>
+    </PropertyGroup>
+  </Target>
   <ItemGroup>
     <EmbeddedResource Include="Contract\*.generated.json" />
   </ItemGroup>

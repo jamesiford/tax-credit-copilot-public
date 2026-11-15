@@ -1,8 +1,8 @@
 {
   "session": "skeleton",
   "branch": "dotnet/w1-skeleton",
-  "head": "66e63f9d",
-  "summary": "Built the .NET 10 walking skeleton with 110 registered operations, replaceable endpoint groups, portable JSON validation/errors, SSE support, hermetic controls and fail-closed access seams. Whole-solution build and format pass; 141 fast tests pass with the persisted CPython 3.12 oracle. All twelve fresh socket replay reports cover 1769 exchanges; framework is 29/39 (74.36%) without waivers. Deferred business/gateway groups remain red by design. Removed the halt and supplied architecture, ownership, board and improvements reports. The head identifies the implementation commit; the finish commit contains only the final log/status.",
+  "head": "7000de8",
+  "summary": "Fixed the conductor's reset 404: its dotnet-run inventory marker now supplies the explicit startup hook argument without overriding an opt-out or enabling ordinary/deployed hosts. Reran the unmodified conductor replay gate: 1769 exchanges, framework 11/19 (57.9%), zero framework waivers, PASS. Whole-solution build and format pass; all 141 fast tests and three launch regression tests pass. The local wrapper's broader classification remains 29/39 (74.36%); the conductor score is authoritative. Deferred business/gateway groups remain red by design. The head identifies the prior finish commit; this correction and updated finish evidence are committed together.",
   "stages": {
     "preflight": "done",
     "stage1": "done",
@@ -48,6 +48,12 @@
       "what": "Implemented all eleven captured workspace routes, not the ten mentioned in the scope prose.",
       "why": "The authoritative inventory includes eleven operations; dropping one would violate the complete operation surface.",
       "decision_needed": false
+    },
+    {
+      "id": "DEV-5",
+      "what": "Bridge the conductor's TCC_CONTRACT_DIR inventory marker to --TCC_CONTRACT_HOOKS=1 for dotnet run.",
+      "why": "The unmodified conductor omits the required hook flag and disables launch profiles. The project launch bridge preserves runtime flag gating, explicit opt-outs and ordinary/deployed hook defaults.",
+      "decision_needed": false
     }
   ],
   "findings": [
@@ -59,7 +65,9 @@
     "The unchanged replay posts an empty reset object; the wrapper selects the scenario profile through the reset URL.",
     "Relative raw-report paths could fail after the child changed directory and reuse stale reports. Absolute paths, prior-report removal and two focused tests now prevent false success.",
     "Real persistence seeding, JWT verification, business handlers and data-dependent P2 readiness counters are deferred adapters, not fabricated skeleton functionality.",
-    "Slow parity assertions are unchanged; the fast test-run envelope fell from the unclassified 19m12s parity baseline to 8.997s across all four populated test projects."
+    "Slow parity assertions are unchanged; the fast test-run envelope fell from the unclassified 19m12s parity baseline to 8.997s across all four populated test projects.",
+    "The actual conductor launcher supplies TCC_CONTRACT_DIR, not TCC_CONTRACT_HOOKS. Its empty reset request now returns 200 through the scoped launch bridge.",
+    "The conductor scores framework 11/19 (57.9%), not the local wrapper's 29/39, because its exact-template classifier leaves wrong-method and native path variants unassigned. The unmodified conductor gate passes with zero framework waivers."
   ],
   "open_questions": [],
   "needs_human": [

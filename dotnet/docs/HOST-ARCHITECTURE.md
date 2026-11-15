@@ -125,6 +125,15 @@ and `/reset`; otherwise these paths are 404. `/env` cannot enable hooks.
 Environment overrides are host-local, never process-global mutations.
 One hermetic gate serializes control and product requests.
 
+The conductor's actual launcher sets `TCC_CONTRACT_DIR`, but omits the hook
+flag and disables launch profiles. The API project therefore bridges that
+explicit inventory-directory marker to the startup argument
+`--TCC_CONTRACT_HOOKS=1` in `ComputeRunArguments`. This applies only to
+`dotnet run`, requires `inventory/routes.json` in the supplied directory, and
+never overrides an explicitly set `TCC_CONTRACT_HOOKS` (including `0`).
+Ordinary launches and direct DLL/deployed execution gain no hook default.
+`Contract/test_contract_launch.py` verifies all three launch conditions.
+
 Reset accepts a body profile, a `?profile=` query, or the startup
 `TCC_CONTRACT_PROFILE`, with P1 as the default. P1/P2/G1/G1L are supported.
 The replay sends `{}` to reset, so the wrapper supplies each scenario's profile
@@ -188,3 +197,11 @@ Register entries document F-1/F-3/F-4/F-6; this board applies **zero waivers**,
 so no group relies on a register to meet its threshold or exceeds the 10% cap.
 Pre-approved native framework defaults and portable error wording remain
 visible raw failures rather than being hidden by reproduction code.
+
+The **unmodified conductor gate** was also executed after repairing its launch
+path. Its exact-method/template scorer counts framework as **11/19 (57.9%)**,
+with **zero framework waivers**, and reports `CONDUCTOR_REPLAY_GATE=PASS`.
+This differs from the wrapper's 29/39 because the wrapper also assigns unknown
+paths and wrong-method/native path variants to framework; the conductor leaves
+those unmatched exchanges in `_unassigned`. Both scores exceed 50%; the
+conductor score is authoritative for its acceptance check.
