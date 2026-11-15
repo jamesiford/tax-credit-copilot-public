@@ -18,6 +18,13 @@ public sealed class MutationSelfTests(ITestOutputHelper output)
         ("comparison: >= floor becomes > floor", @"src\TaxCredit.Domain\Calculation\OneZeroEligibility.cs", "avgHours + 1e-9 >= minHours", "avgHours + 1e-9 > minHours"),
         ("sum: a 3.14-style compensated int after a float", @"src\TaxCredit.Domain\Numerics\PySum.cs", "f += (double)items[i].IntValue;", "var xi = (double)items[i].IntValue; var ti = f + xi; c += Math.Abs(f) >= Math.Abs(xi) ? (f - ti) + xi : (xi - ti) + f; f = ti;"),
         ("sort: stable tie-break reversed", @"src\TaxCredit.Domain\Numerics\PySort.cs", "return x.Index.CompareTo(y.Index);", "return y.Index.CompareTo(x.Index);"),
+        ("proximity rounding: half-up becomes banker's on the binary value", @"src\TaxCredit.Domain\Calculation\ProximityCoerce.cs", "return OneZeroEligibility.RoundHalfUp(value, places);", "return PyRound.Round(value, places);"),
+        ("proximity comparison: hours floor >= becomes >", @"src\TaxCredit.Domain\Calculation\Proximity.cs", "var passedHours = avgHours >= minHours;", "var passedHours = avgHours > minHours;"),
+        ("proximity comparison: recorded verdict ignored", @"src\TaxCredit.Domain\Calculation\Proximity.cs", "var eligible = recorded is not null ? ProximityCoerce.Truthy(recorded) : derived;", "var eligible = derived;"),
+        ("proximity max/min inversion: the larger need no longer binds", @"src\TaxCredit.Domain\Calculation\Proximity.cs", "PyArith.Max(needs)", "PyArith.Min(needs)"),
+        ("proximity max/min inversion: the smaller cushion no longer binds", @"src\TaxCredit.Domain\Calculation\Proximity.cs", "PyArith.Min(hoursHeadroom, wagesHeadroomHours.Value)", "PyArith.Max(hoursHeadroom, wagesHeadroomHours.Value)"),
+        ("proximity ordering: id tie-break reversed", @"src\TaxCredit.Domain\Calculation\ProximityCohorts.cs", "PyStr.Compare(x.Id, y.Id)", "PyStr.Compare(y.Id, x.Id)"),
+        ("proximity counting: population no longer overrides the ineligible count", @"src\TaxCredit.Domain\Calculation\ProximityCohorts.cs", ".Add(\"ineligible\", usePopulation ? ProximityCoerce.ToInt(Req(population!, \"ineligible\")) : (long)ineligible.Count)", ".Add(\"ineligible\", (long)ineligible.Count)"),
     ];
 
     [Fact]
@@ -47,7 +54,7 @@ public sealed class MutationSelfTests(ITestOutputHelper output)
                 File.WriteAllText(target, text.Replace(oldText, newText, StringComparison.Ordinal));
 
                 var env = new Dictionary<string, string> { ["TCC_FUZZ_N"] = "2000", ["TCC_RUN_MUTATION_TESTS"] = "0" };
-                var (exit, log) = Run("dotnet", "test tests\\TaxCredit.Parity.Tests --filter \"FullyQualifiedName~GoldenEngineTests|FullyQualifiedName~DifferentialFuzz|FullyQualifiedName~Sum_matches_python\"", Path.Combine(root, "dotnet"), env);
+                var (exit, log) = Run("dotnet", "test tests\\TaxCredit.Parity.Tests --filter \"FullyQualifiedName~GoldenEngineTests|FullyQualifiedName~DifferentialFuzz|FullyQualifiedName~Sum_matches_python|FullyQualifiedName~ProximityParityTests\"", Path.Combine(root, "dotnet"), env);
                 var failedLines = log.Split('\n').Count(l => l.Contains("diverged", StringComparison.Ordinal) || l.Contains("mismatches", StringComparison.Ordinal));
                 output.WriteLine($"{name}: exit={exit}, {failedLines} failure summaries");
                 (exit != 0 && failedLines > 0 ? caught : missed).Add(name);

@@ -101,10 +101,43 @@ public static class PyDate
         ArgumentNullException.ThrowIfNull(text);
         if (!TryFromIsoFormat(text, out var result))
         {
+            // CPython validates the components of a well-formed calendar date in the date constructor, so an impossible
+            // month or day raises that constructor's message, not "Invalid isoformat string" (found by the proximity family).
+            if (TryCalendarParts(text, out var y, out var m, out var d))
+            {
+                Make(y, m, d);
+            }
+
             throw new PyValueError($"Invalid isoformat string: '{text}'");
         }
 
         return result;
+    }
+
+    /// <summary>The year, month and day of a syntactically valid calendar date (<c>YYYY-MM-DD</c> or <c>YYYYMMDD</c>) whose values may be impossible.</summary>
+    private static bool TryCalendarParts(string text, out int year, out int month, out int day)
+    {
+        month = 0;
+        day = 0;
+        year = 0;
+        var p = 0;
+        if (text.Length is not (8 or 10) || !Digits(text, ref p, 4, out year))
+        {
+            return false;
+        }
+
+        var separator = text[p] == '-';
+        if (separator)
+        {
+            p++;
+        }
+
+        if (!Digits(text, ref p, 2, out month) || (separator && (p >= text.Length || text[p++] != '-')))
+        {
+            return false;
+        }
+
+        return Digits(text, ref p, 2, out day) && p == text.Length;
     }
 
     /// <summary>Non-throwing form of <see cref="FromIsoFormat"/>.</summary>
