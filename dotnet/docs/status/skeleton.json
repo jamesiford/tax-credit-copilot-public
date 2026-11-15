@@ -1,44 +1,87 @@
 {
   "session": "skeleton",
   "branch": "dotnet/w1-skeleton",
-  "head": "b8e17f4",
-  "summary": "Stopped at fixed hard stop 1 before implementation: mandatory documentation deliverables fall outside the owned-path allowlist. Only explicitly required stopping artifacts were written. Build, format, fast tests, and replay were not run; their gates are not claimed. The head identifies the clean checkout assessed before the stopping-artifacts commit.",
+  "head": "66e63f9d",
+  "summary": "Built the .NET 10 walking skeleton with 110 registered operations, replaceable endpoint groups, portable JSON validation/errors, SSE support, hermetic controls and fail-closed access seams. Whole-solution build and format pass; 141 fast tests pass with the persisted CPython 3.12 oracle. All twelve fresh socket replay reports cover 1769 exchanges; framework is 29/39 (74.36%) without waivers. Deferred business/gateway groups remain red by design. Removed the halt and supplied architecture, ownership, board and improvements reports. The head identifies the implementation commit; the finish commit contains only the final log/status.",
   "stages": {
-    "preflight": "partial",
-    "stage1": "skipped",
-    "stage2": "skipped",
-    "stage3": "skipped",
-    "stage4": "skipped",
-    "stage5": "skipped"
+    "preflight": "done",
+    "stage1": "done",
+    "stage2": "done",
+    "stage3": "done",
+    "stage4": "done",
+    "stage5": "done"
   },
-  "gates_claimed": {},
+  "gates_claimed": {
+    "no_halt": true,
+    "commits_present": true,
+    "clean_tree": true,
+    "not_pushed": true,
+    "owned_paths": true,
+    "status_json": true,
+    "report_present": true,
+    "dotnet_build": true,
+    "dotnet_format": true,
+    "tests_fast": true,
+    "replay": true
+  },
   "deviations": [
     {
       "id": "DEV-1",
-      "what": "Stopped before implementation and validation.",
-      "why": "Fixed hard stop 1 applies because required reports cannot be created within the fixed owned-path allowlist.",
-      "decision_needed": true
+      "what": "Created the mandatory skeleton reports, log, improvements and status under dotnet/docs.",
+      "why": "The conductor's explicit resume instruction requires these outputs and supersedes the original documentation ownership conflict; no unrelated path was changed.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-2",
+      "what": "Provided both improvements/W1-skeleton.json and improvements/skeleton.json with identical entries.",
+      "why": "The prompt names both files. Stage 4 is the primary register, the fixed-rule name is a compatibility copy, and a test prevents drift.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-3",
+      "what": "Retained native routing, explicit-origin CORS and self-contained documentation instead of matching incidental framework recordings.",
+      "why": "The pre-approved policy forbids reproduction of framework artifacts. These remain visible raw misses; the framework threshold passes without any waiver.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-4",
+      "what": "Implemented all eleven captured workspace routes, not the ten mentioned in the scope prose.",
+      "why": "The authoritative inventory includes eleven operations; dropping one would violate the complete operation surface.",
+      "decision_needed": false
     }
   ],
   "findings": [
-    "The fixed owned-path allowlist excludes dotnet/docs/** despite mandatory reports, log, improvements register, and finish status residing there.",
-    "Stage 4 names improvements/W1-skeleton.json, while the fixed rules name improvements/skeleton.json."
+    "F-6: missing workspace assumptions were plain-text 500; the host returns dependency-unavailable JSON 503.",
+    "F-4: negative proximity bands now return validation JSON 422 instead of an unhandled 500.",
+    "F-3: client identifiers outside Int64 storage range now return validation JSON 422.",
+    "F-1: absolute simulation magnitude above 10000 is refused with JSON 422 before computation.",
+    "Native trailing/case routing, explicit CORS and local documentation intentionally differ from incidental Python framework output.",
+    "The unchanged replay posts an empty reset object; the wrapper selects the scenario profile through the reset URL.",
+    "Relative raw-report paths could fail after the child changed directory and reuse stale reports. Absolute paths, prior-report removal and two focused tests now prevent false success.",
+    "Real persistence seeding, JWT verification, business handlers and data-dependent P2 readiness counters are deferred adapters, not fabricated skeleton functionality.",
+    "Slow parity assertions are unchanged; the fast test-run envelope fell from the unclassified 19m12s parity baseline to 8.997s across all four populated test projects."
   ],
-  "open_questions": [
-    "Which improvements-register filename is authoritative?"
-  ],
+  "open_questions": [],
   "needs_human": [
     {
-      "item": "Authorize the required skeleton documentation paths in both the task allowlist and the owned_paths gate.",
-      "why": "The mandatory deliverables otherwise trigger fixed hard stop 1; the missing-decision policy cannot change fixed rules."
+      "item": "M-01: review ingestion overrides of year-resolved wage_basis, measuring_date and pay codes.",
+      "why": "ADR-005's year-resolved precedence conflicts with the captured behavior. Changing it moves calculated figures, so the certified port remains unchanged pending the owner decision."
     },
     {
-      "item": "Choose the authoritative improvements-register filename.",
-      "why": "The task specifies two different filenames."
+      "item": "Review credit_math pricing the first program when a state has several programs.",
+      "why": "The pre-approved policy preserves this figure-affecting behavior. Typed run-resolution refusals remain where already ported; no new credit_math refusal was added."
+    },
+    {
+      "item": "Review the operational simulation magnitude ceiling of 10000.",
+      "why": "F-1 requires a bound but specifies no threshold. The chosen ceiling refuses runaway input without introducing statute or changing a calculated figure."
     }
   ],
   "reports": [
-    "dotnet/docs/HALT-skeleton.md",
+    "dotnet/docs/HOST-ARCHITECTURE.md",
+    "dotnet/docs/route-groups.json",
+    "dotnet/docs/replay-skeleton-board.json",
+    "dotnet/docs/improvements/W1-skeleton.json",
+    "dotnet/docs/improvements/skeleton.json",
     "dotnet/docs/skeleton-log.md",
     "dotnet/docs/status/skeleton.json"
   ]
