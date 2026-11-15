@@ -13,6 +13,9 @@ import sys
 import unicodedata
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import oracle  # noqa: E402
+
 OUT = Path(__file__).resolve().parents[1] / "dotnet" / "src" / "TaxCredit.Domain" / "Numerics" / "PyUnicodeTables.g.cs"
 
 
@@ -24,6 +27,7 @@ def chunked(values: list[int], per_line: int = 16) -> str:
 
 
 def main() -> int:
+    oracle.require()
     keys, offsets, data = [], [], []
     for c in range(0x110000):
         if 0xD800 <= c <= 0xDFFF:

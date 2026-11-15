@@ -13,6 +13,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import engine_io as io  # noqa: E402
+import oracle  # noqa: E402
+
+oracle.require()
 
 rows = list(csv.DictReader(open(Path(__file__).resolve().parents[1] / "backend" / "data" / "payroll_pay_periods.csv", encoding="utf-8")))
 pack = {"min_weekly_hours": 35.0, "min_weekly_wages": 636.0, "included_pay_codes": None, "excluded_pay_codes": None}

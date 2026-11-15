@@ -15,9 +15,11 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import engine_io  # noqa: E402
+import oracle  # noqa: E402
 
 
 def main() -> int:
+    oracle.require()
     out = sys.stdout
     for line in sys.stdin:
         line = line.strip()

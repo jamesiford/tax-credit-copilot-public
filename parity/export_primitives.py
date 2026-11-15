@@ -27,6 +27,9 @@ import sys
 from decimal import ROUND_HALF_EVEN, ROUND_HALF_UP, Decimal
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import oracle  # noqa: E402
+
 SEED = 20261114
 DEFAULT_OUT = Path(__file__).resolve().parent / "goldens" / "primitives.jsonl.gz"
 
@@ -372,7 +375,7 @@ GENERATORS = [vec_int_parse, vec_round, vec_quantize, vec_repr, vec_parse, vec_d
 def build(seed: int) -> bytes:
     rng = random.Random(seed)
     buf = io.BytesIO()
-    meta = {"k": "meta", "python": sys.version.split()[0], "seed": seed, "decimal_prec": decimal.getcontext().prec,
+    meta = {"k": "meta", **oracle.stamp(), "seed": seed, "decimal_prec": decimal.getcontext().prec,
             "decimal_impl": decimal.__name__}
     count = 0
     with gzip.GzipFile(fileobj=buf, mode="wb", mtime=0, compresslevel=9) as gz:
@@ -388,6 +391,7 @@ def build(seed: int) -> bytes:
 
 
 def main() -> int:
+    oracle.require()
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", type=Path, default=DEFAULT_OUT)
     ap.add_argument("--seed", type=int, default=SEED)

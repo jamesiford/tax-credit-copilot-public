@@ -24,7 +24,7 @@ public sealed class DifferentialFuzzTests(ITestOutputHelper output)
         var total = EnvInt("TCC_FUZZ_N", 20000);
         var seed = ulong.TryParse(Environment.GetEnvironmentVariable("TCC_FUZZ_SEED"), NumberStyles.Integer, CultureInfo.InvariantCulture, out var s) ? s : DefaultSeed;
         var parallel = Math.Max(1, EnvInt("TCC_FUZZ_PARALLEL", 4));
-        output.WriteLine($"fuzz: N={total} seed={seed} batch={BatchSize} parallel={parallel} python={PythonSession.PythonExe}");
+        output.WriteLine($"fuzz: N={total} seed={seed} batch={BatchSize} parallel={parallel} python={PythonSession.PythonExe} ({OracleInterpreter.Version})");
 
         var batches = Enumerable.Range(0, (total + BatchSize - 1) / BatchSize).ToList();
         var failures = new System.Collections.Concurrent.ConcurrentBag<string>();

@@ -11,9 +11,8 @@ internal sealed class PythonSession : IDisposable
 
     private PythonSession(Process process) => _process = process;
 
-    /// <summary>The oracle interpreter: <c>TCC_PYTHON</c>, else the main checkout's virtual environment.</summary>
-    public static string PythonExe =>
-        Environment.GetEnvironmentVariable("TCC_PYTHON") ?? @"C:\Projects\GitHub\tax-credit-copilot-public\.venv\Scripts\python.exe";
+    /// <summary>The oracle interpreter: <c>TCC_PYTHON</c>, verified once to be CPython 3.12; there is no default.</summary>
+    public static string PythonExe => OracleInterpreter.Exe;
 
     public static PythonSession Start()
     {

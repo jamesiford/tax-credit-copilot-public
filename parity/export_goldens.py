@@ -21,6 +21,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import engine_io  # noqa: E402
 import matrix  # noqa: E402
+import oracle  # noqa: E402
 
 OUT_DIR = Path(__file__).resolve().parent / "goldens"
 
@@ -36,9 +37,9 @@ def _gz(lines: list[str]) -> bytes:
 def build() -> dict[str, bytes]:
     started = time.time()
     datasets, scenarios = matrix.build()
-    ds_lines = [engine_io.dumps({"k": "meta", "python": sys.version.split()[0], "datasets": len(datasets)})]
+    ds_lines = [engine_io.dumps({"k": "meta", **oracle.stamp(), "datasets": len(datasets)})]
     ds_lines += [engine_io.dumps({"name": n, "rows": r}) for n, r in datasets.items()]
-    eng_lines = [engine_io.dumps({"k": "meta", "python": sys.version.split()[0], "scenarios": len(scenarios)})]
+    eng_lines = [engine_io.dumps({"k": "meta", **oracle.stamp(), "scenarios": len(scenarios)})]
     ok = err = 0
     for s in scenarios:
         req = dict(s)
@@ -55,6 +56,7 @@ def build() -> dict[str, bytes]:
 
 
 def main() -> int:
+    oracle.require()
     ap = argparse.ArgumentParser()
     ap.add_argument("--check", action="store_true")
     ap.add_argument("--out", type=Path, default=OUT_DIR)
