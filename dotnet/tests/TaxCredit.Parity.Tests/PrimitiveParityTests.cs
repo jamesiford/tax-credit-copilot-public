@@ -224,20 +224,22 @@ public sealed class PrimitiveParityTests
         });
 
     [Fact]
-    public void Sum_matches_python_compensated_summation() =>
-        Run("sum", v =>
-        {
-            var items = v.GetProperty("xs").EnumerateArray()
-                .Select(e => IsDbl(e) ? PyNumber.OfFloat(Dbl(e)) : PyNumber.OfInt(e.GetInt64())).ToList();
-            var actual = PySum.Sum(items);
-            var o = v.GetProperty("o");
-            if (!IsDbl(o))
-            {
-                return actual.IsInt ? Eq("int sum", actual.IntValue.ToString(System.Globalization.CultureInfo.InvariantCulture), o.GetProperty("i").GetString()) : "expected an int sum";
-            }
+    public void Sum_matches_python_compensated_summation() => Run("sum", CheckSum);
 
-            return actual.IsInt ? "expected a float sum" : Same("sum", actual.FloatValue, o);
-        });
+    /// <summary>One <c>sum</c> vector against <see cref="PySum"/>; shared with the version-sensitive test.</summary>
+    internal static string? CheckSum(JsonElement v)
+    {
+        var items = v.GetProperty("xs").EnumerateArray()
+            .Select(e => IsDbl(e) ? PyNumber.OfFloat(Dbl(e)) : PyNumber.OfInt(e.GetInt64())).ToList();
+        var actual = PySum.Sum(items);
+        var o = v.GetProperty("o");
+        if (!IsDbl(o))
+        {
+            return actual.IsInt ? Eq("int sum", actual.IntValue.ToString(System.Globalization.CultureInfo.InvariantCulture), o.GetProperty("i").GetString()) : "expected an int sum";
+        }
+
+        return actual.IsInt ? "expected a float sum" : Same("sum", actual.FloatValue, o);
+    }
 
     [Fact]
     public void A_naive_loop_does_not_match_python_sum_so_the_trap_is_real()
