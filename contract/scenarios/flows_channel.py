@@ -123,9 +123,9 @@ def build_all(b: Any) -> list[dict[str, Any]]:
         S("tool.ping-off", "POST", "/channel/v1/tools/channel_ping", json={"args": {}}, headers=agent_headers()),
         # the numeric-integrity guard (ADR-008): facts come from tool results; a draft figure that is not one is refused
         S("guard.read-facts", "POST", "/channel/v1/tools/book_rank", json={"args": {}}, headers=agent_headers(READER, x_conversation_id="guard-1", x_correlation_id="g-1")),
-        S("guard.verify-matching", "POST", "/channel/v1/tools/verify_figures", json={"args": {"draft": "1 of 1 clients have been assessed."}}, headers=agent_headers(READER, x_conversation_id="guard-1", x_correlation_id="g-2")),
-        S("guard.verify-mismatching", "POST", "/channel/v1/tools/verify_figures", json={"args": {"draft": "Identified credit is $123,456 across 77 clients."}}, headers=agent_headers(READER, x_conversation_id="guard-1", x_correlation_id="g-3")),
-        S("guard.verify-other-conversation", "POST", "/channel/v1/tools/verify_figures", json={"args": {"draft": "1 of 1 clients have been assessed."}}, headers=agent_headers(READER, x_conversation_id="guard-2", x_correlation_id="g-4")),
+        S("guard.verify-matching", "POST", "/channel/v1/tools/verify_figures", json={"args": {"draft_text": "1 of 1 clients have been assessed."}}, headers=agent_headers(READER, x_conversation_id="guard-1", x_correlation_id="g-2")),
+        S("guard.verify-mismatching", "POST", "/channel/v1/tools/verify_figures", json={"args": {"draft_text": "Identified credit is $123,456 across 77 clients."}}, headers=agent_headers(READER, x_conversation_id="guard-1", x_correlation_id="g-3")),
+        S("guard.verify-other-conversation", "POST", "/channel/v1/tools/verify_figures", json={"args": {"draft_text": "1 of 1 clients have been assessed."}}, headers=agent_headers(READER, x_conversation_id="guard-2", x_correlation_id="g-4")),
         S("guard.verify-no-draft", "POST", "/channel/v1/tools/verify_figures", json={"args": {}}, headers=agent_headers(READER, x_conversation_id="guard-1", x_correlation_id="g-5")),
         # narration audit (orchestrator only)
         S("narration.no-token", "POST", "/channel/v1/audit/narration", json={}),
@@ -137,30 +137,38 @@ def build_all(b: Any) -> list[dict[str, Any]]:
         S("download.unknown-ticket-with-token", "GET", "/channel/v1/downloads/not-a-ticket", headers=bearer("user")),
         S("download.bad-token", "GET", "/channel/v1/downloads/not-a-ticket", headers={"authorization": "Bearer garbage"}),
     ]
+    # rate limit: 6 a minute per person, frozen clock (profile G1L)
+    rl: list[dict[str, Any]] = []
+    for i in range(1, 9):
+        rl.append(S(f"ratelimit.{i}", "POST", "/channel/v1/tools/book_rank", json={"args": {}}, headers=agent_headers(READER, x_correlation_id=f"rl-{i}")))
+    rl.append(S("ratelimit.other-person", "POST", "/channel/v1/tools/book_rank", json={"args": {}}, headers=agent_headers(WRITER, x_correlation_id="rl-w")))
+    rl.append(S("ratelimit.health-unaffected", "GET", "/channel/health"))
+    made.append(write("g1_ratelimit", "G1L", rl, tokens=TOKENS))
+
     # the two-step write: prepare, then commit with the token, replayed, with the wrong tool, with changed arguments
     f = {"client_id": 1001, "tax_year": 2025, "finding_id": "policy:test_of_twos:ALL:2025", "resolution": "accept", "note": "contract"}
     h = lambda cid: agent_headers(WRITER, x_correlation_id=cid)  # noqa: E731
     rest += [
-        S("write.prepare", "POST", "/channel/v1/tools/finding_resolve_prepare", json={"args": f}, headers=h("w-1"), capture={"token": "body.result.confirmation_token"}),
+        S("write.prepare", "POST", "/channel/v1/tools/finding_resolve_prepare", json={"args": f}, headers=h("w-1"), capture={"token": "body.facts.confirmation.token"}),
         S("write.prepare-as-reader", "POST", "/channel/v1/tools/finding_resolve_prepare", json={"args": f}, headers=agent_headers(READER, x_correlation_id="w-2")),
-        S("write.commit-wrong-tool", "POST", "/channel/v1/tools/finding_reopen_commit", json={"args": {"client_id": 1001, "finding_id": f["finding_id"]}, "confirmation_token": "{{token}}"}, headers=h("w-3")),
-        S("write.commit-changed-args", "POST", "/channel/v1/tools/finding_resolve_commit", json={"args": {**f, "resolution": "drop"}, "confirmation_token": "{{token}}"}, headers=h("w-4")),
-        S("write.commit-other-user", "POST", "/channel/v1/tools/finding_resolve_commit", json={"args": f, "confirmation_token": "{{token}}"}, headers=agent_headers(READER, x_correlation_id="w-5")),
-        S("write.commit", "POST", "/channel/v1/tools/finding_resolve_commit", json={"args": f, "confirmation_token": "{{token}}"}, headers=h("w-6"), capture={"ref": "body.result.confirmation_ref"}),
-        S("write.commit-replayed", "POST", "/channel/v1/tools/finding_resolve_commit", json={"args": f, "confirmation_token": "{{token}}"}, headers=h("w-7")),
-        S("write.commit-no-token", "POST", "/channel/v1/tools/finding_resolve_commit", json={"args": f}, headers=h("w-8")),
-        S("write.commit-garbage-token", "POST", "/channel/v1/tools/finding_resolve_commit", json={"args": f, "confirmation_token": "garbage"}, headers=h("w-9")),
+        S("write.commit-wrong-tool", "POST", "/channel/v1/tools/finding_reopen_commit", json={"args": {"arguments": {"client_id": 1001, "finding_id": f["finding_id"]}, "confirmation_token": "{{token}}", "idempotency_key": "k-wrong"}}, headers=h("w-3")),
+        S("write.commit-changed-args", "POST", "/channel/v1/tools/finding_resolve_commit", json={"args": {"arguments": {**f, "resolution": "drop"}, "confirmation_token": "{{token}}", "idempotency_key": "k-chg"}}, headers=h("w-4")),
+        S("write.commit-other-user", "POST", "/channel/v1/tools/finding_resolve_commit", json={"args": {"arguments": f, "confirmation_token": "{{token}}", "idempotency_key": "k-1"}}, headers=agent_headers(READER, x_correlation_id="w-5")),
+        S("write.commit", "POST", "/channel/v1/tools/finding_resolve_commit", json={"args": {"arguments": f, "confirmation_token": "{{token}}", "idempotency_key": "k-1"}}, headers=h("w-6"), ),
+        S("write.commit-replayed", "POST", "/channel/v1/tools/finding_resolve_commit", json={"args": {"arguments": f, "confirmation_token": "{{token}}", "idempotency_key": "k-1"}}, headers=h("w-7")),
+        S("write.commit-no-token", "POST", "/channel/v1/tools/finding_resolve_commit", json={"args": {"arguments": f, "idempotency_key": "k-2"}}, headers=h("w-8")),
+        S("write.commit-garbage-token", "POST", "/channel/v1/tools/finding_resolve_commit", json={"args": {"arguments": f, "confirmation_token": "garbage", "idempotency_key": "k-3"}}, headers=h("w-9")),
         S("write.findings-after", "POST", "/channel/v1/tools/findings_list", json={"args": {"client_id": 1001, "tax_year": 2025}}, headers=h("w-10")),
-        S("write.claim-package-prepare", "POST", "/channel/v1/tools/claim_package_create_prepare", json={"args": {"client_id": 1001, "tax_year": 2025}}, headers=h("w-11"), capture={"ptoken": "body.result.confirmation_token"}),
-        S("write.claim-package-commit", "POST", "/channel/v1/tools/claim_package_create_commit", json={"args": {"client_id": 1001, "tax_year": 2025}, "confirmation_token": "{{ptoken}}"}, headers=h("w-12")),
-        S("write.claim-package-link", "POST", "/channel/v1/tools/claim_package_link", json={"args": {"client_id": 1001, "tax_year": 2025}}, headers=h("w-13"), capture={"url": "body.result.download_url"}),
+        S("write.claim-package-prepare", "POST", "/channel/v1/tools/claim_package_create_prepare", json={"args": {"client_id": 1001, "tax_year": 2025}}, headers=h("w-11"), capture={"ptoken": "body.facts.confirmation.token"}),
+        S("write.claim-package-commit", "POST", "/channel/v1/tools/claim_package_create_commit", json={"args": {"arguments": {"client_id": 1001, "tax_year": 2025}, "confirmation_token": "{{ptoken}}", "idempotency_key": "k-4"}}, headers=h("w-12")),
+        S("write.claim-package-link", "POST", "/channel/v1/tools/claim_package_link", json={"args": {"client_id": 1001, "tax_year": 2025}}, headers=h("w-13"), capture={"ticket": "body.facts.download_path"}),
+        S("download.other-user", "GET", "{{ticket}}", headers=bearer("user")),
+        S("download.owner", "GET", "{{ticket}}", headers=bearer("writer_user")),
+        S("download.owner-again-single-use", "GET", "{{ticket}}", headers=bearer("writer_user")),
     ]
-    # rate limit: 6 a minute per caller, frozen clock
-    for i in range(1, 9):
-        rest.append(S(f"ratelimit.{i}", "POST", "/channel/v1/tools/book_rank", json={"args": {}}, headers=agent_headers(READER, x_conversation_id="rl", x_correlation_id=f"rl-{i}") | {"x-acting-user-oid": "00000000-0000-0000-0000-0000000000d1"}))
     made.append(write("g1_rest", "G1", rest))
 
-    # ----------------------------------------------------------------------------------------- MCP
+    # rate limit: 6 a minute per person, frozen clock\n    rl: list[dict[str, Any]] = []\n    for i in range(1, 9):\n        rl.append(S(f"ratelimit.{i}", "POST", "/channel/v1/tools/book_rank", json={"args": {}}, headers=agent_headers(READER, x_correlation_id=f"rl-{i}")))\n    rl.append(S("ratelimit.other-person", "POST", "/channel/v1/tools/book_rank", json={"args": {}}, headers=agent_headers(WRITER, x_correlation_id="rl-w")))\n    rl.append(S("ratelimit.health-unaffected", "GET", "/channel/health"))\n    made.append(write("g1_ratelimit", "G1L", rl, tokens=TOKENS))\n\n    # ----------------------------------------------------------------------------------------- MCP
     H = {**bearer("user"), "content-type": "application/json", "accept": "application/json, text/event-stream"}
     HS = {**H, "mcp-session-id": "{{sid}}", "mcp-protocol-version": "2025-06-18"}
     rpc = lambda i, method, params=None: {"jsonrpc": "2.0", "id": i, "method": method, **({"params": params} if params is not None else {})}  # noqa: E731

@@ -1,0 +1,2907 @@
+{
+ "name": "g1_rest",
+ "profile": "G1",
+ "steps": [
+  {
+   "id": "health",
+   "request": {
+    "method": "GET",
+    "path": "/channel/health"
+   }
+  },
+  {
+   "id": "ready",
+   "request": {
+    "method": "GET",
+    "path": "/channel/ready"
+   }
+  },
+  {
+   "id": "tools.no-token",
+   "request": {
+    "method": "GET",
+    "path": "/channel/v1/tools"
+   }
+  },
+  {
+   "id": "tools.delegated",
+   "request": {
+    "method": "GET",
+    "path": "/channel/v1/tools",
+    "headers": {
+     "authorization": "Bearer {{token.user}}"
+    }
+   }
+  },
+  {
+   "id": "tools.agent",
+   "request": {
+    "method": "GET",
+    "path": "/channel/v1/tools",
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a1",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "corr-1"
+    }
+   }
+  },
+  {
+   "id": "tools.agent-no-acting-headers",
+   "request": {
+    "method": "GET",
+    "path": "/channel/v1/tools",
+    "headers": {
+     "authorization": "Bearer {{token.agent}}"
+    }
+   }
+  },
+  {
+   "id": "unknown-route",
+   "request": {
+    "method": "GET",
+    "path": "/channel/v1/nope"
+   }
+  },
+  {
+   "id": "docs-not-served",
+   "request": {
+    "method": "GET",
+    "path": "/docs"
+   }
+  },
+  {
+   "id": "openapi-not-served",
+   "request": {
+    "method": "GET",
+    "path": "/openapi.json"
+   }
+  },
+  {
+   "id": "tools.wrong-method",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools",
+    "json": {}
+   }
+  },
+  {
+   "id": "auth.user",
+   "request": {
+    "method": "GET",
+    "path": "/channel/v1/tools",
+    "headers": {
+     "authorization": "Bearer {{token.user}}"
+    }
+   }
+  },
+  {
+   "id": "auth.writer_user",
+   "request": {
+    "method": "GET",
+    "path": "/channel/v1/tools",
+    "headers": {
+     "authorization": "Bearer {{token.writer_user}}"
+    }
+   }
+  },
+  {
+   "id": "auth.agent",
+   "request": {
+    "method": "GET",
+    "path": "/channel/v1/tools",
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a1",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "corr-1"
+    }
+   }
+  },
+  {
+   "id": "auth.agent_no_role",
+   "request": {
+    "method": "GET",
+    "path": "/channel/v1/tools",
+    "headers": {
+     "authorization": "Bearer {{token.agent_no_role}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a1",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "corr-1"
+    }
+   }
+  },
+  {
+   "id": "auth.agent_with_scope",
+   "request": {
+    "method": "GET",
+    "path": "/channel/v1/tools",
+    "headers": {
+     "authorization": "Bearer {{token.agent_with_scope}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a1",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "corr-1"
+    }
+   }
+  },
+  {
+   "id": "auth.expired",
+   "request": {
+    "method": "GET",
+    "path": "/channel/v1/tools",
+    "headers": {
+     "authorization": "Bearer {{token.expired}}"
+    }
+   }
+  },
+  {
+   "id": "auth.forged",
+   "request": {
+    "method": "GET",
+    "path": "/channel/v1/tools",
+    "headers": {
+     "authorization": "Bearer {{token.forged}}"
+    }
+   }
+  },
+  {
+   "id": "auth.wrong_audience",
+   "request": {
+    "method": "GET",
+    "path": "/channel/v1/tools",
+    "headers": {
+     "authorization": "Bearer {{token.wrong_audience}}"
+    }
+   }
+  },
+  {
+   "id": "auth.no_scope",
+   "request": {
+    "method": "GET",
+    "path": "/channel/v1/tools",
+    "headers": {
+     "authorization": "Bearer {{token.no_scope}}"
+    }
+   }
+  },
+  {
+   "id": "auth.mixed",
+   "request": {
+    "method": "GET",
+    "path": "/channel/v1/tools",
+    "headers": {
+     "authorization": "Bearer {{token.mixed}}"
+    }
+   }
+  },
+  {
+   "id": "auth.other_tenant_user",
+   "request": {
+    "method": "GET",
+    "path": "/channel/v1/tools",
+    "headers": {
+     "authorization": "Bearer {{token.other_tenant_user}}"
+    }
+   }
+  },
+  {
+   "id": "auth.no_oid",
+   "request": {
+    "method": "GET",
+    "path": "/channel/v1/tools",
+    "headers": {
+     "authorization": "Bearer {{token.no_oid}}"
+    }
+   }
+  },
+  {
+   "id": "acting.no-tenant",
+   "request": {
+    "method": "GET",
+    "path": "/channel/v1/tools",
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a1",
+     "x-acting-user-name": "Acting Person",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "corr-1"
+    }
+   }
+  },
+  {
+   "id": "acting.wrong-tenant",
+   "request": {
+    "method": "GET",
+    "path": "/channel/v1/tools",
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a1",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000ff",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "corr-1"
+    }
+   }
+  },
+  {
+   "id": "acting.bad-channel",
+   "request": {
+    "method": "GET",
+    "path": "/channel/v1/tools",
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a1",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "fax",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "corr-1"
+    }
+   }
+  },
+  {
+   "id": "acting.no-channel",
+   "request": {
+    "method": "GET",
+    "path": "/channel/v1/tools",
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a1",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "corr-1"
+    }
+   }
+  },
+  {
+   "id": "acting.bad-oid",
+   "request": {
+    "method": "GET",
+    "path": "/channel/v1/tools",
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "nope",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "corr-1"
+    }
+   }
+  },
+  {
+   "id": "acting.no-name",
+   "request": {
+    "method": "GET",
+    "path": "/channel/v1/tools",
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a1",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "corr-1"
+    }
+   }
+  },
+  {
+   "id": "acting.no-conversation",
+   "request": {
+    "method": "GET",
+    "path": "/channel/v1/tools",
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a1",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-correlation-id": "corr-1"
+    }
+   }
+  },
+  {
+   "id": "acting.bad-correlation",
+   "request": {
+    "method": "GET",
+    "path": "/channel/v1/tools",
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a1",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "bad id!"
+    }
+   }
+  },
+  {
+   "id": "acting.long-name",
+   "request": {
+    "method": "GET",
+    "path": "/channel/v1/tools",
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a1",
+     "x-acting-user-name": "nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "corr-1"
+    }
+   }
+  },
+  {
+   "id": "acting.cowork-channel-asserted-by-agent",
+   "request": {
+    "method": "GET",
+    "path": "/channel/v1/tools",
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a1",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "cowork",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "corr-1"
+    }
+   }
+  },
+  {
+   "id": "tool.book_rank.typical",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/book_rank",
+    "json": {
+     "args": {}
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "c-book_rank"
+    }
+   }
+  },
+  {
+   "id": "tool.book_rank.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/book_rank",
+    "json": {
+     "args": {
+      "zz_unknown_argument": 1
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "i-book_rank"
+    }
+   }
+  },
+  {
+   "id": "tool.client_resolve.typical",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/client_resolve",
+    "json": {
+     "args": {
+      "name_or_text": "x"
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "c-client_resolve"
+    }
+   }
+  },
+  {
+   "id": "tool.client_resolve.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/client_resolve",
+    "json": {
+     "args": {
+      "name_or_text": {
+       "nested": 1
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "i-client_resolve"
+    }
+   }
+  },
+  {
+   "id": "tool.client_situation.typical",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/client_situation",
+    "json": {
+     "args": {
+      "client_id": 1001
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "c-client_situation"
+    }
+   }
+  },
+  {
+   "id": "tool.client_situation.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/client_situation",
+    "json": {
+     "args": {
+      "client_id": "abc"
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "i-client_situation"
+    }
+   }
+  },
+  {
+   "id": "tool.client_eligibility.typical",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/client_eligibility",
+    "json": {
+     "args": {
+      "client_id": 1001,
+      "tax_year": 2025
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "c-client_eligibility"
+    }
+   }
+  },
+  {
+   "id": "tool.client_eligibility.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/client_eligibility",
+    "json": {
+     "args": {
+      "client_id": "abc",
+      "tax_year": 2025
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "i-client_eligibility"
+    }
+   }
+  },
+  {
+   "id": "tool.client_trend.typical",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/client_trend",
+    "json": {
+     "args": {
+      "client_id": 1001
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "c-client_trend"
+    }
+   }
+  },
+  {
+   "id": "tool.client_trend.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/client_trend",
+    "json": {
+     "args": {
+      "client_id": "abc"
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "i-client_trend"
+    }
+   }
+  },
+  {
+   "id": "tool.client_at_risk.typical",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/client_at_risk",
+    "json": {
+     "args": {
+      "client_id": 1001,
+      "tax_year": 2025
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "c-client_at_risk"
+    }
+   }
+  },
+  {
+   "id": "tool.client_at_risk.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/client_at_risk",
+    "json": {
+     "args": {
+      "client_id": "abc",
+      "tax_year": 2025
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "i-client_at_risk"
+    }
+   }
+  },
+  {
+   "id": "tool.client_discovery.typical",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/client_discovery",
+    "json": {
+     "args": {
+      "client_id": 1001
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "c-client_discovery"
+    }
+   }
+  },
+  {
+   "id": "tool.client_discovery.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/client_discovery",
+    "json": {
+     "args": {
+      "client_id": "abc"
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "i-client_discovery"
+    }
+   }
+  },
+  {
+   "id": "tool.simulate.typical",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/simulate",
+    "json": {
+     "args": {
+      "client_id": 1001,
+      "tax_year": 2025,
+      "worksite_id": "GA_ATL_HQ"
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "c-simulate"
+    }
+   }
+  },
+  {
+   "id": "tool.simulate.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/simulate",
+    "json": {
+     "args": {
+      "client_id": "abc",
+      "tax_year": 2025,
+      "worksite_id": "GA_ATL_HQ"
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "i-simulate"
+    }
+   }
+  },
+  {
+   "id": "tool.calc_walkthrough.typical",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/calc_walkthrough",
+    "json": {
+     "args": {
+      "client_id": 1001,
+      "tax_year": 2025
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "c-calc_walkthrough"
+    }
+   }
+  },
+  {
+   "id": "tool.calc_walkthrough.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/calc_walkthrough",
+    "json": {
+     "args": {
+      "client_id": "abc",
+      "tax_year": 2025
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "i-calc_walkthrough"
+    }
+   }
+  },
+  {
+   "id": "tool.employee_drill.typical",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/employee_drill",
+    "json": {
+     "args": {
+      "client_id": 1001,
+      "record_token": "x",
+      "tax_year": 2025
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "c-employee_drill"
+    }
+   }
+  },
+  {
+   "id": "tool.employee_drill.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/employee_drill",
+    "json": {
+     "args": {
+      "client_id": "abc",
+      "record_token": "x",
+      "tax_year": 2025
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "i-employee_drill"
+    }
+   }
+  },
+  {
+   "id": "tool.findings_list.typical",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/findings_list",
+    "json": {
+     "args": {
+      "client_id": 1001,
+      "tax_year": 2025
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "c-findings_list"
+    }
+   }
+  },
+  {
+   "id": "tool.findings_list.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/findings_list",
+    "json": {
+     "args": {
+      "client_id": "abc",
+      "tax_year": 2025
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "i-findings_list"
+    }
+   }
+  },
+  {
+   "id": "tool.claim_cell_history.typical",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/claim_cell_history",
+    "json": {
+     "args": {
+      "client_id": 1001,
+      "program_code": "GA_JTC",
+      "tax_year": 2025
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "c-claim_cell_history"
+    }
+   }
+  },
+  {
+   "id": "tool.claim_cell_history.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/claim_cell_history",
+    "json": {
+     "args": {
+      "client_id": "abc",
+      "program_code": "GA_JTC",
+      "tax_year": 2025
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "i-claim_cell_history"
+    }
+   }
+  },
+  {
+   "id": "tool.data_catalog.typical",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/data_catalog",
+    "json": {
+     "args": {}
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "c-data_catalog"
+    }
+   }
+  },
+  {
+   "id": "tool.data_catalog.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/data_catalog",
+    "json": {
+     "args": {
+      "zz_unknown_argument": 1
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "i-data_catalog"
+    }
+   }
+  },
+  {
+   "id": "tool.data_query.typical",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/data_query",
+    "json": {
+     "args": {
+      "dataset": "employee_period_fact",
+      "client_id": 1001
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "c-data_query"
+    }
+   }
+  },
+  {
+   "id": "tool.data_query.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/data_query",
+    "json": {
+     "args": {
+      "dataset": {
+       "nested": 1
+      },
+      "client_id": 1001
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "i-data_query"
+    }
+   }
+  },
+  {
+   "id": "tool.data_distinct_values.typical",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/data_distinct_values",
+    "json": {
+     "args": {
+      "client_id": 1001,
+      "dataset": "employee_period_fact",
+      "column": "x"
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "c-data_distinct_values"
+    }
+   }
+  },
+  {
+   "id": "tool.data_distinct_values.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/data_distinct_values",
+    "json": {
+     "args": {
+      "client_id": "abc",
+      "dataset": "employee_period_fact",
+      "column": "x"
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "i-data_distinct_values"
+    }
+   }
+  },
+  {
+   "id": "tool.verify_figures.typical",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/verify_figures",
+    "json": {
+     "args": {
+      "draft_text": "x"
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "c-verify_figures"
+    }
+   }
+  },
+  {
+   "id": "tool.verify_figures.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/verify_figures",
+    "json": {
+     "args": {
+      "draft_text": {
+       "nested": 1
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "i-verify_figures"
+    }
+   }
+  },
+  {
+   "id": "tool.run_batch_status.typical",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/run_batch_status",
+    "json": {
+     "args": {}
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "c-run_batch_status"
+    }
+   }
+  },
+  {
+   "id": "tool.run_batch_status.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/run_batch_status",
+    "json": {
+     "args": {
+      "zz_unknown_argument": 1
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "i-run_batch_status"
+    }
+   }
+  },
+  {
+   "id": "tool.run_batch_list.typical",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/run_batch_list",
+    "json": {
+     "args": {}
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "c-run_batch_list"
+    }
+   }
+  },
+  {
+   "id": "tool.run_batch_list.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/run_batch_list",
+    "json": {
+     "args": {
+      "zz_unknown_argument": 1
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "i-run_batch_list"
+    }
+   }
+  },
+  {
+   "id": "tool.program_catalog.typical",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/program_catalog",
+    "json": {
+     "args": {}
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "c-program_catalog"
+    }
+   }
+  },
+  {
+   "id": "tool.program_catalog.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/program_catalog",
+    "json": {
+     "args": {
+      "zz_unknown_argument": 1
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "i-program_catalog"
+    }
+   }
+  },
+  {
+   "id": "tool.claim_package_link.typical",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/claim_package_link",
+    "json": {
+     "args": {
+      "client_id": 1001,
+      "tax_year": 2025
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "c-claim_package_link"
+    }
+   }
+  },
+  {
+   "id": "tool.claim_package_link.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/claim_package_link",
+    "json": {
+     "args": {
+      "client_id": "abc",
+      "tax_year": 2025
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "i-claim_package_link"
+    }
+   }
+  },
+  {
+   "id": "tool.finding_resolve_prepare.typical",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/finding_resolve_prepare",
+    "json": {
+     "args": {
+      "client_id": 1001,
+      "tax_year": 2025,
+      "finding_id": "policy:test_of_twos:ALL:2025",
+      "resolution": "accept"
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "c-finding_resolve_prepare"
+    }
+   }
+  },
+  {
+   "id": "tool.finding_resolve_prepare.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/finding_resolve_prepare",
+    "json": {
+     "args": {
+      "client_id": "abc",
+      "tax_year": 2025,
+      "finding_id": "policy:test_of_twos:ALL:2025",
+      "resolution": "accept"
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "i-finding_resolve_prepare"
+    }
+   }
+  },
+  {
+   "id": "tool.finding_resolve_commit.typical",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/finding_resolve_commit",
+    "json": {
+     "args": {
+      "confirmation_token": "x",
+      "idempotency_key": "x",
+      "arguments": {
+       "client_id": 1001,
+       "tax_year": 2025,
+       "finding_id": "policy:test_of_twos:ALL:2025",
+       "resolution": "accept"
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "c-finding_resolve_commit"
+    }
+   }
+  },
+  {
+   "id": "tool.finding_resolve_commit.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/finding_resolve_commit",
+    "json": {
+     "args": {
+      "confirmation_token": {
+       "nested": 1
+      },
+      "idempotency_key": "x",
+      "arguments": {
+       "client_id": 1001,
+       "tax_year": 2025,
+       "finding_id": "policy:test_of_twos:ALL:2025",
+       "resolution": "accept"
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "i-finding_resolve_commit"
+    }
+   }
+  },
+  {
+   "id": "tool.finding_reopen_prepare.typical",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/finding_reopen_prepare",
+    "json": {
+     "args": {
+      "client_id": 1001,
+      "finding_id": "policy:test_of_twos:ALL:2025"
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "c-finding_reopen_prepare"
+    }
+   }
+  },
+  {
+   "id": "tool.finding_reopen_prepare.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/finding_reopen_prepare",
+    "json": {
+     "args": {
+      "client_id": "abc",
+      "finding_id": "policy:test_of_twos:ALL:2025"
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "i-finding_reopen_prepare"
+    }
+   }
+  },
+  {
+   "id": "tool.finding_reopen_commit.typical",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/finding_reopen_commit",
+    "json": {
+     "args": {
+      "confirmation_token": "x",
+      "idempotency_key": "x",
+      "arguments": {
+       "client_id": 1001,
+       "finding_id": "policy:test_of_twos:ALL:2025"
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "c-finding_reopen_commit"
+    }
+   }
+  },
+  {
+   "id": "tool.finding_reopen_commit.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/finding_reopen_commit",
+    "json": {
+     "args": {
+      "confirmation_token": {
+       "nested": 1
+      },
+      "idempotency_key": "x",
+      "arguments": {
+       "client_id": 1001,
+       "finding_id": "policy:test_of_twos:ALL:2025"
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "i-finding_reopen_commit"
+    }
+   }
+  },
+  {
+   "id": "tool.claim_transition_prepare.typical",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/claim_transition_prepare",
+    "json": {
+     "args": {
+      "client_id": 1001,
+      "program_code": "GA_JTC",
+      "tax_year": 2025,
+      "status": "proposed"
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "c-claim_transition_prepare"
+    }
+   }
+  },
+  {
+   "id": "tool.claim_transition_prepare.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/claim_transition_prepare",
+    "json": {
+     "args": {
+      "client_id": "abc",
+      "program_code": "GA_JTC",
+      "tax_year": 2025,
+      "status": "proposed"
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "i-claim_transition_prepare"
+    }
+   }
+  },
+  {
+   "id": "tool.claim_transition_commit.typical",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/claim_transition_commit",
+    "json": {
+     "args": {
+      "confirmation_token": "x",
+      "idempotency_key": "x",
+      "arguments": {
+       "client_id": 1001,
+       "program_code": "GA_JTC",
+       "tax_year": 2025,
+       "status": "proposed"
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "c-claim_transition_commit"
+    }
+   }
+  },
+  {
+   "id": "tool.claim_transition_commit.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/claim_transition_commit",
+    "json": {
+     "args": {
+      "confirmation_token": {
+       "nested": 1
+      },
+      "idempotency_key": "x",
+      "arguments": {
+       "client_id": 1001,
+       "program_code": "GA_JTC",
+       "tax_year": 2025,
+       "status": "proposed"
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "i-claim_transition_commit"
+    }
+   }
+  },
+  {
+   "id": "tool.claim_record_prepare.typical",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/claim_record_prepare",
+    "json": {
+     "args": {
+      "client_id": 1001,
+      "program_code": "GA_JTC",
+      "tax_year": 2025,
+      "status": "proposed"
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "c-claim_record_prepare"
+    }
+   }
+  },
+  {
+   "id": "tool.claim_record_prepare.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/claim_record_prepare",
+    "json": {
+     "args": {
+      "client_id": "abc",
+      "program_code": "GA_JTC",
+      "tax_year": 2025,
+      "status": "proposed"
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "i-claim_record_prepare"
+    }
+   }
+  },
+  {
+   "id": "tool.claim_record_commit.typical",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/claim_record_commit",
+    "json": {
+     "args": {
+      "confirmation_token": "x",
+      "idempotency_key": "x",
+      "arguments": {
+       "client_id": 1001,
+       "program_code": "GA_JTC",
+       "tax_year": 2025,
+       "status": "proposed"
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "c-claim_record_commit"
+    }
+   }
+  },
+  {
+   "id": "tool.claim_record_commit.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/claim_record_commit",
+    "json": {
+     "args": {
+      "confirmation_token": {
+       "nested": 1
+      },
+      "idempotency_key": "x",
+      "arguments": {
+       "client_id": 1001,
+       "program_code": "GA_JTC",
+       "tax_year": 2025,
+       "status": "proposed"
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "i-claim_record_commit"
+    }
+   }
+  },
+  {
+   "id": "tool.engagement_set_prepare.typical",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/engagement_set_prepare",
+    "json": {
+     "args": {
+      "client_id": 1001,
+      "program_code": "GA_JTC",
+      "scope": "in_scope"
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "c-engagement_set_prepare"
+    }
+   }
+  },
+  {
+   "id": "tool.engagement_set_prepare.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/engagement_set_prepare",
+    "json": {
+     "args": {
+      "client_id": "abc",
+      "program_code": "GA_JTC",
+      "scope": "in_scope"
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "i-engagement_set_prepare"
+    }
+   }
+  },
+  {
+   "id": "tool.engagement_set_commit.typical",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/engagement_set_commit",
+    "json": {
+     "args": {
+      "confirmation_token": "x",
+      "idempotency_key": "x",
+      "arguments": {
+       "client_id": 1001,
+       "program_code": "GA_JTC",
+       "scope": "in_scope"
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "c-engagement_set_commit"
+    }
+   }
+  },
+  {
+   "id": "tool.engagement_set_commit.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/engagement_set_commit",
+    "json": {
+     "args": {
+      "confirmation_token": {
+       "nested": 1
+      },
+      "idempotency_key": "x",
+      "arguments": {
+       "client_id": 1001,
+       "program_code": "GA_JTC",
+       "scope": "in_scope"
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "i-engagement_set_commit"
+    }
+   }
+  },
+  {
+   "id": "tool.base_year_set_prepare.typical",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/base_year_set_prepare",
+    "json": {
+     "args": {
+      "client_id": 1001,
+      "unit_id": "GA_ATL_HQ",
+      "base_year": 2024
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "c-base_year_set_prepare"
+    }
+   }
+  },
+  {
+   "id": "tool.base_year_set_prepare.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/base_year_set_prepare",
+    "json": {
+     "args": {
+      "client_id": "abc",
+      "unit_id": "GA_ATL_HQ",
+      "base_year": 2024
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "i-base_year_set_prepare"
+    }
+   }
+  },
+  {
+   "id": "tool.base_year_set_commit.typical",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/base_year_set_commit",
+    "json": {
+     "args": {
+      "confirmation_token": "x",
+      "idempotency_key": "x",
+      "arguments": {
+       "client_id": 1001,
+       "unit_id": "GA_ATL_HQ",
+       "base_year": 2024
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "c-base_year_set_commit"
+    }
+   }
+  },
+  {
+   "id": "tool.base_year_set_commit.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/base_year_set_commit",
+    "json": {
+     "args": {
+      "confirmation_token": {
+       "nested": 1
+      },
+      "idempotency_key": "x",
+      "arguments": {
+       "client_id": 1001,
+       "unit_id": "GA_ATL_HQ",
+       "base_year": 2024
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "i-base_year_set_commit"
+    }
+   }
+  },
+  {
+   "id": "tool.claim_package_create_prepare.typical",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/claim_package_create_prepare",
+    "json": {
+     "args": {
+      "client_id": 1001,
+      "tax_year": 2025
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "c-claim_package_create_prepare"
+    }
+   }
+  },
+  {
+   "id": "tool.claim_package_create_prepare.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/claim_package_create_prepare",
+    "json": {
+     "args": {
+      "client_id": "abc",
+      "tax_year": 2025
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "i-claim_package_create_prepare"
+    }
+   }
+  },
+  {
+   "id": "tool.claim_package_create_commit.typical",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/claim_package_create_commit",
+    "json": {
+     "args": {
+      "confirmation_token": "x",
+      "idempotency_key": "x",
+      "arguments": {
+       "client_id": 1001,
+       "tax_year": 2025
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "c-claim_package_create_commit"
+    }
+   }
+  },
+  {
+   "id": "tool.claim_package_create_commit.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/claim_package_create_commit",
+    "json": {
+     "args": {
+      "confirmation_token": {
+       "nested": 1
+      },
+      "idempotency_key": "x",
+      "arguments": {
+       "client_id": 1001,
+       "tax_year": 2025
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "i-claim_package_create_commit"
+    }
+   }
+  },
+  {
+   "id": "tool.run_batch_prepare.typical",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/run_batch_prepare",
+    "json": {
+     "args": {
+      "scope": {
+       "kind": "one"
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "c-run_batch_prepare"
+    }
+   }
+  },
+  {
+   "id": "tool.run_batch_prepare.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/run_batch_prepare",
+    "json": {
+     "args": {
+      "scope": "abc"
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "i-run_batch_prepare"
+    }
+   }
+  },
+  {
+   "id": "tool.run_batch_commit.typical",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/run_batch_commit",
+    "json": {
+     "args": {
+      "confirmation_token": "x",
+      "idempotency_key": "x",
+      "arguments": {
+       "scope": {
+        "kind": "one"
+       }
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "c-run_batch_commit"
+    }
+   }
+  },
+  {
+   "id": "tool.run_batch_commit.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/run_batch_commit",
+    "json": {
+     "args": {
+      "confirmation_token": {
+       "nested": 1
+      },
+      "idempotency_key": "x",
+      "arguments": {
+       "scope": {
+        "kind": "one"
+       }
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "i-run_batch_commit"
+    }
+   }
+  },
+  {
+   "id": "tool.unknown",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/no_such_tool",
+    "json": {
+     "args": {}
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a1",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "corr-1"
+    }
+   }
+  },
+  {
+   "id": "tool.no-token",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/book_rank",
+    "json": {
+     "args": {}
+    }
+   }
+  },
+  {
+   "id": "tool.delegated-book-rank",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/book_rank",
+    "json": {
+     "args": {}
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}"
+    }
+   }
+  },
+  {
+   "id": "tool.body-not-json",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/book_rank",
+    "body_text": "{nope",
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a1",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "corr-1",
+     "content-type": "application/json"
+    }
+   }
+  },
+  {
+   "id": "tool.body-args-not-object",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/book_rank",
+    "json": {
+     "args": [
+      1
+     ]
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a1",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "corr-1"
+    }
+   }
+  },
+  {
+   "id": "tool.body-empty",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/book_rank",
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a1",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "corr-1"
+    }
+   }
+  },
+  {
+   "id": "tool.body-extra-fields",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/book_rank",
+    "json": {
+     "args": {},
+     "zz": 1
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a1",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "corr-1"
+    }
+   }
+  },
+  {
+   "id": "tool.body-too-large",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/book_rank",
+    "json": {
+     "args": {
+      "pad": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a1",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "corr-1"
+    }
+   }
+  },
+  {
+   "id": "tool.idempotency-key-too-long",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/book_rank",
+    "json": {
+     "args": {},
+     "idempotency_key": "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk"
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a1",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "corr-1"
+    }
+   }
+  },
+  {
+   "id": "tool.ping-off",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/channel_ping",
+    "json": {
+     "args": {}
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a1",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "corr-1"
+    }
+   }
+  },
+  {
+   "id": "guard.read-facts",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/book_rank",
+    "json": {
+     "args": {}
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a1",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "guard-1",
+     "x-correlation-id": "g-1"
+    }
+   }
+  },
+  {
+   "id": "guard.verify-matching",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/verify_figures",
+    "json": {
+     "args": {
+      "draft_text": "1 of 1 clients have been assessed."
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a1",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "guard-1",
+     "x-correlation-id": "g-2"
+    }
+   }
+  },
+  {
+   "id": "guard.verify-mismatching",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/verify_figures",
+    "json": {
+     "args": {
+      "draft_text": "Identified credit is $123,456 across 77 clients."
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a1",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "guard-1",
+     "x-correlation-id": "g-3"
+    }
+   }
+  },
+  {
+   "id": "guard.verify-other-conversation",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/verify_figures",
+    "json": {
+     "args": {
+      "draft_text": "1 of 1 clients have been assessed."
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a1",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "guard-2",
+     "x-correlation-id": "g-4"
+    }
+   }
+  },
+  {
+   "id": "guard.verify-no-draft",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/verify_figures",
+    "json": {
+     "args": {}
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a1",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "guard-1",
+     "x-correlation-id": "g-5"
+    }
+   }
+  },
+  {
+   "id": "narration.no-token",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/audit/narration",
+    "json": {}
+   }
+  },
+  {
+   "id": "narration.delegated",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/audit/narration",
+    "json": {},
+    "headers": {
+     "authorization": "Bearer {{token.user}}"
+    }
+   }
+  },
+  {
+   "id": "narration.agent-empty",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/audit/narration",
+    "json": {},
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a1",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "corr-1"
+    }
+   }
+  },
+  {
+   "id": "narration.agent-bad",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/audit/narration",
+    "body_text": "x",
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a1",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "corr-1",
+     "content-type": "application/json"
+    }
+   }
+  },
+  {
+   "id": "download.unknown-ticket",
+   "request": {
+    "method": "GET",
+    "path": "/channel/v1/downloads/not-a-ticket"
+   }
+  },
+  {
+   "id": "download.unknown-ticket-with-token",
+   "request": {
+    "method": "GET",
+    "path": "/channel/v1/downloads/not-a-ticket",
+    "headers": {
+     "authorization": "Bearer {{token.user}}"
+    }
+   }
+  },
+  {
+   "id": "download.bad-token",
+   "request": {
+    "method": "GET",
+    "path": "/channel/v1/downloads/not-a-ticket",
+    "headers": {
+     "authorization": "Bearer garbage"
+    }
+   }
+  },
+  {
+   "id": "write.prepare",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/finding_resolve_prepare",
+    "json": {
+     "args": {
+      "client_id": 1001,
+      "tax_year": 2025,
+      "finding_id": "policy:test_of_twos:ALL:2025",
+      "resolution": "accept",
+      "note": "contract"
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "w-1"
+    }
+   },
+   "capture": {
+    "token": "body.facts.confirmation.token"
+   }
+  },
+  {
+   "id": "write.prepare-as-reader",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/finding_resolve_prepare",
+    "json": {
+     "args": {
+      "client_id": 1001,
+      "tax_year": 2025,
+      "finding_id": "policy:test_of_twos:ALL:2025",
+      "resolution": "accept",
+      "note": "contract"
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a1",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "w-2"
+    }
+   }
+  },
+  {
+   "id": "write.commit-wrong-tool",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/finding_reopen_commit",
+    "json": {
+     "args": {
+      "arguments": {
+       "client_id": 1001,
+       "finding_id": "policy:test_of_twos:ALL:2025"
+      },
+      "confirmation_token": "{{token}}",
+      "idempotency_key": "k-wrong"
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "w-3"
+    }
+   }
+  },
+  {
+   "id": "write.commit-changed-args",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/finding_resolve_commit",
+    "json": {
+     "args": {
+      "arguments": {
+       "client_id": 1001,
+       "tax_year": 2025,
+       "finding_id": "policy:test_of_twos:ALL:2025",
+       "resolution": "drop",
+       "note": "contract"
+      },
+      "confirmation_token": "{{token}}",
+      "idempotency_key": "k-chg"
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "w-4"
+    }
+   }
+  },
+  {
+   "id": "write.commit-other-user",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/finding_resolve_commit",
+    "json": {
+     "args": {
+      "arguments": {
+       "client_id": 1001,
+       "tax_year": 2025,
+       "finding_id": "policy:test_of_twos:ALL:2025",
+       "resolution": "accept",
+       "note": "contract"
+      },
+      "confirmation_token": "{{token}}",
+      "idempotency_key": "k-1"
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a1",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "w-5"
+    }
+   }
+  },
+  {
+   "id": "write.commit",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/finding_resolve_commit",
+    "json": {
+     "args": {
+      "arguments": {
+       "client_id": 1001,
+       "tax_year": 2025,
+       "finding_id": "policy:test_of_twos:ALL:2025",
+       "resolution": "accept",
+       "note": "contract"
+      },
+      "confirmation_token": "{{token}}",
+      "idempotency_key": "k-1"
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "w-6"
+    }
+   }
+  },
+  {
+   "id": "write.commit-replayed",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/finding_resolve_commit",
+    "json": {
+     "args": {
+      "arguments": {
+       "client_id": 1001,
+       "tax_year": 2025,
+       "finding_id": "policy:test_of_twos:ALL:2025",
+       "resolution": "accept",
+       "note": "contract"
+      },
+      "confirmation_token": "{{token}}",
+      "idempotency_key": "k-1"
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "w-7"
+    }
+   }
+  },
+  {
+   "id": "write.commit-no-token",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/finding_resolve_commit",
+    "json": {
+     "args": {
+      "arguments": {
+       "client_id": 1001,
+       "tax_year": 2025,
+       "finding_id": "policy:test_of_twos:ALL:2025",
+       "resolution": "accept",
+       "note": "contract"
+      },
+      "idempotency_key": "k-2"
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "w-8"
+    }
+   }
+  },
+  {
+   "id": "write.commit-garbage-token",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/finding_resolve_commit",
+    "json": {
+     "args": {
+      "arguments": {
+       "client_id": 1001,
+       "tax_year": 2025,
+       "finding_id": "policy:test_of_twos:ALL:2025",
+       "resolution": "accept",
+       "note": "contract"
+      },
+      "confirmation_token": "garbage",
+      "idempotency_key": "k-3"
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "w-9"
+    }
+   }
+  },
+  {
+   "id": "write.findings-after",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/findings_list",
+    "json": {
+     "args": {
+      "client_id": 1001,
+      "tax_year": 2025
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "w-10"
+    }
+   }
+  },
+  {
+   "id": "write.claim-package-prepare",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/claim_package_create_prepare",
+    "json": {
+     "args": {
+      "client_id": 1001,
+      "tax_year": 2025
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "w-11"
+    }
+   },
+   "capture": {
+    "ptoken": "body.facts.confirmation.token"
+   }
+  },
+  {
+   "id": "write.claim-package-commit",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/claim_package_create_commit",
+    "json": {
+     "args": {
+      "arguments": {
+       "client_id": 1001,
+       "tax_year": 2025
+      },
+      "confirmation_token": "{{ptoken}}",
+      "idempotency_key": "k-4"
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "w-12"
+    }
+   }
+  },
+  {
+   "id": "write.claim-package-link",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/claim_package_link",
+    "json": {
+     "args": {
+      "client_id": 1001,
+      "tax_year": 2025
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "w-13"
+    }
+   },
+   "capture": {
+    "ticket": "body.facts.download_path"
+   }
+  },
+  {
+   "id": "download.other-user",
+   "request": {
+    "method": "GET",
+    "path": "{{ticket}}",
+    "headers": {
+     "authorization": "Bearer {{token.user}}"
+    }
+   }
+  },
+  {
+   "id": "download.owner",
+   "request": {
+    "method": "GET",
+    "path": "{{ticket}}",
+    "headers": {
+     "authorization": "Bearer {{token.writer_user}}"
+    }
+   }
+  },
+  {
+   "id": "download.owner-again-single-use",
+   "request": {
+    "method": "GET",
+    "path": "{{ticket}}",
+    "headers": {
+     "authorization": "Bearer {{token.writer_user}}"
+    }
+   }
+  }
+ ],
+ "tokens": {
+  "user": {
+   "kind": "user",
+   "oid": "00000000-0000-0000-0000-0000000000a1",
+   "aud": "api://contract-gateway",
+   "scp": "Channel.Access",
+   "roles": [],
+   "claims": {
+    "azp": "00000000-0000-0000-0000-0000000000c1"
+   }
+  },
+  "writer_user": {
+   "kind": "user",
+   "oid": "00000000-0000-0000-0000-0000000000a2",
+   "aud": "api://contract-gateway",
+   "scp": "Channel.Access",
+   "roles": [],
+   "claims": {
+    "azp": "00000000-0000-0000-0000-0000000000c1"
+   }
+  },
+  "agent": {
+   "kind": "agent",
+   "aud": "api://contract-gateway",
+   "roles": [
+    "Channel.Invoke"
+   ],
+   "claims": {
+    "azp": "00000000-0000-0000-0000-0000000000c1"
+   }
+  },
+  "agent_no_role": {
+   "kind": "agent",
+   "aud": "api://contract-gateway",
+   "roles": [],
+   "claims": {
+    "azp": "00000000-0000-0000-0000-0000000000c1"
+   }
+  },
+  "agent_with_scope": {
+   "kind": "agent",
+   "aud": "api://contract-gateway",
+   "roles": [
+    "Channel.Invoke"
+   ],
+   "claims": {
+    "scp": "Channel.Access"
+   }
+  },
+  "expired": {
+   "kind": "user",
+   "aud": "api://contract-gateway",
+   "scp": "Channel.Access",
+   "roles": [],
+   "exp_in": -7200
+  },
+  "forged": {
+   "kind": "user",
+   "aud": "api://contract-gateway",
+   "scp": "Channel.Access",
+   "roles": [],
+   "key": "other"
+  },
+  "wrong_audience": {
+   "kind": "user",
+   "aud": "api://not-the-gateway",
+   "scp": "Channel.Access",
+   "roles": []
+  },
+  "no_scope": {
+   "kind": "user",
+   "aud": "api://contract-gateway",
+   "scp": "openid",
+   "roles": []
+  },
+  "mixed": {
+   "kind": "user",
+   "aud": "api://contract-gateway",
+   "scp": "Channel.Access",
+   "roles": [
+    "Channel.Invoke"
+   ]
+  },
+  "other_tenant_user": {
+   "kind": "user",
+   "aud": "api://contract-gateway",
+   "scp": "Channel.Access",
+   "roles": [],
+   "tid": "00000000-0000-0000-0000-0000000000ff"
+  },
+  "no_oid": {
+   "kind": "user",
+   "aud": "api://contract-gateway",
+   "scp": "Channel.Access",
+   "roles": [],
+   "drop": [
+    "oid"
+   ]
+  }
+ }
+}

@@ -16,11 +16,11 @@ GATEWAY_AUDIENCE = "api://contract-gateway"
 GATEWAY_APP_ID = "00000000-0000-0000-0000-0000000000c1"
 GATEWAY_ENV = {
     "TENANT_ID": auth.TENANT, "GATEWAY_AUDIENCE": GATEWAY_AUDIENCE, "API_BASE_URL": "http://api.contract.local", "API_AUDIENCE": auth.AUDIENCE,
-    "ENVIRONMENT": "local", "CHANNEL_RATE_LIMIT_PER_MINUTE": "6", "CHANNEL_DEBUG_WHOAMI": "0",
+    "ENVIRONMENT": "local", "CHANNEL_DEBUG_WHOAMI": "0",
 }
 
 
-def build(work: Path) -> World:
+def build(work: Path, rate_limit_per_minute: int = 1000) -> World:
     import httpx
 
     from application import request_limits  # noqa: F401
@@ -40,7 +40,7 @@ def build(work: Path) -> World:
     auth.install(60)
     for name in ("CHANNEL_STORE",):
         pass
-    settings = load_settings(dict(GATEWAY_ENV))
+    settings = load_settings({**GATEWAY_ENV, "CHANNEL_RATE_LIMIT_PER_MINUTE": str(rate_limit_per_minute)})
     api_control = ContractControl(base.app)
     transport = httpx.ASGITransport(app=api_control, raise_app_exceptions=False)
     api = ApiClient(settings, lambda: auth.mint({"kind": "agent", "roles": ["TCC.Agent"]}), transport=transport)
@@ -59,4 +59,4 @@ def build(work: Path) -> World:
                 yield
 
     app.router.lifespan_context = both
-    return World("G1", work, base.warehouse, app, {"api": "P1"})
+    return World("G1" if rate_limit_per_minute == 1000 else "G1L", work, base.warehouse, app, {"api": "P1"})

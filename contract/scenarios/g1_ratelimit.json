@@ -1,0 +1,284 @@
+{
+ "name": "g1_ratelimit",
+ "profile": "G1L",
+ "tokens": {
+  "user": {
+   "kind": "user",
+   "oid": "00000000-0000-0000-0000-0000000000a1",
+   "aud": "api://contract-gateway",
+   "scp": "Channel.Access",
+   "roles": [],
+   "claims": {
+    "azp": "00000000-0000-0000-0000-0000000000c1"
+   }
+  },
+  "writer_user": {
+   "kind": "user",
+   "oid": "00000000-0000-0000-0000-0000000000a2",
+   "aud": "api://contract-gateway",
+   "scp": "Channel.Access",
+   "roles": [],
+   "claims": {
+    "azp": "00000000-0000-0000-0000-0000000000c1"
+   }
+  },
+  "agent": {
+   "kind": "agent",
+   "aud": "api://contract-gateway",
+   "roles": [
+    "Channel.Invoke"
+   ],
+   "claims": {
+    "azp": "00000000-0000-0000-0000-0000000000c1"
+   }
+  },
+  "agent_no_role": {
+   "kind": "agent",
+   "aud": "api://contract-gateway",
+   "roles": [],
+   "claims": {
+    "azp": "00000000-0000-0000-0000-0000000000c1"
+   }
+  },
+  "agent_with_scope": {
+   "kind": "agent",
+   "aud": "api://contract-gateway",
+   "roles": [
+    "Channel.Invoke"
+   ],
+   "claims": {
+    "scp": "Channel.Access"
+   }
+  },
+  "expired": {
+   "kind": "user",
+   "aud": "api://contract-gateway",
+   "scp": "Channel.Access",
+   "roles": [],
+   "exp_in": -7200
+  },
+  "forged": {
+   "kind": "user",
+   "aud": "api://contract-gateway",
+   "scp": "Channel.Access",
+   "roles": [],
+   "key": "other"
+  },
+  "wrong_audience": {
+   "kind": "user",
+   "aud": "api://not-the-gateway",
+   "scp": "Channel.Access",
+   "roles": []
+  },
+  "no_scope": {
+   "kind": "user",
+   "aud": "api://contract-gateway",
+   "scp": "openid",
+   "roles": []
+  },
+  "mixed": {
+   "kind": "user",
+   "aud": "api://contract-gateway",
+   "scp": "Channel.Access",
+   "roles": [
+    "Channel.Invoke"
+   ]
+  },
+  "other_tenant_user": {
+   "kind": "user",
+   "aud": "api://contract-gateway",
+   "scp": "Channel.Access",
+   "roles": [],
+   "tid": "00000000-0000-0000-0000-0000000000ff"
+  },
+  "no_oid": {
+   "kind": "user",
+   "aud": "api://contract-gateway",
+   "scp": "Channel.Access",
+   "roles": [],
+   "drop": [
+    "oid"
+   ]
+  }
+ },
+ "steps": [
+  {
+   "id": "ratelimit.1",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/book_rank",
+    "json": {
+     "args": {}
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a1",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "rl-1"
+    }
+   }
+  },
+  {
+   "id": "ratelimit.2",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/book_rank",
+    "json": {
+     "args": {}
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a1",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "rl-2"
+    }
+   }
+  },
+  {
+   "id": "ratelimit.3",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/book_rank",
+    "json": {
+     "args": {}
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a1",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "rl-3"
+    }
+   }
+  },
+  {
+   "id": "ratelimit.4",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/book_rank",
+    "json": {
+     "args": {}
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a1",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "rl-4"
+    }
+   }
+  },
+  {
+   "id": "ratelimit.5",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/book_rank",
+    "json": {
+     "args": {}
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a1",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "rl-5"
+    }
+   }
+  },
+  {
+   "id": "ratelimit.6",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/book_rank",
+    "json": {
+     "args": {}
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a1",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "rl-6"
+    }
+   }
+  },
+  {
+   "id": "ratelimit.7",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/book_rank",
+    "json": {
+     "args": {}
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a1",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "rl-7"
+    }
+   }
+  },
+  {
+   "id": "ratelimit.8",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/book_rank",
+    "json": {
+     "args": {}
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a1",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "rl-8"
+    }
+   }
+  },
+  {
+   "id": "ratelimit.other-person",
+   "request": {
+    "method": "POST",
+    "path": "/channel/v1/tools/book_rank",
+    "json": {
+     "args": {}
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a2",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "rl-w"
+    }
+   }
+  },
+  {
+   "id": "ratelimit.health-unaffected",
+   "request": {
+    "method": "GET",
+    "path": "/channel/health"
+   }
+  }
+ ]
+}
