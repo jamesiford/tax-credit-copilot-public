@@ -63,6 +63,37 @@ public sealed class MutationSelfTests(ITestOutputHelper output)
         ("open year comparison: a window ending today is still open", @"src\TaxCredit.Domain\Calculation\OpenYear.cs", "return end > (on ?? (today ?? Today)());", "return end >= (on ?? (today ?? Today)());"),
         ("open year comparison: net new equal to the threshold no longer qualifies", @"src\TaxCredit.Domain\Calculation\OpenYear.cs", "netNew >= yearThreshold && netNew > 0", "netNew > yearThreshold && netNew > 0"),
         ("open year clamp: net new is no longer clamped at zero", @"src\TaxCredit.Domain\Calculation\OpenYear.cs", "PyArith.Max(0.0, average - ProximityCoerce.ToFloat(trend.BaseAverageHeadcount))", "(average - ProximityCoerce.ToFloat(trend.BaseAverageHeadcount))"),
+        ("runs transition: a failed item may also be cancelled", @"src\TaxCredit.Domain\Runs\RunStateMachine.cs", "[ItemStatus.Failed] = new HashSet<ItemStatus> { ItemStatus.Queued },", "[ItemStatus.Failed] = new HashSet<ItemStatus> { ItemStatus.Queued, ItemStatus.Cancelled },"),
+        ("runs transition: a queued item can no longer be cancelled", @"src\TaxCredit.Domain\Runs\RunStateMachine.cs", "[ItemStatus.Queued] = new HashSet<ItemStatus> { ItemStatus.Leased, ItemStatus.Cancelled },", "[ItemStatus.Queued] = new HashSet<ItemStatus> { ItemStatus.Leased },"),
+        ("runs transition: a running item cannot be given back to the queue", @"src\TaxCredit.Domain\Runs\RunStateMachine.cs", "ItemStatus.Succeeded, ItemStatus.Failed, ItemStatus.Queued,", "ItemStatus.Succeeded, ItemStatus.Failed,"),
+        ("runs transition: moved no longer checks the state machine", @"src\TaxCredit.Domain\Runs\RunBatchItem.cs", "RunStateMachine.CheckItemMove(Status, status);", "_ = status;"),
+        ("runs comparison: open items are judged by greater than zero, not non-zero", @"src\TaxCredit.Domain\Runs\RunStateMachine.cs", "if (openItems != 0)", "if (openItems > 0)"),
+        ("runs comparison: started items are judged by greater than zero, not non-zero", @"src\TaxCredit.Domain\Runs\RunStateMachine.cs", "return started != 0 ?", "return started > 0 ?"),
+        ("runs comparison: a batch with failures or cancellations needs both to be partial", @"src\TaxCredit.Domain\Runs\RunStateMachine.cs", "if (failed == 0 && cancelled == 0)", "if (failed == 0 || cancelled == 0)"),
+        ("runs comparison: an all-failed batch reads cancelled", @"src\TaxCredit.Domain\Runs\RunStateMachine.cs", "return failed == 0 ? BatchStatus.Cancelled : BatchStatus.Failed;", "return failed == 0 ? BatchStatus.Failed : BatchStatus.Cancelled;"),
+        ("runs comparison: an empty batch ignores the cancel request", @"src\TaxCredit.Domain\Runs\RunStateMachine.cs", "return cancelRequested ? BatchStatus.Cancelled : BatchStatus.Succeeded;", "return BatchStatus.Succeeded;"),
+        ("runs comparison: an empty fingerprint value counts as known", @"src\TaxCredit.Domain\Runs\UnchangedRule.cs", "string.IsNullOrEmpty(before) || string.IsNullOrEmpty(now)", "before is null || now is null"),
+        ("runs comparison: a different tax year is only a smaller one", @"src\TaxCredit.Domain\Runs\UnchangedRule.cs", "if (last.TaxYear != current.TaxYear)", "if (last.TaxYear < current.TaxYear)"),
+        ("runs comparison: the code commit is compared when it was not asked for", @"src\TaxCredit.Domain\Runs\UnchangedRule.cs", "if (includeCodeCommit)", "if (!includeCodeCommit)"),
+        ("runs ordering: the unchanged reasons are reported in reverse order", @"src\TaxCredit.Domain\Runs\UnchangedRule.cs", "return pairs;", "return pairs.AsEnumerable().Reverse().ToList();"),
+        ("runs ordering: the enum wire strings of the skipped statuses are swapped", @"src\TaxCredit.Domain\Runs\RunEnums.cs", "\"skipped_unchanged\", \"skipped_no_payroll\", \"failed\"", "\"skipped_no_payroll\", \"skipped_unchanged\", \"failed\""),
+        ("runs comparison: backoff float overflow starts one doubling late", @"src\TaxCredit.Domain\Runs\RetryPolicy.cs", "k >= 1024 ?", "k > 1024 ?"),
+        ("runs comparison: backoff min keeps the exponential on a NaN cap", @"src\TaxCredit.Domain\Runs\RetryPolicy.cs", "return PyArith.Min(cap, x);", "return PyArith.Min(x, cap);"),
+        ("runs rounding: the backoff jitter is 50 percent, not 25", @"src\TaxCredit.Domain\Runs\RetryPolicy.cs", "(0.25 * jitter())", "(0.5 * jitter())"),
+        ("runs equality: refresh_once is ignored by RunBatch equality", @"src\TaxCredit.Domain\Runs\RunBatch.cs", "RefreshOnce == other.RefreshOnce", "true"),
+        ("runs equality: counts compare by reference in RunBatch equality", @"src\TaxCredit.Domain\Runs\RunBatch.cs", "PyEquality.Equal(Counts, other.Counts)", "ReferenceEquals(Counts, other.Counts)"),
+        ("drafts comparison: a program code may be 65 characters", @"src\TaxCredit.Domain\Programs\ProgramDraftRules.cs", "new(@\"^[A-Z][A-Z0-9_]{2,63}$\"", "new(@\"^[A-Z][A-Z0-9_]{2,64}$\""),
+        ("drafts comparison: the code pattern no longer tolerates a trailing newline", @"src\TaxCredit.Domain\Programs\ProgramDraftRules.cs", "new(@\"^[A-Z][A-Z0-9_]{2,63}$\"", "new(@\"^[A-Z][A-Z0-9_]{2,63}\\z\""),
+        ("drafts ordering: canonical json keeps insertion order", @"src\TaxCredit.Domain\Programs\ProgramDraftRules.cs", "sortKeys: true, compact: true, ensureAscii: false", "sortKeys: false, compact: true, ensureAscii: false"),
+        ("drafts comparison: canonical json escapes non-ASCII like ensure_ascii", @"src\TaxCredit.Domain\Programs\ProgramDraftRules.cs", "sortKeys: true, compact: true, ensureAscii: false", "sortKeys: true, compact: true, ensureAscii: true"),
+        ("drafts comparison: canonical json escapes DEL as a control character", @"src\TaxCredit.Domain\Numerics\PyJson.cs", "(!ascii && c >= ' ')", "(!ascii && c > '\u007f')"),
+        ("drafts transition: a draft under review is editable", @"src\TaxCredit.Domain\Programs\DraftStatus.cs", "new HashSet<DraftStatus> { DraftStatus.Draft, DraftStatus.NeedsChanges }", "new HashSet<DraftStatus> { DraftStatus.Draft, DraftStatus.NeedsChanges, DraftStatus.ReadyForReview }"),
+        ("drafts transition: an exported draft is closed", @"src\TaxCredit.Domain\Programs\DraftStatus.cs", "new HashSet<DraftStatus> { DraftStatus.Withdrawn }", "new HashSet<DraftStatus> { DraftStatus.Withdrawn, DraftStatus.Exported }"),
+        ("drafts hierarchy: CustomerDataInDraft is no longer a ReviewRefused", @"src\TaxCredit.Domain\Programs\DraftErrors.cs", ": ReviewRefusal(\"CustomerDataInDraft\", message)", ": DraftError(\"CustomerDataInDraft\", message)"),
+        ("drafts comparison: the customer data refusal reports the preview code", @"src\TaxCredit.Domain\Programs\DraftErrors.cs", "\"customer_data_refused\"", "\"preview_refused\""),
+        ("drafts comparison: a surrogate run reports one position too few", @"src\TaxCredit.Domain\Numerics\PyUtf8.cs", "(start + length - 1)", "(start + length - 2)"),
+        ("drafts equality: version is ignored by ProgramDraft equality", @"src\TaxCredit.Domain\Programs\ProgramDraft.cs", "Version == other.Version", "true"),
+        ("drafts equality: the years compare by reference in ProgramDraft equality", @"src\TaxCredit.Domain\Programs\ProgramDraft.cs", "PyEquality.Equal(Years, other.Years)", "ReferenceEquals(Years, other.Years)"),
     ];
 
     [Fact]
@@ -94,7 +125,7 @@ public sealed class MutationSelfTests(ITestOutputHelper output)
                 File.WriteAllText(target, text.Replace(oldText, newText, StringComparison.Ordinal));
 
                 var env = new Dictionary<string, string> { ["TCC_FUZZ_N"] = "2000", ["TCC_RUN_MUTATION_TESTS"] = "0" };
-                var (exit, log) = Run("dotnet", "test tests\\TaxCredit.Parity.Tests --filter \"FullyQualifiedName~GoldenEngineTests|FullyQualifiedName~DifferentialFuzz|FullyQualifiedName~Sum_matches_python|FullyQualifiedName~ProximityParityTests|FullyQualifiedName~ClaimsParityTests|FullyQualifiedName~CoverageParityTests|FullyQualifiedName~PerformanceParityTests|FullyQualifiedName~ModelsParityTests\"", Path.Combine(root, "dotnet"), env);
+                var (exit, log) = Run("dotnet", "test tests\\TaxCredit.Parity.Tests --filter \"FullyQualifiedName~GoldenEngineTests|FullyQualifiedName~DifferentialFuzz|FullyQualifiedName~Sum_matches_python|FullyQualifiedName~ProximityParityTests|FullyQualifiedName~ClaimsParityTests|FullyQualifiedName~CoverageParityTests|FullyQualifiedName~PerformanceParityTests|FullyQualifiedName~ModelsParityTests|FullyQualifiedName~RunsParityTests|FullyQualifiedName~DraftsParityTests\"", Path.Combine(root, "dotnet"), env);
                 var failedLines = log.Split('\n').Count(l => l.Contains("diverged", StringComparison.Ordinal) || l.Contains("mismatches", StringComparison.Ordinal));
                 output.WriteLine($"{name}: exit={exit}, {failedLines} failure summaries");
                 (exit != 0 && failedLines > 0 ? caught : missed).Add(name);

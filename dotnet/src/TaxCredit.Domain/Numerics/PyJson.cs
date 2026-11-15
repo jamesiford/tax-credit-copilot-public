@@ -27,10 +27,19 @@ public static partial class PyJson
     /// <param name="sortKeys">Python <c>sort_keys</c>.</param>
     /// <param name="compact"><c>true</c> for separators <c>(',', ':')</c>; <c>false</c> for the default <c>(', ', ': ')</c>.</param>
     /// <returns>The JSON text.</returns>
-    public static string Dumps(object? value, bool sortKeys, bool compact)
+    public static string Dumps(object? value, bool sortKeys, bool compact) => Dumps(value, sortKeys, compact, ensureAscii: true);
+
+    /// <summary>Serialises a tree like <c>json.dumps</c>, with <c>ensure_ascii</c> chosen by the caller.</summary>
+    /// <remarks>With <c>ensure_ascii=False</c> only <c>"</c>, <c>\</c> and the control characters below U+0020 are escaped; DEL and everything non-ASCII stay literal.</remarks>
+    /// <param name="value">The tree.</param>
+    /// <param name="sortKeys">Python <c>sort_keys</c>.</param>
+    /// <param name="compact"><c>true</c> for separators <c>(',', ':')</c>; <c>false</c> for the default <c>(', ', ': ')</c>.</param>
+    /// <param name="ensureAscii">Python <c>ensure_ascii</c>.</param>
+    /// <returns>The JSON text.</returns>
+    public static string Dumps(object? value, bool sortKeys, bool compact, bool ensureAscii)
     {
         var sb = new StringBuilder();
-        Write(sb, value, sortKeys, compact ? "," : ", ", compact ? ":" : ": ");
+        Write(sb, value, sortKeys, compact ? "," : ", ", compact ? ":" : ": ", ensureAscii);
         return sb.ToString();
     }
 
@@ -40,7 +49,7 @@ public static partial class PyJson
     public static string EvidenceHash(object? value) =>
         "sha256:" + Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(Dumps(value)))).ToLowerInvariant();
 
-    private static void Write(StringBuilder sb, object? value, bool sortKeys, string itemSep, string keySep)
+    private static void Write(StringBuilder sb, object? value, bool sortKeys, string itemSep, string keySep, bool ascii)
     {
         switch (value)
         {
@@ -63,10 +72,10 @@ public static partial class PyJson
                 sb.Append(double.IsNaN(d) ? "NaN" : double.IsPositiveInfinity(d) ? "Infinity" : double.IsNegativeInfinity(d) ? "-Infinity" : PyFloat.Repr(d));
                 break;
             case string s:
-                WriteString(sb, s);
+                WriteString(sb, s, ascii);
                 break;
             case PyDict dict:
-                WriteObject(sb, dict, sortKeys, itemSep, keySep);
+                WriteObject(sb, dict, sortKeys, itemSep, keySep, ascii);
                 break;
             case IReadOnlyList<object?> list:
                 sb.Append('[');
@@ -77,7 +86,7 @@ public static partial class PyJson
                         sb.Append(itemSep);
                     }
 
-                    Write(sb, list[k], sortKeys, itemSep, keySep);
+                    Write(sb, list[k], sortKeys, itemSep, keySep, ascii);
                 }
 
                 sb.Append(']');
@@ -87,7 +96,7 @@ public static partial class PyJson
         }
     }
 
-    private static void WriteObject(StringBuilder sb, PyDict dict, bool sortKeys, string itemSep, string keySep)
+    private static void WriteObject(StringBuilder sb, PyDict dict, bool sortKeys, string itemSep, string keySep, bool ascii)
     {
         sb.Append('{');
         var first = true;
@@ -100,15 +109,15 @@ public static partial class PyJson
             }
 
             first = false;
-            WriteString(sb, kv.Key);
+            WriteString(sb, kv.Key, ascii);
             sb.Append(keySep);
-            Write(sb, kv.Value, sortKeys, itemSep, keySep);
+            Write(sb, kv.Value, sortKeys, itemSep, keySep, ascii);
         }
 
         sb.Append('}');
     }
 
-    private static void WriteString(StringBuilder sb, string s)
+    private static void WriteString(StringBuilder sb, string s, bool ascii)
     {
         sb.Append('"');
         foreach (var c in s)
@@ -137,7 +146,7 @@ public static partial class PyJson
                     sb.Append("\\f");
                     break;
                 default:
-                    if (c is >= ' ' and <= '~')
+                    if (c is >= ' ' and <= '~' || (!ascii && c >= ' '))
                     {
                         sb.Append(c);
                     }
