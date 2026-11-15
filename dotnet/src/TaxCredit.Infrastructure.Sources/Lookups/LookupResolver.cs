@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text.Json;
 using TaxCredit.Application.Ports.Sources;
+using TaxCredit.Domain.Numerics;
 using TaxCredit.Domain.Pipeline;
 
 namespace TaxCredit.Infrastructure.Sources.Lookups;
@@ -66,7 +67,7 @@ public sealed class LookupResolver
         return new PayCodeResolution(null, "none", false);
     }
 
-    /// <summary>Client rules precede global rules; strict malformed authored data is never an outage fallback.</summary>
+    /// <summary>Client rules precede global rules; malformed authored dates fail at the boundary even under assume policy.</summary>
     public IReadOnlyList<FiscalRule> FiscalOverrides(long accountId)
     {
         return Entries("entity_fiscal_year_rules", accountId).Where(e => e.Kind == "rule")
@@ -107,8 +108,8 @@ public sealed class LookupResolver
         try
         {
             using var doc = JsonDocument.Parse(entry.Value);
-            var begin = doc.RootElement.GetProperty("fiscal_year_begin").GetString();
-            var end = doc.RootElement.GetProperty("fiscal_year_end").GetString();
+            var begin = ParseOverrideDate(doc.RootElement.GetProperty("fiscal_year_begin").GetString());
+            var end = ParseOverrideDate(doc.RootElement.GetProperty("fiscal_year_end").GetString());
             var expression = doc.RootElement.TryGetProperty("rule_expression", out var expr) ? expr.GetString() : null;
             return new FiscalRule("override:" + entry.Key, expression, begin, end);
         }
@@ -117,4 +118,7 @@ public sealed class LookupResolver
             throw new FiscalRulesMissing();
         }
     }
+
+    private static DateOnly ParseOverrideDate(string? value) =>
+        value is not null && PyDate.TryFromIsoFormat(value, out var date) ? date : throw new FiscalRulesMissing();
 }

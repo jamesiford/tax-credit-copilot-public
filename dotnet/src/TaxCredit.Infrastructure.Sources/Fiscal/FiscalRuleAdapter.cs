@@ -43,6 +43,11 @@ public sealed class SqlFiscalRuleReader(SourceScanner scanner) : IFiscalRuleRead
 public sealed record FiscalReadDiagnostic(string SourceState, string Provider, bool FallbackUsed);
 
 /// <summary>Fiscal I/O precedence around the certified pure resolver. Only typed outages can activate fixture fallback.</summary>
+/// <remarks>
+/// The original Domain IFiscalRuleSource receives no requested year or convention. It propagates missing/malformed strict
+/// failures, but cannot enforce representability of a later leap-day shift. The contextual methods below enforce that gate;
+/// callers constructing Domain FiscalSource directly need a Domain seam change before claiming the same guarantee.
+/// </remarks>
 public sealed class FiscalRuleAdapter : IFiscalRuleSource
 {
     private readonly IFiscalRuleReader _source;
@@ -77,13 +82,17 @@ public sealed class FiscalRuleAdapter : IFiscalRuleSource
             try { rules = _source.Read(accountId); }
             catch (SourceUnavailable) { rules = null; }
         }
+        if (rules is not null) { state = rules.Count == 0 ? "empty" : "present"; }
         if (rules is null && _allowFallback)
         {
             if (_fallback is null || !_fallback.IsConfigured) { throw new SourceUnavailable("source_fixture_fallback"); }
-            rules = _fallback.Read(accountId);
+            rules = _fallback.Read(accountId)?.Select(r => r with
+            {
+                RuleExpression = "Materialized offline fiscal fixture fallback"
+                    + (string.IsNullOrEmpty(r.RuleExpression) ? "." : "; " + r.RuleExpression),
+            }).ToArray();
             fallbackUsed = true;
         }
-        if (rules is not null) { state = rules.Count == 0 ? "empty" : "present"; }
         if (rules is { Count: > 0 })
         {
             ValidateStrictRules(rules, accountId);

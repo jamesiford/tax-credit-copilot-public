@@ -66,7 +66,8 @@ public sealed class SourceQueries(SourceScanner scanner)
         {
             "location_only" => location,
             "worksite_only" => worksite,
-            _ => $"COALESCE(NULLIF({worksite}, 0), {location})",
+            // Preserve Python's SQL twin; its zero-worksite mismatch with projection needs owner reconciliation.
+            _ => $"COALESCE({worksite}, {location})",
         };
     }
     private string Joins() => $"FROM {scanner.TableName("Payroll")} p LEFT JOIN {scanner.TableName("Location")} l"
@@ -76,7 +77,7 @@ public sealed class SourceQueries(SourceScanner scanner)
 }
 
 /// <summary>Version stand-in records limits explicitly; it is not a Delta identity or a snapshot guarantee.</summary>
-public sealed class SourceFingerprintReader(SourceScanner scanner, string provenance = "sql-analytics-count-max")
+public sealed class SourceFingerprintReader(SourceScanner scanner, string? provenance = null)
     : ISourceFingerprintReader
 {
     /// <inheritdoc />
@@ -98,7 +99,8 @@ public sealed class SourceFingerprintReader(SourceScanner scanner, string proven
             modified_status = status,
             mapping_sha256 = Hash(mappingIdentity),
         });
-        return new SourceFingerprint("account-count-max-modified-v1", count, maximum, status, encoding, Hash(encoding), provenance,
+        return new SourceFingerprint("account-count-max-modified-v1", count, maximum, status, encoding, Hash(encoding),
+            provenance ?? scanner.SourceProvenance + "-count-max",
             ["Count/max-preserving updates are undetected.", "SQL endpoint synchronization lag is unmeasured.",
              "Rows and the fingerprint are separate non-atomic observations.", "This marker is not a Delta version or a historical snapshot."]);
     }

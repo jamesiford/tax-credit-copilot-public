@@ -17,6 +17,8 @@ public sealed record AnalyticsQuery(string Sql, IReadOnlyList<object?> Parameter
 /// <summary>Source-only transport; never bound to the operational Warehouse pool.</summary>
 public interface IAnalyticsTransport
 {
+    /// <summary>Provider evidence only; an unknown implementation must not claim live SQL provenance.</summary>
+    string SourceProvenance => "unverified-analytics-transport";
     /// <summary>Whether source connection configuration is complete.</summary>
     bool IsConfigured { get; }
     /// <summary>Names in ordinal order; empty is a missing table, exceptions are outages.</summary>
@@ -115,6 +117,8 @@ public sealed class SqlAnalyticsTransport(AnalyticsConnectionFactory factory) : 
     private readonly ThreadLocal<ScopeState?> _scope = new();
 
     /// <inheritdoc />
+    public string SourceProvenance => "sql-analytics";
+    /// <inheritdoc />
     public bool IsConfigured => factory.IsConfigured;
 
     /// <inheritdoc />
@@ -181,7 +185,7 @@ public sealed class SqlAnalyticsTransport(AnalyticsConnectionFactory factory) : 
         {
             connection.Dispose();
             cancellationToken.ThrowIfCancellationRequested();
-            throw new SourceUnavailable();
+            throw e is SqlException sql ? SqlFailure(sql.Number) : new SourceUnavailable();
         }
         catch { connection.Dispose(); throw; }
     }
@@ -189,14 +193,14 @@ public sealed class SqlAnalyticsTransport(AnalyticsConnectionFactory factory) : 
     private static SqlDataReader Execute(SqlCommand command, CancellationToken cancellationToken)
     {
         try { return command.ExecuteReader(CommandBehavior.SequentialAccess); }
-        catch (SqlException) { cancellationToken.ThrowIfCancellationRequested(); throw new SourceUnavailable(); }
+        catch (SqlException error) { cancellationToken.ThrowIfCancellationRequested(); throw SqlFailure(error.Number); }
     }
 
     private static bool Next(DbDataReader reader, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         try { return reader.Read(); }
-        catch (SqlException) { cancellationToken.ThrowIfCancellationRequested(); throw new SourceUnavailable(); }
+        catch (SqlException error) { cancellationToken.ThrowIfCancellationRequested(); throw SqlFailure(error.Number); }
     }
 
     private static Dictionary<string, object?> Materialize(DbDataReader reader, string[] names, CancellationToken cancellationToken)
@@ -207,8 +211,16 @@ public sealed class SqlAnalyticsTransport(AnalyticsConnectionFactory factory) : 
             for (var i = 0; i < names.Length; i++) { row.Add(names[i], reader.IsDBNull(i) ? null : reader.GetValue(i)); }
             return row;
         }
-        catch (SqlException) { cancellationToken.ThrowIfCancellationRequested(); throw new SourceUnavailable(); }
+        catch (SqlException error) { cancellationToken.ThrowIfCancellationRequested(); throw SqlFailure(error.Number); }
     }
+
+    internal static SourceFailureException SqlFailure(int number) => number switch
+    {
+        207 or 208 => new SourceSchemaMismatch("source_statement", ["metadata_changed"]),
+        245 or 8114 => new SourceSchemaMismatch("source_statement", ["column_type"]),
+        102 or 156 or 8120 => new SourceQueryRejected(),
+        _ => new SourceUnavailable(),
+    };
 
     private void EndScope()
     {

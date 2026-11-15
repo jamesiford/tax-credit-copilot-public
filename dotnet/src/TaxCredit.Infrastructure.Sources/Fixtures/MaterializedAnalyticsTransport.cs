@@ -57,6 +57,8 @@ public sealed class MaterializedAnalyticsTransport : IAnalyticsTransport
     /// <summary>This adapter is explicitly offline, irrespective of credentials/configuration in the process.</summary>
     public const string Provenance = "materialized-P2-offline-analytics-substitution";
     /// <inheritdoc />
+    public string SourceProvenance => Provenance;
+    /// <inheritdoc />
     public bool IsConfigured => true;
     /// <inheritdoc />
     public IReadOnlyList<string> Columns(string schema, string physicalTable, CancellationToken cancellationToken = default)

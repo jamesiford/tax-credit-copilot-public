@@ -54,6 +54,7 @@ public sealed class FiscalLookupTests
             allowFixtureFallback: true, fixtureFallback: fallback);
         Assert.False(on.ClientFiscalWindow(7, 2023, "begins").Assumed);
         Assert.True(on.ReadWithDiagnostic(7).Diagnostic.FallbackUsed);
+        Assert.Equal("unreadable", on.ReadWithDiagnostic(7).Diagnostic.SourceState);
         Assert.Equal("materialized_fixture", on.ReadWithDiagnostic(7).Diagnostic.Provider);
         var notConfigured = new FiscalRuleAdapter(SourceTestData.Library(), reader, new LookupResolver(), allowFixtureFallback: true);
         Assert.Throws<SourceUnavailable>(() => notConfigured.ClientFiscalWindow(7, 2023, "begins"));
@@ -63,7 +64,8 @@ public sealed class FiscalLookupTests
     public void ProgrammingAndSchemaErrorsDoNotTriggerOutageFallback()
     {
         var fallback = new RuleReader { Rules = [SourceRule] };
-        foreach (var exception in new Exception[] { new InvalidOperationException("synthetic bug"), new SourceSchemaMismatch("Entity", ["account_id"]) })
+        foreach (var exception in new Exception[] { new InvalidOperationException("synthetic bug"),
+                     new SourceSchemaMismatch("Entity", ["account_id"]), new SourceQueryRejected() })
         {
             var fiscal = new FiscalRuleAdapter(SourceTestData.Library(), new RuleReader { Failure = exception }, new LookupResolver(),
                 allowFixtureFallback: true, fixtureFallback: fallback);

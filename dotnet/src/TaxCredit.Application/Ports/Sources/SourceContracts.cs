@@ -88,6 +88,10 @@ public sealed class SourceUnavailable(string dependency = "source_sql")
 public sealed class SourceNotConfigured()
     : SourceFailureException("source_not_configured", "source_sql", "Configure the source analytics connection.");
 
+/// <summary>A rejected generated statement is not an outage and must not enable fiscal fixture fallback.</summary>
+public sealed class SourceQueryRejected()
+    : SourceFailureException("source_query_rejected", "source_sql", "Correct the source query or adapter before retrying.");
+
 /// <summary>Required metadata is absent, not a transient outage.</summary>
 public sealed class SourceSchemaMismatch(string table, IReadOnlyList<string> missing)
     : SourceFailureException("source_schema_mismatch", "source_schema", "Validate the configured source mapping and schema.")

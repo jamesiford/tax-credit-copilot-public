@@ -1,6 +1,6 @@
-using Microsoft.Data.SqlClient;
 using Azure.Core;
 using Azure.Identity;
+using Microsoft.Data.SqlClient;
 using TaxCredit.Application.Ports.Sources;
 using TaxCredit.Infrastructure.Sources.Sql;
 
@@ -8,6 +8,23 @@ namespace TaxCredit.Infrastructure.Sources.Tests;
 
 public sealed class ConnectionFingerprintTests
 {
+    [Theory]
+    [InlineData(207, "source_schema_mismatch")]
+    [InlineData(208, "source_schema_mismatch")]
+    [InlineData(245, "source_schema_mismatch")]
+    [InlineData(8114, "source_schema_mismatch")]
+    [InlineData(102, "source_query_rejected")]
+    [InlineData(156, "source_query_rejected")]
+    [InlineData(8120, "source_query_rejected")]
+    [InlineData(-2, "source_unavailable")]
+    public void SqlSchemaTypeAndProgrammingFailuresCannotBeMistakenForOutages(int number, string code)
+    {
+        var failure = SqlAnalyticsTransport.SqlFailure(number);
+        Assert.Equal(code, failure.Code);
+        Assert.Null(failure.InnerException);
+        if (number != -2) { Assert.IsNotType<SourceUnavailable>(failure); }
+    }
+
     [Fact]
     public async Task EntraAdapterAcceptsOnlyDatabaseScopeAndRedactsCredentialFailures()
     {
@@ -73,6 +90,7 @@ public sealed class ConnectionFingerprintTests
         Assert.Equal(first, reader.Fingerprint(7) with { Limitations = first.Limitations });
         Assert.Equal(2, first.RowCount);
         Assert.Equal("present", first.ModifiedStatus);
+        Assert.Equal("materialized-P2-offline-analytics-substitution-count-max", first.Provenance);
         Assert.Equal("empty", reader.Fingerprint(999).ModifiedStatus);
         ((Dictionary<string, object?>)tables["Payroll"][2])["ModifyDate"] = "2029-01-01T00:00:00";
         Assert.Equal(first.Sha256, reader.Fingerprint(7).Sha256);

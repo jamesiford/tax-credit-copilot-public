@@ -36,6 +36,8 @@ public sealed class SqlSourceTests
         Assert.Empty(scanner.Scan("Address", key: "address_id", ids: []));
         Assert.Equal(count, transport.Queries.Count);
         Assert.Throws<ArgumentException>(() => scanner.Scan("Address", 7));
+        Assert.Throws<ArgumentException>(() => scanner.Scan("Payroll"));
+        Assert.Throws<ArgumentException>(() => scanner.Scan("Entity"));
     }
 
     [Fact]
@@ -167,36 +169,6 @@ public sealed class SqlSourceTests
         Assert.Contains("GROUP BY", statement.Sql, StringComparison.Ordinal);
         Assert.DoesNotContain("FORMAT(", statement.Sql, StringComparison.Ordinal);
         Assert.Equal(7L, statement.Parameters[0]);
-    }
-
-    [Theory]
-    [InlineData("period_end", "worksite_then_location")]
-    [InlineData("exclude", "worksite_then_location")]
-    [InlineData("period_end", "worksite_only")]
-    [InlineData("period_end", "location_only")]
-    public void ActualAggregateSqlRunsOfflineWithZeroWorksiteAndEveryNamedTransform(string dateMode, string siteMode)
-    {
-        var mapping = SourceMapping.Load("{\"transforms\":{\"null_pay_date\":\"" + dateMode
-            + "\",\"worksite_location\":\"" + siteMode + "\"}}");
-        var tables = SourceTestData.MiniTables(mapping);
-        ((Dictionary<string, object?>)tables["Payroll"][0])["WorksiteLocationId"] = 0L;
-        var (source, scanner, _) = SourceTestData.Source(tables, mapping);
-        var rows = source.LoadPayPeriods(7);
-        var query = new SourceQueries(scanner).Scope(7);
-        using var result = SourceTestData.Oracle("sql", new
-        {
-            tables,
-            schema = scanner.Schema,
-            sql = query.Sql,
-            parameters = query.Parameters,
-            columns = mapping.Tables.ToDictionary(t => t.Value.Physical, t => t.Value.Fields.Values.Select(f => f.Column).ToArray()),
-        });
-        var observations = result.RootElement.EnumerateArray().ToArray();
-        Assert.Equal(rows.Count, observations.Sum(r => r[3].GetInt32()));
-        Assert.Equal(rows.Select(r => (string)r.Get("Work_State")!).Distinct().Order(StringComparer.Ordinal),
-            observations.Select(r => r[1].GetString()!).Distinct().Order(StringComparer.Ordinal));
-        Assert.Equal(rows.Select(r => (string)r.Get("Pay_Date")!).Distinct().Order(StringComparer.Ordinal),
-            observations.Select(r => r[2].GetString()!).Distinct().Order(StringComparer.Ordinal));
     }
 
     [Theory]

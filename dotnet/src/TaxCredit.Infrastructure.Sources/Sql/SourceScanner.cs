@@ -33,6 +33,8 @@ public sealed class SourceScanner
     public SourceMapping Mapping { get; }
     /// <summary>Source configuration readiness, not connectivity health.</summary>
     public bool IsConfigured => _transport.IsConfigured;
+    /// <summary>The transport's evidence label; offline substitutions cannot silently claim SQL provenance.</summary>
+    public string SourceProvenance => _transport.SourceProvenance;
     /// <summary>True when blank SOURCE_SCHEMA requires operator confirmation.</summary>
     public bool HasBlankSchemaWarning => Schema.Length == 0;
     /// <summary>Shared source connection lifetime; no Warehouse connection is involved.</summary>
@@ -60,6 +62,10 @@ public sealed class SourceScanner
         string? key = null, IEnumerable<long>? ids = null, CancellationToken cancellationToken = default)
     {
         var table = Mapping.Tables[logical];
+        if (table.TenantField is not null && accountId is null && key is null && logical != "Account")
+        {
+            throw new ArgumentException("A tenant table requires a selected account or bounded keyed read.");
+        }
         var resolution = ColumnsOf(logical, cancellationToken);
         var found = resolution.Found;
         var filter = accountId is not null ? table.TenantField : key;

@@ -114,6 +114,7 @@ internal static class SourceTestData
 
 internal sealed class RecordingTransport(IAnalyticsTransport inner) : IAnalyticsTransport
 {
+    public string SourceProvenance => inner.SourceProvenance;
     internal List<AnalyticsQuery> Queries { get; } = [];
     internal int DiscoveryCalls { get; private set; }
     internal int RowsSent { get; private set; }
