@@ -28,6 +28,9 @@ public sealed class TrailRecorder(string title = "", string citation = "")
     /// <summary>The trail title; the credit tools set it when it is still empty or <c>Pending</c> (Python assigns <c>recorder.title</c>).</summary>
     public string Title { get; set; } = title;
 
+    /// <summary>The trail citation; the what-if tool sets it to the baseline credit's citation (Python assigns <c>recorder.citation</c>).</summary>
+    public string Citation { get; set; } = citation;
+
     /// <summary>The recorded steps.</summary>
     public IReadOnlyList<TrailStep> Steps => _steps;
 
@@ -44,7 +47,7 @@ public sealed class TrailRecorder(string title = "", string citation = "")
     /// <returns>The tree.</returns>
     public PyDict ToDict()
     {
-        var d = new PyDict().Add("title", Title).Add("citation", citation).Add("steps", _steps.Select(s => (object?)s.ToDict()).ToList());
+        var d = new PyDict().Add("title", Title).Add("citation", Citation).Add("steps", _steps.Select(s => (object?)s.ToDict()).ToList());
         return d.Add("evidence_hash", PyJson.EvidenceHash(d));
     }
 }

@@ -144,7 +144,27 @@ public sealed class MutationSelfTests(ITestOutputHelper output)
         ("base-year benefit: every year is priced at the last year's rate", @"src\TaxCredit.Domain\BaseYear\BaseYearEngine.cs", "var yearRate = For(settings, y, e => e.PerJobUsd, settings.PerJobUsd);", "var yearRate = For(settings, evalYears[^1], e => e.PerJobUsd, settings.PerJobUsd);"),
         ("base-year benefit: a tranche is repriced at the last year's rate instead of holding the opening year's", @"src\TaxCredit.Domain\BaseYear\BaseYearEngine.cs", "BuildTrancheEvent(y, newJobsCreated, yearRate,", "BuildTrancheEvent(y, newJobsCreated, For(settings, evalYears[^1], e => e.PerJobUsd, settings.PerJobUsd),"),
         ("base-year benefit: a year absent from the map inherits the previous year's statute", @"src\TaxCredit.Domain\BaseYear\BaseYearEngine.cs", "map.TryGetValue(year, out var e) ? key(e) : null;", "(map.TryGetValue(year, out var e) || map.TryGetValue(year - 1, out e)) ? key(e) : null;"),
-        ("base-year benefit: the benefit period defaults to four years", @"src\TaxCredit.Domain\Trend\UnitTrendQueryHelpers.cs", "ProximityCoerce.ToInt(v) : 5L", "ProximityCoerce.ToInt(v) : 4L"),    ];
+        ("base-year benefit: the benefit period defaults to four years", @"src\TaxCredit.Domain\Trend\UnitTrendQueryHelpers.cs", "ProximityCoerce.ToInt(v) : 5L", "ProximityCoerce.ToInt(v) : 4L"),
+        ("forecast rounding: the YTD average rounds half away from zero", @"src\TaxCredit.Domain\Forecast\ForecastProjection.cs", "return PyRound.Round(total / monthsElapsed, 2);", "return Math.Round(total / monthsElapsed, 2, MidpointRounding.AwayFromZero);"),
+        ("forecast comparison: a month closes only strictly before the as-of date", @"src\TaxCredit.Domain\Forecast\ForecastProjection.cs", "Count(me => me <= asOf)", "Count(me => me < asOf)"),
+        ("forecast denominator: months elapsed counted from 1 January, not the fiscal window", @"src\TaxCredit.Domain\Forecast\ForecastProjection.cs", "OneZeroCalendar.TwelveMonthEnds(analysisStart).Count", "OneZeroCalendar.TwelveMonthEnds(new DateOnly(analysisStart.Year, 1, 1)).Count"),
+        ("forecast clamp: months elapsed no longer floors at one", @"src\TaxCredit.Domain\Forecast\ForecastProjection.cs", "Math.Max(1, Math.Min(elapsed, 12))", "Math.Min(elapsed, 12)"),
+        ("forecast sum: month totals use a naive sum instead of Python's compensated sum", @"src\TaxCredit.Domain\Forecast\ForecastProjection.cs", "total += ProximityCoerce.ToFloat(PySum.Sum(slice));", "total += slice.Sum(x => ProximityCoerce.ToFloat(x));"),
+        ("forecast comparison: on track drops the 1e-9 tolerance and needs strictly more than the finish line", @"src\TaxCredit.Domain\Forecast\ForecastProjection.cs", "avg.Projected + 1e-9 >= finishLine", "avg.Projected > finishLine"),
+        ("forecast filter: the prior year's rows are not narrowed to the state", @"src\TaxCredit.Domain\Forecast\ForecastProjection.cs", "(r.RequireWorksiteId() ?? \"None\").StartsWith(prefix, StringComparison.Ordinal)", "true"),
+        ("forecast clamp: the gap to the finish line is no longer clamped at zero", @"src\TaxCredit.Domain\Forecast\ForecastProjection.cs", "PyRound.Round(PyArith.Max(0.0, finishLine - avg.Projected), 2)", "PyRound.Round(finishLine - avg.Projected, 2)"),
+        ("simulation clamp: the projected headcount is no longer clamped at zero", @"src\TaxCredit.Domain\Simulation\WhatIfSimulator.cs", "var projectedAvg = PyRound.Round(PyArith.Max(0.0, baselineAvg + newHires), 2);", "var projectedAvg = PyRound.Round(baselineAvg + newHires, 2);"),
+        ("simulation location: the key is lower-cased with the BCL, not Python's full mapping", @"src\TaxCredit.Domain\Simulation\LocationResolver.cs", "var key = PyStrCase.Lower(PyStr.Strip(cityOrState ?? string.Empty));", "var key = PyStr.Strip(cityOrState ?? string.Empty).ToLowerInvariant();"),
+        ("simulation lookup: the state registry is consulted case-sensitively", @"src\TaxCredit.Domain\Simulation\StateCreditCalculator.cs", "if (!library.StateToPack.TryGet(stateU, out _))", "if (!library.StateToPack.TryGet(state, out _))"),
+        ("simulation comparison: a part-time head is any weight up to and including one", @"src\TaxCredit.Domain\Simulation\OneZeroSimulation.cs", "(e.Weight ?? 1.0) < 1.0", "(e.Weight ?? 1.0) <= 1.0"),
+        ("simulation comparison: a role at exactly the hours floor is below it", @"src\TaxCredit.Domain\Simulation\OneZeroSimulation.cs", "wh < minHours", "wh <= minHours"),
+        ("simulation lever: the wage factor adds the percent instead of a hundredth of it", @"src\TaxCredit.Domain\Simulation\OneZeroLever.cs", "1.0 + (magnitude / 100.0)", "1.0 + magnitude"),
+        ("simulation lever: a new head is cloned five hours under the floor-plus-five rule", @"src\TaxCredit.Domain\Simulation\OneZeroLever.cs", "ProximityCoerce.ToFloat(q.Pack.MinWeeklyHours) + 5.0", "ProximityCoerce.ToFloat(q.Pack.MinWeeklyHours) + 4.0"),
+        ("simulation lever: the template is the lowest-hours employee", @"src\TaxCredit.Domain\Simulation\OneZeroLever.cs", "PySort.MaxBy(hoursByEmployee.ToList()", "PySort.MinBy(hoursByEmployee.ToList()"),
+        ("simulation ordering: equal-hours employees are removed from the end, not the start", @"src\TaxCredit.Domain\Simulation\OneZeroLever.cs", "PySort.Sorted(totals, kv => kv.Value", "PySort.Sorted(totals.Reverse(), kv => kv.Value"),
+        ("simulation slice: a negative removal count keeps nothing instead of counting from the end", @"src\TaxCredit.Domain\Simulation\RowOps.cs", "var end = k < 0 ? length + k : k;", "var end = k < 0 ? 0 : k;"),
+        ("simulation format: fixed notation rounds a tie half up, not half to even", @"src\TaxCredit.Domain\Numerics\PyFormat.cs", "twice > d || (twice == d && !q.IsEven)", "twice >= d"),
+    ];
 
     [Fact]
     public void Each_deliberate_defect_in_a_copy_of_the_port_is_caught_by_the_harness()
@@ -159,6 +179,7 @@ public sealed class MutationSelfTests(ITestOutputHelper output)
         var repo = Directory.GetParent(parity)!.FullName;
         var caught = new List<string>();
         var missed = new List<string>();
+        // TCC_MUTATION_TEST_FILTER=FullyQualifiedName~ForecastParityTests narrows the test run of each mutant to the named classes.
         // TCC_MUTATION_FILTER=performance,rollups runs only the mutations whose name contains one of the comma-separated terms.
         var terms = (Environment.GetEnvironmentVariable("TCC_MUTATION_FILTER") ?? string.Empty).Split(',', StringSplitOptions.RemoveEmptyEntries);
         foreach (var (name, file, oldText, newText) in Mutations.Where(m => terms.Length == 0 || terms.Any(t => m.Name.Contains(t, StringComparison.OrdinalIgnoreCase))))
@@ -175,7 +196,7 @@ public sealed class MutationSelfTests(ITestOutputHelper output)
                 File.WriteAllText(target, text.Replace(oldText, newText, StringComparison.Ordinal));
 
                 var env = new Dictionary<string, string> { ["TCC_FUZZ_N"] = "2000", ["TCC_RUN_MUTATION_TESTS"] = "0" };
-                var (exit, log) = Run("dotnet", "test tests\\TaxCredit.Parity.Tests --filter \"FullyQualifiedName~GoldenEngineTests|FullyQualifiedName~DifferentialFuzz|FullyQualifiedName~Sum_matches_python|FullyQualifiedName~ProximityParityTests|FullyQualifiedName~ClaimsParityTests|FullyQualifiedName~CoverageParityTests|FullyQualifiedName~PerformanceParityTests|FullyQualifiedName~ModelsParityTests|FullyQualifiedName~RunsParityTests|FullyQualifiedName~DraftsParityTests|FullyQualifiedName~CreditMathParityTests|FullyQualifiedName~PackValidationParityTests|FullyQualifiedName~GoldParityTests|FullyQualifiedName~BaseYearParityTests\"", Path.Combine(root, "dotnet"), env);
+                var (exit, log) = Run("dotnet", "test tests\\TaxCredit.Parity.Tests --filter \"" + (Environment.GetEnvironmentVariable("TCC_MUTATION_TEST_FILTER") ?? "FullyQualifiedName~GoldenEngineTests|FullyQualifiedName~DifferentialFuzz|FullyQualifiedName~Sum_matches_python|FullyQualifiedName~ProximityParityTests|FullyQualifiedName~ClaimsParityTests|FullyQualifiedName~CoverageParityTests|FullyQualifiedName~PerformanceParityTests|FullyQualifiedName~ModelsParityTests|FullyQualifiedName~RunsParityTests|FullyQualifiedName~DraftsParityTests|FullyQualifiedName~CreditMathParityTests|FullyQualifiedName~PackValidationParityTests|FullyQualifiedName~GoldParityTests|FullyQualifiedName~BaseYearParityTests|FullyQualifiedName~ForecastParityTests") + "\"", Path.Combine(root, "dotnet"), env);
                 var failedLines = log.Split('\n').Count(l => l.Contains("diverged", StringComparison.Ordinal) || l.Contains("mismatches", StringComparison.Ordinal));
                 output.WriteLine($"{name}: exit={exit}, {failedLines} failure summaries");
                 (exit != 0 && failedLines > 0 ? caught : missed).Add(name);

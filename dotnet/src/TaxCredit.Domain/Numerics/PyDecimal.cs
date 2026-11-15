@@ -33,6 +33,9 @@ public readonly record struct PyDecimal(bool Negative, BigInteger Coefficient, i
     /// <summary>Default decimal context precision (<c>decimal.getcontext().prec</c>).</summary>
     public const int ContextPrecision = 28;
 
+    /// <summary>The text of an <c>InvalidOperation</c> the C <c>_decimal</c> module traps (it prints the signal list, not a reason); an overflowing or infinite <c>quantize</c> raises it.</summary>
+    public const string InvalidOperationMessage = "[<class 'decimal.InvalidOperation'>]";
+
     /// <summary><c>Decimal(str(x))</c>: the exact decimal of the shortest round-trip repr of a finite double.</summary>
     public static PyDecimal FromFloatViaStr(double x)
     {
@@ -43,7 +46,7 @@ public readonly record struct PyDecimal(bool Negative, BigInteger Coefficient, i
 
         if (!double.IsFinite(x))
         {
-            throw new PyInvalidOperation("quantize of an infinity is invalid");
+            throw new PyInvalidOperation(InvalidOperationMessage);
         }
 
         return Parse(PyFloat.Repr(x));
@@ -109,7 +112,7 @@ public readonly record struct PyDecimal(bool Negative, BigInteger Coefficient, i
 
         if (DigitCount(coefficient) > ContextPrecision)
         {
-            throw new PyInvalidOperation("quantize result has too many digits for the context precision");
+            throw new PyInvalidOperation(InvalidOperationMessage);
         }
 
         return new PyDecimal(Negative, coefficient, target);
