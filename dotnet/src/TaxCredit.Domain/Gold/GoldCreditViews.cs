@@ -98,8 +98,8 @@ public sealed record BaseYearView(
 /// <param name="DeclineReason">Why, or <c>null</c>.</param>
 /// <param name="ThresholdSource"><c>designation</c> or <c>rule_pack</c>.</param>
 /// <param name="Status">The status label.</param>
-/// <param name="Tier">The tier, or <c>null</c>.</param>
-/// <param name="Designation">The designation, or <c>null</c>.</param>
+/// <param name="Tier">The tier, or <c>null</c>: whatever the registry held (an int in production, though the Python annotation says <c>str</c>).</param>
+/// <param name="Designation">The designation, or <c>null</c>; passed through unchanged like the tier.</param>
 /// <param name="TierSource"><c>prototype</c> or <c>unassigned</c>.</param>
 /// <param name="RunId">The run.</param>
 public sealed record UnitYearKey(
@@ -116,7 +116,7 @@ public sealed record UnitYearKey(
     string? DeclineReason,
     string ThresholdSource,
     string Status,
-    string? Tier,
-    string? Designation,
+    object? Tier,
+    object? Designation,
     string TierSource,
     string RunId);

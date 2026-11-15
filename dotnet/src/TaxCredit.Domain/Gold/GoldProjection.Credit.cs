@@ -49,7 +49,7 @@ public static partial class GoldProjection
             Int(key.ClientId), Text(key.WorksiteId), GoldCell.OfOptionalText(key.EntityFein), Text(key.ProgramCode), Text(key.Method), Int(key.TaxYear),
             averageHeadcount, isBase, baseAverage, Text(key.BaseYearSource), netNew, Int(key.MonthsReachable), complete, GoldValues.Flag(key.Declined),
             GoldCell.OfOptionalText(key.DeclineReason), threshold, Text(key.ThresholdSource), qualified, Text(key.Status),
-            GoldCell.OfOptionalText(key.Tier), GoldCell.OfOptionalText(key.Designation), Text(key.TierSource), eligibleJobs, newJobs, highWater,
+            Raw(key.Tier), Raw(key.Designation), Text(key.TierSource), eligibleJobs, newJobs, highWater,
             backfilled, perJob, Raw(trend.TrancheYears), annual, baseOverridden, hwmOverridden, Text(key.RunId), Int(1), GoldCell.OfDateTime(appendedAt),
         ]);
     }
