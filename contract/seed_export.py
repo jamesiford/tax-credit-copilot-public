@@ -95,10 +95,13 @@ def export(profile: str, out_dir: Path) -> dict[str, Any]:
     manifest: dict[str, Any] = {"profile": profile, "notes": built.notes, "tables": {}}
 
     def put(kind: str, name: str, columns: list[str], rows: list[dict[str, Any]]) -> None:
-        data = _gz(_jsonl(rows))
+        content = _jsonl(rows)
+        data = _gz(content)
         rel = f"{kind}/{name}.jsonl.gz"
         files[rel] = data
-        manifest["tables"][rel] = {"rows": len(rows), "columns": columns, "sha256": hashlib.sha256(data).hexdigest()}
+        # `content_sha256` (of the decompressed JSON Lines) is the identity of the table; `sha256` is of the committed gzip bytes, which
+        # depend on the zlib build (3.12.13: zlib 1.3.2; 3.14.2: zlib-ng) and so only vouch for the file as shipped.
+        manifest["tables"][rel] = {"rows": len(rows), "columns": columns, "content_sha256": hashlib.sha256(content).hexdigest(), "sha256": hashlib.sha256(data).hexdigest()}
 
     if profile == "P1":
         path = ROOT / "backend" / "data" / "payroll_pay_periods.csv"
@@ -156,7 +159,11 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--profile", choices=["P1", "P2"], required=True)
     parser.add_argument("--out", default=str(SEED))
+    parser.add_argument("--allow-other-python", action="store_true", help="cross-check only")
     args = parser.parse_args()
+    from contract import oracle
+
+    oracle.require(args.allow_other_python)
     from contract.harness import hermetic
 
     hermetic.apply()

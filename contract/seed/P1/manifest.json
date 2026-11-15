@@ -49,8 +49,9 @@
     "eligible",
     "weight"
    ],
+   "content_sha256": "d77067cec3acecc5cea389809ffc0603a92c2dbac53a6a95ae88e78c02132316",
    "rows": 376,
-   "sha256": "f585f0dc2b10676e770694fd04466621afd8cf0dc542138ab3759c72c9d45ef4"
+   "sha256": "0b005f3521d8b2a6d550ef92998ebe940ce75a865ca1426adefa15b950418628"
   },
   "gold/employee_period_fact.jsonl.gz": {
    "columns": [
@@ -74,8 +75,9 @@
     "selection_decision",
     "qc_flag"
    ],
+   "content_sha256": "b32f089afcaca3797b99903712c702140b3cd6ee41a4907f548c6bde82dc791e",
    "rows": 5281,
-   "sha256": "610560ec9e14d8a93b71b09a13d2a970699552d69df5bf8d3a7152e006eb6325"
+   "sha256": "5b99412a04eb389d28d20c77887a9ad40dc861782464e601d3efabb73ca8c331"
   },
   "gold/onezero_matrix.jsonl.gz": {
    "columns": [
@@ -103,8 +105,9 @@
     "month_11",
     "month_12"
    ],
+   "content_sha256": "088d332349d5b4cd4599a95ed906ef244bf99d90a0916870beaefa20c1815de8",
    "rows": 2898,
-   "sha256": "78ad534f6da87532b7dd2ca7465f85e91dc97b2414a098801499f82e093973b6"
+   "sha256": "89ed52e8dc37d4bbf86291098683b114844fe7864c8447e8cd91594ede411f15"
   },
   "gold/run_method_summary.jsonl.gz": {
    "columns": [
@@ -122,6 +125,7 @@
     "month_ends",
     "appended_at"
    ],
+   "content_sha256": "be331e3ffbb9f86821f30d24436e4a9166ac638c1fbfc95b6b292c655006547b",
    "rows": 4,
    "sha256": "ee709b9f0b33e65d5ddbb937e28ece5fd32a36ee14ee095f935652c2fb2f8a56"
   },
@@ -142,6 +146,7 @@
     "is_current",
     "appended_at"
    ],
+   "content_sha256": "75cb2b2a5367e0b427c032da8c002e76e2a4decd6af5ba6451551256f70587ec",
    "rows": 40,
    "sha256": "3979a52152c45f9a0b187e73941ac7d63440ab34cb0758034b13665ee751a8d1"
   },
@@ -169,6 +174,7 @@
     "months_with_headcount",
     "unreachable_months"
    ],
+   "content_sha256": "527492257ff45c4377147baad5c36008b60787ea71e771c83c96a31160a05d67",
    "rows": 16,
    "sha256": "897170d1968fde959a22d47cce579d48377c65cc2fa7e86c45e4307bf266f87c"
   },
@@ -209,6 +215,7 @@
     "is_current",
     "appended_at"
    ],
+   "content_sha256": "aff6b81207f5750e3f9db2782e1b819b542260ce27bbbc59d173c062db98da59",
    "rows": 16,
    "sha256": "501a5407116cdc4ff4be227861ee1c41a955d81ccef28bf83a37e333dca8fbef"
   },
@@ -239,6 +246,7 @@
     "effective_from",
     "effective_to"
    ],
+   "content_sha256": "f12981699337671f2207bd2d1b4db95b50739c55c0470563100f3345d97ce1ba",
    "rows": 2,
    "sha256": "5daaadec0cfcbe9392e2b9881e7d19c52b705a635bc8a287eb9e04ca1b2801e9"
   },
@@ -253,6 +261,7 @@
     "set_by",
     "set_at"
    ],
+   "content_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
    "rows": 0,
    "sha256": "9ceffb7310338057cfe71a4ae1e2c98d2c485d81cdef906532a801f457a38d64"
   },
@@ -279,6 +288,7 @@
     "superseded_by_run_id",
     "triggered_by"
    ],
+   "content_sha256": "4071ef717ccc7d1f8ad4f87937f20780ce9e8002a85287b13372c832ac03d347",
    "rows": 1,
    "sha256": "b597c0de4041b2df7140265c49d20be586845f4974e5013421cddec9c8649baf"
   },
@@ -296,8 +306,9 @@
     "Gross_Wages",
     "Pay_Code"
    ],
+   "content_sha256": "24f9637f892f9edd753ef1287b890ee6a4dd21b7375d61f1eafda05476367485",
    "rows": 9477,
-   "sha256": "ab120a8052a0e4dccee8668c5c2c778cebd67d5dffe069e5c4cafc0a92ecb136"
+   "sha256": "c9e118846da84aa78ef0ffca672b3d5ccd504d60a73737788893e18fdb97d99c"
   }
  }
 }
