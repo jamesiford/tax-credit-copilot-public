@@ -171,28 +171,28 @@ public static partial class Proximity
 
     private static PyDict OpenState(OpenReading s, int decimals)
     {
-        if (decimals is < 0 or > 18)
+        // 10 ** decimals is an int for decimals >= 0 and a float below; both are exact doubles up to 22 places, which is the modelled range.
+        if (decimals is < -22 or > 22)
         {
-            throw new PyUnsupportedException("rest_of_year with decimals outside 0..18 is not modelled (10 ** decimals leaves int)");
+            throw new PyUnsupportedException("rest_of_year with |decimals| above 22 is not modelled (10 ** decimals is no longer an exact double)");
         }
 
-        long step = 1;
-        for (var i = 0; i < decimals; i++)
-        {
-            step *= 10;
-        }
+        var step = decimals >= 0 ? (double)System.Numerics.BigInteger.Pow(10, decimals) : Math.Pow(10.0, decimals);
+        double Up(double extra) => decimals >= 0
+            ? ProximityCoerce.CeilOver(extra * step, System.Numerics.BigInteger.Pow(10, decimals))
+            : ProximityCoerce.CeilOver(extra * step, step);
 
         // Rounded UP, so the figure offered actually clears the line.
-        var extraUp = ProximityCoerce.CeilOver(s.Extra * step, step);
+        var extraUp = Up(s.Extra);
         var rateLimited = s.ExtraForWages > s.ExtraForHours && s.Rate is not null && s.ThresholdRate is not null && s.Rate < s.ThresholdRate;
         double suggestedHours;
         double suggestedRaise;
         if (rateLimited)
         {
-            suggestedHours = ProximityCoerce.CeilOver(s.ExtraForHours * step, step);
+            suggestedHours = Up(s.ExtraForHours);
             var week = s.PaceHours + suggestedHours;
             var neededRate = week > 0 ? s.NeededWagesPace / week : 0.0;
-            suggestedRaise = PyArith.Max(0.0, ProximityCoerce.CeilOver((neededRate - s.Rate!.Value) * 100, 100));
+            suggestedRaise = PyArith.Max(0.0, ProximityCoerce.CeilOver((neededRate - s.Rate!.Value) * 100, new System.Numerics.BigInteger(100)));
         }
         else
         {

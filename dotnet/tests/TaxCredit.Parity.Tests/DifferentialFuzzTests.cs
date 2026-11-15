@@ -115,7 +115,7 @@ public sealed class DifferentialFuzzTests(ITestOutputHelper output)
         }
 
         var failures = new List<string>();
-        foreach (var file in Directory.EnumerateFiles(dir, "*.json"))
+        foreach (var file in Directory.EnumerateFiles(dir, "fuzz-*.json"))
         {
             using var doc = JsonDocument.Parse(File.ReadAllText(file));
             var diff = DifferentialCheck.Compare(doc.RootElement.GetProperty("request").GetRawText(), doc.RootElement.GetProperty("expected").GetRawText());

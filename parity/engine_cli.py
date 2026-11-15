@@ -26,7 +26,14 @@ def main() -> int:
         if not line:
             continue
         try:
-            resp = engine_io.execute(json.loads(line))
+            req = json.loads(line)
+            if req.get("op") == "call":
+                import fuzz_ops  # family operations; imported lazily, see its docstring for the schema
+
+                out.write(fuzz_ops.respond(req) + "\n")
+                out.flush()
+                continue
+            resp = engine_io.execute(req)
             text = engine_io.dumps(resp)
         except (ValueError, TypeError, OverflowError):
             # allow_nan=False rejects a NaN/Infinity result: report it rather than emit invalid JSON.

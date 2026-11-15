@@ -10,12 +10,12 @@ internal readonly record struct NullableKey(string? Value);
 /// <summary>Ordering of string-or-None keys as Python's <c>sorted</c> sees them.</summary>
 internal static class KeyOrder
 {
-    /// <summary>Compares two keys by code point; raises <c>TypeError</c> when either is None (Python cannot order None).</summary>
+    /// <summary>Compares two keys by code point; raises <c>TypeError</c> naming the operands of the failing <c>a &lt; b</c> when either is None (Python cannot order None).</summary>
     public static int Compare(string? a, string? b)
     {
         if (a is null || b is null)
         {
-            throw new PyTypeError("'<' not supported between instances of 'NoneType' and 'str'");
+            throw new PyTypeError($"'<' not supported between instances of '{(a is null ? "NoneType" : "str")}' and '{(b is null ? "NoneType" : "str")}'");
         }
 
         return PyStr.Compare(a, b);

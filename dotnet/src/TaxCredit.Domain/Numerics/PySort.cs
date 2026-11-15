@@ -30,11 +30,77 @@ public static class PySort
         }
         catch (InvalidOperationException e) when (e.InnerException is PyException inner)
         {
-            // List.Sort wraps a comparer's exception; Python lets a TypeError from "<" propagate unchanged.
-            System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(inner).Throw();
+            // List.Sort wraps a comparer's exception; Python lets a TypeError from "<" propagate unchanged. Which operands the failing "<" names depends on
+            // the order CPython's timsort compares them, so the failure is replayed through that order.
+            ReplayFailure(decorated.Select(d => d.Key).ToList(), comparer, reverse, inner);
         }
 
         return decorated.Select(d => d.Item).ToList();
+    }
+
+    /// <summary>
+    /// Throws the exception CPython's <c>list.sort</c> raises for these keys: below 64 elements it is one run (<c>count_run</c>) followed by binary
+    /// insertion, whose comparisons are replayed here. Longer lists merge runs in an order not modelled.
+    /// </summary>
+    private static void ReplayFailure<TKey>(List<TKey> keys, IComparer<TKey> comparer, bool reverse, PyException original)
+    {
+        if (keys.Count > 63)
+        {
+            throw new PyUnsupportedException("the operands named by a failing comparison in a sort of 64 or more keys depend on timsort's merge order (" + original.Message + ")");
+        }
+
+        if (reverse)
+        {
+            keys.Reverse();
+        }
+
+        bool Lt(TKey x, TKey y) => comparer.Compare(x, y) < 0;
+        var n = keys.Count;
+        if (n < 2)
+        {
+            throw original;
+        }
+
+        var run = 2;
+        if (Lt(keys[1], keys[0]))
+        {
+            for (var i = 2; i < n && Lt(keys[i], keys[i - 1]); i++)
+            {
+                run++;
+            }
+
+            keys.Reverse(0, run);
+        }
+        else
+        {
+            for (var i = 2; i < n && !Lt(keys[i], keys[i - 1]); i++)
+            {
+                run++;
+            }
+        }
+
+        for (var start = run; start < n; start++)
+        {
+            int l = 0, r = start;
+            var pivot = keys[start];
+            do
+            {
+                var p = l + ((r - l) >> 1);
+                if (Lt(pivot, keys[p]))
+                {
+                    r = p;
+                }
+                else
+                {
+                    l = p + 1;
+                }
+            }
+            while (l < r);
+            keys.RemoveAt(start);
+            keys.Insert(l, pivot);
+        }
+
+        throw original;
     }
 
     /// <summary>Python <c>min(items, key=key)</c>: the first minimal element.</summary>

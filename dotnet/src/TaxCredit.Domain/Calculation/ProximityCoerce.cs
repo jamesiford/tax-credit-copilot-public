@@ -136,8 +136,12 @@ internal static class ProximityCoerce
     }
 
     /// <summary>Python <c>math.ceil(x * step - 1e-9) / step</c> with an int <paramref name="step"/>.</summary>
-    internal static double CeilOver(double scaled, long step) =>
+    internal static double CeilOver(double scaled, BigInteger step) =>
         ExactTrueDiv(PyArith.Ceil(scaled - 1e-9), step);
+
+    /// <summary>The same with a float <paramref name="step"/> (<c>10 ** decimals</c> for negative decimals): the int is converted to a float, then divided.</summary>
+    internal static double CeilOver(double scaled, double step) =>
+        step == 0.0 ? throw new PyZeroDivisionError("float division by zero") : (double)PyArith.Ceil(scaled - 1e-9) / step;
 
     /// <summary>
     /// <c>_round_half_up</c> with the exceptions Python's <c>decimal</c> raises: a NaN passes through unchanged, an infinity

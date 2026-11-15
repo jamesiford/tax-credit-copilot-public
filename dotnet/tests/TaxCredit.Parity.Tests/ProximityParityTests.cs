@@ -140,7 +140,7 @@ public sealed class ProximityParityTests
         }
     }
 
-    private static object? Invoke(PyDict call)
+    internal static object? Invoke(PyDict call)
     {
         var a = (PyDict)call["args"]!;
         switch ((string)call["fn"]!)

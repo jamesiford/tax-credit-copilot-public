@@ -16,6 +16,8 @@ Encoding rules (mirrored by the C# harness):
 * ``float_digest`` is SHA-256 over the IEEE-754 little-endian bytes of every float
   in the result tree in traversal order, so bit equality never depends on the
   text round trip.
+Family operations (``{"op": "call", "family", "fn", "args"}``, answered by ``fuzz_ops.respond`` in the golden line
+format) are routed by ``engine_cli`` and documented in ``fuzz_ops``.
 Only new files under ``parity/`` are written; no existing Python is touched.
 """
 from __future__ import annotations
