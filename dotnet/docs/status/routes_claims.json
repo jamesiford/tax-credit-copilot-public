@@ -1,0 +1,104 @@
+{
+  "session": "routes_claims",
+  "branch": "dotnet/w2-routes_claims",
+  "head": "aad5a26",
+  "summary": "HALTED at hard stop 1: shared framework tests require the assigned rules operation to remain 501.\nAll 24 operations have feature-local endpoints and mediator handlers; semantic acceptance is incomplete.\nFinal whole-solution build and formatting pass; all ten focused integration tests passed together.\nWhole fast run: 718 passed, 4 failed; three framework failures reproduce and one claim-test timeout passes in isolation.\nComplete seven-scenario raw replay: 156/397 cases, 39.29%; no adjusted score claimed.\nAll 13 uncompressed XLSX members match the recording; immutable publication and download audits are exercised.\nNo live services, forbidden-path edits, pushes or remote changes; temporary synthetic stores removed.\nThe head field identifies the implementation commit; this status and reports are committed afterward.",
+  "stages": {
+    "preflight": "done",
+    "stage-1-packages": "done",
+    "stage-2-claims-assessment-portfolio": "partial",
+    "stage-3-findings-rules-audit": "partial",
+    "stage-4-composed-acceptance": "partial"
+  },
+  "gates_claimed": {
+    "no_halt": false,
+    "commits_present": true,
+    "clean_tree": true,
+    "not_pushed": true,
+    "owned_paths": true,
+    "status_json": true,
+    "report_present": true,
+    "dotnet_build": true,
+    "dotnet_format": true,
+    "tests_fast": false,
+    "replay": false
+  },
+  "deviations": [
+    {
+      "id": "DEV-1",
+      "what": "Stopped rather than modifying Framework tests or suppressing the implemented GET /api/rules operation.",
+      "why": "DiscoveryTests and RegistryTests still assert 501 for that assigned operation. Their files are outside the allocated paths, triggering hard stop 1.",
+      "decision_needed": true
+    },
+    {
+      "id": "DEV-2",
+      "what": "Repeated package creation uses a distinct full UUID generation and returns 201.",
+      "why": "The deterministic first-12-character UUID prefix collides; immutable bytes must not be overwritten. Registered as an explicit F-5 improvement.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-3",
+      "what": "Complete relevant scenarios ran on a fresh ordinary host per scenario, using OS-assigned ports and isolated local state.",
+      "why": "The environment is shared; fixed-port reuse encountered a sibling listener and multi-scenario reset attempts failed. Fresh hosts isolate evidence without changing shared controls.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-4",
+      "what": "No successful live rules application is claimed.",
+      "why": "Live retrieval is explicitly outside scope; captured 404/422/503 distinctions and NEEDS_KEY are implemented and tested.",
+      "decision_needed": false
+    }
+  ],
+  "findings": [
+    "F-5: repeated deterministic package generation can collide on a truncated UUID prefix; full generation identifiers avoid overwriting immutable bytes.",
+    "F-8: identical direct claim assertions return 409, while changed assertions and lifecycle transitions retain append-style history.",
+    "F-2: invalid portfolio engagement scope returns JSON detail with 422 rather than an unhandled 500.",
+    "Named F-14 reader assessment and verification exceptions are intentionally preserved because changing valid-request authorization outcomes requires owner review.",
+    "Raw replay includes incidental error wording, redirect/CORS headers, frozen-versus-real mtime and deterministic IDs affected by missing sibling operations.",
+    "Portfolio degraded rows/counters and oversized storage-bound inputs remain incomplete; they are not waived or reported as successful."
+  ],
+  "open_questions": [
+    "Which still-deferred operation should the two shared framework stub-replacement tests use after the rules route is implemented?",
+    "Should bare AddApplication/AddInfrastructure/AddTaxCreditRuntime construction invoke feature modules, or should the provider-selection test explicitly compose them?",
+    "What shared fixture book-name and deterministic identity-sequencing contract should integration preserve?",
+    "The earlier multi-scenario reset 500 was not diagnosed to an exact shared-control cause; fresh-per-scenario hosting does not certify reusable external reset."
+  ],
+  "needs_human": [
+    {
+      "item": "Authorize the shared framework-test/composition work described in HALT-routes_claims.md.",
+      "why": "The full fast gate cannot pass while two forbidden-to-edit tests require the newly assigned rules route to remain a stub."
+    },
+    {
+      "item": "Resume outstanding semantic route work and replay to at least 98%.",
+      "why": "The unmodified raw board is 39.29%; it includes real missing degraded behavior and storage-bound validation in addition to incidental and sibling differences."
+    },
+    {
+      "item": "Provision native tcc_ops.finding_audit through the operator path.",
+      "why": "Only local SQLite proof exists; this feature is not authorized to perform migrations or native service access."
+    },
+    {
+      "item": "Review M-01 captured-ingestion precedence.",
+      "why": "Captured wage_basis, measuring_date and pay-code overrides of year-resolved packs affect calculated figures and were preserved."
+    },
+    {
+      "item": "Review first-program credit pricing in multi-program states.",
+      "why": "Changing certified credit_math behavior would change figures; typed run-resolution refusals do not authorize a new credit_math refusal."
+    },
+    {
+      "item": "Review CAP-10 QC-drop behavior separately from annotations.",
+      "why": "The writer deliberately remains untouched; global application would change certified figures, not merely complete findings or ingestion read integration."
+    },
+    {
+      "item": "Native fiscal/SQL/Blob verification remains a separate approved activity.",
+      "why": "Strict leap shifts, zero-worksite differences, native AVG, publication transactions and deployed Blob permissions are not established by local feature tests."
+    }
+  ],
+  "reports": [
+    "dotnet/docs/ROUTES-CLAIMS-REPORT.md",
+    "dotnet/docs/HALT-routes_claims.md",
+    "dotnet/docs/routes_claims-log.md",
+    "dotnet/docs/improvements/routes_claims.json",
+    "dotnet/docs/replay-complete-1/board.json",
+    "dotnet/docs/openpyxl-assets-LICENSE.txt"
+  ]
+}
