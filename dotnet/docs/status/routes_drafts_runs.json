@@ -1,0 +1,98 @@
+{
+  "session": "routes_drafts_runs",
+  "branch": "dotnet/w2-routes_drafts_runs",
+  "head": "a8bb4ea",
+  "summary": "HALTED at mandatory ownership boundary, not a passed W2 delivery. All 23 handlers and routes are implemented over the existing durable runner/Worker and repositories. Build and format pass; 11 owned integration tests passed, then all 8 final owned fast tests passed including the new lease boundary. The full fast gate had 711 passes and 9 failures; the owned assertion failure was fixed, leaving eight shared fixture/composition failures requiring unowned changes. Three main semantic scenarios were replayed; adjusted 98% replay and improvements-cap gates are not claimed. Everything is committed locally; nothing was pushed.",
+  "stages": {
+    "stage_1_durable_http_worker": "done",
+    "stage_2_controls_client_base_year": "done",
+    "stage_3_drafts_catalogue_export": "done",
+    "stage_4_full_integration": "partial"
+  },
+  "gates_claimed": {
+    "no_halt": false,
+    "commits_present": true,
+    "clean_tree": true,
+    "not_pushed": true,
+    "owned_paths": true,
+    "status_json": true,
+    "report_present": true,
+    "dotnet_build": true,
+    "dotnet_format": true,
+    "tests_fast": false,
+    "replay": false
+  },
+  "deviations": [
+    {
+      "id": "DEV-1",
+      "what": "Stopped before completing the full adjusted replay gate.",
+      "why": "Hard stop 1: the mandatory fast gate still requires changing shared fixture routes and placeholder expectations outside the allocated folders. HALT report records exact failures.",
+      "decision_needed": true
+    },
+    {
+      "id": "DEV-2",
+      "what": "Fresh dispatch scopes are supplied by the owned API feature module.",
+      "why": "The inherited singleton mediator otherwise retains root-scoped source readers across profile resets. No shared mediator or registration file was changed.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-3",
+      "what": "Worker executable and shared publication were reused without modification.",
+      "why": "Finite Worker and atomic publication already existed and were proven with actual process/reopen tests, not reimplemented.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-4",
+      "what": "The head field names the implementation/report commit preceding this status-only commit.",
+      "why": "This avoids a self-referential commit identifier while preserving the exact implementation evidence.",
+      "decision_needed": false
+    }
+  ],
+  "findings": [
+    "F-18: the recording's disconnected latest-run 404 is replaced by a durable successful manifest; a genuinely never-calculated client remains 404.",
+    "The named preview-client-refused recording actually accepted client selection in the synthetic environment; the task instead requires designated-sample-only preview.",
+    "Deterministic startup ID draw offsets and validator English propagate through raw replay. No dummy ID draws or message-copying shims were added.",
+    "Shared discovery fixtures register draft/batch routes alongside the real endpoints and cause AmbiguousMatchException.",
+    "A shared contract test still asserts 501 for a valid reader dry-run that now correctly returns 202.",
+    "Standalone provider validation scans handlers without discovering the API feature registrations and cannot resolve feature helpers.",
+    "The raw three-scenario wrapper reports 243 group cases, 35 passed and 208 failed before policy/tier handling; this is not the conductor's exact-template adjusted denominator.",
+    "An unowned ReadsCalc setup route substitutes capture-failed for a unit variable; the actual recorded rebase URL succeeds with matching numeric results."
+  ],
+  "open_questions": [
+    "How should standalone AddApplication/AddInfrastructure/AddTaxCreditRuntime validation discover or supply feature helper registrations?",
+    "How does the conductor classify the real-manifest operational count differences without waiving numeric changes? No cap result was claimed.",
+    "The shared direct runner reports validation.queries_run=17 versus recorded 20; this numeric difference remains unchanged."
+  ],
+  "needs_human": [
+    {
+      "item": "Expand allocation for shared fixture/composition repairs.",
+      "why": "Five paging cases and one trust case have duplicate endpoints; the rate-limit test expects placeholder 501; standalone provider validation lacks feature registrations. Required files are unowned."
+    },
+    {
+      "item": "Complete full fast-suite and all-scenario semantic replay after integration repairs.",
+      "why": "Neither the whole fast gate nor the 98% adjusted replay threshold is green. The narrow improvements register is not a blanket waiver."
+    },
+    {
+      "item": "Atomic override intent and recalculation acceptance.",
+      "why": "Existing ports save override and queue batch in separate transactions. A failed enqueue after save can leave intent without accepted work; unchanged resave currently does not repair it."
+    },
+    {
+      "item": "Long-run and native deployment certification.",
+      "why": "Default synchronous-compute lease is 600 seconds with entry renewal and precommit checks, not periodic heartbeat. Expiry rollback is tested; long-run sizing and live native schema provisioning are unmeasured."
+    },
+    {
+      "item": "M-01 year-resolved ingestion override behavior.",
+      "why": "The inherited behavior can change calculated figures and conflicts with strict year-scoped statutory ownership. It was preserved pending owner decision."
+    },
+    {
+      "item": "First-program credit-math behavior for multi-program states.",
+      "why": "Inherited Python-compatible figure-sensitive behavior was preserved; no new refusal or repricing was introduced."
+    }
+  ],
+  "reports": [
+    "dotnet/docs/ROUTES-DRAFTS-RUNS-REPORT.md",
+    "dotnet/docs/HALT-routes_drafts_runs.md",
+    "dotnet/docs/routes_drafts_runs-log.md",
+    "dotnet/docs/improvements/routes_drafts_runs.json"
+  ]
+}
