@@ -8,30 +8,24 @@ using TaxCredit.Application.Ports;
 using TaxCredit.Application.Ports.Contract;
 using TaxCredit.Infrastructure;
 using TaxCredit.ServiceDefaults;
+using TaxCredit.ServiceDefaults.Hosting;
 
 namespace TaxCredit.Api.Hosting;
 
 /// <summary>The only layer that names adapters; endpoint groups depend on application ports.</summary>
 public static class HostComposition
 {
-    /// <summary>Registers the framework and hermetic seams, with replaceable no-op persistence.</summary>
+    /// <summary>Registers real shared adapters, then discovered feature services, before provider construction.</summary>
     public static void AddSkeletonHost(this WebApplicationBuilder builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
         builder.AddServiceDefaults();
         builder.Logging.AddFilter("Microsoft.AspNetCore.Hosting.Diagnostics", LogLevel.Warning);
         builder.Services.AddApplication().AddInfrastructure();
+        builder.Services.AddTaxCreditRuntime(builder.Configuration);
         builder.Services.AddSingleton<RouteTable>();
         builder.Services.AddSingleton<RequestValidator>();
-        builder.Services.AddSingleton<RuntimeConfiguration>();
-        builder.Services.TryAddSingleton<IRuntimeConfiguration>(s => s.GetRequiredService<RuntimeConfiguration>());
-        builder.Services.AddSingleton(_ => new RuntimeSources(builder.Configuration["TCC_CONTRACT_HOOKS"] == "1"));
-        builder.Services.TryAddSingleton<IClock>(s => s.GetRequiredService<RuntimeSources>());
-        builder.Services.TryAddSingleton<IIdSource>(s => s.GetRequiredService<RuntimeSources>());
-        builder.Services.TryAddSingleton<ISecretSource>(s => s.GetRequiredService<RuntimeSources>());
-        builder.Services.TryAddSingleton<IContractWork, NoContractWork>();
-        builder.Services.TryAddSingleton<IApiAccess, SkeletonAccess>();
-        builder.Services.TryAddSingleton<IHostStatus, SkeletonHostStatus>();
+        builder.Services.AddScoped<IApiAccess, RuntimeAccess>();
         builder.Services.AddSingleton<ContractRequestGate>();
         if (builder.Configuration["TCC_CONTRACT_HOOKS"] == "1")
         {
@@ -45,12 +39,16 @@ public static class HostComposition
             .WithOrigins((builder.Configuration["CORS_ORIGINS"] ?? "http://localhost:5173").Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
             .WithMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
             .WithHeaders("Content-Type", "Authorization", "X-TCC-Acting-User")));
+        var features = new FeatureDiscovery(builder.Configuration);
+        builder.Services.AddSingleton(features);
+        features.ConfigureServices(builder.Services, builder.Configuration);
     }
 
     /// <summary>Installs standard CORS and routing, portable errors, and the discovered endpoint groups.</summary>
     public static void MapSkeletonHost(this WebApplication app)
     {
         ArgumentNullException.ThrowIfNull(app);
+        app.Services.GetRequiredService<RuntimeStatus>().Settle();
         if (app.Configuration["TCC_CONTRACT_HOOKS"] == "1")
         {
             // Force key creation at startup, not on the first request.

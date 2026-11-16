@@ -3,6 +3,9 @@ using TaxCredit.Api.Contract;
 using TaxCredit.Api.Wire;
 using TaxCredit.Application.Pipeline;
 using TaxCredit.Application.Ports;
+using TaxCredit.Application.Ports.Ai.Artifacts;
+using TaxCredit.Application.Ports.Auth;
+using TaxCredit.Application.Ports.Sources;
 
 namespace TaxCredit.Api.Hosting;
 
@@ -13,7 +16,8 @@ public sealed class HostMiddleware(RequestDelegate next, ILogger<HostMiddleware>
         LogLevel.Error, new EventId(1, "UnhandledRequest"), "Unhandled request failure ({ExceptionType}).");
 
     /// <summary>Runs validation and access checks for real endpoints and stubs alike.</summary>
-    public async Task InvokeAsync(HttpContext context, RouteTable table, RequestValidator validator, IApiAccess access)
+    public async Task InvokeAsync(HttpContext context, RouteTable table, RequestValidator validator, IApiAccess access,
+        IApiPrincipalAccessor principals)
     {
         ArgumentNullException.ThrowIfNull(context);
         context.Response.Headers.Vary = "Origin";
@@ -26,6 +30,7 @@ public sealed class HostMiddleware(RequestDelegate next, ILogger<HostMiddleware>
 
             return Task.CompletedTask;
         });
+        IDisposable? principalScope = null;
         try
         {
             var endpoint = context.GetEndpoint() as RouteEndpoint;
@@ -48,8 +53,9 @@ public sealed class HostMiddleware(RequestDelegate next, ILogger<HostMiddleware>
                         await ApiErrors.Detail(decision.Status, decision.Detail ?? "Not authorized.").ExecuteAsync(context).ConfigureAwait(false);
                         return;
                     }
-                }
 
+                    principalScope = principals.Push(decision.Principal ?? ApiPrincipal.Anonymous);
+                }
                 if (issues.Count > 0)
                 {
                     await ApiErrors.Detail(422, issues).ExecuteAsync(context).ConfigureAwait(false);
@@ -63,6 +69,24 @@ public sealed class HostMiddleware(RequestDelegate next, ILogger<HostMiddleware>
                 await ApiErrors.Detail(context.Response.StatusCode, context.Response.StatusCode == 404 ? "Not Found" : "Method Not Allowed")
                     .ExecuteAsync(context).ConfigureAwait(false);
             }
+        }
+        catch (ApiAuthException exception) when (!context.Response.HasStarted)
+        {
+            await Error(context, exception is AuthDependencyException ? 503 : exception.StatusCode,
+                exception.Message, bearer: exception.Challenge is not null && exception is not AuthDependencyException).ConfigureAwait(false);
+        }
+        catch (RateRefusalException exception) when (!context.Response.HasStarted)
+        {
+            await Error(context, 429, exception.Decision, retry: exception.Decision.RetryAfterSeconds).ConfigureAwait(false);
+        }
+        catch (SourceFailureException exception) when (!context.Response.HasStarted)
+        {
+            await Error(context, exception is SourceTooLarge ? 422 : 503,
+                new { code = exception.Code, dependency = exception.Dependency, remedy = exception.Remedy }).ConfigureAwait(false);
+        }
+        catch (ArtifactByteException exception) when (!context.Response.HasStarted)
+        {
+            await Error(context, exception.StatusCode, exception.Message).ConfigureAwait(false);
         }
         catch (RefusedException exception) when (!context.Response.HasStarted)
         {
@@ -83,12 +107,18 @@ public sealed class HostMiddleware(RequestDelegate next, ILogger<HostMiddleware>
             await Error(context, 500, "Internal Server Error").ConfigureAwait(false);
         }
 #pragma warning restore CA1031
+        finally
+        {
+            principalScope?.Dispose();
+        }
     }
 
-    private static Task Error(HttpContext context, int status, object detail)
+    private static Task Error(HttpContext context, int status, object detail, bool bearer = false, int? retry = null)
     {
         context.Response.Clear();
         context.Response.Headers.Vary = "Origin";
+        if (bearer) { context.Response.Headers.WWWAuthenticate = "Bearer"; }
+        if (retry is not null) { context.Response.Headers.RetryAfter = retry.Value.ToString(System.Globalization.CultureInfo.InvariantCulture); }
         return ApiErrors.Detail(status, detail).ExecuteAsync(context);
     }
 

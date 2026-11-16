@@ -86,10 +86,11 @@ public sealed class LayeringTests
     }
 
     [Fact]
-    public void Service_defaults_references_no_taxcredit_project()
+    public void Service_defaults_is_an_outward_composition_root_without_inter_host_references()
     {
-        Assert.Empty(ProjectRefs("TaxCredit.ServiceDefaults"));
-        Assert.DoesNotContain(AssemblyRefs(typeof(ServiceExtensions).Assembly), r => r.StartsWith("TaxCredit.", StringComparison.Ordinal));
+        Assert.All(ProjectRefs("TaxCredit.ServiceDefaults"), reference =>
+            Assert.True(reference == "TaxCredit.Application" || reference.StartsWith("TaxCredit.Infrastructure", StringComparison.Ordinal)));
+        Assert.DoesNotContain(AssemblyRefs(typeof(ServiceExtensions).Assembly), r => r is "TaxCredit.Api" or "TaxCredit.Worker");
     }
 
     [Fact]

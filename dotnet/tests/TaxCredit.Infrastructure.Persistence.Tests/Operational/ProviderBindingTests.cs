@@ -1,6 +1,6 @@
-using TaxCredit.Domain.Claims;
 using System.Data;
 using System.Globalization;
+using TaxCredit.Domain.Claims;
 using TaxCredit.Domain.Warehouse;
 using TaxCredit.Infrastructure.Persistence.Operational;
 using TaxCredit.Infrastructure.Persistence.Sql;

@@ -64,5 +64,8 @@ public static class PersistenceRegistration
         services.AddSingleton<IArtifactRepository, ArtifactRepository>();
         services.AddSingleton<IChannelStateRepository, ChannelStateRepository>();
         services.AddSingleton<IChannelAuditRepository, ChannelAuditRepository>();
+        services.AddSingleton<IRunPublication, RunPublication>();
+        services.AddSingleton<IRunSourceObservations, RunSourceObservations>();
+        services.AddSingleton<IRunFailureClassifier, RunFailureClassifier>();
     }
 }

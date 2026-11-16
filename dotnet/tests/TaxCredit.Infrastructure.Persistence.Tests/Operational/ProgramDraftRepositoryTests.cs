@@ -1,6 +1,6 @@
-using TaxCredit.Domain.Numerics;
 using System.Numerics;
 using TaxCredit.Application.Hosting;
+using TaxCredit.Domain.Numerics;
 using TaxCredit.Domain.Programs;
 using TaxCredit.Infrastructure.Persistence.Operational;
 using TaxCredit.Infrastructure.Persistence.Sql;

@@ -1,3 +1,4 @@
+using TaxCredit.Application.Ports.Contract;
 using TaxCredit.Application.Ports.Persistence;
 using TaxCredit.Domain.Numerics;
 using TaxCredit.Infrastructure.Persistence.Sql;
@@ -5,7 +6,7 @@ using TaxCredit.Infrastructure.Persistence.Sql;
 namespace TaxCredit.Infrastructure.Persistence.Operational;
 
 /// <summary>Stores authored lookup facts; source precedence and effective-date resolution remain in Sources.</summary>
-public sealed class LookupStore(PersistenceDatabase database) : ILookupStore
+public sealed class LookupStore(PersistenceDatabase database, IIdSource? ids = null) : ILookupStore
 {
     private static readonly string[] Columns =
     [
@@ -36,7 +37,7 @@ public sealed class LookupStore(PersistenceDatabase database) : ILookupStore
                 + "WHERE {tenant} AND lookup_name = ? AND key_kind = ? AND key_value = ? AND superseded_at IS NULL",
                 clock, entry.Lookup, entry.KeyKind, entry.Key);
             session.Insert(entry.ClientId, "tcc_ops.lookup_override", Columns,
-                [new object?[] { Guid.NewGuid().ToString(), entry.Lookup, entry.ClientId, entry.KeyKind, entry.Key, entry.ValueJson,
+                [new object?[] { (ids?.NewId() ?? Guid.NewGuid()).ToString(), entry.Lookup, entry.ClientId, entry.KeyKind, entry.Key, entry.ValueJson,
                     entry.EffectiveFrom, entry.EffectiveTo, entry.AuthoredBy, clock, entry.Basis, entry.Inferred, null }]);
             AppendAudit(session, entry, "put", entry.AuthoredBy, clock);
             return true;
@@ -77,9 +78,9 @@ public sealed class LookupStore(PersistenceDatabase database) : ILookupStore
                     r.Required("value_json"), r.Required("authored_by"), r.Text("basis") ?? "", r.Bool("inferred"), r.Day("effective_from"), r.Day("effective_to"));
             }).ToList();
 
-    private static void AppendAudit(SqlSession session, LookupEntry entry, string action, string actor, object? at) =>
+    private void AppendAudit(SqlSession session, LookupEntry entry, string action, string actor, object? at) =>
         session.Insert(entry.ClientId, "tcc_ops.lookup_audit",
             ["audit_id", "lookup_name", "client_id", "action", "key_kind", "key_value", "value_json", "actor", "at", "basis"],
-            [new object?[] { Guid.NewGuid().ToString(), entry.Lookup, entry.ClientId, action, entry.KeyKind, entry.Key,
+            [new object?[] { (ids?.NewId() ?? Guid.NewGuid()).ToString(), entry.Lookup, entry.ClientId, action, entry.KeyKind, entry.Key,
                 action == "put" ? entry.ValueJson : null, actor, at, entry.Basis }]);
 }

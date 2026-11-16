@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http.Metadata;
 using Microsoft.AspNetCore.Routing;
 using TaxCredit.Api.Contract;
+using TaxCredit.Api.Hosting;
 using TaxCredit.Api.Wire;
 
 namespace TaxCredit.Api.Endpoints;
@@ -12,7 +13,7 @@ public static class EndpointRegistration
     public static void MapEndpointGroups(this IEndpointRouteBuilder endpoints)
     {
         ArgumentNullException.ThrowIfNull(endpoints);
-        foreach (var type in typeof(IEndpointGroup).Assembly.GetTypes()
+        foreach (var type in endpoints.ServiceProvider.GetRequiredService<FeatureDiscovery>().Types
             .Where(t => t is { IsClass: true, IsAbstract: false } && typeof(IEndpointGroup).IsAssignableFrom(t))
             .OrderBy(t => t.FullName, StringComparer.Ordinal))
         {

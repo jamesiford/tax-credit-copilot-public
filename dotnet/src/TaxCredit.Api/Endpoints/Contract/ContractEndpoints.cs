@@ -2,6 +2,7 @@ using System.Text.Json;
 using TaxCredit.Api.Hosting;
 using TaxCredit.Api.Wire;
 using TaxCredit.Application.Ports.Contract;
+using TaxCredit.ServiceDefaults.Hosting;
 
 namespace TaxCredit.Api.Endpoints.Contract;
 
@@ -57,8 +58,18 @@ public sealed class ContractEndpoints(IConfiguration configuration) : IEndpointG
             return InvalidBody();
         }
 
-        configuration.Apply(set, unset);
-        await work.EnvironmentChanged(context.RequestAborted).ConfigureAwait(false);
+        var previous = configuration.Capture();
+        try
+        {
+            configuration.Apply(set, unset);
+            await work.EnvironmentChanged(context.RequestAborted).ConfigureAwait(false);
+        }
+        catch (Exception error) when (error is ArgumentException or InvalidOperationException)
+        {
+            configuration.Restore(previous);
+            await work.EnvironmentChanged(context.RequestAborted).ConfigureAwait(false);
+            return ApiErrors.Detail(422, "Invalid runtime configuration; the previous configuration was restored.");
+        }
         return Results.Json(new { set = set.Keys.Order(StringComparer.Ordinal), unset = unset.Order(StringComparer.Ordinal) });
     }
 
