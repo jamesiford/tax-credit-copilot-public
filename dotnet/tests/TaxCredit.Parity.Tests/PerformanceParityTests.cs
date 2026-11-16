@@ -8,6 +8,7 @@ namespace TaxCredit.Parity.Tests;
 /// <c>domain/calculation/{performance,reconciliation,rollups}.py</c> on CPython 3.12) against <see cref="PerformanceDashboard"/>,
 /// <see cref="Reconciliation"/> and <see cref="Rollups"/>. Trees are compared by type, key order, double bit pattern and exception type plus message.
 /// </summary>
+[Trait("Category", "heavy")]
 public sealed class PerformanceParityTests
 {
     private const string File = "performance.jsonl.gz";

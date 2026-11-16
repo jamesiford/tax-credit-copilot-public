@@ -8,6 +8,7 @@ namespace TaxCredit.Parity.Tests;
 /// <c>tools/tokens.py</c> on CPython 3.12) against <see cref="GoldProjection"/> and <see cref="RecordTokens"/>. Rows are compared cell by cell as typed trees
 /// (a Decimal is its exact string, an int an int, a date a date), with the column list of every table, and exceptions by type plus message.
 /// </summary>
+[Trait("Category", "heavy")]
 public sealed class GoldParityTests
 {
     private const string File = "gold.jsonl.gz";

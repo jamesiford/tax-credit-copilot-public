@@ -11,6 +11,7 @@ namespace TaxCredit.Parity.Tests;
 /// with a capturing writer, against <see cref="ClientCalculation"/>. Every row of all seven <c>tcc_gold</c> tables, every manifest column, the handler's result
 /// and the claims the assessment records are compared cell by cell; a run that raised must raise the same type with the same message.
 /// </summary>
+[Trait("Category", "heavy")]
 public sealed class ClientCalculationParityTests
 {
     [Fact]

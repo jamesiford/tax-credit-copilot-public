@@ -7,6 +7,7 @@ namespace TaxCredit.Parity.Tests;
 /// The projection against <c>docs/data/schema/tcc-schema.fabric.sql</c>: the column lists are the DDL's, and what Python (and so the port) puts in each
 /// cell can be stored in the column the DDL declares. Where the two disagree the Python is ported and the disagreement is pinned here as a finding.
 /// </summary>
+[Trait("Category", "heavy")]
 public sealed class GoldDdlTests
 {
     [Fact]

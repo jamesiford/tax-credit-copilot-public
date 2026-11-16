@@ -16,6 +16,12 @@
     <ArtifactsPath>$(MSBuildThisFileDirectory)artifacts</ArtifactsPath>
   </PropertyGroup>
 
+  <!-- Pin the conductor's explicitly supplied CPython 3.12 oracle for unattended parity tests.
+       Explicit test settings can override this; OracleInterpreter still refuses a different minor version. -->
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'TaxCredit.Parity.Tests' and '$(VSTestSetting)' == ''">
+    <VSTestSetting>$(MSBuildThisFileDirectory)tests\TaxCredit.Parity.Tests\oracle.runsettings</VSTestSetting>
+  </PropertyGroup>
+
   <!-- Production projects: XML docs on every public member (CS1591 is an error via TreatWarningsAsErrors). -->
   <PropertyGroup Condition="'$(MSBuildProjectDirectory.Contains(&quot;\src\&quot;))' == 'true'">
     <GenerateDocumentationFile>true</GenerateDocumentationFile>

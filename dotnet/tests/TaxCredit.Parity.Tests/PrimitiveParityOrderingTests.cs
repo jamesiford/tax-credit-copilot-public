@@ -5,6 +5,7 @@ using TaxCredit.Domain.Numerics;
 namespace TaxCredit.Parity.Tests;
 
 /// <summary>Gate G1 (continued): dates, ordering, <c>min</c>/<c>max</c> and string semantics.</summary>
+[Trait("Category", "heavy")]
 public sealed class PrimitiveParityOrderingTests
 {
     private const string File = "primitives.jsonl.gz";

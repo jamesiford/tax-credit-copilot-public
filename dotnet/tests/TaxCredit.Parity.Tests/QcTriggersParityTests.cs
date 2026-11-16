@@ -17,6 +17,7 @@ public sealed class QcTriggersParityTests
     private readonly Lazy<List<PyDict>> _payroll = new(() => IngestionGolden.Rows(((PyDict)ClaimGolden.Calls(File).First(c => (string)c["fn"]! == "_payroll")["out"]!)["result"]));
 
     [Fact]
+    [Trait("Category", "heavy")]
     public void Every_golden_call_matches_python_bit_for_bit() => ClaimGolden.AssertAllMatch(File, Invoke, Functions, 1700, 60);
 
     [Fact]

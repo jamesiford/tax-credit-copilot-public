@@ -14,18 +14,23 @@ public sealed class FamilyFuzzTests(ITestOutputHelper output)
     private static readonly FuzzFamily[] All = [new ProximityFuzz(), new GoldFuzz(), new BaseYearFuzz(), new SimulationFuzz(), new CreditMathFuzz()];
 
     [Fact]
+    [Trait("Category", "heavy")]
     public void Proximity_scenarios_agree_with_the_python_engine() => Run(All[0]);
 
     [Fact]
+    [Trait("Category", "heavy")]
     public void Gold_projection_scenarios_agree_with_the_python_engine() => Run(All[1]);
 
     [Fact]
+    [Trait("Category", "heavy")]
     public void Base_year_scenarios_agree_with_the_python_engine() => Run(All[2]);
 
     [Fact]
+    [Trait("Category", "heavy")]
     public void Simulation_and_forecast_scenarios_agree_with_the_python_engine() => Run(All[3]);
 
     [Fact]
+    [Trait("Category", "heavy")]
     public void Credit_math_scenarios_agree_with_the_python_engine() => Run(All[4]);
 
     [Fact]

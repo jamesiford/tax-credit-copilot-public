@@ -16,6 +16,7 @@ public sealed class ForecastParityTests
         ["_months_elapsed", "_ytd_average_headcount", "project_state_year_end", "_resolve_location", "simulate_hiring", "chat_state_credit", "latest_tax_year", "onezero_snapshot", "describe_role", "apply_onezero_lever", "str.lower"];
 
     [Fact]
+    [Trait("Category", "heavy")]
     public void Every_golden_call_matches_python_bit_for_bit()
     {
         var golden = new ForecastGolden();
@@ -23,6 +24,7 @@ public sealed class ForecastParityTests
     }
 
     [Fact]
+    [Trait("Category", "heavy")]
     public void A_perturbed_output_is_detected_by_the_comparison()
     {
         // Mutation self-test (in process): the same comparison, fed outputs with one deliberate defect, must disagree.

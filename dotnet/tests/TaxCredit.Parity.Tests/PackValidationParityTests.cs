@@ -9,6 +9,7 @@ namespace TaxCredit.Parity.Tests;
 /// <see cref="IJsonSchemaValidator"/>, so it is compared on the accept/reject decision and the distinct (keyword, path) pairs as hard equality, and on wording, count
 /// and order as a measured deviation written to <c>docs/pack-validation-deviations.md</c>.
 /// </summary>
+[Trait("Category", "heavy")]
 public sealed class PackValidationParityTests
 {
     [Fact]

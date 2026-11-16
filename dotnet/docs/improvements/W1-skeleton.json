@@ -1,0 +1,34 @@
+{
+  "improvements": [
+    {
+      "id": "IMP-skeleton-1",
+      "kind": "defect_fix",
+      "route": "GET /api/workspace/assumptions",
+      "finding": "F-6",
+      "reason": "Missing sealed inputs are a dependency-unavailable JSON 503, matching the other sealed detail routes, instead of an unhandled plain-text 500."
+    },
+    {
+      "id": "IMP-skeleton-2",
+      "kind": "defect_fix",
+      "route": "GET /api/progress/{tax_year}",
+      "case": "get-api-progress-tax-year.query-within-negative",
+      "finding": "F-4",
+      "reason": "A negative proximity band is invalid client input and returns a JSON validation 422 before a handler, not a plain-text 500."
+    },
+    {
+      "id": "IMP-skeleton-3",
+      "kind": "defect_fix",
+      "route": "GET /api/v2/clients/{client_id}/units",
+      "case": "unknown.client-huge",
+      "finding": "F-3",
+      "reason": "An identifier outside the storage adapter's Int64 range is refused with JSON validation 422 instead of overflowing during a store operation."
+    },
+    {
+      "id": "IMP-skeleton-4",
+      "kind": "defect_fix",
+      "route": "GET /api/simulate/portfolio/{tax_year}",
+      "finding": "F-1",
+      "reason": "Absolute magnitude above 10000 is refused with JSON validation 422 before any computation. The omitted unbounded recording must not hang the replacement host."
+    }
+  ]
+}

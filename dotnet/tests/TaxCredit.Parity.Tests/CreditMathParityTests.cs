@@ -15,6 +15,7 @@ namespace TaxCredit.Parity.Tests;
 /// compared by type (int, float, bool), key order, double bits and exception type plus message; the calculation trail (with its SHA-256) and the
 /// payroll-wage lookups of each credit call are compared too.
 /// </summary>
+[Trait("Category", "heavy")]
 public sealed class CreditMathParityTests
 {
     [Fact]
