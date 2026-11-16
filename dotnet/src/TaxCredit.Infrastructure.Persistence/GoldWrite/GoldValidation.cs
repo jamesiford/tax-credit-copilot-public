@@ -4,11 +4,6 @@ namespace TaxCredit.Infrastructure.Persistence;
 
 internal static class GoldValidation
 {
-    private static readonly string[] ReferenceTables = ["employee_period_fact", "employee_eligibility", "onezero_matrix", "unit_month_summary", "run_method_summary", "unit_year_master", "unit_credit_installment"];
-    private static readonly string[] CurrentTables = ["unit_year_master", "unit_credit_installment"];
-
-    internal static int QueryCount => Queries.Count + ReferenceTables.Length + CurrentTables.Length;
-
     internal static IReadOnlyList<(string Query, long RowCount)> Check(SqlSession session, string? publishingRun = null)
     {
         var failures = new List<(string Query, long RowCount)>();
@@ -21,7 +16,7 @@ internal static class GoldValidation
             }
         }
 
-        foreach (var table in ReferenceTables)
+        foreach (var table in new[] { "employee_period_fact", "employee_eligibility", "onezero_matrix", "unit_month_summary", "run_method_summary", "unit_year_master", "unit_credit_installment" })
         {
             var rows = session.QueryExempt(SqlExemption.Validation, "SELECT DISTINCT g.run_id FROM tcc_gold." + table
                 + " g LEFT JOIN tcc_ops.run_manifest r ON r.run_id=g.run_id AND r.client_id=g.client_id WHERE r.run_id IS NULL");
@@ -31,7 +26,7 @@ internal static class GoldValidation
             }
         }
 
-        foreach (var table in CurrentTables)
+        foreach (var table in new[] { "unit_year_master", "unit_credit_installment" })
         {
             var rows = session.QueryExempt(SqlExemption.Validation, "SELECT g.client_id FROM tcc_gold." + table
                 + " g JOIN tcc_ops.run_manifest r ON r.client_id=g.client_id AND r.run_id=g.run_id WHERE g.is_current=1"

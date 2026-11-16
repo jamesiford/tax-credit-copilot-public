@@ -1,6 +1,5 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using TaxCredit.Api.Hosting;
 using TaxCredit.Application;
 using TaxCredit.Application.Ports.Ai;
 using TaxCredit.Application.Ports.Ai.Artifacts;
@@ -44,7 +43,6 @@ public sealed class ProviderSelectionTests
         }).Build();
         var services = new ServiceCollection();
         services.AddApplication().AddInfrastructure().AddTaxCreditRuntime(configuration);
-        new FeatureDiscovery(configuration).ConfigureServices(services, configuration);
         var groups = new FakeGroups();
         services.AddSingleton<IGroupMembershipProvider>(groups);
         using var provider = services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true, ValidateOnBuild = true });
