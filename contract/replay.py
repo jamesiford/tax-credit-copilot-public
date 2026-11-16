@@ -137,7 +137,10 @@ def main() -> int:
                 results.append(run_in_process(name, args.mode))
             else:
                 if args.reset_url:
-                    urllib.request.urlopen(urllib.request.Request(args.reset_url, method="POST", data=b"{}"))
+                    from contract.replay_setup import prepare_external
+
+                    scenario = json.loads((SCENARIOS / f"{name}.json").read_text(encoding="utf-8"))
+                    prepare_external(args.base_url, args.reset_url, scenario)
                 results.append(replay_one(name, args.base_url, args.mode))
         finally:
             if proc is not None:

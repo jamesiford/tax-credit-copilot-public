@@ -7,7 +7,6 @@ import os
 import re
 import subprocess
 import sys
-import urllib.request
 from collections import Counter, defaultdict
 from pathlib import Path
 
@@ -54,39 +53,15 @@ def summarize(root: Path, reports: list[dict]) -> dict:
     }
 
 
-def setup_scenario(base_url: str, scenario: dict) -> None:
-    """External servers need the same profile and auth setup as a spawned Python harness."""
-    def post(path: str, payload: dict) -> None:
-        request = urllib.request.Request(
-            base_url + path, json.dumps(payload).encode(), {"Content-Type": "application/json"}, method="POST")
-        with urllib.request.urlopen(request, timeout=300) as response:
-            if response.status != 200:
-                raise RuntimeError("Scenario setup failed; response payload is intentionally not logged.")
-
-    post("/__contract__/reset?profile=" + scenario["profile"], {})
-    auth = scenario.get("auth")
-    values = {
-        "AUTH_MODE": "entra" if auth is not None else "none",
-        "CHANNEL_ENFORCE_WRITER_FOR_USERS": "true" if auth is not None else "false",
-        "RATE_LIMIT_PER_MINUTE": str(auth.get("rate_limit_per_minute", 3)) if auth is not None else "60",
-    }
-    if auth is not None:
-        values.update({
-            "AUTH_TENANT_ID": "00000000-0000-0000-0000-0000000000aa",
-            "API_AUDIENCE": "api://11111111-2222-3333-4444-555555555555",
-        })
-    post("/__contract__/env", {"set": values})
-
-
 def run_scenario(root: Path, oracle: str, env: dict, base_url: str, scenario_file: Path, raw: Path) -> dict:
     scenario = json.loads(scenario_file.read_text())
-    setup_scenario(base_url, scenario)
     output = raw.resolve() / scenario_file.stem
     report_file = output.with_suffix(".json")
     report_file.unlink(missing_ok=True)
     result = subprocess.run([
         oracle, "-m", "contract.replay", "--mode", "semantic",
         "--base-url", base_url,
+        "--reset-url", base_url + "/__contract__/reset?profile=" + scenario["profile"],
         "--scenario", scenario_file.stem, "--out", str(output),
     ], cwd=root / "backend", env=env, check=False)
     if result.returncode not in (0, 1) or not report_file.exists():

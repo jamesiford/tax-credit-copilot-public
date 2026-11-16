@@ -66,4 +66,12 @@ The zip/xlsx container size and SHA-256 are **tier D** (`CONTRACT-REPORT.md` sec
 
 Each scenario starts from its profile's seed (`seed/`). The replay tool drives these hooks under `/__contract__/` (see `harness/control.py`): `POST drain` (run every queued run-batch item and finish background recalculation), `POST env` (`{"set":{},"unset":[]}`, used by the "dependency unavailable" scenarios), `POST mint` (`{kind, oid, aud, roles, scp, exp_in, ...}` -> `{"token"}`: a token the server under test will accept, minted with its own test key; used by every authenticated scenario), and optionally `POST reset`. A server that has been given `--reset-url` is reset before each scenario; otherwise start a fresh one per scenario. Clock, ids, tokens and the secrets source must be deterministic as described in `docs/normalisation.md` for the recordings to be comparable byte for byte.
 
+For external replay with `--reset-url`, the reset body carries the scenario's
+declared `profile`. Before minting tokens or replaying requests, the client also
+applies that scenario's authentication mode, writer enforcement and rate limit
+through `/__contract__/env`. This matches the spawned oracle's setup; resetting
+every scenario to P1 with authentication disabled does not test the recordings'
+P2 or authenticated worlds. Without `--reset-url`, a separately prepared server
+remains the caller's responsibility.
+
 Never push this branch.
