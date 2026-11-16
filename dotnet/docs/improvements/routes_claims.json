@@ -27,8 +27,10 @@
     {
       "id": "IMP-routes_claims-4",
       "kind": "defect_fix",
-      "route": "POST /api/clients/{client_id}/packages",
-      "reason": "Formula-like authored text remains an inline string instead of executable spreadsheet content. A focused integration test injects =1+1 and proves literal provenance text with no formula elements."
+      "route": "GET /api/clients/{client_id}/artifacts/{artifact_id}",
+      "categories": ["zip-entry"],
+      "path_prefix": "body.zip_entries[xl/worksheets/sheet4.xml]",
+      "reason": "Formula-like authored text remains literal in the downloaded Provenance sheet. This entry describes only that sheet's XML member; it cannot cover package metadata, artifact IDs, money or other calculated values. The focused =1+1 integration test proves no formula elements."
     },
     {
       "id": "IMP-routes_claims-5",
@@ -42,7 +44,9 @@
       "id": "IMP-routes_claims-6",
       "kind": "defect_fix",
       "route": "GET /api/clients/{client_id}/artifacts/{artifact_id}",
-      "reason": "Registered bytes are checked against both stored size and SHA-256 before streaming. Corruption produces an audited missing outcome and safe 503 rather than serving bytes that contradict the metadata."
+      "categories": ["status"],
+      "path_prefix": "status",
+      "reason": "Registered bytes are checked against both stored size and SHA-256 before streaming. Corruption produces an audited missing outcome and safe 503 rather than serving bytes that contradict the metadata. This entry does not cover artifact IDs, workbook contents or calculated values."
     }
   ]
 }
