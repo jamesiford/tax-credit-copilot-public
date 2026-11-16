@@ -1,0 +1,48 @@
+{
+  "improvements": [
+    {
+      "id": "IMP-routes_drafts_runs-1",
+      "kind": "defect_fix",
+      "route": "GET /api/v2/clients/{client_id}/runs/latest",
+      "finding": "F-18",
+      "reason": "Read the shared durable successful manifest destination instead of reproducing the disconnected historical 404 after accepted calculation. Never-calculated clients remain 404. Operational numeric differences are not waived by this entry."
+    },
+    {
+      "id": "IMP-routes_drafts_runs-2",
+      "kind": "defect_fix",
+      "route": "POST /api/v2/program-drafts/{draft_id}/preview",
+      "case": "preview-client-refused",
+      "finding": "",
+      "reason": "The captured synthetic environment accepted an arbitrary client selection despite the case name. The task explicitly requires only the designated committed sample; client payroll is refused with structured detail and 403."
+    },
+    {
+      "id": "IMP-routes_drafts_runs-3",
+      "kind": "error_text",
+      "route": "POST /api/v2/program-drafts",
+      "case": "create-bad-code",
+      "categories": ["value"],
+      "path_prefix": "detail.reason",
+      "finding": "",
+      "reason": "Keep the modeled error family and refusal status while using concise validation wording rather than copying Python message text."
+    },
+    {
+      "id": "IMP-routes_drafts_runs-4",
+      "kind": "wire_incidental",
+      "route": "POST /api/v2/program-drafts",
+      "case": "create",
+      "categories": ["value"],
+      "path_prefix": "draft_id",
+      "finding": "",
+      "reason": "The deterministic identifier source starts at a different draw after host setup. Do not consume dummy identities merely to reproduce the recording harness's startup sequence."
+    },
+    {
+      "id": "IMP-routes_drafts_runs-5",
+      "kind": "framework_default",
+      "route": "POST /api/v2/program-drafts/{draft_id}/export",
+      "case": "second-export",
+      "categories": ["header"],
+      "finding": "",
+      "reason": "Portable ZIP download headers may differ from Starlette defaults. This entry does not waive ZIP member bytes or canonical hashes; an exact CPython member-byte oracle independently passes."
+    }
+  ]
+}
