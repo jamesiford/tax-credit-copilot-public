@@ -282,3 +282,13 @@ No live Fabric, Foundry, Entra or customer system was contacted. The production
 Foundry SDK publication/invocation factory, sibling projections/commands and
 ordinary-host success for those bindings remain unverified. No package,
 shared project/startup, Domain, Python product or replay comparator was changed.
+
+### Conductor follow-up
+
+The reported CA2026 test-helper leak is fixed by explicitly disposing the
+parsed document after cloning its element. Whole-solution build, formatting
+and all 1,025 fast tests pass again. The repository-root warning-as-error build
+also passes under its newer SDK 11.0.100 analyzer without changing the pinned
+10.0.404 SDK configuration or net10.0 target. Fresh complete diagnostics in
+`dotnet\artifacts\ai-ca2026-replay` reproduce the existing 5/23 raw AI replay
+result; the missing production bindings and replay acceptance remain unresolved.

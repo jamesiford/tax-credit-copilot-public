@@ -1,8 +1,8 @@
 {
   "session": "routes_ai_agents",
   "branch": "dotnet/w2-routes_ai_agents",
-  "head": "e9b3106",
-  "summary": "Implemented four discovered AI routes, the 37-declaration capability boundary, trusted page/chat assembly, strict numeral integrity and twelve exact prompt/publication contracts. Whole-solution build and formatting pass; all 1,025 fast tests pass, including 213 owned AI tests. Final compiled-host semantic replay is 5/23 AI cases passing (21.74%), below 95%; required sibling projections/commands remain absent and are explicitly inventoried. Production Foundry publication/invocation remains unverified. Changes are local and restricted to owned paths.",
+  "head": "504632d",
+  "summary": "Fixed conductor-reported CA2026 by explicitly disposing each parsed stream-frame JsonDocument after cloning its element. Whole-solution warning-as-error builds pass under the pinned SDK 10.0.404 and root-selected SDK 11.0.100, still targeting net10.0. Formatting and all 1,025 fast tests pass. Post-fix complete semantic replay remains 5/23 AI cases passing (21.74%), below 95%, with the previously inventoried missing sibling bindings unchanged. Changes are committed locally within owned paths; production Foundry remains unverified.",
   "stages": {
     "stage_1_prompt_fidelity": "done",
     "stage_2_capabilities": "partial",
@@ -57,6 +57,8 @@
     "Employee summaries are deterministic, and person-only capability facts and unit person lines are withheld from models.",
     "The production Foundry SDK/factory is still absent; verified fake publication DTOs are not deployed agents or live invocation evidence.",
     "Whole fast tests passed 1,025 cases with no failures or skips; the final prompt-registration build, 279 API regressions and full formatting also passed.",
+    "Conductor follow-up: CA2026 identified an undisposed JsonDocument in the stream test parser. The parser now clones while an explicitly disposed document is alive. Builds pass from both the pinned SDK directory and the repository root with its newer analyzer; no target framework or shared configuration was changed.",
+    "Post-fix gates were rerun: dotnet build -warnaserror, dotnet format --verify-no-changes and all 1,025 non-heavy tests pass. Fresh complete replay diagnostics under dotnet\\artifacts\\ai-ca2026-replay reproduce 36 exchanges, 192 differences, six tolerated and 5/23 AI cases passing; replay remains unclaimed.",
     "No live Fabric, Foundry, Entra or customer system, remote change, push or unowned product edit was used. Temporary replay hosts were stopped."
   ],
   "open_questions": [],

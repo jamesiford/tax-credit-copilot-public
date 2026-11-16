@@ -98,3 +98,23 @@
   remote change or out-of-ownership product edit was used.
 - Finish reports distinguish verified local/fake behavior from missing sibling
   production bindings and the unavailable production Foundry factory.
+
+## Conductor follow-up: CA2026
+
+- The conductor's newer analyzer flagged the undisposed document in
+  `StreamEndpointTests.Parse`. The parser now uses an explicit `using` scope
+  and returns a cloned element before disposing the document. Stream payloads,
+  parsing assertions and the net10.0 target are unchanged.
+- Re-ran exact whole-solution `dotnet build -warnaserror`,
+  `dotnet format --verify-no-changes` and
+  `dotnet test --filter 'Category!=heavy'` from `dotnet`: all pass,
+  with zero build warnings/errors and 1,025 passing tests, no failures/skips.
+- Also ran `dotnet build dotnet\TaxCredit.slnx -warnaserror` from the worktree
+  root, where SDK 11.0.100 supplies the newer analyzer. It passes with zero
+  warnings/errors; the project's pinned SDK is still 10.0.404 and all targets
+  remain net10.0. No suppression or shared configuration change was needed.
+- Re-ran the unchanged complete semantic scenario against a fresh ordinary
+  host. `dotnet\artifacts\ai-ca2026-replay\board.json` and its `diagnostics`
+  directory report the same 36 exchanges, 192 differences, six tolerated and
+  5/23 AI cases passing (21.74%). The existing sibling integration blocker and
+  unclaimed replay gate are unchanged. The temporary host was stopped.
