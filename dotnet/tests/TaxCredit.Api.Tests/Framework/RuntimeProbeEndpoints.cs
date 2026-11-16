@@ -1,5 +1,3 @@
-using System.Globalization;
-using System.Numerics;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -7,9 +5,7 @@ using TaxCredit.Api.Endpoints;
 using TaxCredit.Application.Hosting;
 using TaxCredit.Application.Ports.Auth;
 using TaxCredit.Application.Ports.Contract;
-using TaxCredit.Application.Ports.Persistence;
 using TaxCredit.Application.Ports.Sources;
-using TaxCredit.Domain.Programs;
 using TaxCredit.Domain.Warehouse;
 
 namespace TaxCredit.Api.Tests.Framework;
@@ -26,14 +22,6 @@ public sealed class RuntimeProbeEndpoints : IEndpointGroup
             return before!.ToIdentityBody();
         });
         endpoints.MapGet("/api/v2/clients/{client_id}/units", Observe);
-        endpoints.MapGet("/api/v2/program-drafts", (HttpContext context, IProgramDraftRepository drafts) =>
-        {
-            var offset = context.Request.Query["offset"].ToString();
-            var page = drafts.ListPage(null, 50, offset.Length == 0 ? BigInteger.Zero : BigInteger.Parse(offset, CultureInfo.InvariantCulture));
-            return new { total = page.Total, items = page.Items.Count };
-        });
-        endpoints.MapGet("/api/v2/run-batches/{batch_id}", (string batch_id, IRunBatchRepository queue) =>
-            queue.Get(batch_id) is null ? Results.NotFound(new { detail = "Not found." }) : Results.Ok(new { exists = true }));
     }
 
     private static IResult Observe(long client_id, IRunManifestRepository manifests, ISourceReader source,

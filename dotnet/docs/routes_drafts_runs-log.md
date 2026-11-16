@@ -81,3 +81,36 @@
   would conceal rather than repair that seam.
 - Mandatory ownership stop remains. Updated HALT/status with the exact
   conductor-policy conflict instead of deleting evidence or claiming green.
+
+## Conductor-directed integration repair
+
+- Interpreted the repeated explicit instruction to fix the named integration
+  failures as a narrow allocation extension: four shared test files, the
+  validator metadata source, and its runtime binding. No unrelated shared
+  file, test threshold or replay comparison was changed.
+- Removed only obsolete draft-list and batch-detail probe endpoint mappings.
+  Their tests now exercise the real production routes. Huge-offset tests
+  assert the honest total, empty items and exact BigInteger offset.
+- Standalone native-provider validation now calls the same feature discovery
+  registrations as the API before validating the container.
+- Replaced fixture expectations for implemented operations with their real
+  outcomes; writer checks, refusal checks, limiter checks and reset assertions
+  remain. The heavy writer/reset test covers actual direct calculation,
+  forbidden reader access, successful writer creation, and duplicate conflict.
+- That test exposed a real stale-policy bug: scoping handlers alone did not
+  scope the authorization stage. The owned module now registers the existing
+  mediator as request-scoped and removes the reflection/handler-scope wrapper.
+  Both policy and source lifetimes follow the request.
+- Replaced runtime literal query count 17 with the actual validator inventory:
+  20 fixed checks + 7 reference checks + 2 current-manifest checks = 29.
+  No query was removed or fabricated. A new focused test observes each SQL
+  validation exemption and compares the executed count with run metadata.
+  Recorded Python has 20 checks, so numeric replay mismatch remains honest.
+- Targeted shared regressions and reviewer identity: 19 passed, including the
+  heavy dynamic-policy test. New validation-metadata regression: passed.
+- Final required whole build and formatter: passed. Final whole fast suite:
+  **721 passed, 0 failed**, across all eight test projects (API 75).
+- Removed the obsolete ownership HALT marker because these specific failures
+  are repaired. Prior halt evidence remains in Git history, not hidden by
+  an assertion shim. Full replay and heavy verification run independently
+  against isolated destinations; their final results will be recorded below.

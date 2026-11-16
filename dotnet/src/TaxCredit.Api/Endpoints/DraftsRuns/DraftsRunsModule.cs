@@ -18,31 +18,7 @@ public sealed class DraftsRunsModule : IFeatureModule
         services.AddScoped<DraftCustomerData>();
         services.AddScoped<SyntheticPreviewSample>();
         services.AddScoped<TaxCredit.Domain.Programs.PackValidator>();
-        RegisterScopedHandlers(services);
-    }
-
-    private static void RegisterScopedHandlers(IServiceCollection services)
-    {
-        foreach (var type in typeof(BatchRequest).Assembly.GetTypes().Where(t => t.Namespace == typeof(BatchRequest).Namespace && t is { IsClass: true, IsAbstract: false }))
-        {
-            foreach (var contract in type.GetInterfaces().Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IRequestHandler<,>)))
-            {
-                services.AddTransient(type);
-                var wrapper = typeof(RequestScopeHandler<,>).MakeGenericType(contract.GenericTypeArguments);
-                services.AddTransient(contract, provider => Activator.CreateInstance(wrapper, provider.GetRequiredService<IServiceScopeFactory>(), type)!);
-            }
-        }
-    }
-
-    // The inherited singleton mediator resolves from its root provider. Keep feature source/connection lifetimes per dispatch.
-    private sealed class RequestScopeHandler<TRequest, TResponse>(IServiceScopeFactory factory, Type handlerType) : IRequestHandler<TRequest, TResponse>
-        where TRequest : IRequest<TResponse>
-    {
-        public async ValueTask<TResponse> Handle(TRequest request, CancellationToken cancellationToken)
-        {
-            using var scope = factory.CreateScope();
-            var handler = (IRequestHandler<TRequest, TResponse>)scope.ServiceProvider.GetRequiredService(handlerType);
-            return await handler.Handle(request, cancellationToken).ConfigureAwait(false);
-        }
+        // Authorization and source adapters must both use the current request's configuration.
+        services.AddScoped<IMediator, Mediator>();
     }
 }
