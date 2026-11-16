@@ -12,7 +12,7 @@ public sealed record GetPortfolio(long? Year, string? Program, string? Outcome, 
     string Sort, string Order, int Limit, int Offset) : IQuery<object>;
 
 internal sealed class GetPortfolioHandler(IClaimRepository repository, ISourceReader source, RuleLibrary rules,
-    IRuntimeConfiguration configuration, IClock clock) : IRequestHandler<GetPortfolio, object>
+    IClock clock) : IRequestHandler<GetPortfolio, object>
 {
     public ValueTask<object> Handle(GetPortfolio request, CancellationToken cancellationToken)
     {
@@ -25,8 +25,7 @@ internal sealed class GetPortfolioHandler(IClaimRepository repository, ISourceRe
         var grouped = all.Where(c => request.Year is null || c.TaxYear == request.Year).GroupBy(c => c.ClientId).OrderBy(g => g.Key).ToArray();
         var accounts = source.ListAccounts();
         var byId = accounts.ToDictionary(a => a.AccountId);
-        var footprint = configuration.Get("DATA_SOURCE") is "lakehouse" or "flex" ? source.Footprint()
-            : new Dictionary<long, IReadOnlyList<string>>();
+        var footprint = source.Footprint();
         var priceable = rules.LoadRegistry().Active().Where(e => e.State is not null && rules.AuthoredYears(e.PackFile).Count > 0)
             .Select(e => e.State!).ToHashSet(StringComparer.Ordinal);
         var descending = request.Order.Equals("desc", StringComparison.OrdinalIgnoreCase);

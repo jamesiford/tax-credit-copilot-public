@@ -7,6 +7,7 @@ using TaxCredit.Application.Ports.Sources;
 using TaxCredit.Domain.Pipeline;
 using TaxCredit.Domain.Runs;
 using TaxCredit.Domain.Warehouse;
+using TaxCredit.Infrastructure.Persistence;
 
 namespace TaxCredit.Api.Tests.DraftsRuns;
 
@@ -26,6 +27,7 @@ public sealed class ClientRunTests
         Assert.Equal(107, result.GetProperty("summary").GetProperty("employees_evaluated").GetInt64());
         Assert.Equal(77, result.GetProperty("summary").GetProperty("min_max_eligible").GetInt64());
         Assert.Equal(72, result.GetProperty("summary").GetProperty("pay_period_eligible").GetInt64());
+        Assert.Equal(GoldWriter.Section9QueryCount, result.GetProperty("validation").GetProperty("queries_run").GetInt64());
         using var latest = await host.Client.GetAsync("/api/v2/clients/1001/runs/latest");
         Assert.Equal(200, (int)latest.StatusCode);
         var manifest = await latest.Content.ReadFromJsonAsync<JsonElement>();

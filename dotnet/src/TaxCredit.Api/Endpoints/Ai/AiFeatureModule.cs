@@ -27,6 +27,12 @@ public sealed class AiFeatureModule : IFeatureModule
         // The shared mediator is singleton; these lazy streams must resolve handlers from the HTTP request scope.
         services.AddKeyedScoped<IMediator, Mediator>(MediatorKey);
         services.AddCapabilityServices();
+        services.AddScoped<ICapabilityReadBridge, CanonicalCapabilityReads>();
+        foreach (var page in new[] { "portfolio", "unit", "employee" })
+        {
+            services.AddScoped<IAiPageCollaborator>(provider =>
+                new CanonicalPageReads(page, provider.GetRequiredService<IMediator>()));
+        }
         services.AddAiCapabilityHandlers();
         services.AddAiStreamHandlers();
     }

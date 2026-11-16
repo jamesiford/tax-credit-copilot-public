@@ -8,6 +8,9 @@ namespace TaxCredit.Infrastructure.Persistence;
 /// <summary>Persists certified projections, never recomputes them, and atomically publishes the recalculated client-program series.</summary>
 public sealed class GoldWriter : IGoldWriter
 {
+    /// <summary>The contract counts section 9 checks, not supplementary publication integrity queries.</summary>
+    public static int Section9QueryCount => GoldValidation.Section9QueryCount;
+
     private readonly PersistenceDatabase _database;
     private readonly IReadOnlyDictionary<string, IReadOnlyList<StorageColumn>> _schema;
     private readonly Action<string>? _checkpoint;

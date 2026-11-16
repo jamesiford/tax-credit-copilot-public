@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TaxCredit.Api.Hosting;
 using TaxCredit.Application;
+using TaxCredit.Application.Messaging;
 using TaxCredit.Application.Ports.Ai;
 using TaxCredit.Application.Ports.Ai.Artifacts;
 using TaxCredit.Application.Ports.Auth;
@@ -49,6 +50,12 @@ public sealed class ProviderSelectionTests
         services.AddSingleton<IGroupMembershipProvider>(groups);
         using var provider = services.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true, ValidateOnBuild = true });
         using var scope = provider.CreateScope();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+        Assert.Same(mediator, scope.ServiceProvider.GetRequiredService<IMediator>());
+        using (var other = provider.CreateScope())
+        {
+            Assert.NotSame(mediator, other.ServiceProvider.GetRequiredService<IMediator>());
+        }
         Assert.IsType<SqlServerDialect>(scope.ServiceProvider.GetRequiredService<PersistenceDatabase>().Dialect);
         Assert.IsType<SqlAnalyticsTransport>(scope.ServiceProvider.GetRequiredService<IAnalyticsTransport>());
         Assert.IsType<SqlClientSource>(scope.ServiceProvider.GetRequiredService<IClientPayrollSource>());

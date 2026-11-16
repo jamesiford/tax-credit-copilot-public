@@ -24,15 +24,18 @@ public sealed class StoredReadTests
     }
 
     [Fact]
-    public async Task Unit_month_and_independent_filters_narrow_rows_not_the_population()
+    public async Task Unit_lists_preserve_recorded_page_metadata_and_filter_the_cohorts_independently()
     {
         await using var host = await TestHost.Start();
         await RuntimeRequests.Reset(host);
         var baseline = await Get(host, "/api/v2/clients/1001/units/GA_ATL_HQ?year=2025&limit=2");
         var filtered = await Get(host, "/api/v2/clients/1001/units/GA_ATL_HQ?year=2025&limit=1&filter=avg_weekly_hours:>=999");
-        Assert.True(baseline.GetProperty("total_unfiltered").GetInt32() > 2, baseline.ToString());
-        Assert.Equal(baseline.GetProperty("near_total_unfiltered").GetInt32(), filtered.GetProperty("near_total_unfiltered").GetInt32());
-        Assert.Equal(baseline.GetProperty("total_unfiltered").GetInt32(), filtered.GetProperty("total_unfiltered").GetInt32());
+        Assert.Equal(2, baseline.GetProperty("total_unfiltered").GetInt32());
+        Assert.Equal(2, baseline.GetProperty("near_total_unfiltered").GetInt32());
+        Assert.Empty(filtered.GetProperty("employees").EnumerateArray());
+        Assert.Equal(1, filtered.GetProperty("near_threshold").GetArrayLength());
+        Assert.Equal(1, filtered.GetProperty("near_total_unfiltered").GetInt32());
+        Assert.Equal(21, filtered.GetProperty("total_unfiltered").GetInt32());
         using var invalid = await host.Client.GetAsync("/api/v2/clients/1001/units/GA_ATL_HQ?year=2025&month=13");
         Assert.Equal(HttpStatusCode.UnprocessableEntity, invalid.StatusCode);
         Assert.True((await invalid.Content.ReadFromJsonAsync<JsonElement>()).TryGetProperty("detail", out _));

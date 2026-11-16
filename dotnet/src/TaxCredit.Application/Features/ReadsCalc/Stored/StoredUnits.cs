@@ -39,7 +39,7 @@ public sealed class StoredUnits(IGoldReadPort gold, RuleLibrary library, Program
         return output;
     }
 
-    /// <summary>Narrows and sorts in the warehouse before paging, with honest unfiltered counts.</summary>
+    /// <summary>Narrows before paging and preserves the reader's recorded list metadata semantics.</summary>
     public object Detail(ReadArguments args)
     {
         ArgumentNullException.ThrowIfNull(args);
@@ -79,11 +79,8 @@ public sealed class StoredUnits(IGoldReadPort gold, RuleLibrary library, Program
         var employees = Rows(drill, "employees");
         Add(output, ("unit", unit), ("months", drill["months"]), ("employees", employees), ("near_threshold", near),
             ("thresholds", Thresholds(Text(run["program_code"]), year)), ("total", employees.Count),
-            ("total_unfiltered", options.Limit is null ? drill.GetValueOrDefault("employees_total", employees.Count)
-                : gold.UnitEmployees(client, args.Text("unit_id")!, year, method, Text(run["run_id"]), options.Month).Count),
-            ("near_total_unfiltered", options.Limit is null ? drill.GetValueOrDefault("near_total", near.Count)
-                : gold.UnitNearThreshold(client, args.Text("unit_id")!, year, method, Text(run["run_id"]))
-                    .Count(row => options.NearMinHours is null || Number(row.GetValueOrDefault("avg_weekly_hours")) >= options.NearMinHours)));
+            ("total_unfiltered", drill.GetValueOrDefault("employees_total", employees.Count)),
+            ("near_total_unfiltered", drill.GetValueOrDefault("near_total", near.Count)));
         return output;
     }
 

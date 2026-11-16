@@ -28,6 +28,7 @@ public static class FeatureValues
         IDictionary map => map.Keys.Cast<string>().ToDictionary(key => key, key => Wire(map[key]), StringComparer.Ordinal),
         PyDateTime date => date.IsoFormat(),
         PyNumber number => number.IsInt ? (object)number.IntValue : number.FloatValue,
+        PyDecimal money => money.ToString(),
         BigInteger number when number >= long.MinValue && number <= long.MaxValue => (long)number,
         IEnumerable sequence when value is not string => sequence.Cast<object?>().Select(Wire).ToArray(),
         not null when value.GetType().IsDefined(typeof(CompilerGeneratedAttribute), false) =>

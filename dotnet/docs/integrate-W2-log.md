@@ -30,3 +30,22 @@
   annual synthetic CSV and reuses the existing worksite label catalogue.
 - Shared-repair gate: warning-as-error build, format verification and all
   **970 fast tests pass** (no failures/skips).
+
+## Shared runtime integration
+
+- The default mediator is scoped. Native composition now proves scopes do not
+  retain one another's mediator or artifact lease.
+- The runtime reports the actual 20 section-9 validation queries. Nine
+  supplemental integrity checks remain; neither a literal count nor duplicated
+  orphan checks stand in for the contracted query collection.
+- Unit-list metadata follows the recorded page-sensitive semantics; independent
+  filters still retain their existing reader metadata.
+- CSV accounts expose their real source footprint and the established fixture
+  display name, just as scope and AI already did.
+- AI book ranking and portfolio/unit/employee summaries dispatch the same
+  application queries as their pages. Client eligibility reads recorded method
+  summaries and uses the existing credit service, including its recorded trail.
+  Four ordinary-host regressions exercise these bindings without fake page facts.
+- Warning-as-error build, format and **974 fast tests pass**, no skips
+  (`artifacts/integrate-shared-final*`). An invalid new test argument was
+  corrected to the existing public schema; no schema was expanded.

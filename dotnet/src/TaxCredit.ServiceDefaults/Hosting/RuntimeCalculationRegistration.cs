@@ -7,6 +7,7 @@ using TaxCredit.Domain.Numerics;
 using TaxCredit.Domain.Pipeline;
 using TaxCredit.Domain.Programs;
 using TaxCredit.Infrastructure;
+using TaxCredit.Infrastructure.Persistence;
 using TaxCredit.Infrastructure.Rules;
 using TaxCredit.Infrastructure.Sources;
 
@@ -46,7 +47,7 @@ internal static class RuntimeCalculationRegistration
             var ids = p.GetRequiredService<IIdSource>();
             return new ClientCalculationConfig(settings.Get("GIT_COMMIT") ?? (settings.Get("TCC_CONTRACT_HOOKS") == "1"
                     ? "0000000000000000000000000000000000c0ffee" : "working-tree"),
-                AssumptionFiles.Read(Path.Combine(paths.Rules, "methodology")), 17,
+                AssumptionFiles.Read(Path.Combine(paths.Rules, "methodology")), GoldWriter.Section9QueryCount,
                 () => DateOnly.FromDateTime(clock.UtcNow.UtcDateTime), () => Instant(clock),
                 () => p.GetRequiredService<RunIdentityScope>().Current ?? ids.NewId().ToString("N"));
         });

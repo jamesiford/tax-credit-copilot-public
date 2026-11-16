@@ -15,7 +15,7 @@ public static class DependencyInjection
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
         ArgumentNullException.ThrowIfNull(services);
-        services.TryAddSingleton<IMediator, Mediator>();
+        services.TryAddScoped<IMediator, Mediator>();
         services.AddRuleLibrary();
         // Registration order is execution order: Audit is outermost so that refusals and validation failures are
         // recorded too, then Authorization, Validation, and finally the handler.

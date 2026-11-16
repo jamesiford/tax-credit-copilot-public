@@ -99,7 +99,7 @@ public sealed class CsvClientSource(string path, long? fixtureAccountId, FiscalR
         fiscal.WindowForStateYear(accountId, state, taxYear);
     /// <inheritdoc />
     public IReadOnlyList<SourceAccount> ListAccounts() =>
-        IsConfigured && fixtureAccountId is { } id ? [new SourceAccount(id, "Synthetic fixture")] : [];
+        IsConfigured && fixtureAccountId is { } id ? [new SourceAccount(id, "Reference Dataset Client")] : [];
     /// <inheritdoc />
     public PayrollScope PayrollScope(long accountId) => SourceScope.FromRows(LoadPayPeriods(accountId));
     /// <inheritdoc />

@@ -4,6 +4,8 @@ namespace TaxCredit.Infrastructure.Persistence;
 
 internal static class GoldValidation
 {
+    internal static int Section9QueryCount => Queries.Count;
+
     internal static IReadOnlyList<(string Query, long RowCount)> Check(SqlSession session, string? publishingRun = null)
     {
         var failures = new List<(string Query, long RowCount)>();
@@ -16,7 +18,7 @@ internal static class GoldValidation
             }
         }
 
-        foreach (var table in new[] { "employee_period_fact", "employee_eligibility", "onezero_matrix", "unit_month_summary", "run_method_summary", "unit_year_master", "unit_credit_installment" })
+        foreach (var table in new[] { "employee_period_fact", "employee_eligibility", "onezero_matrix", "run_method_summary", "unit_year_master", "unit_credit_installment" })
         {
             var rows = session.QueryExempt(SqlExemption.Validation, "SELECT DISTINCT g.run_id FROM tcc_gold." + table
                 + " g LEFT JOIN tcc_ops.run_manifest r ON r.run_id=g.run_id AND r.client_id=g.client_id WHERE r.run_id IS NULL");
@@ -24,6 +26,13 @@ internal static class GoldValidation
             {
                 failures.Add(("9.7 no orphaned run references: " + table, rows.Count));
             }
+        }
+
+        var duplicateManifests = session.QueryExempt(SqlExemption.Validation,
+            "SELECT client_id FROM tcc_ops.run_manifest WHERE run_status='success' GROUP BY client_id,program_code HAVING COUNT(*)>1");
+        if (duplicateManifests.Count > 0)
+        {
+            failures.Add(("9.11 one successful manifest per client-program", duplicateManifests.Count));
         }
 
         foreach (var table in new[] { "unit_year_master", "unit_credit_installment" })
@@ -59,8 +68,8 @@ internal static class GoldValidation
         ("9.6f unit_year_master.status in domain", "SELECT DISTINCT status FROM tcc_gold.unit_year_master WHERE status NOT IN ('base','above_minimum','below_minimum','partial','no_data','before_base','in_progress')"),
         ("9.6g threshold_source in domain", "SELECT DISTINCT threshold_source FROM tcc_gold.unit_year_master WHERE threshold_source IS NOT NULL AND threshold_source NOT IN ('designation','rule_pack')"),
         ("9.6h tier_source in domain", "SELECT DISTINCT tier_source FROM tcc_gold.unit_year_master WHERE tier_source IS NOT NULL AND tier_source NOT IN ('prototype','unassigned')"),
+        ("9.7 no orphaned run references", "SELECT DISTINCT g.run_id FROM tcc_gold.unit_month_summary g LEFT JOIN tcc_ops.run_manifest r ON r.run_id=g.run_id AND r.client_id=g.client_id WHERE r.run_id IS NULL"),
         ("9.8 average headcount is total / 12", "SELECT client_id FROM tcc_gold.unit_month_summary WHERE ABS(CAST(average_headcount AS DECIMAL(19,4))-(CAST(total AS DECIMAL(19,4))/12.0))>0.01"),
         ("9.9 no model wrote a figure", "SELECT action_id FROM tcc_ops.agent_action_audit WHERE is_deterministic_path=0 AND run_id IS NOT NULL"),
-        ("9.11 one successful manifest per client-program", "SELECT client_id FROM tcc_ops.run_manifest WHERE run_status='success' GROUP BY client_id,program_code HAVING COUNT(*)>1"),
     ];
 }
