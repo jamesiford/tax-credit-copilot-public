@@ -43,6 +43,10 @@
     <!-- END routes_drafts_runs -->
     <!-- BEGIN routes_ai_agents: only this session edits between the markers -->
     <!-- END routes_ai_agents -->
+    <!-- BEGIN gateway: only this session edits between the markers -->
+    <!-- END gateway -->
+    <!-- BEGIN orchestrator: only this session edits between the markers -->
+    <!-- END orchestrator -->
   </ItemGroup>
   <!-- Persistence gate repair: configure the approved oracle only when the runner has not supplied one. -->
   <PropertyGroup Condition="'$(MSBuildProjectName)' == 'TaxCredit.Parity.Tests' and '$(TCC_PYTHON)' == '' and '$(RunSettingsFilePath)' == ''">

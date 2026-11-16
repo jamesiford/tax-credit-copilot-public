@@ -11,6 +11,8 @@
     <Project Path="src/TaxCredit.Infrastructure.Auth/TaxCredit.Infrastructure.Auth.csproj" />
     <Project Path="src/TaxCredit.Infrastructure.Ai/TaxCredit.Infrastructure.Ai.csproj" />
     <Project Path="src/TaxCredit.Worker/TaxCredit.Worker.csproj" />
+    <Project Path="src/TaxCredit.Gateway/TaxCredit.Gateway.csproj" />
+    <Project Path="src/TaxCredit.Orchestrator/TaxCredit.Orchestrator.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/TaxCredit.Domain.Tests/TaxCredit.Domain.Tests.csproj" />
@@ -21,5 +23,7 @@
     <Project Path="tests/TaxCredit.Infrastructure.Auth.Tests/TaxCredit.Infrastructure.Auth.Tests.csproj" />
     <Project Path="tests/TaxCredit.Infrastructure.Ai.Tests/TaxCredit.Infrastructure.Ai.Tests.csproj" />
     <Project Path="tests/TaxCredit.Api.Tests/TaxCredit.Api.Tests.csproj" />
+    <Project Path="tests/TaxCredit.Gateway.Tests/TaxCredit.Gateway.Tests.csproj" />
+    <Project Path="tests/TaxCredit.Orchestrator.Tests/TaxCredit.Orchestrator.Tests.csproj" />
   </Folder>
 </Solution>
