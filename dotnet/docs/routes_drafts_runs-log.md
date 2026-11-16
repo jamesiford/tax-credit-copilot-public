@@ -136,3 +136,43 @@
   replies had described the one-client CSV fixture. This is a runner/profile
   setup distinction, not a reason to route IDs to a guessed source.
 - Final temporary API helper stopped. No live service or remote was changed.
+
+## Ownership rejection and correction
+
+- The latest conductor explicitly rejected all seven shared repair paths.
+  The earlier scope-extension interpretation is withdrawn. Each shared file
+  was restored exactly to baseline `b766691`; the final branch diff is
+  entirely within the original allocation.
+- Withdrew the metadata repair and its newly introduced regression together.
+  Existing tests, assertions, replay logic and thresholds remain unchanged.
+  Shared metadata is again the inherited literal 17, not recorded Python
+  20 or measured SQL inventory 29. The feature-scoped mediator fix remains.
+- Fresh whole build: zero warnings/errors. Whole formatter: exit 0.
+  Complete fast suite: **712 passed, 8 failed, 720 total**; local log
+  `dotnet/artifacts/drafts-runs-ownership-fast.log`.
+- Failures are the same six duplicate-route cases, standalone native
+  provider composition and obsolete 501 expectation. Fixing them again
+  requires the shared paths just rejected by the conductor; no
+  production/test-specific endpoint suppression was introduced.
+- Reinstated the mandated hard-stop report. Numeric UUID and durable
+  post-run count conflicts remain; no dummy ID draws, false manifest
+  state or output-only validation count was introduced.
+- Launched fresh complete 12-scenario semantic replay against a health-checked
+  isolated API on loopback with CPython 3.12.13 and explicit per-scenario
+  profile/auth setup. Diagnostics root:
+  `dotnet/artifacts/drafts-runs-ownership-replay`.
+- Fresh replay completed all 12 scenarios / 1,769 exchanges. Exact owned
+  method/templates: **323 cases, 39 raw passes, 284 failures, 902 field
+  differences, zero unexpected owned 500s**. Wrapper 93/398 is not the
+  conductor's denominator. The tracked replay summary now describes this
+  rerun rather than the withdrawn shared metadata repair.
+- Independent count extraction initially included 13 trailing-slash framework
+  cases (336); exact-template matching without that normalization reproduces
+  the conductor's 323-case denominator. No replay comparison was changed.
+- Reproduced representative shared failures with detailed output:
+  missing `BatchAccess`/`DraftLifecycle`/`PackValidator` registrations,
+  `AmbiguousMatchException`, and expected 501 versus actual 202.
+  Local details: `dotnet/artifacts/drafts-runs-ownership-failure-details.log`.
+- Stopped the temporary API helper. Final worktree changes are limited to
+  allocated paths relative to baseline. Build/format are green; full fast,
+  adjusted replay and mandated no-HALT gates are explicitly not claimed.

@@ -1,6 +1,48 @@
 # DraftsRuns implementation and integration handoff
 
-## Outcome
+## Current outcome after ownership rejection
+
+The latest conductor explicitly rejected the seven shared repair paths.
+All seven files have now been restored byte-for-byte to baseline `b766691`;
+the final branch diff is wholly within the allocated folders. The earlier
+interpretation of the repair request as a scope extension was incorrect.
+The metadata-only repair and its associated test were withdrawn together;
+no pre-existing test, assertion, threshold or comparison was changed.
+The feature-owned request-scoped mediator fix remains.
+
+Fresh whole-solution build and formatting pass. The complete fast suite is
+**712 passed, 8 failed, 720 total**. The eight failures are the existing shared
+duplicate-route, standalone-provider-composition and placeholder-status
+fixtures. Fixing those fixtures requires the shared paths that the conductor
+has just forbidden. No production route is hidden to accommodate a probe.
+Runtime validation metadata is once again the inherited literal **17**,
+not the recorded Python 20 or the observed SQL inventory of 29.
+
+Replay remains below the required 98%. In particular, five truthful
+post-publication `never_run` counts and two numeric-looking UUID strings
+are rejected by the conductor. Those seven cases alone cap compatibility
+at 316/323 (97.83%), even if every other case were resolved. Dummy identity
+draws and disconnected-manifest behavior are expressly forbidden by the
+task. The existing all-scenario diagnostics and fresh rerun are retained;
+raw replay counts are not presented as the conductor's adjusted gate.
+
+The fresh rerun completed **all 12 scenarios / 1,769 exchanges**:
+**323 exact-template owned cases, 39 raw passes, 284 failing cases,
+902 field differences, zero unexpected owned 500s**. The unchanged
+policy-free wrapper reports 93/398, not the conductor's denominator.
+Diagnostics are under
+`C:\Projects\GitHub\tcc-dotnet-w2-drafts\dotnet\artifacts\drafts-runs-ownership-replay`.
+The isolated API helper was stopped. The latest conductor-adjusted result
+remains 79/323 (24.5%); no fresh adjusted pass or cap compliance is claimed.
+
+The task's fixed hard stops now apply: further shared-file changes are
+needed for the fast suite, and repeated attempts have not reconciled the
+replay policy with required behavior. See `HALT-routes_drafts_runs.md` and
+the current status JSON. The remainder of this report is **historical
+implementation/repair evidence**, not a claim that the withdrawn shared
+repairs or their green gates remain in the final tree.
+
+## Historical outcome before ownership rejection
 
 All 23 operation handlers and endpoint mappings are implemented in the
 allocated feature folders. The stage-1 slice is commit `29181ed`; subsequent

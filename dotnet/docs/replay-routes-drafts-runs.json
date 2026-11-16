@@ -1,11 +1,11 @@
 {
   "session": "routes_drafts_runs",
-  "implementation_head": "e5c4b59",
+  "implementation_head": "c5482d5",
   "mode": "semantic",
   "oracle": "CPython 3.12.13",
   "scenario_count": 12,
   "exchanges": 1769,
-  "diagnostics_root": "dotnet/artifacts/drafts-runs-final-v3",
+  "diagnostics_root": "dotnet/artifacts/drafts-runs-ownership-replay",
   "setup": "Explicit profile reset and auth environment before each scenario; one isolated API and no independent Worker against its destination.",
   "exact_method_template_group": {
     "group": "drafts_runs",
@@ -43,7 +43,7 @@
   "unresolved": [
     "The comparator rejects numeric-looking UUID strings as changed figures; the task forbids dummy identity draws.",
     "Successful durable manifests honestly change never_run and skip-coverage summaries; the task forbids reproducing disconnected-manifest state.",
-    "Actual validation metadata is now 29 executed checks versus recorded Python 20, proven against the SQL adapter; no checks were deleted or counts fabricated.",
+    "After the conductor rejected the authoritative shared repair, inherited validation metadata is again literal 17 versus recorded Python 20 and observed SQL inventory 29. No output-only count replacement is used.",
     "Tier-C error wording/schema-detail members and validator English remain raw differences, not failures of the corresponding owned lifecycle tests.",
     "The rebase scenario's unimplemented ReadsCalc setup produces capture-failed; the real recorded unit succeeds in the heavy Gold-only rebase test.",
     "The old disconnected program/portfolio lookup records a null program and refuses a valid state filter; current selection resolves the actual program and clients."
