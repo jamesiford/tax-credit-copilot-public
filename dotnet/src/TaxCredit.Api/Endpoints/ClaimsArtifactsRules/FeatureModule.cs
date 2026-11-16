@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using TaxCredit.Api.Hosting;
 using TaxCredit.Application.Features.ClaimsArtifactsRules;
 using TaxCredit.Application.Features.ClaimsArtifactsRules.Rules;
@@ -11,6 +12,6 @@ public sealed class FeatureModule : IFeatureModule
     public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
     {
         services.AddClaimsArtifactsRules();
-        services.AddScoped<IRuleFileMetadata, RuleFileMetadata>();
+        services.TryAddScoped<IRuleFileMetadata, RuleFileMetadata>();
     }
 }

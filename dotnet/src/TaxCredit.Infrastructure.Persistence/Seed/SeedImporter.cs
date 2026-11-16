@@ -8,9 +8,15 @@ using TaxCredit.Infrastructure.Persistence.Sql;
 
 namespace TaxCredit.Infrastructure.Persistence;
 
+/// <summary>Consumed deterministic draws at the exported application's ready boundary, not just stored identifiers.</summary>
+public sealed record SeedSourceState(long UuidDraws, long SecretDraws);
+
 /// <summary>Evidence from one committed reset, accounting for every manifest table.</summary>
 public sealed record SeedLoadResult(string Profile, IReadOnlyDictionary<string, long> TableCounts)
 {
+    /// <summary>Startup may draw identifiers which never appear in warehouse rows.</summary>
+    public SeedSourceState? SourceState { get; init; }
+
     /// <summary>All imported rows, including staged source rows.</summary>
     public long TotalRows => TableCounts.Values.Sum();
 }
@@ -64,8 +70,21 @@ public sealed class SeedImporter
             }
         }
 
+        var state = ReadSourceState(manifest.RootElement);
         PersistenceSchema.Initialize(_database, _repositoryRoot);
-        return _database.Transact(session => Replace(session, profile, folder, tables, schema));
+        return _database.Transact(session => Replace(session, profile, folder, tables, schema)) with { SourceState = state };
+    }
+
+    private static SeedSourceState? ReadSourceState(JsonElement manifest)
+    {
+        if (!manifest.TryGetProperty("deterministic_sources", out var state)) { return null; }
+        if (state.ValueKind != JsonValueKind.Object
+            || !state.TryGetProperty("uuid_draws", out var ids) || ids.ValueKind != JsonValueKind.Number || !ids.TryGetInt64(out var uuidDraws) || uuidDraws < 0
+            || !state.TryGetProperty("secret_draws", out var secrets) || secrets.ValueKind != JsonValueKind.Number || !secrets.TryGetInt64(out var secretDraws) || secretDraws < 0)
+        {
+            throw new InvalidDataException("Seed deterministic source state is invalid.");
+        }
+        return new(uuidDraws, secretDraws);
     }
 
     /// <summary>Seed generation already consumed these UUID draws; replay must resume after them, not collide with its claims.</summary>

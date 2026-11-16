@@ -74,6 +74,9 @@ async def _api_checks(world: Any) -> dict[str, Any]:
     """Gate G2: what the API serves agrees with the seed rows."""
     checks: dict[str, Any] = {}
     async with world.client() as http:
+        from contract.harness import freeze
+
+        checks["deterministic_sources"] = freeze.source_state()
         scope = (await http.get("/api/scope")).json()
         portfolio = (await http.get("/api/v2/portfolio", params={"limit": 1000})).json()
         checks["api_scope_clients"] = len(scope["clients"])
@@ -135,6 +138,7 @@ def export(profile: str, out_dir: Path) -> dict[str, Any]:
         put("operational", name, cols, [dict(zip(cols, r)) for r in cur.fetchall()])
     op.close()
     manifest["api_checks"] = asyncio.run(_api_checks(built))
+    manifest["deterministic_sources"] = manifest["api_checks"].pop("deterministic_sources")
     mismatches = []
     gold = {k.split("/")[1].split(".")[0]: v["rows"] for k, v in manifest["tables"].items() if k.startswith("gold/")}
     ee = {}

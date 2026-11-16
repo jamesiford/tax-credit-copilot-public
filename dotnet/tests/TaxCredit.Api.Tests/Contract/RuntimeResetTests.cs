@@ -19,7 +19,7 @@ public sealed class RuntimeResetTests
         var sources = host.App.Services.GetRequiredService<RuntimeSources>();
         var id = sources.NewId();
         var secret = sources.NextBytes(16);
-        Assert.EndsWith("000000000004", id.ToString(), StringComparison.Ordinal);
+        Assert.EndsWith("000000000008", id.ToString(), StringComparison.Ordinal);
         Assert.Equal(new byte[] { 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1 }, secret);
         var root = host.App.Services.GetRequiredService<RuntimePaths>().Artifacts;
         var sentinel = Path.Combine(root, "not-owned.txt");

@@ -15,6 +15,7 @@ public sealed class SeedImporterTests
         Assert.Equal(18111, first.TotalRows);
         Assert.Equal(9477, first.TableCounts["source/pay_periods.jsonl.gz"]);
         Assert.Equal(5281, first.TableCounts["gold/employee_period_fact.jsonl.gz"]);
+        Assert.Equal(new SeedSourceState(7, 0), first.SourceState);
         var second = fixture.Load("P1");
         Assert.Equal(first.TableCounts, second.TableCounts);
         var reopened = PersistenceDatabase.Sqlite(fixture.Path);
@@ -37,6 +38,7 @@ public sealed class SeedImporterTests
         var p2 = fixture.Load("P2");
         Assert.Equal(20, p2.TableCounts.Count);
         Assert.Equal(390660, p2.TotalRows);
+        Assert.Equal(new SeedSourceState(30, 0), p2.SourceState);
         Assert.Equal(197094, p2.TableCounts["source/Payroll.jsonl.gz"]);
         Assert.Equal(4, p2.TableCounts["source/EntityFiscalYearRules.jsonl.gz"]);
         Assert.Equal(22, p2.TableCounts["operational/program_claim.jsonl.gz"]);

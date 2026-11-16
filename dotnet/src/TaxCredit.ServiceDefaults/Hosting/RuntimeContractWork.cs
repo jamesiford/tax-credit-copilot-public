@@ -30,14 +30,19 @@ public sealed class RuntimeContractWork(IServiceProvider services, RuntimeConfig
             _ => throw new ArgumentException("Unknown contract profile.", nameof(profile)),
         };
         var importer = services.GetRequiredService<SeedImporter>();
-        importer.Load(seed);
+        var loaded = importer.Load(seed);
+        var state = loaded.SourceState ?? throw new InvalidDataException("Contract reset requires exported deterministic source state.");
+        if (state.UuidDraws < importer.DeterministicIdentityHighWater())
+        {
+            throw new InvalidDataException("Exported deterministic source state precedes stored identifiers.");
+        }
         OperationalSchema.Initialize(services.GetRequiredService<Infrastructure.Persistence.Sql.PersistenceDatabase>());
         settings.Reset();
         settings.Apply(new Dictionary<string, string>(StringComparer.Ordinal)
         {
             ["DATA_SOURCE"] = seed == "P2" ? "lakehouse" : "csv",
         }, []);
-        sources.Reset(importer.DeterministicIdentityHighWater());
+        sources.Reset(state.UuidDraws, state.SecretDraws);
         services.GetRequiredService<RunWorkGate>().Reset();
         services.GetRequiredService<ArtifactGenerations>().Reset();
         services.GetRequiredService<IChannelStateRepository>().Grant(new WriterGrant(SyntheticPolicy.Writer, "Fixture writer",

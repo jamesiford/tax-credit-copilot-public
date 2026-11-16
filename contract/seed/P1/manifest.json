@@ -10,6 +10,10 @@
   "api_portfolio_cells": 1,
   "api_scope_clients": 1
  },
+ "deterministic_sources": {
+  "secret_draws": 0,
+  "uuid_draws": 7
+ },
  "g2_mismatches": [],
  "gold_row_counts": {
   "employee_eligibility": 376,

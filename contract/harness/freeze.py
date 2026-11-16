@@ -59,6 +59,14 @@ def reset_counters() -> None:
     random.seed(20260115)
 
 
+def source_state() -> dict[str, int]:
+    """Export consumed source draws without advancing them, including application startup."""
+    return {
+        "uuid_draws": _uuid_counter.__reduce__()[1][0] - 1,
+        "secret_draws": _bytes_counter.__reduce__()[1][0] - 1,
+    }
+
+
 def _uuid4() -> uuid.UUID:
     n = next(_uuid_counter)
     if _TRACE:

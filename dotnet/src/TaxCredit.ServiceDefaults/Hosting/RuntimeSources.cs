@@ -61,11 +61,12 @@ public sealed class RuntimeSources(bool deterministic) : TimeProvider, IClock, I
     }
 
     /// <summary>Resets both counter families at a scenario boundary.</summary>
-    public void Reset(long consumedIds = 0)
+    public void Reset(long consumedIds = 0, long consumedSecrets = 0)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(consumedIds);
+        ArgumentOutOfRangeException.ThrowIfNegative(consumedSecrets);
         Interlocked.Exchange(ref _ids, consumedIds);
-        Interlocked.Exchange(ref _secrets, 0);
+        Interlocked.Exchange(ref _secrets, consumedSecrets);
         Interlocked.Exchange(ref _ticks, 0);
     }
 }

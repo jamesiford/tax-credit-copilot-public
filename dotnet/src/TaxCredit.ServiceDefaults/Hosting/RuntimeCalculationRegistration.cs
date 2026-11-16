@@ -23,6 +23,7 @@ internal static class RuntimeCalculationRegistration
             IngestedConfigDirectory = Path.Combine(paths.Repository, "backend", "data", "rules_ingested")
         };
         services.AddRulePackSource(options);
+        services.AddScoped<Application.Features.ClaimsArtifactsRules.Rules.IRuleFileMetadata, RuntimeRuleFileMetadata>();
         services.AddTaxCreditProgramWages(Path.Combine(paths.Repository, "backend", "data", "payroll.csv"),
             code => new RuleLibrary(new JsonRulePackSource(options)).LoadRegistry().Get(code)?.State
                 ?? throw new InvalidOperationException("Unknown wage program."));

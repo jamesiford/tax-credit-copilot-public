@@ -17,6 +17,8 @@ public sealed class RuleAuditTests
         var verified = await host.Client.PostAsJsonAsync("/api/rules/SC_JTC/verify", new { verified_by = "synthetic-practitioner", note = "Reviewed source" });
         Assert.Equal(HttpStatusCode.OK, verified.StatusCode);
         var rules = await Json(await host.Client.GetAsync("/api/rules"));
+        Assert.Equal("2026-01-04T06:19+00:00", rules.GetProperty("summary").GetProperty("last_update_iso").GetString());
+        Assert.Equal("CO_EZ", rules.GetProperty("recent_changes")[0].GetProperty("credit_code").GetString());
         var sc = rules.GetProperty("rules").EnumerateArray().Single(r => r.GetProperty("code").GetString() == "SC_JTC");
         Assert.True(sc.GetProperty("verified").GetBoolean());
         Assert.Equal("synthetic-practitioner", sc.GetProperty("verification").GetProperty("verified_by").GetString());

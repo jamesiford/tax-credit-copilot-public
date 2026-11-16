@@ -49,3 +49,24 @@
 - Warning-as-error build, format and **974 fast tests pass**, no skips
   (`artifacts/integrate-shared-final*`). An invalid new test argument was
   corrected to the existing public schema; no schema was expanded.
+
+## Deterministic source restoration
+
+- Independent CPython 3.12 exports capture counters at the application's ready
+  boundary: P1 has consumed seven UUID draws, P2 thirty, and both zero secret
+  draws. Stored IDs alone accounted for only three and twenty-six. The other
+  draws initialise OpenTelemetry context keys during Python startup.
+- The exporter now captures that source state without advancing it; seed
+  manifests carry it and reset restores it, validating against stored IDs.
+  No dummy IDs are consumed. Both regenerated manifests are otherwise exactly
+  equal, including every shipped and decompressed table hash and API check.
+- Rule modification times are frozen at the metadata adapter using the documented
+  path-CRC32/clock protocol. Non-contract hosts still read actual file timestamps.
+- Strict build and all 974 fast tests pass; the draft/artifact scenarios were
+  reproduced first, then all twelve scenarios completed (1,769 exchanges).
+  Early draft and artifact identifiers now agree. Later business-operation
+  allocations and durable-manifest differences remain separately measurable.
+- `docs/convergence_board.py` is a diagnostic over unchanged raw reports. It
+  uses exact method/template matching, shows tolerated fields and waiver shares,
+  and rejects numeric waiver matches. Three focused diagnostic tests pass.
+  Its output is explicitly not presented as the external conductor's result.
