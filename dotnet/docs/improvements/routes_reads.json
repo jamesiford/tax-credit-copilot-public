@@ -1,0 +1,74 @@
+{
+  "improvements": [
+    {
+      "id": "IMP-routes_reads-1",
+      "kind": "defect_fix",
+      "route": "GET /api/v2/clients/{client_id}/units",
+      "case": "unknown.client-huge",
+      "categories": ["status", "body-kind", "type", "missing-field", "extra-field"],
+      "finding": "F-3",
+      "reason": "The shared storage identity binder deliberately refuses an out-of-Int64 client with JSON detail and 422 instead of allowing a SQL overflow and plain-text 500. No valid storage identity or calculated value is changed."
+    },
+    {
+      "id": "IMP-routes_reads-2",
+      "kind": "defect_fix",
+      "route": "GET /api/progress/{tax_year}",
+      "case": "get-api-progress-tax-year.query-within-negative",
+      "categories": ["status", "body-kind", "type", "missing-field", "extra-field"],
+      "finding": "F-4",
+      "reason": "A negative proximity band is invalid client input and receives the existing JSON detail family with 422 rather than Python's unhandled plain-text 500. Accepted cohort calculations are unchanged."
+    },
+    {
+      "id": "IMP-routes_reads-3",
+      "kind": "defect_fix",
+      "route": "GET /api/simulate/portfolio/{tax_year}",
+      "case": "unrecorded.simulate-portfolio-magnitude-over-bound",
+      "finding": "F-1",
+      "reason": "The unbounded CPU case was omitted from recordings. Finite simulation magnitude is operationally bounded at 10000 and larger or nonfinite input is refused with JSON detail and 422; no captured successful simulation figure is repriced."
+    },
+    {
+      "id": "IMP-routes_reads-4",
+      "kind": "defect_fix",
+      "route": "POST /api/onezero/employee/{employee_id}/review",
+      "case": "unrecorded.review-store-reopen",
+      "finding": "",
+      "reason": "Reviews use versioned durable lookup storage rather than a process-global dictionary. Reopening retains the same review and clearing closes its current version. The legacy unscoped employee namespace remains an explicitly documented integration limit."
+    },
+    {
+      "id": "IMP-routes_reads-5",
+      "kind": "defect_fix",
+      "route": "POST /api/ingestion/{tax_year}/exceptions/{exception_id}/resolve",
+      "case": "unrecorded.resolve-store-reopen",
+      "finding": "",
+      "reason": "Exception annotations hydrate the certified resolution behavior from durable client-bound lookup versions instead of a private process-global store. A multi-client source without a selected client is refused rather than silently annotating a different employer."
+    },
+    {
+      "id": "IMP-routes_reads-6",
+      "kind": "error_text",
+      "route": "GET /api/v2/clients/{client_id}/units/{unit_id}",
+      "path_prefix": "detail",
+      "categories": ["value", "type", "missing-field", "extra-field", "array-length"],
+      "finding": "",
+      "reason": "Handled failures retain the correct status and JSON detail family but use shared .NET validation wording and structural error metadata, not copies of Pydantic's English messages. Successful response fields and population numbers are not covered."
+    },
+    {
+      "id": "IMP-routes_reads-7",
+      "kind": "error_text",
+      "route": "POST /api/employee/drill",
+      "path_prefix": "detail",
+      "categories": ["value", "type", "missing-field", "extra-field", "array-length"],
+      "finding": "",
+      "reason": "Invalid JSON and token/scope refusals use the shared JSON detail error family and existing validators. Pydantic-specific prose and input-location formatting are not reimplemented; successful run identities or stored values are not waived."
+    },
+    {
+      "id": "IMP-routes_reads-8",
+      "kind": "framework_default",
+      "route": "GET /api/me",
+      "case": "cors.simple-with-token",
+      "path_prefix": "headers.access-control-allow-origin",
+      "categories": ["header"],
+      "finding": "F-13",
+      "reason": "The existing host applies its configured CORS origin allowlist instead of reflecting Python's wildcard header for an unapproved origin. This shared framework behavior is not replaced by feature-specific header emulation."
+    }
+  ]
+}
