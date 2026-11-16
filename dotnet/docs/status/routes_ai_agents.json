@@ -1,8 +1,8 @@
 {
   "session": "routes_ai_agents",
   "branch": "dotnet/w2-routes_ai_agents",
-  "head": "504632d",
-  "summary": "Fixed conductor-reported CA2026 by explicitly disposing each parsed stream-frame JsonDocument after cloning its element. Whole-solution warning-as-error builds pass under the pinned SDK 10.0.404 and root-selected SDK 11.0.100, still targeting net10.0. Formatting and all 1,025 fast tests pass. Post-fix complete semantic replay remains 5/23 AI cases passing (21.74%), below 95%, with the previously inventoried missing sibling bindings unchanged. Changes are committed locally within owned paths; production Foundry remains unverified.",
+  "head": "176f0bb",
+  "summary": "Removed overbroad improvement coverage; the two retained route/case/category/path-scoped defect entries can match at most three of 27 AI cases (11.1%, not a whole-case acceptance claim). Missing sibling services and incidental differences are no longer blanket-waived. Re-ran build, formatting and all 1,025 fast tests successfully, plus all 1,769 semantic replay exchanges. Raw canonical AI acceptance remains 8/27; explicit DEC-AI-1/2/3 needs_human decisions address the policy/cap conflict and missing canonical sibling services. Replay stays unclaimed; no figures, authorization, thresholds, scenarios, comparators or production behavior were changed.",
   "stages": {
     "stage_1_prompt_fidelity": "done",
     "stage_2_capabilities": "partial",
@@ -26,13 +26,13 @@
       "id": "DEV-1",
       "what": "Offline chat renders authorized canonical blocks or explicit dependency refusals instead of the recording's fixed demonstration.",
       "why": "Unrelated demonstration figures are not a valid answer about the selected client; no calculated fact is changed.",
-      "decision_needed": false
+      "decision_needed": true
     },
     {
       "id": "DEV-2",
       "what": "Client summaries read the inward Gold port instead of reproducing the Python router-default SQL binding error.",
       "why": "The intended read works with concrete application arguments; provider exceptions are sanitized.",
-      "decision_needed": false
+      "decision_needed": true
     },
     {
       "id": "DEV-3",
@@ -43,8 +43,8 @@
     {
       "id": "DEV-4",
       "what": "Validation English/context and SSE charset spelling are not reproduced byte for byte.",
-      "why": "The approved policy excludes framework and wire artifacts; error families, statuses, validation locations and stream semantics are preserved. The improvements register records the exact scopes.",
-      "decision_needed": false
+      "why": "The approved policy excludes framework and wire artifacts, but counting those differences as case waivers exceeds the cap. Their previous register entries were removed rather than silently treating that policy conflict as approval. Error families, statuses, validation locations and stream semantics remain preserved.",
+      "decision_needed": true
     }
   ],
   "findings": [
@@ -59,13 +59,28 @@
     "Whole fast tests passed 1,025 cases with no failures or skips; the final prompt-registration build, 279 API regressions and full formatting also passed.",
     "Conductor follow-up: CA2026 identified an undisposed JsonDocument in the stream test parser. The parser now clones while an explicitly disposed document is alive. Builds pass from both the pinned SDK directory and the repository root with its newer analyzer; no target framework or shared configuration was changed.",
     "Post-fix gates were rerun: dotnet build -warnaserror, dotnet format --verify-no-changes and all 1,025 non-heavy tests pass. Fresh complete replay diagnostics under dotnet\\artifacts\\ai-ca2026-replay reproduce 36 exchanges, 192 differences, six tolerated and 5/23 AI cases passing; replay remains unclaimed.",
+    "Waiver follow-up: the conductor's prior full board reported 24/27 AI cases passing after coverage (88.9%), including 16/27 waiver-dependent cases (59.3%). Old blanket entries incorrectly hid missing summary projections; they have been removed rather than counted as implemented functionality.",
+    "All mechanical gates pass again after the register-only correction: whole-solution build and formatting plus 1,025 fast tests, no failures or skips. Fresh full replay completed twelve scenarios and 1,769 exchanges with 9,472 raw field differences and six tolerated; the owned AI scenario still has 192 differences. Exact owned method/path selection gives 8/27 raw AI cases passing. The unchanged local wrapper groups four extra method/slash cases and reports 11/31, not the conductor's grouping.",
+    "The two retained entries were checked against every fresh failure and can match only chat.ask, chat.ask-client and summary.client event differences: at most 3/27 cases (11.1%). This is a scope upper bound, not a passing adjusted result; headers remain unwaived, as do missing sibling capability and portfolio/unit/employee results. Fresh reports are under dotnet\\artifacts\\ai-waiver-review; the temporary host was stopped.",
     "No live Fabric, Foundry, Entra or customer system, remote change, push or unowned product edit was used. Temporary replay hosts were stopped."
   ],
   "open_questions": [],
   "needs_human": [
     {
+      "item": "DEC-AI-1: Resolve the incidental-difference policy versus the 25% case-waiver cap before claiming replay acceptance.",
+      "why": "The task explicitly forbids reproducing Pydantic English/context, byte-level SSE headers and trailing-slash framework behavior, yet the conductor counts these as case failures unless waived. Eight error-validation/wording cases plus two header-only refusals exceed the six waived cases allowed by a 27-case denominator: even if every other case were fixed, at least four would still fail, at best 23/27 (85.2%), below 95%. Prior incidental entries 6-11 are withdrawn pending this decision, not treated as an approved budget exception. Recommend preserving semantic/error/status behavior; a policy owner must resolve the conflicting acceptance/accounting requirements or authorize a different compatibility requirement. No threshold or comparator was changed."
+    },
+    {
+      "item": "DEC-AI-2: Confirm the intended offline chat and repaired client-summary contract, separately from absent sibling implementations.",
+      "why": "chat.ask and chat.ask-client capture a fixed 117-frame demonstration with figures unrelated to the selected client; summary.client captures the Python Query-default SQL error instead of a working read. The task says not to reproduce either defect. Retained entries 1-2 now apply only to those case-name families, event differences and event paths. They cannot waive validation, headers, other page scopes or capability success results. Approve the designed contract or provide an explicit compatibility decision; no model/demo figures or SQL failure were reintroduced."
+    },
+    {
+      "item": "DEC-AI-3: Integrate canonical sibling services before evaluating successful tool and page cases.",
+      "why": "The conductor's three uncovered cases are capabilities.book-rank, capabilities.client-eligibility and p1_auth:agent.capabilities-book-rank. Their required portfolio and eligibility projections are absent from this wave base. Portfolio/unit/employee summaries also lack canonical projections and were incorrectly hidden by old blanket entry 3; that entry is removed. Bind ICapabilityReadBridge and IAiPageCollaborator to the named ReadsCalc/ClaimsDrafts services in the report. Do not waive these dependencies or replace them with recorded bodies, a second ranking implementation or invented figures."
+    },
+    {
       "item": "Coordinate ReadsCalc, ClaimsDrafts and Runs bindings, then rerun the complete semantic AI replay.",
-      "why": "The report inventories every required read, page/chat projection, command preview/commit and person-bound ticket contract. Current raw AI acceptance is 21.74%, not the required 95%."
+      "why": "The report inventories every required read, page/chat projection, command preview/commit and person-bound ticket contract. Fresh full replay has 8/27 raw canonical AI cases passing (29.6%); its p1_artifacts_ai subset is still 5/23 (21.74%), not the required 95%."
     },
     {
       "item": "Supply and separately validate the production Foundry publication/invocation factory.",
