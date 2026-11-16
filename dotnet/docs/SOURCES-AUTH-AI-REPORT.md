@@ -338,8 +338,15 @@ upgrade the entire shared dependency graph together.
 
 The missing `TCC_PYTHON` gate failure is resolved at the test process source.
 CPython 3.12.13 was checked; imports resolve to this worktree's `backend`.
-The parity resolver deliberately has no process-global default, so the conductor
-must set the variable in its gate process too:
+The parity resolver remains unchanged and requires a testhost environment
+variable. The owned `sources_auth_ai` section of `Directory.Packages.props`
+now supplies the approved local CPython path through `VSTestCLIRunSettings`
+when `TCC_PYTHON` is absent and that executable exists. This persists across
+independent conductor processes without changing user/machine environment.
+Explicit `TCC_PYTHON`, CLI runsettings, `VSTestSetting` or `RunSettingsFilePath`
+take precedence; production projects receive no test setting. If the approved
+executable is absent, the original setup/version refusal remains in force.
+Other environments can still configure the oracle explicitly:
 
 ```powershell
 $env:TCC_PYTHON = 'C:\Projects\py312-oracle\.venv\Scripts\python.exe'
@@ -387,3 +394,18 @@ authorized session documents.
 leap-shift Domain seam described above. Its owner decision and the unchanged
 figure-affecting Python inconsistencies are explicit `needs_human` entries,
 not claims of integration or live-service certification.
+
+### Conductor oracle-environment correction
+
+The conductor rerun exposed that a shell-local `TCC_PYTHON` did not reach its
+independent process. The persistent testhost setting above fixes that launch
+boundary without editing parity tests, weakening interpreter validation or
+changing global state. The centralized test property is intentionally confined
+to the owned marker section; it is gate configuration, not a package change.
+
+Verified with `TCC_PYTHON` **removed** from the parent process: bare
+`dotnet build -warnaserror`, `dotnet format --verify-no-changes` and
+`dotnet test --filter 'Category!=heavy'` all pass under SDK10.0.404. Build:
+zero warnings/errors, 26.68 seconds. Tests: **605 passed**, zero failures/skips,
+including **152 parity tests** in 7 minutes 1 second. MSBuild probes also
+confirmed explicit oracle/runsettings precedence and production isolation.

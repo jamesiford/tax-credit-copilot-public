@@ -139,3 +139,19 @@
   head points to the preceding verified implementation/report commit, avoiding
   an impossible self-reference. Final checks cover JSON, ownership, no halt,
   report presence, no remote tracking branch and clean committed tree.
+
+## Conductor follow-up: persistent oracle launch configuration
+
+- The independent conductor process still lacked `TCC_PYTHON`; the earlier
+  shell-local setup fixed our checks but did not persist into its launch.
+- Added test-only `VSTestCLIRunSettings` inside the owned sources_auth_ai
+  central-props marker. It supplies only the approved existing local oracle
+  executable when no oracle/explicit runsettings are supplied. No parity code,
+  interpreter validation, machine/user environment or fuzz limit changed.
+- MSBuild probes verify explicit TCC_PYTHON/runsettings take precedence and
+  production projects receive no testhost configuration. Missing approved
+  executable retains the original actionable setup error.
+- Re-ran the exact whole build, format and non-heavy test gate with TCC_PYTHON
+  explicitly removed from the parent process. SDK10.0.404 build: zero warnings/
+  errors, 26.68 seconds; format passed; 605 tests passed, zero failures/skips.
+  Parity152 passed in 7 minutes 1 second; other counts remain unchanged.
