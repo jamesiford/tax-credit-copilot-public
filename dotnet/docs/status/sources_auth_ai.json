@@ -1,27 +1,27 @@
 {
   "session": "sources_auth_ai",
   "branch": "dotnet/w1-sources_auth_ai",
-  "head": "203e113",
-  "summary": "Implementation resumed after the conductor explicitly requested removal of the halt and the required report/status. S1-S6 adapters and hermetic tests are in progress. CPython3.12.13 imports verified against this worktree; parity commands explicitly set TCC_PYTHON. No live services or pushes. This intermediate status does not claim final build/test gates.",
+  "head": "143fb97",
+  "summary": "Implemented payroll/fiscal source adapters, API trust/writer/visibility services, monotonic limits, guarded AI runtimes/telemetry and immutable local/Blob bytes. Whole SDK10.0.404 build and format pass; all 605 non-heavy tests pass, including all 152 parity tests with explicit CPython3.12.13 TCC_PYTHON. One additional heavy P2 comparison passed. Halt removed and complete report/register committed. S2 remains partial at the existing Domain strict leap-shift seam; figure-affecting Python inconsistencies are preserved for owner review. No private certification, live services, HTTP replay or pushes. Head identifies the verified implementation/report commit preceding this status-only commit.",
   "stages": {
-    "S1": "partial",
+    "S1": "done",
     "S2": "partial",
-    "S3": "partial",
-    "S4": "partial",
-    "S5": "partial",
-    "S6": "partial"
+    "S3": "done",
+    "S4": "done",
+    "S5": "done",
+    "S6": "done"
   },
   "gates_claimed": {
     "no_halt": true,
     "commits_present": true,
-    "clean_tree": false,
+    "clean_tree": true,
     "not_pushed": true,
     "owned_paths": true,
     "status_json": true,
     "report_present": true,
-    "dotnet_build": false,
-    "dotnet_format": false,
-    "tests_fast": false
+    "dotnet_build": true,
+    "dotnet_format": true,
+    "tests_fast": true
   },
   "deviations": [
     {
@@ -33,10 +33,21 @@
   ],
   "findings": [
     "The original missing TCC_PYTHON gate failure requires explicit oracle configuration in the test process, not a user/machine-wide environment change.",
-    "The newest Azure SDK graph conflicts with the shared DI10.0.0 package baseline; compatible stable MIT versions are used without changing another session's package declarations."
+    "The newest Azure SDK graph conflicts with the shared DI10.0.0 package baseline; compatible stable MIT versions are used without changing another session's package declarations.",
+    "SDK discovery follows the working directory: running from dotnet selects pinned10.0.404; root runs had selected SDK11. Preview constructor syntax was removed without changing the SDK or language settings.",
+    "Public exception classes must be sealed or abstract. Source/auth bases are now abstract with sealed concrete refusals; ModelException is sealed. The architecture rule and exact exception assertions remain enforced.",
+    "Malformed stored override dates now fail at lookup parsing even under assume. Python SQL COALESCE and projector falsy-worksite behavior are both preserved pending figure-impact review."
   ],
   "open_questions": [],
   "needs_human": [
+    {
+      "item": "Python projection and SQL disagree on zero worksite state fallback.",
+      "why": "The projector uses falsy-worksite fallback; Python SQL uses COALESCE, so zero worksite can produce SC versus an empty state. Both paths remain unchanged, with an explicit regression test. Reconciliation could change program selection and calculated figures and requires owner review."
+    },
+    {
+      "item": "Strict unrepresentable leap-day shifts need a contextual certified Domain fiscal port.",
+      "why": "For a stored 2024-02-29 through 2025-02-28 rule, begins TY2025 and ends TY2024 are refused by the rich adapter, but the certified Domain resolver assumes calendar. Its fiscal port lacks requested year/convention. The owned adapter cannot correct this without a Domain seam change; S2 is explicitly partial and regression evidence names this boundary."
+    },
     {
       "item": "M-01: captured ingestion overrides year-resolved wage basis, measuring date and pay codes.",
       "why": "The design says ingestion may fill but not override authored statute. This path affects calculated figures and remains unchanged in the certified RuleLibrary pending the owner's decision."
