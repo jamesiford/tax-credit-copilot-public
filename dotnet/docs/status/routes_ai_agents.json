@@ -1,0 +1,117 @@
+{
+  "session": "routes_ai_agents",
+  "branch": "dotnet/w2-routes_ai_agents",
+  "head": "b559447",
+  "summary": "Stopped under task hard stop 1; HALT-routes_ai_agents.md records missing canonical sibling implementations requiring unowned changes and the unresolved fixed-policy conflict. Latest conductor AI acceptance is 13/27 (48.1%), with 5/27 waiver-dependent cases (18.5%); replay is not fixed or claimed. Re-ran build, formatting and all 1,025 fast tests successfully. Fresh complete semantic replay covered 1,769 exchanges and still has 8/27 raw passing exact AI cases. No product behavior, improvements coverage, calculated figures, authorization, scenarios, thresholds or comparator changed. The temporary host was stopped; all changes are committed locally.",
+  "stages": {
+    "stage_1_prompt_fidelity": "done",
+    "stage_2_capabilities": "partial",
+    "stage_3_chat_summary_numeric": "partial",
+    "stage_4_stream_lifetime_and_composed_replay": "partial"
+  },
+  "gates_claimed": {
+    "commits_present": true,
+    "clean_tree": true,
+    "not_pushed": true,
+    "owned_paths": true,
+    "status_json": true,
+    "report_present": true,
+    "dotnet_build": true,
+    "dotnet_format": true,
+    "tests_fast": true
+  },
+  "deviations": [
+    {
+      "id": "DEV-1",
+      "what": "Offline chat renders authorized canonical blocks or explicit dependency refusals instead of the recording's fixed demonstration.",
+      "why": "Unrelated demonstration figures are not a valid answer about the selected client; no calculated fact is changed.",
+      "decision_needed": true
+    },
+    {
+      "id": "DEV-2",
+      "what": "Client summaries read the inward Gold port instead of reproducing the Python router-default SQL binding error.",
+      "why": "The intended read works with concrete application arguments; provider exceptions are sanitized.",
+      "decision_needed": true
+    },
+    {
+      "id": "DEV-3",
+      "what": "These routes use a keyed request-scoped instance of the existing mediator and explicit feature-local forwarding registrations.",
+      "why": "The shared singleton captured request collaborators at root scope, and unconditional application scanning registered optional handlers without their feature services. Both issues were corrected entirely in owned paths.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-4",
+      "what": "Validation English/context and SSE charset spelling are not reproduced byte for byte.",
+      "why": "The approved policy excludes framework and wire artifacts, but counting those differences as case waivers exceeds the cap. Their previous register entries were removed rather than silently treating that policy conflict as approval. Error families, statuses, validation locations and stream semantics remain preserved.",
+      "decision_needed": true
+    },
+    {
+      "id": "DEV-5",
+      "what": "Created the mandatory HALT-routes_ai_agents.md and stopped; no_halt is no longer claimed.",
+      "why": "The missing ReadsCalc/ClaimsDrafts implementations are outside the owned paths. The task forbids copying sibling calculations or reproducing framework artifacts solely for replay; the fixed policy/cap conflict remains unresolved. Another register-only change cannot satisfy the gate honestly.",
+      "decision_needed": true
+    }
+  ],
+  "findings": [
+    "The roster, prompt files and captured publication requests each number twelve; manifest metadata is not another agent. Current ChannelNarratorAgent is version four.",
+    "The catalogue's implemented flags preserve the Python declarations; they are not proof that missing sibling production bridges are installed.",
+    "Final raw replay completed all 36 exchanges: 192 differences, six tolerated; AI five of 23 passing. The replay gate is not claimed.",
+    "Missing book_rank and client_eligibility projections, portfolio/unit/employee page projections and sibling setup handlers block replay success. They are never replaced with recordings or invented zeroes.",
+    "The unchanged replay-board wrapper explicitly applies no improvements waivers. Removing incidental differences would still not satisfy missing production contracts.",
+    "Strict numeric integrity and page-summary written-precision checking are distinct. Portal chat's model prose remains unchecked numerically, as in the documented Python path; no W3 composer or ledger is claimed.",
+    "Employee summaries are deterministic, and person-only capability facts and unit person lines are withheld from models.",
+    "The production Foundry SDK/factory is still absent; verified fake publication DTOs are not deployed agents or live invocation evidence.",
+    "Whole fast tests passed 1,025 cases with no failures or skips; the final prompt-registration build, 279 API regressions and full formatting also passed.",
+    "Conductor follow-up: CA2026 identified an undisposed JsonDocument in the stream test parser. The parser now clones while an explicitly disposed document is alive. Builds pass from both the pinned SDK directory and the repository root with its newer analyzer; no target framework or shared configuration was changed.",
+    "Post-fix gates were rerun: dotnet build -warnaserror, dotnet format --verify-no-changes and all 1,025 non-heavy tests pass. Fresh complete replay diagnostics under dotnet\\artifacts\\ai-ca2026-replay reproduce 36 exchanges, 192 differences, six tolerated and 5/23 AI cases passing; replay remains unclaimed.",
+    "Waiver follow-up: the conductor's prior full board reported 24/27 AI cases passing after coverage (88.9%), including 16/27 waiver-dependent cases (59.3%). Old blanket entries incorrectly hid missing summary projections; they have been removed rather than counted as implemented functionality.",
+    "All mechanical gates pass again after the register-only correction: whole-solution build and formatting plus 1,025 fast tests, no failures or skips. Fresh full replay completed twelve scenarios and 1,769 exchanges with 9,472 raw field differences and six tolerated; the owned AI scenario still has 192 differences. Exact owned method/path selection gives 8/27 raw AI cases passing. The unchanged local wrapper groups four extra method/slash cases and reports 11/31, not the conductor's grouping.",
+    "The two retained entries were checked against every fresh failure and can match only chat.ask, chat.ask-client and summary.client event differences: at most 3/27 cases (11.1%). This is a scope upper bound, not a passing adjusted result; headers remain unwaived, as do missing sibling capability and portfolio/unit/employee results. Fresh reports are under dotnet\\artifacts\\ai-waiver-review; the temporary host was stopped.",
+    "Latest conductor follow-up: AI 13/27 passing (48.1%), with 5/27 waiver-dependent cases (18.5%); 1,769 exchanges, 8,868 failing fields and 737 covered. W1 sources_auth_ai entries also cover AI cases, explaining why the conductor's five waiver-dependent cases exceed the three-case scope upper bound of this feature's own two entries.",
+    "Repeated all mechanical gates successfully: zero build warnings/errors, formatting clean, all 1,025 fast tests passed with no skips. Fresh full replay using CPython 3.12.13 completed all twelve scenarios and 1,769 exchanges: 9,472 raw differences, six tolerated and 8/27 raw exact AI cases passing. The unchanged local wrapper reports 11/31 with its four extra method/slash cases and no improvements adjustment; this is not a new conductor-adjusted percentage.",
+    "Fresh diagnostics are ignored under dotnet\\artifacts\\ai-hard-stop-replay. The ordinary host returned health 200 before replay and was stopped afterward. The branch still has only Ai, Framework and WorkspaceSealed application feature folders; no canonical ReadsCalc/ClaimsDrafts implementation has arrived.",
+    "No live Fabric, Foundry, Entra or customer system, remote change, push or unowned product edit was used. Temporary replay hosts were stopped."
+  ],
+  "open_questions": [],
+  "needs_human": [
+    {
+      "item": "HALT: provide canonical sibling implementations or an explicit ownership/policy decision before resuming.",
+      "why": "Task hard stop 1 requires stopping when unowned changes are needed. ReadsCalc portfolio/eligibility and portfolio/unit/employee page services are still absent; reproducing their calculations inside AI is explicitly forbidden. HALT-routes_ai_agents.md records the attempts, current evidence and exact decisions required. The no_halt and replay gates are not claimed."
+    },
+    {
+      "item": "DEC-AI-1: Resolve the incidental-difference policy versus the 25% case-waiver cap before claiming replay acceptance.",
+      "why": "The task explicitly forbids reproducing Pydantic English/context, byte-level SSE headers and trailing-slash framework behavior, yet the conductor counts these as case failures unless waived. Eight error-validation/wording cases plus two header-only refusals exceed the six waived cases allowed by a 27-case denominator: even if every other case were fixed, at least four would still fail, at best 23/27 (85.2%), below 95%. Prior incidental entries 6-11 are withdrawn pending this decision, not treated as an approved budget exception. Recommend preserving semantic/error/status behavior; a policy owner must resolve the conflicting acceptance/accounting requirements or authorize a different compatibility requirement. No threshold or comparator was changed."
+    },
+    {
+      "item": "DEC-AI-2: Confirm the intended offline chat and repaired client-summary contract, separately from absent sibling implementations.",
+      "why": "chat.ask and chat.ask-client capture a fixed 117-frame demonstration with figures unrelated to the selected client; summary.client captures the Python Query-default SQL error instead of a working read. The task says not to reproduce either defect. Retained entries 1-2 now apply only to those case-name families, event differences and event paths. They cannot waive validation, headers, other page scopes or capability success results. Approve the designed contract or provide an explicit compatibility decision; no model/demo figures or SQL failure were reintroduced."
+    },
+    {
+      "item": "DEC-AI-3: Integrate canonical sibling services before evaluating successful tool and page cases.",
+      "why": "The conductor's three uncovered cases are capabilities.book-rank, capabilities.client-eligibility and p1_auth:agent.capabilities-book-rank. Their required portfolio and eligibility projections are absent from this wave base. Portfolio/unit/employee summaries also lack canonical projections and were incorrectly hidden by old blanket entry 3; that entry is removed. Bind ICapabilityReadBridge and IAiPageCollaborator to the named ReadsCalc/ClaimsDrafts services in the report. Do not waive these dependencies or replace them with recorded bodies, a second ranking implementation or invented figures."
+    },
+    {
+      "item": "Coordinate ReadsCalc, ClaimsDrafts and Runs bindings, then rerun the complete semantic AI replay.",
+      "why": "The report inventories every required read, page/chat projection, command preview/commit and person-bound ticket contract. Fresh full replay has 8/27 raw canonical AI cases passing (29.6%); its p1_artifacts_ai subset is still 5/23 (21.74%), not the required 95%."
+    },
+    {
+      "item": "Supply and separately validate the production Foundry publication/invocation factory.",
+      "why": "This task verifies the SDK-neutral recording-client seam and W1 runtime integration without contacting a model or installing shared SDK dependencies."
+    },
+    {
+      "item": "Decide the inherited M-01 year-pack override defect before changing its figures.",
+      "why": "Ingestion can override year-resolved wage basis, measuring dates and pay codes despite the design's year-pack authority rule. The certified calculation was not changed in this feature."
+    },
+    {
+      "item": "Decide inherited multi-program first-program credit pricing before changing its figures.",
+      "why": "The certified credit-math behavior still prices the first programme for a multi-program state; its existing run-resolution refusals are preserved. This feature does not reinterpret or repair those calculated values."
+    }
+  ],
+  "reports": [
+    "dotnet\\docs\\ROUTES-AI-REPORT.md",
+    "dotnet\\docs\\routes_ai_agents-log.md",
+    "dotnet\\docs\\improvements\\routes_ai_agents.json",
+    "dotnet\\docs\\HALT-routes_ai_agents.md",
+    "dotnet\\docs\\status\\routes_ai_agents.json"
+  ]
+}

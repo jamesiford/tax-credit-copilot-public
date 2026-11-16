@@ -1,0 +1,24 @@
+{
+  "improvements": [
+    {
+      "id": "IMP-routes_ai_agents-1",
+      "kind": "defect_fix",
+      "route": "POST /api/chat",
+      "case": "chat.ask",
+      "categories": ["event"],
+      "path_prefix": "events",
+      "finding": "",
+      "reason": "The unconfigured Python portal emits a fixed demonstration containing figures unrelated to the selected client. Offline chat now renders the authorized capability's canonical blocks or explicitly names the unavailable dependency. No underlying calculated figure is changed or replaced with another calculation; the unrelated demonstration is not treated as a real answer."
+    },
+    {
+      "id": "IMP-routes_ai_agents-2",
+      "kind": "defect_fix",
+      "route": "POST /api/summary",
+      "case": "summary.client",
+      "categories": ["event"],
+      "path_prefix": "events",
+      "finding": "",
+      "reason": "Python passes a FastAPI Query default into the client-grid SQL binding and streams the binding exception. The feature calls the inward Gold port with concrete arguments and sanitizes unexpected source failures instead of reproducing the router-default defect."
+    }
+  ]
+}
