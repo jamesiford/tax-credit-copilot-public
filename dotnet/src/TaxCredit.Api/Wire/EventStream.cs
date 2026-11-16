@@ -11,7 +11,7 @@ public sealed class EventStream(IAsyncEnumerable<StreamEvent> events) : IResult
     public async Task ExecuteAsync(HttpContext httpContext)
     {
         ArgumentNullException.ThrowIfNull(httpContext);
-        httpContext.Response.ContentType = "text/event-stream";
+        httpContext.Response.ContentType = "text/event-stream; charset=utf-8";
         httpContext.Response.Headers.CacheControl = "no-cache";
         httpContext.Response.Headers["X-Accel-Buffering"] = "no";
         httpContext.Features.Get<IHttpResponseBodyFeature>()?.DisableBuffering();

@@ -87,7 +87,7 @@ public sealed class RequestValidator(RouteTable table)
         // The storage adapters cannot represent ids outside Int64. Refuse rather than overflow later (F-3).
         if (parameter.Name is "client_id" or "account_id"
             && parameter.Annotation.StartsWith("int", StringComparison.Ordinal)
-            && (!long.TryParse(values[^1], NumberStyles.Integer, CultureInfo.InvariantCulture, out var id) || id <= 0))
+            && !long.TryParse(values[^1], NumberStyles.Integer, CultureInfo.InvariantCulture, out _))
         {
             if (!issues.Any(i => i.Loc.SequenceEqual(new object[] { location, parameter.Name })))
             {

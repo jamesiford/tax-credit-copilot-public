@@ -24,6 +24,12 @@ public sealed class AssessmentTests
         Assert.Equal(new[] { 2023, 2024, 2025 }, all.GetProperty("years").EnumerateArray().Select(y => y.GetInt32()));
         var cells = all.GetProperty("assessed");
         Assert.Equal(3, cells.GetArrayLength());
+        Assert.Equal(new[]
+        {
+            "40000000-0000-4000-8000-000000000008",
+            "40000000-0000-4000-8000-000000000009",
+            "40000000-0000-4000-8000-00000000000a",
+        }, cells.EnumerateArray().Select(cell => cell.GetProperty("claim_id").GetString()));
         Assert.Equal(cells[0].GetProperty("average_headcount").GetDouble(), cells[0].GetProperty("base_average_headcount").GetDouble());
         Assert.True(cells[0].GetProperty("is_base_year").GetBoolean());
         (await host.Client.PostAsJsonAsync("/api/claims/cell/5555/GA_JTC/2025/transition",
@@ -32,6 +38,7 @@ public sealed class AssessmentTests
             new { client_id = 5555, program_code = "GA_JTC", tax_years = new[] { 2025 } }));
         var refreshed = Assert.Single(targeted.GetProperty("assessed").EnumerateArray());
         Assert.Equal("proposed", refreshed.GetProperty("status").GetString());
+        Assert.Equal("40000000-0000-4000-8000-00000000000d", refreshed.GetProperty("claim_id").GetString());
         Assert.Equal(cells[2].GetProperty("base_average_headcount").GetDouble(), refreshed.GetProperty("base_average_headcount").GetDouble());
         Assert.True(refreshed.GetProperty("base_average_headcount").GetDouble() > 0);
         Assert.True(refreshed.GetProperty("average_headcount").GetDouble() > refreshed.GetProperty("base_average_headcount").GetDouble());

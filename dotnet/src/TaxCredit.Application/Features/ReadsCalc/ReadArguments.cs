@@ -28,7 +28,15 @@ public sealed class ReadArguments(IReadOnlyDictionary<string, string?> parameter
     public int? OptionalInt(string name) => Text(name) is null ? null : WholeNumber(name);
 
     /// <summary>Storage identity validation is deliberately not a global integer clamp.</summary>
-    public long? Client(string name = "account_id") => Text(name) is { } value ? ClientIdentity.Parse(value) : null;
+    public long? Client(string name = "account_id")
+    {
+        if (Text(name) is not { } value) { return null; }
+        if (long.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var id) && id <= 0)
+        {
+            throw new ReadRefusalException(404, "No payroll or accepted run exists for this client.");
+        }
+        return ClientIdentity.Parse(value);
+    }
 
     /// <summary>Reads finite computation arguments only.</summary>
     public double Number(string name, double fallback = 0) => Text(name) is { } value

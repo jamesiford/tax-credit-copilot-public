@@ -34,7 +34,7 @@ public sealed class StreamingAndMoneyTests
         var events = recording.GetProperty("response").GetProperty("body").GetProperty("events").EnumerateArray().ToArray();
         await using var host = await TestHost.Start(routes: app => app.MapGet("/__tests__/stream", () => new EventStream(Frames(events))));
         using var response = await host.Client.GetAsync("/__tests__/stream");
-        Assert.Equal("text/event-stream", response.Content.Headers.ContentType?.ToString());
+        Assert.Equal("text/event-stream; charset=utf-8", response.Content.Headers.ContentType?.ToString());
         Assert.Equal("no-cache", response.Headers.CacheControl?.ToString());
         Assert.Equal("no", Assert.Single(response.Headers.GetValues("X-Accel-Buffering")));
         var frames = (await response.Content.ReadAsStringAsync()).Split("\n\n", StringSplitOptions.RemoveEmptyEntries);

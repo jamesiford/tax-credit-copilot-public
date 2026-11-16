@@ -23,6 +23,6 @@ public sealed class FrameworkEndpoints : IEndpointGroup
     }
 
     private static IResult Documentation(string title) => Results.Content(
-        $"<!doctype html><html lang=\"en\"><meta charset=\"utf-8\"><title>{title}</title><body><h1>Tax Credit Copilot API</h1><p>Walking skeleton: unimplemented operations return 501.</p><a href=\"/openapi.json\">OpenAPI schema inventory</a></body></html>",
+        $"<!doctype html><html lang=\"en\"><meta charset=\"utf-8\"><title>{title}</title><body><h1>Tax Credit Copilot API</h1><p>OpenAPI describes the API operations and their request and response schemas.</p><a href=\"/openapi.json\">OpenAPI schema inventory</a></body></html>",
         "text/html; charset=utf-8");
 }

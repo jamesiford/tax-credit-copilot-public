@@ -8,6 +8,23 @@ namespace TaxCredit.Api.Tests.Contract;
 public sealed class RuntimeTrustTests
 {
     [Fact]
+    public async Task Capability_reads_do_not_require_a_writer_but_preparations_still_check_the_acting_person()
+    {
+        await using var host = await RuntimeRequests.Start();
+        await RuntimeRequests.Reset(host);
+        var agent = await RuntimeRequests.Mint(host, new { kind = "agent" });
+        var acting = RuntimeRequests.Acting(RuntimeRequests.Reader);
+        using var read = await RuntimeRequests.Send(host, agent, "/api/capabilities/book_rank", HttpMethod.Post,
+            new { args = new { } }, acting);
+        Assert.Equal(200, (int)read.StatusCode);
+        Assert.True((await read.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("facts").GetProperty("calculated").GetBoolean());
+        using var prepare = await RuntimeRequests.Send(host, agent, "/api/capabilities/engagement_set_prepare", HttpMethod.Post,
+            new { args = new { client_id = 1001, program_code = "GA_JTC", scope = "in_scope" } }, acting);
+        Assert.Equal(403, (int)prepare.StatusCode);
+        Assert.Equal("not_authorized", (await prepare.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("error").GetProperty("code").GetString());
+    }
+
+    [Fact]
     public async Task Signed_reads_observe_seeded_stores_and_the_principal_survives_await_without_leaking()
     {
         await using var host = await RuntimeRequests.Start();

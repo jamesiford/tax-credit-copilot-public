@@ -156,6 +156,8 @@ public sealed partial class ClientAssessment
             AssumptionSetId = credit.TryGetValue("assumption_set_id", out var set) ? set as string : null,
             RulePackVersion = packFile ?? "None",
             DecidedBy = assessedBy,
+            ClaimId = _newClaimId(),
+            EffectiveFrom = _clock(),
         });
     }
 

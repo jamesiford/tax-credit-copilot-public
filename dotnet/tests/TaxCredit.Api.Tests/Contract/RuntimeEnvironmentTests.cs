@@ -22,12 +22,15 @@ public sealed class RuntimeEnvironmentTests
             Assert.Equal(id == "reader.batch-dry-run" ? 202 : 200, (int)response.StatusCode);
         }
         using var drafts = await RuntimeRequests.Send(host, reader, "/api/v2/program-drafts");
-        Assert.Equal(200, (int)drafts.StatusCode);
+        Assert.Equal(403, (int)drafts.StatusCode);
         var writer = await RuntimeRequests.Mint(host, new { oid = RuntimeRequests.Writer });
+        using var writerDrafts = await RuntimeRequests.Send(host, writer, "/api/v2/program-drafts");
+        Assert.Equal(200, (int)writerDrafts.StatusCode);
         using var allowed = await Case(host, writer, "reader.draft-create");
         Assert.Equal(201, (int)allowed.StatusCode);
         await RuntimeRequests.Env(host, new { CHANNEL_ENFORCE_WRITER_FOR_USERS = "false", PROGRAM_DRAFT_REQUIRE_SECOND_REVIEWER = "true" });
-        using var changed = await Case(host, reader, "reader.draft-create");
+        using var changed = await RuntimeRequests.Send(host, reader, "/api/v2/program-drafts", HttpMethod.Post,
+            new { code = "ZZ_ENV_CHANGED", state = "ZZ", name = "Synthetic environment probe", years = new[] { 2025 } });
         Assert.Equal(201, (int)changed.StatusCode);
         using var observation = await RuntimeRequests.Send(host, reader);
         Assert.Equal("true", (await observation.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("second_reviewer").GetString());

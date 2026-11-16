@@ -1,4 +1,5 @@
 using TaxCredit.Application.Ports.Persistence;
+using TaxCredit.Application.Ports.Sources;
 using TaxCredit.Domain.Claims;
 using TaxCredit.Domain.Findings;
 using TaxCredit.Domain.Numerics;
@@ -36,10 +37,13 @@ public sealed class OperationalResetTests
             foreach (var table in OperationalSchema.TableNames)
             {
                 var seedName = table[8..] + ".jsonl.gz";
-                var expected = restored.TableCounts.GetValueOrDefault("operational/" + seedName)
+                var expected = table == "tcc_ops.write_sequence" ? 1 : restored.TableCounts.GetValueOrDefault("operational/" + seedName)
                     + restored.TableCounts.GetValueOrDefault("ops/" + seedName);
                 Assert.Equal(expected, Count(after, table));
             }
+            var sequence = Assert.Single(after.QueryExempt(SqlExemption.Seed, "SELECT sequence_name,last_value FROM tcc_ops.write_sequence"));
+            Assert.Equal("manual_override", sequence["sequence_name"]);
+            Assert.Equal(0L, Convert.ToInt64(sequence["last_value"], System.Globalization.CultureInfo.InvariantCulture));
         }
 
         AssertQueueAndChannelEmpty(reopened);
@@ -61,7 +65,11 @@ public sealed class OperationalResetTests
         var batches = new RunBatchRepository(database);
         var batch = RunBatchRepositoryTests.Batch("reset-batch");
         batches.Create(batch, RunBatchRepositoryTests.Items(batch, 11, 22));
-        Assert.Single(batches.Claim("reset-worker", 1, 120, Now));
+        var leased = Assert.Single(batches.Claim("reset-worker", 1, 120, Now));
+        Assert.Equal("reset-publication", new RunPublication(database, batches, new RunManifestRepository(database))
+            .Identity(leased, "reset-worker", Now, () => "reset-publication"));
+        new RunSourceObservations(database).Record(11, "reset-run",
+            new SourceFingerprint("count_max", 1, null, "absent", "synthetic", new string('a', 64), "synthetic", ["Not a snapshot."]));
         PopulateDraft(database);
         PopulateMetadata(database);
         PopulateChannel(database);
@@ -208,6 +216,7 @@ public sealed class OperationalResetTests
         Assert.Empty(new ManualOverrideRepository(database).History(11));
         Assert.Empty(new ManualOverrideRepository(database).BaseYears(11, "GA_JTC"));
         Assert.Null(new RunManifestRepository(database).Get("reset-run"));
+        Assert.Null(new RunSourceObservations(database).Get(11, "reset-run"));
         Assert.Null(new ClaimRepository(database).Current(11, "GA_JTC", 2023));
         Assert.Empty(new ClaimRepository(database).Engagements(11));
     }

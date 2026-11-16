@@ -63,6 +63,7 @@ public sealed class StreamEndpointTests
         using var request = new HttpRequestMessage(HttpMethod.Post, "/api/summary") { Content = JsonContent.Create(new { page = "portfolio" }) };
         using var response = await host.Client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
         Assert.Equal("text/event-stream", response.Content.Headers.ContentType?.MediaType);
+        Assert.Equal("utf-8", response.Content.Headers.ContentType?.CharSet);
         Assert.Equal("no-cache", response.Headers.CacheControl?.ToString());
         Assert.Equal("no", Assert.Single(response.Headers.GetValues("X-Accel-Buffering")));
         using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(5));

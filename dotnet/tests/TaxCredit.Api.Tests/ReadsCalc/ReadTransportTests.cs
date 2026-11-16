@@ -6,6 +6,21 @@ namespace TaxCredit.Api.Tests.ReadsCalc;
 
 public sealed class ReadTransportTests
 {
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    public async Task Nonpositive_clients_are_unavailable_reads_not_integer_binding_errors(int client)
+    {
+        await using var host = await TestHost.Start();
+        foreach (var route in new[] { "/api/progress/2025", "/api/forecast/2025", "/api/ingestion/2025" })
+        {
+            using var response = await host.Client.GetAsync($"{route}?account_id={client}&state=GA");
+            Assert.Equal(404, (int)response.StatusCode);
+            using var body = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+            Assert.Equal(JsonValueKind.String, body.RootElement.GetProperty("detail").ValueKind);
+        }
+    }
+
     [Fact]
     public void Engine_maps_and_typed_count_maps_serialize_as_objects_without_losing_null_or_money_scale()
     {

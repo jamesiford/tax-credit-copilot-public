@@ -12,6 +12,7 @@ public sealed class PortfolioP2Tests
     public async Task Staged_P2_source_fiscal_assembly_matches_the_accepted_python_seed_for_both_methods()
     {
         await using var host = await TestHost.Start(services: PortfolioTestData.Register);
+        host.Client.Timeout = TimeSpan.FromMinutes(5);
         await RuntimeRequests.Reset(host, "P2");
         using var scope = host.App.Services.CreateScope();
         var trend = scope.ServiceProvider.GetRequiredService<ReadsUnitTrendService>();

@@ -95,7 +95,7 @@ internal sealed class SchemaValidator(JsonElement definitions)
         {
             var code = expected switch
             {
-                "object" => "model_attributes_type",
+                "object" => schema.TryGetProperty("properties", out _) ? "model_attributes_type" : "dict_type",
                 "integer" => "int_parsing",
                 "number" => "float_parsing",
                 "array" => "list_type",

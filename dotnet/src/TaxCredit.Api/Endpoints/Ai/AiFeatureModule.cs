@@ -24,7 +24,7 @@ public sealed class AiFeatureModule : IFeatureModule
         services.TryAddScoped<IChatFactSource, CapabilityChatFacts>();
         services.TryAddScoped<PageBriefBuilder>();
         services.TryAddScoped<ChatPlanner>();
-        // The shared mediator is singleton; these lazy streams must resolve handlers from the HTTP request scope.
+        // Lazy streams resolve handlers from the HTTP request scope.
         services.AddKeyedScoped<IMediator, Mediator>(MediatorKey);
         services.AddCapabilityServices();
         services.AddScoped<ICapabilityReadBridge, CanonicalCapabilityReads>();

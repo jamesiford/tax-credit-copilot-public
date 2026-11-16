@@ -13,6 +13,7 @@ internal static class RuntimeWritePolicy
         if (request.Method != "POST") { return true; }
         return request.Path is not ("/api/chat" or "/api/summary" or "/api/employee/drill" or "/api/workspace/employee"
             or "/api/workspace/source/search")
+            && !request.Path.StartsWith("/api/capabilities/", StringComparison.Ordinal)
             && !request.Path.StartsWith("/api/simulate/", StringComparison.Ordinal);
     }
 }

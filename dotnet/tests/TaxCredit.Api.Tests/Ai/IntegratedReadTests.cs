@@ -52,4 +52,14 @@ public sealed class IntegratedReadTests
         Assert.Equal(page, frames[0].Data.GetProperty("page").GetString());
         Assert.NotEmpty(frames[1].Data.GetProperty("facts").EnumerateArray());
     }
+
+    [Fact]
+    public async Task Capability_argument_map_refusals_name_the_dictionary_contract()
+    {
+        await using var host = await TestHost.Start();
+        using var response = await host.Client.PostAsJsonAsync("/api/capabilities/book_rank", new { args = new[] { 1 } });
+        Assert.Equal(422, (int)response.StatusCode);
+        var body = await response.Content.ReadFromJsonAsync<JsonElement>();
+        Assert.Equal("dict_type", body.GetProperty("detail")[0].GetProperty("type").GetString());
+    }
 }

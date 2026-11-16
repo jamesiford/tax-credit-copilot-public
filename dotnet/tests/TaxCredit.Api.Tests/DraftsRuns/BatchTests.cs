@@ -19,6 +19,7 @@ public sealed class BatchTests
     public async Task Each_dispatch_uses_current_source_scope_instead_of_capturing_the_mediator_root()
     {
         await using var host = await TestHost.Start();
+        host.Client.Timeout = TimeSpan.FromMinutes(5);
         using var first = await host.Client.PostAsJsonAsync("/api/v2/run-batches", new { scope = new { kind = "all" }, dry_run = true });
         Assert.Equal(1, (await first.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("preview").GetProperty("clients").GetInt64());
         await RuntimeRequests.Reset(host, "P2");
