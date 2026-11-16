@@ -112,7 +112,8 @@ public sealed class StreamEndpointTests
         body.Split("\n\n", StringSplitOptions.RemoveEmptyEntries).Select(block =>
         {
             var lines = block.Split('\n');
-            return (lines[0]["event: ".Length..], JsonDocument.Parse(lines[1]["data: ".Length..]).RootElement.Clone());
+            using var document = JsonDocument.Parse(lines[1]["data: ".Length..]);
+            return (lines[0]["event: ".Length..], document.RootElement.Clone());
         }).ToArray();
 
     private static Task<TestHost> Start(StreamNarrator narrator) => TestHost.Start(services: services =>
