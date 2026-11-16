@@ -89,13 +89,13 @@ public sealed class RegistryTests
     [Fact]
     public async Task A_real_operation_replaces_only_its_stub_without_ambiguity()
     {
-        await using var host = await TestHost.Start(routes: app => app.MapGet("/api/scope", () => new { real = true }));
-        using var response = await host.Client.GetAsync("/api/scope");
+        var (replaced, remaining) = await DeferredOperations.Pair();
+        await using var host = await TestHost.Start(routes: app => app.MapGet(replaced.Path, () => new { real = true }));
+        using var response = await host.Client.GetAsync(replaced.Path);
         Assert.Equal("""{"real":true}""", await response.Content.ReadAsStringAsync());
-        var endpoints = ((IEndpointRouteBuilder)host.App).DataSources.SelectMany(s => s.Endpoints).OfType<RouteEndpoint>();
-        var claims = endpoints.Where(e => e.RoutePattern.RawText == "/api/scope" && e.Metadata.GetMetadata<IHttpMethodMetadata>()!.HttpMethods.Contains("GET")).ToArray();
-        Assert.Single(claims);
-        using var deferred = await host.Client.GetAsync("/api/rules");
+        DeferredOperations.AssertSingle(host.App, replaced);
+        DeferredOperations.AssertSingle(host.App, remaining);
+        using var deferred = await host.Client.GetAsync(remaining.Path);
         Assert.Equal(501, (int)deferred.StatusCode);
     }
 }

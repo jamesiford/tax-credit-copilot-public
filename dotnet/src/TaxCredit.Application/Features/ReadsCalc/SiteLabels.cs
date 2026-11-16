@@ -32,6 +32,10 @@ public static class SiteLabels
     /// <summary>A label is never guessed for an unknown unit.</summary>
     public static string Name(string worksite) => Sites.TryGetValue(worksite, out var site) ? site.Name : worksite;
 
+    /// <summary>The legacy catalogue is display metadata, not a payroll-derived location.</summary>
+    public static Portfolio.PortfolioWorksite? Reference(string worksite) => Sites.TryGetValue(worksite, out var site)
+        ? new(site.Name, site.County, site.City) : null;
+
     internal static object Dimension(string worksite)
     {
         var known = Sites.TryGetValue(worksite, out var site);

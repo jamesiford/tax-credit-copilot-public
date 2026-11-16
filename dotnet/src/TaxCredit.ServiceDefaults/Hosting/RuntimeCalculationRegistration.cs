@@ -55,6 +55,7 @@ internal static class RuntimeCalculationRegistration
             () => p.GetRequiredService<IIdSource>().NewId().ToString()));
         services.AddScoped<ClientCalculationParts>();
         services.AddScoped<ClientCalculation>();
+        services.AddScoped<Application.Features.ReadsCalc.Portfolio.IPortfolioReferenceData, PortfolioReferenceData>();
     }
 
     internal static PyDateTime Instant(IClock clock) => PyDateTime.FromIsoFormat(clock.UtcNow.ToString("yyyy-MM-dd'T'HH:mm:ss.ffffff'+00:00'",

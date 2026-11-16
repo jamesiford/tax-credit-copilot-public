@@ -19,16 +19,16 @@ public sealed class RuntimeEnvironmentTests
         foreach (var id in new[] { "reader.assess", "reader.run", "reader.rules-verify", "reader.batch-dry-run" })
         {
             using var response = await Case(host, reader, id);
-            Assert.Equal(501, (int)response.StatusCode);
+            Assert.Equal(id == "reader.batch-dry-run" ? 202 : 200, (int)response.StatusCode);
         }
         using var drafts = await RuntimeRequests.Send(host, reader, "/api/v2/program-drafts");
         Assert.Equal(200, (int)drafts.StatusCode);
         var writer = await RuntimeRequests.Mint(host, new { oid = RuntimeRequests.Writer });
         using var allowed = await Case(host, writer, "reader.draft-create");
-        Assert.Equal(501, (int)allowed.StatusCode);
+        Assert.Equal(201, (int)allowed.StatusCode);
         await RuntimeRequests.Env(host, new { CHANNEL_ENFORCE_WRITER_FOR_USERS = "false", PROGRAM_DRAFT_REQUIRE_SECOND_REVIEWER = "true" });
         using var changed = await Case(host, reader, "reader.draft-create");
-        Assert.Equal(501, (int)changed.StatusCode);
+        Assert.Equal(201, (int)changed.StatusCode);
         using var observation = await RuntimeRequests.Send(host, reader);
         Assert.Equal("true", (await observation.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("second_reviewer").GetString());
         await RuntimeRequests.Reset(host);
@@ -44,16 +44,16 @@ public sealed class RuntimeEnvironmentTests
         var reader = await RuntimeRequests.Mint(host, new { });
         await RuntimeRequests.Env(host, new { RATE_LIMIT_PER_MINUTE = "1" });
         using var first = await Case(host, reader, "reader.batch-dry-run");
-        Assert.Equal(501, (int)first.StatusCode);
+        Assert.Equal(202, (int)first.StatusCode);
         using var second = await Case(host, reader, "reader.batch-dry-run");
         Assert.Equal(429, (int)second.StatusCode);
         Assert.NotNull(second.Headers.RetryAfter);
         await RuntimeRequests.Env(host, new { RATE_LIMIT_PER_MINUTE = "2" });
         using var renewed = await Case(host, reader, "reader.batch-dry-run");
-        Assert.Equal(501, (int)renewed.StatusCode);
+        Assert.Equal(202, (int)renewed.StatusCode);
         await RuntimeRequests.Reset(host);
         using var reset = await Case(host, reader, "reader.batch-dry-run");
-        Assert.Equal(501, (int)reset.StatusCode);
+        Assert.Equal(202, (int)reset.StatusCode);
         Assert.Equal("60", host.App.Services.GetRequiredService<IRuntimeConfiguration>().Get("RATE_LIMIT_PER_MINUTE"));
     }
 
