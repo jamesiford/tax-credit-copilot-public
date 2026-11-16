@@ -1,0 +1,2389 @@
+{
+  "account_id": 2001,
+  "state": "GA",
+  "program_code": "GA_JTC",
+  "method": "pay_period",
+  "years": [
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025,
+    2026
+  ],
+  "declined_years": [
+    {
+      "tax_year": "2019",
+      "reason": "no GA payroll inside 2019-01-01..2019-12-31 for account 2001"
+    }
+  ],
+  "units": [
+    {
+      "unit_id": "GA_GA-001",
+      "worksite_id": "GA_GA-001",
+      "name": "GA_GA-001",
+      "feins": [
+        "001000001"
+      ],
+      "county": "Fulton",
+      "city": "",
+      "census_tract": "",
+      "base_year": 2020,
+      "base_year_source": "inferred",
+      "base_average_headcount": 18.33,
+      "threshold": 2.0,
+      "threshold_source": "designation",
+      "rows": [
+        {
+          "tax_year": 2020,
+          "month_totals": [
+            20.0,
+            20.0,
+            20.0,
+            20.0,
+            20.0,
+            20.0,
+            20.0,
+            20.0,
+            20.0,
+            20.0,
+            20.0,
+            0.0
+          ],
+          "total": 220.0,
+          "average_headcount": 18.33,
+          "months_with_headcount": 11,
+          "feins": [
+            "001000001"
+          ],
+          "tier": 1,
+          "designation": "T1",
+          "tier_source": "prototype",
+          "net_new": 0.0,
+          "threshold": 2.0,
+          "qualified": false,
+          "backfilled": false,
+          "eligible_jobs": 0.0,
+          "new_jobs_created": 0.0,
+          "high_water_mark": 0.0,
+          "annual_credit_usd": 0,
+          "is_base_year": true,
+          "status": "base"
+        },
+        {
+          "tax_year": 2021,
+          "month_totals": [
+            26.0,
+            26.0,
+            26.0,
+            26.0,
+            26.0,
+            26.0,
+            25.0,
+            25.0,
+            25.0,
+            25.0,
+            25.0,
+            25.0
+          ],
+          "total": 306.0,
+          "average_headcount": 25.5,
+          "months_with_headcount": 12,
+          "feins": [
+            "001000001"
+          ],
+          "tier": 1,
+          "designation": "T1",
+          "tier_source": "prototype",
+          "net_new": 7.17,
+          "threshold": 2.0,
+          "qualified": true,
+          "backfilled": false,
+          "eligible_jobs": 7.17,
+          "new_jobs_created": 7.17,
+          "high_water_mark": 25.5,
+          "annual_credit_usd": 25095,
+          "is_base_year": false,
+          "status": "above_minimum"
+        },
+        {
+          "tax_year": 2022,
+          "month_totals": [
+            27.0,
+            27.0,
+            27.0,
+            26.0,
+            26.0,
+            26.0,
+            26.0,
+            26.0,
+            26.0,
+            26.0,
+            26.0,
+            25.0
+          ],
+          "total": 314.0,
+          "average_headcount": 26.17,
+          "months_with_headcount": 12,
+          "feins": [
+            "001000001"
+          ],
+          "tier": 1,
+          "designation": "T1",
+          "tier_source": "prototype",
+          "net_new": 7.84,
+          "threshold": 2.0,
+          "qualified": true,
+          "backfilled": false,
+          "eligible_jobs": 7.84,
+          "new_jobs_created": 0.67,
+          "high_water_mark": 26.17,
+          "annual_credit_usd": 27440,
+          "is_base_year": false,
+          "status": "above_minimum"
+        },
+        {
+          "tax_year": 2023,
+          "month_totals": [
+            27.0,
+            26.0,
+            26.0,
+            26.0,
+            25.0,
+            25.0,
+            25.0,
+            26.0,
+            26.0,
+            27.0,
+            26.0,
+            26.0
+          ],
+          "total": 311.0,
+          "average_headcount": 25.92,
+          "months_with_headcount": 12,
+          "feins": [
+            "001000001"
+          ],
+          "tier": 1,
+          "designation": "T1",
+          "tier_source": "prototype",
+          "net_new": 7.59,
+          "threshold": 2.0,
+          "qualified": true,
+          "backfilled": false,
+          "eligible_jobs": 7.59,
+          "new_jobs_created": 0.0,
+          "high_water_mark": 26.17,
+          "annual_credit_usd": 26565,
+          "is_base_year": false,
+          "status": "above_minimum"
+        },
+        {
+          "tax_year": 2024,
+          "month_totals": [
+            29.0,
+            28.0,
+            28.0,
+            27.0,
+            26.0,
+            26.0,
+            26.0,
+            26.0,
+            26.0,
+            26.0,
+            26.0,
+            0.0
+          ],
+          "total": 294.0,
+          "average_headcount": 24.5,
+          "months_with_headcount": 11,
+          "feins": [
+            "001000001"
+          ],
+          "tier": 1,
+          "designation": "T1",
+          "tier_source": "prototype",
+          "net_new": 6.17,
+          "threshold": 2.0,
+          "qualified": true,
+          "backfilled": false,
+          "eligible_jobs": 6.17,
+          "new_jobs_created": 0.0,
+          "high_water_mark": 26.17,
+          "annual_credit_usd": 21595,
+          "is_base_year": false,
+          "status": "above_minimum"
+        },
+        {
+          "tax_year": 2025,
+          "month_totals": [
+            24.0,
+            24.0,
+            24.0,
+            24.0,
+            24.0,
+            24.0,
+            24.0,
+            24.0,
+            24.0,
+            24.0,
+            23.0,
+            24.0
+          ],
+          "total": 287.0,
+          "average_headcount": 23.92,
+          "months_with_headcount": 12,
+          "feins": [
+            "001000001"
+          ],
+          "tier": 1,
+          "designation": "T1",
+          "tier_source": "prototype",
+          "net_new": 5.59,
+          "threshold": 2.0,
+          "qualified": true,
+          "backfilled": false,
+          "eligible_jobs": 5.59,
+          "new_jobs_created": 0.0,
+          "high_water_mark": 26.17,
+          "annual_credit_usd": 19565,
+          "is_base_year": false,
+          "status": "above_minimum"
+        },
+        {
+          "tax_year": 2026,
+          "month_totals": [
+            26.0,
+            25.0,
+            25.0,
+            25.0,
+            25.0,
+            25.0,
+            26.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "total": 177.0,
+          "average_headcount": 14.75,
+          "months_with_headcount": 7,
+          "feins": [
+            "001000001"
+          ],
+          "tier": 1,
+          "designation": "T1",
+          "tier_source": "prototype",
+          "net_new": 0.0,
+          "threshold": 2.0,
+          "qualified": false,
+          "backfilled": false,
+          "eligible_jobs": 0.0,
+          "new_jobs_created": 0.0,
+          "high_water_mark": 26.17,
+          "annual_credit_usd": 0,
+          "is_base_year": false,
+          "status": "below_minimum"
+        }
+      ],
+      "credit_years": [
+        {
+          "tax_year": 2020,
+          "claimable_usd": 0,
+          "from_creation_years": [],
+          "projected": false
+        },
+        {
+          "tax_year": 2021,
+          "claimable_usd": 25095,
+          "from_creation_years": [
+            2021
+          ],
+          "projected": false
+        },
+        {
+          "tax_year": 2022,
+          "claimable_usd": 27440,
+          "from_creation_years": [
+            2021,
+            2022
+          ],
+          "projected": false
+        },
+        {
+          "tax_year": 2023,
+          "claimable_usd": 27440,
+          "from_creation_years": [
+            2021,
+            2022
+          ],
+          "projected": false
+        },
+        {
+          "tax_year": 2024,
+          "claimable_usd": 23940,
+          "from_creation_years": [
+            2021,
+            2022
+          ],
+          "projected": false
+        },
+        {
+          "tax_year": 2025,
+          "claimable_usd": 21910,
+          "from_creation_years": [
+            2021,
+            2022
+          ],
+          "projected": false
+        },
+        {
+          "tax_year": 2026,
+          "claimable_usd": 0,
+          "from_creation_years": [
+            2022
+          ],
+          "projected": false
+        },
+        {
+          "tax_year": 2027,
+          "claimable_usd": 0,
+          "from_creation_years": [],
+          "projected": true
+        }
+      ],
+      "total_annual_credit_usd": 120260,
+      "total_tranche_lifetime_usd": 125825,
+      "final_high_water_mark": 26.17
+    },
+    {
+      "unit_id": "GA_GA-004",
+      "worksite_id": "GA_GA-004",
+      "name": "GA_GA-004",
+      "feins": [
+        "001000001"
+      ],
+      "county": "Lowndes",
+      "city": "",
+      "census_tract": "",
+      "base_year": 2020,
+      "base_year_source": "inferred",
+      "base_average_headcount": 15.58,
+      "threshold": 2.0,
+      "threshold_source": "designation",
+      "rows": [
+        {
+          "tax_year": 2020,
+          "month_totals": [
+            17.0,
+            17.0,
+            17.0,
+            17.0,
+            17.0,
+            17.0,
+            17.0,
+            17.0,
+            17.0,
+            17.0,
+            17.0,
+            0.0
+          ],
+          "total": 187.0,
+          "average_headcount": 15.58,
+          "months_with_headcount": 11,
+          "feins": [
+            "001000001"
+          ],
+          "tier": 1,
+          "designation": "T1",
+          "tier_source": "prototype",
+          "net_new": 0.0,
+          "threshold": 2.0,
+          "qualified": false,
+          "backfilled": false,
+          "eligible_jobs": 0.0,
+          "new_jobs_created": 0.0,
+          "high_water_mark": 0.0,
+          "annual_credit_usd": 0,
+          "is_base_year": true,
+          "status": "base"
+        },
+        {
+          "tax_year": 2021,
+          "month_totals": [
+            18.0,
+            17.0,
+            17.0,
+            17.0,
+            17.0,
+            18.0,
+            18.0,
+            18.0,
+            18.0,
+            19.0,
+            20.0,
+            20.0
+          ],
+          "total": 217.0,
+          "average_headcount": 18.08,
+          "months_with_headcount": 12,
+          "feins": [
+            "001000001"
+          ],
+          "tier": 1,
+          "designation": "T1",
+          "tier_source": "prototype",
+          "net_new": 2.5,
+          "threshold": 2.0,
+          "qualified": true,
+          "backfilled": false,
+          "eligible_jobs": 2.5,
+          "new_jobs_created": 2.5,
+          "high_water_mark": 18.08,
+          "annual_credit_usd": 8750,
+          "is_base_year": false,
+          "status": "above_minimum"
+        },
+        {
+          "tax_year": 2022,
+          "month_totals": [
+            22.0,
+            22.0,
+            22.0,
+            22.0,
+            22.0,
+            22.0,
+            23.0,
+            23.0,
+            23.0,
+            23.0,
+            23.0,
+            23.0
+          ],
+          "total": 270.0,
+          "average_headcount": 22.5,
+          "months_with_headcount": 12,
+          "feins": [
+            "001000001"
+          ],
+          "tier": 1,
+          "designation": "T1",
+          "tier_source": "prototype",
+          "net_new": 6.92,
+          "threshold": 2.0,
+          "qualified": true,
+          "backfilled": false,
+          "eligible_jobs": 6.92,
+          "new_jobs_created": 4.42,
+          "high_water_mark": 22.5,
+          "annual_credit_usd": 24220,
+          "is_base_year": false,
+          "status": "above_minimum"
+        },
+        {
+          "tax_year": 2023,
+          "month_totals": [
+            25.0,
+            24.0,
+            23.0,
+            23.0,
+            23.0,
+            23.0,
+            23.0,
+            23.0,
+            23.0,
+            23.0,
+            23.0,
+            23.0
+          ],
+          "total": 279.0,
+          "average_headcount": 23.25,
+          "months_with_headcount": 12,
+          "feins": [
+            "001000001"
+          ],
+          "tier": 1,
+          "designation": "T1",
+          "tier_source": "prototype",
+          "net_new": 7.67,
+          "threshold": 2.0,
+          "qualified": true,
+          "backfilled": false,
+          "eligible_jobs": 7.67,
+          "new_jobs_created": 0.75,
+          "high_water_mark": 23.25,
+          "annual_credit_usd": 26845,
+          "is_base_year": false,
+          "status": "above_minimum"
+        },
+        {
+          "tax_year": 2024,
+          "month_totals": [
+            24.0,
+            24.0,
+            24.0,
+            24.0,
+            24.0,
+            24.0,
+            24.0,
+            24.0,
+            24.0,
+            24.0,
+            24.0,
+            0.0
+          ],
+          "total": 264.0,
+          "average_headcount": 22.0,
+          "months_with_headcount": 11,
+          "feins": [
+            "001000001"
+          ],
+          "tier": 1,
+          "designation": "T1",
+          "tier_source": "prototype",
+          "net_new": 6.42,
+          "threshold": 2.0,
+          "qualified": true,
+          "backfilled": false,
+          "eligible_jobs": 6.42,
+          "new_jobs_created": 0.0,
+          "high_water_mark": 23.25,
+          "annual_credit_usd": 22470,
+          "is_base_year": false,
+          "status": "above_minimum"
+        },
+        {
+          "tax_year": 2025,
+          "month_totals": [
+            26.0,
+            26.0,
+            26.0,
+            26.0,
+            26.0,
+            26.0,
+            27.0,
+            27.0,
+            27.0,
+            26.0,
+            25.0,
+            26.0
+          ],
+          "total": 314.0,
+          "average_headcount": 26.17,
+          "months_with_headcount": 12,
+          "feins": [
+            "001000001"
+          ],
+          "tier": 1,
+          "designation": "T1",
+          "tier_source": "prototype",
+          "net_new": 10.59,
+          "threshold": 2.0,
+          "qualified": true,
+          "backfilled": false,
+          "eligible_jobs": 10.59,
+          "new_jobs_created": 2.92,
+          "high_water_mark": 26.17,
+          "annual_credit_usd": 37065,
+          "is_base_year": false,
+          "status": "above_minimum"
+        },
+        {
+          "tax_year": 2026,
+          "month_totals": [
+            26.0,
+            25.0,
+            25.0,
+            25.0,
+            25.0,
+            26.0,
+            27.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "total": 179.0,
+          "average_headcount": 14.92,
+          "months_with_headcount": 7,
+          "feins": [
+            "001000001"
+          ],
+          "tier": 1,
+          "designation": "T1",
+          "tier_source": "prototype",
+          "net_new": 0.0,
+          "threshold": 2.0,
+          "qualified": false,
+          "backfilled": false,
+          "eligible_jobs": 0.0,
+          "new_jobs_created": 0.0,
+          "high_water_mark": 26.17,
+          "annual_credit_usd": 0,
+          "is_base_year": false,
+          "status": "below_minimum"
+        }
+      ],
+      "credit_years": [
+        {
+          "tax_year": 2020,
+          "claimable_usd": 0,
+          "from_creation_years": [],
+          "projected": false
+        },
+        {
+          "tax_year": 2021,
+          "claimable_usd": 8750,
+          "from_creation_years": [
+            2021
+          ],
+          "projected": false
+        },
+        {
+          "tax_year": 2022,
+          "claimable_usd": 24220,
+          "from_creation_years": [
+            2021,
+            2022
+          ],
+          "projected": false
+        },
+        {
+          "tax_year": 2023,
+          "claimable_usd": 26845,
+          "from_creation_years": [
+            2021,
+            2022,
+            2023
+          ],
+          "projected": false
+        },
+        {
+          "tax_year": 2024,
+          "claimable_usd": 26845,
+          "from_creation_years": [
+            2021,
+            2022,
+            2023
+          ],
+          "projected": false
+        },
+        {
+          "tax_year": 2025,
+          "claimable_usd": 37065,
+          "from_creation_years": [
+            2021,
+            2022,
+            2023,
+            2025
+          ],
+          "projected": false
+        },
+        {
+          "tax_year": 2026,
+          "claimable_usd": 0,
+          "from_creation_years": [
+            2022,
+            2023,
+            2025
+          ],
+          "projected": false
+        },
+        {
+          "tax_year": 2027,
+          "claimable_usd": 12845,
+          "from_creation_years": [
+            2023,
+            2025
+          ],
+          "projected": true
+        }
+      ],
+      "total_annual_credit_usd": 119350,
+      "total_tranche_lifetime_usd": 157010,
+      "final_high_water_mark": 26.17
+    },
+    {
+      "unit_id": "GA_GA-007",
+      "worksite_id": "GA_GA-007",
+      "name": "GA_GA-007",
+      "feins": [
+        "001000001"
+      ],
+      "county": "Bibb",
+      "city": "",
+      "census_tract": "",
+      "base_year": 2020,
+      "base_year_source": "inferred",
+      "base_average_headcount": 20.17,
+      "threshold": 2.0,
+      "threshold_source": "designation",
+      "rows": [
+        {
+          "tax_year": 2020,
+          "month_totals": [
+            22.0,
+            22.0,
+            22.0,
+            22.0,
+            22.0,
+            22.0,
+            22.0,
+            22.0,
+            22.0,
+            22.0,
+            22.0,
+            0.0
+          ],
+          "total": 242.0,
+          "average_headcount": 20.17,
+          "months_with_headcount": 11,
+          "feins": [
+            "001000001"
+          ],
+          "tier": 1,
+          "designation": "T1",
+          "tier_source": "prototype",
+          "net_new": 0.0,
+          "threshold": 2.0,
+          "qualified": false,
+          "backfilled": false,
+          "eligible_jobs": 0.0,
+          "new_jobs_created": 0.0,
+          "high_water_mark": 0.0,
+          "annual_credit_usd": 0,
+          "is_base_year": true,
+          "status": "base"
+        },
+        {
+          "tax_year": 2021,
+          "month_totals": [
+            22.0,
+            22.0,
+            22.0,
+            23.0,
+            22.0,
+            23.0,
+            23.0,
+            23.0,
+            23.0,
+            22.0,
+            22.0,
+            22.0
+          ],
+          "total": 269.0,
+          "average_headcount": 22.42,
+          "months_with_headcount": 12,
+          "feins": [
+            "001000001"
+          ],
+          "tier": 1,
+          "designation": "T1",
+          "tier_source": "prototype",
+          "net_new": 2.25,
+          "threshold": 2.0,
+          "qualified": true,
+          "backfilled": false,
+          "eligible_jobs": 2.25,
+          "new_jobs_created": 2.25,
+          "high_water_mark": 22.42,
+          "annual_credit_usd": 7875,
+          "is_base_year": false,
+          "status": "above_minimum"
+        },
+        {
+          "tax_year": 2022,
+          "month_totals": [
+            23.0,
+            23.0,
+            23.0,
+            23.0,
+            23.0,
+            23.0,
+            22.0,
+            21.0,
+            21.0,
+            21.0,
+            21.0,
+            21.0
+          ],
+          "total": 265.0,
+          "average_headcount": 22.08,
+          "months_with_headcount": 12,
+          "feins": [
+            "001000001"
+          ],
+          "tier": 1,
+          "designation": "T1",
+          "tier_source": "prototype",
+          "net_new": 1.91,
+          "threshold": 2.0,
+          "qualified": false,
+          "backfilled": false,
+          "eligible_jobs": 0.0,
+          "new_jobs_created": 0.0,
+          "high_water_mark": 22.42,
+          "annual_credit_usd": 0,
+          "is_base_year": false,
+          "status": "below_minimum"
+        },
+        {
+          "tax_year": 2023,
+          "month_totals": [
+            21.0,
+            21.0,
+            21.0,
+            21.0,
+            21.0,
+            21.0,
+            21.0,
+            21.0,
+            21.0,
+            21.0,
+            21.0,
+            21.0
+          ],
+          "total": 252.0,
+          "average_headcount": 21.0,
+          "months_with_headcount": 12,
+          "feins": [
+            "001000001"
+          ],
+          "tier": 1,
+          "designation": "T1",
+          "tier_source": "prototype",
+          "net_new": 0.83,
+          "threshold": 2.0,
+          "qualified": false,
+          "backfilled": false,
+          "eligible_jobs": 0.0,
+          "new_jobs_created": 0.0,
+          "high_water_mark": 22.42,
+          "annual_credit_usd": 0,
+          "is_base_year": false,
+          "status": "below_minimum"
+        },
+        {
+          "tax_year": 2024,
+          "month_totals": [
+            22.0,
+            21.0,
+            21.0,
+            21.0,
+            21.0,
+            21.0,
+            21.0,
+            21.0,
+            21.0,
+            21.0,
+            21.0,
+            0.0
+          ],
+          "total": 232.0,
+          "average_headcount": 19.33,
+          "months_with_headcount": 11,
+          "feins": [
+            "001000001"
+          ],
+          "tier": 1,
+          "designation": "T1",
+          "tier_source": "prototype",
+          "net_new": 0.0,
+          "threshold": 2.0,
+          "qualified": false,
+          "backfilled": false,
+          "eligible_jobs": 0.0,
+          "new_jobs_created": 0.0,
+          "high_water_mark": 22.42,
+          "annual_credit_usd": 0,
+          "is_base_year": false,
+          "status": "below_minimum"
+        },
+        {
+          "tax_year": 2025,
+          "month_totals": [
+            22.0,
+            22.0,
+            23.0,
+            23.0,
+            23.0,
+            19.0,
+            19.0,
+            19.0,
+            18.0,
+            18.0,
+            18.0,
+            18.0
+          ],
+          "total": 242.0,
+          "average_headcount": 20.17,
+          "months_with_headcount": 12,
+          "feins": [
+            "001000001"
+          ],
+          "tier": 1,
+          "designation": "T1",
+          "tier_source": "prototype",
+          "net_new": 0.0,
+          "threshold": 2.0,
+          "qualified": false,
+          "backfilled": false,
+          "eligible_jobs": 0.0,
+          "new_jobs_created": 0.0,
+          "high_water_mark": 22.42,
+          "annual_credit_usd": 0,
+          "is_base_year": false,
+          "status": "below_minimum"
+        },
+        {
+          "tax_year": 2026,
+          "month_totals": [
+            16.0,
+            18.0,
+            18.0,
+            18.0,
+            18.0,
+            18.0,
+            17.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "total": 123.0,
+          "average_headcount": 10.25,
+          "months_with_headcount": 7,
+          "feins": [
+            "001000001"
+          ],
+          "tier": 1,
+          "designation": "T1",
+          "tier_source": "prototype",
+          "net_new": 0.0,
+          "threshold": 2.0,
+          "qualified": false,
+          "backfilled": false,
+          "eligible_jobs": 0.0,
+          "new_jobs_created": 0.0,
+          "high_water_mark": 22.42,
+          "annual_credit_usd": 0,
+          "is_base_year": false,
+          "status": "below_minimum"
+        }
+      ],
+      "credit_years": [
+        {
+          "tax_year": 2020,
+          "claimable_usd": 0,
+          "from_creation_years": [],
+          "projected": false
+        },
+        {
+          "tax_year": 2021,
+          "claimable_usd": 7875,
+          "from_creation_years": [
+            2021
+          ],
+          "projected": false
+        },
+        {
+          "tax_year": 2022,
+          "claimable_usd": 6685,
+          "from_creation_years": [
+            2021
+          ],
+          "projected": false
+        },
+        {
+          "tax_year": 2023,
+          "claimable_usd": 2905,
+          "from_creation_years": [
+            2021
+          ],
+          "projected": false
+        },
+        {
+          "tax_year": 2024,
+          "claimable_usd": 0,
+          "from_creation_years": [
+            2021
+          ],
+          "projected": false
+        },
+        {
+          "tax_year": 2025,
+          "claimable_usd": 0,
+          "from_creation_years": [
+            2021
+          ],
+          "projected": false
+        },
+        {
+          "tax_year": 2026,
+          "claimable_usd": 0,
+          "from_creation_years": [],
+          "projected": false
+        },
+        {
+          "tax_year": 2027,
+          "claimable_usd": 0,
+          "from_creation_years": [],
+          "projected": true
+        }
+      ],
+      "total_annual_credit_usd": 7875,
+      "total_tranche_lifetime_usd": 17465,
+      "final_high_water_mark": 22.42
+    },
+    {
+      "unit_id": "GA_GA-010",
+      "worksite_id": "GA_GA-010",
+      "name": "GA_GA-010",
+      "feins": [
+        "001000001"
+      ],
+      "county": "Chatham",
+      "city": "",
+      "census_tract": "",
+      "base_year": 2020,
+      "base_year_source": "inferred",
+      "base_average_headcount": 11.0,
+      "threshold": 2.0,
+      "threshold_source": "designation",
+      "rows": [
+        {
+          "tax_year": 2020,
+          "month_totals": [
+            12.0,
+            12.0,
+            12.0,
+            12.0,
+            12.0,
+            12.0,
+            12.0,
+            12.0,
+            12.0,
+            12.0,
+            12.0,
+            0.0
+          ],
+          "total": 132.0,
+          "average_headcount": 11.0,
+          "months_with_headcount": 11,
+          "feins": [
+            "001000001"
+          ],
+          "tier": 1,
+          "designation": "T1",
+          "tier_source": "prototype",
+          "net_new": 0.0,
+          "threshold": 2.0,
+          "qualified": false,
+          "backfilled": false,
+          "eligible_jobs": 0.0,
+          "new_jobs_created": 0.0,
+          "high_water_mark": 0.0,
+          "annual_credit_usd": 0,
+          "is_base_year": true,
+          "status": "base"
+        },
+        {
+          "tax_year": 2021,
+          "month_totals": [
+            12.0,
+            12.0,
+            13.0,
+            13.0,
+            13.0,
+            13.0,
+            13.0,
+            13.0,
+            13.0,
+            13.0,
+            13.0,
+            14.0
+          ],
+          "total": 155.0,
+          "average_headcount": 12.92,
+          "months_with_headcount": 12,
+          "feins": [
+            "001000001"
+          ],
+          "tier": 1,
+          "designation": "T1",
+          "tier_source": "prototype",
+          "net_new": 1.92,
+          "threshold": 2.0,
+          "qualified": false,
+          "backfilled": false,
+          "eligible_jobs": 0.0,
+          "new_jobs_created": 1.92,
+          "high_water_mark": 12.92,
+          "annual_credit_usd": 0,
+          "is_base_year": false,
+          "status": "below_minimum"
+        },
+        {
+          "tax_year": 2022,
+          "month_totals": [
+            17.0,
+            17.0,
+            17.0,
+            17.0,
+            17.0,
+            17.0,
+            17.0,
+            17.0,
+            17.0,
+            17.0,
+            16.0,
+            16.0
+          ],
+          "total": 202.0,
+          "average_headcount": 16.83,
+          "months_with_headcount": 12,
+          "feins": [
+            "001000001"
+          ],
+          "tier": 1,
+          "designation": "T1",
+          "tier_source": "prototype",
+          "net_new": 5.83,
+          "threshold": 2.0,
+          "qualified": true,
+          "backfilled": true,
+          "eligible_jobs": 5.83,
+          "new_jobs_created": 3.91,
+          "high_water_mark": 16.83,
+          "annual_credit_usd": 20405,
+          "is_base_year": false,
+          "status": "above_minimum"
+        },
+        {
+          "tax_year": 2023,
+          "month_totals": [
+            19.0,
+            19.0,
+            19.0,
+            19.0,
+            20.0,
+            20.0,
+            21.0,
+            21.0,
+            21.0,
+            21.0,
+            21.0,
+            21.0
+          ],
+          "total": 242.0,
+          "average_headcount": 20.17,
+          "months_with_headcount": 12,
+          "feins": [
+            "001000001"
+          ],
+          "tier": 1,
+          "designation": "T1",
+          "tier_source": "prototype",
+          "net_new": 9.17,
+          "threshold": 2.0,
+          "qualified": true,
+          "backfilled": false,
+          "eligible_jobs": 9.17,
+          "new_jobs_created": 3.34,
+          "high_water_mark": 20.17,
+          "annual_credit_usd": 32095,
+          "is_base_year": false,
+          "status": "above_minimum"
+        },
+        {
+          "tax_year": 2024,
+          "month_totals": [
+            25.0,
+            25.0,
+            25.0,
+            25.0,
+            25.0,
+            25.0,
+            24.0,
+            25.0,
+            25.0,
+            26.0,
+            24.0,
+            0.0
+          ],
+          "total": 274.0,
+          "average_headcount": 22.83,
+          "months_with_headcount": 11,
+          "feins": [
+            "001000001"
+          ],
+          "tier": 1,
+          "designation": "T1",
+          "tier_source": "prototype",
+          "net_new": 11.83,
+          "threshold": 2.0,
+          "qualified": true,
+          "backfilled": false,
+          "eligible_jobs": 11.83,
+          "new_jobs_created": 2.66,
+          "high_water_mark": 22.83,
+          "annual_credit_usd": 41405,
+          "is_base_year": false,
+          "status": "above_minimum"
+        },
+        {
+          "tax_year": 2025,
+          "month_totals": [
+            27.0,
+            26.0,
+            24.0,
+            24.0,
+            24.0,
+            24.0,
+            24.0,
+            24.0,
+            23.0,
+            23.0,
+            22.0,
+            22.0
+          ],
+          "total": 287.0,
+          "average_headcount": 23.92,
+          "months_with_headcount": 12,
+          "feins": [
+            "001000001"
+          ],
+          "tier": 1,
+          "designation": "T1",
+          "tier_source": "prototype",
+          "net_new": 12.92,
+          "threshold": 2.0,
+          "qualified": true,
+          "backfilled": false,
+          "eligible_jobs": 12.92,
+          "new_jobs_created": 1.09,
+          "high_water_mark": 23.92,
+          "annual_credit_usd": 45220,
+          "is_base_year": false,
+          "status": "above_minimum"
+        },
+        {
+          "tax_year": 2026,
+          "month_totals": [
+            21.0,
+            21.0,
+            21.0,
+            21.0,
+            20.0,
+            20.0,
+            20.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "total": 144.0,
+          "average_headcount": 12.0,
+          "months_with_headcount": 7,
+          "feins": [
+            "001000001"
+          ],
+          "tier": 1,
+          "designation": "T1",
+          "tier_source": "prototype",
+          "net_new": 1.0,
+          "threshold": 2.0,
+          "qualified": false,
+          "backfilled": false,
+          "eligible_jobs": 0.0,
+          "new_jobs_created": 0.0,
+          "high_water_mark": 23.92,
+          "annual_credit_usd": 0,
+          "is_base_year": false,
+          "status": "below_minimum"
+        }
+      ],
+      "credit_years": [
+        {
+          "tax_year": 2020,
+          "claimable_usd": 0,
+          "from_creation_years": [],
+          "projected": false
+        },
+        {
+          "tax_year": 2021,
+          "claimable_usd": 0,
+          "from_creation_years": [],
+          "projected": false
+        },
+        {
+          "tax_year": 2022,
+          "claimable_usd": 13685,
+          "from_creation_years": [
+            2022
+          ],
+          "projected": false
+        },
+        {
+          "tax_year": 2023,
+          "claimable_usd": 25375,
+          "from_creation_years": [
+            2022,
+            2023
+          ],
+          "projected": false
+        },
+        {
+          "tax_year": 2024,
+          "claimable_usd": 34685,
+          "from_creation_years": [
+            2022,
+            2023,
+            2024
+          ],
+          "projected": false
+        },
+        {
+          "tax_year": 2025,
+          "claimable_usd": 38500,
+          "from_creation_years": [
+            2022,
+            2023,
+            2024,
+            2025
+          ],
+          "projected": false
+        },
+        {
+          "tax_year": 2026,
+          "claimable_usd": 14000,
+          "from_creation_years": [
+            2022,
+            2023,
+            2024,
+            2025
+          ],
+          "projected": false
+        },
+        {
+          "tax_year": 2027,
+          "claimable_usd": 24815,
+          "from_creation_years": [
+            2023,
+            2024,
+            2025
+          ],
+          "projected": true
+        }
+      ],
+      "total_annual_credit_usd": 139125,
+      "total_tranche_lifetime_usd": 168000,
+      "final_high_water_mark": 23.92
+    },
+    {
+      "unit_id": "GA_GA-013",
+      "worksite_id": "GA_GA-013",
+      "name": "GA_GA-013",
+      "feins": [
+        "001000001"
+      ],
+      "county": "Fulton",
+      "city": "",
+      "census_tract": "",
+      "base_year": 2020,
+      "base_year_source": "inferred",
+      "base_average_headcount": 11.0,
+      "threshold": 2.0,
+      "threshold_source": "designation",
+      "rows": [
+        {
+          "tax_year": 2020,
+          "month_totals": [
+            12.0,
+            12.0,
+            12.0,
+            12.0,
+            12.0,
+            12.0,
+            12.0,
+            12.0,
+            12.0,
+            12.0,
+            12.0,
+            0.0
+          ],
+          "total": 132.0,
+          "average_headcount": 11.0,
+          "months_with_headcount": 11,
+          "feins": [
+            "001000001"
+          ],
+          "tier": 1,
+          "designation": "T1",
+          "tier_source": "prototype",
+          "net_new": 0.0,
+          "threshold": 2.0,
+          "qualified": false,
+          "backfilled": false,
+          "eligible_jobs": 0.0,
+          "new_jobs_created": 0.0,
+          "high_water_mark": 0.0,
+          "annual_credit_usd": 0,
+          "is_base_year": true,
+          "status": "base"
+        },
+        {
+          "tax_year": 2021,
+          "month_totals": [
+            17.0,
+            17.0,
+            17.0,
+            17.0,
+            17.0,
+            17.0,
+            18.0,
+            19.0,
+            19.0,
+            19.0,
+            19.0,
+            19.0
+          ],
+          "total": 215.0,
+          "average_headcount": 17.92,
+          "months_with_headcount": 12,
+          "feins": [
+            "001000001"
+          ],
+          "tier": 1,
+          "designation": "T1 B40",
+          "tier_source": "prototype",
+          "net_new": 6.92,
+          "threshold": 2.0,
+          "qualified": true,
+          "backfilled": false,
+          "eligible_jobs": 6.92,
+          "new_jobs_created": 6.92,
+          "high_water_mark": 17.92,
+          "annual_credit_usd": 24220,
+          "is_base_year": false,
+          "status": "above_minimum"
+        },
+        {
+          "tax_year": 2022,
+          "month_totals": [
+            19.0,
+            19.0,
+            19.0,
+            20.0,
+            20.0,
+            20.0,
+            20.0,
+            20.0,
+            20.0,
+            19.0,
+            19.0,
+            19.0
+          ],
+          "total": 234.0,
+          "average_headcount": 19.5,
+          "months_with_headcount": 12,
+          "feins": [
+            "001000001"
+          ],
+          "tier": 1,
+          "designation": "T1",
+          "tier_source": "prototype",
+          "net_new": 8.5,
+          "threshold": 2.0,
+          "qualified": true,
+          "backfilled": false,
+          "eligible_jobs": 8.5,
+          "new_jobs_created": 1.58,
+          "high_water_mark": 19.5,
+          "annual_credit_usd": 29750,
+          "is_base_year": false,
+          "status": "above_minimum"
+        },
+        {
+          "tax_year": 2023,
+          "month_totals": [
+            20.0,
+            20.0,
+            20.0,
+            20.0,
+            20.0,
+            20.0,
+            20.0,
+            18.0,
+            17.0,
+            17.0,
+            16.0,
+            16.0
+          ],
+          "total": 224.0,
+          "average_headcount": 18.67,
+          "months_with_headcount": 12,
+          "feins": [
+            "001000001"
+          ],
+          "tier": 1,
+          "designation": "T1",
+          "tier_source": "prototype",
+          "net_new": 7.67,
+          "threshold": 2.0,
+          "qualified": true,
+          "backfilled": false,
+          "eligible_jobs": 7.67,
+          "new_jobs_created": 0.0,
+          "high_water_mark": 19.5,
+          "annual_credit_usd": 26845,
+          "is_base_year": false,
+          "status": "above_minimum"
+        },
+        {
+          "tax_year": 2024,
+          "month_totals": [
+            19.0,
+            19.0,
+            19.0,
+            19.0,
+            20.0,
+            20.0,
+            21.0,
+            21.0,
+            20.0,
+            19.0,
+            20.0,
+            0.0
+          ],
+          "total": 217.0,
+          "average_headcount": 18.08,
+          "months_with_headcount": 11,
+          "feins": [
+            "001000001"
+          ],
+          "tier": 1,
+          "designation": "T1",
+          "tier_source": "prototype",
+          "net_new": 7.08,
+          "threshold": 2.0,
+          "qualified": true,
+          "backfilled": false,
+          "eligible_jobs": 7.08,
+          "new_jobs_created": 0.0,
+          "high_water_mark": 19.5,
+          "annual_credit_usd": 24780,
+          "is_base_year": false,
+          "status": "above_minimum"
+        },
+        {
+          "tax_year": 2025,
+          "month_totals": [
+            20.0,
+            20.0,
+            20.0,
+            20.0,
+            20.0,
+            20.0,
+            18.0,
+            18.0,
+            18.0,
+            18.0,
+            17.0,
+            17.0
+          ],
+          "total": 226.0,
+          "average_headcount": 18.83,
+          "months_with_headcount": 12,
+          "feins": [
+            "001000001"
+          ],
+          "tier": 1,
+          "designation": "T1",
+          "tier_source": "prototype",
+          "net_new": 7.83,
+          "threshold": 2.0,
+          "qualified": true,
+          "backfilled": false,
+          "eligible_jobs": 7.83,
+          "new_jobs_created": 0.0,
+          "high_water_mark": 19.5,
+          "annual_credit_usd": 27405,
+          "is_base_year": false,
+          "status": "above_minimum"
+        },
+        {
+          "tax_year": 2026,
+          "month_totals": [
+            18.0,
+            18.0,
+            18.0,
+            18.0,
+            18.0,
+            17.0,
+            17.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "total": 124.0,
+          "average_headcount": 10.33,
+          "months_with_headcount": 7,
+          "feins": [
+            "001000001"
+          ],
+          "tier": 1,
+          "designation": "T1",
+          "tier_source": "prototype",
+          "net_new": 0.0,
+          "threshold": 2.0,
+          "qualified": false,
+          "backfilled": false,
+          "eligible_jobs": 0.0,
+          "new_jobs_created": 0.0,
+          "high_water_mark": 19.5,
+          "annual_credit_usd": 0,
+          "is_base_year": false,
+          "status": "below_minimum"
+        }
+      ],
+      "credit_years": [
+        {
+          "tax_year": 2020,
+          "claimable_usd": 0,
+          "from_creation_years": [],
+          "projected": false
+        },
+        {
+          "tax_year": 2021,
+          "claimable_usd": 24220,
+          "from_creation_years": [
+            2021
+          ],
+          "projected": false
+        },
+        {
+          "tax_year": 2022,
+          "claimable_usd": 29750,
+          "from_creation_years": [
+            2021,
+            2022
+          ],
+          "projected": false
+        },
+        {
+          "tax_year": 2023,
+          "claimable_usd": 29750,
+          "from_creation_years": [
+            2021,
+            2022
+          ],
+          "projected": false
+        },
+        {
+          "tax_year": 2024,
+          "claimable_usd": 29750,
+          "from_creation_years": [
+            2021,
+            2022
+          ],
+          "projected": false
+        },
+        {
+          "tax_year": 2025,
+          "claimable_usd": 29750,
+          "from_creation_years": [
+            2021,
+            2022
+          ],
+          "projected": false
+        },
+        {
+          "tax_year": 2026,
+          "claimable_usd": 0,
+          "from_creation_years": [
+            2022
+          ],
+          "projected": false
+        },
+        {
+          "tax_year": 2027,
+          "claimable_usd": 0,
+          "from_creation_years": [],
+          "projected": true
+        }
+      ],
+      "total_annual_credit_usd": 133000,
+      "total_tranche_lifetime_usd": 143220,
+      "final_high_water_mark": 19.5
+    },
+    {
+      "unit_id": "GA_GA-016",
+      "worksite_id": "GA_GA-016",
+      "name": "GA_GA-016",
+      "feins": [
+        "001000001"
+      ],
+      "county": "Lowndes",
+      "city": "",
+      "census_tract": "",
+      "base_year": 2023,
+      "base_year_source": "inferred",
+      "base_average_headcount": 12.0,
+      "threshold": 2.0,
+      "threshold_source": "designation",
+      "rows": [
+        {
+          "tax_year": 2023,
+          "month_totals": [
+            11.0,
+            11.0,
+            12.0,
+            12.0,
+            12.0,
+            12.0,
+            12.0,
+            12.0,
+            12.0,
+            12.0,
+            13.0,
+            13.0
+          ],
+          "total": 144.0,
+          "average_headcount": 12.0,
+          "months_with_headcount": 12,
+          "feins": [
+            "001000001"
+          ],
+          "tier": 1,
+          "designation": "T1",
+          "tier_source": "prototype",
+          "net_new": 0.0,
+          "threshold": 2.0,
+          "qualified": false,
+          "backfilled": false,
+          "eligible_jobs": 0.0,
+          "new_jobs_created": 0.0,
+          "high_water_mark": 0.0,
+          "annual_credit_usd": 0,
+          "is_base_year": true,
+          "status": "base"
+        },
+        {
+          "tax_year": 2024,
+          "month_totals": [
+            18.0,
+            18.0,
+            18.0,
+            18.0,
+            18.0,
+            18.0,
+            17.0,
+            16.0,
+            15.0,
+            15.0,
+            15.0,
+            0.0
+          ],
+          "total": 186.0,
+          "average_headcount": 15.5,
+          "months_with_headcount": 11,
+          "feins": [
+            "001000001"
+          ],
+          "tier": 1,
+          "designation": "T1",
+          "tier_source": "prototype",
+          "net_new": 3.5,
+          "threshold": 2.0,
+          "qualified": true,
+          "backfilled": false,
+          "eligible_jobs": 3.5,
+          "new_jobs_created": 3.5,
+          "high_water_mark": 15.5,
+          "annual_credit_usd": 12250,
+          "is_base_year": false,
+          "status": "above_minimum"
+        },
+        {
+          "tax_year": 2025,
+          "month_totals": [
+            17.0,
+            17.0,
+            17.0,
+            17.0,
+            16.0,
+            16.0,
+            16.0,
+            16.0,
+            15.0,
+            15.0,
+            15.0,
+            15.0
+          ],
+          "total": 192.0,
+          "average_headcount": 16.0,
+          "months_with_headcount": 12,
+          "feins": [
+            "001000001"
+          ],
+          "tier": 1,
+          "designation": "T1",
+          "tier_source": "prototype",
+          "net_new": 4.0,
+          "threshold": 2.0,
+          "qualified": true,
+          "backfilled": false,
+          "eligible_jobs": 4.0,
+          "new_jobs_created": 0.5,
+          "high_water_mark": 16.0,
+          "annual_credit_usd": 14000,
+          "is_base_year": false,
+          "status": "above_minimum"
+        },
+        {
+          "tax_year": 2026,
+          "month_totals": [
+            17.0,
+            15.0,
+            15.0,
+            13.0,
+            11.0,
+            11.0,
+            13.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "total": 95.0,
+          "average_headcount": 7.92,
+          "months_with_headcount": 7,
+          "feins": [
+            "001000001"
+          ],
+          "tier": 1,
+          "designation": "T1",
+          "tier_source": "prototype",
+          "net_new": 0.0,
+          "threshold": 2.0,
+          "qualified": false,
+          "backfilled": false,
+          "eligible_jobs": 0.0,
+          "new_jobs_created": 0.0,
+          "high_water_mark": 16.0,
+          "annual_credit_usd": 0,
+          "is_base_year": false,
+          "status": "below_minimum"
+        }
+      ],
+      "credit_years": [
+        {
+          "tax_year": 2023,
+          "claimable_usd": 0,
+          "from_creation_years": [],
+          "projected": false
+        },
+        {
+          "tax_year": 2024,
+          "claimable_usd": 12250,
+          "from_creation_years": [
+            2024
+          ],
+          "projected": false
+        },
+        {
+          "tax_year": 2025,
+          "claimable_usd": 14000,
+          "from_creation_years": [
+            2024,
+            2025
+          ],
+          "projected": false
+        },
+        {
+          "tax_year": 2026,
+          "claimable_usd": 0,
+          "from_creation_years": [
+            2024,
+            2025
+          ],
+          "projected": false
+        },
+        {
+          "tax_year": 2027,
+          "claimable_usd": 14000,
+          "from_creation_years": [
+            2024,
+            2025
+          ],
+          "projected": true
+        },
+        {
+          "tax_year": 2028,
+          "claimable_usd": 14000,
+          "from_creation_years": [
+            2024,
+            2025
+          ],
+          "projected": true
+        },
+        {
+          "tax_year": 2029,
+          "claimable_usd": 1750,
+          "from_creation_years": [
+            2025
+          ],
+          "projected": true
+        },
+        {
+          "tax_year": 2030,
+          "claimable_usd": 0,
+          "from_creation_years": [],
+          "projected": true
+        }
+      ],
+      "total_annual_credit_usd": 26250,
+      "total_tranche_lifetime_usd": 56000,
+      "final_high_water_mark": 16.0
+    }
+  ],
+  "year_meta": [
+    {
+      "tax_year": 2020,
+      "fiscal": {
+        "begin": "2020-01-01",
+        "end": "2020-12-31",
+        "tax_year": 2020,
+        "label_convention": "begins",
+        "basis": "client_rules",
+        "assumed": false,
+        "is_calendar": true,
+        "convention_matters": false,
+        "tax_year_if_labelled_by_end": 2020,
+        "tax_year_if_labelled_by_begin": 2020,
+        "note": "From EntityFiscalYearRules for account 2001 (Calendar year)."
+      },
+      "months": [
+        "2020-01-31",
+        "2020-02-29",
+        "2020-03-31",
+        "2020-04-30",
+        "2020-05-31",
+        "2020-06-30",
+        "2020-07-31",
+        "2020-08-31",
+        "2020-09-30",
+        "2020-10-31",
+        "2020-11-30",
+        "2020-12-31"
+      ],
+      "unreachable_months": [
+        11
+      ],
+      "months_reachable": 11,
+      "thresholds": {
+        "program_code": "GA_JTC",
+        "tax_year": 2020,
+        "minimum_average_weekly_hours": 35.0,
+        "minimum_average_weekly_wages_usd": 541.0,
+        "wage_table_year_basis": "source_tax_year",
+        "regulation": "110-9-1-.02(1)(a) and 110-9-1-.03(3)(b)1",
+        "source_tax_year": 2020,
+        "dol_report_year": 2019,
+        "lowest_wage_county": "Glascock",
+        "annualized_wage_usd": 28132.0,
+        "prototype_verify": false,
+        "source": "rules/ga_jtc/2020.json"
+      },
+      "eligible_employees": 83,
+      "annual_average": 76.08,
+      "benefit": {
+        "threshold": 2.0,
+        "per_job_usd": 3500.0,
+        "benefit_period_years": 5,
+        "year_resolved": true
+      }
+    },
+    {
+      "tax_year": 2021,
+      "fiscal": {
+        "begin": "2021-01-01",
+        "end": "2021-12-31",
+        "tax_year": 2021,
+        "label_convention": "begins",
+        "basis": "client_rules",
+        "assumed": false,
+        "is_calendar": true,
+        "convention_matters": false,
+        "tax_year_if_labelled_by_end": 2021,
+        "tax_year_if_labelled_by_begin": 2021,
+        "note": "From EntityFiscalYearRules for account 2001 (Calendar year), shifted +1 year(s) from the stored base window 2020-01-01..2020-12-31."
+      },
+      "months": [
+        "2021-01-31",
+        "2021-02-28",
+        "2021-03-31",
+        "2021-04-30",
+        "2021-05-31",
+        "2021-06-30",
+        "2021-07-31",
+        "2021-08-31",
+        "2021-09-30",
+        "2021-10-31",
+        "2021-11-30",
+        "2021-12-31"
+      ],
+      "unreachable_months": [
+        11
+      ],
+      "months_reachable": 11,
+      "thresholds": {
+        "program_code": "GA_JTC",
+        "tax_year": 2021,
+        "minimum_average_weekly_hours": 35.0,
+        "minimum_average_weekly_wages_usd": 589.0,
+        "wage_table_year_basis": "source_tax_year",
+        "regulation": "110-9-1-.02(1)(a) and 110-9-1-.03(3)(b)1",
+        "source_tax_year": 2021,
+        "dol_report_year": 2020,
+        "lowest_wage_county": "Glascock",
+        "annualized_wage_usd": 30628.0,
+        "prototype_verify": false,
+        "source": "rules/ga_jtc/2021.json"
+      },
+      "eligible_employees": 106,
+      "annual_average": 96.84,
+      "benefit": {
+        "threshold": 2.0,
+        "per_job_usd": 3500.0,
+        "benefit_period_years": 5,
+        "year_resolved": true
+      }
+    },
+    {
+      "tax_year": 2022,
+      "fiscal": {
+        "begin": "2022-01-01",
+        "end": "2022-12-31",
+        "tax_year": 2022,
+        "label_convention": "begins",
+        "basis": "client_rules",
+        "assumed": false,
+        "is_calendar": true,
+        "convention_matters": false,
+        "tax_year_if_labelled_by_end": 2022,
+        "tax_year_if_labelled_by_begin": 2022,
+        "note": "From EntityFiscalYearRules for account 2001 (Calendar year), shifted +2 year(s) from the stored base window 2020-01-01..2020-12-31."
+      },
+      "months": [
+        "2022-01-31",
+        "2022-02-28",
+        "2022-03-31",
+        "2022-04-30",
+        "2022-05-31",
+        "2022-06-30",
+        "2022-07-31",
+        "2022-08-31",
+        "2022-09-30",
+        "2022-10-31",
+        "2022-11-30",
+        "2022-12-31"
+      ],
+      "unreachable_months": [
+        11
+      ],
+      "months_reachable": 11,
+      "thresholds": {
+        "program_code": "GA_JTC",
+        "tax_year": 2022,
+        "minimum_average_weekly_hours": 35.0,
+        "minimum_average_weekly_wages_usd": 602.0,
+        "wage_table_year_basis": "source_tax_year",
+        "regulation": "110-9-1-.02(1)(a) and 110-9-1-.03(3)(b)1",
+        "source_tax_year": 2022,
+        "dol_report_year": 2021,
+        "lowest_wage_county": "Glascock",
+        "annualized_wage_usd": 31304.0,
+        "prototype_verify": false,
+        "source": "rules/ga_jtc/2022.json"
+      },
+      "eligible_employees": 112,
+      "annual_average": 107.08,
+      "benefit": {
+        "threshold": 2.0,
+        "per_job_usd": 3500.0,
+        "benefit_period_years": 5,
+        "year_resolved": true
+      }
+    },
+    {
+      "tax_year": 2023,
+      "fiscal": {
+        "begin": "2023-01-01",
+        "end": "2023-12-31",
+        "tax_year": 2023,
+        "label_convention": "begins",
+        "basis": "client_rules",
+        "assumed": false,
+        "is_calendar": true,
+        "convention_matters": false,
+        "tax_year_if_labelled_by_end": 2023,
+        "tax_year_if_labelled_by_begin": 2023,
+        "note": "From EntityFiscalYearRules for account 2001 (Calendar year), shifted +3 year(s) from the stored base window 2020-01-01..2020-12-31."
+      },
+      "months": [
+        "2023-01-31",
+        "2023-02-28",
+        "2023-03-31",
+        "2023-04-30",
+        "2023-05-31",
+        "2023-06-30",
+        "2023-07-31",
+        "2023-08-31",
+        "2023-09-30",
+        "2023-10-31",
+        "2023-11-30",
+        "2023-12-31"
+      ],
+      "unreachable_months": [
+        11
+      ],
+      "months_reachable": 11,
+      "thresholds": {
+        "program_code": "GA_JTC",
+        "tax_year": 2023,
+        "minimum_average_weekly_hours": 35.0,
+        "minimum_average_weekly_wages_usd": 636.0,
+        "wage_table_year_basis": "source_tax_year",
+        "regulation": "110-9-1-.02(1)(a) and 110-9-1-.03(3)(b)1",
+        "source_tax_year": 2023,
+        "dol_report_year": 2022,
+        "lowest_wage_county": "Glascock",
+        "annualized_wage_usd": 33072.0,
+        "prototype_verify": false,
+        "source": "rules/ga_jtc/2023.json"
+      },
+      "eligible_employees": 133,
+      "annual_average": 121.01,
+      "benefit": {
+        "threshold": 2.0,
+        "per_job_usd": 3500.0,
+        "benefit_period_years": 5,
+        "year_resolved": true
+      }
+    },
+    {
+      "tax_year": 2024,
+      "fiscal": {
+        "begin": "2024-01-01",
+        "end": "2024-12-31",
+        "tax_year": 2024,
+        "label_convention": "begins",
+        "basis": "client_rules",
+        "assumed": false,
+        "is_calendar": true,
+        "convention_matters": false,
+        "tax_year_if_labelled_by_end": 2024,
+        "tax_year_if_labelled_by_begin": 2024,
+        "note": "From EntityFiscalYearRules for account 2001 (Calendar year), shifted +4 year(s) from the stored base window 2020-01-01..2020-12-31."
+      },
+      "months": [
+        "2024-01-31",
+        "2024-02-29",
+        "2024-03-31",
+        "2024-04-30",
+        "2024-05-31",
+        "2024-06-30",
+        "2024-07-31",
+        "2024-08-31",
+        "2024-09-30",
+        "2024-10-31",
+        "2024-11-30",
+        "2024-12-31"
+      ],
+      "unreachable_months": [
+        11
+      ],
+      "months_reachable": 11,
+      "thresholds": {
+        "program_code": "GA_JTC",
+        "tax_year": 2024,
+        "minimum_average_weekly_hours": 35.0,
+        "minimum_average_weekly_wages_usd": 686.0,
+        "wage_table_year_basis": "source_tax_year",
+        "regulation": "110-9-1-.02(1)(a) and 110-9-1-.03(3)(b)1",
+        "source_tax_year": 2024,
+        "dol_report_year": 2023,
+        "lowest_wage_county": "Taliaferro",
+        "annualized_wage_usd": 35672.0,
+        "prototype_verify": false,
+        "source": "rules/ga_jtc/2024.json"
+      },
+      "eligible_employees": 146,
+      "annual_average": 122.24,
+      "benefit": {
+        "threshold": 2.0,
+        "per_job_usd": 3500.0,
+        "benefit_period_years": 5,
+        "year_resolved": true
+      }
+    },
+    {
+      "tax_year": 2025,
+      "fiscal": {
+        "begin": "2025-01-01",
+        "end": "2025-12-31",
+        "tax_year": 2025,
+        "label_convention": "begins",
+        "basis": "client_rules",
+        "assumed": false,
+        "is_calendar": true,
+        "convention_matters": false,
+        "tax_year_if_labelled_by_end": 2025,
+        "tax_year_if_labelled_by_begin": 2025,
+        "note": "From EntityFiscalYearRules for account 2001 (Calendar year), shifted +5 year(s) from the stored base window 2020-01-01..2020-12-31."
+      },
+      "months": [
+        "2025-01-31",
+        "2025-02-28",
+        "2025-03-31",
+        "2025-04-30",
+        "2025-05-31",
+        "2025-06-30",
+        "2025-07-31",
+        "2025-08-31",
+        "2025-09-30",
+        "2025-10-31",
+        "2025-11-30",
+        "2025-12-31"
+      ],
+      "unreachable_months": [
+        11
+      ],
+      "months_reachable": 11,
+      "thresholds": {
+        "program_code": "GA_JTC",
+        "tax_year": 2025,
+        "minimum_average_weekly_hours": 35.0,
+        "minimum_average_weekly_wages_usd": 680.0,
+        "wage_table_year_basis": "source_tax_year",
+        "regulation": "110-9-1-.02(1)(a) and 110-9-1-.03(3)(b)1",
+        "source_tax_year": 2025,
+        "dol_report_year": 2024,
+        "lowest_wage_county": "Taliaferro",
+        "annualized_wage_usd": 35360.0,
+        "prototype_verify": false,
+        "source": "rules/ga_jtc/2025.json"
+      },
+      "eligible_employees": 143,
+      "annual_average": 129.01,
+      "benefit": {
+        "threshold": 2.0,
+        "per_job_usd": 3500.0,
+        "benefit_period_years": 5,
+        "year_resolved": true
+      }
+    },
+    {
+      "tax_year": 2026,
+      "fiscal": {
+        "begin": "2026-01-01",
+        "end": "2026-12-31",
+        "tax_year": 2026,
+        "label_convention": "begins",
+        "basis": "client_rules",
+        "assumed": false,
+        "is_calendar": true,
+        "convention_matters": false,
+        "tax_year_if_labelled_by_end": 2026,
+        "tax_year_if_labelled_by_begin": 2026,
+        "note": "From EntityFiscalYearRules for account 2001 (Calendar year), shifted +6 year(s) from the stored base window 2020-01-01..2020-12-31."
+      },
+      "months": [
+        "2026-01-31",
+        "2026-02-28",
+        "2026-03-31",
+        "2026-04-30",
+        "2026-05-31",
+        "2026-06-30",
+        "2026-07-31",
+        "2026-08-31",
+        "2026-09-30",
+        "2026-10-31",
+        "2026-11-30",
+        "2026-12-31"
+      ],
+      "unreachable_months": [
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "months_reachable": 7,
+      "thresholds": {
+        "program_code": "GA_JTC",
+        "tax_year": 2026,
+        "minimum_average_weekly_hours": 35.0,
+        "minimum_average_weekly_wages_usd": 680.0,
+        "wage_table_year_basis": "source_tax_year",
+        "regulation": "110-9-1-.02(1)(a) and 110-9-1-.03(3)(b)1",
+        "source_tax_year": 2026,
+        "dol_report_year": 2025,
+        "lowest_wage_county": null,
+        "annualized_wage_usd": null,
+        "prototype_verify": true,
+        "source": "rules/ga_jtc/2026.json"
+      },
+      "eligible_employees": 139,
+      "annual_average": 70.17,
+      "benefit": {
+        "threshold": 2.0,
+        "per_job_usd": 3500.0,
+        "benefit_period_years": 5,
+        "year_resolved": true
+      }
+    }
+  ],
+  "totals": {
+    "units": 6,
+    "annual_credit_usd": 545860,
+    "tranche_lifetime_usd": 667520
+  },
+  "disclosures": [
+    {
+      "code": "DISC-8",
+      "subject": "base year",
+      "text": "The frozen base year and its high-water-mark treatment are read from a verbal SME description and are not yet confirmed against the Georgia Job Tax Credit form."
+    },
+    {
+      "code": "DISC-10",
+      "subject": "tier",
+      "text": "Tier designations are prototype data covering four worksites. Units outside that registry are shown unassigned and fall back to the rule pack's minimum-new-jobs threshold."
+    },
+    {
+      "code": "TIER-FLAT",
+      "subject": "credit amount",
+      "text": "Claimable dollars use one statutory amount per qualifying job. Tier-varied amounts are not authored in any rule pack, so a Tier 2 location is priced at the Tier 1 rate."
+    },
+    {
+      "code": "NO-TRACT",
+      "subject": "census tract",
+      "text": "Census tract is not held anywhere in the system and is left blank."
+    },
+    {
+      "code": "NO-MEASURING-DATE",
+      "subject": "month coverage",
+      "text": "No pay period reaches the measuring date in TY2020 month 12, TY2021 month 12, TY2022 month 12, TY2023 month 12, TY2024 month 12, TY2025 month 12, TY2026 months 8/9/10/11/12. Those months read zero as a fact about the pay calendar, not about headcount, and are marked rather than counted as a decline."
+    }
+  ]
+}

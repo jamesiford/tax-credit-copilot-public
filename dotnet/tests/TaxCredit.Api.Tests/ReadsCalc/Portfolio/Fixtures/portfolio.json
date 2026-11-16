@@ -1,0 +1,970 @@
+[
+  {
+    "code": "CO_EZ",
+    "name": "Colorado Enterprise Zone Job Credit",
+    "jurisdiction": "CO",
+    "citation": "C.R.S. § 39-30-105",
+    "basis": "net_new_headcount",
+    "metric_label": "Avg monthly headcount",
+    "metric_value": 11.33,
+    "metric_sublabel": "Prior year 0.0 · 12 eligible employees",
+    "qualifying_jobs": 6.33,
+    "threshold": 5.0,
+    "per_job_label": "$500 per qualifying job",
+    "annual_credit_usd": 3165,
+    "lifetime_credit_usd": 9495,
+    "benefit_period_years": 3,
+    "average_headcount": 11.33,
+    "prior_year_average_headcount": 0.0,
+    "net_new_headcount": 11.33,
+    "part_time_eligible_count": 0,
+    "trend": [
+      12.0,
+      12.0,
+      12.0,
+      12.0,
+      12.0,
+      12.0,
+      12.0,
+      12.0,
+      12.0,
+      12.0,
+      12.0,
+      4.0
+    ],
+    "calculation_trail": [
+      {
+        "step": "Run statutory One/Zero Base Calculation (CO 2025)",
+        "inputs": {
+          "eligible_employees": 12,
+          "part_time_half_weight": 0
+        },
+        "formula": "per-employee 1/0.5/0 by unit per month → Average Monthly Headcount = mean of 12 monthly unit counts",
+        "output": {
+          "average_headcount": 11.33
+        },
+        "citation": "C.R.S. § 39-30-105"
+      },
+      {
+        "step": "Net-new vs prior year (2024)",
+        "inputs": {
+          "current_avg_headcount": 11.33,
+          "prior_avg_headcount": 0.0
+        },
+        "formula": "net_new = max(0, current_avg_headcount - prior_avg_headcount)",
+        "output": {
+          "net_new": 11.33
+        },
+        "citation": "C.R.S. § 39-30-105"
+      },
+      {
+        "step": "Apply 5-job statutory threshold",
+        "inputs": {
+          "net_new": 11.33,
+          "threshold": 5.0
+        },
+        "formula": "qualifying_jobs = max(0, net_new - threshold)",
+        "output": {
+          "qualifying_jobs": 6.33
+        },
+        "citation": "C.R.S. § 39-30-105"
+      },
+      {
+        "step": "Apply benefit math (Colorado Enterprise Zone Job Credit)",
+        "inputs": {
+          "qualifying_jobs": 6.33,
+          "amount_per_job_usd": 500.0
+        },
+        "formula": "annual = qualifying_jobs * amount_per_job; lifetime = annual * benefit_years",
+        "output": {
+          "annual_credit_usd": 3165,
+          "lifetime_credit_usd": 9495
+        },
+        "citation": "C.R.S. § 39-30-105"
+      }
+    ],
+    "filing": {
+      "window": "Form DR 0074 with state return",
+      "cycle": "annual"
+    },
+    "why_surfaced": "11.33 net-new average headcount (current 11.33 vs prior 0.0) vs 5-job threshold → 6.33 qualifying"
+  },
+  {
+    "code": "FL_QTI",
+    "name": "Florida Qualified Target Industry Tax Refund",
+    "jurisdiction": "FL",
+    "citation": "F.S. § 288.106",
+    "basis": "net_new_headcount",
+    "metric_label": "Avg monthly headcount",
+    "metric_value": 2.58,
+    "metric_sublabel": "Prior year 0.0 · 10 eligible employees",
+    "qualifying_jobs": 0.0,
+    "threshold": 10.0,
+    "per_job_label": "$3,000 per qualifying job",
+    "annual_credit_usd": 0,
+    "lifetime_credit_usd": 0,
+    "benefit_period_years": 7,
+    "average_headcount": 2.58,
+    "prior_year_average_headcount": 0.0,
+    "net_new_headcount": 2.58,
+    "part_time_eligible_count": 0,
+    "trend": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      3.0,
+      3.0,
+      4.0,
+      5.0,
+      6.0,
+      8.0,
+      2.0
+    ],
+    "calculation_trail": [
+      {
+        "step": "Run statutory One/Zero Base Calculation (FL 2025)",
+        "inputs": {
+          "eligible_employees": 10,
+          "part_time_half_weight": 0
+        },
+        "formula": "per-employee 1/0.5/0 by unit per month → Average Monthly Headcount = mean of 12 monthly unit counts",
+        "output": {
+          "average_headcount": 2.58
+        },
+        "citation": "F.S. § 288.106"
+      },
+      {
+        "step": "Net-new vs prior year (2024)",
+        "inputs": {
+          "current_avg_headcount": 2.58,
+          "prior_avg_headcount": 0.0
+        },
+        "formula": "net_new = max(0, current_avg_headcount - prior_avg_headcount)",
+        "output": {
+          "net_new": 2.58
+        },
+        "citation": "F.S. § 288.106"
+      },
+      {
+        "step": "Apply 10-job statutory threshold",
+        "inputs": {
+          "net_new": 2.58,
+          "threshold": 10.0
+        },
+        "formula": "qualifying_jobs = max(0, net_new - threshold)",
+        "output": {
+          "qualifying_jobs": 0.0
+        },
+        "citation": "F.S. § 288.106"
+      },
+      {
+        "step": "Apply benefit math (Florida Qualified Target Industry Tax Refund)",
+        "inputs": {
+          "qualifying_jobs": 0.0,
+          "amount_per_job_usd": 3000.0
+        },
+        "formula": "annual = qualifying_jobs * amount_per_job; lifetime = annual * benefit_years",
+        "output": {
+          "annual_credit_usd": 0,
+          "lifetime_credit_usd": 0
+        },
+        "citation": "F.S. § 288.106"
+      }
+    ],
+    "filing": {
+      "window": "Pre-application required before hiring",
+      "cycle": "pre-application"
+    },
+    "why_surfaced": "2.58 net-new average headcount (current 2.58 vs prior 0.0) vs 10-job threshold → 0.0 qualifying"
+  },
+  {
+    "code": "GA_JTC",
+    "name": "Georgia Jobs Tax Credit",
+    "jurisdiction": "GA",
+    "citation": "OCGA § 48-7-40",
+    "basis": "net_new_headcount",
+    "metric_label": "Avg monthly headcount",
+    "metric_value": 61.0,
+    "metric_sublabel": "Prior year 40.0 · 72 eligible employees",
+    "qualifying_jobs": 19.0,
+    "threshold": 2.0,
+    "per_job_label": "$3,500 per qualifying job",
+    "annual_credit_usd": 66500,
+    "lifetime_credit_usd": 332500,
+    "benefit_period_years": 5,
+    "average_headcount": 61.0,
+    "prior_year_average_headcount": 40.0,
+    "net_new_headcount": 21.0,
+    "part_time_eligible_count": 0,
+    "trend": [
+      62.0,
+      64.0,
+      68.0,
+      67.0,
+      66.0,
+      66.0,
+      65.0,
+      65.0,
+      65.0,
+      67.0,
+      66.0,
+      11.0
+    ],
+    "calculation_trail": [
+      {
+        "step": "Run statutory One/Zero Base Calculation (GA 2025)",
+        "inputs": {
+          "eligible_employees": 72,
+          "part_time_half_weight": 0
+        },
+        "formula": "per-employee 1/0.5/0 by unit per month → Average Monthly Headcount = mean of 12 monthly unit counts",
+        "output": {
+          "average_headcount": 61.0
+        },
+        "citation": "OCGA § 48-7-40"
+      },
+      {
+        "step": "Net-new vs prior year (2024)",
+        "inputs": {
+          "current_avg_headcount": 61.0,
+          "prior_avg_headcount": 40.0
+        },
+        "formula": "net_new = max(0, current_avg_headcount - prior_avg_headcount)",
+        "output": {
+          "net_new": 21.0
+        },
+        "citation": "OCGA § 48-7-40"
+      },
+      {
+        "step": "Apply 2-job statutory threshold",
+        "inputs": {
+          "net_new": 21.0,
+          "threshold": 2.0
+        },
+        "formula": "qualifying_jobs = max(0, net_new - threshold)",
+        "output": {
+          "qualifying_jobs": 19.0
+        },
+        "citation": "OCGA § 48-7-40"
+      },
+      {
+        "step": "Apply benefit math (Georgia Jobs Tax Credit)",
+        "inputs": {
+          "qualifying_jobs": 19.0,
+          "amount_per_job_usd": 3500.0
+        },
+        "formula": "annual = qualifying_jobs * amount_per_job; lifetime = annual * benefit_years",
+        "output": {
+          "annual_credit_usd": 66500,
+          "lifetime_credit_usd": 332500
+        },
+        "citation": "OCGA § 48-7-40"
+      }
+    ],
+    "filing": {
+      "window": "With Georgia Form IT-CA at return filing",
+      "cycle": "annual",
+      "_prototype_verify": true,
+      "_disc_ref": "PILOT-06",
+      "form": "IT-CA (Georgia Job Tax Credit)",
+      "attach_to_return": "Georgia Form 600 (C-corp) / 600S (S-corp) / 700 (partnership)",
+      "filing_channel": "Georgia Tax Center (GTC) e-file or with the paper return",
+      "deadline_note": "File with the original Georgia income-tax return for the tax year (including extensions).",
+      "carryforward_years": 10,
+      "required_attachments": [
+        "Form IT-CA with per-county net-new job counts",
+        "Average Monthly Headcount schedule (base year vs credit year)",
+        "Payroll register / evidence pack supporting the One/Zero calculation",
+        "County tier designation reference for the credit year"
+      ],
+      "_note": "Prototype filing guidance for demonstration. Confirm the exact GA DOR form edition, e-file path, and attachment list with the partner (PILOT-06) before any real filing."
+    },
+    "why_surfaced": "21.0 net-new average headcount (current 61.0 vs prior 40.0) vs 2-job threshold → 19.0 qualifying"
+  },
+  {
+    "code": "NC_JTEC",
+    "name": "North Carolina Job Expansion Tax Credit",
+    "jurisdiction": "NC",
+    "citation": "N.C.G.S. § 105-129.87",
+    "basis": "net_new_headcount",
+    "metric_label": "Avg monthly headcount",
+    "metric_value": 24.08,
+    "metric_sublabel": "Prior year 0.0 · 29 eligible employees",
+    "qualifying_jobs": 14.08,
+    "threshold": 10.0,
+    "per_job_label": "$750 per qualifying job",
+    "annual_credit_usd": 10560,
+    "lifetime_credit_usd": 52800,
+    "benefit_period_years": 5,
+    "average_headcount": 24.08,
+    "prior_year_average_headcount": 0.0,
+    "net_new_headcount": 24.08,
+    "part_time_eligible_count": 0,
+    "trend": [
+      25.0,
+      25.0,
+      25.0,
+      25.0,
+      25.0,
+      25.0,
+      25.0,
+      25.0,
+      25.0,
+      25.0,
+      27.0,
+      12.0
+    ],
+    "calculation_trail": [
+      {
+        "step": "Run statutory One/Zero Base Calculation (NC 2025)",
+        "inputs": {
+          "eligible_employees": 29,
+          "part_time_half_weight": 0
+        },
+        "formula": "per-employee 1/0.5/0 by unit per month → Average Monthly Headcount = mean of 12 monthly unit counts",
+        "output": {
+          "average_headcount": 24.08
+        },
+        "citation": "N.C.G.S. § 105-129.87"
+      },
+      {
+        "step": "Net-new vs prior year (2024)",
+        "inputs": {
+          "current_avg_headcount": 24.08,
+          "prior_avg_headcount": 0.0
+        },
+        "formula": "net_new = max(0, current_avg_headcount - prior_avg_headcount)",
+        "output": {
+          "net_new": 24.08
+        },
+        "citation": "N.C.G.S. § 105-129.87"
+      },
+      {
+        "step": "Apply 10-job statutory threshold",
+        "inputs": {
+          "net_new": 24.08,
+          "threshold": 10.0
+        },
+        "formula": "qualifying_jobs = max(0, net_new - threshold)",
+        "output": {
+          "qualifying_jobs": 14.08
+        },
+        "citation": "N.C.G.S. § 105-129.87"
+      },
+      {
+        "step": "Apply benefit math (North Carolina Job Expansion Tax Credit)",
+        "inputs": {
+          "qualifying_jobs": 14.08,
+          "amount_per_job_usd": 750.0
+        },
+        "formula": "annual = qualifying_jobs * amount_per_job; lifetime = annual * benefit_years",
+        "output": {
+          "annual_credit_usd": 10560,
+          "lifetime_credit_usd": 52800
+        },
+        "citation": "N.C.G.S. § 105-129.87"
+      }
+    ],
+    "filing": {
+      "window": "Annual NC-478 attached to return",
+      "cycle": "annual"
+    },
+    "why_surfaced": "24.08 net-new average headcount (current 24.08 vs prior 0.0) vs 10-job threshold → 14.08 qualifying"
+  },
+  {
+    "code": "NY_EXCELSIOR",
+    "name": "New York Excelsior Jobs Program — Jobs Credit",
+    "jurisdiction": "NY",
+    "citation": "NY Tax Law § 31",
+    "basis": "net_new_headcount",
+    "metric_label": "Avg monthly headcount",
+    "metric_value": 10.67,
+    "metric_sublabel": "Prior year 11.08 · 16 eligible employees",
+    "qualifying_jobs": 0.0,
+    "threshold": 2.0,
+    "per_job_label": "$6,599 per qualifying job",
+    "annual_credit_usd": 0,
+    "lifetime_credit_usd": 0,
+    "benefit_period_years": 10,
+    "average_headcount": 10.67,
+    "prior_year_average_headcount": 11.08,
+    "net_new_headcount": 0.0,
+    "part_time_eligible_count": 0,
+    "trend": [
+      15.0,
+      15.0,
+      15.0,
+      12.0,
+      10.0,
+      10.0,
+      10.0,
+      10.0,
+      10.0,
+      10.0,
+      10.0,
+      1.0
+    ],
+    "calculation_trail": [
+      {
+        "step": "Run statutory One/Zero Base Calculation (NY 2025)",
+        "inputs": {
+          "eligible_employees": 16,
+          "part_time_half_weight": 0
+        },
+        "formula": "per-employee 1/0.5/0 by unit per month → Average Monthly Headcount = mean of 12 monthly unit counts",
+        "output": {
+          "average_headcount": 10.67
+        },
+        "citation": "NY Tax Law § 31"
+      },
+      {
+        "step": "Net-new vs prior year (2024)",
+        "inputs": {
+          "current_avg_headcount": 10.67,
+          "prior_avg_headcount": 11.08
+        },
+        "formula": "net_new = max(0, current_avg_headcount - prior_avg_headcount)",
+        "output": {
+          "net_new": 0.0
+        },
+        "citation": "NY Tax Law § 31"
+      },
+      {
+        "step": "Apply 2-job statutory threshold",
+        "inputs": {
+          "net_new": 0.0,
+          "threshold": 2.0
+        },
+        "formula": "qualifying_jobs = max(0, net_new - threshold)",
+        "output": {
+          "qualifying_jobs": 0.0
+        },
+        "citation": "NY Tax Law § 31"
+      },
+      {
+        "step": "Apply benefit math (New York Excelsior Jobs Program — Jobs Credit)",
+        "inputs": {
+          "qualifying_jobs": 0.0,
+          "amount_per_job_usd": 6599
+        },
+        "formula": "annual = qualifying_jobs * amount_per_job; lifetime = annual * benefit_years",
+        "output": {
+          "annual_credit_usd": 0,
+          "lifetime_credit_usd": 0
+        },
+        "citation": "NY Tax Law § 31"
+      }
+    ],
+    "filing": {
+      "window": "FY annual filing via NY ESD certificate",
+      "cycle": "annual"
+    },
+    "why_surfaced": "0.0 net-new average headcount (current 10.67 vs prior 11.08) vs 2-job threshold → 0.0 qualifying"
+  },
+  {
+    "code": "OH_JCTC",
+    "name": "Ohio Job Creation Tax Credit",
+    "jurisdiction": "OH",
+    "citation": "ORC § 122.17",
+    "basis": "net_new_headcount",
+    "metric_label": "Avg monthly headcount",
+    "metric_value": 3.34,
+    "metric_sublabel": "Prior year 0.0 · 9 eligible employees",
+    "qualifying_jobs": 0.0,
+    "threshold": 10.0,
+    "per_job_label": "$2,000 per qualifying job",
+    "annual_credit_usd": 0,
+    "lifetime_credit_usd": 0,
+    "benefit_period_years": 6,
+    "average_headcount": 3.34,
+    "prior_year_average_headcount": 0.0,
+    "net_new_headcount": 3.34,
+    "part_time_eligible_count": 0,
+    "trend": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      2.0,
+      4.0,
+      6.0,
+      7.0,
+      8.0,
+      9.0,
+      4.0
+    ],
+    "calculation_trail": [
+      {
+        "step": "Run statutory One/Zero Base Calculation (OH 2025)",
+        "inputs": {
+          "eligible_employees": 9,
+          "part_time_half_weight": 0
+        },
+        "formula": "per-employee 1/0.5/0 by unit per month → Average Monthly Headcount = mean of 12 monthly unit counts",
+        "output": {
+          "average_headcount": 3.34
+        },
+        "citation": "ORC § 122.17"
+      },
+      {
+        "step": "Net-new vs prior year (2024)",
+        "inputs": {
+          "current_avg_headcount": 3.34,
+          "prior_avg_headcount": 0.0
+        },
+        "formula": "net_new = max(0, current_avg_headcount - prior_avg_headcount)",
+        "output": {
+          "net_new": 3.34
+        },
+        "citation": "ORC § 122.17"
+      },
+      {
+        "step": "Apply 10-job statutory threshold",
+        "inputs": {
+          "net_new": 3.34,
+          "threshold": 10.0
+        },
+        "formula": "qualifying_jobs = max(0, net_new - threshold)",
+        "output": {
+          "qualifying_jobs": 0.0
+        },
+        "citation": "ORC § 122.17"
+      },
+      {
+        "step": "Apply benefit math (Ohio Job Creation Tax Credit)",
+        "inputs": {
+          "qualifying_jobs": 0.0,
+          "amount_per_job_usd": 2000.0
+        },
+        "formula": "annual = qualifying_jobs * amount_per_job; lifetime = annual * benefit_years",
+        "output": {
+          "annual_credit_usd": 0,
+          "lifetime_credit_usd": 0
+        },
+        "citation": "ORC § 122.17"
+      }
+    ],
+    "filing": {
+      "window": "Quarterly performance reports to JobsOhio",
+      "cycle": "quarterly"
+    },
+    "why_surfaced": "3.34 net-new average headcount (current 3.34 vs prior 0.0) vs 10-job threshold → 0.0 qualifying"
+  },
+  {
+    "code": "SC_JTC",
+    "name": "South Carolina Jobs Tax Credit",
+    "jurisdiction": "SC",
+    "citation": "S.C. Code § 12-6-3360",
+    "basis": "net_new_headcount",
+    "metric_label": "Avg monthly headcount",
+    "metric_value": 5.12,
+    "metric_sublabel": "Prior year 4.09 · 11 eligible employees",
+    "qualifying_jobs": 0.0,
+    "threshold": 5.0,
+    "per_job_label": "$1,500 per qualifying job",
+    "annual_credit_usd": 0,
+    "lifetime_credit_usd": 0,
+    "benefit_period_years": 5,
+    "average_headcount": 5.12,
+    "prior_year_average_headcount": 4.09,
+    "net_new_headcount": 1.03,
+    "part_time_eligible_count": 3,
+    "trend": [
+      5.5,
+      5.5,
+      5.5,
+      4.5,
+      4.5,
+      4.5,
+      4.5,
+      4.5,
+      4.5,
+      7.0,
+      8.5,
+      2.5
+    ],
+    "calculation_trail": [
+      {
+        "step": "Run statutory One/Zero Base Calculation (SC 2025)",
+        "inputs": {
+          "eligible_employees": 11,
+          "part_time_half_weight": 3
+        },
+        "formula": "per-employee 1/0.5/0 by unit per month → Average Monthly Headcount = mean of 12 monthly unit counts",
+        "output": {
+          "average_headcount": 5.12
+        },
+        "citation": "S.C. Code § 12-6-3360"
+      },
+      {
+        "step": "Net-new vs prior year (2024)",
+        "inputs": {
+          "current_avg_headcount": 5.12,
+          "prior_avg_headcount": 4.09
+        },
+        "formula": "net_new = max(0, current_avg_headcount - prior_avg_headcount)",
+        "output": {
+          "net_new": 1.03
+        },
+        "citation": "S.C. Code § 12-6-3360"
+      },
+      {
+        "step": "Apply 5-job statutory threshold",
+        "inputs": {
+          "net_new": 1.03,
+          "threshold": 5.0
+        },
+        "formula": "qualifying_jobs = max(0, net_new - threshold)",
+        "output": {
+          "qualifying_jobs": 0.0
+        },
+        "citation": "S.C. Code § 12-6-3360"
+      },
+      {
+        "step": "Apply benefit math (South Carolina Jobs Tax Credit)",
+        "inputs": {
+          "qualifying_jobs": 0.0,
+          "amount_per_job_usd": 1500.0
+        },
+        "formula": "annual = qualifying_jobs * amount_per_job; lifetime = annual * benefit_years",
+        "output": {
+          "annual_credit_usd": 0,
+          "lifetime_credit_usd": 0
+        },
+        "citation": "S.C. Code § 12-6-3360"
+      }
+    ],
+    "filing": {
+      "window": "Form SCH TC-4 with return",
+      "cycle": "annual"
+    },
+    "why_surfaced": "1.03 net-new average headcount (current 5.12 vs prior 4.09) vs 5-job threshold → 0.0 qualifying"
+  },
+  {
+    "code": "TN_JTC",
+    "name": "Tennessee Job Tax Credit",
+    "jurisdiction": "TN",
+    "citation": "T.C.A. § 67-4-2109",
+    "basis": "net_new_headcount",
+    "metric_label": "Avg monthly headcount",
+    "metric_value": 0.83,
+    "metric_sublabel": "Prior year 0.0 · 4 eligible employees",
+    "qualifying_jobs": 0.0,
+    "threshold": 25.0,
+    "per_job_label": "$4,500 per qualifying job",
+    "annual_credit_usd": 0,
+    "lifetime_credit_usd": 0,
+    "benefit_period_years": 5,
+    "average_headcount": 0.83,
+    "prior_year_average_headcount": 0.0,
+    "net_new_headcount": 0.83,
+    "part_time_eligible_count": 0,
+    "trend": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      1.0,
+      1.0,
+      2.0,
+      3.0,
+      2.0
+    ],
+    "calculation_trail": [
+      {
+        "step": "Run statutory One/Zero Base Calculation (TN 2025)",
+        "inputs": {
+          "eligible_employees": 4,
+          "part_time_half_weight": 0
+        },
+        "formula": "per-employee 1/0.5/0 by unit per month → Average Monthly Headcount = mean of 12 monthly unit counts",
+        "output": {
+          "average_headcount": 0.83
+        },
+        "citation": "T.C.A. § 67-4-2109"
+      },
+      {
+        "step": "Net-new vs prior year (2024)",
+        "inputs": {
+          "current_avg_headcount": 0.83,
+          "prior_avg_headcount": 0.0
+        },
+        "formula": "net_new = max(0, current_avg_headcount - prior_avg_headcount)",
+        "output": {
+          "net_new": 0.83
+        },
+        "citation": "T.C.A. § 67-4-2109"
+      },
+      {
+        "step": "Apply 25-job statutory threshold",
+        "inputs": {
+          "net_new": 0.83,
+          "threshold": 25.0
+        },
+        "formula": "qualifying_jobs = max(0, net_new - threshold)",
+        "output": {
+          "qualifying_jobs": 0.0
+        },
+        "citation": "T.C.A. § 67-4-2109"
+      },
+      {
+        "step": "Apply benefit math (Tennessee Job Tax Credit)",
+        "inputs": {
+          "qualifying_jobs": 0.0,
+          "amount_per_job_usd": 4500.0
+        },
+        "formula": "annual = qualifying_jobs * amount_per_job; lifetime = annual * benefit_years",
+        "output": {
+          "annual_credit_usd": 0,
+          "lifetime_credit_usd": 0
+        },
+        "citation": "T.C.A. § 67-4-2109"
+      }
+    ],
+    "filing": {
+      "window": "TN Form FAE170 by franchise/excise due date",
+      "cycle": "annual"
+    },
+    "why_surfaced": "0.83 net-new average headcount (current 0.83 vs prior 0.0) vs 25-job threshold → 0.0 qualifying"
+  },
+  {
+    "code": "VA_MBJF",
+    "name": "Virginia Major Business Facility Job Tax Credit",
+    "jurisdiction": "VA",
+    "citation": "Va. Code § 58.1-439",
+    "basis": "net_new_headcount",
+    "metric_label": "Avg monthly headcount",
+    "metric_value": 3.92,
+    "metric_sublabel": "Prior year 0.0 · 16 eligible employees",
+    "qualifying_jobs": 0.0,
+    "threshold": 25.0,
+    "per_job_label": "$1,000 per qualifying job",
+    "annual_credit_usd": 0,
+    "lifetime_credit_usd": 0,
+    "benefit_period_years": 5,
+    "average_headcount": 3.92,
+    "prior_year_average_headcount": 0.0,
+    "net_new_headcount": 3.92,
+    "part_time_eligible_count": 0,
+    "trend": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      3.0,
+      5.0,
+      8.0,
+      11.0,
+      14.0,
+      5.0
+    ],
+    "calculation_trail": [
+      {
+        "step": "Run statutory One/Zero Base Calculation (VA 2025)",
+        "inputs": {
+          "eligible_employees": 16,
+          "part_time_half_weight": 0
+        },
+        "formula": "per-employee 1/0.5/0 by unit per month → Average Monthly Headcount = mean of 12 monthly unit counts",
+        "output": {
+          "average_headcount": 3.92
+        },
+        "citation": "Va. Code § 58.1-439"
+      },
+      {
+        "step": "Net-new vs prior year (2024)",
+        "inputs": {
+          "current_avg_headcount": 3.92,
+          "prior_avg_headcount": 0.0
+        },
+        "formula": "net_new = max(0, current_avg_headcount - prior_avg_headcount)",
+        "output": {
+          "net_new": 3.92
+        },
+        "citation": "Va. Code § 58.1-439"
+      },
+      {
+        "step": "Apply 25-job statutory threshold",
+        "inputs": {
+          "net_new": 3.92,
+          "threshold": 25.0
+        },
+        "formula": "qualifying_jobs = max(0, net_new - threshold)",
+        "output": {
+          "qualifying_jobs": 0.0
+        },
+        "citation": "Va. Code § 58.1-439"
+      },
+      {
+        "step": "Apply benefit math (Virginia Major Business Facility Job Tax Credit)",
+        "inputs": {
+          "qualifying_jobs": 0.0,
+          "amount_per_job_usd": 1000.0
+        },
+        "formula": "annual = qualifying_jobs * amount_per_job; lifetime = annual * benefit_years",
+        "output": {
+          "annual_credit_usd": 0,
+          "lifetime_credit_usd": 0
+        },
+        "citation": "Va. Code § 58.1-439"
+      }
+    ],
+    "filing": {
+      "window": "Va. Form 500 attachment",
+      "cycle": "annual"
+    },
+    "why_surfaced": "3.92 net-new average headcount (current 3.92 vs prior 0.0) vs 25-job threshold → 0.0 qualifying"
+  },
+  {
+    "code": "FED_WOTC",
+    "name": "Federal Work Opportunity Tax Credit (lite)",
+    "jurisdiction": "US",
+    "citation": "IRC § 51",
+    "basis": "new_hires_in_window",
+    "metric_label": "WOTC-eligible hires (2025)",
+    "metric_value": 44,
+    "metric_sublabel": "~22% of 200 gross new hires (target-group certified)",
+    "qualifying_jobs": 44,
+    "threshold": 1.0,
+    "per_job_label": "$2,400 per hire",
+    "annual_credit_usd": 105600,
+    "lifetime_credit_usd": 105600,
+    "benefit_period_years": 1,
+    "trend": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "calculation_trail": [
+      {
+        "step": "Identify new hires in the federal window",
+        "inputs": {
+          "tax_year": 2025
+        },
+        "formula": "count employees with hire_date in tax_year (payroll.csv)",
+        "output": {
+          "gross_new_hires": 200
+        },
+        "citation": "synthetic payroll.csv hire_date; per-hire WOTC basis"
+      },
+      {
+        "step": "Apply illustrative WOTC target-group certification rate",
+        "inputs": {
+          "gross_new_hires": 200,
+          "target_group_rate": 0.22
+        },
+        "formula": "qualifying_hires = round(gross_new_hires * target_group_rate)",
+        "output": {
+          "qualifying_hires": 44
+        },
+        "citation": "DOL ETA 9061/9062 target-group screening (illustrative rate; see pack)"
+      },
+      {
+        "step": "Apply per-hire federal credit amount",
+        "inputs": {
+          "new_hires": 44,
+          "amount_per_hire_usd": 2400.0
+        },
+        "formula": "new_hires * amount_per_hire_usd",
+        "output": {
+          "annual_credit_usd": 105600
+        },
+        "citation": "IRC § 51"
+      },
+      {
+        "step": "Project over 1-year benefit period",
+        "inputs": {
+          "annual_credit_usd": 105600,
+          "benefit_period_years": 1
+        },
+        "formula": "annual_credit_usd * benefit_period_years",
+        "output": {
+          "lifetime_credit_usd": 105600
+        },
+        "citation": "IRC § 51"
+      }
+    ],
+    "filing": {
+      "window": "DOL ETA Form 9061/9062 within 28 days of hire",
+      "cycle": "per-hire"
+    },
+    "why_surfaced": "200 new hires in 2025; ~44 expected WOTC-certified at the illustrative 22% target-group rate"
+  },
+  {
+    "code": "TX_NO_PACK",
+    "name": "TX: no state rule pack in library",
+    "jurisdiction": "TX",
+    "citation": "n/a — federal credits (WOTC) still apply",
+    "basis": "no_pack",
+    "metric_label": "Eligible employees",
+    "metric_value": 14,
+    "metric_sublabel": "14 TX employees · no state JTC equivalent in library",
+    "qualifying_jobs": 0,
+    "threshold": 0,
+    "per_job_label": "—",
+    "annual_credit_usd": 0,
+    "lifetime_credit_usd": 0,
+    "benefit_period_years": 0,
+    "trend": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "calculation_trail": [
+      {
+        "step": "Look up state rule pack for TX",
+        "inputs": {
+          "state": "TX",
+          "library": [
+            "CO",
+            "FL",
+            "GA",
+            "NC",
+            "NY",
+            "OH",
+            "SC",
+            "TN",
+            "VA"
+          ]
+        },
+        "formula": "STATE_TO_PACK[state]",
+        "output": {
+          "pack": null,
+          "fallback": "federal-only"
+        },
+        "citation": "backend/rules/"
+      }
+    ],
+    "filing": {
+      "window": "n/a — no state rule pack",
+      "cycle": "federal-only"
+    },
+    "why_surfaced": "No state rule pack for TX; federal WOTC still applies"
+  }
+]
