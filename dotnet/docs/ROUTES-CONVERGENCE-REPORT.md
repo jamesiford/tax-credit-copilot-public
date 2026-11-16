@@ -4,16 +4,70 @@
 
 The shared composition, deterministic-source and cross-feature integration
 repairs are implemented. All twelve recorded scenarios executed. Reads, claims
-and AI meet their thresholds; framework and drafts do not. Stage 4 requires an
+and AI meet the local diagnostic's thresholds; framework and drafts do not.
+The latest **official conductor** instead passes reads and AI and fails
+framework, claims and drafts. Stage 4 requires an
 honest halt rather than reproducing framework accidents, fabricating counters,
 discarding durable state or waiving numeric differences.
 
-This report uses the local policy diagnostic over the unchanged semantic
-replay reports, not a claimed execution of the external conductor. The older
+The official result below is authoritative for gate claims. Historical local
+diagnostics are identified separately and are not substituted for it. The older
 `replay_board.py` groups some operations loosely and prints obsolete green
 labels; those labels are not evidence of gate success.
 
-## Resumed conductor failure: actual setup repaired
+## Latest official conductor confirmation
+
+The task was resumed again with the conductor report generated on 16 November
+2026 after the setup repair. Its actual raw report has **3,870 failing fields**,
+and every ordered failure in every scenario is identical to the previous
+corrected direct replay. This confirms that the public reset/profile/auth fix
+is now exercised by the conductor. The new percentages are not a runtime
+regression or a different reset world.
+
+| Group | Official pass | Required | Official waived | Result |
+|---|---:|---:|---:|---|
+| framework | 17/19 (89.5%) | 90% | 9/19 (47.4%) | Threshold and 25% cap fail |
+| reads_calc | 406/414 (98.1%) | 95% | 89/414 (21.5%) | Meets both |
+| claims_artifacts_rules | 279/316 (88.3%) | 90% | 70/316 (22.2%) | Threshold fails |
+| drafts_runs | 225/323 (69.7%) | 90% | 43/323 (13.3%) | Threshold fails |
+| ai | 26/27 (96.3%) | 90% | 3/27 (11.1%) | Meets both |
+
+The official policy board has **2,187 remaining fields** after 573 registered
+fields and 1,110 tolerated free-text fields are removed from the 3,870 raw
+failures. Its other buckets remain gateway 0/251, sealed workspace 79/96 and
+unassigned 240/319. All 1,769 recorded steps completed.
+
+| Required group | Official failed cases | Remaining fields | Difference from local diagnostic |
+|---|---:|---:|---|
+| framework | 2 | 9 | Official scoring accepts three HTML matches rejected by the local numeric guard |
+| reads_calc | 8 | 148 | Same failed cases; different waiver accounting |
+| claims_artifacts_rules | 37 | 126 | Twelve additional cases differ only in scalar `detail` wording |
+| drafts_runs | 98 | 302 | Sixty-two additional wording-only cases: 39 `detail.reason`, 22 `detail`, one `detail.detail` |
+| ai | 1 | 1 | One additional `error.message` wording-only case |
+
+Tier C permits error-message wording to differ, but the official scorer does
+not remove all those scalar paths. This report records that distinction rather
+than copying Python wording, adding broad waivers, or changing the comparison.
+Even the more permissive local diagnostic still fails framework and drafts.
+In particular, resolving wording alone cannot satisfy all required gates.
+
+No new product or harness change is justified by this resume: the actual raw
+evidence exactly reproduces the already investigated stopping condition.
+Framework's two cross-server documentation cases, its waiver-cap conflict and
+the durable-preview numeric differences below still require owner decisions.
+The required Stage-4 HALT is retained; no overall convergence is claimed.
+
+A fresh full direct replay on one isolated ordinary host confirms **12
+scenarios, 1,769 steps, 3,870 raw failures and 16,711 semantically tolerated
+fields**, with every ordered failure exactly equal to the latest conductor.
+Evidence is `artifacts\integrate-conductor-confirm-external\replay.json`,
+`replay.log` and `confirmation.json`. The owned host was health-checked and
+stopped in `finally`. Strict build and format pass again; all 978 fast tests
+and ten Python regressions pass. The corresponding fresh logs/TRX files use
+the `integrate-conductor-confirm-` prefix. No .NET runtime or heavy fixture
+changed, so the existing 141 distinct heavy passing results still apply.
+
+## Earlier resume: actual setup repaired
 
 The resumed task supplied a new conductor board: framework 17/19 (89.5%,
 nine waived), reads 367/414 (88.6%, 114 waived), claims 241/316 (76.3%,

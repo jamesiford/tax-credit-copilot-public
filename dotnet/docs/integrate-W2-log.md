@@ -208,3 +208,49 @@
   heavy fixture changed during resume; the prior 141 distinct heavy passing
   results remain applicable. Updated the required report/HALT/status rather
   than claiming the still-failing framework or drafts gates are green.
+
+## Latest resume: official conductor evidence reconciled
+
+- Read the complete task again, including its new failure summary. The newest
+  actual conductor raw report contains **3,870 fields**, not the board's
+  policy-processed **2,187**. Every ordered failure in every scenario is
+  identical to the previous corrected direct replay. The real reset/profile/
+  auth repair is therefore confirmed in the conductor, not just a local
+  preparation helper.
+- Official groups are framework **17/19 (89.5%)**, reads **406/414 (98.1%)**,
+  claims **279/316 (88.3%)**, drafts **225/323 (69.7%)** and AI **26/27
+  (96.3%)**. Framework uses **9/19 waivers (47.4%)**, above the 25% cap.
+  Corrected machine status so claims is not marked as an official gate pass.
+- Measured remaining official cases/fields after the board's exact waiver
+  list and free-text paths: framework 2/9, reads 8/148, claims 37/126,
+  drafts 98/302, AI 1/1. The 2,187 total additionally includes deferred
+  gateway 251/1,281, sealed workspace 17/17 and unassigned 79/303.
+- The difference from the historical local diagnostic is scoring, not new
+  runtime behavior: 12 additional claims cases have only scalar `detail`
+  wording differences; 62 additional drafts cases have only wording
+  differences (39 `detail.reason`, 22 `detail`, one `detail.detail`); one AI
+  case differs only at `error.message`. The official board also accepts the
+  three HTML matches rejected by the local numeric guard. Tier-C wording
+  freedom does not justify changing a comparator or passing off the local
+  board as official. Neither interpretation passes every required gate.
+- Strict warning-as-error build again reports zero warnings/errors; format
+  verification passes; all **978 fast tests pass**, with no failures/skips
+  across eight assemblies. All **ten Python setup/diagnostic regressions**
+  pass. Evidence is `artifacts\integrate-conductor-confirm-build.log`,
+  `integrate-conductor-confirm-format.log` and
+  `integrate-conductor-confirm-fast*`. No production, test or dependency
+  change was needed.
+- Retain the required Stage-4 HALT rather than repeat exhausted framework
+  ownership/artifact-policy or durable-preview numeric work without an owner
+  decision. Updated report, HALT and machine status distinguish the actual
+  official gate from historical local diagnostics. No threshold, comparison,
+  recording, numeric waiver or product behavior changed.
+- Repeated the actual complete external replay on one newly isolated ordinary
+  host, using the approved CPython 3.12.13 and verified worktree import, cwd
+  `backend`, root `PYTHONPATH`, semantic mode and a plain reset URL. All
+  **12 scenarios / 1,769 steps** completed with **3,870 raw failures** and
+  **16,711 tolerated fields**. Every ordered failure is exactly equal to the
+  latest conductor. `artifacts\integrate-conductor-confirm-external` contains
+  `replay.json`, `replay.log` and `confirmation.json`; execution completeness
+  is explicitly separate from `semantic_pass: false`. Health was checked
+  before replay and the owned process was stopped in `finally`.

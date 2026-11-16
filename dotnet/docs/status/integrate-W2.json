@@ -1,8 +1,8 @@
 {
   "session": "integrate-W2",
   "branch": "dotnet/integration",
-  "head": "9a1ffd2",
-  "summary": "HALT under Stage 4, not successful convergence. On resume, fixed the actual external replay reset-url path: each scenario now selects its declared P1/P2 profile and auth settings before token minting. Direct one-host replay lowers raw failing fields from 5740 to 3870 and exactly matches independently prepared evidence. Local policy groups: framework 14/19, reads 406/414, claims 291/316, drafts 287/323, AI 27/27. Three thresholds met; framework also exceeds the waiver cap and three numeric HTML matches remain rejected. Strict build, format, 978 fast tests and ten Python regressions pass. Previous 141 distinct heavy passing cases remain applicable; no .NET runtime changed on resume. No new official conductor board or push claimed. Head pins the verified replay repair before this documentation commit.",
+  "head": "dd2df70",
+  "summary": "Retained Stage-4 HALT, not successful convergence. Fresh full direct replay completes 12 scenarios/1769 steps and exactly reproduces all 3870 ordered raw failures in the latest conductor, confirming the reset/profile/auth repair. Official groups: framework 17/19, reads 406/414, claims 279/316, drafts 225/323, AI 26/27; only reads and AI meet thresholds, and framework exceeds the waiver cap. The official board has 2187 remaining fields after 573 registered and 1110 tolerated fields. Historical local diagnostics are not official gate claims. Error-wording scoring explains 12 additional claims, 62 drafts and one AI failed case; durable-preview numbers and framework ownership/cap still block honest convergence. Strict build, format, 978 fast tests and ten Python regressions pass again. No new runtime change or push; previous 141 distinct heavy passing cases remain applicable. Head pins the verified branch before this documentation-only confirmation.",
   "stages": {
     "stage_1_shared_tests_and_composition": "done",
     "stage_2_harness_and_determinism": "done",
@@ -17,11 +17,12 @@
     "diagnostic_tests": true,
     "external_replay_setup_tests": true,
     "actual_external_replay_matches_independent_scenarios": true,
+    "actual_external_replay_matches_latest_conductor": true,
     "replay_all_scenarios_executed": true,
     "replay": false,
     "framework": false,
     "reads_calc": true,
-    "claims_artifacts_rules": true,
+    "claims_artifacts_rules": false,
     "drafts_runs": false,
     "ai": true,
     "framework_waiver_cap": false,
@@ -63,14 +64,20 @@
       "what": "Repaired the actual external replay entry point instead of relying on the auxiliary runner's separate scenario preparation.",
       "why": "The resumed conductor left authentication disabled and reset P2 scenarios to P1. Declared profile/auth preparation now runs through existing controls before recorded requests. Direct one-host replay reproduces independently prepared evidence; no comparison, recording or threshold changes.",
       "decision_needed": false
+    },
+    {
+      "id": "DEV-7",
+      "what": "Use the latest actual conductor board for gate claims, keeping the historical local diagnostic separate.",
+      "why": "The conductor reproduces identical raw failures but scores scalar error wording and framework HTML differently. Its claims threshold is not met; the earlier local claims pass is not an official pass.",
+      "decision_needed": false
     }
   ],
   "findings": [
-    "Framework: 5 failed cases and 12 fields. Three native documentation HTML matches are rejected by the unchanged numeric prohibition. Six accepted waivers already exceed 25%.",
+    "Local diagnostic framework: 5 failed cases and 12 fields. Three native documentation HTML matches are rejected by its numeric prohibition. Six accepted waivers already exceed 25%.",
     "Two g1_rest recordings expect 404 for docs/OpenAPI on a server different from the ordinary API; exact operation grouping still assigns them to framework.",
-    "Drafts: 36 failed cases and 239 fields. Twenty-eight cases reflect durable latest-manifest/default-program semantics; seven involve identity/base-year durability and one a wrong-method result.",
+    "Local diagnostic drafts: 36 failed cases and 239 fields. Twenty-eight cases reflect durable latest-manifest/default-program semantics; seven involve identity/base-year durability and one a wrong-method result.",
     "Reads: 8 failed cases and 148 fields. Six concern unavailable-client or bounded-limit statuses; two involve later run identity and exact monetary-string scale.",
-    "Claims: 25 failed cases and 114 fields. Sixteen identity cases, three attribution-only, four status envelopes, one zero-year filter and one timestamp remain.",
+    "Local diagnostic claims: 25 failed cases and 114 fields. Sixteen identity cases, three attribution-only, four status envelopes, one zero-year filter and one timestamp remain.",
     "Python's independently unconfigured footprint reader silently returns empty state lists despite staged payroll; the configured source now reports actual states.",
     "Python's unconfigured portal demonstration can answer an unrelated question; the offline merged host reads authorized canonical facts instead.",
     "Stored deterministic IDs do not describe the ready-boundary UUID source state: four startup OpenTelemetry allocations are real and must be exported, not replaced with dummy draws.",
@@ -78,7 +85,9 @@
     "Native DECIMAL4 formatting differs from some recorded money strings. Equal arithmetic value does not establish money-string scale equivalence.",
     "The final replay is execution-complete, not semantically passing. The mock gateway remains deferred; sealed and unassigned buckets are not hidden.",
     "The resumed conductor's additional failures were a real external setup defect: reset-url sent an empty body and applied no scenario auth. Raw p1_auth/P2-read/P2-batch failures dropped from 1029/888/498 to 182/148/215 after correcting that path.",
-    "Actual one-host external replay now has 3870 raw failing fields versus the resumed conductor raw report's 5740. This is separate from the conductor board's 3754 policy-processed count; all remaining fields and numeric waiver rejections exactly match the prior local diagnostic."
+    "Actual one-host external replay now has 3870 raw failing fields versus the earlier resumed conductor raw report's 5740. The newest conductor run reproduces every ordered failure exactly and has 2187 fields after its own policy processing.",
+    "Latest official failed cases/fields: framework 2/9, reads 8/148, claims 37/126, drafts 98/302 and AI 1/1. Earlier cluster counts above are explicitly local diagnostic measurements, not official gate counts.",
+    "Twelve additional official claims cases, 62 drafts cases and one AI case fail only on scalar error wording permitted by Tier C but not removed by the official scorer. No comparison, threshold or product wording was changed to conceal that discrepancy."
   ],
   "open_questions": [
     "Which server should own the g1_rest docs/OpenAPI exchanges in the merged replay?",
@@ -89,7 +98,7 @@
   "needs_human": [
     {
       "item": "Resolve framework server ownership, artifact policy and waiver-cap conflict.",
-      "why": "Framework is 14/19 with 6/19 waived. Three numeric HTML waiver matches are rejected; even accepting them would reach only 17/19 and further exceed the cap."
+      "why": "The official board is 17/19 with 9/19 waived (47.4%), failing both threshold and cap. The local numeric guard additionally rejects three HTML matches, yielding 14/19. Neither result passes."
     },
     {
       "item": "Reconcile durable latest-run storage and default-program preview semantics.",
@@ -130,6 +139,10 @@
     {
       "item": "Accept the SQL source-fingerprint limitation or choose a stronger version source.",
       "why": "Per-account row count plus maximum modified date is an observation recorded with runs, not an immutable Delta snapshot."
+    },
+    {
+      "item": "Align official scalar error-wording scoring with the existing Tier-C policy without changing values, shapes or thresholds.",
+      "why": "The official board retains 12 claims, 62 drafts and one AI wording-only failed case that the local diagnostic tolerates. Resolving this measurement mismatch still leaves the independently documented framework and durable-preview blockers."
     }
   ],
   "reports": [

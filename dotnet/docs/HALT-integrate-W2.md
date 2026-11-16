@@ -4,6 +4,39 @@ Stage 4 stopping condition: the merged branch does not honestly satisfy all
 five semantic replay thresholds. Integration repairs are retained, but this is
 **not a successful wave gate**.
 
+The latest official conductor run now exercises the corrected setup: all
+ordered failures in all twelve scenarios exactly match the previous corrected
+direct replay's 3,870 raw fields. Its policy board reports 2,187 fields after
+573 registered and 1,110 tolerated fields are removed. This is confirmation
+of the same stopping condition, not a new runtime regression.
+
+| Group | Official conductor | Required | Waived | Outcome |
+|---|---:|---:|---:|---|
+| framework | 17/19 (89.5%) | 90% | 9/19 (47.4%) | Threshold and 25% cap fail |
+| reads_calc | 406/414 (98.1%) | 95% | 89/414 (21.5%) | Meets both |
+| claims_artifacts_rules | 279/316 (88.3%) | 90% | 70/316 (22.2%) | Threshold fails |
+| drafts_runs | 225/323 (69.7%) | 90% | 43/323 (13.3%) | Threshold fails |
+| ai | 26/27 (96.3%) | 90% | 3/27 (11.1%) | Meets both |
+
+**These official results govern the machine-readable gate claims.** The
+historical local diagnostic below is not the conductor board. Official failed
+cases/fields are framework 2/9, reads 8/148, claims 37/126, drafts 98/302 and
+AI 1/1. Twelve claims, 62 drafts and one AI case fail only on scalar error
+wording (`detail`, `detail.reason`, `detail.detail`, `error.message`) that the
+local diagnostic tolerates under Tier C. Official scoring also accepts three
+HTML waiver matches the local numeric guard rejects. Neither difference
+justifies changing product behavior or weakening a comparator; even the local
+diagnostic cannot meet all thresholds.
+
+A fresh full direct replay confirms all 12 scenarios and 1,769 steps, with
+3,870 raw failing fields exactly equal to the official conductor. Strict build,
+format, all 978 fast tests and ten Python regressions pass again. Evidence is
+under `artifacts\integrate-conductor-confirm-external` and the matching
+`integrate-conductor-confirm-*` logs/TRX directory. The isolated local host
+was verified responsive and stopped. No new runtime or test change was made.
+
+## Historical independently scored evidence
+
 The resumed conductor failures exposed an additional real harness defect:
 external replay reset every scenario to default P1 and never installed the
 auth scenario's mode. Commit `9a1ffd2` fixes the actual `--reset-url` path to
