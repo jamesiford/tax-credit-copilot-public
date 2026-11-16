@@ -13,6 +13,62 @@ replay reports, not a claimed execution of the external conductor. The older
 `replay_board.py` groups some operations loosely and prints obsolete green
 labels; those labels are not evidence of gate success.
 
+## Resumed conductor failure: actual setup repaired
+
+The resumed task supplied a new conductor board: framework 17/19 (89.5%,
+nine waived), reads 367/414 (88.6%, 114 waived), claims 241/316 (76.3%,
+61 waived), drafts 205/323 (63.5%, 43 waived), AI 26/27 (96.3%, three
+waived). Framework and reads exceeded the waiver cap. The conductor's raw
+semantic report contained 5,740 failing fields; its policy board separately
+reported 3,754 after its own policy processing. These are different measures.
+
+Inspection of the conductor's actual raw exchanges established the missing
+boundary: the public external `contract.replay --reset-url` path sent only
+`{}` before each scenario. It never selected P2 or installed the auth scenario's
+mode. Earlier local checks had prepared both outside that path, so their setup
+was correct but the conductor did not run it. This was an integration defect,
+not evidence that the extra conductor failures should be waived.
+
+Commit `9a1ffd2` moves that setup into `contract\replay_setup.py`, called by the
+actual external replay command before token minting or any recorded request.
+Reset now receives the declared profile, followed by auth mode, writer
+enforcement, audience/tenant fixture configuration and the scenario's rate
+limit through the existing control hooks. The auxiliary runner delegates to
+that same public path; it no longer has a separate preparation implementation.
+Preconfigured external servers without `--reset-url` remain untouched.
+
+The direct complete replay was then run on **one isolated ordinary host**,
+using `backend` as cwd, the approved interpreter, `--mode semantic`,
+`--base-url` and `--reset-url`. All twelve scenarios completed:
+
+| Raw scenario | Conductor before | Corrected direct replay |
+|---|---:|---:|
+| p1_auth | 1,029 failing fields | 182 |
+| p2_reads_writes | 888 | 148 |
+| p2_run_batches | 498 | 215 |
+| Other nine scenarios | Unchanged | Unchanged |
+| All scenarios | 5,740 | 3,870 |
+
+The corrected one-host reports reproduce the previous independently prepared
+scenario results exactly: group totals, every unresolved field and every
+rejected numeric waiver. This establishes the corrected setup without changing
+an expected response, comparator, threshold or runtime handler.
+
+Current evidence is under `dotnet\artifacts\integrate-resume-external`:
+`replay.json` / `replay.log` are the direct unmodified replay output and
+`policy.json` is the separately identified diagnostic. The stricter local
+diagnostic below still fails framework and drafts. In particular it rejects
+the three numeric HTML matches the supplied conductor board had accepted;
+neither board is silently substituted for the other.
+
+Five new external-setup regressions cover P2/auth setup, ordering before each
+scenario, setup failure propagation, restoring unauthenticated mode and leaving
+a no-reset preconfigured server alone. Together with the existing three policy
+and two report-output regressions, all ten Python checks pass. Strict .NET
+build/format and all 978 fast tests pass again. The initial no-build test
+attempt aborted in VSTest host initialization; rebuilding local metadata
+resolved it without dependency, test or runtime changes.
+
 ## Comparable before and after
 
 Both columns below rescore actual baseline/final replay output using the same
@@ -76,8 +132,9 @@ explicitly tested.
 
 Implementation commits before the final runtime-boundary repair:
 `15e9218` (shared fixtures), `32181ce` (scoped collaborators/metadata),
-`5b213e9` (exported deterministic sources). The machine-readable status pins the
-subsequent verified runtime commit; the documentation commit follows it.
+`5b213e9` (exported deterministic sources), `232dd39` (runtime boundaries) and
+`9a1ffd2` (actual external replay setup). The machine-readable status pins the
+verified replay repair; the documentation commit follows it.
 
 ## Register integrity
 
@@ -211,6 +268,14 @@ production limits and semantic assertions were unchanged.
 No live Fabric, Foundry, Entra or customer system was contacted. No Python
 product, recording, certified fixture, remote or package dependency changed.
 All commits are local; nothing was pushed.
+
+On resume the .NET gates were repeated: `integrate-resume-build.log` has zero
+warnings/errors, `integrate-resume-format.log` records format verification and
+`integrate-resume-built-fast` contains 978 passing tests without skips. The
+previous 141 distinct heavy-case results remain applicable: this repair changes
+only the external replay harness and its helper/tests, not .NET production or
+heavy fixture behavior. No new improvements entry is needed for correct
+scenario setup, because it introduces no deliberate product difference.
 
 ## Decisions carried forward
 

@@ -163,3 +163,48 @@
   `status\integrate-W2.json` record remaining clusters, ordinary feature backlog
   and owner decisions. No convergence success, external conductor execution,
   push, live-system access or changed certified arithmetic is claimed.
+
+## Resume: conductor preparation mismatch repaired
+
+- Reread the complete updated task. Its latest conductor board was framework
+  17/19, reads 367/414, claims 241/316, drafts 205/323 and AI 26/27, with
+  framework/read waiver shares 47.4%/27.5%. Read the actual raw report rather
+  than treating the earlier local diagnostic as a passing official gate.
+- The raw conductor report had 5,740 failing fields. Compared with the
+  independently prepared local runs, only three scenarios differed:
+  `p1_auth` 1,029 versus 182, `p2_reads_writes` 888 versus 148 and
+  `p2_run_batches` 498 versus 215. Authentication had remained disabled and P2
+  had been reset to P1. The raw failure count is not the conductor policy
+  board's separate 3,754 post-processing count.
+- Root cause: actual `contract.replay --reset-url` sent `{}` and did not apply
+  scenario auth configuration. The auxiliary local runner did the right setup
+  outside that entry point. Moved preparation into the public replay path:
+  reset's body selects the scenario profile, then the existing environment hook
+  installs its auth/writer/rate settings before token minting or any exchange.
+  The auxiliary runner now delegates to that path, removing duplicate setup.
+  Servers supplied without `--reset-url` are still left preconfigured.
+- Ran the actual full external command directly, with one isolated ordinary
+  host, approved CPython 3.12, cwd `backend`, root `PYTHONPATH`, semantic mode
+  and a plain reset URL. All twelve scenarios completed; raw failures are now
+  **3,870**. The three repaired scenarios are exactly 182/148/215 fields and
+  the other nine are unchanged. Diagnostic groups, all remaining fields and
+  rejected numeric matches exactly equal the previous independent evidence.
+  Owned host was health-checked and terminated in `finally`.
+- Current raw evidence: `artifacts\integrate-resume-external\replay.json`,
+  `replay.log` and the separate `policy.json`. The five-group diagnostic is
+  still 14/19, 406/414, 291/316, 287/323, 27/27. Framework/drafts remain HALT;
+  numeric HTML matches remain rejected. No product case was waived to fix setup.
+- Five new external-setup tests pass, including the actual CLI's per-scenario
+  setup ordering, failure propagation and no-reset opt-out. The three existing
+  diagnostic tests and two stale-report/output-path tests also pass (ten total).
+- A first no-build fast run aborted before test execution in
+  `DotnetTestHostManager.GetTestHostPath` with `NullReferenceException`. After
+  the replay host exited, rebuilt local outputs: strict build has zero warnings
+  or errors, and all **978 fast tests pass**, zero failures/skips. Format
+  verification passes. Logs: `integrate-resume-build.log`,
+  `integrate-resume-format.log`, `integrate-resume-built-fast*`.
+  No dependency was installed or changed.
+- Committed the verified actual replay fix as `9a1ffd2`. No .NET runtime or
+  heavy fixture changed during resume; the prior 141 distinct heavy passing
+  results remain applicable. Updated the required report/HALT/status rather
+  than claiming the still-failing framework or drafts gates are green.

@@ -1,8 +1,8 @@
 {
   "session": "integrate-W2",
   "branch": "dotnet/integration",
-  "head": "232dd39",
-  "summary": "HALT under Stage 4, not successful convergence. Shared composition, deterministic sources, assessment identity order, capability reads and unavailable-client boundaries repaired. Local final diagnostics: framework 14/19, reads 406/414, claims 291/316, drafts 287/323, AI 27/27. Three of five thresholds met; framework also exceeds the waiver cap and three numeric HTML waivers remain rejected. Strict build, format and 978 fast tests pass. All 141 distinct heavy cases pass across the full run and targeted fixture repairs. The final combined run is 980/980. All twelve scenarios executed locally; no external conductor run or push claimed. Head identifies the verified runtime commit immediately before this documentation commit.",
+  "head": "9a1ffd2",
+  "summary": "HALT under Stage 4, not successful convergence. On resume, fixed the actual external replay reset-url path: each scenario now selects its declared P1/P2 profile and auth settings before token minting. Direct one-host replay lowers raw failing fields from 5740 to 3870 and exactly matches independently prepared evidence. Local policy groups: framework 14/19, reads 406/414, claims 291/316, drafts 287/323, AI 27/27. Three thresholds met; framework also exceeds the waiver cap and three numeric HTML matches remain rejected. Strict build, format, 978 fast tests and ten Python regressions pass. Previous 141 distinct heavy passing cases remain applicable; no .NET runtime changed on resume. No new official conductor board or push claimed. Head pins the verified replay repair before this documentation commit.",
   "stages": {
     "stage_1_shared_tests_and_composition": "done",
     "stage_2_harness_and_determinism": "done",
@@ -15,6 +15,8 @@
     "tests_fast": true,
     "tests_heavy": true,
     "diagnostic_tests": true,
+    "external_replay_setup_tests": true,
+    "actual_external_replay_matches_independent_scenarios": true,
     "replay_all_scenarios_executed": true,
     "replay": false,
     "framework": false,
@@ -55,6 +57,12 @@
       "what": "Distinguished 1769 recorded steps from 1765 HTTP exchanges and four controls.",
       "why": "The supplied group denominators count HTTP exchanges, while the task's earlier summary includes scenario controls in its exchange label.",
       "decision_needed": false
+    },
+    {
+      "id": "DEV-6",
+      "what": "Repaired the actual external replay entry point instead of relying on the auxiliary runner's separate scenario preparation.",
+      "why": "The resumed conductor left authentication disabled and reset P2 scenarios to P1. Declared profile/auth preparation now runs through existing controls before recorded requests. Direct one-host replay reproduces independently prepared evidence; no comparison, recording or threshold changes.",
+      "decision_needed": false
     }
   ],
   "findings": [
@@ -68,7 +76,9 @@
     "Stored deterministic IDs do not describe the ready-boundary UUID source state: four startup OpenTelemetry allocations are real and must be exported, not replaced with dummy draws.",
     "Heavy fixture failures exposed stale draft-list authorization, duplicate test creation, omitted operational-table population and the intentionally retained zeroed write-sequence row.",
     "Native DECIMAL4 formatting differs from some recorded money strings. Equal arithmetic value does not establish money-string scale equivalence.",
-    "The final replay is execution-complete, not semantically passing. The mock gateway remains deferred; sealed and unassigned buckets are not hidden."
+    "The final replay is execution-complete, not semantically passing. The mock gateway remains deferred; sealed and unassigned buckets are not hidden.",
+    "The resumed conductor's additional failures were a real external setup defect: reset-url sent an empty body and applied no scenario auth. Raw p1_auth/P2-read/P2-batch failures dropped from 1029/888/498 to 182/148/215 after correcting that path.",
+    "Actual one-host external replay now has 3870 raw failing fields versus the resumed conductor raw report's 5740. This is separate from the conductor board's 3754 policy-processed count; all remaining fields and numeric waiver rejections exactly match the prior local diagnostic."
   ],
   "open_questions": [
     "Which server should own the g1_rest docs/OpenAPI exchanges in the merged replay?",

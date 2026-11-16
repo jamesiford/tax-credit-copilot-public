@@ -4,6 +4,15 @@ Stage 4 stopping condition: the merged branch does not honestly satisfy all
 five semantic replay thresholds. Integration repairs are retained, but this is
 **not a successful wave gate**.
 
+The resumed conductor failures exposed an additional real harness defect:
+external replay reset every scenario to default P1 and never installed the
+auth scenario's mode. Commit `9a1ffd2` fixes the actual `--reset-url` path to
+prepare each declared profile/auth world before any request. A direct full
+replay on one host reduces raw failing fields from 5,740 to 3,870 and exactly
+reproduces the independently prepared scenario evidence below. Comparisons,
+recordings and thresholds are unchanged. This resolves the setup mismatch,
+not the remaining framework/drafts stopping condition.
+
 | Group | Final | Required | Waived | Outcome |
 |---|---:|---:|---:|---|
 | framework | 14/19 (73.68%) | 90% | 6/19 (31.58%) | Threshold and 25% cap fail |
@@ -32,7 +41,13 @@ business/persistence work, not an unexplained startup offset.
 
 The comparable baseline/final board, regressions, all register changes and
 verification evidence are in `ROUTES-CONVERGENCE-REPORT.md` and
-`integrate-W2-log.md`. The final status pins the verified runtime commit.
+`integrate-W2-log.md`. The current status pins the verified external-replay
+repair on top of the verified runtime fixes.
+Five setup regressions plus the five existing policy/report regressions pass;
+strict build, format and all 978 fast tests pass again. Direct one-host evidence
+is `dotnet\artifacts\integrate-resume-external\replay.json`; its separate
+`policy.json` remains an explicitly local diagnostic, not a new official
+conductor board.
 
 ## Remaining blockers and required decisions
 
