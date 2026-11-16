@@ -1,0 +1,87 @@
+{
+  "session": "routes_ai_agents",
+  "branch": "dotnet/w2-routes_ai_agents",
+  "head": "e9b3106",
+  "summary": "Implemented four discovered AI routes, the 37-declaration capability boundary, trusted page/chat assembly, strict numeral integrity and twelve exact prompt/publication contracts. Whole-solution build and formatting pass; all 1,025 fast tests pass, including 213 owned AI tests. Final compiled-host semantic replay is 5/23 AI cases passing (21.74%), below 95%; required sibling projections/commands remain absent and are explicitly inventoried. Production Foundry publication/invocation remains unverified. Changes are local and restricted to owned paths.",
+  "stages": {
+    "stage_1_prompt_fidelity": "done",
+    "stage_2_capabilities": "partial",
+    "stage_3_chat_summary_numeric": "partial",
+    "stage_4_stream_lifetime_and_composed_replay": "partial"
+  },
+  "gates_claimed": {
+    "no_halt": true,
+    "commits_present": true,
+    "clean_tree": true,
+    "not_pushed": true,
+    "owned_paths": true,
+    "status_json": true,
+    "report_present": true,
+    "dotnet_build": true,
+    "dotnet_format": true,
+    "tests_fast": true
+  },
+  "deviations": [
+    {
+      "id": "DEV-1",
+      "what": "Offline chat renders authorized canonical blocks or explicit dependency refusals instead of the recording's fixed demonstration.",
+      "why": "Unrelated demonstration figures are not a valid answer about the selected client; no calculated fact is changed.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-2",
+      "what": "Client summaries read the inward Gold port instead of reproducing the Python router-default SQL binding error.",
+      "why": "The intended read works with concrete application arguments; provider exceptions are sanitized.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-3",
+      "what": "These routes use a keyed request-scoped instance of the existing mediator and explicit feature-local forwarding registrations.",
+      "why": "The shared singleton captured request collaborators at root scope, and unconditional application scanning registered optional handlers without their feature services. Both issues were corrected entirely in owned paths.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-4",
+      "what": "Validation English/context and SSE charset spelling are not reproduced byte for byte.",
+      "why": "The approved policy excludes framework and wire artifacts; error families, statuses, validation locations and stream semantics are preserved. The improvements register records the exact scopes.",
+      "decision_needed": false
+    }
+  ],
+  "findings": [
+    "The roster, prompt files and captured publication requests each number twelve; manifest metadata is not another agent. Current ChannelNarratorAgent is version four.",
+    "The catalogue's implemented flags preserve the Python declarations; they are not proof that missing sibling production bridges are installed.",
+    "Final raw replay completed all 36 exchanges: 192 differences, six tolerated; AI five of 23 passing. The replay gate is not claimed.",
+    "Missing book_rank and client_eligibility projections, portfolio/unit/employee page projections and sibling setup handlers block replay success. They are never replaced with recordings or invented zeroes.",
+    "The unchanged replay-board wrapper explicitly applies no improvements waivers. Removing incidental differences would still not satisfy missing production contracts.",
+    "Strict numeric integrity and page-summary written-precision checking are distinct. Portal chat's model prose remains unchecked numerically, as in the documented Python path; no W3 composer or ledger is claimed.",
+    "Employee summaries are deterministic, and person-only capability facts and unit person lines are withheld from models.",
+    "The production Foundry SDK/factory is still absent; verified fake publication DTOs are not deployed agents or live invocation evidence.",
+    "Whole fast tests passed 1,025 cases with no failures or skips; the final prompt-registration build, 279 API regressions and full formatting also passed.",
+    "No live Fabric, Foundry, Entra or customer system, remote change, push or unowned product edit was used. Temporary replay hosts were stopped."
+  ],
+  "open_questions": [],
+  "needs_human": [
+    {
+      "item": "Coordinate ReadsCalc, ClaimsDrafts and Runs bindings, then rerun the complete semantic AI replay.",
+      "why": "The report inventories every required read, page/chat projection, command preview/commit and person-bound ticket contract. Current raw AI acceptance is 21.74%, not the required 95%."
+    },
+    {
+      "item": "Supply and separately validate the production Foundry publication/invocation factory.",
+      "why": "This task verifies the SDK-neutral recording-client seam and W1 runtime integration without contacting a model or installing shared SDK dependencies."
+    },
+    {
+      "item": "Decide the inherited M-01 year-pack override defect before changing its figures.",
+      "why": "Ingestion can override year-resolved wage basis, measuring dates and pay codes despite the design's year-pack authority rule. The certified calculation was not changed in this feature."
+    },
+    {
+      "item": "Decide inherited multi-program first-program credit pricing before changing its figures.",
+      "why": "The certified credit-math behavior still prices the first programme for a multi-program state; its existing run-resolution refusals are preserved. This feature does not reinterpret or repair those calculated values."
+    }
+  ],
+  "reports": [
+    "dotnet\\docs\\ROUTES-AI-REPORT.md",
+    "dotnet\\docs\\routes_ai_agents-log.md",
+    "dotnet\\docs\\improvements\\routes_ai_agents.json",
+    "dotnet\\docs\\status\\routes_ai_agents.json"
+  ]
+}
