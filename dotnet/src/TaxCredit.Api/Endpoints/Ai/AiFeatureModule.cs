@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using TaxCredit.Api.Hosting;
 using TaxCredit.Application.Features.Ai.Briefs;
 using TaxCredit.Application.Features.Ai.Capabilities;
+using TaxCredit.Application.Features.Ai.Capabilities.Bindings;
 using TaxCredit.Application.Features.Ai.Chat;
 using TaxCredit.Application.Features.Ai.Streams;
 using TaxCredit.Application.Messaging;
@@ -27,7 +28,13 @@ public sealed class AiFeatureModule : IFeatureModule
         // Lazy streams resolve handlers from the HTTP request scope.
         services.AddKeyedScoped<IMediator, Mediator>(MediatorKey);
         services.AddCapabilityServices();
-        services.AddScoped<ICapabilityReadBridge, CanonicalCapabilityReads>();
+        services.AddScoped<CanonicalCapabilityReads>();
+        services.AddScoped<CapabilityPackageTickets>();
+        services.AddScoped<CapabilityDecisionPreviews>();
+        services.AddScoped<CapabilityOperationalPreviews>();
+        services.AddScoped<CapabilityRiskReads>();
+        services.AddScoped<ICapabilityReadBridge, ApplicationCapabilityReads>();
+        services.AddScoped<ICapabilityWriteBridge, ApplicationCapabilityWrites>();
         foreach (var page in new[] { "portfolio", "unit", "employee" })
         {
             services.AddScoped<IAiPageCollaborator>(provider =>

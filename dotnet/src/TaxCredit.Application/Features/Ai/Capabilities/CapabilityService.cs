@@ -132,8 +132,18 @@ internal static class CapabilityFailures
     {
         CapabilityException refusal => refusal,
         ApiAuthException refusal => new CapabilityException(refusal.StatusCode, "not_authorized", refusal.Message),
+        ClaimsArtifactsRules.FeatureRefusalException refusal => new CapabilityException(refusal.Status,
+            refusal.Status == 404 ? "not_calculated" : "rejected", "The application feature refused this request."),
+        DraftsRuns.DraftsRunsRefusalException refusal => new CapabilityException(refusal.Status,
+            refusal.Status == 404 ? "not_calculated" : "rejected", "The requested operation was refused."),
+        ReadsCalc.ReadRefusalException refusal => new CapabilityException(refusal.StatusCode,
+            refusal.StatusCode == 404 ? "not_calculated" : "rejected", refusal.Message),
+        TaxCredit.Domain.Pipeline.ClientRunNotAvailable refusal => new CapabilityException(404, "year_not_authored", refusal.Message),
+        TaxCredit.Domain.Claims.ClaimError refusal => new CapabilityException(422, "rejected", refusal.Message),
+        TaxCredit.Domain.Numerics.PyValueError refusal => new CapabilityException(422, "rejected", refusal.Message),
         SourceFailureException => new CapabilityException(503, "data_source_unavailable", "The source data is unavailable."),
         TimeoutException => new CapabilityException(504, "timeout", $"{tool} did not finish in time; a commit may still land. Retry with the same idempotency key.", true),
+        OperationCanceledException => new CapabilityException(504, "timeout", $"{tool} did not finish in time; a commit may still land. Retry with the same idempotency key.", true),
         ArgumentException => new CapabilityException(422, "rejected", "The capability rejected the arguments."),
         _ => QueryFailure(error) ?? new CapabilityException(500, "internal_error", "the capability failed unexpectedly", true, innerException: error),
     };

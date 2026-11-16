@@ -1,7 +1,9 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json.Nodes;
+using TaxCredit.Application.Features.Ai.Capabilities.Bindings;
 using TaxCredit.Application.Ports.Auth;
+using TaxCredit.Application.Ports.Contract;
 using TaxCredit.Application.Ports.Persistence;
 using TaxCredit.Domain.Numerics;
 using static TaxCredit.Application.Features.Ai.Capabilities.CapabilityResult;
@@ -9,7 +11,8 @@ using static TaxCredit.Application.Features.Ai.Capabilities.CapabilityResult;
 namespace TaxCredit.Application.Features.Ai.Capabilities;
 
 internal sealed class CapabilityWrites(IChannelStateRepository repository, IChannelAuditRepository audit,
-    IWriterPolicy writer, ICapabilityWriteBridge bridge, CapabilityOptions options, TimeProvider clock)
+    IWriterPolicy writer, ICapabilityWriteBridge bridge, CapabilityOptions options, TimeProvider clock,
+    IIdSource ids, ISecretSource secrets, CapabilityCommitLocks commitLocks)
 {
     private static readonly Dictionary<string, string> Summaries = new(StringComparer.Ordinal)
     {
@@ -31,7 +34,7 @@ internal sealed class CapabilityWrites(IChannelStateRepository repository, IChan
         var arguments = (prepare ? supplied : supplied["arguments"]!.AsObject());
         var args = new JsonObject(arguments.Where(entry => entry.Value is not null)
             .Select(entry => KeyValuePair.Create(entry.Key, (JsonNode?)entry.Value!.DeepClone())));
-        var auditId = Guid.NewGuid().ToString("N");
+        var auditId = ids.NewId().ToString("N");
         var started = clock.GetTimestamp();
         Audit(auditId, 0, "begin", "pending", tool, args, principal);
         try
@@ -62,9 +65,9 @@ internal sealed class CapabilityWrites(IChannelStateRepository repository, IChan
         {
             throw new InvalidOperationException("The command owner did not supply a valid preview.");
         }
-        var token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32)).TrimEnd('=').Replace('+', '-').Replace('/', '_');
+        var token = Convert.ToBase64String(secrets.NextBytes(32)).TrimEnd('=').Replace('+', '-').Replace('/', '_');
         var now = clock.GetUtcNow();
-        var row = repository.Create(new Confirmation(Guid.NewGuid().ToString("N"), Hash(token), principal.EffectiveOid!,
+        var row = repository.Create(new Confirmation(ids.NewId().ToString("N"), Hash(token), principal.EffectiveOid!,
             change, ArgsHash(args), Time(now), Time(now + options.ConfirmationLifetime)));
         var facts = new JsonObject
         {
@@ -100,6 +103,7 @@ internal sealed class CapabilityWrites(IChannelStateRepository repository, IChan
         {
             throw CapabilityException.Invalid("an idempotency key of at most 200 characters is required");
         }
+        using var commitLease = await commitLocks.EnterAsync(principal.EffectiveOid!, key, cancellationToken).ConfigureAwait(false);
         var token = supplied["confirmation_token"]!.GetValue<string>();
         if (token.Length > 500)
         {
