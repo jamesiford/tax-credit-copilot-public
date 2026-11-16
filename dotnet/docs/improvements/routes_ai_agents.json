@@ -1,0 +1,94 @@
+{
+  "improvements": [
+    {
+      "id": "IMP-routes_ai_agents-1",
+      "kind": "defect_fix",
+      "route": "POST /api/chat",
+      "finding": "",
+      "reason": "The unconfigured Python portal emits a fixed demonstration containing figures unrelated to the selected client. Offline chat now renders the authorized capability's canonical blocks or explicitly names the unavailable dependency. No underlying calculated figure is changed or replaced with another calculation; the unrelated demonstration is not treated as a real answer."
+    },
+    {
+      "id": "IMP-routes_ai_agents-2",
+      "kind": "defect_fix",
+      "route": "POST /api/summary",
+      "case": "summary.client",
+      "finding": "",
+      "reason": "Python passes a FastAPI Query default into the client-grid SQL binding and streams the binding exception. The feature calls the inward Gold port with concrete arguments and sanitizes unexpected source failures instead of reproducing the router-default defect."
+    },
+    {
+      "id": "IMP-routes_ai_agents-3",
+      "kind": "defect_fix",
+      "route": "POST /api/summary",
+      "finding": "",
+      "reason": "Person-facing employee summaries and unit near-miss lines can contain employee identifiers. Employee summaries remain deterministic and unit person-level fact lines are excluded from model context, while authorized local fallback facts retain their meaning."
+    },
+    {
+      "id": "IMP-routes_ai_agents-4",
+      "kind": "defect_fix",
+      "route": "POST /api/chat",
+      "finding": "",
+      "reason": "The Python explain intent reads a process-global last calculation trail. The scoped capability boundary is used instead, so one caller cannot receive another caller's cached trail. If the sibling stored-trail projection is unavailable, the answer explicitly refuses rather than substituting another calculation."
+    },
+    {
+      "id": "IMP-routes_ai_agents-5",
+      "kind": "error_text",
+      "route": "POST /api/summary",
+      "finding": "",
+      "reason": "Unexpected provider and page-source exception text is not streamed to the caller. Controlled errors remain actionable, unexpected failures use safe text, and classified telemetry does not include prompts, source values or employee identifiers."
+    },
+    {
+      "id": "IMP-routes_ai_agents-6",
+      "kind": "wire_incidental",
+      "route": "POST /api/chat",
+      "categories": ["header"],
+      "path_prefix": "headers.content-type",
+      "finding": "",
+      "reason": "The shared SSE transport explicitly declares UTF-8. Its charset spelling differs from the Python recording but preserves the event-stream media type, JSON encoding, per-frame flushing and terminal semantics; the shared transport is not changed to reproduce a byte-level header artifact."
+    },
+    {
+      "id": "IMP-routes_ai_agents-7",
+      "kind": "wire_incidental",
+      "route": "POST /api/summary",
+      "categories": ["header"],
+      "path_prefix": "headers.content-type",
+      "finding": "",
+      "reason": "The existing SSE transport includes an explicit UTF-8 charset. The recorded header spelling is not reproduced because the policy excludes byte-level headers and real-socket tests establish the required event-stream encoding and framing."
+    },
+    {
+      "id": "IMP-routes_ai_agents-8",
+      "kind": "framework_default",
+      "route": "POST /api/capabilities/{tool}",
+      "categories": ["value", "missing-field"],
+      "path_prefix": "detail",
+      "finding": "",
+      "reason": "Request validation preserves the JSON detail family, field locations and refusal statuses, without recreating Pydantic's English wording, dictionary-type label or constraint-context metadata. These differences do not alter any valid capability argument or result."
+    },
+    {
+      "id": "IMP-routes_ai_agents-9",
+      "kind": "error_text",
+      "route": "POST /api/capabilities/{tool}",
+      "categories": ["value"],
+      "path_prefix": "error.message",
+      "finding": "",
+      "reason": "Controlled capability errors retain the Python capability error envelope, status, code and retryable semantics. Their explanatory text need not reproduce the Python validator's implementation-specific wording."
+    },
+    {
+      "id": "IMP-routes_ai_agents-10",
+      "kind": "error_text",
+      "route": "POST /api/chat",
+      "categories": ["value"],
+      "path_prefix": "detail",
+      "finding": "",
+      "reason": "Malformed history receives the same validation status and detail error family. English validation messages describe the invalid history directly rather than copying Pydantic's generated wording."
+    },
+    {
+      "id": "IMP-routes_ai_agents-11",
+      "kind": "framework_default",
+      "route": "POST /api/summary",
+      "categories": ["value", "missing-field"],
+      "path_prefix": "detail",
+      "finding": "",
+      "reason": "Invalid page, token-length and month requests retain their validation verdicts, field locations, JSON detail family and statuses. Framework-specific English messages and constraint-context objects are not part of the intended behavior."
+    }
+  ]
+}
