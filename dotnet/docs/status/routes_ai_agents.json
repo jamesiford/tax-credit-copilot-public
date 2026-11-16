@@ -1,8 +1,8 @@
 {
   "session": "routes_ai_agents",
   "branch": "dotnet/w2-routes_ai_agents",
-  "head": "176f0bb",
-  "summary": "Removed overbroad improvement coverage; the two retained route/case/category/path-scoped defect entries can match at most three of 27 AI cases (11.1%, not a whole-case acceptance claim). Missing sibling services and incidental differences are no longer blanket-waived. Re-ran build, formatting and all 1,025 fast tests successfully, plus all 1,769 semantic replay exchanges. Raw canonical AI acceptance remains 8/27; explicit DEC-AI-1/2/3 needs_human decisions address the policy/cap conflict and missing canonical sibling services. Replay stays unclaimed; no figures, authorization, thresholds, scenarios, comparators or production behavior were changed.",
+  "head": "b559447",
+  "summary": "Stopped under task hard stop 1; HALT-routes_ai_agents.md records missing canonical sibling implementations requiring unowned changes and the unresolved fixed-policy conflict. Latest conductor AI acceptance is 13/27 (48.1%), with 5/27 waiver-dependent cases (18.5%); replay is not fixed or claimed. Re-ran build, formatting and all 1,025 fast tests successfully. Fresh complete semantic replay covered 1,769 exchanges and still has 8/27 raw passing exact AI cases. No product behavior, improvements coverage, calculated figures, authorization, scenarios, thresholds or comparator changed. The temporary host was stopped; all changes are committed locally.",
   "stages": {
     "stage_1_prompt_fidelity": "done",
     "stage_2_capabilities": "partial",
@@ -10,7 +10,6 @@
     "stage_4_stream_lifetime_and_composed_replay": "partial"
   },
   "gates_claimed": {
-    "no_halt": true,
     "commits_present": true,
     "clean_tree": true,
     "not_pushed": true,
@@ -45,6 +44,12 @@
       "what": "Validation English/context and SSE charset spelling are not reproduced byte for byte.",
       "why": "The approved policy excludes framework and wire artifacts, but counting those differences as case waivers exceeds the cap. Their previous register entries were removed rather than silently treating that policy conflict as approval. Error families, statuses, validation locations and stream semantics remain preserved.",
       "decision_needed": true
+    },
+    {
+      "id": "DEV-5",
+      "what": "Created the mandatory HALT-routes_ai_agents.md and stopped; no_halt is no longer claimed.",
+      "why": "The missing ReadsCalc/ClaimsDrafts implementations are outside the owned paths. The task forbids copying sibling calculations or reproducing framework artifacts solely for replay; the fixed policy/cap conflict remains unresolved. Another register-only change cannot satisfy the gate honestly.",
+      "decision_needed": true
     }
   ],
   "findings": [
@@ -62,10 +67,17 @@
     "Waiver follow-up: the conductor's prior full board reported 24/27 AI cases passing after coverage (88.9%), including 16/27 waiver-dependent cases (59.3%). Old blanket entries incorrectly hid missing summary projections; they have been removed rather than counted as implemented functionality.",
     "All mechanical gates pass again after the register-only correction: whole-solution build and formatting plus 1,025 fast tests, no failures or skips. Fresh full replay completed twelve scenarios and 1,769 exchanges with 9,472 raw field differences and six tolerated; the owned AI scenario still has 192 differences. Exact owned method/path selection gives 8/27 raw AI cases passing. The unchanged local wrapper groups four extra method/slash cases and reports 11/31, not the conductor's grouping.",
     "The two retained entries were checked against every fresh failure and can match only chat.ask, chat.ask-client and summary.client event differences: at most 3/27 cases (11.1%). This is a scope upper bound, not a passing adjusted result; headers remain unwaived, as do missing sibling capability and portfolio/unit/employee results. Fresh reports are under dotnet\\artifacts\\ai-waiver-review; the temporary host was stopped.",
+    "Latest conductor follow-up: AI 13/27 passing (48.1%), with 5/27 waiver-dependent cases (18.5%); 1,769 exchanges, 8,868 failing fields and 737 covered. W1 sources_auth_ai entries also cover AI cases, explaining why the conductor's five waiver-dependent cases exceed the three-case scope upper bound of this feature's own two entries.",
+    "Repeated all mechanical gates successfully: zero build warnings/errors, formatting clean, all 1,025 fast tests passed with no skips. Fresh full replay using CPython 3.12.13 completed all twelve scenarios and 1,769 exchanges: 9,472 raw differences, six tolerated and 8/27 raw exact AI cases passing. The unchanged local wrapper reports 11/31 with its four extra method/slash cases and no improvements adjustment; this is not a new conductor-adjusted percentage.",
+    "Fresh diagnostics are ignored under dotnet\\artifacts\\ai-hard-stop-replay. The ordinary host returned health 200 before replay and was stopped afterward. The branch still has only Ai, Framework and WorkspaceSealed application feature folders; no canonical ReadsCalc/ClaimsDrafts implementation has arrived.",
     "No live Fabric, Foundry, Entra or customer system, remote change, push or unowned product edit was used. Temporary replay hosts were stopped."
   ],
   "open_questions": [],
   "needs_human": [
+    {
+      "item": "HALT: provide canonical sibling implementations or an explicit ownership/policy decision before resuming.",
+      "why": "Task hard stop 1 requires stopping when unowned changes are needed. ReadsCalc portfolio/eligibility and portfolio/unit/employee page services are still absent; reproducing their calculations inside AI is explicitly forbidden. HALT-routes_ai_agents.md records the attempts, current evidence and exact decisions required. The no_halt and replay gates are not claimed."
+    },
     {
       "item": "DEC-AI-1: Resolve the incidental-difference policy versus the 25% case-waiver cap before claiming replay acceptance.",
       "why": "The task explicitly forbids reproducing Pydantic English/context, byte-level SSE headers and trailing-slash framework behavior, yet the conductor counts these as case failures unless waived. Eight error-validation/wording cases plus two header-only refusals exceed the six waived cases allowed by a 27-case denominator: even if every other case were fixed, at least four would still fail, at best 23/27 (85.2%), below 95%. Prior incidental entries 6-11 are withdrawn pending this decision, not treated as an approved budget exception. Recommend preserving semantic/error/status behavior; a policy owner must resolve the conflicting acceptance/accounting requirements or authorize a different compatibility requirement. No threshold or comparator was changed."
@@ -99,6 +111,7 @@
     "dotnet\\docs\\ROUTES-AI-REPORT.md",
     "dotnet\\docs\\routes_ai_agents-log.md",
     "dotnet\\docs\\improvements\\routes_ai_agents.json",
+    "dotnet\\docs\\HALT-routes_ai_agents.md",
     "dotnet\\docs\\status\\routes_ai_agents.json"
   ]
 }
