@@ -47,6 +47,13 @@ public static class HostComposition
     /// <summary>Installs standard CORS and routing, portable errors, and the discovered endpoint groups.</summary>
     public static void MapSkeletonHost(this WebApplication app)
     {
+        app.UseSkeletonHost();
+        app.MapEndpointGroups();
+    }
+
+    /// <summary>Shares startup, controls gate and wire middleware without imposing an executable's route surface.</summary>
+    public static void UseSkeletonHost(this WebApplication app)
+    {
         ArgumentNullException.ThrowIfNull(app);
         app.Services.GetRequiredService<RuntimeStatus>().Settle();
         if (app.Configuration["TCC_CONTRACT_HOOKS"] == "1")
@@ -60,6 +67,5 @@ public static class HostComposition
         app.UseRouting();
         app.UseCors();
         app.UseMiddleware<HostMiddleware>();
-        app.MapEndpointGroups();
     }
 }

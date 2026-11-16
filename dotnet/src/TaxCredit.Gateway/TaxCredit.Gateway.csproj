@@ -3,9 +3,17 @@
     <RootNamespace>TaxCredit.Gateway</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="ModelContextProtocol" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\TaxCredit.Api\TaxCredit.Api.csproj" />
     <ProjectReference Include="..\TaxCredit.Application\TaxCredit.Application.csproj" />
     <ProjectReference Include="..\TaxCredit.ServiceDefaults\TaxCredit.ServiceDefaults.csproj" />
   </ItemGroup>
+  <Target Name="ConfigureContractReplayLaunch" BeforeTargets="ComputeRunArguments"
+          Condition="'$(TCC_CONTRACT_DIR)' != '' and '$(TCC_CONTRACT_HOOKS)' == '' and Exists('$(TCC_CONTRACT_DIR)\inventory\routes.json')">
+    <PropertyGroup>
+      <RunArguments>$(RunArguments) --TCC_CONTRACT_HOOKS=1</RunArguments>
+    </PropertyGroup>
+  </Target>
 </Project>
