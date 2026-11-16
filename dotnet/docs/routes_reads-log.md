@@ -120,3 +120,48 @@ or any shared source.
   history, explicitly superseded here. Updated the report, status and delimited
   port-map addendum. The owned API helper was stopped; no unrelated process was
   killed. No package, live system, external worktree or unowned source changed.
+
+## Second conductor retry: replay decisions, no speculative product workaround
+
+- Read the latest conductor raw report and its exact waived-field keys.
+  Its score is **332/414 (80.2%)**, with **207/414 (50.0%)** waived; the
+  current conductor cap is **25%**, superseding the earlier 20% planning value.
+  Across all groups it reports 6,690 unwaived fields, from 7,805 raw fields
+  less 1,115 registered differences.
+- Classified every unwaived owned case, exactly **82**: 37 P2 setup,
+  two auth setup, 30 existing storage-identity/page-bound refusals,
+  eleven page-independent-count conflicts and two missing sibling-write
+  envelopes. No unexplained owned-handler mismatch remains in that partition.
+- The conductor's P2 `scope` says `data_source=csv`, not `lakehouse`.
+  Reproduced an unqualified reset on a normal host: it returns P1, CSV and one
+  client. The complete 74-exchange P2 scenario then yields **927 raw failing
+  fields and only 2/40 owned cases matching**. Explicit P2 reset on the same
+  host immediately selects lakehouse and four clients.
+- `contract.replay` posts the supplied external reset URL verbatim with `{}`;
+  it does not select `scenario.profile`. `exchange.run_scenario` mints tokens
+  but does not apply `scenario.auth`. Auth must be explicitly configured after
+  reset, without a subsequent reset clearing the runtime environment overlay.
+- Independently reproduced both restricted-client failures: same normal host,
+  same synthetic restricted token retained only in memory, units/matrix return
+  **200/200** locally and **403/403** after explicit Entra scenario setup.
+  No token, credential or private data was persisted.
+- Reran strict whole build: **0 warnings/errors**; whole formatter passes;
+  whole non-heavy suite **741/741 passes**, including **95 API tests**.
+- Reran all **twelve complete scenarios** with explicit profile/auth setup,
+  unchanged semantic comparisons and ordinary feature discovery:
+  **1,769 exchanges, 6,765 raw failing fields**, exit 1. Wrapper remains
+  **270/520 (51.92%)**; exact owned methods **188/414 raw**. P2 is **38/40**:
+  only required honest counts (26/13 versus recorded 3/3) and free 404 text
+  differ. Artifacts: `dotnet/artifacts/reads-05.json`, `reads-05-raw/`, and
+  `reads-05-unconfigured-p2.json`, all ignored.
+- Updated the main report and `status/routes_reads.json` with explicit
+  `needs_human` decisions: apply the correct scenario setup; settle Tier C
+  message freedom versus the 25% cap; reconcile required honest counts with
+  pinned numeric metadata; decide the shared invalid-ID/page contract; and
+  integrate the sibling writes before judging their dependent envelopes.
+- No product code, register entry, test, recording, numerical comparison or
+  threshold changed in this retry. Inferring profile/auth from requests,
+  faking sibling write effects, reproducing forbidden framework internals or
+  restoring dishonest counts is not an authorized solution. The replay gate
+  remains explicitly false. Stopped the owned API helper; no unrelated process
+  or external worktree was changed.

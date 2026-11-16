@@ -2,7 +2,7 @@
   "session": "routes_reads",
   "branch": "dotnet/w2-routes_reads",
   "head": "c253ade",
-  "summary": "All 29 owned operations and the portfolio/discovery/full-trend application seams are implemented.\nFixed root-captured source/fiscal services, duplicate explicit host endpoints, standalone handler validation and reviewer defaults entirely inside owned folders.\nRemoved the obsolete HALT: no shared source edit is necessary.\nVerified c253ade: whole strict build and formatter pass; all 741 fast tests pass, including 95 API tests.\nFour lifecycle/source-absence/token/auth regressions and all 14 previously unreported P1 calculation recording cases pass.\nAll twelve complete ordinary-host scenarios ran: 1769 exchanges, 6765 failing fields across all groups; replay exits 1.\nExact owned raw score is 188/414 (45.41%); wrapper score is 270/520 (51.92%). P2 owned cases are 38/40; no adjusted passing score is claimed.\nRequired honest population metadata conflicts with recorded counts; free error detail alone exceeds the waiver cap, and unfinished sibling writes affect later envelopes.\nNo recorded number, comparison, threshold or existing test was weakened. Local commits only; no push, package, live integration or unowned edit.",
+  "summary": "All 29 owned operations and portfolio/discovery/full-trend application seams remain implemented at verified code c253ade.\nSecond retry: reran the whole strict build, formatter and fast suite; all pass, including 741/741 fast tests and 95/95 API tests.\nReran all twelve complete normal-host scenarios: 1769 exchanges, 6765 raw failing fields; replay exits 1.\nConfigured local exact-owned score remains 188/414 raw; P2 is 38/40, differing only in required honest counts and free 404 wording.\nThe conductor reports 332/414 (80.2%) after waivers, with 207/414 (50.0%) waived against its current 25% cap.\nClassified all 82 unwaived conductor cases: 37 wrong P2 setup, 2 auth setup, 30 shared bounds, 11 required count metadata, 2 missing sibling-write envelopes.\nIndependently reproduced default reset selecting P1/csv instead of P2/lakehouse, and restricted reads changing 200/200 to 403/403 only after explicit auth setup.\nReplay remains blocked by setup and policy decisions now stated explicitly in needs_human; no product workaround or passing gate is claimed.\nNo code, register, recorded figure, comparison, test or threshold was weakened this retry. Documentation/status committed locally only; no push or unowned edit.",
   "stages": {
     "stage_1_application_boundary": "done",
     "stage_2_stored_scope_drill": "done",
@@ -59,7 +59,9 @@
     "One normal host now passes P1-to-P2-to-P1 source/fiscal reselection, including the April fiscal start; auth changes do not reuse local client rights.",
     "Accepted eligibility and units remain readable without configured payroll; strict fiscal selection and source-backed forecasts refuse explicitly.",
     "W1 GoldReader.PeopleTotal and Python recordings return the limited displayed count for unfiltered population metadata; Stage 2 explicitly forbids that behavior.",
-    "The raw semantic comparer still compares Tier C validation wording and structural error metadata, although the task permits the JSON detail family with free message text.",
+    "The raw semantic comparer still compares Tier C validation wording and structural error metadata, although the task permits the JSON detail family with free message text. The current conductor cap is 25%, superseding the earlier 20% planning value.",
+    "The second conductor board reports 332/414 (80.2%) after waivers, with 207/414 (50.0%) waived. Its 82 unwaived owned cases partition exactly into 37 P2 setup, 2 auth setup, 30 shared identity/page bounds, 11 required honest-count metadata and 2 missing sibling-write envelopes.",
+    "The conductor's P2 scope reports csv rather than lakehouse; restricted-client auth probes return 200 instead of 403. Independent same-host experiments reproduced both: default reset selects P1/csv/one client, explicit P2 reset selects lakehouse/four clients; the same in-memory restricted token gets 200/200 locally and 403/403 after explicit Entra configuration. The external replay does not apply scenario.profile or scenario.auth automatically. ReadsCalc must not infer either from the requested account or token.",
     "Existing shared positive-Int64 identity and maximum-10000 page binding produce deliberate 422 refusals for nonpositive identities and huge page limits; no global binder or infrastructure cap was bypassed.",
     "F-3 and F-4 reach deliberate JSON 422 refusals through existing binding/validation boundaries; F-1 magnitude is bounded.",
     "Captured ingestion precedence M-01 and first-program credit_math pricing remain unchanged because correcting them changes figures.",
@@ -79,7 +81,15 @@
     },
     {
       "item": "Reconcile free Tier C messages/error metadata with the replay waiver cap.",
-      "why": "Of 414 exact owned cases, 177 (42.75%) fail only on detail/header differences, above the 20% planning cap. Thirty-seven narrowly described improvement entries do not imply a passing adjusted score or permission to exceed the cap; no Python framework-emulation code was added."
+      "why": "The conductor reports 207/414 waived (50.0%) against its current 25% cap. Even the prior configured local replay has 177 error/header-only cases (42.75%). Decide whether policy-free Tier C differences are excluded from the cap, or explicitly authorize a compatible error serializer despite the current no-Pydantic-emulation instruction. No comparison, threshold or register scope was weakened."
+    },
+    {
+      "item": "Configure the external replay's profile and authentication for each scenario before measuring owned routes.",
+      "why": "The conductor's P2 scope reports csv instead of lakehouse, and its two restricted-client probes return 200. A fresh default-reset complete P2 replay independently matches only 2/40 owned cases (927 all-group failing fields); explicit P2 reset on the same host reports lakehouse/four clients. The raw replay posts its reset URL verbatim and mints tokens without applying scenario.auth. Supply reset?profile=P2 and the scenario's auth/env overlay, without clearing it afterward through another unqualified reset. Do not request product-side account/token inference as a workaround."
+    },
+    {
+      "item": "Decide how the replay treats 30 invalid-identity or oversized-page cases refused by existing shared bounds.",
+      "why": "The inherited positive-Int64 identity binder and maximum-10000 SQL page contract refuse them with 422. Reproducing inconsistent Python empty-success/404 behavior or bypassing the adapter bound would require a separately authorized shared-contract change, not numerical replay fabrication."
     },
     {
       "item": "Integrate sibling claim/run/base-year/rebase implementations before judging dependent owned read envelopes.",

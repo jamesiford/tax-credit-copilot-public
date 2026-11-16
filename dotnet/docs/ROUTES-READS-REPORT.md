@@ -242,7 +242,7 @@ into 177 with only `detail`/header differences, 12 with only unfiltered-count
 metadata differences, two dependent sibling-write envelopes, 34 with status
 differences (mostly existing shared identity/page bounds), and one source-error
 metadata nesting difference. Even error-only cases alone represent **42.75%**
-of owned cases, above the planning policy's **20%** waiver cap. The task permits
+of owned cases, above the conductor's current **25%** waiver cap. The task permits
 free Tier C message text and the JSON `detail` family; copying Pydantic error
 internals to escape that cap would contradict its no-framework-emulation rule.
 
@@ -334,3 +334,77 @@ The obsolete HALT is removed: no unowned source change is needed for these
 repairs. The remaining replay-policy decisions and genuine sibling-consumption
 seams are listed in the machine-readable status. This is not a claim that the
 100% replay threshold passes.
+
+## Second conductor retry: exact remaining decisions
+
+The next conductor run reports **332/414 (80.2%)** after registered
+differences, with **207/414 (50.0%)** relying on the register against its
+current **25%** cap. Its raw input contains 7,805 failing fields across all
+groups, of which 1,115 are registered, leaving the reported 6,690. This is
+distinct from the correctly configured local twelve-scenario replay above;
+neither result is a passing gate.
+
+Every one of its **82 unwaived owned cases** has been inspected, using the
+unchanged raw report and the board's exact waived-field keys:
+
+| Remaining cause | Cases | Evidence / disposition |
+|---|---:|---|
+| P2 seed/source setup | 37 | The conductor's P2 `scope` has `data_source: csv`, not `lakehouse`; its first client's catalogue and missing accepted runs are P1, not a numerical engine discrepancy |
+| Auth setup | 2 | `client-authz.units` and `client-authz.query-account` return 200 instead of 403; the configured-auth regression and local replay refuse them correctly |
+| Existing positive storage-identity / bounded-page contract | 30 | Invalid nonpositive identities and huge page sizes reach deliberate shared 422 refusals; Python instead returns inconsistent 404/empty 200 or accepts the enormous page |
+| Required page-independent counts | 11 | `total_unfiltered` / `near_total_unfiltered` must be honest under Stage 2, but the recordings contain page sizes |
+| Missing sibling writes | 2 | `reader.read-units` and `ok.post-api-employee-drill` cannot read the run identity/override that an unimplemented sibling write would have produced |
+
+These are not 82 unimplemented handlers. In particular, changing a read to
+choose P2 from an account number, infer authentication from a minted token, or
+fabricate a run after a sibling 501 would conceal incorrect setup and violate
+source, authorization and ownership boundaries.
+
+The harness protocol is explicit in `contract/replay.py`: a non-Python server
+needs the scenario's profile seed and auth setup before execution. The raw
+replay does not select `scenario.profile` for an external server; its
+`--reset-url` is posted verbatim with `{}`. `exchange.run_scenario` mints tokens
+but does not enable authentication from `scenario.auth`. For each scenario,
+select the profile in the reset URL (or body), then configure the scenario's
+auth/environment values. Do not follow that configuration with another
+unqualified reset, which clears the runtime overlay.
+
+The isolated normal-host setup experiment is now reproduced independently:
+an unqualified reset returns `profile: P1`; scope reports `csv` and one client.
+Running the **complete 74-exchange P2 scenario** after that reset produces
+**927 raw failing fields, only 2/40 exact owned cases matching**. An explicit
+`POST /__contract__/reset?profile=P2` on that same host returns `profile: P2`;
+scope immediately reports `lakehouse` and four clients. The experiment is
+`dotnet/artifacts/reads-05-unconfigured-p2.json` (ignored local artifact).
+It changes no comparison and no host code.
+
+The two auth discrepancies are reproduced separately on that same normal host.
+The same restricted synthetic token, held only in memory, reads units and the
+account-scoped matrix with statuses **200/200** in local mode. After explicitly
+applying the auth scenario's `AUTH_MODE=entra`, writer enforcement, audience and
+synthetic issuer configuration, the identical requests return **403/403**.
+No token or credential was persisted. This is a setup requirement, not a reason
+to change the product's deliberate local development mode.
+
+The second retry also completed fresh checks, without a product-code change:
+
+| Check | Fresh result |
+|---|---|
+| Whole strict build, `reads-retry3-gates` | 0 warnings, 0 errors |
+| Whole formatter verification | Passed |
+| Whole non-heavy suite | **741/741 passed**, including **95/95 API tests** |
+| All twelve complete scenarios, `reads-replay05` | **1,769 exchanges, 6,765 raw failing fields**, exit 1 |
+| Exact owned methods/templates | **188/414 raw**, unchanged; wrapper **270/520 (51.92%)** |
+| Correctly selected P2 | **38/40 raw**; only honest counts and free 404 wording differ |
+
+Fresh artifacts are `dotnet/artifacts/reads-05.json` and `reads-05-raw/`.
+Their per-scenario totals exactly reproduce the configured replay table above.
+All twelve scenarios completed; the normal API helper was stopped afterward.
+The improvements register stays at 37 entries, and no numerical waiver,
+recording, test, comparison, feature flag or threshold changed.
+
+The current product code is therefore retained, rather than adding forbidden
+Pydantic-emulation code, restoring dishonest totals, changing shared storage
+validation, or implementing sibling endpoints in ReadsCalc. The required
+owner decisions are explicit in `status/routes_reads.json`; repeating the same
+gate without settling them cannot yield an honest 100% result.
