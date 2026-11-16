@@ -1,8 +1,8 @@
 {
   "session": "sources_auth_ai",
   "branch": "dotnet/w1-sources_auth_ai",
-  "head": "143fb97",
-  "summary": "Implemented payroll/fiscal source adapters, API trust/writer/visibility services, monotonic limits, guarded AI runtimes/telemetry and immutable local/Blob bytes. Whole SDK10.0.404 build and format pass; all 605 non-heavy tests pass, including all 152 parity tests with explicit CPython3.12.13 TCC_PYTHON. One additional heavy P2 comparison passed. Halt removed and complete report/register committed. S2 remains partial at the existing Domain strict leap-shift seam; figure-affecting Python inconsistencies are preserved for owner review. No private certification, live services, HTTP replay or pushes. Head identifies the verified implementation/report commit preceding this status-only commit.",
+  "head": "42a6c4c",
+  "summary": "Fixed the conductor's missing-oracle environment at the independent testhost launch boundary. Owned central props persist the approved existing CPython3.12 path for bare test runs without machine/user environment changes; explicit oracle/runsettings remain authoritative. Re-ran whole SDK10.0.404 build, format and bare non-heavy test gate with parent TCC_PYTHON removed: all605 tests pass, including152 parity tests in7m1s; build has zero warnings/errors. Source/auth/AI/artifact implementations remain verified; S2 remains partial at the documented existing Domain strict leap-shift seam. No private certification, live services, HTTP replay or pushes. Head identifies the verified correction/report commit preceding this status-only commit.",
   "stages": {
     "S1": "done",
     "S2": "partial",
@@ -29,10 +29,16 @@
       "what": "The conductor's follow-up explicitly authorizes the required session documentation and removal of the original halt.",
       "why": "Implementation proceeds within the owned adapter folders and the session-specific report, log, improvements and status paths.",
       "decision_needed": false
+    },
+    {
+      "id": "DEV-2",
+      "what": "Added testhost oracle launch configuration inside the owned sources_auth_ai central-props section, alongside its package declarations.",
+      "why": "The conductor does not inherit our shell-local environment. VSTestCLIRunSettings supplies the approved existing executable only for test projects with no explicit oracle/runsettings. This fixes bare gates without editing unowned parity code or shared machine settings.",
+      "decision_needed": false
     }
   ],
   "findings": [
-    "The original missing TCC_PYTHON gate failure requires explicit oracle configuration in the test process, not a user/machine-wide environment change.",
+    "Shell-local TCC_PYTHON did not persist into the conductor's independent process. Test-only central VSTestCLIRunSettings now supplies the approved existing oracle when no explicit configuration is given; interpreter validation remains unchanged.",
     "The newest Azure SDK graph conflicts with the shared DI10.0.0 package baseline; compatible stable MIT versions are used without changing another session's package declarations.",
     "SDK discovery follows the working directory: running from dotnet selects pinned10.0.404; root runs had selected SDK11. Preview constructor syntax was removed without changing the SDK or language settings.",
     "Public exception classes must be sealed or abstract. Source/auth bases are now abstract with sealed concrete refusals; ModelException is sealed. The architecture rule and exact exception assertions remain enforced.",
