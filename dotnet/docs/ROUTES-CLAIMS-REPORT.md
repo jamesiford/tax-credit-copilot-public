@@ -12,12 +12,15 @@ discovery graph, but that is not a claim of full semantic equivalence.
   system was contacted, and no new dependency/project reference was added.
 - Final whole-solution `dotnet build -warnaserror` passed with zero warnings and
   errors. Final whole-solution `dotnet format --verify-no-changes` passed.
-- All ten focused feature integration tests passed together in 49 seconds.
-  The QC reset test took 23 seconds under load and was subsequently tagged heavy;
-  the independently unverified P2 integration test is also heavy.
-- Whole-solution fast run: **718 passed, 4 failed, 722 total**. Seven non-API test
-  projects passed. The claim test timed out at its 30-second limit under parallel
-  contention but passed on a focused rerun. The other three failures reproduce.
+- The conductor retry passes **all 12 feature integration tests**, including the
+  heavy P2 portfolio test and a new same-host package/download/reset regression.
+  The feature run took two minutes; P2 alone took 112 seconds.
+- Final whole-solution fast run: **717 passed, 3 failed, 720 total**. All seven
+  non-API projects pass; all remaining failures are the shared framework tests
+  below. The claim-history test had taken 68 seconds in the reproduced loaded
+  run, so it is now heavy under the task policy and retains all its assertions.
+  Its artificial 30-second timeout was removed. The P2 test now sets its heavy
+  timeout before sending requests and checks reset success.
 - Two shared framework tests insist that `GET /api/rules` remain **501**; this
   task requires its implementation. The provider-selection test also validates
   auto-discovered handlers without invoking the feature module that registers
@@ -26,11 +29,26 @@ discovery graph, but that is not a claim of full semantic equivalence.
 - Formatting initially identified four owned import-order issues. Project-scoped
   formatting did not correct those diagnostics; explicit import ordering did.
   Final whole-solution verification passed.
+- The retry reproduced and fixed the conductor's reset 500. The shared default
+  mediator is a singleton that resolves handlers from its root provider. A
+  package handler therefore retained the scoped artifact-generation lease until
+  host disposal. The feature registers the existing mediator as scoped through
+  ordinary pre-Build registration: no service-location workaround, second
+  provider, reset bypass or changed shared file. Same-host create/download/reset
+  and subsequent publication pass.
+- `probe_claims_reset.py` launches and stops its own ordinary host on an
+  OS-assigned port. `revision-reset-before.json` reproduces package 201 followed
+  by reset 500 and no replay report. `revision-reset-after.json` shows reset 200
+  and an actual report from unchanged `contract.replay --reset-url`; that replay
+  still exits 1 for semantic differences. Report generation is not acceptance.
+- Final gate logs: `revision-build-final.log`, `revision-format-final.log`,
+  `revision-tests-feature-final.log`, and `revision-tests-fast-final.log`.
 
 ### Complete scenario replay, unchanged semantic comparator
 
-Evidence: `replay-complete-1/board.json`, per-scenario `*-board.json`, and
-`replay-complete-1/raw/*.json` / `*.md`. Full scenarios, including sibling setup
+Latest evidence: `revision-replay/board.json`, per-scenario `*-board.json`, and
+`revision-replay/raw/*.json` / `*.md`. The retry reproduces the original
+`replay-complete-1` counts below. Full scenarios, including sibling setup
 and unrelated exchanges, ran against separate ordinary hosts, each on an
 OS-assigned port with an isolated SQLite/byte directory.
 
@@ -98,7 +116,7 @@ supplied actors. The named F-14 valid-request reader exceptions remain unchanged
 | PUT /api/claims/engagement | ClaimEndpoints / Claims.SetEngagement | Real scoped engagement history; Writer | p1_writes engagement cases; 200/422 |
 | POST /api/claims/assess | AssessmentEndpoints / Claims.AssessClient | Certified ClientAssessment multi-year sweep, payroll/fiscal ports, real claim sink; named Open exception | AssessmentTests; reader.assess/writer.assess; 200/404/422 |
 | GET /api/claims/lifecycle | ClaimEndpoints / Claims.GetLifecycle | Certified status/provenance/outcome/engagement enums, no write | p1_reads lifecycle captures; 200 |
-| GET /api/v2/portfolio | PortfolioEndpoints / Portfolio.GetPortfolio | Stored claims, source book/footprint, authored coverage; no engine | ClaimTests heavy (not independently passed), complete P1/P2 captures; 200/422; degraded path incomplete |
+| GET /api/v2/portfolio | PortfolioEndpoints / Portfolio.GetPortfolio | Stored claims, source book/footprint, authored coverage; no engine | ClaimTests heavy now passes, complete P1/P2 captures; 200/422; degraded path incomplete |
 | GET /api/v2/clients/{client_id}/situation | AssessmentEndpoints / Claims.GetClientSituation | Recorded claims + certified CoverageSituation + book name; no engine | P1/P2 client situations and unknown.situation-unknown; unknown is assessed=false, not zero |
 | GET /api/rules | RuleEndpoints / Rules.ListRules | Real flat pack catalogue, metadata, practitioner lookup; no write | RuleAuditTests + p1_reads; 200; conflicts with two shared stale 501 assertions |
 | POST /api/rules/{code}/verify | RuleEndpoints / Rules.VerifyRules | Existing PackValidator + durable practitioner lookup; named Open exception | RuleAuditTests + reader.rules-verify; 200/404/422 |
@@ -190,6 +208,9 @@ Reproduce the focused feature tests from `dotnet` with:
 ```powershell
 dotnet test tests\TaxCredit.Api.Tests\TaxCredit.Api.Tests.csproj --filter "FullyQualifiedName~ClaimsArtifactsRules&Category!=heavy"
 ```
+
+For the complete 12-test feature check, including the slow synthetic P2 reset
+and same-host reset regression, omit `&Category!=heavy`.
 
 `replay_claims.py` invokes the unchanged replay wrapper, starts/stops a separate
 ordinary host per scenario, verifies readiness, uses OS-assigned ports, and

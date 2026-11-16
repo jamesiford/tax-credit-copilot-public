@@ -1,8 +1,8 @@
 {
   "session": "routes_claims",
   "branch": "dotnet/w2-routes_claims",
-  "head": "aad5a26",
-  "summary": "HALTED at hard stop 1: shared framework tests require the assigned rules operation to remain 501.\nAll 24 operations have feature-local endpoints and mediator handlers; semantic acceptance is incomplete.\nFinal whole-solution build and formatting pass; all ten focused integration tests passed together.\nWhole fast run: 718 passed, 4 failed; three framework failures reproduce and one claim-test timeout passes in isolation.\nComplete seven-scenario raw replay: 156/397 cases, 39.29%; no adjusted score claimed.\nAll 13 uncompressed XLSX members match the recording; immutable publication and download audits are exercised.\nNo live services, forbidden-path edits, pushes or remote changes; temporary synthetic stores removed.\nThe head field identifies the implementation commit; this status and reports are committed afterward.",
+  "head": "2cd6769",
+  "summary": "PARTIALLY REPAIRED; hard stop 1 remains for three shared framework failures outside the allocation.\nFixed conductor reset 500: a scoped mediator releases package byte leases at request disposal.\nSame-host create/download/reset/recreate passes; conductor-style replay now produces a report.\nAll 12 feature tests pass, including the heavy P2 portfolio integration and new reset regression.\nFinal whole-solution build and format pass; full fast suite is 717 passed, 3 failed, 720 total.\nAll seven full scenarios re-run: 156/397 owned cases, 39.29%; 98% acceptance still not achieved.\nTwo framework tests still require implemented GET /api/rules to return 501; bare runtime misses feature collaborators.\nNo shared-file edits, live services, pushes or remote changes; temporary synthetic stores removed.\nThe head field identifies the repair commit; this status and reports are committed afterward.",
   "stages": {
     "preflight": "done",
     "stage-1-packages": "done",
@@ -39,7 +39,7 @@
     {
       "id": "DEV-3",
       "what": "Complete relevant scenarios ran on a fresh ordinary host per scenario, using OS-assigned ports and isolated local state.",
-      "why": "The environment is shared; fixed-port reuse encountered a sibling listener and multi-scenario reset attempts failed. Fresh hosts isolate evidence without changing shared controls.",
+      "why": "The environment is shared, so OS-assigned ports and exclusively owned stores isolate evidence. The earlier reusable-reset defect is now separately reproduced, fixed and covered by a same-host regression.",
       "decision_needed": false
     },
     {
@@ -55,13 +55,16 @@
     "F-2: invalid portfolio engagement scope returns JSON detail with 422 rather than an unhandled 500.",
     "Named F-14 reader assessment and verification exceptions are intentionally preserved because changing valid-request authorization outcomes requires owner review.",
     "Raw replay includes incidental error wording, redirect/CORS headers, frozen-versus-real mtime and deterministic IDs affected by missing sibling operations.",
-    "Portfolio degraded rows/counters and oversized storage-bound inputs remain incomplete; they are not waived or reported as successful."
+    "Portfolio degraded rows/counters and oversized storage-bound inputs remain incomplete; they are not waived or reported as successful.",
+    "The shared singleton mediator captured scoped artifact-byte leases at its root, making reset fail after package publication. Ordinary feature registration now scopes the existing mediator; same-host reset and report generation pass.",
+    "The heavy P2 test previously set HttpClient.Timeout after its first request. Moving timeout configuration before requests and asserting reset success makes the complete test pass.",
+    "The claim-history test took 68 seconds under full-suite contention and is now heavy under the task policy; its conflict/history/isolation assertions are unchanged."
   ],
   "open_questions": [
     "Which still-deferred operation should the two shared framework stub-replacement tests use after the rules route is implemented?",
     "Should bare AddApplication/AddInfrastructure/AddTaxCreditRuntime construction invoke feature modules, or should the provider-selection test explicitly compose them?",
     "What shared fixture book-name and deterministic identity-sequencing contract should integration preserve?",
-    "The earlier multi-scenario reset 500 was not diagnosed to an exact shared-control cause; fresh-per-scenario hosting does not certify reusable external reset."
+    "The feature scopes the mediator to release request adapters; should the shared AddApplication default also be corrected by its owner for hosts that do not load this feature?"
   ],
   "needs_human": [
     {
@@ -99,6 +102,13 @@
     "dotnet/docs/routes_claims-log.md",
     "dotnet/docs/improvements/routes_claims.json",
     "dotnet/docs/replay-complete-1/board.json",
-    "dotnet/docs/openpyxl-assets-LICENSE.txt"
+    "dotnet/docs/openpyxl-assets-LICENSE.txt",
+    "dotnet/docs/revision-reset-before.json",
+    "dotnet/docs/revision-reset-after.json",
+    "dotnet/docs/revision-replay/board.json",
+    "dotnet/docs/revision-build-final.log",
+    "dotnet/docs/revision-format-final.log",
+    "dotnet/docs/revision-tests-feature-final.log",
+    "dotnet/docs/revision-tests-fast-final.log"
   ]
 }

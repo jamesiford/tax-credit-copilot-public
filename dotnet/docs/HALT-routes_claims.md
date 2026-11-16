@@ -33,3 +33,19 @@ resume the outstanding semantic discrepancies and full gate work documented in
 
 All work remains local, synthetic and within allocated paths. No push, remote
 change, live customer-service access or shared-file edit was made.
+
+## Conductor retry
+
+The reported reset 500 is now fixed within the allocated feature. The default
+singleton mediator retained a scoped artifact-byte lease from a package request.
+Registering the existing mediator as scoped through the ordinary feature module
+releases that lease at request disposal. The same-host regression and diagnostic
+probe pass; unchanged conductor-style replay now produces a report rather than
+failing during reset.
+
+Final retry evidence: all 12 feature tests pass, build/format pass, and the full
+fast suite has 717 passes and the same three shared framework failures (720
+tests). The seven complete scenarios still score 156/397, 39.29%, without
+waivers. This HALT remains because neither the ownership restriction nor the
+two contradictory shared 501 assertions changed. Removing it would falsely
+claim that the mandatory hard-stop condition was resolved.
