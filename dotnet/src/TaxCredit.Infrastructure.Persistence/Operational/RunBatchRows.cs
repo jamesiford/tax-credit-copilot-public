@@ -45,7 +45,7 @@ internal static class RunBatchRows
         return
         [
             batch.BatchId, batch.Kind.Value(), batch.ScopeKind.Value(), PyJson.Dumps(spec, sortKeys: true, compact: false), batch.ProgramCode,
-            batch.TaxYears.Count == 0 ? null : PyJson.Dumps(batch.TaxYears.ToArray()), batch.Force, batch.IncludeCodeCommit, batch.RefreshOnce,
+            batch.TaxYears.Count == 0 ? null : PyJson.Dumps(batch.TaxYears.Select(y => (object?)y).ToList()), batch.Force, batch.IncludeCodeCommit, batch.RefreshOnce,
             batch.Status.Value(), batch.CancelRequested, counts["items_total"], counts["items_queued"], counts["items_running"],
             counts["items_succeeded"], counts["items_skipped"], counts["items_failed"], counts["items_cancelled"],
             batch.RequestedBy, OpsRow.Clock(session, batch.RequestedAt), OpsRow.Clock(session, batch.StartedAt),

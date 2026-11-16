@@ -13,10 +13,12 @@ public static class OperationalSchema
         "tcc_ops.program_draft", "tcc_ops.lookup_override", "tcc_ops.lookup_audit", "tcc_ops.agent_finding_resolution",
         "tcc_ops.finding_audit", "tcc_ops.artifact_access", "tcc_ops.artifact", "tcc_ops.channel_confirmation",
         "tcc_ops.channel_user", "tcc_ops.channel_audit", "tcc_ops.agent_action_audit",
+        "tcc_ops.write_sequence", "tcc_ops.run_work_identity", "tcc_ops.run_source_observation",
     ]);
 
-    /// <summary>The only table these adapters add beyond the checked-in central DDL; its SQLite name is tcc_ops_finding_audit.</summary>
-    public static IReadOnlyList<string> SupplementalTableNames { get; } = Array.AsReadOnly<string>(["tcc_ops.finding_audit"]);
+    /// <summary>Local supplemental tables; deployed provisioning must explicitly supply the equivalent native DDL.</summary>
+    public static IReadOnlyList<string> SupplementalTableNames { get; } = Array.AsReadOnly<string>(
+        ["tcc_ops.finding_audit", "tcc_ops.write_sequence", "tcc_ops.run_work_identity", "tcc_ops.run_source_observation"]);
 
     /// <summary>Adds the attributed reopen audit missing from the checked-in base schema, without changing existing tables.</summary>
     public static void Initialize(PersistenceDatabase database)
@@ -30,6 +32,15 @@ public static class OperationalSchema
                 ? "CREATE TABLE IF NOT EXISTS tcc_ops.finding_audit " + declaration
                 : "IF OBJECT_ID('tcc_ops.finding_audit', 'U') IS NULL CREATE TABLE tcc_ops.finding_audit " + declaration;
             session.ExecuteExempt(SqlExemption.Schema, sql);
+            if (session.Dialect is SqliteDialect)
+            {
+                OverrideOrder.UpgradeLocal(session);
+                session.ExecuteExempt(SqlExemption.Schema, "CREATE TABLE IF NOT EXISTS tcc_ops.run_work_identity "
+                    + "(client_id INTEGER NOT NULL,item_id TEXT NOT NULL,run_id TEXT NOT NULL,PRIMARY KEY(client_id,item_id)) STRICT");
+                session.ExecuteExempt(SqlExemption.Schema, "CREATE TABLE IF NOT EXISTS tcc_ops.run_source_observation "
+                    + "(client_id INTEGER NOT NULL,run_id TEXT NOT NULL,observation_json TEXT NOT NULL,PRIMARY KEY(client_id,run_id)) STRICT");
+            }
+
             return true;
         });
     }
