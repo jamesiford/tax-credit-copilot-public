@@ -19,8 +19,15 @@
     <PackageVersion Include="Microsoft.AspNetCore.TestHost" Version="10.0.0" />
     <!-- END skeleton -->
     <!-- BEGIN persistence: only this session edits between the markers -->
+    <PackageVersion Include="Microsoft.Data.SqlClient" Version="7.1.2" />
+    <PackageVersion Include="Microsoft.Data.Sqlite" Version="10.0.0" />
+    <PackageVersion Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.13" />
     <!-- END persistence -->
     <!-- BEGIN sources_auth_ai: only this session edits between the markers -->
     <!-- END sources_auth_ai -->
   </ItemGroup>
+  <!-- Persistence gate repair: configure the approved oracle only when the runner has not supplied one. -->
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'TaxCredit.Parity.Tests' and '$(TCC_PYTHON)' == '' and '$(RunSettingsFilePath)' == ''">
+    <RunSettingsFilePath>$(MSBuildThisFileDirectory)tests\TaxCredit.Infrastructure.Persistence.Tests\Oracle.runsettings</RunSettingsFilePath>
+  </PropertyGroup>
 </Project>
