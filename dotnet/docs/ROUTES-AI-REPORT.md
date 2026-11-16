@@ -267,6 +267,17 @@ The final absolute diagnostics are
 under this worktree. They are generated/ignored artifacts, not checked-in
 response substitutes. The temporary replay hosts were stopped.
 
+To reproduce with a separately started hermetic host, invoke the unchanged
+wrapper from the worktree root using the approved interpreter:
+
+```powershell
+& C:\Projects\py312-oracle\.venv\Scripts\python.exe `
+  dotnet\src\TaxCredit.Api\Contract\replay_board.py `
+  --base-url http://127.0.0.1:51821 --scenario p1_artifacts_ai --group ai `
+  --out "$PWD\dotnet\artifacts\ai-replay-final\board.json" `
+  --raw-dir "$PWD\dotnet\artifacts\ai-replay-final\diagnostics"
+```
+
 No live Fabric, Foundry, Entra or customer system was contacted. The production
 Foundry SDK publication/invocation factory, sibling projections/commands and
 ordinary-host success for those bindings remain unverified. No package,
