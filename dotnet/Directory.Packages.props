@@ -24,6 +24,17 @@
     <PackageVersion Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.13" />
     <!-- END persistence -->
     <!-- BEGIN sources_auth_ai: only this session edits between the markers -->
+    <!-- Azure SDK and SqlClient are MIT; versions match stable installed packages, not previews. -->
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.Data.SqlClient" Version="7.1.2" />
+    <PackageVersion Include="Azure.Identity" Version="1.17.1" />
+    <PackageVersion Include="Azure.Storage.Blobs" Version="12.26.0" />
+  </ItemGroup>
+  <!-- Supply the approved local oracle to testhosts, not the shared machine environment. -->
+  <PropertyGroup Condition="$(MSBuildProjectName.EndsWith('.Tests')) and '$(TCC_PYTHON)' == '' and '$(VSTestCLIRunSettings)' == '' and '$(VSTestSetting)' == '' and '$(RunSettingsFilePath)' == '' and Exists('C:\Projects\py312-oracle\.venv\Scripts\python.exe')">
+    <VSTestCLIRunSettings>RunConfiguration.EnvironmentVariables.TCC_PYTHON=C:\Projects\py312-oracle\.venv\Scripts\python.exe</VSTestCLIRunSettings>
+  </PropertyGroup>
+  <ItemGroup>
     <!-- END sources_auth_ai -->
   </ItemGroup>
   <!-- Persistence gate repair: configure the approved oracle only when the runner has not supplied one. -->
