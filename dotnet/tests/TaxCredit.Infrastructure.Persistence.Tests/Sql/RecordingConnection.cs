@@ -16,6 +16,7 @@ internal sealed class RecordingConnection : DbConnection
     internal Exception? BeginError { get; set; }
     internal Exception? CommitError { get; set; }
     internal Exception? ExecuteError { get; set; }
+    internal Func<string, object?[], DataTable>? Read { get; set; }
     [AllowNull] public override string ConnectionString { get; set; } = string.Empty;
     public override string Database => "synthetic";
     public override string DataSource => "fake";
@@ -87,7 +88,7 @@ internal sealed class RecordingConnection : DbConnection
         protected override DbDataReader ExecuteDbDataReader(CommandBehavior behavior)
         {
             ExecuteNonQuery();
-            return new DataTable().CreateDataReader();
+            return (connection.Read?.Invoke(CommandText, _parameters.Values.Select(p => p.Value).ToArray()) ?? new DataTable()).CreateDataReader();
         }
     }
 

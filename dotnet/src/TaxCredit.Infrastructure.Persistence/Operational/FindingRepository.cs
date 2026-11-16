@@ -1,3 +1,4 @@
+using TaxCredit.Application.Ports.Contract;
 using TaxCredit.Application.Ports.Persistence;
 using TaxCredit.Domain.Findings;
 using TaxCredit.Domain.Numerics;
@@ -6,7 +7,7 @@ using TaxCredit.Infrastructure.Persistence.Sql;
 namespace TaxCredit.Infrastructure.Persistence.Operational;
 
 /// <summary>Append-only scoped finding decisions; reopening is independently attributed in the audit.</summary>
-public sealed class FindingRepository(PersistenceDatabase database) : IFindingRepository
+public sealed class FindingRepository(PersistenceDatabase database, IIdSource? ids = null) : IFindingRepository
 {
     private static readonly string[] Columns =
     [
@@ -93,7 +94,7 @@ public sealed class FindingRepository(PersistenceDatabase database) : IFindingRe
         };
     }
 
-    private static void AppendAudit(SqlSession session, long clientId, string findingId, string action, string actor, string at) =>
+    private void AppendAudit(SqlSession session, long clientId, string findingId, string action, string actor, string at) =>
         session.Insert(clientId, "tcc_ops.finding_audit", ["audit_id", "client_id", "finding_id", "action", "actor", "at"],
-            [new object?[] { Guid.NewGuid().ToString(), clientId, findingId, action, actor, at }]);
+            [new object?[] { (ids?.NewId() ?? Guid.NewGuid()).ToString(), clientId, findingId, action, actor, at }]);
 }

@@ -2,12 +2,52 @@ using TaxCredit.Domain.Numerics;
 using TaxCredit.Domain.Pipeline;
 using TaxCredit.Domain.Warehouse;
 using TaxCredit.Infrastructure.Persistence.Operational;
+using TaxCredit.Infrastructure.Persistence.Sql;
 
 namespace TaxCredit.Infrastructure.Persistence.Tests.Operational;
 
 public sealed class ManifestOverrideTests
 {
     private static readonly PyDateTime Now = PyDateTime.FromIsoFormat("2026-01-01T12:00:00+00:00");
+
+    [Fact]
+    public async Task Concurrent_appends_use_one_durable_sequence_and_a_clear_always_wins_after_them()
+    {
+        using var store = new OperationalDatabase();
+        using var start = new Barrier(2);
+        Task Write(int prefix) => Task.Run(() =>
+        {
+            var repository = new ManualOverrideRepository(store.Reopen());
+            start.SignalAndWait();
+            for (var n = 0; n < 8; n++) { repository.Record(Override($"{prefix}-{8 - n}", 11, "GA_JTC:local", (2020 + n).ToString(System.Globalization.CultureInfo.InvariantCulture))); }
+        });
+        await Task.WhenAll(Write(1), Write(2));
+        new ManualOverrideRepository(store.Reopen()).Record(Override("0-clear", 11, "GA_JTC:local", null));
+        var reopened = new ManualOverrideRepository(store.Reopen());
+        Assert.Equal(17, reopened.History(11).Count);
+        Assert.Equal("0-clear", reopened.History(11)[^1].OverrideId);
+        Assert.Empty(reopened.BaseYears(11, "GA_JTC"));
+        using var session = store.Database.Open();
+        var orders = session.Query(11, "SELECT write_order FROM tcc_ops.manual_override WHERE {tenant} ORDER BY write_order");
+        Assert.Equal(Enumerable.Range(1, 17).Select(n => (long)n), orders.Select(r => (long)r["write_order"]!));
+    }
+
+    [Fact]
+    public void Local_legacy_upgrade_is_idempotent_and_does_not_change_timestamps_or_public_ids()
+    {
+        using var store = new OperationalDatabase();
+        var repository = new ManualOverrideRepository(store.Database);
+        repository.Record(Override("z", 11, "GA_JTC:local", "2020"));
+        store.Database.Transact(session => session.ExecuteExempt(SqlExemption.Schema,
+            "ALTER TABLE tcc_ops.manual_override DROP COLUMN write_order"));
+        OperationalSchema.Initialize(store.Database);
+        OperationalSchema.Initialize(store.Database);
+        var rows = new ManualOverrideRepository(store.Reopen()).History(11);
+        Assert.Equal("z", Assert.Single(rows).OverrideId);
+        Assert.Equal(Now, rows[0].CreatedAt);
+        new ManualOverrideRepository(store.Reopen()).Record(Override("a", 11, "GA_JTC:local", null));
+        Assert.Empty(repository.BaseYears(11, "GA_JTC"));
+    }
 
     [Fact]
     public void LatestReadsOnlyUnsupersededSuccessInTheSelectedClientAndProgram()
@@ -55,6 +95,26 @@ public sealed class ManifestOverrideTests
         step1AssumptionSetId: "step", step1AssumptionSha256: new string('a', 64), onezeroAssumptionSetId: "oz",
         onezeroAssumptionSha256: new string('b', 64), rulePackVersion: "pack", codeCommit: new string('c', 40),
         calculationId: new string('d', 64), runCompletedAt: Now, triggeredBy: "synthetic-actor");
+
+    [Fact]
+    public void Identical_timestamps_follow_durable_append_order_across_connections_and_reopen()
+    {
+        using var store = new OperationalDatabase();
+        var first = new ManualOverrideRepository(store.Database);
+        var second = new ManualOverrideRepository(store.Reopen());
+        first.Record(Override("z", 11, "GA_JTC:local", "2020"));
+        second.Record(Override("y", 11, "GA_JTC:local", "2021"));
+        Assert.Equal(2021, first.BaseYears(11, "GA_JTC")["local"]);
+        first.Record(Override("x", 11, "GA_JTC:local", null));
+        Assert.Empty(second.BaseYears(11, "GA_JTC"));
+        second.Record(Override("w", 22, "GA_JTC:local", "2019"));
+        second.Record(Override("v", 11, "GA_JTC:local", "2023"));
+        var reopened = new ManualOverrideRepository(store.Reopen());
+        Assert.Equal(2023, reopened.BaseYears(11, "GA_JTC")["local"]);
+        Assert.Equal(2019, reopened.BaseYears(22, "GA_JTC")["local"]);
+        Assert.Equal(["z", "y", "x", "v"], reopened.History(11).Select(r => r.OverrideId));
+        Assert.All(reopened.History(11), row => Assert.Equal(Now, row.CreatedAt));
+    }
 
     private static ManualOverride Override(string id, long client, string key, string? value) =>
         new(id, "run", client, "unit", key, "base_year", null, value, "reason", "synthetic decision", "author", Now);

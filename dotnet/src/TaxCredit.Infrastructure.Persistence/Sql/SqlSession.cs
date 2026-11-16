@@ -13,6 +13,7 @@ internal enum SqlExemption
     Seed,
     ManifestIdentity,
     ChannelIdentity,
+    OperationalSequence,
 }
 
 /// <summary>Owned connection scope: ordinary repository operations always require a tenant.</summary>
@@ -127,6 +128,7 @@ public sealed class SqlSession : IDisposable
             SqlExemption.Seed => "transactional reset of verified hermetic seeds",
             SqlExemption.ManifestIdentity => "manifest lookup by globally unique run identity",
             SqlExemption.ChannelIdentity => "global channel or draft identity storage",
+            SqlExemption.OperationalSequence => "transactional global append sequence; payload writes remain tenant-bound",
             _ => throw new TenantScopeViolation("Unknown exemption."),
         }));
     }

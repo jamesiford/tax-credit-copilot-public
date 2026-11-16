@@ -1,0 +1,362 @@
+{
+  "mode": "semantic",
+  "scope": "Exact method/template framework membership; same denominator as the authoritative baseline, not a new conductor execution",
+  "baseline": {
+    "passed": 11,
+    "cases": 19,
+    "percent": 57.9,
+    "waived": 0
+  },
+  "current": {
+    "passed": 8,
+    "cases": 19,
+    "percent": 42.11,
+    "waived": 0
+  },
+  "scenarios": [
+    {
+      "scenario": "g1_mcp",
+      "exchanges": 103,
+      "differences": 602
+    },
+    {
+      "scenario": "g1_ratelimit",
+      "exchanges": 10,
+      "differences": 86
+    },
+    {
+      "scenario": "g1_rest",
+      "exchanges": 142,
+      "differences": 857
+    },
+    {
+      "scenario": "p1_artifacts_ai",
+      "exchanges": 36,
+      "differences": 170
+    },
+    {
+      "scenario": "p1_auth",
+      "exchanges": 114,
+      "differences": 500
+    },
+    {
+      "scenario": "p1_program_drafts",
+      "exchanges": 175,
+      "differences": 870
+    },
+    {
+      "scenario": "p1_query_edges",
+      "exchanges": 71,
+      "differences": 921
+    },
+    {
+      "scenario": "p1_reads",
+      "exchanges": 584,
+      "differences": 2523
+    },
+    {
+      "scenario": "p1_workspace_unavailable",
+      "exchanges": 30,
+      "differences": 115
+    },
+    {
+      "scenario": "p1_writes",
+      "exchanges": 366,
+      "differences": 1186
+    },
+    {
+      "scenario": "p2_reads_writes",
+      "exchanges": 74,
+      "differences": 1120
+    },
+    {
+      "scenario": "p2_run_batches",
+      "exchanges": 64,
+      "differences": 509
+    }
+  ],
+  "exchanges": 1769,
+  "cases": [
+    {
+      "scenario": "g1_rest",
+      "case": "docs-not-served",
+      "route": "GET /docs",
+      "passed": false,
+      "differences": [
+        {
+          "category": "status",
+          "path": "status"
+        },
+        {
+          "category": "header",
+          "path": "headers.content-type"
+        },
+        {
+          "category": "header",
+          "path": "headers.vary"
+        },
+        {
+          "category": "body-kind",
+          "path": "body"
+        }
+      ]
+    },
+    {
+      "scenario": "g1_rest",
+      "case": "openapi-not-served",
+      "route": "GET /openapi.json",
+      "passed": false,
+      "differences": [
+        {
+          "category": "status",
+          "path": "status"
+        },
+        {
+          "category": "header",
+          "path": "headers.vary"
+        },
+        {
+          "category": "missing-field",
+          "path": "detail"
+        },
+        {
+          "category": "extra-field",
+          "path": "openapi"
+        },
+        {
+          "category": "extra-field",
+          "path": "info"
+        },
+        {
+          "category": "extra-field",
+          "path": "paths"
+        },
+        {
+          "category": "extra-field",
+          "path": "components"
+        }
+      ]
+    },
+    {
+      "scenario": "p1_auth",
+      "case": "public.health-no-token",
+      "route": "GET /api/health",
+      "passed": true,
+      "differences": []
+    },
+    {
+      "scenario": "p1_auth",
+      "case": "public.ready-no-token",
+      "route": "GET /api/ready",
+      "passed": false,
+      "differences": [
+        {
+          "category": "missing-field",
+          "path": "source_schema.reads"
+        },
+        {
+          "category": "extra-field",
+          "path": "source_schema.accounts"
+        },
+        {
+          "category": "extra-field",
+          "path": "source_schema.problem"
+        },
+        {
+          "category": "value",
+          "path": "source_schema.status"
+        }
+      ]
+    },
+    {
+      "scenario": "p1_auth",
+      "case": "none.docs",
+      "route": "GET /docs",
+      "passed": false,
+      "differences": [
+        {
+          "category": "value",
+          "path": "body.text"
+        }
+      ]
+    },
+    {
+      "scenario": "p1_auth",
+      "case": "none.openapi",
+      "route": "GET /openapi.json",
+      "passed": true,
+      "differences": []
+    },
+    {
+      "scenario": "p1_auth",
+      "case": "token.expired-on-public-health",
+      "route": "GET /api/health",
+      "passed": true,
+      "differences": []
+    },
+    {
+      "scenario": "p1_reads",
+      "case": "ok.api-ready",
+      "route": "GET /api/ready",
+      "passed": false,
+      "differences": [
+        {
+          "category": "missing-field",
+          "path": "source_schema.reads"
+        },
+        {
+          "category": "extra-field",
+          "path": "source_schema.accounts"
+        },
+        {
+          "category": "extra-field",
+          "path": "source_schema.problem"
+        },
+        {
+          "category": "value",
+          "path": "source_schema.status"
+        }
+      ]
+    },
+    {
+      "scenario": "p1_reads",
+      "case": "ok.api-health",
+      "route": "GET /api/health",
+      "passed": true,
+      "differences": []
+    },
+    {
+      "scenario": "p1_reads",
+      "case": "framework.openapi",
+      "route": "GET /openapi.json",
+      "passed": true,
+      "differences": []
+    },
+    {
+      "scenario": "p1_reads",
+      "case": "framework.docs",
+      "route": "GET /docs",
+      "passed": false,
+      "differences": [
+        {
+          "category": "value",
+          "path": "body.text"
+        }
+      ]
+    },
+    {
+      "scenario": "p1_reads",
+      "case": "framework.redoc",
+      "route": "GET /redoc",
+      "passed": false,
+      "differences": [
+        {
+          "category": "value",
+          "path": "body.text"
+        }
+      ]
+    },
+    {
+      "scenario": "p1_reads",
+      "case": "framework.oauth2-redirect",
+      "route": "GET /docs/oauth2-redirect",
+      "passed": false,
+      "differences": [
+        {
+          "category": "value",
+          "path": "body.text"
+        }
+      ]
+    },
+    {
+      "scenario": "p1_reads",
+      "case": "cors.simple",
+      "route": "GET /api/health",
+      "passed": false,
+      "differences": [
+        {
+          "category": "header",
+          "path": "headers.access-control-allow-origin"
+        }
+      ]
+    },
+    {
+      "scenario": "p1_reads",
+      "case": "get-api-ready.unknown-query",
+      "route": "GET /api/ready",
+      "passed": false,
+      "differences": [
+        {
+          "category": "missing-field",
+          "path": "source_schema.reads"
+        },
+        {
+          "category": "extra-field",
+          "path": "source_schema.accounts"
+        },
+        {
+          "category": "extra-field",
+          "path": "source_schema.problem"
+        },
+        {
+          "category": "value",
+          "path": "source_schema.status"
+        }
+      ]
+    },
+    {
+      "scenario": "p1_reads",
+      "case": "get-api-health.unknown-query",
+      "route": "GET /api/health",
+      "passed": true,
+      "differences": []
+    },
+    {
+      "scenario": "p1_workspace_unavailable",
+      "case": "unavailable.health-still-ok",
+      "route": "GET /api/health",
+      "passed": true,
+      "differences": []
+    },
+    {
+      "scenario": "p2_reads_writes",
+      "case": "ready",
+      "route": "GET /api/ready",
+      "passed": false,
+      "differences": [
+        {
+          "category": "missing-field",
+          "path": "source_schema.errors"
+        },
+        {
+          "category": "missing-field",
+          "path": "source_schema.warnings"
+        },
+        {
+          "category": "missing-field",
+          "path": "source_schema.reads"
+        },
+        {
+          "category": "extra-field",
+          "path": "source_schema.accounts"
+        },
+        {
+          "category": "extra-field",
+          "path": "source_schema.problem"
+        },
+        {
+          "category": "value",
+          "path": "source_schema.status"
+        }
+      ]
+    },
+    {
+      "scenario": "p2_reads_writes",
+      "case": "health",
+      "route": "GET /api/health",
+      "passed": true,
+      "differences": []
+    }
+  ],
+  "note": "Board-only wave. Values/thresholds unchanged; no improvements applied. Readiness reports real source observations rather than captured skipped/scan-counter placeholders. Full diagnostic reports remain ignored artifacts."
+}

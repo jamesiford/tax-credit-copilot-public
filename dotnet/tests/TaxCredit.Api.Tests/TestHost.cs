@@ -8,7 +8,7 @@ using TaxCredit.Api.Hosting;
 
 namespace TaxCredit.Api.Tests;
 
-internal sealed class TestHost(WebApplication app, HttpClient client) : IAsyncDisposable
+internal sealed class TestHost(WebApplication app, HttpClient client, string ownedRoot) : IAsyncDisposable
 {
     internal WebApplication App { get; } = app;
     internal HttpClient Client { get; } = client;
@@ -17,6 +17,7 @@ internal sealed class TestHost(WebApplication app, HttpClient client) : IAsyncDi
         IReadOnlyDictionary<string, string?>? configuration = null)
     {
         var builder = WebApplication.CreateBuilder(new WebApplicationOptions { EnvironmentName = "Production" });
+        var ownedRoot = Directory.CreateDirectory(Path.Combine(Corpus.Root, "dotnet", "artifacts", "host-tests", Guid.NewGuid().ToString("N"))).FullName;
         builder.Logging.ClearProviders();
         builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
         {
@@ -27,6 +28,8 @@ internal sealed class TestHost(WebApplication app, HttpClient client) : IAsyncDi
             ["FOUNDRY_PROJECT_ENDPOINT"] = "",
             ["APPLICATIONINSIGHTS_CONNECTION_STRING"] = "",
             ["CORS_ORIGINS"] = "http://localhost:5173",
+            ["OPERATIONAL_DB"] = Path.Combine(ownedRoot, "operations.db"),
+            ["ARTIFACT_LOCAL_ROOT"] = Path.Combine(ownedRoot, "bytes"),
         });
         if (configuration is not null)
         {
@@ -45,12 +48,13 @@ internal sealed class TestHost(WebApplication app, HttpClient client) : IAsyncDi
         routes?.Invoke(app);
         app.MapSkeletonHost();
         await app.StartAsync();
-        return new TestHost(app, app.GetTestClient());
+        return new TestHost(app, app.GetTestClient(), ownedRoot);
     }
 
     public async ValueTask DisposeAsync()
     {
         Client.Dispose();
         await App.DisposeAsync();
+        Directory.Delete(ownedRoot, recursive: true);
     }
 }

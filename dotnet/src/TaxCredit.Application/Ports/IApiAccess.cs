@@ -1,4 +1,5 @@
 using System.Text.Json;
+using TaxCredit.Application.Ports.Auth;
 
 namespace TaxCredit.Application.Ports;
 
@@ -22,7 +23,9 @@ public sealed record ApiAccessRequest(
 /// <param name="Status">HTTP status on refusal.</param>
 /// <param name="Detail">A string or the family's structured detail.</param>
 /// <param name="BearerChallenge">Whether to send WWW-Authenticate: Bearer.</param>
-public sealed record ApiAccessDecision(bool Allowed, int Status = 403, object? Detail = null, bool BearerChallenge = false);
+/// <param name="Principal">The verified request identity; the caller must push it in its own asynchronous execution context.</param>
+public sealed record ApiAccessDecision(bool Allowed, int Status = 403, object? Detail = null, bool BearerChallenge = false,
+    ApiPrincipal? Principal = null);
 
 /// <summary>The host's authentication and authorization seam, replaced by the auth slice.</summary>
 public interface IApiAccess

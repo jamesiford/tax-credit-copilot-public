@@ -9,6 +9,23 @@ public sealed class RunBatchRepositoryTests
     private static readonly PyDateTime Now = At(0);
 
     [Fact]
+    public void Selected_years_preserve_values_and_order_after_real_reopen()
+    {
+        using var store = new OperationalDatabase();
+        var repository = new RunBatchRepository(store.Database);
+        var batch = Batch("selected") with { TaxYears = [2025, 2021, 2023] };
+        repository.Create(batch, Items(batch, 11));
+        repository.Create(Batch("empty"), []);
+        var reopened = new RunBatchRepository(store.Reopen());
+        Assert.Equal([2025L, 2021L, 2023L], reopened.Get("selected")!.TaxYears);
+        Assert.Empty(reopened.Get("empty")!.TaxYears);
+        using var session = store.Database.Open();
+        var empty = session.QueryExempt(Infrastructure.Persistence.Sql.SqlExemption.Worker,
+            "SELECT tax_years FROM tcc_ops.run_batch WHERE batch_id = ?", "empty");
+        Assert.Null(empty.Single()["tax_years"]);
+    }
+
+    [Fact]
     public void CreateCountersPagesAndRequesterIdempotencySurviveReopening()
     {
         using var store = new OperationalDatabase();

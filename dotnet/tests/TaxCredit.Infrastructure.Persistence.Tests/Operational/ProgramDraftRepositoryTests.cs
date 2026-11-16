@@ -1,3 +1,5 @@
+using System.Numerics;
+using TaxCredit.Application.Hosting;
 using TaxCredit.Domain.Numerics;
 using TaxCredit.Domain.Programs;
 using TaxCredit.Infrastructure.Persistence.Operational;
@@ -8,6 +10,23 @@ namespace TaxCredit.Infrastructure.Persistence.Tests.Operational;
 public sealed class ProgramDraftRepositoryTests
 {
     private static readonly PyDateTime Now = RunBatchRepositoryTests.At(0);
+
+    [Fact]
+    public void Huge_valid_offsets_keep_the_real_total_without_narrowing_or_allocating()
+    {
+        using var store = new OperationalDatabase();
+        var repository = new ProgramDraftRepository(store.Database);
+        repository.Create(Draft(), Event("created"));
+        foreach (var offset in new[] { new BigInteger(int.MaxValue) + 1, new BigInteger(long.MaxValue), BigInteger.Pow(10, 100) })
+        {
+            var page = repository.ListPage(null, 50, offset);
+            Assert.Equal(1, page.Total);
+            Assert.Empty(page.Items);
+        }
+        Assert.Throws<ArgumentOutOfRangeException>(() => repository.ListPage(null, 50, -1));
+        Assert.Contains("9223372036854775807", new SqlServerDialect().Page("SELECT draft_id FROM tcc_ops.program_draft ORDER BY draft_id", 1, long.MaxValue),
+            StringComparison.Ordinal);
+    }
 
     [Fact]
     public void DocumentsHashesStatusesEventsAndListMetadataSurviveReopening()

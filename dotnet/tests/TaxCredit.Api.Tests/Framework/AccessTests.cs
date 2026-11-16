@@ -12,16 +12,21 @@ public sealed class AccessTests
     }
 
     [Fact]
-    public async Task A_missing_authentication_adapter_fails_closed_outside_local_mode()
+    public async Task The_real_authentication_adapter_refuses_missing_and_invalid_tokens()
     {
-        await using var host = await TestHost.Start(hooks: false, configuration: new Dictionary<string, string?> { ["AUTH_MODE"] = "entra" });
+        await using var host = await TestHost.Start(hooks: false, configuration: new Dictionary<string, string?>
+        {
+            ["AUTH_MODE"] = "entra",
+            ["AUTH_TENANT_ID"] = "00000000-0000-0000-0000-0000000000aa",
+            ["API_AUDIENCE"] = "api://11111111-2222-3333-4444-555555555555",
+        });
         using var noToken = await host.Client.GetAsync("/api/scope");
         Assert.Equal(401, (int)noToken.StatusCode);
         Assert.Equal("Bearer", Assert.Single(noToken.Headers.WwwAuthenticate).Scheme);
         using var request = new HttpRequestMessage(HttpMethod.Get, "/api/scope");
         request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", "not-a-validated-token");
         using var unsigned = await host.Client.SendAsync(request);
-        Assert.Equal(503, (int)unsigned.StatusCode);
+        Assert.Equal(401, (int)unsigned.StatusCode);
         using var publicProbe = await host.Client.GetAsync("/api/health");
         Assert.Equal(200, (int)publicProbe.StatusCode);
     }

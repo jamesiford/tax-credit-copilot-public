@@ -1,14 +1,27 @@
 using System.Buffers.Binary;
+using System.Diagnostics;
+using System.Globalization;
 using System.Security.Cryptography;
 using TaxCredit.Application.Ports.Contract;
 
-namespace TaxCredit.Api.Hosting;
+namespace TaxCredit.ServiceDefaults.Hosting;
 
 /// <summary>Test seams are immutable at startup; an environment hook cannot turn them on in production.</summary>
-public sealed class RuntimeSources(bool deterministic) : IClock, IIdSource, ISecretSource
+public sealed class RuntimeSources(bool deterministic) : TimeProvider, IClock, IIdSource, ISecretSource
 {
     private long _ids;
     private long _secrets;
+    private long _ticks;
+
+    /// <inheritdoc />
+    public override DateTimeOffset GetUtcNow() => UtcNow;
+
+    /// <inheritdoc />
+    public override long GetTimestamp() => deterministic ? 0 : base.GetTimestamp();
+
+    /// <summary>Elapsed calculation timers are deterministic independently of identity draws.</summary>
+    public double ElapsedSeconds() => deterministic ? Interlocked.Increment(ref _ticks) / 1000.0
+        : (double)Stopwatch.GetTimestamp() / Stopwatch.Frequency;
 
     /// <inheritdoc />
     public DateTimeOffset UtcNow => deterministic
@@ -24,7 +37,7 @@ public sealed class RuntimeSources(bool deterministic) : IClock, IIdSource, ISec
         }
 
         var n = Interlocked.Increment(ref _ids);
-        return Guid.Parse("40000000-0000-4000-8000-" + n.ToString("x12", System.Globalization.CultureInfo.InvariantCulture));
+        return Guid.Parse("40000000-0000-4000-8000-" + n.ToString("x12", CultureInfo.InvariantCulture));
     }
 
     /// <inheritdoc />
@@ -48,9 +61,11 @@ public sealed class RuntimeSources(bool deterministic) : IClock, IIdSource, ISec
     }
 
     /// <summary>Resets both counter families at a scenario boundary.</summary>
-    public void Reset()
+    public void Reset(long consumedIds = 0)
     {
-        Interlocked.Exchange(ref _ids, 0);
+        ArgumentOutOfRangeException.ThrowIfNegative(consumedIds);
+        Interlocked.Exchange(ref _ids, consumedIds);
         Interlocked.Exchange(ref _secrets, 0);
+        Interlocked.Exchange(ref _ticks, 0);
     }
 }

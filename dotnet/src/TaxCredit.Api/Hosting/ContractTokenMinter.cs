@@ -6,12 +6,11 @@ using TaxCredit.Application.Ports.Contract;
 
 namespace TaxCredit.Api.Hosting;
 
-/// <summary>RSA keys and minted-claim digests stay in memory; no token or private key reaches a file or log.</summary>
+/// <summary>RSA keys stay in memory; no token or private key reaches a file, log or validation lookup.</summary>
 public sealed class ContractTokenMinter(IClock clock) : ITokenMinter, IContractSigningKey, IDisposable
 {
     private readonly RSA _main = RSA.Create(2048);
     private readonly RSA _other = RSA.Create(2048);
-    private readonly Queue<string> _claimDigests = new();
     private readonly object _lock = new();
 
     /// <inheritdoc />
@@ -77,12 +76,6 @@ public sealed class ContractTokenMinter(IClock clock) : ITokenMinter, IContractS
         var signingInput = header + "." + Encode(payload);
         lock (_lock)
         {
-            _claimDigests.Enqueue(Convert.ToHexStringLower(SHA256.HashData(payload)));
-            while (_claimDigests.Count > 256)
-            {
-                _claimDigests.Dequeue();
-            }
-
             return signingInput + "." + Encode(key.SignData(Encoding.ASCII.GetBytes(signingInput), HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1));
         }
     }

@@ -1,0 +1,27 @@
+{
+  "improvements": [
+    {
+      "id": "IMP-composition-1",
+      "kind": "defect_fix",
+      "route": "GET /api/ready",
+      "categories": ["missing-field", "extra-field", "value"],
+      "path_prefix": "source_schema",
+      "finding": "",
+      "reason": "Readiness now observes the configured source and reports its actual account availability instead of reproducing skipped/scan-counter placeholders. This is not a changed certified figure; the board applies no waiver."
+    },
+    {
+      "id": "IMP-composition-2",
+      "kind": "defect_fix",
+      "route": "GET /api/me",
+      "finding": "",
+      "reason": "A genuine authentication dependency failure maps to JSON 503 without a bearer challenge, rather than misclassifying an unavailable dependency as invalid credentials. The rule applies at the shared protected-route boundary."
+    },
+    {
+      "id": "IMP-composition-3",
+      "kind": "defect_fix",
+      "route": "POST /__contract__/env",
+      "finding": "",
+      "reason": "Invalid consumer settings and attempted changes to startup-only controls are refused with JSON 422 and the prior host-local overlay is restored, rather than acknowledging ignored or partially applied configuration."
+    }
+  ]
+}

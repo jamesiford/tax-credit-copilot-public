@@ -70,14 +70,19 @@ public sealed class ProgramDraftRepository(PersistenceDatabase database) : IProg
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(limit);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(limit, 1000);
         ArgumentOutOfRangeException.ThrowIfNegative(offset);
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(offset, int.MaxValue);
         return database.Transact(session =>
         {
             var where = string.IsNullOrEmpty(status) ? "" : " WHERE status = ?";
             object?[] args = string.IsNullOrEmpty(status) ? [] : [status];
-            var total = new OpsRow(session.QueryExempt(SqlExemption.ChannelIdentity, "SELECT COUNT(*) AS n FROM tcc_ops.program_draft" + where, args)[0]).Long("n");
+            var count = session.Dialect is SqliteDialect ? "COUNT(*)" : "COUNT_BIG(*)";
+            var total = new OpsRow(session.QueryExempt(SqlExemption.ChannelIdentity, "SELECT " + count + " AS n FROM tcc_ops.program_draft" + where, args)[0]).Long("n");
+            if (offset >= total)
+            {
+                return ((IReadOnlyList<ProgramDraft>)Array.Empty<ProgramDraft>(), total);
+            }
+
             var rows = session.QueryExempt(SqlExemption.ChannelIdentity,
-                session.Dialect.Page(ProgramDraftRows.Select + where + " ORDER BY updated_at DESC, draft_id", (int)limit, (int)offset), args);
+                session.Dialect.Page(ProgramDraftRows.Select + where + " ORDER BY updated_at DESC, draft_id", (int)limit, offset), args);
             return ((IReadOnlyList<ProgramDraft>)rows.Select(row => Hydrate(session, row, documents: false)).ToArray(), total);
         });
     }

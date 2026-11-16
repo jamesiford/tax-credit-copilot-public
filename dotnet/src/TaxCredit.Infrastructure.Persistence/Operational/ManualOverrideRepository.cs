@@ -28,10 +28,11 @@ public sealed class ManualOverrideRepository(PersistenceDatabase database) : IMa
                 throw new InvalidOperationException("The override identity is already recorded.");
             }
 
-            session.Insert(overrideRow.ClientId, "tcc_ops.manual_override", Columns,
+            var order = OverrideOrder.Next(session);
+            session.Insert(overrideRow.ClientId, "tcc_ops.manual_override", [.. Columns, "write_order"],
                 [new object?[] { overrideRow.OverrideId, overrideRow.RunId, overrideRow.ClientId, overrideRow.Scope, overrideRow.TargetKey,
                     overrideRow.FieldChanged, overrideRow.ValueBefore, overrideRow.ValueAfter, overrideRow.ReasonCode, overrideRow.JustificationText,
-                    overrideRow.CreatedBy, OpsRow.Timestamp(session, overrideRow.CreatedAt), overrideRow.ApprovedBy, OpsRow.Timestamp(session, overrideRow.ApprovedAt) }]);
+                    overrideRow.CreatedBy, OpsRow.Timestamp(session, overrideRow.CreatedAt), overrideRow.ApprovedBy, OpsRow.Timestamp(session, overrideRow.ApprovedAt), order }]);
             return overrideRow;
         });
     }
@@ -64,7 +65,7 @@ public sealed class ManualOverrideRepository(PersistenceDatabase database) : IMa
     {
         using var session = database.Open();
         return session.Query(clientId, "SELECT " + string.Join(", ", Columns)
-            + " FROM tcc_ops.manual_override WHERE {tenant} ORDER BY created_at, override_id").Select(Hydrate).ToArray();
+            + " FROM tcc_ops.manual_override WHERE {tenant} ORDER BY write_order").Select(Hydrate).ToArray();
     }
 
     private static ManualOverride Hydrate(IReadOnlyDictionary<string, object?> values)

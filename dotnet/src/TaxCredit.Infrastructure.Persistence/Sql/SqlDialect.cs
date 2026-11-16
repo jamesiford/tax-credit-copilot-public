@@ -10,7 +10,7 @@ public interface ISqlDialect
     string Name(string qualifiedName);
 
     /// <summary>Pages an ordered SELECT, including SELECT DISTINCT.</summary>
-    string Page(string sql, int limit, int offset);
+    string Page(string sql, int limit, long offset);
 
     /// <summary>Escapes a literal LIKE needle; statements use ESCAPE '\'.</summary>
     string Like(string value);
@@ -26,7 +26,7 @@ public sealed class SqlServerDialect : ISqlDialect
     public string Name(string qualifiedName) => SqlNames.Qualified(qualifiedName, false);
 
     /// <inheritdoc />
-    public string Page(string sql, int limit, int offset)
+    public string Page(string sql, int limit, long offset)
     {
         SqlNames.CheckPage(limit, offset);
         return string.Create(CultureInfo.InvariantCulture, $"{sql} OFFSET {offset} ROWS FETCH NEXT {limit} ROWS ONLY");
@@ -46,7 +46,7 @@ public sealed partial class SqliteDialect : ISqlDialect
     public string Name(string qualifiedName) => SqlNames.Qualified(qualifiedName, true);
 
     /// <inheritdoc />
-    public string Page(string sql, int limit, int offset)
+    public string Page(string sql, int limit, long offset)
     {
         SqlNames.CheckPage(limit, offset);
         return string.Create(CultureInfo.InvariantCulture, $"{sql} LIMIT {limit} OFFSET {offset}");
@@ -84,7 +84,7 @@ internal static class SqlNames
         return sqlite ? "\"" + string.Join("_", parts) + "\"" : string.Join(".", parts.Select(p => "[" + p + "]"));
     }
 
-    internal static void CheckPage(int limit, int offset)
+    internal static void CheckPage(int limit, long offset)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(limit, 1);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(limit, 10000);

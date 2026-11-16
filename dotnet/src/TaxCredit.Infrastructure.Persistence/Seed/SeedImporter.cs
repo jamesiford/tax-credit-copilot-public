@@ -68,6 +68,17 @@ public sealed class SeedImporter
         return _database.Transact(session => Replace(session, profile, folder, tables, schema));
     }
 
+    /// <summary>Seed generation already consumed these UUID draws; replay must resume after them, not collide with its claims.</summary>
+    public long DeterministicIdentityHighWater()
+    {
+        using var session = _database.Open();
+        return session.QueryExempt(SqlExemption.Seed,
+            "SELECT claim_id AS id FROM tcc_ops.program_claim UNION ALL SELECT run_id AS id FROM tcc_ops.run_manifest")
+            .Select(row => Guid.TryParse(row["id"] as string, out var id) ? id.ToString("N") : "")
+            .Where(id => id.StartsWith("40000000000040008000", StringComparison.Ordinal))
+            .Select(id => long.Parse(id[^12..], NumberStyles.HexNumber, CultureInfo.InvariantCulture)).DefaultIfEmpty().Max();
+    }
+
     private static SeedLoadResult Replace(SqlSession session, string profile, string folder, JsonElement tables,
         IReadOnlyDictionary<string, IReadOnlyList<StorageColumn>> schema)
     {
@@ -84,6 +95,11 @@ public sealed class SeedImporter
         foreach (var table in tables.EnumerateObject())
         {
             counts.Add(table.Name, ImportTable(session, folder, table.Name, table.Value, schema));
+        }
+
+        if (names.Any(row => (string)row["name"]! == "tcc_ops_write_sequence"))
+        {
+            session.ExecuteExempt(SqlExemption.Seed, "INSERT INTO tcc_ops.write_sequence (sequence_name,last_value) VALUES ('manual_override',0)");
         }
 
         return new SeedLoadResult(profile, counts);

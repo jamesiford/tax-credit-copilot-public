@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Numerics;
 using System.Text.Json;
 using TaxCredit.Api.Contract;
 
@@ -84,7 +85,9 @@ public sealed class RequestValidator(RouteTable table)
         var value = ParseScalar(values[^1] ?? "", parameter.Annotation);
         issues.AddRange(validator.Validate(value, schema, [location, parameter.Name]));
         // The storage adapters cannot represent ids outside Int64. Refuse rather than overflow later (F-3).
-        if (parameter.Annotation.StartsWith("int", StringComparison.Ordinal) && !long.TryParse(values[^1], NumberStyles.Integer, CultureInfo.InvariantCulture, out _))
+        if (parameter.Name is "client_id" or "account_id"
+            && parameter.Annotation.StartsWith("int", StringComparison.Ordinal)
+            && (!long.TryParse(values[^1], NumberStyles.Integer, CultureInfo.InvariantCulture, out var id) || id <= 0))
         {
             if (!issues.Any(i => i.Loc.SequenceEqual(new object[] { location, parameter.Name })))
             {
@@ -105,9 +108,9 @@ public sealed class RequestValidator(RouteTable table)
             };
         }
 
-        if (annotation.StartsWith("int", StringComparison.Ordinal) && long.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var integer))
+        if (annotation.StartsWith("int", StringComparison.Ordinal) && BigInteger.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var integer))
         {
-            return JsonSerializer.SerializeToElement(integer);
+            return JsonElement.Parse(integer.ToString(CultureInfo.InvariantCulture));
         }
 
         if (annotation.StartsWith("float", StringComparison.Ordinal) && double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var number) && double.IsFinite(number))

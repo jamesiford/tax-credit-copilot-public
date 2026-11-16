@@ -13,13 +13,26 @@ public sealed class WireTests
     [InlineData("ok.api-ready")]
     [InlineData("get-api-health.unknown-query")]
     [InlineData("get-api-ready.unknown-query")]
-    public async Task Probes_read_the_recorded_contract(string id)
+    public async Task Probes_preserve_health_and_report_observed_readiness(string id)
     {
         await using var host = await TestHost.Start();
         var recording = Corpus.Recording("p1_reads", id);
         using var request = Corpus.Request(recording);
         using var response = await host.Client.SendAsync(request);
-        await Corpus.AssertJsonResponse(recording, response);
+        if (id.Contains("ready", StringComparison.Ordinal))
+        {
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            using var body = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+            Assert.True(body.RootElement.GetProperty("ready").GetBoolean());
+            Assert.Equal("ready", body.RootElement.GetProperty("stores").GetProperty("status").GetString());
+            Assert.Equal("ready", body.RootElement.GetProperty("source_schema").GetProperty("status").GetString());
+            Assert.Equal(1, body.RootElement.GetProperty("source_schema").GetProperty("accounts").GetInt32());
+            Assert.Equal("disabled", body.RootElement.GetProperty("ai").GetString());
+        }
+        else
+        {
+            await Corpus.AssertJsonResponse(recording, response);
+        }
     }
 
     [Fact]
