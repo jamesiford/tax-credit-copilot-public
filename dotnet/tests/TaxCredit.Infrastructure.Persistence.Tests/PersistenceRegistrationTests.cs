@@ -11,6 +11,7 @@ namespace TaxCredit.Infrastructure.Persistence.Tests;
 public sealed class PersistenceRegistrationTests
 {
     [Fact]
+    [Trait("Category", "heavy")]
     public void Registration_connects_reads_writes_seed_and_paired_contracts_to_one_destination()
     {
         using var fixture = new PersistenceFixture(false);

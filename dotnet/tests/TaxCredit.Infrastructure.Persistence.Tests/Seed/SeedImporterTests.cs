@@ -124,6 +124,7 @@ public sealed class SeedImporterTests
     }
 
     [Fact]
+    [Trait("Category", "heavy")]
     public void Insert_failure_rolls_back_the_entire_reset()
     {
         using var fixture = new PersistenceFixture();

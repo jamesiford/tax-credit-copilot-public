@@ -8,6 +8,7 @@ namespace TaxCredit.Infrastructure.Persistence.Tests.Seed;
 public sealed class SeedRowValidationTests
 {
     [Fact]
+    [Trait("Category", "heavy")]
     public void Malformed_source_values_are_refused_even_when_the_new_hashes_match()
     {
         using var fixture = new PersistenceFixture();

@@ -30,6 +30,7 @@ public sealed class GoldWriterTests
     }
 
     [Theory]
+    [Trait("Category", "heavy")]
     [InlineData("prior-current-retired")]
     [InlineData("employee_period_fact")]
     [InlineData("unit_credit_installment")]

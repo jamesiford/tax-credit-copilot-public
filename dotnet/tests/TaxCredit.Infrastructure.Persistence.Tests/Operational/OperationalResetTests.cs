@@ -15,6 +15,7 @@ public sealed class OperationalResetTests
     private static readonly PyDateTime Now = RunBatchRepositoryTests.At(0);
 
     [Fact]
+    [Trait("Category", "heavy")]
     public void P1ResetClearsEveryOperationalTableAndInvalidatesPreResetLeases()
     {
         using var store = new OperationalDatabase();
