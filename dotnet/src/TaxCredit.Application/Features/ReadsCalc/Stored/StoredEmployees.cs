@@ -8,7 +8,7 @@ using static TaxCredit.Application.Features.ReadsCalc.ReadValues;
 namespace TaxCredit.Application.Features.ReadsCalc.Stored;
 
 /// <summary>Opaque handles resolve against a tenant's stored run, never against a reminted global population.</summary>
-public sealed class StoredEmployees(IGoldReadPort gold, ClientRunResolver resolver, RestOfYearReading rest,
+public sealed class StoredEmployees(IGoldReadPort gold, ReadStatutes resolver, RestOfYearReading rest,
     IRuntimeConfiguration configuration)
 {
     /// <summary>The compact v2 employee reading preserves both recorded verdicts and the selected unit method.</summary>

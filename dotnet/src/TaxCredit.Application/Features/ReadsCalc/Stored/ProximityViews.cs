@@ -10,7 +10,7 @@ using static TaxCredit.Application.Features.ReadsCalc.ReadValues;
 namespace TaxCredit.Application.Features.ReadsCalc.Stored;
 
 /// <summary>Reads stored verdicts and measuring months; only the newly requested projection computes.</summary>
-public sealed class ProximityViews(IGoldReadPort gold, ClientRunResolver resolver, RestOfYearReading rest,
+public sealed class ProximityViews(IGoldReadPort gold, ReadStatutes resolver, RestOfYearReading rest,
     RuleLibrary library, IClock clock)
 {
     private static readonly string[] NearFields = ["band_weekly_hours", "within_band", "ineligible", "evaluated", "failure_modes", "cohort", "floors"];

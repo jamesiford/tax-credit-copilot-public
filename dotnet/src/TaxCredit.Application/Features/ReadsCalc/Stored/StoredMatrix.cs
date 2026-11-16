@@ -6,7 +6,7 @@ using static TaxCredit.Application.Features.ReadsCalc.ReadValues;
 namespace TaxCredit.Application.Features.ReadsCalc.Stored;
 
 /// <summary>The matrix and its counts are the run's stored answer, not an engine replay.</summary>
-public sealed class StoredMatrix(IGoldReadPort gold, ClientRunResolver resolver)
+public sealed class StoredMatrix(IGoldReadPort gold, ReadStatutes resolver)
 {
     /// <summary>Shapes the accepted allocation while naming a year the run has never reached.</summary>
     public object Read(ReadArguments args)

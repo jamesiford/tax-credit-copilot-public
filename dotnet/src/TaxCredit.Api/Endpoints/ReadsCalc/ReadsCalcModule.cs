@@ -5,6 +5,7 @@ using TaxCredit.Application.Features.ReadsCalc.Portfolio;
 using TaxCredit.Application.Features.ReadsCalc.Scope;
 using TaxCredit.Application.Features.ReadsCalc.Stored;
 using TaxCredit.Domain.Canonical;
+using TaxCredit.Domain.Pipeline;
 
 namespace TaxCredit.Api.Endpoints.ReadsCalc;
 
@@ -16,6 +17,8 @@ public sealed class ReadsCalcModule : IFeatureModule
     {
         ArgumentNullException.ThrowIfNull(services);
         services.AddScoped<StoredEligibility>();
+        services.AddScoped<ReadStatutes>();
+        services.AddScoped<Func<ClientRunResolver>>(provider => provider.GetRequiredService<ClientRunResolver>);
         services.AddScoped<StoredMatrix>();
         services.AddScoped<StoredUnits>();
         services.AddScoped<StoredEmployees>();

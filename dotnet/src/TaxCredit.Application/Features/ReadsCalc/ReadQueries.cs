@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using TaxCredit.Application.Features.ReadsCalc.Ingestion;
 using TaxCredit.Application.Features.ReadsCalc.Scope;
 using TaxCredit.Application.Features.ReadsCalc.Stored;
@@ -11,8 +12,7 @@ namespace TaxCredit.Application.Features.ReadsCalc;
 public sealed record StoredReadQuery(string View, ReadArguments Arguments) : IQuery<object>;
 
 /// <summary>Dispatches accepted-result reads through the mediator pipeline.</summary>
-public sealed class StoredReadHandler(StoredEligibility eligibility, StoredMatrix matrix, StoredUnits units,
-    StoredEmployees employees, ProximityViews proximity) : IRequestHandler<StoredReadQuery, object>
+public sealed class StoredReadHandler(IServiceScopeFactory scopes) : IRequestHandler<StoredReadQuery, object>
 {
     /// <inheritdoc />
     public ValueTask<object> Handle(StoredReadQuery request, CancellationToken cancellationToken)
@@ -21,14 +21,14 @@ public sealed class StoredReadHandler(StoredEligibility eligibility, StoredMatri
         cancellationToken.ThrowIfCancellationRequested();
         return ValueTask.FromResult(request.View switch
         {
-            "eligibility" => eligibility.Read(request.Arguments),
-            "matrix" => matrix.Read(request.Arguments),
-            "units" => units.Page(request.Arguments),
-            "unit" => units.Detail(request.Arguments),
-            "employee" => employees.Detail(request.Arguments),
-            "drill" => employees.Drill(request.Arguments),
-            "proximity" => proximity.Cohort(request.Arguments),
-            "progress" => proximity.Progress(request.Arguments),
+            "eligibility" => ReadHandlerScope.Execute<StoredEligibility>(scopes, view => view.Read(request.Arguments)),
+            "matrix" => ReadHandlerScope.Execute<StoredMatrix>(scopes, view => view.Read(request.Arguments)),
+            "units" => ReadHandlerScope.Execute<StoredUnits>(scopes, view => view.Page(request.Arguments)),
+            "unit" => ReadHandlerScope.Execute<StoredUnits>(scopes, view => view.Detail(request.Arguments)),
+            "employee" => ReadHandlerScope.Execute<StoredEmployees>(scopes, view => view.Detail(request.Arguments)),
+            "drill" => ReadHandlerScope.Execute<StoredEmployees>(scopes, view => view.Drill(request.Arguments)),
+            "proximity" => ReadHandlerScope.Execute<ProximityViews>(scopes, view => view.Cohort(request.Arguments)),
+            "progress" => ReadHandlerScope.Execute<ProximityViews>(scopes, view => view.Progress(request.Arguments)),
             _ => throw new InvalidOperationException("Unknown accepted-result view."),
         });
     }
@@ -38,14 +38,15 @@ public sealed class StoredReadHandler(StoredEligibility eligibility, StoredMatri
 public sealed record ScopeReadQuery(ReadArguments Arguments, bool Client = false) : IQuery<object>;
 
 /// <summary>Queries the source catalogue and materialized statutory years.</summary>
-public sealed class ScopeReadHandler(ScopeViews views) : IRequestHandler<ScopeReadQuery, object>
+public sealed class ScopeReadHandler(IServiceScopeFactory scopes) : IRequestHandler<ScopeReadQuery, object>
 {
     /// <inheritdoc />
     public ValueTask<object> Handle(ScopeReadQuery request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
         cancellationToken.ThrowIfCancellationRequested();
-        return ValueTask.FromResult(request.Client ? views.Client(request.Arguments.Client()!.Value) : views.Options());
+        return ValueTask.FromResult(ReadHandlerScope.Execute<ScopeViews>(scopes,
+            views => request.Client ? views.Client(request.Arguments.Client()!.Value) : views.Options()));
     }
 }
 
@@ -53,14 +54,15 @@ public sealed class ScopeReadHandler(ScopeViews views) : IRequestHandler<ScopeRe
 public sealed record IngestionReadQuery(ReadArguments Arguments, bool Rows = false) : IQuery<object>;
 
 /// <summary>Dispatches overview and source browsing without silently selecting another dataset.</summary>
-public sealed class IngestionReadHandler(IngestionViews views) : IRequestHandler<IngestionReadQuery, object>
+public sealed class IngestionReadHandler(IServiceScopeFactory scopes) : IRequestHandler<IngestionReadQuery, object>
 {
     /// <inheritdoc />
     public ValueTask<object> Handle(IngestionReadQuery request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
         cancellationToken.ThrowIfCancellationRequested();
-        return ValueTask.FromResult(request.Rows ? views.Rows(request.Arguments) : views.Overview(request.Arguments));
+        return ValueTask.FromResult(ReadHandlerScope.Execute<IngestionViews>(scopes,
+            views => request.Rows ? views.Rows(request.Arguments) : views.Overview(request.Arguments)));
     }
 }
 

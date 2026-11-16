@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using TaxCredit.Application.Features.ReadsCalc.Ingestion;
 using TaxCredit.Application.Messaging;
 using TaxCredit.Application.Pipeline;
@@ -12,13 +13,14 @@ public sealed record ResolveIngestionException(ReadArguments Arguments, string A
 }
 
 /// <summary>Uses the shared lookup persistence boundary, distinct from Claims finding resolution.</summary>
-public sealed class ResolveIngestionExceptionHandler(QcAnnotations annotations) : IRequestHandler<ResolveIngestionException, object>
+public sealed class ResolveIngestionExceptionHandler(IServiceScopeFactory scopes) : IRequestHandler<ResolveIngestionException, object>
 {
     /// <inheritdoc />
     public ValueTask<object> Handle(ResolveIngestionException request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
         cancellationToken.ThrowIfCancellationRequested();
-        return ValueTask.FromResult(annotations.Resolve(request.Arguments, request.Actor));
+        return ValueTask.FromResult(ReadHandlerScope.Execute<QcAnnotations>(scopes,
+            annotations => annotations.Resolve(request.Arguments, request.Actor)));
     }
 }

@@ -10,7 +10,7 @@ namespace TaxCredit.Application.Features.ReadsCalc.Stored;
 
 /// <summary>The location grid and its two independent cohorts read accepted Gold only.</summary>
 public sealed class StoredUnits(IGoldReadPort gold, RuleLibrary library, ProgramDefaults defaults,
-    ClientRunResolver resolver, RestOfYearReading rest)
+    ReadStatutes resolver, RestOfYearReading rest)
 {
     private static readonly string[] LeverFields = ["additional_weekly_hours", "projected_weekly_hours", "exceeds_plausible_week", "failure_mode", "hourly_rate_to_qualify"];
     /// <summary>Returns the three stored grains, exact SQL totals and a current-run envelope.</summary>
@@ -69,7 +69,7 @@ public sealed class StoredUnits(IGoldReadPort gold, RuleLibrary library, Program
         var near = Levers(Rows(drill, "near_threshold"), Text(run["program_code"]), year);
         if (near.Count > 0)
         {
-            var statute = resolver.ResolveStatute(client, args.Text("state"), year);
+            var statute = resolver.ResolveStatute(client, args.Text("state"), year, Text(run["program_code"]), true);
             var checkpoint = new DateOnly(year, 8, 31);
             if (checkpoint < statute.Window.End)
             {

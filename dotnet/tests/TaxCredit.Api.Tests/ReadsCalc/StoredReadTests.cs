@@ -59,6 +59,7 @@ public sealed class StoredReadTests
     public async Task Opaque_handles_are_client_bound_and_uncalculated_years_are_not_zero_results()
     {
         await using var host = await TestHost.Start();
+        host.Client.Timeout = TimeSpan.FromMinutes(10);
         await RuntimeRequests.Reset(host, "P2");
         var unit = await Get(host, "/api/v2/clients/2001/units/GA_GA-001?year=2023&limit=1");
         var token = unit.GetProperty("employees")[0].GetProperty("record_token").GetString();

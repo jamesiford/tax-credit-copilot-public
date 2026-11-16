@@ -48,11 +48,13 @@ public sealed class ReadsCalcEndpoints : IEndpointGroup
     public void Map(IEndpointRouteBuilder endpoints)
     {
         ArgumentNullException.ThrowIfNull(endpoints);
+        var defaults = new ReadEndpointFallbacks(endpoints);
         foreach (var operation in Operations)
         {
-            endpoints.MapMethods(operation.Path, [operation.Method], (HttpContext context, IMediator mediator,
+            defaults.MapMethods(operation.Path, [operation.Method], (HttpContext context, IMediator mediator,
                 IApiPrincipalAccessor principals) => Execute(context, mediator, principals, operation));
         }
+        endpoints.DataSources.Add(defaults);
     }
 
     private static async Task<IResult> Execute(HttpContext context, IMediator mediator, IApiPrincipalAccessor principals,
@@ -69,7 +71,7 @@ public sealed class ReadsCalcEndpoints : IEndpointGroup
             var args = new ReadArguments(parameters, RequestValidator.Body(context));
             if (operation.View == "review")
             {
-                parameters["reviewer"] = principal.Attributed(args.Text("reviewer"), "system");
+                parameters["reviewer"] = principal.Attributed(args.Text("reviewer"), "Reviewer");
             }
             var request = Request(operation, args, principal);
             var response = await mediator.Send(request, context.RequestAborted).ConfigureAwait(false);
@@ -105,7 +107,7 @@ public sealed class ReadsCalcEndpoints : IEndpointGroup
             "client_scope" => new ScopeReadQuery(args, true),
             "ingestion" => new IngestionReadQuery(args),
             "source_rows" => new IngestionReadQuery(args, true),
-            "resolve" => new ResolveIngestionException(args, principal.Attributed(args.Text("reviewer") ?? args.Text("actor"), "system")),
+            "resolve" => new ResolveIngestionException(args, principal.Attributed(args.Text("reviewer") ?? args.Text("actor"), "Reviewer")),
             "review" => new ReviewOneZeroEmployee(args),
             "" => new CalculateViewQuery($"{operation.Method} {operation.Path}", args),
             _ => new StoredReadQuery(operation.View, args),

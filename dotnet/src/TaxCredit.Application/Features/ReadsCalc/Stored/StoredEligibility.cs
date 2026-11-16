@@ -6,7 +6,7 @@ using static TaxCredit.Application.Features.ReadsCalc.ReadValues;
 namespace TaxCredit.Application.Features.ReadsCalc.Stored;
 
 /// <summary>Reads the accepted population; display floors never replace a stored eligibility verdict.</summary>
-public sealed class StoredEligibility(IGoldReadPort gold, ClientRunResolver resolver)
+public sealed class StoredEligibility(IGoldReadPort gold, ReadStatutes resolver)
 {
     /// <summary>Returns both methods and whole-population counts independently of the page's narrowing.</summary>
     public object Read(ReadArguments args)
