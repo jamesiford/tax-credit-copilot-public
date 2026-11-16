@@ -30,7 +30,8 @@ def tolerated(failure: dict, status: int) -> bool:
         return True
     if re.search(r"(?:^|\.)findings\[\d+\]\.message$", path):
         return True
-    return status >= 400 and failure["category"] == "value" and path in ("detail", "detail.message", "detail.reason")
+    return status >= 400 and failure["category"] == "value" and path in (
+        "detail", "detail.message", "detail.reason", "detail.detail", "error.message")
 
 
 def numeric_change(failure: dict) -> bool:

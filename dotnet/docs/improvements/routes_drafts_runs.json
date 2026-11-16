@@ -26,16 +26,6 @@
       "reason": "Keep the modeled error family and refusal status while using concise validation wording rather than copying Python message text."
     },
     {
-      "id": "IMP-routes_drafts_runs-4",
-      "kind": "wire_incidental",
-      "route": "POST /api/v2/program-drafts",
-      "case": "create",
-      "categories": ["value"],
-      "path_prefix": "draft_id",
-      "finding": "",
-      "reason": "The deterministic identifier source starts at a different draw after host setup. Do not consume dummy identities merely to reproduce the recording harness's startup sequence."
-    },
-    {
       "id": "IMP-routes_drafts_runs-5",
       "kind": "framework_default",
       "route": "POST /api/v2/program-drafts/{draft_id}/export",

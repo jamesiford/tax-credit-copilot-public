@@ -20,6 +20,10 @@ class PolicyDiagnosticsTests(unittest.TestCase):
         self.assertTrue(tolerated({"category": "header", "path": "headers.vary"}, 200))
         self.assertFalse(tolerated({"category": "value", "path": "summary.total"}, 200))
         self.assertFalse(tolerated({"category": "status", "path": "status"}, 422))
+        self.assertTrue(tolerated({"category": "value", "path": "detail.detail"}, 422))
+        self.assertTrue(tolerated({"category": "value", "path": "error.message"}, 422))
+        self.assertFalse(tolerated({"category": "missing-field", "path": "error.message"}, 422))
+        self.assertFalse(tolerated({"category": "value", "path": "error.message"}, 200))
 
 
 if __name__ == "__main__":

@@ -63,10 +63,103 @@
 - Rule modification times are frozen at the metadata adapter using the documented
   path-CRC32/clock protocol. Non-contract hosts still read actual file timestamps.
 - Strict build and all 974 fast tests pass; the draft/artifact scenarios were
-  reproduced first, then all twelve scenarios completed (1,769 exchanges).
+  reproduced first, then all twelve scenarios completed (1,769 recorded steps:
+  1,765 HTTP exchanges and four scenario controls).
   Early draft and artifact identifiers now agree. Later business-operation
   allocations and durable-manifest differences remain separately measurable.
 - `docs/convergence_board.py` is a diagnostic over unchanged raw reports. It
   uses exact method/template matching, shows tolerated fields and waiver shares,
   and rejects numeric waiver matches. Three focused diagnostic tests pass.
   Its output is explicitly not presented as the external conductor's result.
+
+## Remaining shared-boundary defects
+
+- The initial priced assessment claim now uses the existing injected ID/clock
+  delegates, just as a refreshed claim already did. Removed the outer sink's
+  identity rewrite. This fixes the genuine allocation order for an initial claim
+  and for the priced evidence object preceding a refresh; no dummy ID draws,
+  pricing changes or domain re-port were introduced. The ordinary-host assessment
+  regression checks both initial identities and the subsequent refresh identity.
+- Capability POST is an invocation envelope, not necessarily a write. The
+  transport no longer demands writer entitlement for every capability read.
+  Preparation/commit still enforce their own writer policy against the acting
+  person. A signed agent acting for a reader can rank the book and is still
+  refused an engagement preparation.
+- Integer binding now distinguishes Int64 overflow (422) from a nonpositive,
+  unavailable client read (404). Reads refuse before calling any tenant SQL port;
+  positive storage identity checks are unchanged. Regressions cover progress,
+  forecast and ingestion for both zero and negative selections.
+- Event streams explicitly declare UTF-8, dictionary-body errors identify the
+  dictionary contract, and local API documentation no longer claims the host is
+  an unimplemented skeleton. One existing stream test initially failed because
+  its header assertion omitted the now-explicit charset; its exact assertion was
+  updated without changing its frame-order/data checks.
+- Strict build and **978 fast tests pass**, no skips
+  (`artifacts/integrate-convergence-build.log`,
+  `artifacts/integrate-convergence-fast-final*`).
+
+## Register integrity and policy diagnostics
+
+- Retired eleven broad source/AI/persistence waivers about latent concurrency,
+  accounting and rollback behavior that the recorded exchanges do not test.
+  They must not cover unrelated ID, run-count or AI-stream failures. Their
+  underlying fixes remain intact and described in the earlier subsystem reports.
+- Retired three additional inert persistence entries whose category lists were
+  scenario names rather than replay categories. Their actual overflow,
+  duplicate-claim and latest-run differences already have route-owned entries.
+- Removed the obsolete draft-ID waiver now that startup source state is restored.
+- `improvements/integrate-W2.json` records actual source-backed footprint lists,
+  native HTTP-binding metadata, the second offline demonstration case, the invalid
+  state-as-scope case, and framework HTML/CORS differences. State-list entries
+  cover only the eight explicit array paths, never the portfolio population.
+- Diagnostic error-text handling includes the existing capability error-message
+  envelope and nested detail text, only for error statuses and value differences.
+  Missing fields, status differences, schema keywords and successful values are
+  not tolerated. Three diagnostic tests pass.
+- The unchanged numeric prohibition rejects three documentation-HTML matches
+  because the HTML contains different numeric fragments. These are reported as
+  rejected matches, not silently waived. Framework waivers also exceed the
+  unchanged 25% cap even before those three are accepted. Final replay and
+  wave-end heavy checks determine the final board and stopping report.
+
+## Final verification and required HALT
+
+- All twelve final semantic scenarios completed. Under the identical final
+  diagnostic policy, framework remains 14/19 (73.68%, six waived, 31.58%);
+  reads improves 370 to 406/414 (98.07%, 26 waived); claims 250 to 291/316
+  (92.09%, 70 waived); drafts 250 to 287/323 (88.85%, 42 waived); AI 15 to
+  27/27 (100%, three waived). Framework also fails the unchanged 25% waiver cap.
+  The three numeric documentation-HTML matches remain rejected.
+- The complete wave-end heavy run executed 141 tests: 137 passed, four failed,
+  none skipped (`artifacts\integrate-convergence-heavy*`). Its four failures
+  were in merged fixture assumptions, not suppressed or deleted. The reader
+  draft-list check now asserts the real 403 and adds writer 200; its post-toggle
+  creation uses a distinct program rather than colliding with the draft just
+  created. Reset fixtures populate all 22 operational tables through real
+  adapters, check removed publication/source observations, and assert that the
+  retained internal write-sequence row resets to zero. Two P2-heavy clients use
+  a five-minute timeout instead of the default 100 seconds under concurrent
+  replay/test load. Assertions and runtime timeouts were not relaxed.
+- The first four-test repair run passed both P2 cases and exposed the next two
+  fixture assumptions (duplicate creation returned 409, and reset intentionally
+  retained one zeroed sequence row). The final run passes all 978 fast tests
+  plus those two remaining heavy cases: **980 passed, zero failures/skips**.
+  Thus every one of the 141 distinct heavy cases has a passing result across
+  the initial full run and targeted repairs, not an initially green single run.
+  TRX evidence: `artifacts\integrate-heavy-repair` and
+  `artifacts\integrate-final-repair`; each originally failed name has a passing
+  targeted result.
+- Final `dotnet build -warnaserror --no-restore -m:1 -nr:false -v:q` reports
+  zero warnings/errors (`artifacts\integrate-final-build.log`).
+  `dotnet format --no-restore --verify-no-changes` passes
+  (`artifacts\integrate-final-format.log`). All three policy-diagnostic tests
+  pass on the approved CPython 3.12 interpreter.
+- Runtime/test repairs are committed as `232dd39`. No runtime production code
+  changed after the final full replay; subsequent changes repaired test
+  fixtures and documentation only.
+- Stage 4 requires HALT: framework ownership/artifact-policy/cap conflicts and
+  real durable-preview numeric differences cannot be hidden behind waivers.
+  `ROUTES-CONVERGENCE-REPORT.md`, `HALT-integrate-W2.md` and
+  `status\integrate-W2.json` record remaining clusters, ordinary feature backlog
+  and owner decisions. No convergence success, external conductor execution,
+  push, live-system access or changed certified arithmetic is claimed.

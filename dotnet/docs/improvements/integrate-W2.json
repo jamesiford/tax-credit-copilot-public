@@ -1,0 +1,311 @@
+{
+  "improvements": [
+    {
+      "id": "IMP-integrate-W2-1",
+      "kind": "defect_fix",
+      "route": "POST /api/chat",
+      "case": "chat.ask-client",
+      "categories": ["event"],
+      "path_prefix": "events",
+      "finding": "",
+      "reason": "The unconfigured Python portal streams an unrelated fixed demonstration. The merged host instead reads the selected client's authorized canonical facts and explicitly discloses that narration is unavailable. No computed fact is repriced or substituted."
+    },
+    {
+      "id": "IMP-integrate-W2-2",
+      "kind": "defect_fix",
+      "route": "GET /api/v2/portfolio",
+      "categories": ["array-length"],
+      "path_prefix": "items[0].states",
+      "finding": "",
+      "reason": "The bound source adapter supplies its actual payroll footprint. Python's independently unconfigured SQL reader silently returned an empty footprint, even with staged payroll. This covers only the state-list shape, never client populations, identifiers or figures."
+    },
+    {
+      "id": "IMP-integrate-W2-3",
+      "kind": "defect_fix",
+      "route": "GET /api/v2/portfolio",
+      "categories": ["array-length"],
+      "path_prefix": "items[0].priceable_states",
+      "finding": "",
+      "reason": "Priceable states are the genuine source footprint intersected with authored statute coverage, rather than a silently empty unconfigured-reader result. Only this state-list shape is covered; no client total or figure is covered."
+    },
+    {
+      "id": "IMP-integrate-W2-4",
+      "kind": "defect_fix",
+      "route": "GET /api/v2/portfolio",
+      "categories": ["array-length"],
+      "path_prefix": "items[1].states",
+      "finding": "",
+      "reason": "The configured adapter supplies the second client's actual footprint instead of the empty result of Python's independently unconfigured SQL reader. Only the state-list shape is covered, not client counts or figures."
+    },
+    {
+      "id": "IMP-integrate-W2-5",
+      "kind": "defect_fix",
+      "route": "GET /api/v2/portfolio",
+      "categories": ["array-length"],
+      "path_prefix": "items[1].priceable_states",
+      "finding": "",
+      "reason": "The second client's priceable footprint is derived from its real source states and authored packs. An unconfigured sibling adapter no longer silently hides known coverage. No population or monetary field is covered."
+    },
+    {
+      "id": "IMP-integrate-W2-6",
+      "kind": "defect_fix",
+      "route": "GET /api/v2/portfolio",
+      "categories": ["array-length"],
+      "path_prefix": "items[2].states",
+      "finding": "",
+      "reason": "The configured adapter supplies the third client's actual footprint instead of the empty result of Python's independently unconfigured SQL reader. Only the state-list shape is covered, not client counts or figures."
+    },
+    {
+      "id": "IMP-integrate-W2-7",
+      "kind": "defect_fix",
+      "route": "GET /api/v2/portfolio",
+      "categories": ["array-length"],
+      "path_prefix": "items[2].priceable_states",
+      "finding": "",
+      "reason": "The third client's priceable footprint is derived from its real source states and authored packs. An unconfigured sibling adapter no longer silently hides known coverage. No population or monetary field is covered."
+    },
+    {
+      "id": "IMP-integrate-W2-8",
+      "kind": "defect_fix",
+      "route": "GET /api/v2/portfolio",
+      "categories": ["array-length"],
+      "path_prefix": "items[3].states",
+      "finding": "",
+      "reason": "The configured adapter supplies the fourth client's actual footprint instead of the empty result of Python's independently unconfigured SQL reader. Only the state-list shape is covered, not client counts or figures."
+    },
+    {
+      "id": "IMP-integrate-W2-9",
+      "kind": "defect_fix",
+      "route": "GET /api/v2/portfolio",
+      "categories": ["array-length"],
+      "path_prefix": "items[3].priceable_states",
+      "finding": "",
+      "reason": "The fourth client's priceable footprint is derived from its real source states and authored packs. An unconfigured sibling adapter no longer silently hides known coverage. No population or monetary field is covered."
+    },
+    {
+      "id": "IMP-integrate-W2-10",
+      "kind": "defect_fix",
+      "route": "GET /api/v2/portfolio",
+      "case": "portfolio.scope-state",
+      "finding": "F-2",
+      "reason": "A state abbreviation is not an engagement scope. The host returns a JSON 422 refusal instead of reproducing the unhandled Python enum-conversion 500; no valid selection or stored value changes."
+    },
+    {
+      "id": "IMP-integrate-W2-11",
+      "kind": "framework_default",
+      "route": "GET /docs",
+      "categories": ["value"],
+      "path_prefix": "body.text",
+      "finding": "",
+      "reason": "The local documentation links the same public OpenAPI inventory without copying FastAPI's CDN-specific HTML. Framework-generated page bytes are not reproduced. This intentionally remains subject to the unchanged group waiver cap."
+    },
+    {
+      "id": "IMP-integrate-W2-12",
+      "kind": "framework_default",
+      "route": "GET /redoc",
+      "categories": ["value"],
+      "path_prefix": "body.text",
+      "finding": "",
+      "reason": "The native API reference links the public schema without copying FastAPI/ReDoc CDN markup or remote font dependencies. Framework page bytes differ; the unchanged waiver cap still applies."
+    },
+    {
+      "id": "IMP-integrate-W2-13",
+      "kind": "framework_default",
+      "route": "GET /docs/oauth2-redirect",
+      "categories": ["value"],
+      "path_prefix": "body.text",
+      "finding": "",
+      "reason": "No browser OAuth client is configured. The page says so rather than reproducing an unused Swagger-specific window-opener script. It does not change bearer authentication or authorize a caller."
+    },
+    {
+      "id": "IMP-integrate-W2-14",
+      "kind": "defect_fix",
+      "route": "GET /api/health",
+      "case": "cors.simple",
+      "categories": ["header"],
+      "path_prefix": "headers.access-control-allow-origin",
+      "finding": "F-13",
+      "reason": "The configured origin allow-list does not authorize an arbitrary external origin. The host does not recreate permissive wildcard CORS merely to match the recording. The unchanged framework waiver cap still applies."
+    },
+    {
+      "id": "IMP-integrate-W2-15",
+      "kind": "framework_default",
+      "route": "GET /api/v2/portfolio",
+      "categories": ["value"],
+      "path_prefix": "detail[0].type",
+      "finding": "",
+      "reason": "Invalid boolean text still receives JSON detail and 422. Native boolean error-code naming is retained instead of emulating Pydantic; successful fields, locations and application verdicts are unaffected."
+    },
+    {
+      "id": "IMP-integrate-W2-16",
+      "kind": "framework_default",
+      "route": "POST /api/claims",
+      "categories": ["value", "array-length"],
+      "path_prefix": "detail[0].",
+      "finding": "",
+      "reason": "Invalid bodies still receive JSON detail and 422. Native binding retains its own error codes and omits Pydantic's JSON-parser byte-position component; this does not cover status, successful claims or calculated figures."
+    },
+    {
+      "id": "IMP-integrate-W2-17",
+      "kind": "framework_default",
+      "route": "POST /api/claims/cell/{client_id}/{program_code}/{tax_year}/transition",
+      "categories": ["value", "array-length"],
+      "path_prefix": "detail[0].",
+      "finding": "",
+      "reason": "Invalid transitions still receive JSON detail and 422. Native body/enum error-code naming and parser byte-position metadata are not made Pydantic-specific. Status, transition verdicts and stored values are not covered."
+    },
+    {
+      "id": "IMP-integrate-W2-18",
+      "kind": "framework_default",
+      "route": "PUT /api/claims/engagement",
+      "categories": ["value", "array-length"],
+      "path_prefix": "detail[0].",
+      "finding": "",
+      "reason": "Invalid engagement bodies still receive JSON detail and 422. Native error codes and parser byte-position metadata differ from Pydantic; successful values and application schema verdicts are not covered."
+    },
+    {
+      "id": "IMP-integrate-W2-19",
+      "kind": "framework_default",
+      "route": "POST /api/claims/assess",
+      "categories": ["value", "array-length"],
+      "path_prefix": "detail[0].",
+      "finding": "",
+      "reason": "Malformed or null bodies still receive JSON detail and 422. Native body-binding codes and JSON-parser byte-position metadata are framework-specific; no assessment, status or figure is covered."
+    },
+    {
+      "id": "IMP-integrate-W2-20",
+      "kind": "framework_default",
+      "route": "POST /api/rules/{code}/verify",
+      "categories": ["value", "array-length"],
+      "path_prefix": "detail[0].",
+      "finding": "",
+      "reason": "Invalid bodies still receive JSON detail and 422. Native binding retains its own error codes and parser-position metadata rather than emulating Pydantic; this does not cover verification verdicts or successful values."
+    },
+    {
+      "id": "IMP-integrate-W2-21",
+      "kind": "framework_default",
+      "route": "POST /api/rules/ingested/{state}/apply",
+      "categories": ["value", "array-length"],
+      "path_prefix": "detail[0].",
+      "finding": "",
+      "reason": "Invalid bodies still receive JSON detail and 422. Native body-binding codes and JSON-parser byte-position metadata differ from Pydantic; application validation and statute values are not covered."
+    },
+    {
+      "id": "IMP-integrate-W2-22",
+      "kind": "framework_default",
+      "route": "POST /api/findings/{finding_id}/resolve",
+      "categories": ["value", "array-length"],
+      "path_prefix": "detail[0].",
+      "finding": "",
+      "reason": "Invalid bodies still receive JSON detail and 422. Native body-binding error codes and parser-position metadata are retained, without changing resolution decisions or successful values."
+    },
+    {
+      "id": "IMP-integrate-W2-23",
+      "kind": "framework_default",
+      "route": "POST /api/findings/{finding_id}/reopen",
+      "categories": ["value", "array-length"],
+      "path_prefix": "detail[0].",
+      "finding": "",
+      "reason": "Invalid bodies still receive JSON detail and 422. Native body-binding error codes and parser-position metadata are retained, without changing reopening decisions or successful values."
+    },
+    {
+      "id": "IMP-integrate-W2-24",
+      "kind": "framework_default",
+      "route": "POST /api/v2/program-drafts",
+      "categories": ["value", "array-length"],
+      "path_prefix": "detail[0].",
+      "finding": "",
+      "reason": "Invalid bodies still receive JSON detail and 422. Native binding codes and parser-position metadata are not made Pydantic-specific; draft schema keywords, paths, verdicts and successful values are not covered."
+    },
+    {
+      "id": "IMP-integrate-W2-25",
+      "kind": "framework_default",
+      "route": "PUT /api/v2/program-drafts/{draft_id}/documents",
+      "categories": ["value", "array-length"],
+      "path_prefix": "detail[0].",
+      "finding": "",
+      "reason": "Invalid bodies still receive JSON detail and 422. Native binding codes and parser-position metadata differ from Pydantic; document schema keywords, paths, verdicts and successful values are not covered."
+    },
+    {
+      "id": "IMP-integrate-W2-26",
+      "kind": "framework_default",
+      "route": "POST /api/v2/program-drafts/{draft_id}/validate",
+      "categories": ["value", "array-length"],
+      "path_prefix": "detail[0].",
+      "finding": "",
+      "reason": "Invalid HTTP bodies still receive JSON detail and 422. Native body-binding codes and parser-position metadata are retained; actual pack validation keywords, paths and verdicts are not covered."
+    },
+    {
+      "id": "IMP-integrate-W2-27",
+      "kind": "framework_default",
+      "route": "POST /api/v2/program-drafts/{draft_id}/request-review",
+      "categories": ["value", "array-length"],
+      "path_prefix": "detail[0].",
+      "finding": "",
+      "reason": "Malformed HTTP bodies still receive JSON detail and 422. Native binding codes and parser-position metadata are framework-specific; review state, pack verdicts and successful responses are not covered."
+    },
+    {
+      "id": "IMP-integrate-W2-28",
+      "kind": "framework_default",
+      "route": "POST /api/v2/program-drafts/{draft_id}/review",
+      "categories": ["value", "array-length"],
+      "path_prefix": "detail[0].",
+      "finding": "",
+      "reason": "Invalid HTTP bodies still receive JSON detail and 422. Native enum/body error codes and parser-position metadata are retained; review decisions, draft schema verdicts and successful values are not covered."
+    },
+    {
+      "id": "IMP-integrate-W2-29",
+      "kind": "framework_default",
+      "route": "POST /api/v2/program-drafts/{draft_id}/preview",
+      "categories": ["value", "array-length"],
+      "path_prefix": "detail[0].",
+      "finding": "",
+      "reason": "Invalid HTTP bodies still receive JSON detail and 422. Native body/enum error codes and parser-position metadata differ from Pydantic; preview calculations and validation verdicts are not covered."
+    },
+    {
+      "id": "IMP-integrate-W2-30",
+      "kind": "framework_default",
+      "route": "POST /api/v2/program-drafts/{draft_id}/withdraw",
+      "categories": ["value", "array-length"],
+      "path_prefix": "detail[0].",
+      "finding": "",
+      "reason": "Invalid HTTP bodies still receive JSON detail and 422. Native binding codes and parser-position metadata are retained, without changing withdrawal decisions, schema verdicts or successful values."
+    },
+    {
+      "id": "IMP-integrate-W2-31",
+      "kind": "framework_default",
+      "route": "POST /api/v2/program-drafts/{draft_id}/export",
+      "categories": ["value", "array-length"],
+      "path_prefix": "detail[0].",
+      "finding": "",
+      "reason": "Invalid HTTP bodies still receive JSON detail and 422. Native body/boolean error codes and parser-position metadata are retained; exported packs, validation verdicts and successful values are not covered."
+    },
+    {
+      "id": "IMP-integrate-W2-32",
+      "kind": "framework_default",
+      "route": "POST /api/v2/clients/{client_id}/units/{unit_id}/base-year",
+      "categories": ["value", "array-length"],
+      "path_prefix": "detail[0].",
+      "finding": "",
+      "reason": "Invalid bodies still receive JSON detail and 422. Native body-binding codes and parser-position metadata differ from Pydantic; override decisions, durability and successful values are not covered."
+    },
+    {
+      "id": "IMP-integrate-W2-33",
+      "kind": "framework_default",
+      "route": "POST /api/v2/clients/{client_id}/runs",
+      "categories": ["value", "array-length"],
+      "path_prefix": "detail[0].",
+      "finding": "",
+      "reason": "Invalid HTTP bodies still receive JSON detail and 422. Native binding codes and parser-position metadata are retained; authorization, run identities, validation counts and calculated figures are not covered."
+    },
+    {
+      "id": "IMP-integrate-W2-34",
+      "kind": "framework_default",
+      "route": "POST /api/v2/run-batches",
+      "categories": ["value", "array-length"],
+      "path_prefix": "detail[0].",
+      "finding": "",
+      "reason": "Invalid HTTP bodies still receive JSON detail and 422. Native body/enum error codes and parser-position metadata are retained; batch previews, populations, identities and stored run state are not covered."
+    }
+  ]
+}
