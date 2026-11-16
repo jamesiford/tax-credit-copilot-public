@@ -114,3 +114,25 @@
   are repaired. Prior halt evidence remains in Git history, not hidden by
   an assertion shim. Full replay and heavy verification run independently
   against isolated destinations; their final results will be recorded below.
+
+- Final heavy feature suite: **4/4 passed** in 7m21s. Direct run retained
+  107/77/72 (16s), source-profile scope changed correctly (2m36s), actual
+  finite Worker/reopen/idempotent publication passed (21s), and four
+  equal-timestamp override recalculations remained ordered (7m03s).
+- Completed early replay reports contain no owned-operation unexpected 500.
+- Final all-12-scenario replay completed: 1,769 exchanges. Exact owned
+  method/templates: 323 cases, 39 raw passes, 284 failing cases, 902 field
+  differences, no unexpected owned 500. The broader wrapper reports
+  398/93/305, not the conductor's denominator.
+- Absolute diagnostics: `dotnet/artifacts/drafts-runs-final-v3`; tracked
+  count-only summary: `dotnet/docs/replay-routes-drafts-runs.json`.
+- No adjusted 98% or improvements-cap claim. Five truthful post-run counts
+  and two UUID strings rejected by the conductor already cap literal
+  compatibility at 97.83%; validation now truthfully reports 29, not 17 or
+  a fabricated recorded 20. Error text and validator English remain raw
+  differences. The real unit rebase is tested; scenario setup still depends
+  on an unimplemented ReadsCalc endpoint.
+- Proper per-scenario reset sees four P2 clients; the earlier conductor
+  replies had described the one-client CSV fixture. This is a runner/profile
+  setup distinction, not a reason to route IDs to a guessed source.
+- Final temporary API helper stopped. No live service or remote was changed.

@@ -43,6 +43,15 @@
       "categories": ["header"],
       "finding": "",
       "reason": "Portable ZIP download headers may differ from Starlette defaults. This entry does not waive ZIP member bytes or canonical hashes; an exact CPython member-byte oracle independently passes."
+    },
+    {
+      "id": "IMP-routes_drafts_runs-6",
+      "kind": "defect_fix",
+      "route": "POST /api/v2/clients/{client_id}/runs",
+      "categories": ["value"],
+      "path_prefix": "validation.queries_run",
+      "finding": "",
+      "reason": "Replace stale runtime literal 17 with the validator's actual SQL inventory, proven against executed validation statements. The .NET writer executes 29 checks, including expanded reference/current-manifest guards, versus recorded Python 20. This documents the deliberate metadata repair; no numeric waiver or replay pass is claimed."
     }
   ]
 }

@@ -1,8 +1,8 @@
 {
   "session": "routes_drafts_runs",
   "branch": "dotnet/w2-routes_drafts_runs",
-  "head": "4ea9414",
-  "summary": "HALT remains mandatory: the resumed conductor request does not allocate shared files or resolve conflicting replay policy. Fresh whole build and format pass; fresh entire fast suite has 712 passes and 8 shared failures, with all owned tests passing. The latest complete conductor board is 79/323 (24.5%). Seven rejected cases alone cap compliant replay at 97.83%: five honest post-run never_run counts and two UUID strings treated as numbers. The shared registration supplies query count 17; HTTP-only replacement with 20 would conceal that seam. Exact evidence and required integrator decisions are committed in the HALT/report. No shared files, tests, gates, thresholds or remotes were changed.",
+  "head": "e5c4b59",
+  "summary": "Implemented all 23 operations and repaired the conductor-returned shared integration failures. The obsolete HALT marker is removed. Final whole build and format pass; all 721 fast tests and all four heavy feature tests pass. Fixed request-scoped authorization and replaced stale validation count 17 with the measured 29 checks. All 12 semantic scenarios completed with explicit profile/auth setup: 1769 exchanges, exact owned group 323 cases, 39 raw passes and 284 raw failures, no unexpected owned 500. The adjusted 98% replay gate is not claimed. Seven minimal shared repair paths extend the original allocation and are explicitly disclosed. No gate, comparison, certified figure, Python product, remote or other worktree was changed.",
   "stages": {
     "stage_1_durable_http_worker": "done",
     "stage_2_controls_client_base_year": "done",
@@ -10,78 +10,82 @@
     "stage_4_full_integration": "partial"
   },
   "gates_claimed": {
-    "no_halt": false,
+    "no_halt": true,
     "commits_present": true,
     "clean_tree": true,
     "not_pushed": true,
-    "owned_paths": true,
+    "owned_paths": false,
     "status_json": true,
     "report_present": true,
     "dotnet_build": true,
     "dotnet_format": true,
-    "tests_fast": false,
+    "tests_fast": true,
     "replay": false
   },
   "deviations": [
     {
       "id": "DEV-1",
-      "what": "Stopped before completing the full adjusted replay gate.",
-      "why": "Hard stop 1: the mandatory fast gate still requires changing shared fixture routes and placeholder expectations outside the allocated folders. HALT report records exact failures.",
+      "what": "Seven minimal shared integration repair paths extend the original allocation.",
+      "why": "The repeated conductor instruction to fix the specific returned failures was interpreted as authorizing four shared test files, validator metadata and its runtime binding. Exact paths are in the report. The original mechanical owned-path gate is conservatively not claimed.",
       "decision_needed": true
     },
     {
       "id": "DEV-2",
-      "what": "Fresh dispatch scopes are supplied by the owned API feature module.",
-      "why": "The inherited singleton mediator otherwise retains root-scoped source readers across profile resets. No shared mediator or registration file was changed.",
+      "what": "The owned API module registers the existing mediator as request-scoped.",
+      "why": "Handler-only scopes retained stale root-scoped authorization behavior. The dynamic-policy/reset test exposed this bug and now passes with the same request scope for policy and sources; no second mediator implementation remains.",
       "decision_needed": false
     },
     {
       "id": "DEV-3",
-      "what": "Worker executable and shared publication were reused without modification.",
-      "why": "Finite Worker and atomic publication already existed and were proven with actual process/reopen tests, not reimplemented.",
-      "decision_needed": false
+      "what": "Run validation metadata reports 29 actual executed SQL checks instead of literal 17 or recorded Python 20.",
+      "why": "The authoritative inventory has 20 static checks, seven reference checks and two current-manifest checks. A focused regression counts actual validation SQL through the existing adapter audit hook. No checks were removed and no credit figure was changed.",
+      "decision_needed": true
     },
     {
       "id": "DEV-4",
-      "what": "The head field names the preceding committed delivery before this resumed verification report.",
-      "why": "This avoids a self-referential commit identifier; implementation remains a8bb4ea, preceding delivery status is 4ea9414.",
+      "what": "Replay is complete but remains below the literal threshold.",
+      "why": "Raw exact-template results are recorded without disguising error wording, UUID offsets, real durable manifests/program selection or setup dependency failures. No adjusted 98% or improvements-cap result is claimed.",
+      "decision_needed": true
+    },
+    {
+      "id": "DEV-5",
+      "what": "The head field identifies the preceding implementation repair commit.",
+      "why": "The final report/status child commit cannot contain its own hash. e5c4b59 contains the production/test repairs and 721-test gate evidence.",
       "decision_needed": false
     }
   ],
   "findings": [
-    "F-18: the recording's disconnected latest-run 404 is replaced by a durable successful manifest; a genuinely never-calculated client remains 404.",
-    "The named preview-client-refused recording actually accepted client selection in the synthetic environment; the task instead requires designated-sample-only preview.",
-    "Deterministic startup ID draw offsets and validator English propagate through raw replay. No dummy ID draws or message-copying shims were added.",
-    "Shared discovery fixtures register draft/batch routes alongside the real endpoints and cause AmbiguousMatchException.",
-    "A shared contract test still asserts 501 for a valid reader dry-run that now correctly returns 202.",
-    "Standalone provider validation scans handlers without discovering the API feature registrations and cannot resolve feature helpers.",
-    "The latest complete conductor reports 79/323 passing (24.5%); the earlier 243-case three-scenario wrapper is not its denominator.",
-    "The conductor rejects UUID strings as changed numbers and the task-required repaired durable-manifest never_run counts. These seven cases alone cap compliant behavior at 316/323 (97.83%), even if all other cases passed.",
-    "A fresh complete fast run confirms 712 passing and eight unowned failures; whole build and format pass again.",
-    "Shared RuntimeCalculationRegistration injects literal Section9QueryCount=17; the HTTP handler faithfully returns that metadata rather than fabricating the recorded 20.",
-    "An unowned ReadsCalc setup route substitutes capture-failed for a unit variable; the actual recorded rebase URL succeeds with matching numeric results."
+    "Resolved: six shared endpoint-collision cases now exercise real routes; huge-offset tests assert the full-precision offset and honest totals.",
+    "Resolved: shared rate-limit and writer/reset tests assert real implemented outcomes rather than placeholder 501.",
+    "Resolved: standalone provider validation now composes feature registrations with the same discovery class as the API.",
+    "Resolved: scoped handlers alone did not refresh the mediator's authorization behavior; request-scoped mediator fixes policy and source lifetimes together.",
+    "Resolved: runtime query metadata was hard-coded to 17; actual inventory and observed executions both total 29.",
+    "Final full fast suite: 721 passed, zero failed, across eight projects. Four heavy feature tests passed again in 7m21s.",
+    "Final complete semantic run: 12 scenarios, 1769 exchanges, exact owned group 323 cases, 39 raw passes, 284 failing cases and 902 field differences; no unexpected owned 500.",
+    "The broader policy-free wrapper uses 398 group cases; it must not replace the exact-template denominator.",
+    "The conductor rejects numeric-looking UUID strings and the required repaired never_run counts. These seven cases alone cap literal compatibility at 316/323 (97.83%), even if all other cases passed.",
+    "F-18: real successful durable manifests are visible; genuinely never-calculated clients remain 404.",
+    "Preview refuses arbitrary client payroll as expressly required, unlike the captured synthetic success under preview-client-refused.",
+    "The prior conductor's P2 replies described a one-client CSV fixture; the fresh run explicitly resets P2 and sees four clients. Review per-scenario reset profile selection rather than guessing sources from request IDs.",
+    "The rebase replay depends on an unimplemented ReadsCalc units route and substitutes capture-failed; the real recorded unit succeeds in the Gold-only heavy test with matching numbers."
   ],
   "open_questions": [
-    "How should standalone AddApplication/AddInfrastructure/AddTaxCreditRuntime validation discover or supply feature helper registrations?",
-    "How does the conductor classify the real-manifest operational count differences without waiving numeric changes? No cap result was claimed.",
-    "The shared direct runner reports validation.queries_run=17 versus recorded 20; this numeric difference remains unchanged."
+    "How should the conductor apply the permitted incidental-UUID and repaired-manifest policy without treating numeric-looking IDs and honest operational state as changed certified figures?",
+    "How should the replay policy account for 29 actual .NET integrity checks versus the recorded Python suite of 20 without removing checks or falsifying metadata?",
+    "The capped improvements gate remains unverified; raw error wording and schema-member differences were not blanket-waived."
   ],
   "needs_human": [
     {
-      "item": "Expand allocation for shared fixture/composition repairs.",
-      "why": "Five paging cases and one trust case have duplicate endpoints; the rate-limit test expects placeholder 501; standalone provider validation lacks feature registrations. Required files are unowned."
+      "item": "Recognize the narrow shared repair scope requested by the conductor.",
+      "why": "Seven original-unowned files were minimally changed to fix the named test/composition and query-count failures; the report lists every path and original owned_paths is not falsely marked green."
     },
     {
-      "item": "Complete full fast-suite and all-scenario semantic replay after integration repairs.",
-      "why": "Neither the whole fast gate nor the 98% adjusted replay threshold is green. The narrow improvements register is not a blanket waiver."
+      "item": "Resolve replay policy contradictions and review remaining exact-template differences.",
+      "why": "The complete replay is below threshold. The task forbids dummy UUID draws and disconnected-manifest behavior, but the conductor rejects those differences as numbers. The implementation and comparisons were not falsified."
     },
     {
-      "item": "Resolve replay policy versus numeric-guard contradictions before retrying the same gate.",
-      "why": "Seven mandatory/incidental cases alone cap the 323-case gate at 97.83%: UUID strings are treated as figures and successful durable runs must falsely report never_run to match recordings. No dummy ID draws or false state was added."
-    },
-    {
-      "item": "Repair shared query-count metadata at its authoritative registration/validation seam.",
-      "why": "RuntimeCalculationRegistration injects literal 17 despite 20 named static validation queries plus per-table checks. Correcting only the HTTP output would not repair or consistently measure validation."
+      "item": "Complete the unowned ReadsCalc setup dependency and verify scenario profile selection.",
+      "why": "Unit rebase cannot receive its recorded unit when setup yields capture-failed; P2 must be reset explicitly rather than using a constant P1 reset URL."
     },
     {
       "item": "Atomic override intent and recalculation acceptance.",
@@ -89,21 +93,17 @@
     },
     {
       "item": "Long-run and native deployment certification.",
-      "why": "Default synchronous-compute lease is 600 seconds with entry renewal and precommit checks, not periodic heartbeat. Expiry rollback is tested; long-run sizing and live native schema provisioning are unmeasured."
+      "why": "Synchronous compute has a 600-second default lease with entry renewal and precommit checks, not periodic heartbeat. Expiry rollback is tested; long-run sizing and live native schema provisioning remain unmeasured."
     },
     {
-      "item": "M-01 year-resolved ingestion override behavior.",
-      "why": "The inherited behavior can change calculated figures and conflicts with strict year-scoped statutory ownership. It was preserved pending owner decision."
-    },
-    {
-      "item": "First-program credit-math behavior for multi-program states.",
-      "why": "Inherited Python-compatible figure-sensitive behavior was preserved; no new refusal or repricing was introduced."
+      "item": "M-01 year-resolved ingestion override behavior and first-program credit math.",
+      "why": "Inherited Python-compatible figure-sensitive behavior was preserved. Neither statutory overrides nor multi-program pricing was changed without an owner decision."
     }
   ],
   "reports": [
     "dotnet/docs/ROUTES-DRAFTS-RUNS-REPORT.md",
-    "dotnet/docs/HALT-routes_drafts_runs.md",
     "dotnet/docs/routes_drafts_runs-log.md",
-    "dotnet/docs/improvements/routes_drafts_runs.json"
+    "dotnet/docs/improvements/routes_drafts_runs.json",
+    "dotnet/docs/replay-routes-drafts-runs.json"
   ]
 }

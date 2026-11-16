@@ -1,0 +1,51 @@
+{
+  "session": "routes_drafts_runs",
+  "implementation_head": "e5c4b59",
+  "mode": "semantic",
+  "oracle": "CPython 3.12.13",
+  "scenario_count": 12,
+  "exchanges": 1769,
+  "diagnostics_root": "dotnet/artifacts/drafts-runs-final-v3",
+  "setup": "Explicit profile reset and auth environment before each scenario; one isolated API and no independent Worker against its destination.",
+  "exact_method_template_group": {
+    "group": "drafts_runs",
+    "cases": 323,
+    "passed_raw": 39,
+    "failed_raw": 284,
+    "field_failures": 902,
+    "pass_percent_raw": 12.07,
+    "unexpected_500_cases": 0
+  },
+  "policy_free_wrapper_group": {
+    "cases": 398,
+    "passed_raw": 93,
+    "failed_raw": 305,
+    "pass_percent_raw": 23.37,
+    "note": "The wrapper also classifies framework method/path variants into the group; do not use this denominator for the conductor gate."
+  },
+  "policy_adjusted_gate_claimed": false,
+  "threshold_percent": 98,
+  "status": "below-threshold",
+  "scenarios": [
+    { "scenario": "g1_mcp", "exchanges": 103, "owned_cases": 0, "owned_failed_cases_raw": 0, "owned_field_failures": 0 },
+    { "scenario": "g1_ratelimit", "exchanges": 10, "owned_cases": 0, "owned_failed_cases_raw": 0, "owned_field_failures": 0 },
+    { "scenario": "g1_rest", "exchanges": 142, "owned_cases": 0, "owned_failed_cases_raw": 0, "owned_field_failures": 0 },
+    { "scenario": "p1_artifacts_ai", "exchanges": 36, "owned_cases": 0, "owned_failed_cases_raw": 0, "owned_field_failures": 0 },
+    { "scenario": "p1_auth", "exchanges": 114, "owned_cases": 24, "owned_failed_cases_raw": 13, "owned_field_failures": 71 },
+    { "scenario": "p1_program_drafts", "exchanges": 175, "owned_cases": 148, "owned_failed_cases_raw": 145, "owned_field_failures": 338 },
+    { "scenario": "p1_query_edges", "exchanges": 71, "owned_cases": 4, "owned_failed_cases_raw": 4, "owned_field_failures": 4 },
+    { "scenario": "p1_reads", "exchanges": 584, "owned_cases": 52, "owned_failed_cases_raw": 38, "owned_field_failures": 90 },
+    { "scenario": "p1_workspace_unavailable", "exchanges": 30, "owned_cases": 0, "owned_failed_cases_raw": 0, "owned_field_failures": 0 },
+    { "scenario": "p1_writes", "exchanges": 366, "owned_cases": 33, "owned_failed_cases_raw": 28, "owned_field_failures": 58 },
+    { "scenario": "p2_reads_writes", "exchanges": 74, "owned_cases": 7, "owned_failed_cases_raw": 7, "owned_field_failures": 88 },
+    { "scenario": "p2_run_batches", "exchanges": 64, "owned_cases": 55, "owned_failed_cases_raw": 49, "owned_field_failures": 253 }
+  ],
+  "unresolved": [
+    "The comparator rejects numeric-looking UUID strings as changed figures; the task forbids dummy identity draws.",
+    "Successful durable manifests honestly change never_run and skip-coverage summaries; the task forbids reproducing disconnected-manifest state.",
+    "Actual validation metadata is now 29 executed checks versus recorded Python 20, proven against the SQL adapter; no checks were deleted or counts fabricated.",
+    "Tier-C error wording/schema-detail members and validator English remain raw differences, not failures of the corresponding owned lifecycle tests.",
+    "The rebase scenario's unimplemented ReadsCalc setup produces capture-failed; the real recorded unit succeeds in the heavy Gold-only rebase test.",
+    "The old disconnected program/portfolio lookup records a null program and refuses a valid state filter; current selection resolves the actual program and clients."
+  ]
+}
