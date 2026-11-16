@@ -1,8 +1,8 @@
 {
   "session": "routes_claims",
   "branch": "dotnet/w2-routes_claims",
-  "head": "2cd6769",
-  "summary": "PARTIALLY REPAIRED; hard stop 1 remains for three shared framework failures outside the allocation.\nFixed conductor reset 500: a scoped mediator releases package byte leases at request disposal.\nSame-host create/download/reset/recreate passes; conductor-style replay now produces a report.\nAll 12 feature tests pass, including the heavy P2 portfolio integration and new reset regression.\nFinal whole-solution build and format pass; full fast suite is 717 passed, 3 failed, 720 total.\nAll seven full scenarios re-run: 156/397 owned cases, 39.29%; 98% acceptance still not achieved.\nTwo framework tests still require implemented GET /api/rules to return 501; bare runtime misses feature collaborators.\nNo shared-file edits, live services, pushes or remote changes; temporary synthetic stores removed.\nThe head field identifies the repair commit; this status and reports are committed afterward.",
+  "head": "3054859",
+  "summary": "BLOCKED at hard stop 1; ownership restrictions and three shared framework failures remain unchanged.\nFixed rejected improvement scope: formula safety covers only Provenance XML; integrity covers status only.\nNeither safety entry matches the actual package.create artifact-ID mismatch; IDs and figures remain failures.\nBuild and format rerun successfully; all fast tests rerun: 717 passed, 3 failed, 720 total.\nAll twelve full scenarios rerun: 1769 exchanges; exact-method owned raw score 98/316 (31.01%), no waivers.\nThe supplied external conductor score was 80/316 adjusted (25.3%); neither score meets 98%.\nEarlier 397-case wrapper totals include other methods by route shape and are not the conductor denominator.\nThe reset lifecycle fix and 12 passing feature tests from the prior repair remain unchanged.\nNo forbidden edits, live services, pushes or remote changes; mandatory HALT retained.\nThe head field identifies the register repair commit; status and reports are committed afterward.",
   "stages": {
     "preflight": "done",
     "stage-1-packages": "done",
@@ -58,7 +58,9 @@
     "Portfolio degraded rows/counters and oversized storage-bound inputs remain incomplete; they are not waived or reported as successful.",
     "The shared singleton mediator captured scoped artifact-byte leases at its root, making reset fail after package publication. Ordinary feature registration now scopes the existing mediator; same-host reset and report generation pass.",
     "The heavy P2 test previously set HttpClient.Timeout after its first request. Moving timeout configuration before requests and asserting reset success makes the complete test pass.",
-    "The claim-history test took 68 seconds under full-suite contention and is now heavy under the task policy; its conflict/history/isolation assertions are unchanged."
+    "The claim-history test took 68 seconds under full-suite contention and is now heavy under the task policy; its conflict/history/isolation assertions are unchanged.",
+    "The formula-safety register entry was overly broad. It is now confined to the downloaded Provenance XML member and cannot cover package metadata artifact IDs; the integrity entry is confined to status.",
+    "The legacy replay wrapper groups by route shape as well as method, producing 397 owned cases instead of the conductor's 316. Exact-method local raw replay is 98/316; the external conductor last reported 80/316 adjusted. Neither passes."
   ],
   "open_questions": [
     "Which still-deferred operation should the two shared framework stub-replacement tests use after the rules route is implemented?",
@@ -73,7 +75,7 @@
     },
     {
       "item": "Resume outstanding semantic route work and replay to at least 98%.",
-      "why": "The unmodified raw board is 39.29%; it includes real missing degraded behavior and storage-bound validation in addition to incidental and sibling differences."
+      "why": "The latest exact-method local raw replay is 98/316 (31.01%); the supplied external conductor result was 80/316 adjusted (25.3%). There are real degraded-behavior and validation gaps as well as sibling and incidental differences; none is waived as accepted."
     },
     {
       "item": "Provision native tcc_ops.finding_audit through the operator path.",
@@ -109,6 +111,11 @@
     "dotnet/docs/revision-build-final.log",
     "dotnet/docs/revision-format-final.log",
     "dotnet/docs/revision-tests-feature-final.log",
-    "dotnet/docs/revision-tests-fast-final.log"
+    "dotnet/docs/revision-tests-fast-final.log",
+    "dotnet/docs/retry2-summary.json",
+    "dotnet/docs/retry2-replay/board.json",
+    "dotnet/docs/retry2-build.log",
+    "dotnet/docs/retry2-format.log",
+    "dotnet/docs/retry2-tests-fast.log"
   ]
 }

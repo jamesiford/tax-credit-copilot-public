@@ -1,0 +1,259 @@
+# Replay report (semantic)
+
+- server interpreter: external server (zlib n/a), oracle: None
+- scenarios: 1
+- exchanges compared: 366
+- failures: 818
+- tolerated (semantic mode only): 82
+
+## p1_writes: 366 exchanges, 818 failures, 82 tolerated
+- `GET /api/v2/clients/1001/units/GA_ATL_HQ` / `boot.unit` **status** at `status`: expected `200` actual `501`
+- `GET /api/v2/clients/1001/units/GA_ATL_HQ` / `boot.unit` **missing-field** at `calculation_state`: expected `calculated` actual `<absent>`
+- `GET /api/v2/clients/1001/units/GA_ATL_HQ` / `boot.unit` **missing-field** at `run`: expected `{"run_id":"40000000000040008000000000000001","produced_at":"2026-01-15 12:00:00","started_at":"2026-01-15 12:00:00","calculation_id":"9e9a9edc79a44dce8ea0d3be5147883b87a1298e2ccf5619947c8e40d3cbf0cd","code_commit":"0000000000000000000000000000000000c0ffee","rule_pack_version":"rules/ga_jtc/2025.json...(473 chars)` actual `<absent>`
+- `GET /api/v2/clients/1001/units/GA_ATL_HQ` / `boot.unit` **missing-field** at `newer_run_in_flight`: expected `false` actual `<absent>`
+- `GET /api/v2/clients/1001/units/GA_ATL_HQ` / `boot.unit` **missing-field** at `in_flight`: expected `null` actual `<absent>`
+- `GET /api/v2/clients/1001/units/GA_ATL_HQ` / `boot.unit` **missing-field** at `message`: expected `null` actual `<absent>`
+- `GET /api/v2/clients/1001/units/GA_ATL_HQ` / `boot.unit` **missing-field** at `client_id`: expected `1001` actual `<absent>`
+- `GET /api/v2/clients/1001/units/GA_ATL_HQ` / `boot.unit` **missing-field** at `state`: expected `null` actual `<absent>`
+- `GET /api/v2/clients/1001/units/GA_ATL_HQ` / `boot.unit` **missing-field** at `year`: expected `2025` actual `<absent>`
+- `GET /api/v2/clients/1001/units/GA_ATL_HQ` / `boot.unit` **missing-field** at `method`: expected `min_max` actual `<absent>`
+- `GET /api/v2/clients/1001/units/GA_ATL_HQ` / `boot.unit` **missing-field** at `month_filter`: expected `{"month_index":null}` actual `<absent>`
+- `GET /api/v2/clients/1001/units/GA_ATL_HQ` / `boot.unit` **missing-field** at `filters_applied`: expected `{}` actual `<absent>`
+- `GET /api/v2/clients/1001/units/GA_ATL_HQ` / `boot.unit` **missing-field** at `near_filters_applied`: expected `{}` actual `<absent>`
+- `GET /api/v2/clients/1001/units/GA_ATL_HQ` / `boot.unit` **missing-field** at `unit`: expected `{"client_id":1001,"worksite_id":"GA_ATL_HQ","entity_fein":"58-1234567","program_code":"GA_JTC","method":"min_max","tax_year":2025,"average_headcount":17.25,"is_base_year":false,"base_average_headcount":9.17,"base_year_source":"inferred","net_new_vs_base":8.08,"months_reachable":11,"year_complete":tr...(808 chars)` actual `<absent>`
+- `GET /api/v2/clients/1001/units/GA_ATL_HQ` / `boot.unit` **missing-field** at `months`: expected `{"client_id":1001,"tax_year":2025,"method":"min_max","run_id":"40000000000040008000000000000001","worksite_id":"GA_ATL_HQ","month_01":17.0,"month_02":17.0,"month_03":19.0,"month_04":19.0,"month_05":18.0,"month_06":18.0,"month_07":18.0,"month_08":18.0,"month_09":18.0,"month_10":18.0,"month_11":18.0,"...(407 chars)` actual `<absent>`
+- `GET /api/v2/clients/1001/units/GA_ATL_HQ` / `boot.unit` **missing-field** at `employees`: expected `[{"employee_id":"E00048","record_token":"e75b41d8333131b91396d9e5","worksite_id":"GA_ATL_HQ","entity_fein":"58-1234567","first_pps":"2024-12-23","last_ppe":"2025-05-04","weight":1.0,"month_01":1.0,"month_02":1.0,"month_03":1.0,"month_04":1.0,"month_05":0.0,"month_06":0.0,"month_07":0.0,"month_08":0....(1058 chars)` actual `<absent>`
+- `GET /api/v2/clients/1001/units/GA_ATL_HQ` / `boot.unit` **missing-field** at `near_threshold`: expected `[{"employee_id":"E00067","record_token":"8ba8e33f494280f845e7fe52","avg_weekly_hours":34.76,"avg_weekly_wages":1742.6,"weeks_worked":51.86,"total_hours":1802.8,"total_wages":90366.21,"first_start":"2024-12-23","last_end":"2025-12-21","additional_weekly_hours":0.24,"projected_weekly_hours":35.0,"exce...(1618 chars)` actual `<absent>`
+- `GET /api/v2/clients/1001/units/GA_ATL_HQ` / `boot.unit` **missing-field** at `thresholds`: expected `{"min_weekly_hours":35.0,"min_weekly_wages":680.0,"resolved":true}` actual `<absent>`
+- `GET /api/v2/clients/1001/units/GA_ATL_HQ` / `boot.unit` **missing-field** at `total`: expected `2` actual `<absent>`
+- `GET /api/v2/clients/1001/units/GA_ATL_HQ` / `boot.unit` **missing-field** at `total_unfiltered`: expected `2` actual `<absent>`
+- `GET /api/v2/clients/1001/units/GA_ATL_HQ` / `boot.unit` **missing-field** at `near_total_unfiltered`: expected `2` actual `<absent>`
+- `GET /api/v2/clients/1001/units/GA_ATL_HQ` / `boot.unit` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /api/v2/clients/{client_id}/units/{unit_id}`
+- `POST /api/claims` / `ok.post-api-claims` **value** at `claim_id`: expected `40000000-0000-4000-8000-000000000008` actual `40000000-0000-4000-8000-000000000004`
+- `POST /api/claims/cell/1001/GA_JTC/2025/transition` / `ok.post-api-claims-cell-client-id-program-code-tax-year-transition` **value** at `claim_id`: expected `40000000-0000-4000-8000-000000000009` actual `40000000-0000-4000-8000-000000000005`
+- `PUT /api/claims/engagement` / `ok.put-api-claims-engagement` **value** at `set_by`: expected `anonymous` actual `system`
+- `POST /api/claims/assess` / `ok.post-api-claims-assess` **value** at `assessed[0].claim_id`: expected `40000000-0000-4000-8000-00000000000b` actual `40000000-0000-4000-8000-000000000006`
+- `POST /api/onezero/employee/E00048/review` / `ok.post-api-onezero-employee-employee-id-review` **status** at `status`: expected `200` actual `501`
+- `POST /api/onezero/employee/E00048/review` / `ok.post-api-onezero-employee-employee-id-review` **missing-field** at `ok`: expected `true` actual `<absent>`
+- `POST /api/onezero/employee/E00048/review` / `ok.post-api-onezero-employee-employee-id-review` **missing-field** at `review`: expected `{"employee_id":"E00048","status":"validated","note":"n","reviewer":"contract","reviewed_at":"2026-01-15"}` actual `<absent>`
+- `POST /api/onezero/employee/E00048/review` / `ok.post-api-onezero-employee-employee-id-review` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /api/onezero/employee/{employee_id}/review`
+- `POST /api/rules/ingested/GA/apply` / `ok.post-api-rules-ingested-state-apply` **value** at `detail`: expected `Web IQ not configured (set WEBIQ_API_KEY) — cannot retrieve the canonical source to apply.` actual `Web IQ retrieval is not configured; cannot retrieve the canonical source to apply.`
+- `POST /api/simulate/unit` / `ok.post-api-simulate-unit` **status** at `status`: expected `200` actual `501`
+- `POST /api/simulate/unit` / `ok.post-api-simulate-unit` **missing-field** at `scope`: expected `{"client_id":1001,"worksite_id":"GA_ATL_HQ","state":"GA","program_code":"GA_JTC","tax_year":2025,"method":"min_max"}` actual `<absent>`
+- `POST /api/simulate/unit` / `ok.post-api-simulate-unit` **missing-field** at `action`: expected `add_headcount` actual `<absent>`
+- `POST /api/simulate/unit` / `ok.post-api-simulate-unit` **missing-field** at `magnitude`: expected `2.0` actual `<absent>`
+- `POST /api/simulate/unit` / `ok.post-api-simulate-unit` **missing-field** at `base_year`: expected `2024` actual `<absent>`
+- `POST /api/simulate/unit` / `ok.post-api-simulate-unit` **missing-field** at `series_years`: expected `[2024,2025]` actual `<absent>`
+- `POST /api/simulate/unit` / `ok.post-api-simulate-unit` **missing-field** at `eligibility_floors`: expected `{"min_weekly_hours":35.0,"min_weekly_wages":680.0}` actual `<absent>`
+- `POST /api/simulate/unit` / `ok.post-api-simulate-unit` **missing-field** at `baseline`: expected `{"average_headcount":17.25,"base_average_headcount":9.17,"net_new_vs_base":8.08,"threshold":2.0,"jobs_margin":6.08,"qualified":true,"status":"above_minimum","eligible_jobs":8.08,"annual_credit_usd":28280,"series_credit_usd":28280}` actual `<absent>`
+- `POST /api/simulate/unit` / `ok.post-api-simulate-unit` **missing-field** at `projected`: expected `{"average_headcount":19.08,"base_average_headcount":9.17,"net_new_vs_base":9.91,"threshold":2.0,"jobs_margin":7.91,"qualified":true,"status":"above_minimum","eligible_jobs":9.91,"annual_credit_usd":34685,"series_credit_usd":34685}` actual `<absent>`
+- `POST /api/simulate/unit` / `ok.post-api-simulate-unit` **missing-field** at `delta`: expected `{"average_headcount":1.83,"net_new_vs_base":1.83,"annual_credit_usd":6405,"series_credit_usd":6405}` actual `<absent>`
+- `POST /api/simulate/unit` / `ok.post-api-simulate-unit` **missing-field** at `open_year`: expected `null` actual `<absent>`
+- `POST /api/simulate/unit` / `ok.post-api-simulate-unit` **missing-field** at `run_rate`: expected `null` actual `<absent>`
+- `POST /api/simulate/unit` / `ok.post-api-simulate-unit` **missing-field** at `run_id`: expected `40000000000040008000000000000001` actual `<absent>`
+- `POST /api/simulate/unit` / `ok.post-api-simulate-unit` **missing-field** at `method_note`: expected `Priced as the location grid prices it: GA_ATL_HQ against its own TY2024 base, under TY2025 statute. The lever changes only this location's payroll; everyone's eligibility is re-decided by the same engine.` actual `<absent>`
+- `POST /api/simulate/unit` / `ok.post-api-simulate-unit` **value** at `detail`: expected `Added 2 full-time heads (cloned from E00064) at GA_ATL_HQ` actual `Operation not implemented: POST /api/simulate/unit`
+- `POST /api/simulate/employee` / `ok.post-api-simulate-employee` **status** at `status`: expected `200` actual `501`
+- `POST /api/simulate/employee` / `ok.post-api-simulate-employee` **missing-field** at `scope`: expected `{"client_id":1001,"state":"GA","tax_year":2025,"method":"min_max","as_of":"2025-08-31"}` actual `<absent>`
+- `POST /api/simulate/employee` / `ok.post-api-simulate-employee` **missing-field** at `employees`: expected `[{"record_token":"e75b41d8333131b91396d9e5","employee_id":"E00048","worksite_id":"GA_ATL_HQ","worksites":["GA_ATL_HQ"],"designation":"T1","tier":1,"tier_source":"prototype","additional_weekly_hours":4.0,"hourly_raise":1.5,"applied":{"pace_weekly_hours":39.72,"projected_weekly_hours":43.72,"rate":28....(527 chars)` actual `<absent>`
+- `POST /api/simulate/employee` / `ok.post-api-simulate-employee` **missing-field** at `locations`: expected `[{"worksite_id":"GA_ATL_HQ","base_year":2024,"designation":"T1","tier":1,"tier_source":"prototype","in_progress":false,"threshold":2.0,"employees":["E00048"],"before":{"average_headcount":17.25,"net_new_vs_base":8.08,"jobs_margin":6.08,"qualified":true,"annual_credit_usd":28280},"after":{"average_he...(418 chars)` actual `<absent>`
+- `POST /api/simulate/employee` / `ok.post-api-simulate-employee` **missing-field** at `summary`: expected `{"employees":1,"became_eligible":0,"lost_eligibility":1,"locations_moved":0}` actual `<absent>`
+- `POST /api/simulate/employee` / `ok.post-api-simulate-employee` **missing-field** at `client`: expected `{"annual_credit_usd_before":83125,"annual_credit_usd_after":81970,"annual_credit_usd_delta":-1155,"run_rate":null}` actual `<absent>`
+- `POST /api/simulate/employee` / `ok.post-api-simulate-employee` **missing-field** at `eligibility_floors`: expected `{"min_weekly_hours":35.0,"min_weekly_wages":680.0}` actual `<absent>`
+- `POST /api/simulate/employee` / `ok.post-api-simulate-employee` **missing-field** at `method_note`: expected `From 31 Aug to the end of the fiscal year each stacked employee works their pace to date plus the extra hours, at their own rate plus the raise; periods already closed are left as paid. All 1 changes are applied together and the certified engine re-decides everyone once, so two people who could not ...(664 chars)` actual `<absent>`
+- `POST /api/simulate/employee` / `ok.post-api-simulate-employee` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /api/simulate/employee`
+- `POST /api/simulate/onezero` / `ok.post-api-simulate-onezero` **status** at `status`: expected `200` actual `501`
+- `POST /api/simulate/onezero` / `ok.post-api-simulate-onezero` **missing-field** at `as_of`: expected `2026-01-15` actual `<absent>`
+- `POST /api/simulate/onezero` / `ok.post-api-simulate-onezero` **missing-field** at `scope`: expected `{"state":"GA","program_code":"GA_JTC","fein":null,"tax_year":2025,"client_id":1001}` actual `<absent>`
+- `POST /api/simulate/onezero` / `ok.post-api-simulate-onezero` **missing-field** at `action`: expected `add_headcount` actual `<absent>`
+- `POST /api/simulate/onezero` / `ok.post-api-simulate-onezero` **missing-field** at `magnitude`: expected `2.0` actual `<absent>`
+- `POST /api/simulate/onezero` / `ok.post-api-simulate-onezero` **missing-field** at `base_average_headcount`: expected `40.0` actual `<absent>`
+- `POST /api/simulate/onezero` / `ok.post-api-simulate-onezero` **missing-field** at `base_year`: expected `2024` actual `<absent>`
+- `POST /api/simulate/onezero` / `ok.post-api-simulate-onezero` **missing-field** at `eligibility_floors`: expected `{"min_weekly_hours":35.0,"min_weekly_wages":680.0,"pt_band_hours":null,"pt_weight":null}` actual `<absent>`
+- `POST /api/simulate/onezero` / `ok.post-api-simulate-onezero` **missing-field** at `baseline`: expected `{"average_headcount":61.0,"eligible_employee_count":72,"part_time_eligible_count":0,"qualifying_jobs":19.0,"annual_credit_usd":66500,"lifetime_credit_usd":332500,"base_average_headcount":40.0}` actual `<absent>`
+- `POST /api/simulate/onezero` / `ok.post-api-simulate-onezero` **missing-field** at `projected`: expected `{"average_headcount":62.83,"eligible_employee_count":74,"part_time_eligible_count":0,"qualifying_jobs":20.83,"annual_credit_usd":72905,"lifetime_credit_usd":364525,"base_average_headcount":40.0}` actual `<absent>`
+- `POST /api/simulate/onezero` / `ok.post-api-simulate-onezero` **missing-field** at `delta`: expected `{"average_headcount":1.83,"eligible_employee_count":2,"annual_credit_usd":6405,"lifetime_credit_usd":32025}` actual `<absent>`
+- `POST /api/simulate/onezero` / `ok.post-api-simulate-onezero` **missing-field** at `_roadmap_tag`: expected `J2` actual `<absent>`
+- `POST /api/simulate/onezero` / `ok.post-api-simulate-onezero` **value** at `detail`: expected `Added 2 full-time heads (cloned from E00023) in GA` actual `Operation not implemented: POST /api/simulate/onezero`
+- `POST /api/ingestion/2025/exceptions/t2:E00200:2025-02/resolve` / `ok.post-api-ingestion-tax-year-exceptions-exception-id-resolve` **status** at `status`: expected `200` actual `501`
+- `POST /api/ingestion/2025/exceptions/t2:E00200:2025-02/resolve` / `ok.post-api-ingestion-tax-year-exceptions-exception-id-resolve` **missing-field** at `ok`: expected `true` actual `<absent>`
+- `POST /api/ingestion/2025/exceptions/t2:E00200:2025-02/resolve` / `ok.post-api-ingestion-tax-year-exceptions-exception-id-resolve` **missing-field** at `exception_id`: expected `t2:E00200:2025-02` actual `<absent>`
+- `POST /api/ingestion/2025/exceptions/t2:E00200:2025-02/resolve` / `ok.post-api-ingestion-tax-year-exceptions-exception-id-resolve` **missing-field** at `resolution`: expected `{"exception_id":"t2:E00200:2025-02","resolution":"accept","keep_worksite":null,"note":null,"reviewer":"contract","resolved_at":"2026-01-15"}` actual `<absent>`
+- `POST /api/ingestion/2025/exceptions/t2:E00200:2025-02/resolve` / `ok.post-api-ingestion-tax-year-exceptions-exception-id-resolve` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /api/ingestion/{tax_year}/exceptions/{exception_id}/resolve`
+- `POST /api/v2/clients/1001/units/GA_ATL_HQ/base-year` / `ok.post-api-v2-clients-client-id-units-unit-id-base-year` **status** at `status`: expected `200` actual `501`
+- `POST /api/v2/clients/1001/units/GA_ATL_HQ/base-year` / `ok.post-api-v2-clients-client-id-units-unit-id-base-year` **missing-field** at `recorded`: expected `true` actual `<absent>`
+- `POST /api/v2/clients/1001/units/GA_ATL_HQ/base-year` / `ok.post-api-v2-clients-client-id-units-unit-id-base-year` **missing-field** at `override_id`: expected `4000000000004000800000000000000c` actual `<absent>`
+- `POST /api/v2/clients/1001/units/GA_ATL_HQ/base-year` / `ok.post-api-v2-clients-client-id-units-unit-id-base-year` **missing-field** at `worksite_id`: expected `GA_ATL_HQ` actual `<absent>`
+- `POST /api/v2/clients/1001/units/GA_ATL_HQ/base-year` / `ok.post-api-v2-clients-client-id-units-unit-id-base-year` **missing-field** at `base_year`: expected `2024` actual `<absent>`
+- `POST /api/v2/clients/1001/units/GA_ATL_HQ/base-year` / `ok.post-api-v2-clients-client-id-units-unit-id-base-year` **missing-field** at `replaced`: expected `2024` actual `<absent>`
+- `POST /api/v2/clients/1001/units/GA_ATL_HQ/base-year` / `ok.post-api-v2-clients-client-id-units-unit-id-base-year` **missing-field** at `recalculation`: expected `started` actual `<absent>`
+- `POST /api/v2/clients/1001/units/GA_ATL_HQ/base-year` / `ok.post-api-v2-clients-client-id-units-unit-id-base-year` **missing-field** at `durable`: expected `false` actual `<absent>`
+- `POST /api/v2/clients/1001/units/GA_ATL_HQ/base-year` / `ok.post-api-v2-clients-client-id-units-unit-id-base-year` **missing-field** at `note`: expected `Saved. The client is being recalculated from the chosen base; the grid updates when the new run lands. The previous run stays in Gold as history.` actual `<absent>`
+- `POST /api/v2/clients/1001/units/GA_ATL_HQ/base-year` / `ok.post-api-v2-clients-client-id-units-unit-id-base-year` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /api/v2/clients/{client_id}/units/{unit_id}/base-year`
+- `POST /api/v2/clients/1001/runs` / `ok.post-api-v2-clients-client-id-runs` **status** at `status`: expected `200` actual `501`
+- `POST /api/v2/clients/1001/runs` / `ok.post-api-v2-clients-client-id-runs` **missing-field** at `run_id`: expected `40000000000040008000000000000012` actual `<absent>`
+- `POST /api/v2/clients/1001/runs` / `ok.post-api-v2-clients-client-id-runs` **missing-field** at `client_id`: expected `1001` actual `<absent>`
+- `POST /api/v2/clients/1001/runs` / `ok.post-api-v2-clients-client-id-runs` **missing-field** at `tax_year`: expected `2025` actual `<absent>`
+- `POST /api/v2/clients/1001/runs` / `ok.post-api-v2-clients-client-id-runs` **missing-field** at `state`: expected `GA` actual `<absent>`
+- `POST /api/v2/clients/1001/runs` / `ok.post-api-v2-clients-client-id-runs` **missing-field** at `program_code`: expected `GA_JTC` actual `<absent>`
+- `POST /api/v2/clients/1001/runs` / `ok.post-api-v2-clients-client-id-runs` **missing-field** at `run_status`: expected `success` actual `<absent>`
+- `POST /api/v2/clients/1001/runs` / `ok.post-api-v2-clients-client-id-runs` **missing-field** at `run_started_at`: expected `2026-01-15T12:00:00Z` actual `<absent>`
+- `POST /api/v2/clients/1001/runs` / `ok.post-api-v2-clients-client-id-runs` **missing-field** at `run_completed_at`: expected `2026-01-15T12:00:00Z` actual `<absent>`
+- `POST /api/v2/clients/1001/runs` / `ok.post-api-v2-clients-client-id-runs` **missing-field** at `calculation_id`: expected `9e9a9edc79a44dce8ea0d3be5147883b87a1298e2ccf5619947c8e40d3cbf0cd` actual `<absent>`
+- `POST /api/v2/clients/1001/runs` / `ok.post-api-v2-clients-client-id-runs` **missing-field** at `code_commit`: expected `0000000000000000000000000000000000c0ffee` actual `<absent>`
+- `POST /api/v2/clients/1001/runs` / `ok.post-api-v2-clients-client-id-runs` **missing-field** at `rows_written`: expected `{"run_manifest":1,"employee_period_fact":5281,"employee_eligibility":376,"onezero_matrix":2898,"unit_month_summary":16,"run_method_summary":4,"unit_year_master":16,"unit_credit_installment":40}` actual `<absent>`
+- `POST /api/v2/clients/1001/runs` / `ok.post-api-v2-clients-client-id-runs` **missing-field** at `validation`: expected `{"queries_run":20,"violations":[]}` actual `<absent>`
+- `POST /api/v2/clients/1001/runs` / `ok.post-api-v2-clients-client-id-runs` **missing-field** at `summary`: expected `{"employees_evaluated":107,"min_max_eligible":77,"pay_period_eligible":72}` actual `<absent>`
+- `POST /api/v2/clients/1001/runs` / `ok.post-api-v2-clients-client-id-runs` **missing-field** at `claim`: expected `{"assessed":2,"declined":1}` actual `<absent>`
+- `POST /api/v2/clients/1001/runs` / `ok.post-api-v2-clients-client-id-runs` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /api/v2/clients/{client_id}/runs`
+- `POST /api/employee/drill` / `ok.post-api-employee-drill` **status** at `status`: expected `200` actual `501`
+- `POST /api/employee/drill` / `ok.post-api-employee-drill` **missing-field** at `basis`: expected `per_client` actual `<absent>`
+- `POST /api/employee/drill` / `ok.post-api-employee-drill` **missing-field** at `record_token`: expected `e75b41d8333131b91396d9e5` actual `<absent>`
+- `POST /api/employee/drill` / `ok.post-api-employee-drill` **missing-field** at `employee_id`: expected `E00048` actual `<absent>`
+- `POST /api/employee/drill` / `ok.post-api-employee-drill` **missing-field** at `account_id`: expected `1001` actual `<absent>`
+- `POST /api/employee/drill` / `ok.post-api-employee-drill` **missing-field** at `state`: expected `GA` actual `<absent>`
+- `POST /api/employee/drill` / `ok.post-api-employee-drill` **missing-field** at `program_code`: expected `GA_JTC` actual `<absent>`
+- `POST /api/employee/drill` / `ok.post-api-employee-drill` **missing-field** at `tax_year`: expected `2025` actual `<absent>`
+- `POST /api/employee/drill` / `ok.post-api-employee-drill` **missing-field** at `run`: expected `{"program_code":"GA_JTC","tax_year":2025,"fiscal_begin":"2025-01-01","fiscal_end":"2025-12-31","data_source":"csv","months":["2025-01-31","2025-02-28","2025-03-31","2025-04-30","2025-05-31","2025-06-30","2025-07-31","2025-08-31","2025-09-30","2025-10-31","2025-11-30","2025-12-31"],"run_id":"40000000...(326 chars)` actual `<absent>`
+- `POST /api/employee/drill` / `ok.post-api-employee-drill` **missing-field** at `thresholds`: expected `{"minimum_average_weekly_hours":"35.0","minimum_average_weekly_wages_usd":"680.0"}` actual `<absent>`
+- `POST /api/employee/drill` / `ok.post-api-employee-drill` **missing-field** at `raw_source_rows`: expected `[{"source_file":"","source_row":0,"job_title":"Operations Coordinator","unit_id":"GA_ATL_HQ","fein":"58-1234567","pay_period_start":"2024-12-23","pay_period_end":"2025-01-05","pay_date":"2025-01-10","pay_frequency_code":"","hours":"74.07","wages":"2102.59","selection_decision":"included"},{"source_f...(2889 chars)` actual `<absent>`
+- `POST /api/employee/drill` / `ok.post-api-employee-drill` **missing-field** at `rest_of_year`: expected `{"state":"on_pace","weeks_remaining":32.0,"remaining_pay_periods":16,"pace_weekly_hours":39.72,"note":"On pace to clear both floors if the year continues as it has."}` actual `<absent>`
+- `POST /api/employee/drill` / `ok.post-api-employee-drill` **missing-field** at `where`: expected `{"worksite_id":"GA_ATL_HQ","worksites":["GA_ATL_HQ"],"designation":"T1","tier":1,"tier_source":"prototype"}` actual `<absent>`
+- `POST /api/employee/drill` / `ok.post-api-employee-drill` **missing-field** at `step1`: expected `{"totals":{"total_hours":"748.99","total_wages":"21261.24"},"min_max":{"denominator_weeks":18.86,"avg_weekly_hours":39.72,"avg_weekly_wages":1127.49,"rounded_avg_weekly_hours":39.72,"rounded_avg_weekly_wages":1127.49,"passed_hours":true,"passed_wages":true,"eligible":true,"denominator_detail":{"week...(821 chars)` actual `<absent>`
+- `POST /api/employee/drill` / `ok.post-api-employee-drill` **missing-field** at `onezero`: expected `{"months":["2025-01-31","2025-02-28","2025-03-31","2025-04-30","2025-05-31","2025-06-30","2025-07-31","2025-08-31","2025-09-30","2025-10-31","2025-11-30","2025-12-31"],"min_max":[{"segment_id":"GA_ATL_HQ-2024-12-23-0","unit_id":"GA_ATL_HQ","fein":"58-1234567","period_start":"2024-12-23","period_end"...(3240 chars)` actual `<absent>`
+- `POST /api/employee/drill` / `ok.post-api-employee-drill` **missing-field** at `exceptions`: expected `{"step1":[],"onezero":[]}` actual `<absent>`
+- `POST /api/employee/drill` / `ok.post-api-employee-drill` **missing-field** at `not_available`: expected `["Access reconciliation — there is one partner comparison and it is for the certified reference client.","Source file and row lineage — lakehouse payroll has no such coordinate.","Assumption-set and calculation hashes — those identify the certified artifact, and minting new ones here would prove not...(586 chars)` actual `<absent>`
+- `POST /api/employee/drill` / `ok.post-api-employee-drill` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /api/employee/drill`
+- `GET /api/claims/coverage/1001` / `claims.read-after` **value** at `cells[0].claim_id`: expected `40000000-0000-4000-8000-000000000008` actual `40000000-0000-4000-8000-000000000004`
+- `GET /api/claims/coverage/1001` / `claims.read-after` **value** at `cells[1].claim_id`: expected `40000000-0000-4000-8000-000000000014` actual `40000000-0000-4000-8000-000000000002`
+- `GET /api/claims/coverage/1001` / `claims.read-after` **value** at `cells[1].decided_by`: expected `contract` actual `tests`
+- `GET /api/claims/coverage/1001` / `claims.read-after` **type** at `cells[1].decided_at`: expected `2026-01-15T12:00:00+00:00` actual `null`
+- `GET /api/claims/coverage/1001` / `claims.read-after` **value** at `cells[2].claim_id`: expected `40000000-0000-4000-8000-000000000016` actual `40000000-0000-4000-8000-000000000006`
+- `GET /api/claims/coverage/1001` / `claims.read-after` **value** at `engagements[0].set_by`: expected `anonymous` actual `system`
+- `GET /api/claims/cell/1001/GA_JTC/2023` / `claims.cell-after` **value** at `current.claim_id`: expected `40000000-0000-4000-8000-000000000008` actual `40000000-0000-4000-8000-000000000004`
+- `GET /api/claims/cell/1001/GA_JTC/2023` / `claims.cell-after` **value** at `history[0].claim_id`: expected `40000000-0000-4000-8000-000000000008` actual `40000000-0000-4000-8000-000000000004`
+- `POST /api/claims/cell/1001/ZZ_NONE/2023/transition` / `claims.transition-unknown-cell` **value** at `detail`: expected `No claim recorded for client 1001, ZZ_NONE, TY2023.` actual `No recorded claim to transition.`
+- `POST /api/claims/cell/1001/GA_JTC/2023/transition` / `claims.transition-bad-status` **missing-field** at `detail[0].ctx`: expected `{"expected":"'not_assessed', 'assessed', 'proposed', 'declined', 'claimed', 'certified' or 'amended'"}` actual `<absent>`
+- `POST /api/claims/cell/1001/GA_JTC/2023/transition` / `claims.transition-bad-status` **value** at `detail[0].type`: expected `enum` actual `literal_error`
+- `POST /api/claims/cell/1001/GA_JTC/2023/transition` / `claims.transition-bad-status` **value** at `detail[0].msg`: expected `Input should be 'not_assessed', 'assessed', 'proposed', 'declined', 'claimed', 'certified' or 'amended'` actual `Value is not one of the allowed choices.`
+- `POST /api/claims` / `claims.create-duplicate` **status** at `status`: expected `201` actual `409`
+- `POST /api/claims` / `claims.create-duplicate` **missing-field** at `claim_id`: expected `40000000-0000-4000-8000-000000000017` actual `<absent>`
+- `POST /api/claims` / `claims.create-duplicate` **missing-field** at `client_id`: expected `1001` actual `<absent>`
+- `POST /api/claims` / `claims.create-duplicate` **missing-field** at `entity_id`: expected `null` actual `<absent>`
+- `POST /api/claims` / `claims.create-duplicate` **missing-field** at `program_code`: expected `GA_JTC` actual `<absent>`
+- `POST /api/claims` / `claims.create-duplicate` **missing-field** at `tax_year`: expected `2023` actual `<absent>`
+- `POST /api/claims` / `claims.create-duplicate` **missing-field** at `status`: expected `claimed` actual `<absent>`
+- `POST /api/claims` / `claims.create-duplicate` **missing-field** at `provenance`: expected `client_asserted` actual `<absent>`
+- `POST /api/claims` / `claims.create-duplicate` **missing-field** at `provenance_verified`: expected `false` actual `<absent>`
+- `POST /api/claims` / `claims.create-duplicate` **missing-field** at `identified_usd`: expected `0` actual `<absent>`
+- `POST /api/claims` / `claims.create-duplicate` **missing-field** at `claimed_usd`: expected `12000` actual `<absent>`
+- `POST /api/claims` / `claims.create-duplicate` **missing-field** at `certified_usd`: expected `0` actual `<absent>`
+- `POST /api/claims` / `claims.create-duplicate` **missing-field** at `variance_usd`: expected `-12000` actual `<absent>`
+- `POST /api/claims` / `claims.create-duplicate` **missing-field** at `variance_is_computable`: expected `true` actual `<absent>`
+- `POST /api/claims` / `claims.create-duplicate` **missing-field** at `opportunity_usd`: expected `0` actual `<absent>`
+- `POST /api/claims` / `claims.create-duplicate` **missing-field** at `average_headcount`: expected `null` actual `<absent>`
+- `POST /api/claims` / `claims.create-duplicate` **missing-field** at `base_average_headcount`: expected `null` actual `<absent>`
+- `POST /api/claims` / `claims.create-duplicate` **missing-field** at `threshold_jobs`: expected `null` actual `<absent>`
+- `POST /api/claims` / `claims.create-duplicate` **missing-field** at `is_base_year`: expected `false` actual `<absent>`
+- `POST /api/claims` / `claims.create-duplicate` **missing-field** at `net_new_jobs`: expected `null` actual `<absent>`
+- `POST /api/claims` / `claims.create-duplicate` **missing-field** at `jobs_to_threshold`: expected `null` actual `<absent>`
+- `POST /api/claims` / `claims.create-duplicate` **missing-field** at `jobs_margin`: expected `null` actual `<absent>`
+- `POST /api/claims` / `claims.create-duplicate` **missing-field** at `near_threshold`: expected `false` actual `<absent>`
+- `POST /api/claims` / `claims.create-duplicate` **missing-field** at `priority_band`: expected `settled` actual `<absent>`
+- `POST /api/claims` / `claims.create-duplicate` **missing-field** at `priority_rank`: expected `5` actual `<absent>`
+- `POST /api/claims` / `claims.create-duplicate` **missing-field** at `outcome`: expected `over_claimed` actual `<absent>`
+- `POST /api/claims` / `claims.create-duplicate` **missing-field** at `is_exposure`: expected `true` actual `<absent>`
+- `POST /api/claims` / `claims.create-duplicate` **missing-field** at `identified_run_id`: expected `null` actual `<absent>`
+- `POST /api/claims` / `claims.create-duplicate` **missing-field** at `assumption_set_id`: expected `null` actual `<absent>`
+- `POST /api/claims` / `claims.create-duplicate` **missing-field** at `rule_pack_version`: expected `null` actual `<absent>`
+- `POST /api/claims` / `claims.create-duplicate` **missing-field** at `filed_on`: expected `null` actual `<absent>`
+- `POST /api/claims` / `claims.create-duplicate` **missing-field** at `filing_reference`: expected `null` actual `<absent>`
+- `POST /api/claims` / `claims.create-duplicate` **missing-field** at `decided_by`: expected `contract` actual `<absent>`
+- `POST /api/claims` / `claims.create-duplicate` **missing-field** at `decided_at`: expected `null` actual `<absent>`
+- `POST /api/claims` / `claims.create-duplicate` **missing-field** at `decline_reason`: expected `null` actual `<absent>`
+- `POST /api/claims` / `claims.create-duplicate` **missing-field** at `effective_from`: expected `2026-01-15T12:00:00+00:00` actual `<absent>`
+- `POST /api/claims` / `claims.create-duplicate` **missing-field** at `effective_to`: expected `null` actual `<absent>`
+- `POST /api/claims` / `claims.create-duplicate` **extra-field** at `detail`: expected `<absent>` actual `An identical claim is already recorded; use transition to change its decision.`
+- `POST /api/claims` / `claims.create-money-as-number` **value** at `claim_id`: expected `40000000-0000-4000-8000-000000000018` actual `40000000-0000-4000-8000-00000000000c`
+- `POST /api/claims` / `claims.create-money-as-number` **value** at `decided_by`: expected `anonymous` actual `system`
+- `POST /api/claims` / `claims.create-money-as-string` **value** at `claim_id`: expected `40000000-0000-4000-8000-000000000019` actual `40000000-0000-4000-8000-00000000000d`
+- `POST /api/claims` / `claims.create-money-as-string` **value** at `decided_by`: expected `anonymous` actual `system`
+- `POST /api/claims` / `claims.create-money-raw-exponent` **value** at `claim_id`: expected `40000000-0000-4000-8000-00000000001a` actual `40000000-0000-4000-8000-00000000000e`
+- `POST /api/claims` / `claims.create-money-raw-exponent` **value** at `decided_by`: expected `anonymous` actual `system`
+- `POST /api/claims` / `claims.create-unknown-client` **value** at `claim_id`: expected `40000000-0000-4000-8000-00000000001b` actual `40000000-0000-4000-8000-00000000000f`
+- `POST /api/claims` / `claims.create-unknown-client` **value** at `decided_by`: expected `anonymous` actual `system`
+- `POST /api/claims` / `claims.create-bad-provenance` **missing-field** at `detail[0].ctx`: expected `{"expected":"'computed', 'filed_by_us', 'client_asserted', 'inherited' or 'authority_confirmed'"}` actual `<absent>`
+- `POST /api/claims` / `claims.create-bad-provenance` **value** at `detail[0].type`: expected `enum` actual `literal_error`
+- `POST /api/claims` / `claims.create-bad-provenance` **value** at `detail[0].msg`: expected `Input should be 'computed', 'filed_by_us', 'client_asserted', 'inherited' or 'authority_confirmed'` actual `Value is not one of the allowed choices.`
+- `POST /api/claims/assess` / `claims.assess-unknown-client` **value** at `detail`: expected `No payroll for client 999999 in the active data source.` actual `No payroll for this client in the active data source.`
+- `POST /api/claims/assess` / `claims.assess-blank-assessor` **missing-field** at `detail[0].ctx`: expected `{"min_length":1}` actual `<absent>`
+- `POST /api/claims/assess` / `claims.assess-blank-assessor` **value** at `detail[0].msg`: expected `String should have at least 1 character` actual `Value is too short.`
+- `PUT /api/claims/engagement` / `claims.engagement-bad-scope` **missing-field** at `detail[0].ctx`: expected `{"expected":"'in_scope', 'out_of_scope' or 'prospective'"}` actual `<absent>`
+- `PUT /api/claims/engagement` / `claims.engagement-bad-scope` **value** at `detail[0].type`: expected `enum` actual `literal_error`
+- `PUT /api/claims/engagement` / `claims.engagement-bad-scope` **value** at `detail[0].msg`: expected `Input should be 'in_scope', 'out_of_scope' or 'prospective'` actual `Value is not one of the allowed choices.`
+- `GET /api/claims/coverage` / `claims.coverage-final` **value** at `clients[0].cells[0].claim_id`: expected `40000000-0000-4000-8000-00000000001a` actual `40000000-0000-4000-8000-00000000000e`
+- `GET /api/claims/coverage` / `claims.coverage-final` **value** at `clients[0].cells[0].decided_by`: expected `anonymous` actual `system`
+- `GET /api/claims/coverage` / `claims.coverage-final` **value** at `clients[0].cells[1].claim_id`: expected `40000000-0000-4000-8000-000000000019` actual `40000000-0000-4000-8000-00000000000d`
+- `GET /api/claims/coverage` / `claims.coverage-final` **value** at `clients[0].cells[1].decided_by`: expected `anonymous` actual `system`
+- `GET /api/claims/coverage` / `claims.coverage-final` **value** at `clients[0].cells[2].claim_id`: expected `40000000-0000-4000-8000-000000000018` actual `40000000-0000-4000-8000-00000000000c`
+- `GET /api/claims/coverage` / `claims.coverage-final` **value** at `clients[0].cells[2].decided_by`: expected `anonymous` actual `system`
+- `GET /api/claims/coverage` / `claims.coverage-final` **value** at `clients[0].cells[3].claim_id`: expected `40000000-0000-4000-8000-000000000017` actual `40000000-0000-4000-8000-000000000004`
+- `GET /api/claims/coverage` / `claims.coverage-final` **value** at `clients[0].cells[4].claim_id`: expected `40000000-0000-4000-8000-000000000014` actual `40000000-0000-4000-8000-000000000002`
+- `GET /api/claims/coverage` / `claims.coverage-final` **value** at `clients[0].cells[4].decided_by`: expected `contract` actual `tests`
+- `GET /api/claims/coverage` / `claims.coverage-final` **type** at `clients[0].cells[4].decided_at`: expected `2026-01-15T12:00:00+00:00` actual `null`
+- `GET /api/claims/coverage` / `claims.coverage-final` **value** at `clients[0].cells[5].claim_id`: expected `40000000-0000-4000-8000-000000000016` actual `40000000-0000-4000-8000-000000000006`
+- `GET /api/claims/coverage` / `claims.coverage-final` **value** at `clients[1].cells[0].claim_id`: expected `40000000-0000-4000-8000-00000000001b` actual `40000000-0000-4000-8000-00000000000f`
+- `GET /api/claims/coverage` / `claims.coverage-final` **value** at `clients[1].cells[0].decided_by`: expected `anonymous` actual `system`
+- `GET /api/v2/portfolio` / `claims.portfolio-final` **value** at `items[0].claim_id`: expected `40000000-0000-4000-8000-000000000016` actual `40000000-0000-4000-8000-000000000006`
+- `GET /api/v2/portfolio` / `claims.portfolio-final` **value** at `items[0].client_name`: expected `Reference Dataset Client` actual `Synthetic fixture`
+- `GET /api/v2/portfolio` / `claims.portfolio-final` **value** at `items[1].claim_id`: expected `40000000-0000-4000-8000-00000000001b` actual `40000000-0000-4000-8000-00000000000f`
+- (tolerated) `GET /api/findings/1001/2025` / `boot.findings` **number-lexeme** at `findings[0].population.total_hours`: expected `160.0` actual `160`
+- (tolerated) `GET /api/findings/1001/2025` / `boot.findings` **number-lexeme** at `findings[0].population.sample[0].units[0].hours`: expected `120.0` actual `120`
+- (tolerated) `GET /api/findings/1001/2025` / `boot.findings` **number-lexeme** at `findings[0].population.sample[0].units[1].hours`: expected `40.0` actual `40`
+- (tolerated) `GET /api/findings/1001/2025` / `boot.findings` **number-lexeme** at `findings[1].evidence.units[0].hours`: expected `40.0` actual `40`
+- (tolerated) `GET /api/findings/1001/2025` / `boot.findings` **number-lexeme** at `findings[1].evidence.units[1].hours`: expected `80.0` actual `80`
+- (tolerated) `POST /api/claims/cell/1001/GA_JTC/2025/transition` / `ok.post-api-claims-cell-client-id-program-code-tax-year-transition` **number-lexeme** at `average_headcount`: expected `61.0` actual `61`
+- (tolerated) `POST /api/claims/cell/1001/GA_JTC/2025/transition` / `ok.post-api-claims-cell-client-id-program-code-tax-year-transition` **number-lexeme** at `base_average_headcount`: expected `40.0` actual `40`
+- (tolerated) `POST /api/claims/cell/1001/GA_JTC/2025/transition` / `ok.post-api-claims-cell-client-id-program-code-tax-year-transition` **number-lexeme** at `threshold_jobs`: expected `2.0` actual `2`
+- (tolerated) `POST /api/claims/cell/1001/GA_JTC/2025/transition` / `ok.post-api-claims-cell-client-id-program-code-tax-year-transition` **number-lexeme** at `net_new_jobs`: expected `21.0` actual `21`
+- (tolerated) `POST /api/claims/cell/1001/GA_JTC/2025/transition` / `ok.post-api-claims-cell-client-id-program-code-tax-year-transition` **number-lexeme** at `jobs_to_threshold`: expected `0.0` actual `0`
+- (tolerated) `POST /api/claims/cell/1001/GA_JTC/2025/transition` / `ok.post-api-claims-cell-client-id-program-code-tax-year-transition` **number-lexeme** at `jobs_margin`: expected `19.0` actual `19`
+- (tolerated) `POST /api/claims/assess` / `ok.post-api-claims-assess` **number-lexeme** at `assessed[0].average_headcount`: expected `61.0` actual `61`
+- (tolerated) `POST /api/claims/assess` / `ok.post-api-claims-assess` **number-lexeme** at `assessed[0].base_average_headcount`: expected `40.0` actual `40`
+- (tolerated) `POST /api/claims/assess` / `ok.post-api-claims-assess` **number-lexeme** at `assessed[0].threshold_jobs`: expected `2.0` actual `2`
+- (tolerated) `POST /api/claims/assess` / `ok.post-api-claims-assess` **number-lexeme** at `assessed[0].net_new_jobs`: expected `21.0` actual `21`
+- (tolerated) `POST /api/claims/assess` / `ok.post-api-claims-assess` **number-lexeme** at `assessed[0].jobs_to_threshold`: expected `0.0` actual `0`
+- (tolerated) `POST /api/claims/assess` / `ok.post-api-claims-assess` **number-lexeme** at `assessed[0].jobs_margin`: expected `19.0` actual `19`
+- (tolerated) `GET /api/claims/coverage/1001` / `claims.read-after` **number-lexeme** at `cells[1].average_headcount`: expected `40.0` actual `40`
+- (tolerated) `GET /api/claims/coverage/1001` / `claims.read-after` **number-lexeme** at `cells[1].base_average_headcount`: expected `40.0` actual `40`
+- (tolerated) `GET /api/claims/coverage/1001` / `claims.read-after` **number-lexeme** at `cells[1].threshold_jobs`: expected `2.0` actual `2`
+- (tolerated) `GET /api/claims/coverage/1001` / `claims.read-after` **number-lexeme** at `cells[1].net_new_jobs`: expected `0.0` actual `0`
+- (tolerated) `GET /api/claims/coverage/1001` / `claims.read-after` **number-lexeme** at `cells[1].jobs_to_threshold`: expected `2.0` actual `2`
+- (tolerated) `GET /api/claims/coverage/1001` / `claims.read-after` **number-lexeme** at `cells[1].jobs_margin`: expected `-2.0` actual `-2`
+- (tolerated) `GET /api/claims/coverage/1001` / `claims.read-after` **number-lexeme** at `cells[2].average_headcount`: expected `61.0` actual `61`
+- (tolerated) `GET /api/claims/coverage/1001` / `claims.read-after` **number-lexeme** at `cells[2].base_average_headcount`: expected `40.0` actual `40`
+- (tolerated) `GET /api/claims/coverage/1001` / `claims.read-after` **number-lexeme** at `cells[2].threshold_jobs`: expected `2.0` actual `2`
+- (tolerated) `GET /api/claims/coverage/1001` / `claims.read-after` **number-lexeme** at `cells[2].net_new_jobs`: expected `21.0` actual `21`
+- (tolerated) `GET /api/claims/coverage/1001` / `claims.read-after` **number-lexeme** at `cells[2].jobs_to_threshold`: expected `0.0` actual `0`
+- (tolerated) `GET /api/claims/coverage/1001` / `claims.read-after` **number-lexeme** at `cells[2].jobs_margin`: expected `19.0` actual `19`
+- (tolerated) `GET /api/claims/coverage` / `claims.coverage-final` **number-lexeme** at `clients[0].cells[4].average_headcount`: expected `40.0` actual `40`
+- (tolerated) `GET /api/claims/coverage` / `claims.coverage-final` **number-lexeme** at `clients[0].cells[4].base_average_headcount`: expected `40.0` actual `40`
+- (tolerated) `GET /api/claims/coverage` / `claims.coverage-final` **number-lexeme** at `clients[0].cells[4].threshold_jobs`: expected `2.0` actual `2`
+- (tolerated) `GET /api/claims/coverage` / `claims.coverage-final` **number-lexeme** at `clients[0].cells[4].net_new_jobs`: expected `0.0` actual `0`
+- (tolerated) `GET /api/claims/coverage` / `claims.coverage-final` **number-lexeme** at `clients[0].cells[4].jobs_to_threshold`: expected `2.0` actual `2`
+- (tolerated) `GET /api/claims/coverage` / `claims.coverage-final` **number-lexeme** at `clients[0].cells[4].jobs_margin`: expected `-2.0` actual `-2`
+- (tolerated) `GET /api/claims/coverage` / `claims.coverage-final` **number-lexeme** at `clients[0].cells[5].average_headcount`: expected `61.0` actual `61`
+- (tolerated) `GET /api/claims/coverage` / `claims.coverage-final` **number-lexeme** at `clients[0].cells[5].base_average_headcount`: expected `40.0` actual `40`
+- (tolerated) `GET /api/claims/coverage` / `claims.coverage-final` **number-lexeme** at `clients[0].cells[5].threshold_jobs`: expected `2.0` actual `2`
+- (tolerated) `GET /api/claims/coverage` / `claims.coverage-final` **number-lexeme** at `clients[0].cells[5].net_new_jobs`: expected `21.0` actual `21`
+- (tolerated) `GET /api/claims/coverage` / `claims.coverage-final` **number-lexeme** at `clients[0].cells[5].jobs_to_threshold`: expected `0.0` actual `0`
+- (tolerated) `GET /api/claims/coverage` / `claims.coverage-final` **number-lexeme** at `clients[0].cells[5].jobs_margin`: expected `19.0` actual `19`
+- (tolerated) `GET /api/v2/portfolio` / `claims.portfolio-final` **number-lexeme** at `items[0].average_headcount`: expected `61.0` actual `61`
+- (tolerated) `GET /api/v2/portfolio` / `claims.portfolio-final` **number-lexeme** at `items[0].base_average_headcount`: expected `40.0` actual `40`
+- (tolerated) `GET /api/v2/portfolio` / `claims.portfolio-final` **number-lexeme** at `items[0].threshold_jobs`: expected `2.0` actual `2`
+- (tolerated) `GET /api/v2/portfolio` / `claims.portfolio-final` **number-lexeme** at `items[0].net_new_jobs`: expected `21.0` actual `21`
+- (tolerated) `GET /api/v2/portfolio` / `claims.portfolio-final` **number-lexeme** at `items[0].jobs_to_threshold`: expected `0.0` actual `0`
+- (tolerated) `GET /api/v2/portfolio` / `claims.portfolio-final` **number-lexeme** at `items[0].jobs_margin`: expected `19.0` actual `19`
+- (tolerated) `GET /api/v2/portfolio` / `claims.portfolio-final` **number-lexeme** at `items[0].gap_jobs`: expected `0.0` actual `0`
+- (tolerated) `GET /api/findings/1001/2025` / `findings.read-after-resolve` **number-lexeme** at `findings[0].evidence.units[0].hours`: expected `40.0` actual `40`
+- (tolerated) `GET /api/findings/1001/2025` / `findings.read-after-resolve` **number-lexeme** at `findings[0].evidence.units[1].hours`: expected `80.0` actual `80`

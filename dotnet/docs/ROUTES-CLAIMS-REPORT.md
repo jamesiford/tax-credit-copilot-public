@@ -5,6 +5,30 @@ See `HALT-routes_claims.md` for the shared-file authorization needed to resume.
 All 24 assigned operations have real endpoints/handlers in the ordinary production
 discovery graph, but that is not a claim of full semantic equivalence.
 
+## Second conductor retry
+
+Commit `3054859` corrects an overly broad improvement declaration, not product
+values. `IMP-routes_claims-4` now applies only to the downloaded Provenance-sheet
+XML member. `IMP-routes_claims-6` applies only to status. Both were checked
+against the real `package.create` artifact-ID mismatch and neither matches it.
+No UUID draws were added to emulate missing sibling work, and no comparator
+or threshold changed.
+
+All whole-solution gates were rerun: build and format pass, fast tests have
+717 passes and the same three shared framework failures. All twelve complete
+scenarios ran, totaling 1,769 exchanges and 7,702 failing fields across all
+groups. Exact-method owned routes have **98/316 raw passing cases (31.01%)**,
+without waivers. The older wrapper's 397-case route-shape result is not the
+conductor's acceptance denominator. The latest supplied external conductor
+result was **80/316 adjusted (25.3%)**, with nine waived cases; its waiver engine
+was not used for the local raw count. Neither result satisfies 98%.
+
+Evidence: `retry2-summary.json`, `retry2-replay/raw/`, `retry2-build.log`,
+`retry2-format.log`, and `retry2-tests-fast.log`. The wrapper emits a
+no-owned-group diagnostic for the three gateway scenarios after writing their
+raw reports; all twelve raw reports are present. The mandatory ownership HALT
+remains, rather than deleting the evidence or weakening shared tests.
+
 ## Evidence and gate results
 
 - CPython 3.12.13 oracle imports this checkout. Only committed synthetic seeds

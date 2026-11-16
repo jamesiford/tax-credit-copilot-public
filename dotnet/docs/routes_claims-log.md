@@ -146,3 +146,28 @@
 - Implementation commit: `2cd6769`. Shared-test/composition work still requires
   edits outside the fixed allocation. The mandatory HALT remains; this retry
   repairs reset and feature-test defects but does not claim task acceptance.
+
+## Second conductor retry: rejected improvement scope
+
+- The supplied gate rejected IMP-routes_claims-4 for covering an artifact-ID
+  mismatch. It described formula safety but matched the entire package-create
+  response. Narrowed it to the actual downloaded Provenance XML member and
+  narrowed the integrity entry to status. Neither entry now matches the real
+  artifact-ID discrepancy. IDs and calculated values are not waived.
+- Committed the register correction as `3054859`; no product code, test
+  assertion, recording, comparator or threshold changed.
+- Reran build, format and all fast tests. Build/format pass; fast results remain
+  717 pass, three shared framework failures, 720 total.
+- Reran all twelve full scenarios against exclusively owned ordinary hosts.
+  All raw reports exist: 1,769 exchanges and 7,702 failing fields across groups.
+  Exact method/template ownership gives 98/316 raw passing owned cases (31.01%),
+  without waivers. The supplied conductor reported 80/316 adjusted (25.3%).
+  These are different runs/engines; neither is a passing acceptance result.
+- The legacy wrapper's 397 route-shape cases are explicitly not the conductor
+  denominator. Gateway-only scenarios produce its no-owned-group diagnostic
+  after their unchanged replay reports are written; they were not skipped.
+- Shared assertions/composition remain outside the task's fixed allocation.
+  The mandatory HALT remains rather than manufacturing a 501, hiding handlers,
+  removing tests or treating a request to retry as unrestricted ownership.
+- Removed only the inspected retry2 runner's temporary synthetic state subtree
+  after all its owned hosts exited. No shared process or worktree was changed.

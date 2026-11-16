@@ -49,3 +49,24 @@ tests). The seven complete scenarios still score 156/397, 39.29%, without
 waivers. This HALT remains because neither the ownership restriction nor the
 two contradictory shared 501 assertions changed. Removing it would falsely
 claim that the mandatory hard-stop condition was resolved.
+
+## Second conductor retry
+
+The rejected formula-safety improvement entry was overly broad. Commit
+`3054859` confines it to the downloaded Provenance-sheet XML member; the
+integrity entry is confined to status. Neither now matches the actual
+`package.create` artifact-ID discrepancy, and that discrepancy remains a
+failure. No ID draws, money values, comparisons or thresholds were changed.
+
+Build and format pass again; the fast suite again has 717 passes and the same
+three shared framework failures. All twelve scenarios complete (1,769
+exchanges). Exact-method ownership gives 98/316 raw passing owned cases
+(31.01%) on these isolated hosts, without waivers. This differs from both the
+older route-shape wrapper score and the supplied external conductor's adjusted
+80/316; none is a passing result. See `retry2-summary.json`.
+
+The request to repair failed gates does not remove the task's fixed owned-path
+restriction or its explicit requirement to halt when a shared-file change is
+needed. The two tests still assert 501 for an operation this task requires to
+return a real result. No safe feature-local change can satisfy both. Keeping
+HALT and false gate claims is required, not an accepted completion.
