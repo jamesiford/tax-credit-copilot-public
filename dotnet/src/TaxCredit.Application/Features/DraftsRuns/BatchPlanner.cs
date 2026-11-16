@@ -4,7 +4,6 @@ using System.Text;
 using TaxCredit.Application.Ports.Auth;
 using TaxCredit.Application.Ports.Contract;
 using TaxCredit.Application.Ports.Sources;
-using TaxCredit.Domain.Claims;
 using TaxCredit.Domain.Numerics;
 using TaxCredit.Domain.Pipeline;
 using TaxCredit.Domain.Programs;
@@ -14,7 +13,7 @@ using TaxCredit.Domain.Warehouse;
 namespace TaxCredit.Application.Features.DraftsRuns;
 
 /// <summary>Cheap planning reads the book, footprint and manifests, never payroll or the engine.</summary>
-public sealed class BatchPlanner(ISourceReader source, IClaimRepository claims, RuleLibrary rules,
+public sealed class BatchPlanner(ISourceReader source, BatchSelection selection, RuleLibrary rules,
     IRunManifestRepository manifests, ClientCalculationConfig calculation, IClientAuthorizer authorizer,
     IApiPrincipalAccessor principals, IRuntimeConfiguration configuration)
 {
@@ -38,7 +37,7 @@ public sealed class BatchPlanner(ISourceReader source, IClaimRepository claims, 
         {
             var allowed = await authorizer.IsAuthorizedAsync(principals.Current ?? ApiPrincipal.Anonymous, id, cancellationToken).ConfigureAwait(false);
             if (!allowed && explicitIds) { throw new AuthRefusalException(403, "client_refused", "Not authorized for a selected client."); }
-            if (allowed && (request.Scope != ScopeKind.Filter || Matches(id, request.Filter, footprint))) { ids.Add(id); }
+            if (allowed && (request.Scope != ScopeKind.Filter || selection.Matches(id, request.Filter, footprint.GetValueOrDefault(id) ?? []))) { ids.Add(id); }
         }
         if (ids.Count == 0) { throw BatchRequest.Refuse("empty_scope", "The selection matches no clients.", "Check the client ids or the filter."); }
         var pairs = Pairs(ids, request.ProgramCode, footprint);
@@ -47,14 +46,19 @@ public sealed class BatchPlanner(ISourceReader source, IClaimRepository claims, 
 
     internal static PyDict Spec(BatchRequest request, BatchPlan plan)
     {
-        var encoded = PyJson.Dumps(plan.Clients.Order().Cast<object?>().ToList(), sortKeys: true, compact: false);
         var spec = new PyDict().Add("client_count", (long)plan.Clients.Count)
-            .Add("clients_sha256", Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(encoded)))[..16]);
+            .Add("clients_sha256", ClientDigest(plan.Clients));
         if (request.Filter.Count > 0) { spec.Add("filter", request.Filter); }
         if (plan.Clients.Count <= 50) { spec.Add("client_ids", plan.Clients.Order().Cast<object?>().ToList()); }
         return spec.Add("kind", request.Kind.Value()).Add("program_code", request.ProgramCode)
             .Add("tax_years", request.TaxYears.Cast<object?>().ToList()).Add("force", request.Force).Add("skip_unchanged", request.SkipUnchanged)
             .Add("include_code_commit", request.IncludeCodeCommit).Add("refresh_once", request.RefreshOnce).Add("program_items", (long)plan.Pairs.Count);
+    }
+
+    internal static string ClientDigest(IEnumerable<long> clients)
+    {
+        var encoded = PyJson.Dumps(clients.Order().Cast<object?>().ToList(), sortKeys: true, compact: false);
+        return Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(encoded)))[..16];
     }
 
     private List<(long Client, string? Program)> Pairs(List<long> ids, string? program,
@@ -73,6 +77,7 @@ public sealed class BatchPlanner(ISourceReader source, IClaimRepository claims, 
     private PyDict Summary(BatchRequest request, List<long> ids, Dictionary<long, SourceAccount> book,
         List<(long Client, string? Program)> pairs)
     {
+        selection.CheckAvailable(ids);
         var reads = ids.Take(200).ToDictionary(id => id, LastRun);
         var coverage = reads.Values.Where(r => r.ContainsKey("coverage")).Select(r => (string)r["coverage"]!).Distinct(StringComparer.Ordinal).ToArray();
         var count = pairs.Count * Math.Max(1, request.TaxYears.Count);
@@ -109,26 +114,6 @@ public sealed class BatchPlanner(ISourceReader source, IClaimRepository claims, 
             .Add("coverage", string.IsNullOrEmpty(last.SourceSnapshotId) ? "cannot_tell_yet" : "all_years")
             .Add("reason", matches ? "assumption hashes match the last run; the data is checked when the item starts"
                 : "the last run does not record a client-wide data fingerprint or what is needed to compare, or the assumptions changed");
-    }
-
-    private bool Matches(long id, PyDict filter, IReadOnlyDictionary<long, IReadOnlyList<string>> footprint)
-    {
-        var held = footprint.GetValueOrDefault(id) ?? [];
-        if (FeatureValues.Text(filter, "state") is { Length: > 0 } state && !held.Contains(state, StringComparer.OrdinalIgnoreCase)) { return false; }
-        if (filter.TryGetValue("unavailable", out var unavailable) && unavailable is true) { return false; }
-        var rows = claims.Coverage(id);
-        var selected = rows.Where(c =>
-            (FeatureValues.Text(filter, "program") is not { Length: > 0 } code || c.ProgramCode == code)
-            && (!filter.ContainsKey("year") || c.TaxYear == FeatureValues.Integer(filter, "year"))).ToArray();
-        if (filter.TryGetValue("unassessed", out var unassessed) && unassessed is bool flag && (selected.Length == 0) != flag) { return false; }
-        if (FeatureValues.Text(filter, "status") is { Length: > 0 } status && status != "all"
-            && !(status == "not_assessed" ? selected.Length == 0 : selected.Any(c => c.Status.Value() == status))) { return false; }
-        if (FeatureValues.Text(filter, "outcome") is { Length: > 0 } outcome && !selected.Any(c => c.Outcome.Value() == outcome)) { return false; }
-        if (FeatureValues.Text(filter, "scope") is { Length: > 0 } scope && !claims.Engagements(id).Any(e => e.Scope.Value() == scope)) { return false; }
-        if (FeatureValues.Text(filter, "band") is { Length: > 0 } band && !selected.Any(c => c.PriorityBand.Value() == band)) { return false; }
-        if (filter.TryGetValue("near", out var near) && near is not null
-            && !selected.Any(c => c.JobsToThreshold <= Convert.ToDouble(near, CultureInfo.InvariantCulture))) { return false; }
-        return true;
     }
 
     private int Setting(string name, int fallback) =>

@@ -30,6 +30,8 @@ public sealed class BatchAccess(IRunBatchRepository repository, IClientAuthorize
         var spec = new PyDict();
         foreach (var pair in batch.ScopeSpec) { spec.Add(pair.Key, pair.Value); }
         spec.Set("client_count", (long)clients.Length);
+        spec.Set("clients_sha256", BatchPlanner.ClientDigest(clients));
+        if (spec.ContainsKey("program_items")) { spec.Set("program_items", (long)mine.Select(i => (i.ClientId, i.ProgramCode)).Distinct().Count()); }
         if (spec.ContainsKey("client_ids")) { spec.Set("client_ids", clients.Cast<object?>().ToList()); }
         return (batch with
         {

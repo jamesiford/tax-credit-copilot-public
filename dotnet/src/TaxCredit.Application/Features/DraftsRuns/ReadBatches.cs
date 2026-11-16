@@ -10,20 +10,23 @@ namespace TaxCredit.Application.Features.DraftsRuns;
 /// <summary>Reads one authorized batch and its queue liveness.</summary>
 public sealed record GetBatchQuery(string BatchId) : IQuery<object>;
 
-internal sealed class GetBatchHandler(BatchAccess access, IRunBatchRepository repository, IClock clock,
+internal sealed class GetBatchHandler(BatchAccess access, IClock clock,
     IRuntimeConfiguration configuration) : IRequestHandler<GetBatchQuery, object>
 {
     public async ValueTask<object> Handle(GetBatchQuery request, CancellationToken cancellationToken)
     {
-        var (batch, _) = await access.Read(request.BatchId, cancellationToken).ConfigureAwait(false);
+        var (batch, items) = await access.Read(request.BatchId, cancellationToken).ConfigureAwait(false);
         var view = BatchViews.Batch(batch);
-        var health = repository.QueueHealth(FeatureValues.Now(clock));
+        var queued = items.Any(i => i.Status == ItemStatus.Queued);
+        var liveLease = items.Any(i => i.Status is ItemStatus.Leased or ItemStatus.Running
+            && i.LeaseExpiresAt is { } expires
+            && DateTimeOffset.Parse(expires.IsoFormat(), CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal) > clock.UtcNow);
         var threshold = int.TryParse(configuration.Get("RUN_STALE_WORKER_SECONDS"), CultureInfo.InvariantCulture, out var seconds) ? seconds : 60;
-        if (health.Queued > 0 && health.LiveLeases == 0 && health.OldestQueuedAt is { } oldest
-            && (clock.UtcNow - DateTimeOffset.Parse(oldest.IsoFormat(), CultureInfo.InvariantCulture)).TotalSeconds >= threshold)
+        if (queued && !liveLease
+            && (clock.UtcNow - DateTimeOffset.Parse(batch.RequestedAt.IsoFormat(), CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal)).TotalSeconds >= threshold)
         {
             view.Set("degraded", new List<object?> { new PyDict().Add("dependency", "run_worker")
-                .Add("impact", "queued runs are not progressing").Add("remedy", "Start TaxCredit.Worker with the same durable store configuration.") });
+                .Add("impact", "queued runs in this batch are not progressing").Add("remedy", "Start TaxCredit.Worker with the same durable store configuration.") });
         }
         return view;
     }

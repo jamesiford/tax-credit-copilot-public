@@ -11,6 +11,8 @@ namespace TaxCredit.Application.Features.DraftsRuns;
 /// <summary>Converts transport trees without using the HTTP serializer for canonical evidence.</summary>
 public static class FeatureValues
 {
+    internal static PyDict Copy(IEnumerable<KeyValuePair<string, object?>> values) =>
+        values.Aggregate(new PyDict(), (map, pair) => map.Add(pair.Key, pair.Value));
     /// <summary>Reads the certified JSON tree, preserving integer and floating-point inputs.</summary>
     public static PyDict Document(JsonElement? body) =>
         body is { ValueKind: JsonValueKind.Object } value ? (PyDict)PyJson.Loads(value.GetRawText())! : new();
@@ -21,6 +23,7 @@ public static class FeatureValues
         PyDict map => map.ToDictionary(p => p.Key, p => Wire(p.Value), StringComparer.Ordinal),
         PyDateTime instant => instant.IsoFormat(),
         BigInteger number when number >= long.MinValue && number <= long.MaxValue => (long)number,
+        BigInteger number => JsonSerializer.Deserialize<JsonElement>(number.ToString(CultureInfo.InvariantCulture)),
         IReadOnlyDictionary<string, object?> map => map.ToDictionary(p => p.Key, p => Wire(p.Value), StringComparer.Ordinal),
         IEnumerable sequence when value is not string => sequence.Cast<object?>().Select(Wire).ToArray(),
         _ => value,

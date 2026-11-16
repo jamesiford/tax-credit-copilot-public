@@ -10,9 +10,20 @@ namespace TaxCredit.Api.Endpoints.DraftsRuns;
 
 internal static class FeatureResponses
 {
-    internal static async Task<IResult> Send(IMediator mediator, IRequest<object> request, CancellationToken cancellationToken, int status = 200)
+    internal static async Task<IResult> Send(IMediator mediator, IRequest<object> request, CancellationToken cancellationToken, int status = 200, HttpContext? context = null)
     {
-        try { return Results.Json(FeatureValues.Wire(await mediator.Send(request, cancellationToken).ConfigureAwait(false)), statusCode: status); }
+        try
+        {
+            var result = await mediator.Send(request, cancellationToken).ConfigureAwait(false);
+            if (result is DraftDownload download && context is not null)
+            {
+                context.Response.Headers["X-Bundle-Sha256"] = download.Sha256;
+                context.Response.Headers["X-Verification"] = "not_verified";
+                context.Response.Headers["X-Wrote-Local-Files"] = "0";
+                return Results.File(download.Bytes, "application/zip", download.FileName);
+            }
+            return Results.Json(FeatureValues.Wire(result), statusCode: status);
+        }
         catch (DraftsRunsRefusalException refused) { return ApiErrors.Detail(refused.Status, refused.Detail); }
         catch (DraftError refused)
         {
