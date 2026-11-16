@@ -84,6 +84,21 @@ public sealed class PackageTests
     }
 
     [Fact]
+    [Trait("Category", "heavy")]
+    public async Task Package_requests_release_byte_leases_before_reset_and_the_same_host_can_publish_again()
+    {
+        await using var host = await TestHost.Start();
+        (await host.Client.PostAsJsonAsync("/__contract__/reset", new { profile = "P1" })).EnsureSuccessStatusCode();
+        var first = await Create(host.Client);
+        Assert.NotEmpty(await host.Client.GetByteArrayAsync($"/api/clients/1001/artifacts/{first}"));
+        (await host.Client.PostAsJsonAsync("/__contract__/reset", new { profile = "P1" })).EnsureSuccessStatusCode();
+        Assert.Equal(HttpStatusCode.NotFound, (await host.Client.GetAsync($"/api/clients/1001/artifacts/{first}")).StatusCode);
+        var second = await Create(host.Client);
+        Assert.NotEmpty(await host.Client.GetByteArrayAsync($"/api/clients/1001/artifacts/{second}"));
+        (await host.Client.PostAsJsonAsync("/__contract__/reset", new { profile = "P1" })).EnsureSuccessStatusCode();
+    }
+
+    [Fact]
     public async Task Missing_and_corrupt_bytes_are_never_served_and_every_registered_attempt_is_audited()
     {
         await using var host = await TestHost.Start();

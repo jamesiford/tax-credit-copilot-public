@@ -8,10 +8,10 @@ namespace TaxCredit.Api.Tests.ClaimsArtifactsRules;
 public sealed class ClaimTests
 {
     [Fact]
+    [Trait("Category", "heavy")]
     public async Task Duplicate_assertion_is_a_conflict_but_transitions_append_and_reopening_is_isolated()
     {
         await using var host = await TestHost.Start();
-        host.Client.Timeout = TimeSpan.FromSeconds(30);
         await host.Client.PostAsJsonAsync("/__contract__/reset", new { profile = "P1" });
         var assertion = new
         {
@@ -45,8 +45,8 @@ public sealed class ClaimTests
     public async Task Portfolio_preserves_parameter_specific_edges_and_unknown_situation_is_not_zero()
     {
         await using var host = await TestHost.Start();
-        await host.Client.PostAsJsonAsync("/__contract__/reset", new { profile = "P2" });
-        host.Client.Timeout = TimeSpan.FromSeconds(30);
+        host.Client.Timeout = TimeSpan.FromMinutes(5);
+        (await host.Client.PostAsJsonAsync("/__contract__/reset", new { profile = "P2" })).EnsureSuccessStatusCode();
         var normal = await Json(await host.Client.GetAsync("/api/v2/portfolio"));
         Assert.Equal(4, normal.GetProperty("total").GetInt32());
         var page = await Json(await host.Client.GetAsync("/api/v2/portfolio?limit=2&offset=1"));

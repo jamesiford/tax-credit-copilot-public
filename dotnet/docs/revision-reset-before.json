@@ -1,0 +1,10 @@
+{
+  "health": 200,
+  "initial_reset": 200,
+  "reset_without_artifact": 200,
+  "create_package": 201,
+  "reset_after_package": 500,
+  "conductor_style_replay_exit": 1,
+  "conductor_style_replay_report_exists": false,
+  "conductor_style_replay_error": "urllib.error.HTTPError: HTTP Error 500: Internal Server Error"
+}
