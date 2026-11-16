@@ -1,0 +1,95 @@
+# Replay report (semantic)
+
+- server interpreter: external server (zlib n/a), oracle: None
+- scenarios: 1
+- exchanges compared: 10
+- failures: 86
+- tolerated (semantic mode only): 0
+
+## g1_ratelimit: 10 exchanges, 86 failures, 0 tolerated
+- `POST /channel/v1/tools/book_rank` / `ratelimit.1` **status** at `status`: expected `200` actual `501`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.1` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.1` **missing-field** at `blocks`: expected `[{"kind":"paragraph","rows":[],"text":"1 of 1 clients have been assessed. Ranked by what inaction costs, in the order the page shows."},{"kind":"table","rows":[["#","Client","Reason","Programme","Tax year","Identified","Jobs margin"],["1","Reference Dataset Client","Identified","GA_JTC","2025","$66,...(323 chars)` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.1` **missing-field** at `disclaimer`: expected `Not tax advice: these figures are computed from payroll by this software and must be reviewed by a qualified tax professional before any filing or claim.` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.1` **missing-field** at `facts`: expected `{"assessed_clients":1,"calculated":true,"claimed_is_unverified":false,"clients":[{"client_name":"Reference Dataset Client","credit_earned_on_trend_usd":null,"identified_usd":"66500","jobs_margin":19.0,"position":1,"program_code":"GA_JTC","provenance_verified":true,"reason":"Identified","tax_year":20...(655 chars)` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.1` **missing-field** at `provenance`: expected `{"assumption_set_id":null,"rule_pack_version":null,"run_id":null,"source":"recorded claims; no run","trail_sha256":null}` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.1` **missing-field** at `tool`: expected `book_rank` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.1` **missing-field** at `warnings`: expected `[]` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.1` **missing-field** at `correlation_id`: expected `rl-1` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.1` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /channel/v1/tools/{tool}`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.2` **status** at `status`: expected `200` actual `501`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.2` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.2` **missing-field** at `blocks`: expected `[{"kind":"paragraph","rows":[],"text":"1 of 1 clients have been assessed. Ranked by what inaction costs, in the order the page shows."},{"kind":"table","rows":[["#","Client","Reason","Programme","Tax year","Identified","Jobs margin"],["1","Reference Dataset Client","Identified","GA_JTC","2025","$66,...(323 chars)` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.2` **missing-field** at `disclaimer`: expected `Not tax advice: these figures are computed from payroll by this software and must be reviewed by a qualified tax professional before any filing or claim.` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.2` **missing-field** at `facts`: expected `{"assessed_clients":1,"calculated":true,"claimed_is_unverified":false,"clients":[{"client_name":"Reference Dataset Client","credit_earned_on_trend_usd":null,"identified_usd":"66500","jobs_margin":19.0,"position":1,"program_code":"GA_JTC","provenance_verified":true,"reason":"Identified","tax_year":20...(655 chars)` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.2` **missing-field** at `provenance`: expected `{"assumption_set_id":null,"rule_pack_version":null,"run_id":null,"source":"recorded claims; no run","trail_sha256":null}` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.2` **missing-field** at `tool`: expected `book_rank` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.2` **missing-field** at `warnings`: expected `[]` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.2` **missing-field** at `correlation_id`: expected `rl-2` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.2` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /channel/v1/tools/{tool}`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.3` **status** at `status`: expected `200` actual `501`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.3` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.3` **missing-field** at `blocks`: expected `[{"kind":"paragraph","rows":[],"text":"1 of 1 clients have been assessed. Ranked by what inaction costs, in the order the page shows."},{"kind":"table","rows":[["#","Client","Reason","Programme","Tax year","Identified","Jobs margin"],["1","Reference Dataset Client","Identified","GA_JTC","2025","$66,...(323 chars)` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.3` **missing-field** at `disclaimer`: expected `Not tax advice: these figures are computed from payroll by this software and must be reviewed by a qualified tax professional before any filing or claim.` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.3` **missing-field** at `facts`: expected `{"assessed_clients":1,"calculated":true,"claimed_is_unverified":false,"clients":[{"client_name":"Reference Dataset Client","credit_earned_on_trend_usd":null,"identified_usd":"66500","jobs_margin":19.0,"position":1,"program_code":"GA_JTC","provenance_verified":true,"reason":"Identified","tax_year":20...(655 chars)` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.3` **missing-field** at `provenance`: expected `{"assumption_set_id":null,"rule_pack_version":null,"run_id":null,"source":"recorded claims; no run","trail_sha256":null}` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.3` **missing-field** at `tool`: expected `book_rank` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.3` **missing-field** at `warnings`: expected `[]` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.3` **missing-field** at `correlation_id`: expected `rl-3` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.3` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /channel/v1/tools/{tool}`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.4` **status** at `status`: expected `200` actual `501`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.4` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.4` **missing-field** at `blocks`: expected `[{"kind":"paragraph","rows":[],"text":"1 of 1 clients have been assessed. Ranked by what inaction costs, in the order the page shows."},{"kind":"table","rows":[["#","Client","Reason","Programme","Tax year","Identified","Jobs margin"],["1","Reference Dataset Client","Identified","GA_JTC","2025","$66,...(323 chars)` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.4` **missing-field** at `disclaimer`: expected `Not tax advice: these figures are computed from payroll by this software and must be reviewed by a qualified tax professional before any filing or claim.` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.4` **missing-field** at `facts`: expected `{"assessed_clients":1,"calculated":true,"claimed_is_unverified":false,"clients":[{"client_name":"Reference Dataset Client","credit_earned_on_trend_usd":null,"identified_usd":"66500","jobs_margin":19.0,"position":1,"program_code":"GA_JTC","provenance_verified":true,"reason":"Identified","tax_year":20...(655 chars)` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.4` **missing-field** at `provenance`: expected `{"assumption_set_id":null,"rule_pack_version":null,"run_id":null,"source":"recorded claims; no run","trail_sha256":null}` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.4` **missing-field** at `tool`: expected `book_rank` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.4` **missing-field** at `warnings`: expected `[]` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.4` **missing-field** at `correlation_id`: expected `rl-4` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.4` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /channel/v1/tools/{tool}`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.5` **status** at `status`: expected `200` actual `501`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.5` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.5` **missing-field** at `blocks`: expected `[{"kind":"paragraph","rows":[],"text":"1 of 1 clients have been assessed. Ranked by what inaction costs, in the order the page shows."},{"kind":"table","rows":[["#","Client","Reason","Programme","Tax year","Identified","Jobs margin"],["1","Reference Dataset Client","Identified","GA_JTC","2025","$66,...(323 chars)` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.5` **missing-field** at `disclaimer`: expected `Not tax advice: these figures are computed from payroll by this software and must be reviewed by a qualified tax professional before any filing or claim.` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.5` **missing-field** at `facts`: expected `{"assessed_clients":1,"calculated":true,"claimed_is_unverified":false,"clients":[{"client_name":"Reference Dataset Client","credit_earned_on_trend_usd":null,"identified_usd":"66500","jobs_margin":19.0,"position":1,"program_code":"GA_JTC","provenance_verified":true,"reason":"Identified","tax_year":20...(655 chars)` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.5` **missing-field** at `provenance`: expected `{"assumption_set_id":null,"rule_pack_version":null,"run_id":null,"source":"recorded claims; no run","trail_sha256":null}` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.5` **missing-field** at `tool`: expected `book_rank` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.5` **missing-field** at `warnings`: expected `[]` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.5` **missing-field** at `correlation_id`: expected `rl-5` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.5` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /channel/v1/tools/{tool}`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.6` **status** at `status`: expected `200` actual `501`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.6` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.6` **missing-field** at `blocks`: expected `[{"kind":"paragraph","rows":[],"text":"1 of 1 clients have been assessed. Ranked by what inaction costs, in the order the page shows."},{"kind":"table","rows":[["#","Client","Reason","Programme","Tax year","Identified","Jobs margin"],["1","Reference Dataset Client","Identified","GA_JTC","2025","$66,...(323 chars)` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.6` **missing-field** at `disclaimer`: expected `Not tax advice: these figures are computed from payroll by this software and must be reviewed by a qualified tax professional before any filing or claim.` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.6` **missing-field** at `facts`: expected `{"assessed_clients":1,"calculated":true,"claimed_is_unverified":false,"clients":[{"client_name":"Reference Dataset Client","credit_earned_on_trend_usd":null,"identified_usd":"66500","jobs_margin":19.0,"position":1,"program_code":"GA_JTC","provenance_verified":true,"reason":"Identified","tax_year":20...(655 chars)` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.6` **missing-field** at `provenance`: expected `{"assumption_set_id":null,"rule_pack_version":null,"run_id":null,"source":"recorded claims; no run","trail_sha256":null}` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.6` **missing-field** at `tool`: expected `book_rank` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.6` **missing-field** at `warnings`: expected `[]` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.6` **missing-field** at `correlation_id`: expected `rl-6` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.6` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /channel/v1/tools/{tool}`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.7` **status** at `status`: expected `429` actual `501`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.7` **header** at `headers.retry-after`: expected `11` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.7` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.7` **missing-field** at `error`: expected `{"code":"rate_limited","message":"too many calls; slow down","retryable":true,"retry_after_seconds":11}` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.7` **missing-field** at `correlation_id`: expected `rl-7` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.7` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /channel/v1/tools/{tool}`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.8` **status** at `status`: expected `429` actual `501`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.8` **header** at `headers.retry-after`: expected `11` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.8` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.8` **missing-field** at `error`: expected `{"code":"rate_limited","message":"too many calls; slow down","retryable":true,"retry_after_seconds":11}` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.8` **missing-field** at `correlation_id`: expected `rl-8` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.8` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /channel/v1/tools/{tool}`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.other-person` **status** at `status`: expected `200` actual `501`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.other-person` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.other-person` **missing-field** at `blocks`: expected `[{"kind":"paragraph","rows":[],"text":"1 of 1 clients have been assessed. Ranked by what inaction costs, in the order the page shows."},{"kind":"table","rows":[["#","Client","Reason","Programme","Tax year","Identified","Jobs margin"],["1","Reference Dataset Client","Identified","GA_JTC","2025","$66,...(323 chars)` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.other-person` **missing-field** at `disclaimer`: expected `Not tax advice: these figures are computed from payroll by this software and must be reviewed by a qualified tax professional before any filing or claim.` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.other-person` **missing-field** at `facts`: expected `{"assessed_clients":1,"calculated":true,"claimed_is_unverified":false,"clients":[{"client_name":"Reference Dataset Client","credit_earned_on_trend_usd":null,"identified_usd":"66500","jobs_margin":19.0,"position":1,"program_code":"GA_JTC","provenance_verified":true,"reason":"Identified","tax_year":20...(655 chars)` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.other-person` **missing-field** at `provenance`: expected `{"assumption_set_id":null,"rule_pack_version":null,"run_id":null,"source":"recorded claims; no run","trail_sha256":null}` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.other-person` **missing-field** at `tool`: expected `book_rank` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.other-person` **missing-field** at `warnings`: expected `[]` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.other-person` **missing-field** at `correlation_id`: expected `rl-w` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `ratelimit.other-person` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /channel/v1/tools/{tool}`
+- `GET /channel/health` / `ratelimit.health-unaffected` **status** at `status`: expected `200` actual `501`
+- `GET /channel/health` / `ratelimit.health-unaffected` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `GET /channel/health` / `ratelimit.health-unaffected` **missing-field** at `status`: expected `ok` actual `<absent>`
+- `GET /channel/health` / `ratelimit.health-unaffected` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /channel/health`

@@ -1,0 +1,259 @@
+# Replay report (semantic)
+
+- server interpreter: external server (zlib n/a), oracle: None
+- scenarios: 1
+- exchanges compared: 584
+- failures: 2091
+- tolerated (semantic mode only): 247
+
+## p1_reads: 584 exchanges, 2091 failures, 247 tolerated
+- `GET /api/v2/clients/1001/units/GA_ATL_HQ` / `boot.unit` **status** at `status`: expected `200` actual `501`
+- `GET /api/v2/clients/1001/units/GA_ATL_HQ` / `boot.unit` **missing-field** at `calculation_state`: expected `calculated` actual `<absent>`
+- `GET /api/v2/clients/1001/units/GA_ATL_HQ` / `boot.unit` **missing-field** at `run`: expected `{"run_id":"40000000000040008000000000000001","produced_at":"2026-01-15 12:00:00","started_at":"2026-01-15 12:00:00","calculation_id":"9e9a9edc79a44dce8ea0d3be5147883b87a1298e2ccf5619947c8e40d3cbf0cd","code_commit":"0000000000000000000000000000000000c0ffee","rule_pack_version":"rules/ga_jtc/2025.json...(473 chars)` actual `<absent>`
+- `GET /api/v2/clients/1001/units/GA_ATL_HQ` / `boot.unit` **missing-field** at `newer_run_in_flight`: expected `false` actual `<absent>`
+- `GET /api/v2/clients/1001/units/GA_ATL_HQ` / `boot.unit` **missing-field** at `in_flight`: expected `null` actual `<absent>`
+- `GET /api/v2/clients/1001/units/GA_ATL_HQ` / `boot.unit` **missing-field** at `message`: expected `null` actual `<absent>`
+- `GET /api/v2/clients/1001/units/GA_ATL_HQ` / `boot.unit` **missing-field** at `client_id`: expected `1001` actual `<absent>`
+- `GET /api/v2/clients/1001/units/GA_ATL_HQ` / `boot.unit` **missing-field** at `state`: expected `null` actual `<absent>`
+- `GET /api/v2/clients/1001/units/GA_ATL_HQ` / `boot.unit` **missing-field** at `year`: expected `2025` actual `<absent>`
+- `GET /api/v2/clients/1001/units/GA_ATL_HQ` / `boot.unit` **missing-field** at `method`: expected `min_max` actual `<absent>`
+- `GET /api/v2/clients/1001/units/GA_ATL_HQ` / `boot.unit` **missing-field** at `month_filter`: expected `{"month_index":null}` actual `<absent>`
+- `GET /api/v2/clients/1001/units/GA_ATL_HQ` / `boot.unit` **missing-field** at `filters_applied`: expected `{}` actual `<absent>`
+- `GET /api/v2/clients/1001/units/GA_ATL_HQ` / `boot.unit` **missing-field** at `near_filters_applied`: expected `{}` actual `<absent>`
+- `GET /api/v2/clients/1001/units/GA_ATL_HQ` / `boot.unit` **missing-field** at `unit`: expected `{"client_id":1001,"worksite_id":"GA_ATL_HQ","entity_fein":"58-1234567","program_code":"GA_JTC","method":"min_max","tax_year":2025,"average_headcount":17.25,"is_base_year":false,"base_average_headcount":9.17,"base_year_source":"inferred","net_new_vs_base":8.08,"months_reachable":11,"year_complete":tr...(808 chars)` actual `<absent>`
+- `GET /api/v2/clients/1001/units/GA_ATL_HQ` / `boot.unit` **missing-field** at `months`: expected `{"client_id":1001,"tax_year":2025,"method":"min_max","run_id":"40000000000040008000000000000001","worksite_id":"GA_ATL_HQ","month_01":17.0,"month_02":17.0,"month_03":19.0,"month_04":19.0,"month_05":18.0,"month_06":18.0,"month_07":18.0,"month_08":18.0,"month_09":18.0,"month_10":18.0,"month_11":18.0,"...(407 chars)` actual `<absent>`
+- `GET /api/v2/clients/1001/units/GA_ATL_HQ` / `boot.unit` **missing-field** at `employees`: expected `[{"employee_id":"E00048","record_token":"e75b41d8333131b91396d9e5","worksite_id":"GA_ATL_HQ","entity_fein":"58-1234567","first_pps":"2024-12-23","last_ppe":"2025-05-04","weight":1.0,"month_01":1.0,"month_02":1.0,"month_03":1.0,"month_04":1.0,"month_05":0.0,"month_06":0.0,"month_07":0.0,"month_08":0....(1058 chars)` actual `<absent>`
+- `GET /api/v2/clients/1001/units/GA_ATL_HQ` / `boot.unit` **missing-field** at `near_threshold`: expected `[{"employee_id":"E00067","record_token":"8ba8e33f494280f845e7fe52","avg_weekly_hours":34.76,"avg_weekly_wages":1742.6,"weeks_worked":51.86,"total_hours":1802.8,"total_wages":90366.21,"first_start":"2024-12-23","last_end":"2025-12-21","additional_weekly_hours":0.24,"projected_weekly_hours":35.0,"exce...(1618 chars)` actual `<absent>`
+- `GET /api/v2/clients/1001/units/GA_ATL_HQ` / `boot.unit` **missing-field** at `thresholds`: expected `{"min_weekly_hours":35.0,"min_weekly_wages":680.0,"resolved":true}` actual `<absent>`
+- `GET /api/v2/clients/1001/units/GA_ATL_HQ` / `boot.unit` **missing-field** at `total`: expected `2` actual `<absent>`
+- `GET /api/v2/clients/1001/units/GA_ATL_HQ` / `boot.unit` **missing-field** at `total_unfiltered`: expected `2` actual `<absent>`
+- `GET /api/v2/clients/1001/units/GA_ATL_HQ` / `boot.unit` **missing-field** at `near_total_unfiltered`: expected `2` actual `<absent>`
+- `GET /api/v2/clients/1001/units/GA_ATL_HQ` / `boot.unit` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /api/v2/clients/{client_id}/units/{unit_id}`
+- `GET /api/ready` / `ok.api-ready` **missing-field** at `source_schema.reads`: expected `{"tables":{},"cache":{"hits":0,"misses":0,"negative_hits":0,"evictions":0,"single_flight_waits":0},"rows":0,"bytes":0}` actual `<absent>`
+- `GET /api/ready` / `ok.api-ready` **extra-field** at `source_schema.accounts`: expected `<absent>` actual `1`
+- `GET /api/ready` / `ok.api-ready` **extra-field** at `source_schema.problem`: expected `<absent>` actual `null`
+- `GET /api/ready` / `ok.api-ready` **value** at `source_schema.status`: expected `skipped` actual `ready`
+- `GET /api/me` / `ok.api-me` **status** at `status`: expected `200` actual `501`
+- `GET /api/me` / `ok.api-me` **missing-field** at `auth_mode`: expected `none` actual `<absent>`
+- `GET /api/me` / `ok.api-me` **missing-field** at `authenticated`: expected `false` actual `<absent>`
+- `GET /api/me` / `ok.api-me` **missing-field** at `upn`: expected `null` actual `<absent>`
+- `GET /api/me` / `ok.api-me` **missing-field** at `oid`: expected `null` actual `<absent>`
+- `GET /api/me` / `ok.api-me` **missing-field** at `name`: expected `null` actual `<absent>`
+- `GET /api/me` / `ok.api-me` **missing-field** at `roles`: expected `[]` actual `<absent>`
+- `GET /api/me` / `ok.api-me` **missing-field** at `principal_type`: expected `user` actual `<absent>`
+- `GET /api/me` / `ok.api-me` **missing-field** at `acting_for`: expected `null` actual `<absent>`
+- `GET /api/me` / `ok.api-me` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /api/me`
+- `GET /api/capabilities` / `ok.api-capabilities` **status** at `status`: expected `200` actual `501`
+- `GET /api/capabilities` / `ok.api-capabilities` **missing-field** at `tools`: expected `[{"name":"book_rank","description":"WHOLE BOOK only: which clients to call across every client, ranked by a named reason, in the page's own order. Needs no client. Never use it for a question about one client (a client named, or \"them\" or \"this client\"): use that client's tools.","kind":"read","...(35326 chars)` actual `<absent>`
+- `GET /api/capabilities` / `ok.api-capabilities` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /api/capabilities`
+- `GET /api/v2/portfolio` / `ok.api-v2-portfolio` **value** at `items[0].client_name`: expected `Reference Dataset Client` actual `Synthetic fixture`
+- `GET /api/v2/clients/1001/situation` / `ok.api-v2-clients-client-id-situation` **value** at `client_name`: expected `Reference Dataset Client` actual `Synthetic fixture`
+- `GET /api/eligibility/2025` / `ok.api-eligibility-tax-year` **status** at `status`: expected `200` actual `501`
+- `GET /api/eligibility/2025` / `ok.api-eligibility-tax-year` **missing-field** at `account_id`: expected `1001` actual `<absent>`
+- `GET /api/eligibility/2025` / `ok.api-eligibility-tax-year` **missing-field** at `state`: expected `GA` actual `<absent>`
+- `GET /api/eligibility/2025` / `ok.api-eligibility-tax-year` **missing-field** at `program_code`: expected `GA_JTC` actual `<absent>`
+- `GET /api/eligibility/2025` / `ok.api-eligibility-tax-year` **missing-field** at `tax_year`: expected `2025` actual `<absent>`
+- `GET /api/eligibility/2025` / `ok.api-eligibility-tax-year` **missing-field** at `thresholds`: expected `{"program_code":"GA_JTC","tax_year":2025,"minimum_average_weekly_hours":35.0,"minimum_average_weekly_wages_usd":680.0,"wage_table_year_basis":"source_tax_year","regulation":"110-9-1-.02(1)(a) and 110-9-1-.03(3)(b)1","source_tax_year":2025,"dol_report_year":2024,"lowest_wage_county":"Taliaferro","ann...(385 chars)` actual `<absent>`
+- `GET /api/eligibility/2025` / `ok.api-eligibility-tax-year` **missing-field** at `fiscal`: expected `{"begin":"2025-01-01","end":"2025-12-31","tax_year":2025,"label_convention":"begins","basis":"assumed_calendar","assumed":true,"is_calendar":true,"convention_matters":false,"tax_year_if_labelled_by_end":2025,"tax_year_if_labelled_by_begin":2025,"note":"No fiscal-year rule on file for this client, so...(483 chars)` actual `<absent>`
+- `GET /api/eligibility/2025` / `ok.api-eligibility-tax-year` **missing-field** at `calculation_state`: expected `calculated` actual `<absent>`
+- `GET /api/eligibility/2025` / `ok.api-eligibility-tax-year` **missing-field** at `run`: expected `{"run_id":"40000000000040008000000000000001","client_id":1001,"program_code":"GA_JTC","tax_year":2025,"fiscal_year_begin":"2025-01-01","fiscal_year_end":"2025-12-31","step1_assumption_set_id":"GDS-STEP1-2026-08-25-v8","onezero_assumption_set_id":"GDS-ONEZERO-2026-08-24-v7","rule_pack_version":"rules...(614 chars)` actual `<absent>`
+- `GET /api/eligibility/2025` / `ok.api-eligibility-tax-year` **missing-field** at `statute_matches_run`: expected `{"matches":true,"verdict_disagreements":0,"resolved_rule_pack_source":"rules/ga_jtc/2025.json"}` actual `<absent>`
+- `GET /api/eligibility/2025` / `ok.api-eligibility-tax-year` **missing-field** at `employees_evaluated`: expected `107` actual `<absent>`
+- `GET /api/eligibility/2025` / `ok.api-eligibility-tax-year` **missing-field** at `min_max_eligible`: expected `77` actual `<absent>`
+- `GET /api/eligibility/2025` / `ok.api-eligibility-tax-year` **missing-field** at `pay_period_eligible`: expected `72` actual `<absent>`
+- `GET /api/eligibility/2025` / `ok.api-eligibility-tax-year` **missing-field** at `near_floor`: expected `11` actual `<absent>`
+- `GET /api/eligibility/2025` / `ok.api-eligibility-tax-year` **missing-field** at `eligible_either_method`: expected `77` actual `<absent>`
+- `GET /api/eligibility/2025` / `ok.api-eligibility-tax-year` **missing-field** at `reconciliation`: expected `{"eligible_both":72,"min_max_only":5,"pay_period_only":0,"neither":30}` actual `<absent>`
+- `GET /api/eligibility/2025` / `ok.api-eligibility-tax-year` **missing-field** at `total`: expected `107` actual `<absent>`
+- `GET /api/eligibility/2025` / `ok.api-eligibility-tax-year` **missing-field** at `rows`: expected `[{"record_token":"0ad59c7b10f410528bd5a1d1","employee_id":"E00001","status":"both","near_floor":false,"totals":{"hours":2004.86,"wages":56748.14},"min_max":{"weeks":51.86,"avg_hours":38.66,"avg_wages":1094.32,"passed_hours":true,"passed_wages":true,"eligible":true},"pay_period":{"weeks":52.0,"avg_ho...(19475 chars)` actual `<absent>`
+- `GET /api/eligibility/2025` / `ok.api-eligibility-tax-year` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /api/eligibility/{tax_year}`
+- `GET /api/rules` / `ok.api-rules` **value** at `summary.last_update_iso`: expected `2026-01-04T06:19+00:00` actual `2026-11-16T06:11+00:00`
+- `GET /api/rules` / `ok.api-rules` **value** at `recent_changes[0].timestamp_utc`: expected `2026-01-04 06:19` actual `2026-11-16 06:11`
+- `GET /api/rules` / `ok.api-rules` **value** at `recent_changes[0].citation`: expected `C.R.S. § 39-30-105` actual `Va. Code § 58.1-439`
+- `GET /api/rules` / `ok.api-rules` **value** at `recent_changes[0].credit_code`: expected `CO_EZ` actual `VA_MBJF`
+- `GET /api/rules` / `ok.api-rules` **value** at `recent_changes[0].title`: expected `Colorado Enterprise Zone Job Credit — prototype pack pinned` actual `Virginia Major Business Facility Job Tax Credit — prototype pack pinned`
+- `GET /api/rules` / `ok.api-rules` **value** at `recent_changes[0].detail`: expected `Filing: Form DR 0074 with state return · pinned as v0.1.0` actual `Filing: Va. Form 500 attachment · pinned as v0.1.0`
+- `GET /api/rules` / `ok.api-rules` **value** at `recent_changes[1].timestamp_utc`: expected `2026-01-01 17:38` actual `2026-11-16 06:11`
+- `GET /api/rules` / `ok.api-rules` **value** at `recent_changes[1].citation`: expected `N.C.G.S. § 105-129.87` actual `T.C.A. § 67-4-2109`
+- `GET /api/rules` / `ok.api-rules` **value** at `recent_changes[1].credit_code`: expected `NC_JTEC` actual `TN_JTC`
+- `GET /api/rules` / `ok.api-rules` **value** at `recent_changes[1].title`: expected `North Carolina Job Expansion Tax Credit — prototype pack pinned` actual `Tennessee Job Tax Credit — prototype pack pinned`
+- `GET /api/rules` / `ok.api-rules` **value** at `recent_changes[1].detail`: expected `Filing: Annual NC-478 attached to return · pinned as v0.1.0` actual `Filing: TN Form FAE170 by franchise/excise due date · pinned as v0.3.0`
+- `GET /api/rules` / `ok.api-rules` **value** at `recent_changes[1].version`: expected `v0.1.0` actual `v0.3.0`
+- `GET /api/rules` / `ok.api-rules` **value** at `recent_changes[2].timestamp_utc`: expected `2025-12-28 23:02` actual `2026-11-16 06:11`
+- `GET /api/rules` / `ok.api-rules` **value** at `recent_changes[2].citation`: expected `ORC § 122.17` actual `S.C. Code § 12-6-3360`
+- `GET /api/rules` / `ok.api-rules` **value** at `recent_changes[2].credit_code`: expected `OH_JCTC` actual `SC_JTC`
+- `GET /api/rules` / `ok.api-rules` **value** at `recent_changes[2].title`: expected `Ohio Job Creation Tax Credit — prototype pack pinned` actual `South Carolina Jobs Tax Credit — prototype pack pinned`
+- `GET /api/rules` / `ok.api-rules` **value** at `recent_changes[2].detail`: expected `Filing: Quarterly performance reports to JobsOhio · pinned as v0.1.0` actual `Filing: Form SCH TC-4 with return · pinned as v0.1.0`
+- `GET /api/rules` / `ok.api-rules` **value** at `recent_changes[3].timestamp_utc`: expected `2025-12-28 01:09` actual `2026-11-16 06:11`
+- `GET /api/rules` / `ok.api-rules` **value** at `recent_changes[3].citation`: expected `Va. Code § 58.1-439` actual `ORC § 122.17`
+- `GET /api/rules` / `ok.api-rules` **value** at `recent_changes[3].credit_code`: expected `VA_MBJF` actual `OH_JCTC`
+- `GET /api/rules` / `ok.api-rules` **value** at `recent_changes[3].title`: expected `Virginia Major Business Facility Job Tax Credit — prototype pack pinned` actual `Ohio Job Creation Tax Credit — prototype pack pinned`
+- `GET /api/rules` / `ok.api-rules` **value** at `recent_changes[3].detail`: expected `Filing: Va. Form 500 attachment · pinned as v0.1.0` actual `Filing: Quarterly performance reports to JobsOhio · pinned as v0.1.0`
+- `GET /api/rules` / `ok.api-rules` **value** at `recent_changes[4].timestamp_utc`: expected `2025-12-23 02:54` actual `2026-11-16 06:11`
+- `GET /api/rules` / `ok.api-rules` **value** at `recent_changes[4].citation`: expected `IRC § 51` actual `N.C.G.S. § 105-129.87`
+- `GET /api/rules` / `ok.api-rules` **value** at `recent_changes[4].credit_code`: expected `FED_WOTC` actual `NC_JTEC`
+- `GET /api/rules` / `ok.api-rules` **value** at `recent_changes[4].title`: expected `Federal Work Opportunity Tax Credit (lite) — prototype pack pinned` actual `North Carolina Job Expansion Tax Credit — prototype pack pinned`
+- `GET /api/rules` / `ok.api-rules` **value** at `recent_changes[4].detail`: expected `Filing: DOL ETA Form 9061/9062 within 28 days of hire · pinned as v0.1.0` actual `Filing: Annual NC-478 attached to return · pinned as v0.1.0`
+- `GET /api/progress/2025` / `ok.api-progress-tax-year` **status** at `status`: expected `200` actual `501`
+- `GET /api/progress/2025` / `ok.api-progress-tax-year` **missing-field** at `_roadmap_tag`: expected `N2` actual `<absent>`
+- `GET /api/progress/2025` / `ok.api-progress-tax-year` **missing-field** at `_story`: expected `FCST-01` actual `<absent>`
+- `GET /api/progress/2025` / `ok.api-progress-tax-year` **missing-field** at `state`: expected `GA` actual `<absent>`
+- `GET /api/progress/2025` / `ok.api-progress-tax-year` **missing-field** at `program_code`: expected `GA_JTC` actual `<absent>`
+- `GET /api/progress/2025` / `ok.api-progress-tax-year` **missing-field** at `tax_year`: expected `2025` actual `<absent>`
+- `GET /api/progress/2025` / `ok.api-progress-tax-year` **missing-field** at `as_of`: expected `2025-08-31` actual `<absent>`
+- `GET /api/progress/2025` / `ok.api-progress-tax-year` **missing-field** at `months_elapsed`: expected `8` actual `<absent>`
+- `GET /api/progress/2025` / `ok.api-progress-tax-year` **missing-field** at `ytd_average_headcount`: expected `65.38` actual `<absent>`
+- `GET /api/progress/2025` / `ok.api-progress-tax-year` **missing-field** at `projected_average_headcount`: expected `65.38` actual `<absent>`
+- `GET /api/progress/2025` / `ok.api-progress-tax-year` **missing-field** at `prior_year_average_headcount`: expected `40.0` actual `<absent>`
+- `GET /api/progress/2025` / `ok.api-progress-tax-year` **missing-field** at `threshold`: expected `2.0` actual `<absent>`
+- `GET /api/progress/2025` / `ok.api-progress-tax-year` **missing-field** at `finish_line_headcount`: expected `42.0` actual `<absent>`
+- `GET /api/progress/2025` / `ok.api-progress-tax-year` **missing-field** at `gap_to_finish`: expected `0.0` actual `<absent>`
+- `GET /api/progress/2025` / `ok.api-progress-tax-year` **missing-field** at `projected_net_new`: expected `25.38` actual `<absent>`
+- `GET /api/progress/2025` / `ok.api-progress-tax-year` **missing-field** at `on_track`: expected `true` actual `<absent>`
+- `GET /api/progress/2025` / `ok.api-progress-tax-year` **missing-field** at `projected_annual_credit_usd`: expected `81830` actual `<absent>`
+- `GET /api/progress/2025` / `ok.api-progress-tax-year` **missing-field** at `projected_lifetime_credit_usd`: expected `409150` actual `<absent>`
+- `GET /api/progress/2025` / `ok.api-progress-tax-year` **missing-field** at `credit_code`: expected `GA_JTC` actual `<absent>`
+- `GET /api/progress/2025` / `ok.api-progress-tax-year` **missing-field** at `credit_name`: expected `Georgia Jobs Tax Credit` actual `<absent>`
+- `GET /api/progress/2025` / `ok.api-progress-tax-year` **missing-field** at `method_note`: expected `Linear run-rate from 8 month(s) of 2025 actuals (YTD Average Monthly Headcount 65.38); assumes the current run-rate holds through year-end. No seasonality applied.` actual `<absent>`
+- `GET /api/progress/2025` / `ok.api-progress-tax-year` **missing-field** at `account_id`: expected `1001` actual `<absent>`
+- `GET /api/progress/2025` / `ok.api-progress-tax-year` **missing-field** at `has_prior_year_payroll`: expected `true` actual `<absent>`
+- `GET /api/progress/2025` / `ok.api-progress-tax-year` **missing-field** at `base_is_meaningful`: expected `true` actual `<absent>`
+- `GET /api/progress/2025` / `ok.api-progress-tax-year` **missing-field** at `base_caveat`: expected `null` actual `<absent>`
+- `GET /api/progress/2025` / `ok.api-progress-tax-year` **missing-field** at `near_the_line`: expected `{"band_weekly_hours":5.0,"within_band":16,"ineligible":30,"evaluated":107,"failure_modes":{"hours_only":27,"wages_only":0,"both":3},"cohort":[{"employee_id":"E00015","weeks_worked":51.86,"total_hours":1812.09,"total_wages":44121.79,"avg_weekly_hours":34.94,"avg_weekly_wages":850.83,"eligible":false,...(10204 chars)` actual `<absent>`
+- `GET /api/progress/2025` / `ok.api-progress-tax-year` **missing-field** at `is_estimate`: expected `true` actual `<absent>`
+- `GET /api/progress/2025` / `ok.api-progress-tax-year` **missing-field** at `denominator_note`: expected `Average headcount over 8 closed month(s), not 12. Projected to year end at the current run-rate with no seasonality applied.` actual `<absent>`
+- `GET /api/progress/2025` / `ok.api-progress-tax-year` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /api/progress/{tax_year}`
+- `GET /api/forecast/2025` / `ok.api-forecast-tax-year` **status** at `status`: expected `200` actual `501`
+- `GET /api/forecast/2025` / `ok.api-forecast-tax-year` **missing-field** at `as_of`: expected `2025-08-31` actual `<absent>`
+- `GET /api/forecast/2025` / `ok.api-forecast-tax-year` **missing-field** at `tax_year`: expected `2025` actual `<absent>`
+- `GET /api/forecast/2025` / `ok.api-forecast-tax-year` **missing-field** at `fiscal_year_end_month`: expected `12` actual `<absent>`
+- `GET /api/forecast/2025` / `ok.api-forecast-tax-year` **missing-field** at `estimated_credit_total_usd`: expected `306670` actual `<absent>`
+- `GET /api/forecast/2025` / `ok.api-forecast-tax-year` **missing-field** at `state_count`: expected `1` actual `<absent>`
+- `GET /api/forecast/2025` / `ok.api-forecast-tax-year` **missing-field** at `states`: expected `[{"_roadmap_tag":"N2","_story":"FCST-01","state":"GA","program_code":"GA_JTC","tax_year":2025,"as_of":"2025-08-31","months_elapsed":8,"ytd_average_headcount":129.62,"projected_average_headcount":129.62,"prior_year_average_headcount":40.0,"threshold":2.0,"finish_line_headcount":42.0,"gap_to_finish":0...(667 chars)` actual `<absent>`
+- `GET /api/forecast/2025` / `ok.api-forecast-tax-year` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /api/forecast/{tax_year}`
+- `GET /api/alerts/monthly/2025` / `ok.api-alerts-monthly-tax-year` **status** at `status`: expected `200` actual `501`
+- `GET /api/alerts/monthly/2025` / `ok.api-alerts-monthly-tax-year` **missing-field** at `as_of`: expected `2026-01-15` actual `<absent>`
+- `GET /api/alerts/monthly/2025` / `ok.api-alerts-monthly-tax-year` **missing-field** at `tax_year`: expected `2025` actual `<absent>`
+- `GET /api/alerts/monthly/2025` / `ok.api-alerts-monthly-tax-year` **missing-field** at `cadence`: expected `monthly` actual `<absent>`
+- `GET /api/alerts/monthly/2025` / `ok.api-alerts-monthly-tax-year` **missing-field** at `anchored_on`: expected `state measuring date (one_zero.measuring_date; default last day of month)` actual `<absent>`
+- `GET /api/alerts/monthly/2025` / `ok.api-alerts-monthly-tax-year` **missing-field** at `unit_status_counts`: expected `{"on_track":0,"at_risk":4,"exceeding":0}` actual `<absent>`
+- `GET /api/alerts/monthly/2025` / `ok.api-alerts-monthly-tax-year` **missing-field** at `unit_alerts`: expected `[{"state":"GA","program_code":"GA_JTC","Worksite_ID":"GA_ATL_HQ","status":"at_risk","green":13,"yellow":9,"red":8,"total":30},{"state":"GA","program_code":"GA_JTC","Worksite_ID":"GA_CUM_OPS","status":"at_risk","green":18,"yellow":4,"red":5,"total":27},{"state":"GA","program_code":"GA_JTC","Worksite_...(503 chars)` actual `<absent>`
+- `GET /api/alerts/monthly/2025` / `ok.api-alerts-monthly-tax-year` **missing-field** at `at_risk_employee_count`: expected `12` actual `<absent>`
+- `GET /api/alerts/monthly/2025` / `ok.api-alerts-monthly-tax-year` **missing-field** at `employee_levers`: expected `[{"state":"GA","program_code":"GA_JTC","Employee_ID":"E00008","Worksite_ID":"GA_ATL_HQ","avg_weekly_hours":34.8,"avg_weekly_wages":1692.88,"hours_gap_per_week":0.2,"wages_gap_per_week":0.0,"annual_hours_to_qualify":10.3,"lever":"E00008 (GA_ATL_HQ) is at 34.8 hrs/wk and $1,693/wk avg — add 0.2 hrs/wk...(4036 chars)` actual `<absent>`
+- `GET /api/alerts/monthly/2025` / `ok.api-alerts-monthly-tax-year` **missing-field** at `_roadmap_tag`: expected `J3` actual `<absent>`
+- `GET /api/alerts/monthly/2025` / `ok.api-alerts-monthly-tax-year` **missing-field** at `source`: expected `UX-03: monthly cadence on the magical pay date; alerts distinguish on-track / at-risk / exceeding and name the specific lever to clear the threshold (e.g. 'add overtime to clear SC 32-hr threshold').` actual `<absent>`
+- `GET /api/alerts/monthly/2025` / `ok.api-alerts-monthly-tax-year` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /api/alerts/monthly/{tax_year}`
+- `GET /api/triggers` / `ok.api-triggers` **status** at `status`: expected `200` actual `501`
+- `GET /api/triggers` / `ok.api-triggers` **missing-field** at `as_of`: expected `2026-01-15` actual `<absent>`
+- `GET /api/triggers` / `ok.api-triggers` **missing-field** at `prior_snapshot`: expected `Tax year 2024 (Q4 only)` actual `<absent>`
+- `GET /api/triggers` / `ok.api-triggers` **missing-field** at `current_snapshot`: expected `Tax year 2025 (full)` actual `<absent>`
+- `GET /api/triggers` / `ok.api-triggers` **missing-field** at `trigger_count`: expected `31` actual `<absent>`
+- `GET /api/triggers` / `ok.api-triggers` **missing-field** at `by_type`: expected `{"headcount_spike":17,"new_fein":7,"new_jurisdiction":7}` actual `<absent>`
+- `GET /api/triggers` / `ok.api-triggers` **missing-field** at `triggers`: expected `[{"type":"headcount_spike","jurisdiction":"GA","unit":"GA_SAV_DC","prior_headcount":17,"current_headcount":24,"delta":7,"severity":"medium","message":"Headcount spike at GA_SAV_DC: 17 -> 24 employees (+7). Eligible for One/Zero recompute against GA rule pack."},{"type":"headcount_spike","jurisdictio...(7398 chars)` actual `<absent>`
+- `GET /api/triggers` / `ok.api-triggers` **missing-field** at `source`: expected `Per the stakeholder meeting (5/29): triggers replace static alerts with a real differ over consecutive payroll snapshots. Production runs nightly via Azure Function.` actual `<absent>`
+- `GET /api/triggers` / `ok.api-triggers` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /api/triggers`
+- `GET /api/performance/2025` / `ok.api-performance-tax-year` **status** at `status`: expected `200` actual `501`
+- `GET /api/performance/2025` / `ok.api-performance-tax-year` **missing-field** at `as_of`: expected `2026-01-15` actual `<absent>`
+- `GET /api/performance/2025` / `ok.api-performance-tax-year` **missing-field** at `tax_year`: expected `2025` actual `<absent>`
+- `GET /api/performance/2025` / `ok.api-performance-tax-year` **missing-field** at `scoped_worksite`: expected `null` actual `<absent>`
+- `GET /api/performance/2025` / `ok.api-performance-tax-year` **missing-field** at `totals`: expected `{"green":65,"yellow":17,"red":25,"total":107}` actual `<absent>`
+- `GET /api/performance/2025` / `ok.api-performance-tax-year` **missing-field** at `yellow_credit_at_stake_usd`: expected `59500` actual `<absent>`
+- `GET /api/performance/2025` / `ok.api-performance-tax-year` **missing-field** at `states`: expected `[{"tax_year":2025,"pack_citation":"OCGA § 48-7-40","min_weekly_hours":35.0,"min_weekly_wages":680.0,"yellow_margin":0.05,"summary":{"green":65,"yellow":17,"red":25},"units":[{"Worksite_ID":"GA_ATL_HQ","green":13,"yellow":9,"red":8,"total":30},{"Worksite_ID":"GA_CUM_OPS","green":18,"yellow":4,"red":5...(30296 chars)` actual `<absent>`
+- `GET /api/performance/2025` / `ok.api-performance-tax-year` **missing-field** at `anonymization_note`: expected `Employee_ID values shown are synthetic prototype tokens (E00001 ...). The pay-period CSV omits SSN, names, and hire/term dates by design (see the BCS business-framing overview, 'Anonymity of PII'). Production tokenizes Employee_ID at the ingestion boundary; per-employee detail is releasable only und...(333 chars)` actual `<absent>`
+- `GET /api/performance/2025` / `ok.api-performance-tax-year` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /api/performance/{tax_year}`
+- `GET /api/onezero/matrix/2025` / `ok.api-onezero-matrix-tax-year` **status** at `status`: expected `200` actual `501`
+- `GET /api/onezero/matrix/2025` / `ok.api-onezero-matrix-tax-year` **missing-field** at `account_id`: expected `1001` actual `<absent>`
+- `GET /api/onezero/matrix/2025` / `ok.api-onezero-matrix-tax-year` **missing-field** at `state`: expected `GA` actual `<absent>`
+- `GET /api/onezero/matrix/2025` / `ok.api-onezero-matrix-tax-year` **missing-field** at `program_code`: expected `GA_JTC` actual `<absent>`
+- `GET /api/onezero/matrix/2025` / `ok.api-onezero-matrix-tax-year` **missing-field** at `tax_year`: expected `2025` actual `<absent>`
+- `GET /api/onezero/matrix/2025` / `ok.api-onezero-matrix-tax-year` **missing-field** at `method`: expected `min_max` actual `<absent>`
+- `GET /api/onezero/matrix/2025` / `ok.api-onezero-matrix-tax-year` **missing-field** at `thresholds`: expected `{"program_code":"GA_JTC","tax_year":2025,"minimum_average_weekly_hours":35.0,"minimum_average_weekly_wages_usd":680.0,"wage_table_year_basis":"source_tax_year","regulation":"110-9-1-.02(1)(a) and 110-9-1-.03(3)(b)1","source_tax_year":2025,"dol_report_year":2024,"lowest_wage_county":"Taliaferro","ann...(385 chars)` actual `<absent>`
+- `GET /api/onezero/matrix/2025` / `ok.api-onezero-matrix-tax-year` **missing-field** at `fiscal`: expected `{"begin":"2025-01-01","end":"2025-12-31","tax_year":2025,"label_convention":"begins","basis":"assumed_calendar","assumed":true,"is_calendar":true,"convention_matters":false,"tax_year_if_labelled_by_end":2025,"tax_year_if_labelled_by_begin":2025,"note":"No fiscal-year rule on file for this client, so...(483 chars)` actual `<absent>`
+- `GET /api/onezero/matrix/2025` / `ok.api-onezero-matrix-tax-year` **missing-field** at `calculation_state`: expected `calculated` actual `<absent>`
+- `GET /api/onezero/matrix/2025` / `ok.api-onezero-matrix-tax-year` **missing-field** at `run`: expected `{"run_id":"40000000000040008000000000000001","client_id":1001,"program_code":"GA_JTC","tax_year":2025,"fiscal_year_begin":"2025-01-01","fiscal_year_end":"2025-12-31","step1_assumption_set_id":"GDS-STEP1-2026-08-25-v8","onezero_assumption_set_id":"GDS-ONEZERO-2026-08-24-v7","rule_pack_version":"rules...(614 chars)` actual `<absent>`
+- `GET /api/onezero/matrix/2025` / `ok.api-onezero-matrix-tax-year` **missing-field** at `months`: expected `["2025-01-31","2025-02-28","2025-03-31","2025-04-30","2025-05-31","2025-06-30","2025-07-31","2025-08-31","2025-09-30","2025-10-31","2025-11-30","2025-12-31"]` actual `<absent>`
+- `GET /api/onezero/matrix/2025` / `ok.api-onezero-matrix-tax-year` **missing-field** at `units`: expected `4` actual `<absent>`
+- `GET /api/onezero/matrix/2025` / `ok.api-onezero-matrix-tax-year` **missing-field** at `matrix_rows`: expected `79` actual `<absent>`
+- `GET /api/onezero/matrix/2025` / `ok.api-onezero-matrix-tax-year` **missing-field** at `eligible_employees`: expected `77` actual `<absent>`
+- `GET /api/onezero/matrix/2025` / `ok.api-onezero-matrix-tax-year` **missing-field** at `annual_average`: expected `64.17` actual `<absent>`
+- `GET /api/onezero/matrix/2025` / `ok.api-onezero-matrix-tax-year` **missing-field** at `summary`: expected `[{"unit_id":"GA_ATL_HQ","fein":"58-1234567","month_totals":[17.0,17.0,19.0,19.0,18.0,18.0,18.0,18.0,18.0,18.0,18.0,9.0],"total":207.0,"average_headcount":17.25},{"unit_id":"GA_CUM_OPS","fein":"58-1234567","month_totals":[21.0,22.0,22.0,21.0,21.0,21.0,20.0,20.0,20.0,20.0,20.0,3.0],"total":231.0,"aver...(642 chars)` actual `<absent>`
+- `GET /api/onezero/matrix/2025` / `ok.api-onezero-matrix-tax-year` **missing-field** at `matrix`: expected `[{"record_token":"ffbd9e314fa15f19bdb0a804","employee_id":"E00004","unit_id":"GA_ATL_HQ","fein":"58-1234567","months":[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0],"weight":1.0},{"record_token":"8a35e08f43045a17e8b638c9","employee_id":"E00005","unit_id":"GA_ATL_HQ","fein":"58-1234567","months":[...(14341 chars)` actual `<absent>`
+- `GET /api/onezero/matrix/2025` / `ok.api-onezero-matrix-tax-year` **missing-field** at `flags`: expected `[]` actual `<absent>`
+- `GET /api/onezero/matrix/2025` / `ok.api-onezero-matrix-tax-year` **missing-field** at `contested_months`: expected `0` actual `<absent>`
+- `GET /api/onezero/matrix/2025` / `ok.api-onezero-matrix-tax-year` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /api/onezero/matrix/{tax_year}`
+- `GET /api/onezero/2025` / `ok.api-onezero-tax-year` **status** at `status`: expected `200` actual `501`
+- `GET /api/onezero/2025` / `ok.api-onezero-tax-year` **missing-field** at `as_of`: expected `2026-01-15` actual `<absent>`
+- `GET /api/onezero/2025` / `ok.api-onezero-tax-year` **missing-field** at `tax_year`: expected `2025` actual `<absent>`
+- `GET /api/onezero/2025` / `ok.api-onezero-tax-year` **missing-field** at `method`: expected `both` actual `<absent>`
+- `GET /api/onezero/2025` / `ok.api-onezero-tax-year` **missing-field** at `fein`: expected `null` actual `<absent>`
+- `GET /api/onezero/2025` / `ok.api-onezero-tax-year` **missing-field** at `fiscal_year_end_month`: expected `12` actual `<absent>`
+- `GET /api/onezero/2025` / `ok.api-onezero-tax-year` **missing-field** at `method_docs`: expected `["the Pay Period Method (preferred)","the Min Max Method (fallback)","the BCS business-framing overview"]` actual `<absent>`
+- `GET /api/onezero/2025` / `ok.api-onezero-tax-year` **missing-field** at `row_count`: expected `6270` actual `<absent>`
+- `GET /api/onezero/2025` / `ok.api-onezero-tax-year` **missing-field** at `state_count`: expected `1` actual `<absent>`
+- `GET /api/onezero/2025` / `ok.api-onezero-tax-year` **missing-field** at `results`: expected `[{"state":"GA","program_code":"GA_JTC","rule_pack_citation":"OCGA § 48-7-40","method":"both","eligibility_floors":{"tax_year":2025,"min_weekly_hours":35.0,"min_weekly_wages":680.0,"wage_test_applies":true,"pt_band_hours":null,"pt_weight":null,"measuring_date":"last_day","entity_combination":"permitt...(17371 chars)` actual `<absent>`
+- `GET /api/onezero/2025` / `ok.api-onezero-tax-year` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /api/onezero/{tax_year}`
+- `GET /api/onezero/2025/employee/E00048` / `ok.api-onezero-tax-year-employee-employee-id` **status** at `status`: expected `200` actual `501`
+- `GET /api/onezero/2025/employee/E00048` / `ok.api-onezero-tax-year-employee-employee-id` **missing-field** at `employee_id`: expected `E00048` actual `<absent>`
+- `GET /api/onezero/2025/employee/E00048` / `ok.api-onezero-tax-year-employee-employee-id` **missing-field** at `tax_year`: expected `2025` actual `<absent>`
+- `GET /api/onezero/2025/employee/E00048` / `ok.api-onezero-tax-year-employee-employee-id` **missing-field** at `source_lines`: expected `[{"Worksite_ID":"GA_ATL_HQ","Entity_FEIN":"58-1234567","Pay_Period_Start":"2024-12-23","Pay_Period_End":"2025-01-05","Pay_Date":"2025-01-10","Hours_Worked":74.07,"Gross_Wages":2102.59,"Pay_Code":"Regular","Worksite_Name":"Atlanta HQ"},{"Worksite_ID":"GA_ATL_HQ","Entity_FEIN":"58-1234567","Pay_Period...(2339 chars)` actual `<absent>`
+- `GET /api/onezero/2025/employee/E00048` / `ok.api-onezero-tax-year-employee-employee-id` **missing-field** at `source_line_count`: expected `10` actual `<absent>`
+- `GET /api/onezero/2025/employee/E00048` / `ok.api-onezero-tax-year-employee-employee-id` **missing-field** at `totals`: expected `{"total_hours":748.99,"total_wages":21261.24}` actual `<absent>`
+- `GET /api/onezero/2025/employee/E00048` / `ok.api-onezero-tax-year-employee-employee-id` **missing-field** at `weeks_worked`: expected `20.0` actual `<absent>`
+- `GET /api/onezero/2025/employee/E00048` / `ok.api-onezero-tax-year-employee-employee-id` **missing-field** at `avg_weekly_hours`: expected `37.45` actual `<absent>`
+- `GET /api/onezero/2025/employee/E00048` / `ok.api-onezero-tax-year-employee-employee-id` **missing-field** at `avg_weekly_wages`: expected `1063.06` actual `<absent>`
+- `GET /api/onezero/2025/employee/E00048` / `ok.api-onezero-tax-year-employee-employee-id` **missing-field** at `floor_test`: expected `{"min_weekly_hours":35.0,"min_weekly_wages":680.0,"wage_test_applies":true,"passed_hours":true,"passed_wages":true,"weight":1.0}` actual `<absent>`
+- `GET /api/onezero/2025/employee/E00048` / `ok.api-onezero-tax-year-employee-employee-id` **missing-field** at `eligible`: expected `true` actual `<absent>`
+- `GET /api/onezero/2025/employee/E00048` / `ok.api-onezero-tax-year-employee-employee-id` **missing-field** at `months`: expected `[{"month_end":"2025-01-31","counted":1.0,"worksite_id":"GA_ATL_HQ","worksite_name":"Atlanta HQ"},{"month_end":"2025-02-28","counted":1.0,"worksite_id":"GA_ATL_HQ","worksite_name":"Atlanta HQ"},{"month_end":"2025-03-31","counted":1.0,"worksite_id":"GA_ATL_HQ","worksite_name":"Atlanta HQ"},{"month_end...(865 chars)` actual `<absent>`
+- `GET /api/onezero/2025/employee/E00048` / `ok.api-onezero-tax-year-employee-employee-id` **missing-field** at `months_counted`: expected `4` actual `<absent>`
+- `GET /api/onezero/2025/employee/E00048` / `ok.api-onezero-tax-year-employee-employee-id` **missing-field** at `headcount_contribution`: expected `0.3333` actual `<absent>`
+- `GET /api/onezero/2025/employee/E00048` / `ok.api-onezero-tax-year-employee-employee-id` **missing-field** at `citation`: expected `OCGA § 48-7-40` actual `<absent>`
+- (tolerated) `GET /api/findings/1001/2025` / `boot.findings` **number-lexeme** at `findings[0].population.total_hours`: expected `160.0` actual `160`
+- (tolerated) `GET /api/findings/1001/2025` / `boot.findings` **number-lexeme** at `findings[0].population.sample[0].units[0].hours`: expected `120.0` actual `120`
+- (tolerated) `GET /api/findings/1001/2025` / `boot.findings` **number-lexeme** at `findings[0].population.sample[0].units[1].hours`: expected `40.0` actual `40`
+- (tolerated) `GET /api/findings/1001/2025` / `boot.findings` **number-lexeme** at `findings[1].evidence.units[0].hours`: expected `40.0` actual `40`
+- (tolerated) `GET /api/findings/1001/2025` / `boot.findings` **number-lexeme** at `findings[1].evidence.units[1].hours`: expected `80.0` actual `80`
+- (tolerated) `GET /api/claims/coverage/1001` / `ok.api-claims-coverage-client-id` **number-lexeme** at `cells[0].average_headcount`: expected `40.0` actual `40`
+- (tolerated) `GET /api/claims/coverage/1001` / `ok.api-claims-coverage-client-id` **number-lexeme** at `cells[0].base_average_headcount`: expected `40.0` actual `40`
+- (tolerated) `GET /api/claims/coverage/1001` / `ok.api-claims-coverage-client-id` **number-lexeme** at `cells[0].threshold_jobs`: expected `2.0` actual `2`
+- (tolerated) `GET /api/claims/coverage/1001` / `ok.api-claims-coverage-client-id` **number-lexeme** at `cells[0].net_new_jobs`: expected `0.0` actual `0`
+- (tolerated) `GET /api/claims/coverage/1001` / `ok.api-claims-coverage-client-id` **number-lexeme** at `cells[0].jobs_to_threshold`: expected `2.0` actual `2`
+- (tolerated) `GET /api/claims/coverage/1001` / `ok.api-claims-coverage-client-id` **number-lexeme** at `cells[0].jobs_margin`: expected `-2.0` actual `-2`
+- (tolerated) `GET /api/claims/coverage/1001` / `ok.api-claims-coverage-client-id` **number-lexeme** at `cells[1].average_headcount`: expected `61.0` actual `61`
+- (tolerated) `GET /api/claims/coverage/1001` / `ok.api-claims-coverage-client-id` **number-lexeme** at `cells[1].base_average_headcount`: expected `40.0` actual `40`
+- (tolerated) `GET /api/claims/coverage/1001` / `ok.api-claims-coverage-client-id` **number-lexeme** at `cells[1].threshold_jobs`: expected `2.0` actual `2`
+- (tolerated) `GET /api/claims/coverage/1001` / `ok.api-claims-coverage-client-id` **number-lexeme** at `cells[1].net_new_jobs`: expected `21.0` actual `21`
+- (tolerated) `GET /api/claims/coverage/1001` / `ok.api-claims-coverage-client-id` **number-lexeme** at `cells[1].jobs_to_threshold`: expected `0.0` actual `0`
+- (tolerated) `GET /api/claims/coverage/1001` / `ok.api-claims-coverage-client-id` **number-lexeme** at `cells[1].jobs_margin`: expected `19.0` actual `19`
+- (tolerated) `GET /api/claims/coverage` / `ok.api-claims-coverage` **number-lexeme** at `clients[0].cells[0].average_headcount`: expected `40.0` actual `40`
+- (tolerated) `GET /api/claims/coverage` / `ok.api-claims-coverage` **number-lexeme** at `clients[0].cells[0].base_average_headcount`: expected `40.0` actual `40`
+- (tolerated) `GET /api/claims/coverage` / `ok.api-claims-coverage` **number-lexeme** at `clients[0].cells[0].threshold_jobs`: expected `2.0` actual `2`
+- (tolerated) `GET /api/claims/coverage` / `ok.api-claims-coverage` **number-lexeme** at `clients[0].cells[0].net_new_jobs`: expected `0.0` actual `0`
+- (tolerated) `GET /api/claims/coverage` / `ok.api-claims-coverage` **number-lexeme** at `clients[0].cells[0].jobs_to_threshold`: expected `2.0` actual `2`
+- (tolerated) `GET /api/claims/coverage` / `ok.api-claims-coverage` **number-lexeme** at `clients[0].cells[0].jobs_margin`: expected `-2.0` actual `-2`
+- (tolerated) `GET /api/claims/coverage` / `ok.api-claims-coverage` **number-lexeme** at `clients[0].cells[1].average_headcount`: expected `61.0` actual `61`
+- (tolerated) `GET /api/claims/coverage` / `ok.api-claims-coverage` **number-lexeme** at `clients[0].cells[1].base_average_headcount`: expected `40.0` actual `40`
+- (tolerated) `GET /api/claims/coverage` / `ok.api-claims-coverage` **number-lexeme** at `clients[0].cells[1].threshold_jobs`: expected `2.0` actual `2`
+- (tolerated) `GET /api/claims/coverage` / `ok.api-claims-coverage` **number-lexeme** at `clients[0].cells[1].net_new_jobs`: expected `21.0` actual `21`
+- (tolerated) `GET /api/claims/coverage` / `ok.api-claims-coverage` **number-lexeme** at `clients[0].cells[1].jobs_to_threshold`: expected `0.0` actual `0`
+- (tolerated) `GET /api/claims/coverage` / `ok.api-claims-coverage` **number-lexeme** at `clients[0].cells[1].jobs_margin`: expected `19.0` actual `19`
+- (tolerated) `GET /api/claims/cell/1001/GA_JTC/2025` / `ok.api-claims-cell-client-id-program-code-tax-year` **number-lexeme** at `current.average_headcount`: expected `61.0` actual `61`
+- (tolerated) `GET /api/claims/cell/1001/GA_JTC/2025` / `ok.api-claims-cell-client-id-program-code-tax-year` **number-lexeme** at `current.base_average_headcount`: expected `40.0` actual `40`
+- (tolerated) `GET /api/claims/cell/1001/GA_JTC/2025` / `ok.api-claims-cell-client-id-program-code-tax-year` **number-lexeme** at `current.threshold_jobs`: expected `2.0` actual `2`
+- (tolerated) `GET /api/claims/cell/1001/GA_JTC/2025` / `ok.api-claims-cell-client-id-program-code-tax-year` **number-lexeme** at `current.net_new_jobs`: expected `21.0` actual `21`
+- (tolerated) `GET /api/claims/cell/1001/GA_JTC/2025` / `ok.api-claims-cell-client-id-program-code-tax-year` **number-lexeme** at `current.jobs_to_threshold`: expected `0.0` actual `0`
+- (tolerated) `GET /api/claims/cell/1001/GA_JTC/2025` / `ok.api-claims-cell-client-id-program-code-tax-year` **number-lexeme** at `current.jobs_margin`: expected `19.0` actual `19`
+- (tolerated) `GET /api/claims/cell/1001/GA_JTC/2025` / `ok.api-claims-cell-client-id-program-code-tax-year` **number-lexeme** at `history[0].average_headcount`: expected `61.0` actual `61`
+- (tolerated) `GET /api/claims/cell/1001/GA_JTC/2025` / `ok.api-claims-cell-client-id-program-code-tax-year` **number-lexeme** at `history[0].base_average_headcount`: expected `40.0` actual `40`
+- (tolerated) `GET /api/claims/cell/1001/GA_JTC/2025` / `ok.api-claims-cell-client-id-program-code-tax-year` **number-lexeme** at `history[0].threshold_jobs`: expected `2.0` actual `2`
+- (tolerated) `GET /api/claims/cell/1001/GA_JTC/2025` / `ok.api-claims-cell-client-id-program-code-tax-year` **number-lexeme** at `history[0].net_new_jobs`: expected `21.0` actual `21`
+- (tolerated) `GET /api/claims/cell/1001/GA_JTC/2025` / `ok.api-claims-cell-client-id-program-code-tax-year` **number-lexeme** at `history[0].jobs_to_threshold`: expected `0.0` actual `0`
+- (tolerated) `GET /api/claims/cell/1001/GA_JTC/2025` / `ok.api-claims-cell-client-id-program-code-tax-year` **number-lexeme** at `history[0].jobs_margin`: expected `19.0` actual `19`
+- (tolerated) `GET /api/v2/portfolio` / `ok.api-v2-portfolio` **number-lexeme** at `items[0].average_headcount`: expected `61.0` actual `61`
+- (tolerated) `GET /api/v2/portfolio` / `ok.api-v2-portfolio` **number-lexeme** at `items[0].base_average_headcount`: expected `40.0` actual `40`
+- (tolerated) `GET /api/v2/portfolio` / `ok.api-v2-portfolio` **number-lexeme** at `items[0].threshold_jobs`: expected `2.0` actual `2`
+- (tolerated) `GET /api/v2/portfolio` / `ok.api-v2-portfolio` **number-lexeme** at `items[0].net_new_jobs`: expected `21.0` actual `21`
+- (tolerated) `GET /api/v2/portfolio` / `ok.api-v2-portfolio` **number-lexeme** at `items[0].jobs_to_threshold`: expected `0.0` actual `0`
+- (tolerated) `GET /api/v2/portfolio` / `ok.api-v2-portfolio` **number-lexeme** at `items[0].jobs_margin`: expected `19.0` actual `19`
+- (tolerated) `GET /api/v2/portfolio` / `ok.api-v2-portfolio` **number-lexeme** at `items[0].gap_jobs`: expected `0.0` actual `0`
+- (tolerated) `GET /api/v2/clients/1001/situation` / `ok.api-v2-clients-client-id-situation` **number-lexeme** at `by_band.unclaimed_at_scale[0].net_new_jobs`: expected `21.0` actual `21`
+- (tolerated) `GET /api/v2/clients/1001/situation` / `ok.api-v2-clients-client-id-situation` **number-lexeme** at `by_band.unclaimed_at_scale[0].threshold_jobs`: expected `2.0` actual `2`

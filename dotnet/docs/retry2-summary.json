@@ -1,0 +1,40 @@
+{
+  "session": "routes_claims",
+  "repair_commit": "3054859",
+  "build_exit": 0,
+  "format_exit": 0,
+  "tests_fast_exit": 1,
+  "tests_fast": {
+    "passed": 717,
+    "failed": 3,
+    "total": 720
+  },
+  "replay_exit": 1,
+  "replay": {
+    "scenarios": 12,
+    "exchanges": 1769,
+    "failed_fields": 7702,
+    "exact_method_owned_cases": 316,
+    "exact_method_owned_raw_passed": 98,
+    "exact_method_owned_raw_failed": 218,
+    "exact_method_owned_raw_pass_percent": 31.01,
+    "waivers_applied": 0
+  },
+  "improvement_scope_checks": {
+    "recorded_package_create_artifact_id_mismatch_present": true,
+    "formula_entry_matches_artifact_id_mismatch": false,
+    "integrity_entry_matches_artifact_id_mismatch": false
+  },
+  "external_conductor_last_supplied": {
+    "owned_cases": 316,
+    "adjusted_passed": 80,
+    "adjusted_pass_percent": 25.3,
+    "waived_cases": 9
+  },
+  "limitations": [
+    "The local replay is the unchanged semantic comparator on isolated ordinary hosts, not the external conductor's waiver engine.",
+    "The older wrapper board includes route-shape matches for other methods and is not the conductor acceptance score.",
+    "The two stale 501 assertions and the bare-runtime feature-composition test remain outside the permitted paths.",
+    "The mandatory HALT remains; 98% semantic acceptance has not been achieved."
+  ]
+}
