@@ -1,0 +1,652 @@
+{
+  "account_id": null,
+  "state": "GA",
+  "program_code": "GA_JTC",
+  "method": "pay_period",
+  "years": [
+    2024,
+    2025
+  ],
+  "declined_years": [
+    {
+      "tax_year": "2019",
+      "reason": "no GA payroll inside 2019-01-01..2019-12-31"
+    },
+    {
+      "tax_year": "2020",
+      "reason": "no GA payroll inside 2020-01-01..2020-12-31"
+    },
+    {
+      "tax_year": "2021",
+      "reason": "no GA payroll inside 2021-01-01..2021-12-31"
+    },
+    {
+      "tax_year": "2022",
+      "reason": "no GA payroll inside 2022-01-01..2022-12-31"
+    },
+    {
+      "tax_year": "2023",
+      "reason": "no GA payroll inside 2023-01-01..2023-12-31"
+    },
+    {
+      "tax_year": "2026",
+      "reason": "payroll reaches 0 of 12 monthly measuring dates in 2026-01-31..2026-12-31; a twelve-month average would be mostly zeroes"
+    }
+  ],
+  "units": [
+    {
+      "unit_id": "GA_ATL_HQ",
+      "worksite_id": "GA_ATL_HQ",
+      "name": "Atlanta HQ",
+      "feins": [
+        "58-1234567"
+      ],
+      "county": "Fulton",
+      "city": "Atlanta",
+      "census_tract": "",
+      "base_year": 2024,
+      "base_year_source": "inferred",
+      "base_average_headcount": 8.92,
+      "threshold": 2.0,
+      "threshold_source": "designation",
+      "rows": [
+        {
+          "tax_year": 2024,
+          "month_totals": [
+            9.0,
+            9.0,
+            9.0,
+            9.0,
+            9.0,
+            10.0,
+            9.0,
+            10.0,
+            11.0,
+            10.0,
+            10.0,
+            2.0
+          ],
+          "total": 107.0,
+          "average_headcount": 8.92,
+          "months_with_headcount": 12,
+          "feins": [
+            "58-1234567"
+          ],
+          "tier": 1,
+          "designation": "Tier 1 — Standard",
+          "tier_source": "prototype",
+          "net_new": 0.0,
+          "threshold": 2.0,
+          "qualified": false,
+          "backfilled": false,
+          "eligible_jobs": 0.0,
+          "new_jobs_created": 0.0,
+          "high_water_mark": 0.0,
+          "annual_credit_usd": 0,
+          "is_base_year": true,
+          "status": "base"
+        },
+        {
+          "tax_year": 2025,
+          "month_totals": [
+            15.0,
+            15.0,
+            17.0,
+            17.0,
+            16.0,
+            16.0,
+            16.0,
+            16.0,
+            16.0,
+            16.0,
+            16.0,
+            7.0
+          ],
+          "total": 183.0,
+          "average_headcount": 15.25,
+          "months_with_headcount": 12,
+          "feins": [
+            "58-1234567"
+          ],
+          "tier": 1,
+          "designation": "Tier 1 — Standard",
+          "tier_source": "prototype",
+          "net_new": 6.33,
+          "threshold": 2.0,
+          "qualified": true,
+          "backfilled": false,
+          "eligible_jobs": 6.33,
+          "new_jobs_created": 6.33,
+          "high_water_mark": 15.25,
+          "annual_credit_usd": 22155,
+          "is_base_year": false,
+          "status": "above_minimum"
+        }
+      ],
+      "credit_years": [
+        {
+          "tax_year": 2024,
+          "claimable_usd": 0,
+          "from_creation_years": [],
+          "projected": false
+        },
+        {
+          "tax_year": 2025,
+          "claimable_usd": 22155,
+          "from_creation_years": [
+            2025
+          ],
+          "projected": false
+        },
+        {
+          "tax_year": 2026,
+          "claimable_usd": 22155,
+          "from_creation_years": [
+            2025
+          ],
+          "projected": true
+        }
+      ],
+      "total_annual_credit_usd": 22155,
+      "total_tranche_lifetime_usd": 110775,
+      "final_high_water_mark": 15.25
+    },
+    {
+      "unit_id": "GA_CUM_OPS",
+      "worksite_id": "GA_CUM_OPS",
+      "name": "Cumberland Center",
+      "feins": [
+        "58-1234567"
+      ],
+      "county": "Cobb",
+      "city": "Cumberland",
+      "census_tract": "",
+      "base_year": 2024,
+      "base_year_source": "inferred",
+      "base_average_headcount": 10.42,
+      "threshold": 2.0,
+      "threshold_source": "designation",
+      "rows": [
+        {
+          "tax_year": 2024,
+          "month_totals": [
+            7.0,
+            9.0,
+            9.0,
+            10.0,
+            11.0,
+            11.0,
+            11.0,
+            13.0,
+            13.0,
+            13.0,
+            14.0,
+            4.0
+          ],
+          "total": 125.0,
+          "average_headcount": 10.42,
+          "months_with_headcount": 12,
+          "feins": [
+            "58-1234567"
+          ],
+          "tier": 1,
+          "designation": "Tier 1 — Standard",
+          "tier_source": "prototype",
+          "net_new": 0.0,
+          "threshold": 2.0,
+          "qualified": false,
+          "backfilled": false,
+          "eligible_jobs": 0.0,
+          "new_jobs_created": 0.0,
+          "high_water_mark": 0.0,
+          "annual_credit_usd": 0,
+          "is_base_year": true,
+          "status": "base"
+        },
+        {
+          "tax_year": 2025,
+          "month_totals": [
+            20.0,
+            21.0,
+            21.0,
+            20.0,
+            20.0,
+            20.0,
+            19.0,
+            19.0,
+            19.0,
+            19.0,
+            19.0,
+            2.0
+          ],
+          "total": 219.0,
+          "average_headcount": 18.25,
+          "months_with_headcount": 12,
+          "feins": [
+            "58-1234567"
+          ],
+          "tier": 1,
+          "designation": "Tier 1 — Standard",
+          "tier_source": "prototype",
+          "net_new": 7.83,
+          "threshold": 2.0,
+          "qualified": true,
+          "backfilled": false,
+          "eligible_jobs": 7.83,
+          "new_jobs_created": 7.83,
+          "high_water_mark": 18.25,
+          "annual_credit_usd": 27405,
+          "is_base_year": false,
+          "status": "above_minimum"
+        }
+      ],
+      "credit_years": [
+        {
+          "tax_year": 2024,
+          "claimable_usd": 0,
+          "from_creation_years": [],
+          "projected": false
+        },
+        {
+          "tax_year": 2025,
+          "claimable_usd": 27405,
+          "from_creation_years": [
+            2025
+          ],
+          "projected": false
+        },
+        {
+          "tax_year": 2026,
+          "claimable_usd": 27405,
+          "from_creation_years": [
+            2025
+          ],
+          "projected": true
+        }
+      ],
+      "total_annual_credit_usd": 27405,
+      "total_tranche_lifetime_usd": 137025,
+      "final_high_water_mark": 18.25
+    },
+    {
+      "unit_id": "GA_MAC_OPS",
+      "worksite_id": "GA_MAC_OPS",
+      "name": "Macon Operations",
+      "feins": [
+        "58-1234567"
+      ],
+      "county": "Bibb",
+      "city": "Macon",
+      "census_tract": "",
+      "base_year": 2024,
+      "base_year_source": "inferred",
+      "base_average_headcount": 9.58,
+      "threshold": 2.0,
+      "threshold_source": "designation",
+      "rows": [
+        {
+          "tax_year": 2024,
+          "month_totals": [
+            10.0,
+            10.0,
+            10.0,
+            10.0,
+            10.0,
+            10.0,
+            10.0,
+            10.0,
+            11.0,
+            11.0,
+            11.0,
+            2.0
+          ],
+          "total": 115.0,
+          "average_headcount": 9.58,
+          "months_with_headcount": 12,
+          "feins": [
+            "58-1234567"
+          ],
+          "tier": 2,
+          "designation": "Tier 2 — Less Developed Census Tract",
+          "tier_source": "prototype",
+          "net_new": 0.0,
+          "threshold": 2.0,
+          "qualified": false,
+          "backfilled": false,
+          "eligible_jobs": 0.0,
+          "new_jobs_created": 0.0,
+          "high_water_mark": 0.0,
+          "annual_credit_usd": 0,
+          "is_base_year": true,
+          "status": "base"
+        },
+        {
+          "tax_year": 2025,
+          "month_totals": [
+            15.0,
+            14.0,
+            15.0,
+            15.0,
+            15.0,
+            15.0,
+            15.0,
+            15.0,
+            15.0,
+            17.0,
+            17.0,
+            1.0
+          ],
+          "total": 169.0,
+          "average_headcount": 14.08,
+          "months_with_headcount": 12,
+          "feins": [
+            "58-1234567"
+          ],
+          "tier": 1,
+          "designation": "Tier 1 — Standard",
+          "tier_source": "prototype",
+          "net_new": 4.5,
+          "threshold": 2.0,
+          "qualified": true,
+          "backfilled": false,
+          "eligible_jobs": 4.5,
+          "new_jobs_created": 4.5,
+          "high_water_mark": 14.08,
+          "annual_credit_usd": 15750,
+          "is_base_year": false,
+          "status": "above_minimum"
+        }
+      ],
+      "credit_years": [
+        {
+          "tax_year": 2024,
+          "claimable_usd": 0,
+          "from_creation_years": [],
+          "projected": false
+        },
+        {
+          "tax_year": 2025,
+          "claimable_usd": 15750,
+          "from_creation_years": [
+            2025
+          ],
+          "projected": false
+        },
+        {
+          "tax_year": 2026,
+          "claimable_usd": 15750,
+          "from_creation_years": [
+            2025
+          ],
+          "projected": true
+        }
+      ],
+      "total_annual_credit_usd": 15750,
+      "total_tranche_lifetime_usd": 78750,
+      "final_high_water_mark": 14.08
+    },
+    {
+      "unit_id": "GA_SAV_DC",
+      "worksite_id": "GA_SAV_DC",
+      "name": "Savannah Distribution Center",
+      "feins": [
+        "58-2233445"
+      ],
+      "county": "Chatham",
+      "city": "Savannah",
+      "census_tract": "",
+      "base_year": 2024,
+      "base_year_source": "inferred",
+      "base_average_headcount": 11.08,
+      "threshold": 2.0,
+      "threshold_source": "designation",
+      "rows": [
+        {
+          "tax_year": 2024,
+          "month_totals": [
+            12.0,
+            12.0,
+            12.0,
+            12.0,
+            12.0,
+            12.0,
+            12.0,
+            12.0,
+            12.0,
+            12.0,
+            12.0,
+            1.0
+          ],
+          "total": 133.0,
+          "average_headcount": 11.08,
+          "months_with_headcount": 12,
+          "feins": [
+            "58-2233445"
+          ],
+          "tier": 1,
+          "designation": "Tier 1 — Standard",
+          "tier_source": "prototype",
+          "net_new": 0.0,
+          "threshold": 2.0,
+          "qualified": false,
+          "backfilled": false,
+          "eligible_jobs": 0.0,
+          "new_jobs_created": 0.0,
+          "high_water_mark": 0.0,
+          "annual_credit_usd": 0,
+          "is_base_year": true,
+          "status": "base"
+        },
+        {
+          "tax_year": 2025,
+          "month_totals": [
+            12.0,
+            14.0,
+            15.0,
+            15.0,
+            15.0,
+            15.0,
+            15.0,
+            15.0,
+            15.0,
+            15.0,
+            14.0,
+            1.0
+          ],
+          "total": 161.0,
+          "average_headcount": 13.42,
+          "months_with_headcount": 12,
+          "feins": [
+            "58-2233445"
+          ],
+          "tier": 1,
+          "designation": "Tier 1 — Standard",
+          "tier_source": "prototype",
+          "net_new": 2.34,
+          "threshold": 2.0,
+          "qualified": true,
+          "backfilled": false,
+          "eligible_jobs": 2.34,
+          "new_jobs_created": 2.34,
+          "high_water_mark": 13.42,
+          "annual_credit_usd": 8190,
+          "is_base_year": false,
+          "status": "above_minimum"
+        }
+      ],
+      "credit_years": [
+        {
+          "tax_year": 2024,
+          "claimable_usd": 0,
+          "from_creation_years": [],
+          "projected": false
+        },
+        {
+          "tax_year": 2025,
+          "claimable_usd": 8190,
+          "from_creation_years": [
+            2025
+          ],
+          "projected": false
+        },
+        {
+          "tax_year": 2026,
+          "claimable_usd": 8190,
+          "from_creation_years": [
+            2025
+          ],
+          "projected": true
+        }
+      ],
+      "total_annual_credit_usd": 8190,
+      "total_tranche_lifetime_usd": 40950,
+      "final_high_water_mark": 13.42
+    }
+  ],
+  "year_meta": [
+    {
+      "tax_year": 2024,
+      "fiscal": {
+        "begin": "2024-01-01",
+        "end": "2024-12-31",
+        "tax_year": 2024,
+        "label_convention": "begins",
+        "basis": "assumed_calendar",
+        "assumed": true,
+        "is_calendar": true,
+        "convention_matters": false,
+        "tax_year_if_labelled_by_end": 2024,
+        "tax_year_if_labelled_by_begin": 2024,
+        "note": "No fiscal-year rule on file for this client, so a calendar year is assumed. Both labelling conventions agree for a calendar year, so the tax year is unambiguous — but the WINDOW may not match the client's actual accounting year."
+      },
+      "months": [
+        "2024-01-31",
+        "2024-02-29",
+        "2024-03-31",
+        "2024-04-30",
+        "2024-05-31",
+        "2024-06-30",
+        "2024-07-31",
+        "2024-08-31",
+        "2024-09-30",
+        "2024-10-31",
+        "2024-11-30",
+        "2024-12-31"
+      ],
+      "unreachable_months": [
+        11
+      ],
+      "months_reachable": 11,
+      "thresholds": {
+        "program_code": "GA_JTC",
+        "tax_year": 2024,
+        "minimum_average_weekly_hours": 35.0,
+        "minimum_average_weekly_wages_usd": 686.0,
+        "wage_table_year_basis": "source_tax_year",
+        "regulation": "110-9-1-.02(1)(a) and 110-9-1-.03(3)(b)1",
+        "source_tax_year": 2024,
+        "dol_report_year": 2023,
+        "lowest_wage_county": "Taliaferro",
+        "annualized_wage_usd": 35672.0,
+        "prototype_verify": false,
+        "source": "rules/ga_jtc/2024.json"
+      },
+      "eligible_employees": 49,
+      "annual_average": 40.0,
+      "benefit": {
+        "threshold": 2.0,
+        "per_job_usd": 3500.0,
+        "benefit_period_years": 5,
+        "year_resolved": true
+      }
+    },
+    {
+      "tax_year": 2025,
+      "fiscal": {
+        "begin": "2025-01-01",
+        "end": "2025-12-31",
+        "tax_year": 2025,
+        "label_convention": "begins",
+        "basis": "assumed_calendar",
+        "assumed": true,
+        "is_calendar": true,
+        "convention_matters": false,
+        "tax_year_if_labelled_by_end": 2025,
+        "tax_year_if_labelled_by_begin": 2025,
+        "note": "No fiscal-year rule on file for this client, so a calendar year is assumed. Both labelling conventions agree for a calendar year, so the tax year is unambiguous — but the WINDOW may not match the client's actual accounting year."
+      },
+      "months": [
+        "2025-01-31",
+        "2025-02-28",
+        "2025-03-31",
+        "2025-04-30",
+        "2025-05-31",
+        "2025-06-30",
+        "2025-07-31",
+        "2025-08-31",
+        "2025-09-30",
+        "2025-10-31",
+        "2025-11-30",
+        "2025-12-31"
+      ],
+      "unreachable_months": [
+        11
+      ],
+      "months_reachable": 11,
+      "thresholds": {
+        "program_code": "GA_JTC",
+        "tax_year": 2025,
+        "minimum_average_weekly_hours": 35.0,
+        "minimum_average_weekly_wages_usd": 680.0,
+        "wage_table_year_basis": "source_tax_year",
+        "regulation": "110-9-1-.02(1)(a) and 110-9-1-.03(3)(b)1",
+        "source_tax_year": 2025,
+        "dol_report_year": 2024,
+        "lowest_wage_county": "Taliaferro",
+        "annualized_wage_usd": 35360.0,
+        "prototype_verify": false,
+        "source": "rules/ga_jtc/2025.json"
+      },
+      "eligible_employees": 72,
+      "annual_average": 61.0,
+      "benefit": {
+        "threshold": 2.0,
+        "per_job_usd": 3500.0,
+        "benefit_period_years": 5,
+        "year_resolved": true
+      }
+    }
+  ],
+  "totals": {
+    "units": 4,
+    "annual_credit_usd": 73500,
+    "tranche_lifetime_usd": 367500
+  },
+  "disclosures": [
+    {
+      "code": "DISC-8",
+      "subject": "base year",
+      "text": "The frozen base year and its high-water-mark treatment are read from a verbal SME description and are not yet confirmed against the Georgia Job Tax Credit form."
+    },
+    {
+      "code": "DISC-10",
+      "subject": "tier",
+      "text": "Tier designations are prototype data covering four worksites. Units outside that registry are shown unassigned and fall back to the rule pack's minimum-new-jobs threshold."
+    },
+    {
+      "code": "TIER-FLAT",
+      "subject": "credit amount",
+      "text": "Claimable dollars use one statutory amount per qualifying job. Tier-varied amounts are not authored in any rule pack, so a Tier 2 location is priced at the Tier 1 rate."
+    },
+    {
+      "code": "NO-TRACT",
+      "subject": "census tract",
+      "text": "Census tract is not held anywhere in the system and is left blank."
+    },
+    {
+      "code": "NO-MEASURING-DATE",
+      "subject": "month coverage",
+      "text": "No pay period reaches the measuring date in TY2024 month 12, TY2025 month 12. Those months read zero as a fact about the pay calendar, not about headcount, and are marked rather than counted as a decline."
+    }
+  ]
+}
