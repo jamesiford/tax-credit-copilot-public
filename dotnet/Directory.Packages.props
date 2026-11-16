@@ -46,6 +46,14 @@
     <!-- BEGIN gateway: only this session edits between the markers -->
     <!-- END gateway -->
     <!-- BEGIN orchestrator: only this session edits between the markers -->
+    <!-- Microsoft Agent Framework (stable) and Azure Responses hosting (preview): MIT. -->
+    <PackageVersion Include="Microsoft.Agents.AI" Version="1.28.0" />
+    <PackageVersion Include="Microsoft.Agents.AI.Workflows" Version="1.28.0" />
+    <PackageVersion Include="Azure.AI.AgentServer.Responses" Version="1.0.0-beta.9" />
+    <PackageVersion Include="Microsoft.Extensions.AI.OpenAI" Version="10.11.0" />
+    <!-- Reuse the shared declarations; the actual framework requires this serviced floor. -->
+    <PackageVersion Update="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.13" />
+    <PackageVersion Update="Microsoft.Extensions.DependencyInjection" Version="10.0.13" />
     <!-- END orchestrator -->
   </ItemGroup>
   <!-- Persistence gate repair: configure the approved oracle only when the runner has not supplied one. -->
