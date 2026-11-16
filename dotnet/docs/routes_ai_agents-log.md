@@ -118,3 +118,42 @@
   directory report the same 36 exchanges, 192 differences, six tolerated and
   5/23 AI cases passing (21.74%). The existing sibling integration blocker and
   unclaimed replay gate are unchanged. The temporary host was stopped.
+
+## Conductor follow-up: excessive improvements coverage
+
+- Read the conductor's full raw/adjusted boards rather than inferring success
+  from the local single-scenario wrapper. The conductor completed 1,769
+  exchanges and reported AI 24/27 after coverage (88.9%), with 16/27 cases
+  waiver-dependent (59.3%); both thresholds fail.
+- Traced each owned-register match. The summary privacy entry incorrectly
+  matched missing portfolio/unit/employee services; the chat demo entry also
+  matched unrelated history/header differences. This coverage was not proof
+  of implemented behavior and is removed.
+- Retained only the offline-demo and repaired-client-summary defect entries,
+  constrained by route, case family, event category and event path. Verified
+  against every conductor failure that these scopes can match only the three
+  intended case/event families, never other page scopes, capability results,
+  validation or headers.
+- Removed inactive/general privacy/explanation/error waivers and withdrew
+  incidental header/validation waivers pending a concrete policy decision.
+  Production behavior remains unchanged; removed coverage exposes failures,
+  rather than manufacturing a passing percentage.
+- Added DEC-AI-1/2/3 under finish-status `needs_human`: resolve the explicit
+  framework-artifact prohibition versus the case-waiver cap; confirm the
+  designed offline/read contracts; integrate the missing canonical sibling
+  projections. No decision is assumed and no replay gate is claimed.
+- Re-ran whole-solution build (zero warnings/errors), formatting and all
+  1,025 non-heavy tests successfully. No source behavior changed in this
+  follow-up.
+- Ran every unchanged scenario through a fresh ordinary host: twelve
+  scenarios, 1,769 exchanges, 9,472 raw field differences, six tolerated.
+  The owned AI scenario still has 192 differences. Exact four-route
+  method/path selection yields 8/27 raw AI cases passing; the existing
+  wrapper includes four other method/slash cases and reports 11/31.
+- Against these fresh diagnostics, the retained register scopes can touch
+  only three AI cases (at most 11.1% of the conductor denominator). Their
+  header differences remain failures; this upper bound is not an adjusted
+  acceptance claim. All missing service results remain unwaived.
+- Diagnostics are under `dotnet\artifacts\ai-waiver-review`. The temporary
+  host was stopped. The report and finish status preserve the unresolved
+  policy/integration decisions rather than suggesting replay is green.

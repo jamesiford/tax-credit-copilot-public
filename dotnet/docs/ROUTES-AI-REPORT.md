@@ -292,3 +292,83 @@ also passes under its newer SDK 11.0.100 analyzer without changing the pinned
 10.0.404 SDK configuration or net10.0 target. Fresh complete diagnostics in
 `dotnet\artifacts\ai-ca2026-replay` reproduce the existing 5/23 raw AI replay
 result; the missing production bindings and replay acceptance remain unresolved.
+
+### Conductor follow-up: waiver coverage is not implementation
+
+The conductor's **full** 1,769-exchange replay reported 24/27 AI cases passing
+after improvements (88.9%), including 16/27 waiver-dependent cases (59.3%).
+Both the 95% acceptance threshold and the 25% waiver cap failed. That result
+is different from the earlier **raw, single-scenario** 5/23 score; neither is
+a passing result.
+
+The register was overbroad. In particular, entry 3's privacy rationale matched
+every summary failure, including missing portfolio/unit/employee services.
+A privacy improvement does **not** make an absent application service work.
+Entry 1 also covered unrelated history validation and headers; entry 2 matched
+the header-only missing-client refusal. These blanket scopes are removed.
+
+The retained two entries are constrained simultaneously by route, case-name
+family, `event` category and `events` path. Against the conductor's evidence,
+they can match only `chat.ask`, `chat.ask-client` and `summary.client` event
+differences. They cannot cover headers, validation, capability facts/statuses,
+or other summary pages. They do not prove a case has no remaining failures.
+An assertion over all conductor failures verifies that scope boundary.
+
+Prior entries 3-5 are withdrawn from replay matching: person-only model
+filtering, scoped explanation and safe exception text remain implementation
+properties, not blanket exceptions for missing dependencies. Entries 6-11
+(incidental headers and validation metadata/text) are also withdrawn pending
+the explicit `needs_human` policy decision below. Exposing these differences
+as failures is intentional; it does not change production behavior or make
+the actual replay result better.
+
+| Decision recorded in finish status | Evidence and proposed disposition |
+|---|---|
+| `DEC-AI-1`: policy versus cap | Eight wording/validation cases plus two header-only refusals already exceed the six cases allowed by a 27-case denominator. The task says not to reproduce these artifacts. Preserve semantic behavior; the policy owner must resolve the conflicting acceptance/accounting requirements. |
+| `DEC-AI-2`: designed offline/read contract | The recording has a fixed 117-frame offline demo for two chat cases and a SQL binding error for the client summary. Do not reinstate either defect solely for replay; confirm the intended contract explicitly. |
+| `DEC-AI-3`: canonical sibling bindings | The uncovered capability cases are `capabilities.book-rank`, `capabilities.client-eligibility` and `agent.capabilities-book-rank`. Bind their canonical ReadsCalc projections; likewise bind portfolio/unit/employee pages. Missing services must stay unwaived failures until integrated. |
+
+The eight incidental error cases are `capabilities.book-rank-bad-arg`,
+`capabilities.args-not-object`, `capabilities.idempotency-key-too-long`,
+`chat.history`, `chat.bad-history`, `summary.bad-page`, `summary.short-token`
+and `summary.bad-month`. The two header-only cases are `chat.empty-message`
+and `summary.client-without-client`. They preserve their validation/refusal
+status and error shape family. This is a concrete decision request, not
+permission assumed from a broad register entry.
+
+Those ten incidental cases alone make the current requirements incompatible:
+the cap permits six waived cases, leaving at least four failing even if every
+other feature case were implemented. That ceiling is 23/27 (85.2%), below
+95%. This is why `DEC-AI-1` needs an explicit policy decision rather than
+another reproduction patch or a larger self-approved register.
+
+No compatibility code, canned result, second portfolio ranking, changed
+calculated value, authorization change, relaxed threshold or replay-comparator
+edit was introduced. Canonical sibling projections still must come from their
+owners; copying their algorithms here would create the competing source of
+truth the task explicitly excludes.
+
+Verification after narrowing the register:
+
+- Whole-solution warning-as-error build and formatting pass; all 1,025
+  non-heavy tests pass again, with no failures or skips.
+- Replayed **all twelve scenarios and all 1,769 exchanges** through a fresh
+  ordinary hermetic host. Raw aggregate diagnostics contain 9,472 field
+  differences and six tolerated differences. The AI scenario itself remains
+  at 192 differences; unrelated-group failures are not repaired in this slice.
+- Exact four-operation method/path selection yields **8/27 raw AI cases
+  passing**. The unchanged local board's looser route classifier includes four
+  additional method/trailing-slash cases and reports 11/31; it is not the
+  conductor's 27-case grouping, and is not presented as an adjusted gate.
+- Checked every retained entry against the fresh failures. At most **three
+  of the conductor's 27 AI cases (11.1%)** contain matches, below the cap.
+  This is a conservative match-scope upper bound, **not** a claim that those
+  whole cases pass: their header differences remain unwaived. No missing
+  capability or portfolio/unit/employee-page dependency can match an entry.
+
+The fresh raw reports are in
+`dotnet\artifacts\ai-waiver-review\diagnostics`, with the unchanged wrapper's
+board in `dotnet\artifacts\ai-waiver-review\board.json`. No scenarios were
+omitted or modified. The host was stopped. Full AI replay acceptance remains
+blocked by the three explicit decisions and missing sibling services;
+`gates_claimed` still intentionally omits `replay`.
