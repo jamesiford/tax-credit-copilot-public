@@ -372,3 +372,34 @@ board in `dotnet\artifacts\ai-waiver-review\board.json`. No scenarios were
 omitted or modified. The host was stopped. Full AI replay acceptance remains
 blocked by the three explicit decisions and missing sibling services;
 `gates_claimed` still intentionally omits `replay`.
+
+## Latest conductor follow-up: required hard stop
+
+The new conductor result is **13/27 AI cases passing (48.1%)**, with
+**5/27 waiver-dependent cases (18.5%)**. Its aggregate is 1,769 exchanges,
+8,868 failing fields and 737 covered fields. This supersedes the older
+adjusted board, not the underlying implementation or its missing bindings.
+The five waiver-dependent cases also include the W1 `sources_auth_ai`
+register; this feature's two narrow entries alone do not account for all five.
+
+Inspected the current failures and confirmed that the branch still has only
+Ai, Framework and WorkspaceSealed application feature folders. The required
+ReadsCalc/ClaimsDrafts implementations have not appeared. No new owned defect
+was found that could resolve replay within the assignment's constraints.
+Neither product code nor improvements coverage was changed on this follow-up.
+
+Re-ran the warning-as-error build, format verification and all 1,025 fast
+tests successfully. Re-ran all twelve unchanged semantic scenarios through a
+fresh, health-checked ordinary host with CPython 3.12.13: 1,769 exchanges,
+9,472 raw differences, six tolerated, and 8/27 raw passing exact AI cases.
+The existing wrapper still reports 11/31 because it additionally groups four
+method/slash cases and applies no improvements. These local raw results are
+not represented as a new conductor-adjusted percentage.
+
+Fresh diagnostics are under `dotnet\artifacts\ai-hard-stop-replay`; the host
+was stopped. `HALT-routes_ai_agents.md` now records hard stop 1: supplying
+the missing sibling implementations requires unowned changes, while copying
+their calculations or changing fixed replay policy is forbidden. `no_halt`
+and `replay` are therefore not claimed. The HALT document names the exact
+integration and policy decisions required to resume; further identical
+replay/register-only cycles are not implementation progress.

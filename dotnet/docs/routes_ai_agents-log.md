@@ -157,3 +157,32 @@
 - Diagnostics are under `dotnet\artifacts\ai-waiver-review`. The temporary
   host was stopped. The report and finish status preserve the unresolved
   policy/integration decisions rather than suggesting replay is green.
+
+## Conductor follow-up: 48.1% AI replay and mandatory stop
+
+- Read the task again in full and inspected the latest raw/adjusted conductor
+  evidence: 13/27 AI passing (48.1%), 5/27 waiver-dependent (18.5%),
+  1,769 exchanges, 8,868 failing fields and 737 covered fields.
+- Confirmed no new canonical sibling implementation is available: the
+  Application feature folders remain Ai, Framework and WorkspaceSealed.
+  The current owned failures remain missing capability/page services,
+  prohibited framework artifacts, or the already documented Python defects.
+- The conductor's five waiver-dependent AI cases include W1 register matches.
+  The feature's two retained event-only entries were not widened, and no
+  other session's register was modified.
+- Re-ran `dotnet build -warnaserror`, `dotnet format --verify-no-changes`
+  and `dotnet test --filter 'Category!=heavy'`: all pass, zero build
+  warnings/errors, 1,025 tests passed, no failures or skips.
+- Verified CPython 3.12.13 and replayed all twelve unchanged scenarios through
+  a fresh ordinary host after its health endpoint returned 200. Result:
+  1,769 exchanges, 9,472 raw differences, six tolerated; exact four-operation
+  AI selection 8/27 passing. The unchanged wrapper reports 11/31 because of
+  its four additional method/slash cases, without improvements adjustment.
+  The owned scenario remains 36 exchanges and 192 differences.
+- Diagnostics are ignored under `dotnet\artifacts\ai-hard-stop-replay`.
+  The owned host was stopped. No live external system was contacted.
+- Recorded `HALT-routes_ai_agents.md` under hard stop 1: implementing absent
+  sibling services needs unowned changes; copying their algorithms or changing
+  fixed acceptance policy is not an authorized alternative. This deliberately
+  withdraws `no_halt` as well as leaving `replay` unclaimed. Product code,
+  calculated figures, comparators, scenarios and register coverage are unchanged.
