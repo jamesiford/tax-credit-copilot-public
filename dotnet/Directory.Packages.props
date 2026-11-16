@@ -35,6 +35,14 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- END sources_auth_ai -->
+    <!-- BEGIN routes_reads: only this session edits between the markers -->
+    <!-- END routes_reads -->
+    <!-- BEGIN routes_claims: only this session edits between the markers -->
+    <!-- END routes_claims -->
+    <!-- BEGIN routes_drafts_runs: only this session edits between the markers -->
+    <!-- END routes_drafts_runs -->
+    <!-- BEGIN routes_ai_agents: only this session edits between the markers -->
+    <!-- END routes_ai_agents -->
   </ItemGroup>
   <!-- Persistence gate repair: configure the approved oracle only when the runner has not supplied one. -->
   <PropertyGroup Condition="'$(MSBuildProjectName)' == 'TaxCredit.Parity.Tests' and '$(TCC_PYTHON)' == '' and '$(RunSettingsFilePath)' == ''">

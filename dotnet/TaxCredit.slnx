@@ -10,6 +10,7 @@
     <Project Path="src/TaxCredit.Infrastructure.Sources/TaxCredit.Infrastructure.Sources.csproj" />
     <Project Path="src/TaxCredit.Infrastructure.Auth/TaxCredit.Infrastructure.Auth.csproj" />
     <Project Path="src/TaxCredit.Infrastructure.Ai/TaxCredit.Infrastructure.Ai.csproj" />
+    <Project Path="src/TaxCredit.Worker/TaxCredit.Worker.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/TaxCredit.Domain.Tests/TaxCredit.Domain.Tests.csproj" />
