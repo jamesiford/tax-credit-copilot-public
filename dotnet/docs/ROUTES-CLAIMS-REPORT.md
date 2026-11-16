@@ -7,6 +7,13 @@ discovery graph, but that is not a claim of full semantic equivalence.
 
 ## Second conductor retry
 
+**Latest conductor update:** 78/316 adjusted (24.7%), seven waived, and the
+same three shared-framework failures. The next rejected waiver is
+`IMP-sources_auth_ai-2`, not this feature's already narrowed entries. A third
+read-only retry confirmed the shared 501 assertions and unchanged ownership
+rules. No new product change or full gate run is claimed for that retry.
+Hard stops 1 and 3 remain in effect; see the third-retry section in HALT.
+
 Commit `3054859` corrects an overly broad improvement declaration, not product
 values. `IMP-routes_claims-4` now applies only to the downloaded Provenance-sheet
 XML member. `IMP-routes_claims-6` applies only to status. Both were checked

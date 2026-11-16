@@ -1,8 +1,8 @@
 {
   "session": "routes_claims",
   "branch": "dotnet/w2-routes_claims",
-  "head": "3054859",
-  "summary": "BLOCKED at hard stop 1; ownership restrictions and three shared framework failures remain unchanged.\nFixed rejected improvement scope: formula safety covers only Provenance XML; integrity covers status only.\nNeither safety entry matches the actual package.create artifact-ID mismatch; IDs and figures remain failures.\nBuild and format rerun successfully; all fast tests rerun: 717 passed, 3 failed, 720 total.\nAll twelve full scenarios rerun: 1769 exchanges; exact-method owned raw score 98/316 (31.01%), no waivers.\nThe supplied external conductor score was 80/316 adjusted (25.3%); neither score meets 98%.\nEarlier 397-case wrapper totals include other methods by route shape and are not the conductor denominator.\nThe reset lifecycle fix and 12 passing feature tests from the prior repair remain unchanged.\nNo forbidden edits, live services, pushes or remote changes; mandatory HALT retained.\nThe head field identifies the register repair commit; status and reports are committed afterward.",
+  "head": "cffc895",
+  "summary": "BLOCKED: fixed owned-path restriction still prevents repairing the three shared framework failures.\nLatest supplied conductor replay: 78/316 adjusted passing cases (24.7%), seven waived; not accepted.\nThe newly rejected IMP-sources_auth_ai-2 belongs to the sources/auth/AI register, not this feature register.\nThe two shared tests were re-read and still require the implemented GET /api/rules to return 501.\nNo new product changes or redundant full gate runs were made in this retry; prior build/format passed.\nPrior local fast suite remains 717/720; all twelve raw replay reports and 12 passing feature tests retained.\nArtifact-ID and calculated-value mismatches remain failures, not waived or patched with extra ID draws.\nTask hard stops 1 and 3 require ending this repeated blocked attempt and retaining HALT.\nNo forbidden edits, live calls, remote changes or pushes; status/report-only update committed locally.\nThe head field identifies the preceding evidence commit; this status is committed afterward.",
   "stages": {
     "preflight": "done",
     "stage-1-packages": "done",
@@ -60,7 +60,9 @@
     "The heavy P2 test previously set HttpClient.Timeout after its first request. Moving timeout configuration before requests and asserting reset success makes the complete test pass.",
     "The claim-history test took 68 seconds under full-suite contention and is now heavy under the task policy; its conflict/history/isolation assertions are unchanged.",
     "The formula-safety register entry was overly broad. It is now confined to the downloaded Provenance XML member and cannot cover package metadata artifact IDs; the integrity entry is confined to status.",
-    "The legacy replay wrapper groups by route shape as well as method, producing 397 owned cases instead of the conductor's 316. Exact-method local raw replay is 98/316; the external conductor last reported 80/316 adjusted. Neither passes."
+    "The legacy replay wrapper groups by route shape as well as method, producing 397 owned cases instead of the conductor's 316. Exact-method local raw replay is 98/316; the external conductor now reports 78/316 adjusted. Neither passes.",
+    "The latest rejected waiver is IMP-sources_auth_ai-2 in dotnet/docs/improvements/sources_auth_ai.json. It broadly describes atomic byte publication and cannot legitimately waive a package artifact-ID mismatch. That register was inspected but not changed as a substitute for repairing the real mismatch.",
+    "Repeated gate retries have not resolved the shared-test ownership contradiction. Task hard stop 3 now independently requires stopping after three unsuccessful attempts on the same blocker; no additional redundant full gate run is claimed."
   ],
   "open_questions": [
     "Which still-deferred operation should the two shared framework stub-replacement tests use after the rules route is implemented?",
@@ -75,7 +77,11 @@
     },
     {
       "item": "Resume outstanding semantic route work and replay to at least 98%.",
-      "why": "The latest exact-method local raw replay is 98/316 (31.01%); the supplied external conductor result was 80/316 adjusted (25.3%). There are real degraded-behavior and validation gaps as well as sibling and incidental differences; none is waived as accepted."
+      "why": "The latest exact-method local raw replay is 98/316 (31.01%); the latest supplied external conductor result is 78/316 adjusted (24.7%). There are real degraded-behavior and validation gaps as well as sibling and incidental differences; none is waived as accepted."
+    },
+    {
+      "item": "Narrow the cross-feature IMP-sources_auth_ai-2 waiver to its actual atomic-publication behavior.",
+      "why": "The conductor now rejects this other feature's broad entry for matching artifact_id. Fixing the register does not repair deterministic ID differences or make semantic acceptance pass."
     },
     {
       "item": "Provision native tcc_ops.finding_audit through the operator path.",

@@ -70,3 +70,23 @@ restriction or its explicit requirement to halt when a shared-file change is
 needed. The two tests still assert 501 for an operation this task requires to
 return a real result. No safe feature-local change can satisfy both. Keeping
 HALT and false gate claims is required, not an accepted completion.
+
+## Third conductor retry: repeated blocker
+
+The shared tests were re-read and still assert 501 for `/api/rules`. The
+task's owned-path restriction and mandatory stop rule were re-read in full;
+neither authorizes editing those tests. No feature behavior can both implement
+this assigned operation and leave it deferred for the same ordinary host.
+
+The latest supplied conductor result is 78/316 adjusted (24.7%), seven waived,
+with the same three fast-test failures. Its newly rejected entry is
+`IMP-sources_auth_ai-2`, in `dotnet/docs/improvements/sources_auth_ai.json`,
+not this feature's narrowed register. It describes atomic byte publication
+but broadly matches artifact IDs. The entry was inspected, not used to waive
+an ID discrepancy or changed to manufacture acceptance.
+
+No product changes or additional full gate runs were made on this retry.
+Existing local evidence remains attached and is not represented as a new run.
+In addition to hard stop 1, hard stop 3 now requires ending repeated attempts
+on this unchanged blocker. The conductor must explicitly allocate the shared
+test/composition repair before another feature retry can resolve those gates.

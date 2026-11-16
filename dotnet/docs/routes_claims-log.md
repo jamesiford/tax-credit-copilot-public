@@ -171,3 +171,18 @@
   removing tests or treating a request to retry as unrestricted ownership.
 - Removed only the inspected retry2 runner's temporary synthetic state subtree
   after all its owned hosts exited. No shared process or worktree was changed.
+
+## Third conductor retry: stop repeated unchanged failures
+
+- Read the task file in full again and re-read both shared 501 assertions.
+  Ownership and hard stops are unchanged; no shared test edit is authorized.
+- Inspected the newly rejected `IMP-sources_auth_ai-2`: it is a broad entry
+  about atomic byte publication in the other feature's register. It cannot
+  legitimately cover an artifact-ID mismatch. No waiver or ID workaround was
+  added, and that register was not changed to conceal the discrepancy.
+- Recorded the latest supplied conductor result: 78/316 adjusted (24.7%),
+  seven waived, and the same three framework failures. The earlier local
+  results remain historical evidence, not freshly claimed runs.
+- No product changes or redundant full-suite/replay runs on this retry.
+  Hard stop 3 now independently ends repeated attempts on the unchanged
+  ownership blocker. Updated finish JSON and reports only, retaining HALT.
