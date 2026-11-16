@@ -56,7 +56,7 @@ public sealed record ApiPrincipal(
 }
 
 /// <summary>The host maps safe details into the API's JSON detail family, not ProblemDetails.</summary>
-public class ApiAuthException(int statusCode, string code, string detail) : Exception(detail)
+public abstract class ApiAuthException(int statusCode, string code, string detail) : Exception(detail)
 {
     /// <summary>HTTP status is retained without depending on a web framework.</summary>
     public int StatusCode { get; } = statusCode;
@@ -65,6 +65,9 @@ public class ApiAuthException(int statusCode, string code, string detail) : Exce
     /// <summary>Only authentication failures require a bearer challenge.</summary>
     public string? Challenge => StatusCode == 401 ? "Bearer" : null;
 }
+
+/// <summary>Authentication and authorization refusals retain the host's status/code/detail contract separately from dependency failures.</summary>
+public sealed class AuthRefusalException(int statusCode, string code, string detail) : ApiAuthException(statusCode, code, detail);
 
 /// <summary>Infrastructure failure cannot become an anonymous successful request.</summary>
 public sealed class AuthDependencyException(string code) : ApiAuthException(401, code, "identity verification is unavailable");

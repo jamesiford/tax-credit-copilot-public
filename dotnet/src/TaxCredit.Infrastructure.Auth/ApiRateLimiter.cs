@@ -49,7 +49,7 @@ public sealed class ApiRateLimiter : IApiRateLimiter
         }
         if (string.IsNullOrWhiteSpace(principal.Oid))
         {
-            throw new ApiAuthException(401, "invalid_caller", "a signed-in caller must have an object id");
+            throw new AuthRefusalException(401, "invalid_caller", "a signed-in caller must have an object id");
         }
         var key = (kind, principal.Oid);
         lock (_gate)

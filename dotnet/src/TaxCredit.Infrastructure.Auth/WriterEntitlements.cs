@@ -99,12 +99,12 @@ public sealed class WriterPolicy(IWriterEntitlement entitlement, bool enforceFor
         {
             if (principal.ActingFor is null)
             {
-                throw new ApiAuthException(403, "missing_acting_user", "an agent write must name the user it acts for");
+                throw new AuthRefusalException(403, "missing_acting_user", "an agent write must name the user it acts for");
             }
 
             if (actor != principal.ActingFor.Actor)
             {
-                throw new ApiAuthException(403, "author_mismatch", "the command's author is not the user the agent acts for");
+                throw new AuthRefusalException(403, "author_mismatch", "the command's author is not the user the agent acts for");
             }
         }
         else if (!enforceForUsers)
@@ -115,7 +115,7 @@ public sealed class WriterPolicy(IWriterEntitlement entitlement, bool enforceFor
         if (principal.EffectiveOid is not { } oid ||
             !await entitlement.IsWriterAsync(oid, cancellationToken).ConfigureAwait(false))
         {
-            throw new ApiAuthException(403, "writer_forbidden", "this user is not entitled to make changes");
+            throw new AuthRefusalException(403, "writer_forbidden", "this user is not entitled to make changes");
         }
     }
 }

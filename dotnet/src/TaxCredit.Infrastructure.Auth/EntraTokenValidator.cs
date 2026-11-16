@@ -26,7 +26,7 @@ public sealed class EntraTokenValidator : IApiTokenValidator
     {
         if (string.IsNullOrWhiteSpace(token))
         {
-            throw new ApiAuthException(401, "no_bearer", "no bearer token");
+            throw new AuthRefusalException(401, "no_bearer", "no bearer token");
         }
 
         if (token.Length > 32_768)
@@ -149,5 +149,5 @@ public sealed class EntraTokenValidator : IApiTokenValidator
         }
     }
 
-    private static ApiAuthException Invalid(string code) => new(401, code, "invalid token");
+    private static AuthRefusalException Invalid(string code) => new(401, code, "invalid token");
 }

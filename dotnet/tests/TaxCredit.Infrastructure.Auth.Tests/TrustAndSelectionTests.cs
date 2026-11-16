@@ -42,10 +42,10 @@ public sealed class TrustAndSelectionTests
         using var world = new TokenWorld();
         var service = Service(world);
         var token = world.Mint(world.Claims(true));
-        var missing = await Assert.ThrowsAsync<ApiAuthException>(async () => await service.AuthenticateAsync("/api/claims/assess", $"Bearer {token}", null));
+        var missing = await Assert.ThrowsAsync<AuthRefusalException>(async () => await service.AuthenticateAsync("/api/claims/assess", $"Bearer {token}", null));
         Assert.Equal(400, missing.StatusCode);
         var principal = await service.AuthenticateAsync("/api/claims/assess", $"Bearer {token}", TokenWorld.Header());
-        var forbidden = await Assert.ThrowsAsync<ApiAuthException>(async () => await service.AuthorizeRequestAsync(principal, "POST", "/api/claims/assess", [1001]));
+        var forbidden = await Assert.ThrowsAsync<AuthRefusalException>(async () => await service.AuthorizeRequestAsync(principal, "POST", "/api/claims/assess", [1001]));
         Assert.Equal(403, forbidden.StatusCode);
         Assert.Equal("agent_forbidden", forbidden.Code);
     }
@@ -96,7 +96,7 @@ public sealed class TrustAndSelectionTests
     [InlineData("W10")]
     [InlineData("ew")]
     public void MalformedActingHeadersAre400(string? header) =>
-        Assert.Equal(400, Assert.Throws<ApiAuthException>(() => ActingUserParser.Parse(header, TokenWorld.Tenant)).StatusCode);
+        Assert.Equal(400, Assert.Throws<AuthRefusalException>(() => ActingUserParser.Parse(header, TokenWorld.Tenant)).StatusCode);
 
     [Theory]
     [InlineData("oid", "not-a-guid")]
@@ -107,17 +107,17 @@ public sealed class TrustAndSelectionTests
     public void InvalidActingFieldsAre400(string field, string value)
     {
         var body = new Dictionary<string, object?> { ["oid"] = TokenWorld.Writer, ["tid"] = TokenWorld.Tenant, [field] = value };
-        Assert.Equal(400, Assert.Throws<ApiAuthException>(() => ActingUserParser.Parse(TokenWorld.Header(body), TokenWorld.Tenant)).StatusCode);
+        Assert.Equal(400, Assert.Throws<AuthRefusalException>(() => ActingUserParser.Parse(TokenWorld.Header(body), TokenWorld.Tenant)).StatusCode);
     }
 
     [Fact]
     public void HeaderAndFieldBoundsAreEnforced()
     {
-        Assert.Throws<ApiAuthException>(() => ActingUserParser.Parse(new string('A', 2049), TokenWorld.Tenant));
+        Assert.Throws<AuthRefusalException>(() => ActingUserParser.Parse(new string('A', 2049), TokenWorld.Tenant));
         var body = new Dictionary<string, object?> { ["oid"] = TokenWorld.Writer, ["tid"] = TokenWorld.Tenant, ["name"] = new string('n', 257) };
-        Assert.Throws<ApiAuthException>(() => ActingUserParser.Parse(TokenWorld.Header(body), TokenWorld.Tenant));
+        Assert.Throws<AuthRefusalException>(() => ActingUserParser.Parse(TokenWorld.Header(body), TokenWorld.Tenant));
         body["name"] = new { name = "not-text" };
-        Assert.Throws<ApiAuthException>(() => ActingUserParser.Parse(TokenWorld.Header(body), TokenWorld.Tenant));
+        Assert.Throws<AuthRefusalException>(() => ActingUserParser.Parse(TokenWorld.Header(body), TokenWorld.Tenant));
         body["name"] = new string('n', 256);
         Assert.Equal(256, ActingUserParser.Parse(TokenWorld.Header(body), TokenWorld.Tenant).Name!.Length);
     }
@@ -169,10 +169,10 @@ public sealed class TrustAndSelectionTests
     public async Task UnknownBatchExistencePrecedesVisibilityAndVisibleIdsPrecedePaging()
     {
         var authorizer = new CountingAuthorizer();
-        var error = await Assert.ThrowsAsync<ApiAuthException>(async () => await ClientVisibility.VisibleBatchClientsAsync(null, ApiPrincipal.Anonymous, authorizer));
+        var error = await Assert.ThrowsAsync<AuthRefusalException>(async () => await ClientVisibility.VisibleBatchClientsAsync(null, ApiPrincipal.Anonymous, authorizer));
         Assert.Equal(404, error.StatusCode); Assert.Equal(0, authorizer.Calls);
         Assert.Equal(new long[] { 1, 3 }, await ClientVisibility.VisibleBatchClientsAsync([1, 2, 3], ApiPrincipal.Anonymous, authorizer));
-        Assert.Equal(404, (await Assert.ThrowsAsync<ApiAuthException>(async () => await ClientVisibility.VisibleBatchClientsAsync([2], ApiPrincipal.Anonymous, authorizer))).StatusCode);
+        Assert.Equal(404, (await Assert.ThrowsAsync<AuthRefusalException>(async () => await ClientVisibility.VisibleBatchClientsAsync([2], ApiPrincipal.Anonymous, authorizer))).StatusCode);
     }
 
     [Fact]
@@ -183,7 +183,7 @@ public sealed class TrustAndSelectionTests
         var service = new ApiTrustService(world.Configuration, world.Validator, authorizer, new AuthEvents());
         await service.AuthorizeRequestAsync(ApiPrincipal.Anonymous, "GET", "/api/clients/2/artifacts/absent", [2]);
         Assert.Equal(0, authorizer.Calls);
-        var error = await Assert.ThrowsAsync<ApiAuthException>(async () => await service.AuthorizeRequestAsync(ApiPrincipal.Anonymous, "GET", "/api/claims/coverage/2", [2]));
+        var error = await Assert.ThrowsAsync<AuthRefusalException>(async () => await service.AuthorizeRequestAsync(ApiPrincipal.Anonymous, "GET", "/api/claims/coverage/2", [2]));
         Assert.Equal(403, error.StatusCode);
     }
 

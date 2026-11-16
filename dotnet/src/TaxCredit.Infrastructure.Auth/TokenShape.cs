@@ -13,7 +13,7 @@ public static class TokenShape
         var tid = Text(claims, "tid");
         if (oid is null || !Guid.TryParse(tid, out var tenant) || tenant != Guid.Parse(tenantId))
         {
-            throw new ApiAuthException(401, "invalid_claims", "invalid token identity or tenant");
+            throw new AuthRefusalException(401, "invalid_claims", "invalid token identity or tenant");
         }
 
         var upn = Text(claims, "preferred_username") ?? Text(claims, "upn");
@@ -69,7 +69,7 @@ public static class TokenShape
 
         if (value.ValueKind != JsonValueKind.String)
         {
-            throw new ApiAuthException(401, "invalid_claims", "invalid token claim type");
+            throw new AuthRefusalException(401, "invalid_claims", "invalid token claim type");
         }
 
         return string.IsNullOrEmpty(value.GetString()) ? null : value.GetString();
@@ -89,11 +89,11 @@ public static class TokenShape
 
         if (value.ValueKind != JsonValueKind.Array || value.EnumerateArray().Any(v => v.ValueKind != JsonValueKind.String))
         {
-            throw new ApiAuthException(401, "invalid_claims", "invalid token role type");
+            throw new AuthRefusalException(401, "invalid_claims", "invalid token role type");
         }
 
         return value.EnumerateArray().Select(v => v.GetString()!).ToArray();
     }
 
-    private static void Deny(string message) => throw new ApiAuthException(403, "token_shape", message);
+    private static void Deny(string message) => throw new AuthRefusalException(403, "token_shape", message);
 }

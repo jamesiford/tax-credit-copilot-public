@@ -125,7 +125,7 @@ public static class ClientVisibility
     {
         if (existingClients is null)
         {
-            throw new ApiAuthException(404, "unknown_batch", "batch not found");
+            throw new AuthRefusalException(404, "unknown_batch", "batch not found");
         }
 
         var visible = new List<long>();
@@ -139,7 +139,7 @@ public static class ClientVisibility
 
         if (visible.Count == 0)
         {
-            throw new ApiAuthException(404, "unknown_batch", "batch not found");
+            throw new AuthRefusalException(404, "unknown_batch", "batch not found");
         }
 
         return visible;

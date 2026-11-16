@@ -16,7 +16,7 @@ public sealed class JwksAndGroupWireTests
         first.Modulus![0] ^= 1;
         Assert.NotEqual(first.Modulus, (await keys.GetKeyAsync("test-key")).Modulus);
         Assert.Equal(1, transport.Calls);
-        Assert.Equal("unknown_key", (await Assert.ThrowsAsync<ApiAuthException>(async () => await keys.GetKeyAsync("rotated"))).Code);
+        Assert.Equal("unknown_key", (await Assert.ThrowsAsync<AuthRefusalException>(async () => await keys.GetKeyAsync("rotated"))).Code);
         Assert.Equal(1, transport.Calls);
         world.Clock.Seconds = 5;
         transport.Body = world.Jwks("rotated");

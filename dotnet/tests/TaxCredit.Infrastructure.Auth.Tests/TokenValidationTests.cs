@@ -31,7 +31,7 @@ public sealed class TokenValidationTests
     {
         using var world = new TokenWorld();
         var claims = world.Claims(); claims.Remove(field);
-        var error = await Assert.ThrowsAsync<ApiAuthException>(async () => await world.Validator.ValidateAsync(world.Mint(claims)));
+        var error = await Assert.ThrowsAsync<AuthRefusalException>(async () => await world.Validator.ValidateAsync(world.Mint(claims)));
         Assert.Equal(401, error.StatusCode);
         Assert.Equal("Bearer", error.Challenge);
     }
@@ -46,7 +46,7 @@ public sealed class TokenValidationTests
     {
         using var world = new TokenWorld();
         var claims = world.Claims(); claims[field] = value;
-        var error = await Assert.ThrowsAsync<ApiAuthException>(async () => await world.Validator.ValidateAsync(world.Mint(claims)));
+        var error = await Assert.ThrowsAsync<AuthRefusalException>(async () => await world.Validator.ValidateAsync(world.Mint(claims)));
         Assert.Equal(401, error.StatusCode);
     }
 
@@ -68,7 +68,7 @@ public sealed class TokenValidationTests
         }
         else
         {
-            Assert.Equal(401, (await Assert.ThrowsAsync<ApiAuthException>(async () => await world.Validator.ValidateAsync(world.Mint(claims)))).StatusCode);
+            Assert.Equal(401, (await Assert.ThrowsAsync<AuthRefusalException>(async () => await world.Validator.ValidateAsync(world.Mint(claims)))).StatusCode);
         }
     }
 
@@ -81,7 +81,7 @@ public sealed class TokenValidationTests
         using var world = new TokenWorld();
         var keys = new ThrowingKeys();
         var validator = new EntraTokenValidator(world.Configuration, keys, world.Clock);
-        Assert.Equal(401, (await Assert.ThrowsAsync<ApiAuthException>(async () => await validator.ValidateAsync(world.Mint(algorithm: algorithm)))).StatusCode);
+        Assert.Equal(401, (await Assert.ThrowsAsync<AuthRefusalException>(async () => await validator.ValidateAsync(world.Mint(algorithm: algorithm)))).StatusCode);
         Assert.Equal(0, keys.Calls);
     }
 
@@ -90,7 +90,7 @@ public sealed class TokenValidationTests
     {
         using var world = new TokenWorld();
         using var other = RSA.Create(2048);
-        var error = await Assert.ThrowsAsync<ApiAuthException>(async () => await world.Validator.ValidateAsync(world.Mint(key: other)));
+        var error = await Assert.ThrowsAsync<AuthRefusalException>(async () => await world.Validator.ValidateAsync(world.Mint(key: other)));
         Assert.Equal("signature", error.Code);
         Assert.DoesNotContain(TokenWorld.Reader, error.ToString(), StringComparison.Ordinal);
     }
@@ -104,7 +104,7 @@ public sealed class TokenValidationTests
     public async Task MalformedTokensAreNeverAnonymous(string? token)
     {
         using var world = new TokenWorld();
-        Assert.Equal(401, (await Assert.ThrowsAsync<ApiAuthException>(async () => await world.Validator.ValidateAsync(token))).StatusCode);
+        Assert.Equal(401, (await Assert.ThrowsAsync<AuthRefusalException>(async () => await world.Validator.ValidateAsync(token))).StatusCode);
     }
 
     [Theory]
@@ -116,7 +116,7 @@ public sealed class TokenValidationTests
     {
         using var world = new TokenWorld();
         var claims = world.Claims(); claims[field] = new { unsupported = true };
-        Assert.Equal(401, (await Assert.ThrowsAsync<ApiAuthException>(async () => await world.Validator.ValidateAsync(world.Mint(claims)))).StatusCode);
+        Assert.Equal(401, (await Assert.ThrowsAsync<AuthRefusalException>(async () => await world.Validator.ValidateAsync(world.Mint(claims)))).StatusCode);
     }
 
     [Theory]
@@ -141,7 +141,7 @@ public sealed class TokenValidationTests
             case "mixed-scope": claims["scp"] = "user_impersonation"; break;
             case "mixed-name": claims["name"] = "Named person"; break;
         }
-        var error = await Assert.ThrowsAsync<ApiAuthException>(async () => await world.Validator.ValidateAsync(world.Mint(claims)));
+        var error = await Assert.ThrowsAsync<AuthRefusalException>(async () => await world.Validator.ValidateAsync(world.Mint(claims)));
         Assert.Equal(403, error.StatusCode);
         Assert.Null(error.Challenge);
     }

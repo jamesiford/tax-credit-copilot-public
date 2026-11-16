@@ -31,7 +31,7 @@ public enum ModelErrorKind
 
 /// <summary>Only controlled rule codes cross the error boundary; upstream bodies and exceptions never do.</summary>
 /// <remarks>Constructs an error using controlled codes, never upstream text.</remarks>
-public class ModelException(ModelErrorKind kind, string code, TimeSpan? retryAfter = null,
+public sealed class ModelException(ModelErrorKind kind, string code, TimeSpan? retryAfter = null,
     IReadOnlyList<string>? rules = null, IReadOnlyList<string>? hops = null) : Exception($"Model access refused ({kind}).")
 {
     /// <summary>The failure category.</summary>

@@ -36,7 +36,7 @@ public sealed class RateBucketLifecycleTests
     public void SignedInCallersCannotSubstituteActorForMissingOid()
     {
         var limiter = new ApiRateLimiter(new(1), new ManualClock());
-        var error = Assert.Throws<ApiAuthException>(() => limiter.Check("kind", new(Upn: "analyst@example.test", Authenticated: true)));
+        var error = Assert.Throws<AuthRefusalException>(() => limiter.Check("kind", new(Upn: "analyst@example.test", Authenticated: true)));
         Assert.Equal(401, error.StatusCode);
         Assert.Equal(0, limiter.BucketCount);
     }

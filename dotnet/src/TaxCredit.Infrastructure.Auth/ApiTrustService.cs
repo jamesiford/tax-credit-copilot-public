@@ -49,7 +49,7 @@ public sealed class ApiTrustService(AuthConfiguration configuration, IApiTokenVa
         if (RoutePolicy.IsPublic(path)) { return; }
         if (principal.IsAgent && RoutePolicy.IsAgentForbidden(method, path))
         {
-            throw new ApiAuthException(403, "agent_forbidden", "this route is not available to the channel agent");
+            throw new AuthRefusalException(403, "agent_forbidden", "this route is not available to the channel agent");
         }
 
         if (RoutePolicy.IsSelfAuthorizing(path))
@@ -61,7 +61,7 @@ public sealed class ApiTrustService(AuthConfiguration configuration, IApiTokenVa
         {
             if (!await clients.IsAuthorizedAsync(principal, id, cancellationToken).ConfigureAwait(false))
             {
-                throw new ApiAuthException(403, "client_forbidden", $"not authorized for client {id}");
+                throw new AuthRefusalException(403, "client_forbidden", $"not authorized for client {id}");
             }
         }
     }

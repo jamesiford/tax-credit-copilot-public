@@ -93,7 +93,7 @@ public sealed class ProjectionTests
     {
         var tables = SourceTestData.MiniTables();
         ((Dictionary<string, object?>)tables["Payroll"][0])["Hours"] = value;
-        var error = Assert.Throws<SourceFailureException>(() => SourceTestData.Source(tables).Source.LoadProjection(7));
+        var error = Assert.Throws<UnsupportedNonfinitePayroll>(() => SourceTestData.Source(tables).Source.LoadProjection(7));
         Assert.Equal("unsupported_nonfinite_payroll", error.Code);
         Assert.DoesNotContain(value, error.Message, StringComparison.Ordinal);
     }

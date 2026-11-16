@@ -91,5 +91,5 @@ public static class ActingUserParser
         return string.IsNullOrWhiteSpace(value.GetString()) ? null : value.GetString()!.Trim();
     }
 
-    private static ApiAuthException Bad(string detail) => new(400, "invalid_acting_user", detail);
+    private static AuthRefusalException Bad(string detail) => new(400, "invalid_acting_user", detail);
 }

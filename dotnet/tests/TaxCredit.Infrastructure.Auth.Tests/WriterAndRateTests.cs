@@ -97,12 +97,12 @@ public sealed class WriterAndRateTests
     {
         var principal = AgentFor(TokenWorld.Writer);
         var onlyBot = new WriterPolicy(new Roster(TokenWorld.Agent));
-        Assert.Equal("writer_forbidden", (await Assert.ThrowsAsync<ApiAuthException>(async () => await onlyBot.CheckAsync(principal, principal.Actor, true))).Code);
+        Assert.Equal("writer_forbidden", (await Assert.ThrowsAsync<AuthRefusalException>(async () => await onlyBot.CheckAsync(principal, principal.Actor, true))).Code);
         var policy = new WriterPolicy(new Roster(TokenWorld.Writer));
-        Assert.Equal("author_mismatch", (await Assert.ThrowsAsync<ApiAuthException>(async () => await policy.CheckAsync(principal, "other", true))).Code);
+        Assert.Equal("author_mismatch", (await Assert.ThrowsAsync<AuthRefusalException>(async () => await policy.CheckAsync(principal, "other", true))).Code);
         await policy.CheckAsync(principal, principal.Actor, true);
         await policy.CheckAsync(principal, null, false);
-        Assert.Equal("missing_acting_user", (await Assert.ThrowsAsync<ApiAuthException>(async () => await policy.CheckAsync(principal with { ActingFor = null }, "other", true))).Code);
+        Assert.Equal("missing_acting_user", (await Assert.ThrowsAsync<AuthRefusalException>(async () => await policy.CheckAsync(principal with { ActingFor = null }, "other", true))).Code);
     }
 
     [Fact]
@@ -113,8 +113,8 @@ public sealed class WriterAndRateTests
         await new WriterPolicy(roster).CheckAsync(principal, principal.Actor, true);
         await new WriterPolicy(roster).CheckAsync(ApiPrincipal.Anonymous, "local-user", true);
         var strict = new WriterPolicy(roster, true);
-        Assert.Equal("writer_forbidden", (await Assert.ThrowsAsync<ApiAuthException>(async () => await strict.CheckAsync(principal, principal.Actor, true))).Code);
-        Assert.Equal("writer_forbidden", (await Assert.ThrowsAsync<ApiAuthException>(async () => await strict.CheckAsync(ApiPrincipal.Anonymous, "local-user", true))).Code);
+        Assert.Equal("writer_forbidden", (await Assert.ThrowsAsync<AuthRefusalException>(async () => await strict.CheckAsync(principal, principal.Actor, true))).Code);
+        Assert.Equal("writer_forbidden", (await Assert.ThrowsAsync<AuthRefusalException>(async () => await strict.CheckAsync(ApiPrincipal.Anonymous, "local-user", true))).Code);
         Assert.Equal("local-user", ApiPrincipal.Anonymous.Attributed(" local-user "));
     }
 

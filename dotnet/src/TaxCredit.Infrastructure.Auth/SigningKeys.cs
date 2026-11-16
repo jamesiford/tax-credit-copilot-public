@@ -95,7 +95,11 @@ public sealed class CachedJwksProvider : ISigningKeyProvider, IDisposable
 
             if (_attempted.HasValue && _clock.GetElapsedTime(_attempted.Value, now) < TimeSpan.FromSeconds(5))
             {
-                throw _lastFailed ? new AuthDependencyException("jwks_refresh_failed") : new ApiAuthException(401, "unknown_key", "invalid token signing key");
+                if (_lastFailed)
+                {
+                    throw new AuthDependencyException("jwks_refresh_failed");
+                }
+                throw new AuthRefusalException(401, "unknown_key", "invalid token signing key");
             }
 
             _attempted = now;
@@ -112,7 +116,7 @@ public sealed class CachedJwksProvider : ISigningKeyProvider, IDisposable
                 _lastFailed = true;
                 throw new AuthDependencyException("jwks_refresh_failed");
             }
-            return _keys.TryGetValue(keyId, out var key) ? Clone(key) : throw new ApiAuthException(401, "unknown_key", "invalid token signing key");
+            return _keys.TryGetValue(keyId, out var key) ? Clone(key) : throw new AuthRefusalException(401, "unknown_key", "invalid token signing key");
         }
         finally { _gate.Release(); }
     }

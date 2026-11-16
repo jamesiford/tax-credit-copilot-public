@@ -70,7 +70,7 @@ public sealed record SourceLookupEntry(string Lookup, long ClientId, string Kind
     bool Inferred = false, DateOnly? EffectiveFrom = null, DateOnly? EffectiveTo = null);
 
 /// <summary>Safe typed failure for host error mapping; upstream messages/configuration are never retained.</summary>
-public class SourceFailureException(string code, string dependency, string remedy) : Exception(code)
+public abstract class SourceFailureException(string code, string dependency, string remedy) : Exception(code)
 {
     /// <summary>A stable machine-readable refusal code.</summary>
     public string Code { get; } = code;
@@ -79,6 +79,10 @@ public class SourceFailureException(string code, string dependency, string remed
     /// <summary>Operator guidance free of credentials and customer configuration.</summary>
     public string Remedy { get; } = remedy;
 }
+
+/// <summary>Non-finite payroll cannot enter the certified numeric model (FZ-04).</summary>
+public sealed class UnsupportedNonfinitePayroll()
+    : SourceFailureException("unsupported_nonfinite_payroll", "source_projection", "Supply finite payroll numbers; FZ-04 is outside the certified numeric model.");
 
 /// <summary>Only classified transport failures permit opt-in fiscal fallback.</summary>
 public sealed class SourceUnavailable(string dependency = "source_sql")

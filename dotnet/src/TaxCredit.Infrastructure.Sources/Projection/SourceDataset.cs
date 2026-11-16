@@ -88,7 +88,7 @@ public static class SourceValues
         if (!double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var result)) { return null; }
         if (!double.IsFinite(result))
         {
-            throw new SourceFailureException("unsupported_nonfinite_payroll", "source_projection", "Supply finite payroll numbers; FZ-04 is outside the certified numeric model.");
+            throw new UnsupportedNonfinitePayroll();
         }
         return result;
     }
