@@ -110,23 +110,25 @@ Modules: 36 ported, 11 partial, 5 pending.
 ## BEGIN ReadsCalc W2 completion addendum
 
 This addendum does not rewrite the generated DS1 inventory or historical
-percentages above. ReadsCalc is an implemented checkpoint, halted at a shared
-composition boundary; it is not a claim that all integration/replay gates pass.
-See [ROUTES-READS-REPORT.md](ROUTES-READS-REPORT.md) and
-[HALT-routes_reads.md](HALT-routes_reads.md).
+percentages above. ReadsCalc implements all 29 operations. Feature-owned
+operation scopes and explicit-host-route precedence resolve the former
+composition failures without shared edits: strict build, format and all 741
+fast tests pass. Numerical recording-policy and sibling setup differences
+still prevent claiming the replay gate. See
+[ROUTES-READS-REPORT.md](ROUTES-READS-REPORT.md).
 
 | Assigned Python/application surface | Already supplied by W1/W1b, unchanged | Completed in ReadsCalc / evidence |
 |---|---|---|
 | `application.payroll_rows` | `PayrollRows`, source interfaces and adapters | source-view orchestration and fresh `QcAnnotations`; `CalculationBoundaryTests`, `IngestionTests` |
 | `application.program_defaults` | `ProgramDefaults`, strict program/year selection | consumed by source views, portfolio and full trend; `PortfolioPortBoundaryTests` |
-| `application.queries._client_run` | `ClientRunResolver`, statute/window/source resolution | accepted-result eligibility/matrix and explicit simulation orchestration; `StoredReadTests`, `CalculationRecordingTests` |
+| `application.queries._client_run` | `ClientRunResolver`, statute/window/source resolution | lazy `ReadStatutes` for accepted reads and explicit simulation orchestration; `StoredReadTests`, `ReadCompositionTests`, `CalculationRecordingTests` |
 | `application.queries.get_unit_trend` | `UnitTrendQueryHelpers`, certified series/base/tranche helpers | `ReadsUnitTrendService.Execute`; `UnitTrendAssemblyTests`, full Python P2 `PortfolioP2Tests` |
 | `tools.portfolio` | `Headcount`, rule/year resolution, deterministic credit math | `ReadsPortfolioService.BuildPortfolio/StateCredit/LatestTaxYear`; `PortfolioAssemblyTests` |
 | `tools.discovery` | rule library and trail | `ReadsDiscoveryService.DiscoverCredits/FromTiles`; ordering, exclusions, totals and trail tests |
 | AI context/trend/jobs-at-risk application briefs | all 25 `IGoldReadPort` members and `Proximity` | `ReadsStoredPortfolioBriefs`; `StoredPortfolioBriefTests`, no source replay |
 | `application.qc_resolutions` integration | certified `QcResolutions`, durable `ILookupStore` | versioned client-bound `QcAnnotations`; Claims must consume the same lookup contract; writer behavior remains unchanged |
 | Gold/source/service ports marked pending in DS1 | W1/W1b already replaced the capturing seams with real ports | consumed, not re-ported; ordinary-host and persistence reopening tests |
-| Route request/response orchestration | mediator, auth, validation, transport and reset runtime | `ReadsCalcEndpoints`, `ReadArguments`, `ReadValues`; all 29 owned operations, no sibling URLs |
+| Route request/response orchestration | mediator, auth, validation, transport and reset runtime | `ReadsCalcEndpoints`, `ReadArguments`, `ReadValues`, operation scopes and explicit-route defaults; all 29 owned operations, no sibling URLs; `ReadCompositionTests` |
 
 Application symbols live under
 `src/TaxCredit.Application/Features/ReadsCalc/`; corresponding tests live under
@@ -136,9 +138,10 @@ limits and the missing outer `IPortfolioReferenceData` adapter are documented in
 source-calculation aliases, collaborators and recording evidence are documented
 in [routes_reads-calculations-handoff.md](routes_reads-calculations-handoff.md).
 
-No certified engine module was re-ported or changed. Shared mediator lifetime,
-framework probe composition and page-count recording policy still block a full
-ReadsCalc gate. This addendum must not be used to relabel those boundaries as
-complete.
+No certified engine module was re-ported or changed. Normal-host tests now
+prove P1-to-P2-to-P1 source/fiscal reselection, fresh authorization and accepted
+reads without a configured payroll source. Page-count recording policy,
+unfinished sibling setup and the replay waiver cap remain distinct limitations,
+not unresolved feature-composition defects.
 
 ## END ReadsCalc W2 completion addendum

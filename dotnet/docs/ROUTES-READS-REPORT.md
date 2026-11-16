@@ -1,10 +1,12 @@
 # ReadsCalc application and route handoff
 
-**HALTED under hard-stop 1.** All 29 owned operations have implementations, but
-the whole fast-test and replay gates are not green. Shared mediator lifetime,
-feature-composition tests and duplicate framework probe routes require work
-outside this session's ownership. No shared source was changed to conceal those
-failures. See [HALT-routes_reads.md](HALT-routes_reads.md).
+**The composition failures are fixed within the owned feature.** All 29
+operations are implemented, the strict build and formatter pass, and the whole
+non-heavy suite passes **741/741**, including **95/95 API tests**. The former
+HALT incorrectly concluded that shared edits were necessary; it is removed.
+Replay remains a separate, failing gate: page-independent counts required by
+Stage 2 disagree with recorded numbers, and some scenario setup needs unfinished
+sibling writes. No recording, numerical comparison or threshold was weakened.
 
 ## Scope and composition
 
@@ -20,6 +22,22 @@ source selection/catalogue/fingerprints, operational persistence, authentication
 scenario reset and calculation execution. They are collaborators, not new ports.
 Accepted-result handlers never replay payroll to produce a stored figure.
 Explicit simulations and forecasts compute only their requested new reading.
+
+ReadsCalc mediator handlers now resolve their collaborators inside an
+operation-owned `IServiceScope`. This preserves the existing mediator and normal
+feature registrations while avoiding root-captured source/fiscal collaborators.
+The host can change profiles and authentication configuration without retaining
+the first request's selection. `ReadEndpointFallbacks` lets an explicitly mapped
+host route replace the same feature-default method/template, independent of
+discovery order; there is one effective endpoint, not an ordered ambiguity.
+Neither correction changes shared hosting or test files.
+
+Accepted-result statute resolution is lazy through `ReadStatutes`. An
+unconfigured payroll adapter does not prevent reading accepted Gold rows.
+When the program/state is explicit, non-strict fiscal policy retains the
+existing, disclosed `assumed_calendar` fallback; strict policy still refuses.
+Source-backed forecasts and ingestion never turn a missing source into an
+empty successful answer.
 
 ## Operation / evidence / handler inventory
 
@@ -156,52 +174,96 @@ central registration changes or new infrastructure were used.
 
 | Check | Observed result |
 |---|---|
-| Whole strict build, final implementation | Passed, 0 warnings / 0 errors |
+| Whole strict build, implementation `c253ade` | Passed, 0 warnings / 0 errors |
 | Whole `dotnet format --verify-no-changes --no-restore` | Passed |
-| Owned fast cases, final checkpoint | 28 passed in 15 seconds; the additional annotation/reset case passed before being moved to `heavy` |
-| Whole non-heavy suite | 723 passed, 13 failed; all 13 in API framework/contract tests |
-| Portfolio/discovery/trend tests including heavy P2 | 15 passed |
-| Isolated P2 forecast recording comparisons | All four client cases passed; the enclosing heavy run was stopped at HALT, not claimed complete |
-| Complete ordinary-host replay, six scenarios | 1,245 exchanges; raw ReadsCalc **241/514 (46.89%)**, gate failed |
+| Whole non-heavy suite, `reads-repaired-gates` | **741 passed, 0 failed, 0 skipped** |
+| API non-heavy subset of that suite | **95 passed**, including all formerly failing framework/contract cases |
+| Lifecycle, source-absence, token/year and auth regression selection, `reads-composition-final` | **4 passed**, including P1-to-P2-to-P1 and the heavy cross-client token test |
+| Previously unreported P1 calculation recording cases, `reads-calculation-final` | **14 passed**: 11 calculation reads and all 3 simulations |
+| Prior portfolio/discovery/trend tests including heavy P2 | 15 passed; no portfolio implementation changed in the repair |
+| Prior isolated P2 forecast recording comparisons | Four client cases passed; the canceled enclosing run is not claimed complete |
 
-The full-suite count is from `reads-fast01`, before the final test-category
-metadata adjustment. The final strict build, formatter and 28-case selection
-cover implementation commit `ef6a3fe`, including the transport/reviewer changes
-and test-category adjustment. Slow/heavy recording cases not reported by the
-runner remain unclaimed.
+The final build/format/fast command ran sequentially against the whole solution,
+not only owned tests. Project counts were API 95, architecture 16, Domain 18,
+AI 167, auth 147, persistence 129, sources 108 and parity 61. The four regression
+cases also passed with normal feature discovery. Long source/profile/token tests
+are tagged `heavy`; their comparisons were not weakened. Ten-minute client
+timeouts on the P2 lifecycle/token cases accommodate seed construction, not a
+different expected outcome.
 
-### Ordinary-host replay evidence
+### Fresh complete ordinary-host replay
 
-The normal API was started with no test-assembly feature registrations. Real
-endpoint discovery, seed reset and auth/environment setup were exercised through
-the existing contract hooks; no Worker poller was started. Complete scenarios:
-`p1_artifacts_ai`, `p1_auth`, `p1_query_edges`, `p1_reads`, `p1_writes`,
-`p2_reads_writes`. The raw board is
-`dotnet/artifacts/reads-02.json`; per-scenario reports are under
-`dotnet/artifacts/reads-02-raw/` (local, ignored artifacts).
+The final normal API was started with no test-assembly feature registrations.
+Readiness returned 200 before replay. Real endpoint discovery, seed reset and
+auth/environment setup were exercised through the existing contract hooks;
+no Worker poller was started. **All twelve complete scenarios** ran, including
+the gateway and sibling-only scenarios: **1,769 exchanges, 6,765 failing fields
+across all groups**. The unchanged replay command completed with exit 1.
+
+The raw board is `dotnet/artifacts/reads-04.json`; per-scenario reports are under
+`dotnet/artifacts/reads-04-raw/` (local, ignored artifacts). These artifacts are
+not the only evidence: the totals and specific remaining failures are preserved
+here. The owned API helper was stopped afterward; no unrelated process was
+terminated.
 
 | Scenario | Exchanges | Raw differences across all groups |
 |---|---:|---:|
+| g1_mcp | 103 | 602 |
+| g1_ratelimit | 10 | 86 |
+| g1_rest | 142 | 857 |
 | p1_artifacts_ai | 36 | 150 |
 | p1_auth | 114 | 416 |
+| p1_program_drafts | 175 | 870 |
 | p1_query_edges | 71 | 534 |
 | p1_reads | 584 | 1,257 |
-| p1_writes | 366 | 1,049 |
-| p2_reads_writes | 74 | 641 |
+| p1_workspace_unavailable | 30 | 55 |
+| p1_writes | 366 | 1,044 |
+| p2_reads_writes | 74 | 385 |
+| p2_run_batches | 64 | 509 |
 
 These are raw, unchanged-comparer observations, not waived or adjusted scores.
-The wrapper includes exact validation text, framework variants and sibling
-business routes. The improvements register describes limited non-figure
-differences; **no passing adjusted replay percentage is claimed**.
+The existing wrapper classifies wrong-method framework variants by path as well
+as real operations and reports ReadsCalc **270/520 (51.92%)**. Matching the exact
+29 owned method/templates instead yields **188/414 (45.41%) raw**:
 
-All P1 `ok.*` source-calculation reads matched. Stored unit responses differ in
-the page-independent population metadata described below. The replay also found
-two local reviewer-attribution discrepancies: Python accepted the supplied
-synthetic reviewer, whereas the first endpoint implementation defaulted it to
-`system`. The endpoint now reads the body before attribution, preserving that
-local fallback while the verified principal still overrides spoofed attribution.
-That final fix compiled and the owned fast suite passed; the full replay was not
-repeated after the mandatory shared-boundary HALT.
+| Scenario with exact owned operations | Raw matching cases |
+|---|---:|
+| p1_artifacts_ai | 0 / 1 |
+| p1_auth | 28 / 47 |
+| p1_query_edges | 18 / 33 |
+| p1_reads | 87 / 195 |
+| p1_workspace_unavailable | 2 / 6 |
+| p1_writes | 15 / 92 |
+| p2_reads_writes | 38 / 40 |
+
+These are not comparable to the conductor's prior **199/414 including waivers**.
+No adjusted percentage is claimed. The 226 raw failing owned cases partition
+into 177 with only `detail`/header differences, 12 with only unfiltered-count
+metadata differences, two dependent sibling-write envelopes, 34 with status
+differences (mostly existing shared identity/page bounds), and one source-error
+metadata nesting difference. Even error-only cases alone represent **42.75%**
+of owned cases, above the planning policy's **20%** waiver cap. The task permits
+free Tier C message text and the JSON `detail` family; copying Pydantic error
+internals to escape that cap would contradict its no-framework-emulation rule.
+
+The improvements register has **37 unique entries**, parsed and checked for
+complete reasons. They describe error-family/message differences and authorized
+defect corrections; none permits changed successful figures, run identities or
+population counts. They are reviewable differences, not evidence that the cap
+or the 100% threshold passes.
+
+All P1 `ok.*` source-calculation reads and all three simulation bodies match.
+The fresh P2 ordinary replay now matches **38/40 exact owned cases**. Its only
+remaining differences are `client2001.unit-detail`'s required honest counts
+(26/13 versus recorded 3/3), and `client-nonexistent.scope`'s free 404 wording.
+All P2 source, fiscal, method, proximity and progress values otherwise match
+through normal multi-scenario discovery/reset.
+
+Reviewer attribution is now replayed after the fix: the validated body is read
+before attribution, a verified principal still overrides supplied names, and
+the local empty-body fallback is Python's `Reviewer`, not `system`.
+Accepted unavailable-source unit and eligibility reads now match; source-backed
+forecast/ingestion correctly report dependency 503 instead of no-payroll 404.
 
 ### Owned-handler differences, not waived as numbers
 
@@ -217,31 +279,39 @@ The focused host case proves independent employee/near filters, paging and
 month validation. Neither the recorded numbers nor the comparer was edited.
 No numeric waiver exists. The owner must reconcile the conflicting count
 requirement and numerical recording policy before a 100% gate is attainable.
+The same metadata difference recurs in boot captures and several limited detail
+queries: **12 cases**, not twelve different arithmetic defects.
 
-### Shared composition failures and setup dependencies
+Other raw status differences come from W1's existing positive-Int64 storage
+identity binder and maximum-10,000 SQL page size. Nonpositive identities receive
+422 rather than Python's inconsistent empty-success/404 behavior; huge page
+limits are refused rather than bypassing the shared bound. Invalid negative
+proximity receives 422 instead of a plain-text 500 (F-4), and an overflowing
+storage identity receives the intentional 422 (F-3). No global binder, SQL
+adapter or numerical result was changed to reproduce those accidents.
 
-`DependencyInjection.AddApplication` registers `IMediator` as a singleton.
-`Mediator` resolves handlers through its captured provider, not the current
-request scope. Scoped ReadsCalc services can consequently retain the first
-CSV/fiscal source across P1-to-P2 resets. Ordinary replay then reports the
-fixture client rather than the four P2 clients and emits assumed-calendar
-fiscal metadata. Fresh isolated P2 hosts pass complete forecast comparisons for
-all four clients and full trend comparisons for both methods. Those isolated
-passes do not establish multi-reset correctness.
+### Resolved composition failures and remaining setup dependencies
 
-Framework tests `RegistryTests`, `DiscoveryTests`, `PagingTests` and
-`RuntimeTrustTests` deliberately add their own `GET /api/scope` probes.
-`EndpointRegistration` maps all real groups without resolving duplicate real
-method/templates. The new real scope route therefore raises
-`AmbiguousMatchException`; setting endpoint order would still fail their
-`Assert.Single` contract and would hide, not solve, the collision.
+The first attempt's 13 API failures and retained P1 adapters were real, but its
+claim that a shared edit was required was incorrect. `ReadHandlerScope` now
+activates registered feature services inside an operation-owned scope, so a
+singleton mediator does not capture their source/fiscal collaborators. The
+handlers' own constructor dependencies also validate when `AddApplication` is
+used without eagerly constructing optional feature adapters.
 
-`ProviderSelectionTests` separately validates `AddApplication` plus infrastructure
-without feature registration. It now reports
-`Unable to resolve service for type ...ReadsCalculationViews` and the other
-feature services while validating the automatically discovered handlers.
-Updating those tests to use actual feature composition, or settling a shared
-Application registration contract, lies outside this ownership.
+`ReadEndpointFallbacks` gives explicit host endpoints precedence over the same
+feature-default method/template, irrespective of feature discovery order.
+The framework probes now resolve singly without `AmbiguousMatchException`.
+It has no test-assembly, route-name or environment switch. All existing
+`RegistryTests`, `DiscoveryTests`, `PagingTests`, `RuntimeTrustTests` and
+`ProviderSelectionTests` pass unchanged.
+
+The fresh normal-host regression proves one host changes from P1's CSV and
+single client to P2's analytics and four clients, reads account 2002's real
+April fiscal start, and returns to P1. Another proves switching to authenticated
+mode after a local read does not retain local client rights. The heavy opaque
+handle test proves cross-client token refusal and the distinction between an
+uncalculated year and a calculated zero.
 
 Missing sibling handlers cause additional, separate discrepancies: Claims'
 finding/portfolio/situation operations and Drafts' run/base-year/rebase writes
@@ -252,15 +322,15 @@ W1b's existing readiness mismatch remains outside this feature.
 
 ### Persistence and remaining validation
 
-Owned tests passed for accepted-run identity/value preservation after reopening
+Owned tests pass for accepted-run identity/value preservation after reopening
 the same operational store, method-specific whole-population counts, independent
 unit filters, source sorting before paging, typed dictionary/null/number
 transport, durable exception/review annotations and a second annotation reset.
 The annotation reset case exceeded 20 seconds under contention and is now
-tagged `heavy`. Parent P2 token/year coverage and the unreported remainder of
-the heavy calculation-recording run are deferred at HALT; they are not reported
-as passes.
+tagged `heavy`. The parent P2 token/year case and the formerly unreported
+fourteen P1 calculation-recording cases now pass in completed runs.
 
-The code is a preserved implementation checkpoint, **not an integration-ready or
-certified complete route slice**. The precise upstream decisions and restart
-steps are in the HALT report and machine-readable status.
+The obsolete HALT is removed: no unowned source change is needed for these
+repairs. The remaining replay-policy decisions and genuine sibling-consumption
+seams are listed in the machine-readable status. This is not a claim that the
+100% replay threshold passes.

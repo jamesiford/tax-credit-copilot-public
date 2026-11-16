@@ -70,3 +70,53 @@ or any shared source.
   in 15 seconds**, including the final reviewer/transport code and category
   metadata. The documentation/status child commit names this verified code
   commit rather than attempting a self-referential status hash.
+
+## Conductor retry: feature-owned repair, verified code c253ade
+
+- Corrected the initial hard-stop conclusion. No shared source edit was needed.
+  Mediator handlers now create a normal registered DI operation scope instead
+  of capturing initial source/fiscal services through the singleton mediator.
+  Feature-default endpoints yield to explicitly mapped host routes. Existing
+  framework and provider-selection tests remain unchanged.
+- Added ordinary-composition regressions for P1-to-P2-to-P1 profile/fiscal
+  reselection, fresh authenticated client rights after a local read, and Gold
+  availability without configured payroll. Strict fiscal policy still refuses.
+  Lazy accepted statute resolution labels non-strict calendar assumptions;
+  source-backed calculations do not turn an outage into success.
+- Completed the heavy opaque-token/client/year case and the three composition
+  cases in one four-case selection: **4 passed**. P2 seed-heavy clients use a
+  ten-minute HTTP timeout; expected results are unchanged.
+- Corrected local reviewer defaults to `Reviewer`, keeping verified principal
+  attribution authoritative. The fresh replay includes this final correction.
+- Final strict whole-solution build: **0 warnings, 0 errors**. Whole formatter
+  verification passed. Whole non-heavy suite: **741 passed, 0 failed, 0 skipped**,
+  including **95 API tests**, so all 13 previously failing composition cases
+  are fixed.
+- Completed all **14** formerly unreported P1 calculation recording cases:
+  eleven source reads and all three simulations passed. The earlier four P2
+  forecast passes and fifteen portfolio/trend cases remain separately attributed
+  historical evidence; a canceled enclosing run is not claimed complete.
+- Started a normal API with no test-only feature registration, verified 200
+  readiness, and replayed **all twelve complete scenarios** through unchanged
+  semantic comparisons. No Worker poller was started. **1,769 exchanges,
+  6,765 failing fields across all groups**, replay exit 1. Raw outputs:
+  `dotnet/artifacts/reads-04.json` and `reads-04-raw/`, ignored local artifacts.
+- Wrapper ReadsCalc: **270/520 (51.92%)**. Exact 29-operation ownership:
+  **188/414 (45.41%) raw**, not comparable to the prior conductor score that
+  included waivers. P2 is now **38/40 raw**: only the required honest unfiltered
+  metadata (26/13 versus recorded 3/3) and free unknown-client 404 text differ.
+  All its substantive source/fiscal/method/proximity/progress responses match.
+- Of the 226 raw failing owned cases, 177 have only detail/header differences,
+  twelve only population metadata, two sibling-write envelopes, 34 status
+  differences (mostly existing shared identity/page bounds), and one source
+  error's diagnostic nesting. Free Tier C error detail alone covers 42.75% of
+  owned cases, exceeding the planning cap of 20%. No adjusted pass is asserted.
+- The improvements JSON has 37 unique entries with complete reasons. It does
+  not waive changed successful numbers. Required page-independent counts,
+  existing binder/page-bound decisions, free Tier C messages, the cap and missing
+  sibling setup are recorded honestly rather than hidden by recording edits,
+  weakened comparisons, fabricated writes or Python-framework emulation.
+- Removed obsolete `HALT-routes_reads.md`; its original claims remain above as
+  history, explicitly superseded here. Updated the report, status and delimited
+  port-map addendum. The owned API helper was stopped; no unrelated process was
+  killed. No package, live system, external worktree or unowned source changed.

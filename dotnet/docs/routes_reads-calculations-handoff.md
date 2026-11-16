@@ -152,7 +152,7 @@ A concurrent seed-backed full test attempt was stopped to avoid contending with
 the parent's host/test verification, not reported as passing. Final current
 whole-solution analyzer and P2 replay results belong to the parent report.
 
-### Final bounded verification before parent HALT
+### Historical bounded verification before the initial parent HALT
 
 - Updated all three owned parser calls to the final shared `WholeNumber` name.
 - Current isolated .NET 10 compile and lightweight tests: **6 passed, 0 failed,
@@ -171,3 +171,15 @@ whole-solution analyzer and P2 replay results belong to the parent report.
   establish correctness of that reset lifecycle. Parent also reports framework
   stub/duplicate-endpoint and AddApplication-only validation blockers.
   No shared implementation was changed to repair these issues.
+
+### Conductor retry correction
+
+The initial conclusion that composition required unowned changes was wrong.
+The parent fixed source/fiscal retention with operation-owned DI scopes and
+resolved explicit host route overrides within ReadsCalc. Shared mediator,
+hosting and framework tests remain unchanged. The whole strict build and
+formatter now pass, and all **741 non-heavy solution tests** pass, including
+**95 API tests**. Fresh lifecycle, source-absence and token/year tests pass.
+The current complete replay and remaining heavy recording results are reported
+in [ROUTES-READS-REPORT.md](ROUTES-READS-REPORT.md); the historical canceled run
+above is not their evidence.

@@ -1,16 +1,16 @@
 {
   "session": "routes_reads",
   "branch": "dotnet/w2-routes_reads",
-  "head": "ef6a3fe",
-  "summary": "Implemented all 29 owned ReadsCalc operations plus portfolio/discovery/full-trend and stored-brief seams.\nHALTED under hard-stop 1: shared mediator lifetime, framework probe composition and standalone provider validation require unowned changes.\nVerified code commit ef6a3fe: strict whole build and format pass; final owned fast selection 28/28 passes.\nWhole fast gate remains red: 723 passed, 13 failed in framework/contract tests.\nSix complete ordinary-host scenarios: raw ReadsCalc 241/514 (46.89%), not a passing replay gate.\nPage-independent counts meet Stage 2 but conflict with recorded numeric metadata; no numeric waiver was made.\nLocal implementation and documentation commits only; no push, shared source edit, package or live integration.",
+  "head": "c253ade",
+  "summary": "All 29 owned operations and the portfolio/discovery/full-trend application seams are implemented.\nFixed root-captured source/fiscal services, duplicate explicit host endpoints, standalone handler validation and reviewer defaults entirely inside owned folders.\nRemoved the obsolete HALT: no shared source edit is necessary.\nVerified c253ade: whole strict build and formatter pass; all 741 fast tests pass, including 95 API tests.\nFour lifecycle/source-absence/token/auth regressions and all 14 previously unreported P1 calculation recording cases pass.\nAll twelve complete ordinary-host scenarios ran: 1769 exchanges, 6765 failing fields across all groups; replay exits 1.\nExact owned raw score is 188/414 (45.41%); wrapper score is 270/520 (51.92%). P2 owned cases are 38/40; no adjusted passing score is claimed.\nRequired honest population metadata conflicts with recorded counts; free error detail alone exceeds the waiver cap, and unfinished sibling writes affect later envelopes.\nNo recorded number, comparison, threshold or existing test was weakened. Local commits only; no push, package, live integration or unowned edit.",
   "stages": {
     "stage_1_application_boundary": "done",
-    "stage_2_stored_scope_drill": "partial",
-    "stage_3_calculation_ingestion": "partial",
+    "stage_2_stored_scope_drill": "done",
+    "stage_3_calculation_ingestion": "done",
     "stage_4_ordinary_host_handoff": "partial"
   },
   "gates_claimed": {
-    "no_halt": false,
+    "no_halt": true,
     "commits_present": true,
     "clean_tree": true,
     "not_pushed": true,
@@ -19,7 +19,7 @@
     "report_present": true,
     "dotnet_build": true,
     "dotnet_format": true,
-    "tests_fast": false,
+    "tests_fast": true,
     "replay": false
   },
   "deviations": [
@@ -43,39 +43,47 @@
     },
     {
       "id": "DEV-4",
-      "what": "Remaining heavy comparisons and a fresh full replay after the final local reviewer fix are deferred at the mandatory shared-boundary halt.",
-      "why": "The shared runtime/probe repairs require unowned edits. Previously reported isolated P2 passes do not prove ordinary multi-reset behavior.",
+      "what": "ReadsCalc handlers own a normal DI operation scope and feature-default routes yield to explicit host routes.",
+      "why": "This corrects source/fiscal capture and duplicate probe composition without changing shared mediator, hosting, infrastructure or tests. Ordinary reset/auth regression cases and the whole fast suite pass.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-5",
+      "what": "Accepted Gold reads resolve statute lazily; non-strict fiscal policy explicitly labels an assumed calendar when the payroll source is unconfigured.",
+      "why": "An accepted read must not require payroll adapter construction. Strict fiscal policy still refuses, and source-backed calculations still report an unavailable dependency rather than empty success.",
       "decision_needed": false
     }
   ],
   "findings": [
-    "Shared singleton Mediator resolves scoped handlers through its captured root provider; ordinary P1-to-P2 replay retains the first CSV/fiscal adapters.",
-    "Existing Framework and RuntimeTrust tests map GET /api/scope as a probe, causing AmbiguousMatchException after the real endpoint is implemented; endpoint order cannot satisfy their Assert.Single requirement.",
-    "ProviderSelectionTests validates automatically discovered Application handlers without registering feature collaborators and reports Unable to resolve service for type ReadsCalculationViews and other feature services.",
-    "W1 GoldReader.PeopleTotal and Python recordings return the limited displayed count for unfiltered population metadata.",
-    "F-3 and F-4 now reach deliberate JSON 422 refusals through existing binding/validation boundaries; F-1 magnitude is bounded.",
+    "The initial HALT incorrectly concluded that mediator lifetime, framework probe composition and standalone provider validation required unowned edits. Operation scopes and explicit-route defaults resolve all three inside ReadsCalc.",
+    "One normal host now passes P1-to-P2-to-P1 source/fiscal reselection, including the April fiscal start; auth changes do not reuse local client rights.",
+    "Accepted eligibility and units remain readable without configured payroll; strict fiscal selection and source-backed forecasts refuse explicitly.",
+    "W1 GoldReader.PeopleTotal and Python recordings return the limited displayed count for unfiltered population metadata; Stage 2 explicitly forbids that behavior.",
+    "The raw semantic comparer still compares Tier C validation wording and structural error metadata, although the task permits the JSON detail family with free message text.",
+    "Existing shared positive-Int64 identity and maximum-10000 page binding produce deliberate 422 refusals for nonpositive identities and huge page limits; no global binder or infrastructure cap was bypassed.",
+    "F-3 and F-4 reach deliberate JSON 422 refusals through existing binding/validation boundaries; F-1 magnitude is bounded.",
     "Captured ingestion precedence M-01 and first-program credit_math pricing remain unchanged because correcting them changes figures.",
     "FS-01/FS-11, CQ-02/CQ-05 and CAP-10 retain their documented legacy fiscal/filter/QC boundaries.",
     "Source count/max fingerprints are not Delta snapshots or count/max-preserving edit detection; strict leap-window bridge coverage remains partial.",
     "Missing sibling claim/run/base-year/rebase handlers cause later run-identity and override discrepancies; those are not fabricated or registered as numerical improvements."
   ],
   "open_questions": [
-    "The shared mediator/current-request-scope contract and framework probe override contract require integration ownership.",
-    "The unchanged-number policy conflicts with Stage 2 population-count metadata requirements.",
+    "The unchanged-number replay policy conflicts with the explicit page-independent population metadata requirement.",
+    "Tier C error-family/message policy and the replay waiver cap need a consistent integration interpretation.",
     "The legacy employee-review route lacks tenant scope and retains a documented client-zero namespace."
   ],
   "needs_human": [
     {
-      "item": "Authorize shared mediator lifetime/current-scope repair and a single-host P1-to-P2-to-P1 reset test.",
-      "why": "The correction belongs outside ReadsCalc; scoped source/fiscal collaborators must not be captured at the root."
-    },
-    {
-      "item": "Settle framework probe and standalone Application/provider-validation composition.",
-      "why": "Existing tests pin /api/scope as their own probe and omit feature services. Correcting their assumptions requires files outside this session's ownership."
-    },
-    {
       "item": "Reconcile defective unfiltered-count recordings with the explicit page-independence requirement.",
-      "why": "Honest totals change recorded numbers, which cannot be waived. Recordings/comparisons were not weakened."
+      "why": "Honest totals change recorded numbers, which cannot be waived. Recordings/comparisons were not weakened and the focused host test requires honest totals."
+    },
+    {
+      "item": "Reconcile free Tier C messages/error metadata with the replay waiver cap.",
+      "why": "Of 414 exact owned cases, 177 (42.75%) fail only on detail/header differences, above the 20% planning cap. Thirty-seven narrowly described improvement entries do not imply a passing adjusted score or permission to exceed the cap; no Python framework-emulation code was added."
+    },
+    {
+      "item": "Integrate sibling claim/run/base-year/rebase implementations before judging dependent owned read envelopes.",
+      "why": "Their 501 setup writes cannot create the expected run identity, override provenance or accepted results. ReadsCalc neither maps their routes nor fabricates their effects."
     },
     {
       "item": "Supply the outer IPortfolioReferenceData adapter for sibling portfolio/discovery consumers.",
@@ -92,7 +100,6 @@
   ],
   "reports": [
     "dotnet/docs/ROUTES-READS-REPORT.md",
-    "dotnet/docs/HALT-routes_reads.md",
     "dotnet/docs/routes_reads-log.md",
     "dotnet/docs/routes_reads-portfolio-handoff.md",
     "dotnet/docs/routes_reads-calculations-handoff.md",
