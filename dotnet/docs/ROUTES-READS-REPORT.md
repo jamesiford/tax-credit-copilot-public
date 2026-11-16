@@ -1,9 +1,15 @@
 # ReadsCalc application and route handoff
 
+**Stopped under hard-stop 3 after repeated unchanged replay-policy failures.**
+The numerical/waiver/setup decisions are in
+[HALT-routes_reads.md](HALT-routes_reads.md); this is not the former shared-edit
+composition stop.
+
 **The composition failures are fixed within the owned feature.** All 29
 operations are implemented, the strict build and formatter pass, and the whole
 non-heavy suite passes **741/741**, including **95/95 API tests**. The former
-HALT incorrectly concluded that shared edits were necessary; it is removed.
+HALT incorrectly concluded that shared edits were necessary; that reason was
+resolved and is not being reinstated.
 Replay remains a separate, failing gate: page-independent counts required by
 Stage 2 disagree with recorded numbers, and some scenario setup needs unfinished
 sibling writes. No recording, numerical comparison or threshold was weakened.
@@ -408,3 +414,27 @@ Pydantic-emulation code, restoring dishonest totals, changing shared storage
 validation, or implementing sibling endpoints in ReadsCalc. The required
 owner decisions are explicit in `status/routes_reads.json`; repeating the same
 gate without settling them cannot yield an honest 100% result.
+
+## Third retry disposition
+
+The next conductor board again reports the identical **82-case partition**,
+**332/414 (80.2%)** score and **207/414 (50.0%)** register reliance. Its
+board SHA-256 is
+`7c70ecf4603bd6acd6e13f83845c028932178e9c685027c9b2d280268b9286e0`;
+its raw-report SHA-256 is
+`dd44fe621b14905f10fa70d128e95358608b292a10acb1f1bff85828b6e60eab`.
+No policy decision or authorized behavior change accompanied that result.
+
+The task's mandatory hard-stop 3 now applies to the repeated unsatisfiable
+replay item. A new HALT names the actual count/error-policy contradiction,
+setup prerequisites and missing sibling effects. It does not revive the
+already-resolved composition claim. Product behavior and the improvements
+register remain unchanged; `no_halt` and `replay` are explicitly false.
+
+Fresh third-retry verification completed before stopping: whole strict build
+and formatter pass, all **741 fast tests** pass, and all **twelve complete
+scenarios** ran again (`dotnet/artifacts/reads-06.json`, `reads-06-raw/`).
+The unchanged comparer exits 1 with **1,769 exchanges, 6,765 raw failing fields,
+188/414 exact owned cases matching and 38/40 P2 cases matching**; wrapper
+ReadsCalc is **270/520 (51.92%)**. These reproduce the preceding configured
+replay, not a new improvement or passing score. The owned API helper was stopped.

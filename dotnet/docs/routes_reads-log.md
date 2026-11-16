@@ -165,3 +165,31 @@ or any shared source.
   restoring dishonest counts is not an authorized solution. The replay gate
   remains explicitly false. Stopped the owned API helper; no unrelated process
   or external worktree was changed.
+
+## Third retry: mandatory hard-stop disposition
+
+- The new conductor run supplies no policy decision and returns the identical
+  332/414 (80.2%) result with 207/414 waived (50%, cap 25%). Reclassified its
+  raw report against exact waived-field keys: the same 82 cases partition into
+  37 P2 setup, two auth setup, 30 shared bounds, eleven required-count conflicts
+  and two missing sibling-write envelopes.
+- Latest board SHA-256:
+  `7c70ecf4603bd6acd6e13f83845c028932178e9c685027c9b2d280268b9286e0`.
+  Raw report SHA-256:
+  `dd44fe621b14905f10fa70d128e95358608b292a10acb1f1bff85828b6e60eab`.
+- Reran the whole strict build (zero warnings/errors), whole formatter, and
+  non-heavy solution suite: **741 passed, zero failed/skipped**, including all
+  95 API tests. Product code and the 37-entry register are unchanged.
+- The task's mandatory hard-stop 3 applies after repeated honest attempts
+  cannot satisfy both Stage 2's honest count metadata and the pinned numeric
+  gate, nor the free Tier C/no-framework-emulation policy and the waiver cap.
+  Added a new `HALT-routes_reads.md` naming these actual contradictions and
+  concrete decisions. This is not the obsolete shared-composition halt.
+- `status/routes_reads.json` now honestly marks both `no_halt` and `replay`
+  false. Its first `needs_human` entry identifies the mandatory stop. No
+  recording, threshold, comparison or test is weakened to conceal the result.
+- Completed the requested fresh full semantic replay before stopping:
+  `reads-06.json`, `reads-06-raw/`, all twelve scenarios, **1,769 exchanges,
+  6,765 raw failing fields**, exit 1. Exact owned cases **188/414**, P2 **38/40**;
+  wrapper **270/520 (51.92%)**, identical to the previous correctly configured
+  run. Stopped the owned API helper without touching unrelated processes.

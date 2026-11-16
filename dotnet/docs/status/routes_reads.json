@@ -2,7 +2,7 @@
   "session": "routes_reads",
   "branch": "dotnet/w2-routes_reads",
   "head": "c253ade",
-  "summary": "All 29 owned operations and portfolio/discovery/full-trend application seams remain implemented at verified code c253ade.\nSecond retry: reran the whole strict build, formatter and fast suite; all pass, including 741/741 fast tests and 95/95 API tests.\nReran all twelve complete normal-host scenarios: 1769 exchanges, 6765 raw failing fields; replay exits 1.\nConfigured local exact-owned score remains 188/414 raw; P2 is 38/40, differing only in required honest counts and free 404 wording.\nThe conductor reports 332/414 (80.2%) after waivers, with 207/414 (50.0%) waived against its current 25% cap.\nClassified all 82 unwaived conductor cases: 37 wrong P2 setup, 2 auth setup, 30 shared bounds, 11 required count metadata, 2 missing sibling-write envelopes.\nIndependently reproduced default reset selecting P1/csv instead of P2/lakehouse, and restricted reads changing 200/200 to 403/403 only after explicit auth setup.\nReplay remains blocked by setup and policy decisions now stated explicitly in needs_human; no product workaround or passing gate is claimed.\nNo code, register, recorded figure, comparison, test or threshold was weakened this retry. Documentation/status committed locally only; no push or unowned edit.",
+  "summary": "HARD-STOP-3: repeated attempts cannot satisfy the fixed count/error policies and replay gate simultaneously; HALT-routes_reads.md records the actual required decisions.\nAll 29 operations and application seams remain implemented at c253ade; the earlier composition defects are fixed and are not the reason for this stop.\nThird retry strict build and whole formatter pass; all 741 fast tests pass, including 95 API tests.\nThe latest conductor again reports 332/414 (80.2%) after waivers, with 207/414 (50.0%) waived against its 25% cap.\nAll 82 unwaived cases remain exactly partitioned: 37 wrong P2 setup, 2 auth setup, 30 shared bounds, 11 required-count conflicts and 2 missing sibling-write envelopes.\nProperly configured complete local replays have 1769 exchanges, 6765 raw failing fields and P2 38/40, differing only in required honest counts and free 404 wording.\nExplicit needs_human decisions distinguish setup correction, conflicting numerical expectations, Tier C policy/cap and sibling integration; no authorization to change these accompanied the repeated failure.\nNo product code, register, recorded figure, comparison, test or threshold was weakened. The mandatory stop makes no_halt and replay honestly false.",
   "stages": {
     "stage_1_application_boundary": "done",
     "stage_2_stored_scope_drill": "done",
@@ -10,7 +10,7 @@
     "stage_4_ordinary_host_handoff": "partial"
   },
   "gates_claimed": {
-    "no_halt": true,
+    "no_halt": false,
     "commits_present": true,
     "clean_tree": true,
     "not_pushed": true,
@@ -76,6 +76,10 @@
   ],
   "needs_human": [
     {
+      "item": "HARD-STOP-3: settle the count/error-policy contradictions before another unchanged replay retry.",
+      "why": "Repeated implementation and verification attempts now return the identical 82-case conductor partition. Preserving Stage 2 page-independent populations cannot also equal the recorded page sizes; reproducing Pydantic internals conflicts with the explicit no-framework-emulation policy. The mandatory hard-stop path is documented in HALT-routes_reads.md, with no_halt and replay honestly false. This is not the earlier, resolved composition-scope halt."
+    },
+    {
       "item": "Reconcile defective unfiltered-count recordings with the explicit page-independence requirement.",
       "why": "Honest totals change recorded numbers, which cannot be waived. Recordings/comparisons were not weakened and the focused host test requires honest totals."
     },
@@ -109,6 +113,7 @@
     }
   ],
   "reports": [
+    "dotnet/docs/HALT-routes_reads.md",
     "dotnet/docs/ROUTES-READS-REPORT.md",
     "dotnet/docs/routes_reads-log.md",
     "dotnet/docs/routes_reads-portfolio-handoff.md",
