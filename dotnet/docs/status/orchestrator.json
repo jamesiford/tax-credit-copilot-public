@@ -1,0 +1,105 @@
+{
+  "session": "orchestrator",
+  "branch": "dotnet/w3-orchestrator",
+  "head": "9a229f8",
+  "summary": "Implemented the executable with actual Agent Framework tools, official Responses hosting, a service-authenticated REST gateway, shared settling, guarded composition and checkpointed confirmation. All 39 deterministic records and 431 orchestrator cases pass; whole-solution build, format and 1,509 fast tests pass. All 313 named guarantees are indexed (156 E, 103 P, 15 U, 39 X), not claimed as 313 equivalent passing tests. Cross-surface figure parity remains dependent on gateway/integration work; deployment is unverified. The head names the implementation commit; this status/report commit is its descendant. Nothing was pushed.",
+  "stages": {
+    "O1": "done",
+    "O2": "done",
+    "O3": "done",
+    "O4": "done",
+    "O5": "partial",
+    "O6": "done",
+    "O7": "done"
+  },
+  "gates_claimed": {
+    "no_halt": true,
+    "commits_present": true,
+    "clean_tree": true,
+    "not_pushed": true,
+    "owned_paths": true,
+    "status_json": true,
+    "report_present": true,
+    "stages_done": true,
+    "dotnet_build": true,
+    "dotnet_format": true,
+    "tests_fast": true,
+    "orchestrator_records_39": true
+  },
+  "deviations": [
+    {
+      "id": "DEV-1",
+      "what": "An uncertain mutation retains a recovery-only framework checkpoint and its original idempotency identity. Unrelated reads continue, but another prepare and confirmation stay blocked.",
+      "why": "The source clears pending confirmation after uncertainty. Retaining non-confirmable recovery state prevents accidental repetition; IMP-orchestrator-1 records the deliberate safety difference.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-2",
+      "what": "Startup refuses disabled injection/output controls and disabled gateway TLS verification.",
+      "why": "These optional source diagnostic overrides are not silently ignored. The stricter hosted posture and the need for an owner decision are explicit in IMP-orchestrator-2.",
+      "decision_needed": true
+    },
+    {
+      "id": "DEV-3",
+      "what": "Malformed boolean settings fail startup instead of silently becoming false.",
+      "why": "A configuration typo must not quietly disable an intended control. Supported values and every deterministic record retain their behavior; see IMP-orchestrator-3.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-4",
+      "what": "O5 is partial only for complete golden/cross-surface parity evidence; its local guard, lane, placeholder, reference and composition implementation is exercised.",
+      "why": "The complete source model-scripted golden corpora and real portal/API/gateway/MCP figure matrix are not certified by these local fake-gateway proofs. The named index identifies narrower or absent assertions rather than manufacturing equivalence.",
+      "decision_needed": false
+    }
+  ],
+  "findings": [
+    "The captured Resolve/yes/yes conversation performs eligibility reads, not a prepare/commit flow. Actual checkpointed writes are proved separately.",
+    "keyword.10 is a clarification, not a successful simulation; keyword.19 uses injection-screened keyword planning rather than an invented refusal.",
+    "Global data_catalog runs before client resolution; a bare year can invoke ordinary eligibility fallback and must not be assumed to mean help or review-pack resumption.",
+    "Actual .NET SDK explicit conversation/response-chain context outranks the client header fallback.",
+    "The framework requires DependencyInjection and Abstractions >=10.0.13; central 10.0.0 pins were insufficient. The approved owned section updates existing declarations.",
+    "The resolved Azure graph exports overlapping DefaultAzureCredential type names; an assembly alias resolves the ambiguity without changing shared projects.",
+    "A package-link cancellation test needed an explicit read-start signal. The executor now preserves known successful mutation evidence even when SDK cancellation wins during its subsequent read.",
+    "The complete source test index has explicit partial/unverified/outside-scope rows. Neither passing theory counts nor W2 publications are full source-guarantee or .NET deployment certification.",
+    "No engine figure, pinned constant, recording, Python implementation, remote or infrastructure file was changed."
+  ],
+  "open_questions": [],
+  "needs_human": [
+    {
+      "item": "W4 trusted hosting ingress and employer binding",
+      "why": "The .NET SDK does not expose Python's original-subject object. The seam maps platform-injected headers and SDK context; real ingress must authenticate callers and strip or replace spoofable assertions before private data is used. No .NET deployment or live identity proof was performed."
+    },
+    {
+      "item": "Gateway capability integration and complete figure-parity matrix",
+      "why": "The orchestrator uses the existing /channel/v1 REST contract. Parallel gateway bindings and real API/portal/MCP integration must supply the complete cross-surface proof. Local scripted envelopes are not certification of every real capability producer."
+    },
+    {
+      "item": "Unknown-write reconciliation and workflow retention",
+      "why": "WriteWorkflow.RecoverAsync supports a read-only lookup with the original idempotency identity, but the existing gateway contract has no agreed result-recovery endpoint. No endpoint was invented. Decide operational reconciliation, slot capacity/retirement and process/replica durability before relying on fleet-wide exactly-once behavior."
+    },
+    {
+      "item": "Optional safety-control overrides",
+      "why": "Decide whether the source's diagnostic off switches should be supported later. This runtime explicitly refuses them and preserves the default-on behavior; it never silently weakens a control."
+    },
+    {
+      "item": "Inherited M-01 ingestion override precedence",
+      "why": "Captured ingestion can override year-resolved wage_basis, measuring_date and pay codes. The ported calculation behavior is unchanged because correcting it can change figures; owner reconciliation is required."
+    },
+    {
+      "item": "Inherited first-program multi-program pricing",
+      "why": "credit_math prices the first program for a state with several programs. The orchestrator does not reinterpret or refuse that inherited figure; the owner must decide any calculation change."
+    },
+    {
+      "item": "Snapshot, live retrieval and remaining coverage limits",
+      "why": "Count/max source fingerprints are not snapshots. Live Foundry, Fabric, Entra, network diagnostics and knowledge retrieval were not exercised. The source golden matrices and 15 unverified named control/documentation assertions remain visible in the traceability index."
+    }
+  ],
+  "reports": [
+    "dotnet/docs/ORCHESTRATOR-REPORT.md",
+    "dotnet/docs/orchestrator-spec-traceability.md",
+    "dotnet/docs/orchestrator-composition-traceability.md",
+    "dotnet/docs/orchestrator-workflow-traceability.md",
+    "dotnet/docs/orchestrator-log.md",
+    "dotnet/docs/improvements/orchestrator.json"
+  ]
+}
