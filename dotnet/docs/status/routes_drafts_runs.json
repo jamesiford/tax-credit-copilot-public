@@ -1,8 +1,8 @@
 {
   "session": "routes_drafts_runs",
   "branch": "dotnet/w2-routes_drafts_runs",
-  "head": "a8bb4ea",
-  "summary": "HALTED at mandatory ownership boundary, not a passed W2 delivery. All 23 handlers and routes are implemented over the existing durable runner/Worker and repositories. Build and format pass; 11 owned integration tests passed, then all 8 final owned fast tests passed including the new lease boundary. The full fast gate had 711 passes and 9 failures; the owned assertion failure was fixed, leaving eight shared fixture/composition failures requiring unowned changes. Three main semantic scenarios were replayed; adjusted 98% replay and improvements-cap gates are not claimed. Everything is committed locally; nothing was pushed.",
+  "head": "4ea9414",
+  "summary": "HALT remains mandatory: the resumed conductor request does not allocate shared files or resolve conflicting replay policy. Fresh whole build and format pass; fresh entire fast suite has 712 passes and 8 shared failures, with all owned tests passing. The latest complete conductor board is 79/323 (24.5%). Seven rejected cases alone cap compliant replay at 97.83%: five honest post-run never_run counts and two UUID strings treated as numbers. The shared registration supplies query count 17; HTTP-only replacement with 20 would conceal that seam. Exact evidence and required integrator decisions are committed in the HALT/report. No shared files, tests, gates, thresholds or remotes were changed.",
   "stages": {
     "stage_1_durable_http_worker": "done",
     "stage_2_controls_client_base_year": "done",
@@ -43,8 +43,8 @@
     },
     {
       "id": "DEV-4",
-      "what": "The head field names the implementation/report commit preceding this status-only commit.",
-      "why": "This avoids a self-referential commit identifier while preserving the exact implementation evidence.",
+      "what": "The head field names the preceding committed delivery before this resumed verification report.",
+      "why": "This avoids a self-referential commit identifier; implementation remains a8bb4ea, preceding delivery status is 4ea9414.",
       "decision_needed": false
     }
   ],
@@ -55,7 +55,10 @@
     "Shared discovery fixtures register draft/batch routes alongside the real endpoints and cause AmbiguousMatchException.",
     "A shared contract test still asserts 501 for a valid reader dry-run that now correctly returns 202.",
     "Standalone provider validation scans handlers without discovering the API feature registrations and cannot resolve feature helpers.",
-    "The raw three-scenario wrapper reports 243 group cases, 35 passed and 208 failed before policy/tier handling; this is not the conductor's exact-template adjusted denominator.",
+    "The latest complete conductor reports 79/323 passing (24.5%); the earlier 243-case three-scenario wrapper is not its denominator.",
+    "The conductor rejects UUID strings as changed numbers and the task-required repaired durable-manifest never_run counts. These seven cases alone cap compliant behavior at 316/323 (97.83%), even if all other cases passed.",
+    "A fresh complete fast run confirms 712 passing and eight unowned failures; whole build and format pass again.",
+    "Shared RuntimeCalculationRegistration injects literal Section9QueryCount=17; the HTTP handler faithfully returns that metadata rather than fabricating the recorded 20.",
     "An unowned ReadsCalc setup route substitutes capture-failed for a unit variable; the actual recorded rebase URL succeeds with matching numeric results."
   ],
   "open_questions": [
@@ -71,6 +74,14 @@
     {
       "item": "Complete full fast-suite and all-scenario semantic replay after integration repairs.",
       "why": "Neither the whole fast gate nor the 98% adjusted replay threshold is green. The narrow improvements register is not a blanket waiver."
+    },
+    {
+      "item": "Resolve replay policy versus numeric-guard contradictions before retrying the same gate.",
+      "why": "Seven mandatory/incidental cases alone cap the 323-case gate at 97.83%: UUID strings are treated as figures and successful durable runs must falsely report never_run to match recordings. No dummy ID draws or false state was added."
+    },
+    {
+      "item": "Repair shared query-count metadata at its authoritative registration/validation seam.",
+      "why": "RuntimeCalculationRegistration injects literal 17 despite 20 named static validation queries plus per-table checks. Correcting only the HTTP output would not repair or consistently measure validation."
     },
     {
       "item": "Atomic override intent and recalculation acceptance.",

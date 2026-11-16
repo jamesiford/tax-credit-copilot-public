@@ -229,3 +229,24 @@ narrow; it is not a blanket waiver for changed numbers or byte hashes.
 8. Finish exact-template replay classification, including operational numeric
    differences and the shared validation query count. Do not waive figures
    or claim the improvements cap passed without the conductor's evidence.
+
+## Resumed conductor verification
+
+The latest complete conductor result is **79/323 passing (24.5%)**, not the
+earlier three-scenario wrapper denominator. It rejects numeric-looking UUID
+strings and the honest `never_run=0` after a successful durable run. These
+seven distinct cases alone limit compliant behavior to at most 97.83% under
+the current gate, even if all other cases passed. The task explicitly
+forbids dummy identity draws and historical disconnected-manifest behavior.
+
+A fresh build and format check passed; the fresh entire fast suite is
+**712 passed / 8 failed / 720 total**, with exactly the previously identified
+unowned failures and no failing owned tests. The query-count mismatch was
+traced to the shared registration's literal 17; the HTTP handler does not
+calculate that field.
+
+The HALT report now contains the ten exact conductor rejection cases,
+numeric upper-bound calculation, shared source seams and required policy
+decisions. No shared fixture, production registration, gate or comparison
+was modified. The hard stop remains active; this section is not a new
+completion or replay-pass claim.

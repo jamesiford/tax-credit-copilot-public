@@ -56,3 +56,69 @@ scenarios were replayed before the stop, but their raw wrapper result is not
 the conductor's tier/improvements-adjusted gate. The 98% replay threshold is
 not claimed. See `ROUTES-DRAFTS-RUNS-REPORT.md` for exact evidence, remaining
 risks, and callable operation contracts.
+
+## Conductor-requested recheck
+
+The resumed request was investigated without changing the allocation, shared
+tests, shared registration or replay comparisons. A fresh complete command
+chain ran:
+
+```
+dotnet build -warnaserror --nologo -v quiet
+dotnet format --verify-no-changes --no-restore --verbosity quiet
+dotnet test --no-build --filter "Category!=heavy"
+```
+
+Build and format passed. The full fast result is now **712 passed / 8 failed /
+720 total**: all eight failures are exactly the shared failures enumerated
+above. Local output is `dotnet/artifacts/drafts-runs-resume-fast.log`.
+
+The latest conductor's complete semantic output was inspected directly, not
+replaced with the policy-free wrapper. Its exact-template denominator is 323,
+with 79 passing cases (24.5%). Ten distinct case failures singled out by its
+numeric guard were verified from its raw JSON:
+
+| Scenario | Case | Field | Recorded / actual |
+| --- | --- | --- | --- |
+| p1_auth | reader.run | validation.queries_run | 20 / 17 |
+| p1_auth | writer.run | validation.queries_run | 20 / 17 |
+| p1_writes | ok.post-api-v2-clients-client-id-runs | validation.queries_run | 20 / 17 |
+| p1_auth | reader.batch-dry-run | preview.never_run | 1 / 0 |
+| p1_auth | writer.batch-dry-run | preview.never_run | 1 / 0 |
+| p1_auth | ratelimit.writer-batch-1 | preview.never_run | 1 / 0 |
+| p1_auth | ratelimit.writer-batch-2 | preview.never_run | 1 / 0 |
+| p1_auth | ratelimit.reader-batch-1-own-bucket | preview.never_run | 1 / 0 |
+| p1_program_drafts | create | draft_id | numeric-looking UUID strings differ |
+| p1_program_drafts | second-create | draft_id | numeric-looking UUID strings differ |
+
+These are not all implementation errors that can safely be fixed here:
+
+- The five `never_run=0` answers follow earlier successful direct runs and
+  their actual durable manifests. The task explicitly forbids manufacturing
+  historical disconnected-manifest behavior. Returning 1 after the accepted
+  run would assert a false state. The guard refuses to waive the changed count.
+- Draft IDs are UUID **strings**, not figures. Both generators produce valid
+  UUIDs with numeric-only hex digits at these counter values. The task
+  explicitly forbids burning UUID draws just to reproduce startup artifacts.
+  The conductor nevertheless parses the strings as changed numbers and
+  rejects the incidental-identity entry.
+- `RuntimeCalculationRegistration.cs` injects literal
+  `ClientCalculationConfig.Section9QueryCount=17`. The shared
+  `GoldValidation.cs` has 20 named static queries plus additional per-table
+  checks. The feature returns the runner's result faithfully. Changing only
+  the HTTP result to 20 would not repair the shared metadata source; changing
+  the authoritative registration/validator contract is outside ownership.
+
+Even ignoring the three query-count cases, those seven rejected cases cap
+the attainable result at **316/323 = 97.83%**, below 98%, if every other case
+were fixed. Including all ten gives 313/323 = 96.90%. This is a conservative
+upper bound, not a claim that the other failures are already resolved.
+
+The integrator must resolve the policy/guard mismatch for UUID strings and
+post-publication operational state, as well as grant an explicit shared-file
+allocation for fixture/composition and query-count corrections. Removing this
+HALT file would conceal an active mandated stop; restoring placeholder 501s,
+false `never_run` counts, dummy ID draws or output-only query counts would
+violate the task. No such workaround was applied. No replay threshold or
+test was loosened, and no new full replay was claimed: the conductor's
+complete all-scenario result already demonstrates this boundary.

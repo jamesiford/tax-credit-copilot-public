@@ -61,3 +61,23 @@
   Temporary API helper stopped; no Worker races the replay; nothing pushed.
 - See HALT and implementation reports for exact failure names, registration
   seam, override/enqueue atomicity limitation and next integrator actions.
+
+## Conductor recheck
+
+- Reopened the exact shared fixture/composition sources. Confirmed real/test
+  endpoint duplication, explicit placeholder 501 assertions, and automatic
+  handler scanning without feature-module registration. No test-only route
+  priority, conditional suppression or hidden dependency factory was added.
+- Fresh whole build and formatter passed. Fresh entire fast suite finished
+  712 passed / 8 failed / 720 total; all owned cases pass. Log:
+  `dotnet/artifacts/drafts-runs-resume-fast.log`.
+- Read the latest conductor's raw complete semantic report and exact-template
+  board. Verified ten rejected cases, including five honest post-run
+  never-run counts and two numeric-looking UUID strings.
+- Even those seven cases alone cap a compliant replay at 97.83%, below 98%;
+  no fabricated counts or dummy identity draws were used.
+- Traced query-count metadata to the shared registration's literal 17, not
+  to the HTTP handler. The validator owns its queries; an output-only 20
+  would conceal rather than repair that seam.
+- Mandatory ownership stop remains. Updated HALT/status with the exact
+  conductor-policy conflict instead of deleting evidence or claiming green.
