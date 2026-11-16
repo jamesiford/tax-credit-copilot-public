@@ -1,21 +1,101 @@
 # W2 route convergence
 
-## Outcome: HALT, not a successful cutover gate
+## Outcome: five replay percentage thresholds met under the updated policy
 
-The shared composition, deterministic-source and cross-feature integration
-repairs are implemented. All twelve recorded scenarios executed. Reads, claims
-and AI meet the local diagnostic's thresholds; framework and drafts do not.
-The latest **official conductor** instead passes reads and AI and fails
-framework, claims and drafts. Stage 4 requires an
-honest halt rather than reproducing framework accidents, fabricating counters,
-discarding durable state or waiving numeric differences.
+The owner's latest task adds `durable_manifest_counts`: operational batch
+preview counters must follow real durable manifests, and exact registered
+differences from the disconnected recording store are permitted. Applied that
+decision without changing a handler, response, comparison, test or threshold.
+The prior HALT marker is retired; its evidence remains in the history below.
 
-The official result below is authoritative for gate claims. Historical local
-diagnostics are identified separately and are not substituted for it. The older
-`replay_board.py` groups some operations loosely and prints obsolete green
-labels; those labels are not evidence of gate success.
+Fresh full direct replay completes **12 scenarios / 1,769 steps** and exactly
+reproduces all **3,870 raw failing fields** in the supplied conductor report.
+The additional exact registrations cover **220 fields in 26 fully resolved
+draft cases**. Applied to that unchanged official board, drafts rises from
+**286/323 (88.5%) to 312/323 (96.6%)**, with **68/323 (21.1%)** waived,
+below the 25% batch-group limit. This is a verified registered-only projection,
+**not a claim that the external conductor has run again after the commit**.
+Its remaining field count projects from 2,113 to 1,893; raw replay is not
+claimed to have zero failures.
 
-## Latest official conductor confirmation
+| Group | Supplied conductor | After exact registrations | Required | After waived |
+|---|---:|---:|---:|---:|
+| framework | 17/17 (100.0%) | 17/17 (100.0%) | 90% | 9/17 (52.9%) |
+| reads_calc | 406/414 (98.1%) | 406/414 (98.1%) | 95% | 26/414 (6.3%) |
+| claims_artifacts_rules | 291/316 (92.1%) | 291/316 (92.1%) | 90% | 70/316 (22.2%) |
+| drafts_runs | 286/323 (88.5%) | 312/323 (96.6%) | 90% | 68/323 (21.1%) |
+| ai | 26/27 (96.3%) | 26/27 (96.3%) | 90% | 3/27 (11.1%) |
+
+The latest supplied conductor reports only drafts below threshold. Its
+framework group now has 17 cases, no failing cases and 52.9% waived, with no
+framework gate failure. That waiver share remains visible and is **not**
+claimed below 25%; this session changes neither framework policy nor grouping.
+Other buckets remain gateway 2/255, sealed workspace 79/96 and unassigned
+238/317. These are not claims of gateway completion or full literal parity.
+
+### Exact policy application and integrity
+
+Commit `cd1f137` adds **51 exercised entries**, IDs 35-90 excluding
+37, 68, 73, 78 and 88, to `improvements\integrate-W2.json` (85 total).
+Every new entry is an exact route/category/path registration:
+
+- **35 F18 entries / 158 fields** cover `never_run`, `skip_coverage`,
+  `skip_candidates_upper_bound` and the corresponding sampled last-run state
+  and added metadata. Preview, accepted batch detail, cancel/retry and the
+  three observed list positions retain the same truthful accepted summary.
+  Exactly **36 numeric field matches** are authorized operational
+  `never_run` or `skip_candidates_upper_bound` differences.
+- **16 source-binding entries / 62 fields** separately cover missing
+  `programs.none` and added `programs.GA_JTC` map keys. The Python design in
+  `application/runs/pairs.py` resolves programs from payroll footprint; its
+  independently unconfigured recording reader lost that footprint. The
+  already-correct merged source resolves actual authored coverage. These
+  entries cover only missing/added keys, **not changed existing program counts**,
+  work-item identities, stored item program values or calculated figures.
+
+Five unexercised candidate registrations were removed before committing.
+Boundary checks prove the additions do not cover changed existing last-run
+IDs, client/item populations, execution success counts, existing program
+counts, statuses or certified eligibility figures. The 26 resolved cases have
+no remaining raw field differences after existing official waivers, `Vary`
+tolerance and these precise additions; **no extra free-text tolerance or
+changed numeric comparison is needed**.
+
+Verification evidence is under
+`artifacts\integrate-durable-policy-external`: unchanged `replay.json`,
+`replay.log`, exact-conductor `confirmation.json` and `registration-audit.json`.
+The audit starts from the actual supplied board, retains every other group
+verbatim and records every new entry hit and fully resolved case. It also
+reproduces the official drafts baseline exactly (37 failed cases / 240 fields)
+before applying only the new registrations (11 failed cases / 20 fields).
+The old
+`convergence_board.py` retains its earlier policy and is historical, not the
+updated conductor gate or the basis of the projection.
+
+Strict build has zero warnings/errors; format passes; **978 fast tests**
+pass with no failures/skips, and **ten Python setup/diagnostic tests** pass.
+Logs/TRX files use `artifacts\integrate-durable-policy-*`. No .NET runtime,
+test or dependency changed, so the existing 141 distinct heavy-case passing
+results remain applicable. The single isolated replay host was health-checked
+and stopped in `finally`. Nothing was pushed.
+
+### Remaining non-gating differences
+
+Retaining all other official failures leaves **11 draft cases / 20 fields**:
+seven identity/base-year durability cases, one state-filter status case, two
+work-item program-code cases and `p2_run_batches:unknown-client` at
+`detail.detail` (the native error omits the echoed unknown client).
+The earlier local diagnostic tolerates that last wording difference and has
+ten such cases / 19 fields; its extra text tolerance is not used to claim
+another official pass. IDs, status outcomes and work-item stored program values
+were not waived.
+Reads retains eight failures, claims 25 and AI one, all visible within their
+passing percentage thresholds. Existing owner work for exact money scale,
+later genuine ID allocation, valid long-text storage, M01, first-program
+pricing and source-version strength remains below-threshold backlog, not
+silently resolved work.
+
+## Historical: official conductor confirmation before the policy update
 
 The task was resumed again with the conductor report generated on 16 November
 2026 after the setup repair. Its actual raw report has **3,870 failing fields**,
@@ -67,7 +147,7 @@ and ten Python regressions pass. The corresponding fresh logs/TRX files use
 the `integrate-conductor-confirm-` prefix. No .NET runtime or heavy fixture
 changed, so the existing 141 distinct heavy passing results still apply.
 
-## Earlier resume: actual setup repaired
+## Historical: earlier resume and actual setup repair
 
 The resumed task supplied a new conductor board: framework 17/19 (89.5%,
 nine waived), reads 367/414 (88.6%, 114 waived), claims 241/316 (76.3%,
@@ -108,7 +188,7 @@ scenario results exactly: group totals, every unresolved field and every
 rejected numeric waiver. This establishes the corrected setup without changing
 an expected response, comparator, threshold or runtime handler.
 
-Current evidence is under `dotnet\artifacts\integrate-resume-external`:
+Evidence for that checkpoint is under `dotnet\artifacts\integrate-resume-external`:
 `replay.json` / `replay.log` are the direct unmodified replay output and
 `policy.json` is the separately identified diagnostic. The stricter local
 diagnostic below still fails framework and drafts. In particular it rejects
@@ -123,7 +203,7 @@ build/format and all 978 fast tests pass again. The initial no-build test
 attempt aborted in VSTest host initialization; rebuilding local metadata
 resolved it without dependency, test or runtime changes.
 
-## Comparable before and after
+## Historical: comparable runtime before and after
 
 Both columns below rescore actual baseline/final replay output using the same
 final register, exact method/template ownership and documented text tolerances.
@@ -160,7 +240,7 @@ Evidence, relative to `dotnet\artifacts`:
 - `integrate-convergence-final.log`: all twelve scenarios completed. Runner
   exit zero means execution completed, not semantic convergence.
 
-## Repairs and regression evidence
+## Historical: runtime repairs and regression evidence
 
 | Repair | Why it was needed | Evidence |
 |---|---|---|
@@ -190,9 +270,9 @@ Implementation commits before the final runtime-boundary repair:
 `9a1ffd2` (actual external replay setup). The machine-readable status pins the
 verified replay repair; the documentation commit follows it.
 
-## Register integrity
+## Historical: register integrity before the owner policy update
 
-`improvements\integrate-W2.json` contains 34 precise entries:
+At that checkpoint, `improvements\integrate-W2.json` contained 34 precise entries:
 
 | IDs | Scope |
 |---|---|
@@ -221,7 +301,7 @@ The diagnostic's additional error-text paths (`detail.detail`,
 schema/status differences and successful values remain real failures. Its
 three regression tests cover these boundaries.
 
-## Remaining clusters
+## Historical: remaining clusters before the owner policy update
 
 These are failed exchanges, not independent defect counts. Field counts include
 the downstream missing/extra fields caused by a status mismatch. Full exact
@@ -294,7 +374,7 @@ F18 can document genuine durable latest-run behavior, but cannot waive a
 changed `never_run`, other count or identifier. Neither invented previews nor
 severing durable manifests would be honest convergence.
 
-## Verification and operating boundary
+## Historical: runtime verification and operating boundary
 
 All commands ran locally in this worktree on branch `dotnet/integration`.
 SDK 10.0.404 targets net10.0. The approved oracle is
@@ -333,8 +413,9 @@ scenario setup, because it introduces no deliberate product difference.
 
 ## Decisions carried forward
 
-See `HALT-integrate-W2.md` and `status\integrate-W2.json` for the owner work
-list. Besides the concrete remaining clusters, preserve the pre-existing
+See `status\integrate-W2.json` for the remaining owner work list; the active
+HALT marker was retired after the policy update documented above.
+Besides the concrete remaining clusters, preserve the pre-existing
 figure-affecting candidates: M01 ingestion overrides of year-resolved wage
 basis/measuring dates/pay codes, and first-program credit pricing in a
 multi-program state. M01 contradicts ADR-005's prohibition on overriding

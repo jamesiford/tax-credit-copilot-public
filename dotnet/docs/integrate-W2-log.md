@@ -254,3 +254,51 @@
   `replay.json`, `replay.log` and `confirmation.json`; execution completeness
   is explicitly separate from `semantic_pass: false`. Health was checked
   before replay and the owned process was stopped in `finally`.
+
+## Updated owner policy: durable preview registrations close the threshold gap
+
+- Read the complete task again. The owner added `durable_manifest_counts`,
+  explicitly permitting exact F18 operational preview counter differences.
+  The new supplied conductor board is framework 17/17, reads 406/414,
+  claims 291/316, drafts 286/323 and AI 26/27. Only drafts is reported below
+  threshold. Framework's 52.9% waiver share remains visible; this session does
+  not alter its grouping, waiver accounting or policy.
+- Traced the actual planner and Python `application/runs/plan.py` /
+  `pairs.py`. F18 durable last-run data is correct already. Program-map
+  differences are a separate existing source-binding fix: the configured
+  footprint resolves actual authored programs while the recording reader
+  returned an empty footprint. No stale manifests, fabricated counts,
+  program-less fallback or dummy IDs were introduced.
+- Added **51 exercised route/category/path entries** in the session register:
+  35 F18 entries cover 158 fields; 16 separate missing/added source-backed
+  program-map entries cover 62 fields. All **36 numeric matches** are exact
+  authorized never-run/skip-candidate preview counters. Five inert candidate
+  entries were removed. The register now has 85 entries; IDs 35-90 omit
+  37, 68, 73, 78 and 88. Commit: `cd1f137`.
+- Ran a fresh full external replay on one isolated ordinary host, approved
+  CPython 3.12.13 with verified worktree import, cwd `backend`, root
+  `PYTHONPATH`, semantic mode and plain reset URL. All **12 scenarios /
+  1,769 steps** complete with **3,870 raw failures / 16,711 tolerated fields**,
+  exactly equal in every ordered failure to the latest actual conductor.
+  Health checked before execution; owned host stopped in `finally`.
+- Registered-only audit uses that exact raw report and the supplied official
+  board, not the obsolete local diagnostic's grouping/tolerances. All fields
+  in **26 previously failing draft cases** are covered without a new text
+  tolerance. The resulting projection is **312/323 (96.6%) drafts**, with
+  **68/323 (21.1%)** waived; other groups are unchanged. Remaining policy
+  fields project **2,113 -> 1,893**. This is not a new external conductor run.
+- Boundary assertions reject registration coverage for changed existing IDs,
+  client/item totals, execution-success counts, existing program counts,
+  statuses and certified figures. Every new entry has an actual hit. Audit
+  evidence is `artifacts\integrate-durable-policy-external\registration-audit.json`
+  alongside `replay.json`, `replay.log` and `confirmation.json`.
+- Strict build has zero warnings/errors; format passes; all **978 fast tests**
+  pass with no skips/failures across eight assemblies. All **ten Python
+  regressions** pass. Fresh build/format/TRX evidence uses the
+  `integrate-durable-policy-` prefix. No runtime, test or dependency changed;
+  previous 141 distinct heavy passing results remain applicable.
+- All five percentage thresholds are now met under the updated supplied
+  conductor policy plus the exact registrations. Retired the active HALT
+  marker while preserving its historical evidence in the report/log.
+  Updated machine status keeps exact-ID, money-scale, stored-item program,
+  native storage and figure-affecting owner work explicit. Nothing pushed.
