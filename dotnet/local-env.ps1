@@ -37,6 +37,11 @@ function Get-TaxCreditLocalEnvironment {
     $settings.SOURCE_SQL_SERVER = $cfg['LAKEHOUSE_SQL_SERVER']
     $settings.SOURCE_SQL_DATABASE = $cfg['LAKEHOUSE_SQL_DATABASE']
     if ($cfg['SOURCE_SCHEMA']) { $settings.SOURCE_SCHEMA = $cfg['SOURCE_SCHEMA'] }
+    # The sealed workspace routes refuse with a 503 when a lakehouse source has no workspace and lakehouse names, which leaves the portal on
+    # "Workspace unavailable"; carry them through from backend\.env as the Python product does.
+    foreach ($name in 'FABRIC_WORKSPACE', 'FABRIC_LAKEHOUSE', 'ONELAKE_ENDPOINT', 'REFERENCE_ACCOUNT_ID') {
+        if ($cfg[$name]) { $settings[$name] = $cfg[$name] }
+    }
     $settings.ARTIFACT_STORE = 'local'
     # DefaultAzureCredential would otherwise try Visual Studio / VS Code sign-ins first, which may be a different account.
     $settings.AZURE_TOKEN_CREDENTIALS = 'AzureCliCredential'
