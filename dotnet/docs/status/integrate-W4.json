@@ -1,0 +1,41 @@
+{
+  "session": "integrate-W4",
+  "branch": "dotnet/integration",
+  "head": "7ecce3a",
+  "summary": "Rebuilt the integrated branch with pinned .NET SDK 10.0.404; no behavior, test, configuration or package changes were needed.\nAll 141 heavy cases pass in one full invocation, followed by all 1,559 fast cases; no failures or skips.\nDebug and Release strict builds and solution format pass.\nFresh dual-host semantic replays meet every required threshold and current waiver cap, exactly matching merged W4 scores.\nThe original one-case HTTP failure did not recur; its incomplete supplied stack cannot establish a root cause.\nInherited 637 unresolved replay fields and existing release limitations remain; this is not cutover approval.\nThis status names the tested source parent; the subsequent local commit contains documentation and aggregate evidence only.",
+  "stages": {
+    "1": "done",
+    "2": "done"
+  },
+  "gates_claimed": {
+    "build": true,
+    "release_build": true,
+    "format": true,
+    "tests_heavy": true,
+    "tests_fast": true,
+    "replay_framework": true,
+    "replay_reads_calc": true,
+    "replay_claims_artifacts_rules": true,
+    "replay_drafts_runs": true,
+    "replay_ai": true,
+    "replay_gateway": true,
+    "current_waiver_caps": true,
+    "owned_paths": true,
+    "not_pushed": true,
+    "status_json": true,
+    "report_present": true
+  },
+  "deviations": [],
+  "findings": [
+    "The first no-build invocation aborted in DotnetTestHostManager.GetTestHostPath with NullReferenceException before test execution; rebuilding fixed that separate stale-output problem.",
+    "The supplied conductor HTTP failure did not reproduce in the rebuilt complete heavy gate: API 38/38, persistence 11/11, sources 1/1 and parity 91/91. Its original root cause remains unestablished; no speculative source or timeout change was made.",
+    "Fresh current-policy scores match the merged W4 evidence exactly: framework 100%, reads_calc 98.07%, claims_artifacts_rules 93.35%, drafts_runs 96.59%, ai 100% and gateway 92.55%. The existing 637 unresolved fields and producer decisions are unchanged."
+  ],
+  "open_questions": [],
+  "needs_human": [],
+  "reports": [
+    "dotnet/docs/integrate-W4-log.md",
+    "dotnet/docs/integrate-W4-gates.json",
+    "dotnet/docs/status/integrate-W4.json"
+  ]
+}
