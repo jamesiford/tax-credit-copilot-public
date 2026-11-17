@@ -1,3 +1,15 @@
+# Inherited W3 release blockers
+
+The W3 policy-stop record below is preserved as release-blocker evidence after
+the W4 conductor requested removal of the inherited halt-file gate failure.
+This documentation relocation does **not** resolve the stop, authorize release,
+change the framework waiver cap or supersede any owner decision. W4 deployment
+assets remain separate from application convergence approval. The historical
+W3 status retains its failed policy/no-halt claims; its report link now points
+here so the evidence remains accessible.
+
+---
+
 # Stage-4 policy stop: inherited framework waiver cap
 
 ## What happened

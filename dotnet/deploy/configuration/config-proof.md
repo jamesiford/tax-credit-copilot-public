@@ -10,7 +10,7 @@ Read the W4 deployment task and relevant rows from `PLATFORM-RISKS`,
 `PERSISTENCE-REPORT`, `SOURCES-AUTH-AI-REPORT`, `COMPOSITION-REPORT`,
 `COMPOSITION-SCHEMA-PROVISIONING`, `HOST-ARCHITECTURE`,
 `ROUTES-CONVERGENCE-REPORT`, `GATEWAY-REPORT`, `GATEWAY-CONVERGENCE-REPORT`,
-`HALT-integrate-W3`, `ORCHESTRATOR-REPORT`, all three orchestrator traceability
+the W3 policy stop (now `INHERITED-W3-RELEASE-BLOCKERS`), `ORCHESTRATOR-REPORT`, all three orchestrator traceability
 indexes, contract sections 4–5/findings and the findings/improvement indexes.
 Reports distinguish local composition/connectivity from unverified native grants,
 transactions, ingress, privacy and cross-replica durability. None is promoted to

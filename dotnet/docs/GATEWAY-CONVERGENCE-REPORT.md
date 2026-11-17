@@ -19,7 +19,7 @@ replay. There are **1,769 recorded steps, including four controls**.
 All six named replay percentage targets pass in the local W3 policy audit.
 **Unconditional convergence is not claimed:** framework still relies on
 **9/17 waived cases (52.94%)**, above the inherited 25% waiver limit.
-`HALT-integrate-W3.md` records that Stage-4 policy stop. W2 explicitly disclosed
+`INHERITED-W3-RELEASE-BLOCKERS.md` preserves that Stage-4 policy stop. W2 explicitly disclosed
 the same conflict and noted that its latest external conductor did not flag
 the share; this session neither assumes that silence changes the cap nor
 changes a comparator to make it disappear.

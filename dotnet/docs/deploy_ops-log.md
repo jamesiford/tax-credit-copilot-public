@@ -226,3 +226,19 @@ Subsequent implementation and measured gate results are appended below.
   branch was authoritatively absent from the sole remote. Final status records
   native prerequisites as partial rather than converting local assets to
   release approval. Its `head` names the verified parent evidence commit.
+
+## Conductor follow-up: inherited halt filename
+
+- The conductor rejected `HALT-integrate-W3.md`. The previous local check was
+  too narrow: it checked literal `HALT.md`, not inherited `HALT*.md`.
+- Relocated the full W3 record to `INHERITED-W3-RELEASE-BLOCKERS.md`, adding an
+  explicit archival/classification note while preserving the original body.
+  Updated current convergence/configuration/status report links. Historical
+  W3 failed gate claims, owner decisions and policy thresholds are unchanged.
+- Updated this session's status to name the conductor repair and the broader
+  no-halt check. This is documentation-only; no application/runtime source,
+  artifacts, replay evidence, comparison, test or waiver changed. The API policy
+  remains blocked; release approval is not implied by clearing a filename gate.
+- Recheck all eight conductor gates, including recursive case-insensitive
+  `HALT*.md` absence, status/report validity, ownership, local commits, no remote
+  branch and clean tree after the repair commit.

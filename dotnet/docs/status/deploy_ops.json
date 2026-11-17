@@ -1,8 +1,8 @@
 {
   "session": "deploy_ops",
   "branch": "dotnet/w4-deploy_ops",
-  "head": "98a2f1d",
-  "summary": "Delivered independent .NET 10 packaging, four linux/amd64 source images, guarded azd/Terraform, consumer configuration, optional safe telemetry, dormant CI and Python operations handoff. Build/format and 1,551 fast tests passed; mocked Terraform and actionlint passed. Final artifact revision is 2e8ba28. API policy remains blocked; gateway threshold passed with 19 failures. No live deployment, push or product changes. Worker App Service and external orchestrator ingress remain unavailable; native schema/grants, readiness, privacy and owner decisions are explicit.",
+  "head": "c6ece2a",
+  "summary": "Delivered independent .NET 10 assets, four linux/amd64 images, guarded azd/Terraform, configuration, optional telemetry, dormant CI and Python handoff. Conductor follow-up relocates the inherited W3 halt record to INHERITED-W3-RELEASE-BLOCKERS.md without changing its evidence or unresolved decisions; the no-halt check now covers HALT*.md, not just literal HALT.md. Existing build/format, 1,551 fast tests, mocked Terraform and actionlint proofs remain unchanged; artifact revision is 2e8ba28. API policy remains blocked, gateway has 19 failures, and Worker/ingress/native prerequisites remain explicit. No deployment, push or product changes.",
   "stages": {
     "D1": "partial",
     "D2": "done",
@@ -63,6 +63,12 @@
       "what": "Worker has a portable image but its App Service topology is explicitly refused.",
       "why": "The Generic Host exposes no HTTP lifecycle/progress health seam. A dummy web sidecar would falsely report a dead poller as healthy.",
       "decision_needed": true
+    },
+    {
+      "id": "DEV-6",
+      "what": "Relocated the inherited W3 policy-stop record to INHERITED-W3-RELEASE-BLOCKERS.md and repaired its current report links.",
+      "why": "The conductor's no_halt check rejects inherited HALT-prefixed files too. The full original record and unresolved release decisions are preserved; historical W3 gate claims, replay comparisons and thresholds remain unchanged.",
+      "decision_needed": false
     }
   ],
   "findings": [
@@ -78,7 +84,7 @@
     "Full azd environment/package orchestration, OIDC/private SCM promotion and native Fabric/Blob/Entra/Foundry behavior were not executed. The owned MSBuild packaging primitive and official manifest schema were validated.",
     "M-01 ingestion precedence, first-program multi-program pricing, zero-worksite SQL/projector, leap-window context and native money/AVG remain unchanged figure-sensitive owner decisions.",
     "The count/max-modified source marker is not a transactional Delta snapshot. The 600-second lease lacks periodic renewal; restart loses host-local tickets/confirmations and there is no gateway unknown-result recovery endpoint.",
-    "No new replay waiver or application dependency was added. Existing inherited HALT-integrate-W3.md remains; no literal HALT.md or session hard-stop file was created."
+    "No new replay waiver or application dependency was added. The conductor rejected the inherited HALT-prefixed W3 record, which is now preserved in INHERITED-W3-RELEASE-BLOCKERS.md. No HALT-prefixed Markdown remains; the W3 policy/release stop itself is unresolved."
   ],
   "open_questions": [
     "Approved non-HTTP Worker hosting/supervision or an application-owned lifecycle-coupled progress/health seam remains unselected.",
@@ -110,6 +116,7 @@
   ],
   "reports": [
     "dotnet/docs/DEPLOY-REPORT.md",
+    "dotnet/docs/INHERITED-W3-RELEASE-BLOCKERS.md",
     "dotnet/deploy/README.md",
     "dotnet/deploy/DEPLOYMENT-MATRIX.md",
     "dotnet/deploy/CONFIGURATION.md",

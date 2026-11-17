@@ -16,6 +16,13 @@ schema/grants/transactions, meaningful gateway dependency readiness and inherite
 privacy/calculation decisions remain prerequisites. This delivery does not
 silently convert them into infrastructure settings.
 
+The conductor follow-up found that its `no_halt` check also rejects the inherited
+W3 halt filename, not just literal `HALT.md`. Its complete evidence is preserved
+in [`INHERITED-W3-RELEASE-BLOCKERS.md`](INHERITED-W3-RELEASE-BLOCKERS.md), with
+current report links repaired. This documentation relocation clears the file
+gate only: W3's historical failed policy/no-halt claims, waiver cap, owner queue
+and release stop remain unchanged.
+
 ## Stable integration contract
 
 Consumers need the delivery commits integrated first; a parallel shadow worktree
