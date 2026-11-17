@@ -127,7 +127,7 @@ version" gap as a named risk, and decide on a fingerprint or Silver version mark
 - **Mediator and library licences.** MediatR is RPL 1.5 or commercial; the spike uses an in-house mediator (ADR 0003).
   FluentAssertions 8 is under the Xceed community licence; not used (ADR 0004).
 - **What the customer's engineers can operate.** The skeleton uses App Service-friendly defaults and treats Aspire as a
-  local tool (ADR 0007); whether Experian's engineers can run containers, Terraform and .NET services is not answered here.
+  local tool (ADR 0007); whether the customer's engineers can run containers, Terraform and .NET services is not answered here.
 - **Hosted orchestrator interpreter (not investigated).** The hosted orchestrator image uses Python 3.13 (`channel_orchestrator/Dockerfile`), so
   any numeric module vendored into it runs on a third interpreter, neither the 3.12 oracle nor the 3.14 cross-check.
 

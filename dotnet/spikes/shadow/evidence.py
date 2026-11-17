@@ -99,11 +99,10 @@ def gates() -> None:
 
 
 def capture_live() -> None:
-    base = Path(os.environ["USERPROFILE"]) / "OneDrive - Microsoft" / "Customers"
-    checks = list(base.glob("*/Payroll Tax Consulting Acceleration with AI/*/GHCP-Prompts-DotNet/Conductor/checks/fabric_active.py"))
-    if len(checks) != 1:
-        raise RuntimeError("Current admission script was not uniquely located.")
-    environment = {**os.environ, "SHADOW_CAPACITY_CHECK": str(checks[0]), "PYTHONDONTWRITEBYTECODE": "1"}
+    check = os.environ.get("SHADOW_CAPACITY_CHECK")
+    if not check or not Path(check).is_file():
+        raise RuntimeError("Set SHADOW_CAPACITY_CHECK to the capacity admission script before capturing live evidence.")
+    environment = {**os.environ, "PYTHONDONTWRITEBYTECODE": "1"}
     result = subprocess.run([str(ORACLE), "-B", str(HERE / "observe.py"), "--live"], cwd=ROOT / "dotnet",
                             env=environment, capture_output=True, timeout=180, check=False)
     document = json.loads(result.stdout)
