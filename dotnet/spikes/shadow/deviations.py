@@ -151,7 +151,7 @@ def main() -> None:
               "unresolved_differences": unresolved,
               "decisions": json.loads((HERE / "operational-decisions.json").read_text())["decisions"]}
     (ROOT / "dotnet" / "docs" / "SHADOW-DEVIATIONS.json").write_text(json.dumps(report, indent=2) + "\n")
-    (ROOT / "dotnet" / "docs" / "SHADOW-DEVIATIONS.md").write_text(human(report) + "\n", encoding="utf-8")
+    (ROOT / "dotnet" / "docs" / "SHADOW-DEVIATIONS.md").write_text(human(report).rstrip() + "\n", encoding="utf-8")
     print(json.dumps({"registers": len(report["register_inventory"]), "unique_variants": len(differences),
                       "current": sum(row["state"] == "current-deliberate-difference" for row in differences),
                       "unresolved_fields": len(unresolved), "decisions": len(report["decisions"])}))
