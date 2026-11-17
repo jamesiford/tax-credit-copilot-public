@@ -106,3 +106,20 @@ All orchestrator cases run below the heavy-test threshold. No live Foundry,
 Fabric, Entra, customer endpoint, DNS probe or model generation was used.
 The installed SDK wire proofs use local/injected transports. Deployment and
 the complete multi-surface/golden matrices remain explicitly unverified.
+
+## Conductor gate repair
+
+- The conductor reported CA2026 at `WriteWorkflowTests.cs(287,63)` for
+  `JsonDocument.Parse(body).RootElement.Clone()`: the temporary document was
+  never disposed. The test now clones from an explicitly scoped `using`
+  document, keeping the reply independent of the disposed owner. No assertion,
+  production behavior, target framework or analyzer configuration changed.
+- Re-ran whole-solution warning-as-error build, formatting verification and
+  all fast tests from `dotnet` with SDK 10.0.404: passed, zero build
+  warnings/errors and **1,509 tests passed**, zero failures/skips.
+- Also ran those same solution gates from the repository root with installed
+  SDK 11.0.100, where the additional analyzer is active: all passed, including
+  **431 orchestrator cases** and the **39 deterministic records**. Projects
+  still target net10.0; no .NET 11 API or feature was introduced.
+- Repair commit: `b602404`. Status and this log are recorded in its descendant.
+  Existing O5 integration and deployment limits remain unchanged.

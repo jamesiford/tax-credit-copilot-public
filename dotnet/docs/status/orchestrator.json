@@ -1,8 +1,8 @@
 {
   "session": "orchestrator",
   "branch": "dotnet/w3-orchestrator",
-  "head": "9a229f8",
-  "summary": "Implemented the executable with actual Agent Framework tools, official Responses hosting, a service-authenticated REST gateway, shared settling, guarded composition and checkpointed confirmation. All 39 deterministic records and 431 orchestrator cases pass; whole-solution build, format and 1,509 fast tests pass. All 313 named guarantees are indexed (156 E, 103 P, 15 U, 39 X), not claimed as 313 equivalent passing tests. Cross-surface figure parity remains dependent on gateway/integration work; deployment is unverified. The head names the implementation commit; this status/report commit is its descendant. Nothing was pushed.",
+  "head": "b602404",
+  "summary": "Implemented the executable with actual Agent Framework tools, official Responses hosting, a service-authenticated REST gateway, shared settling, guarded composition and checkpointed confirmation. Fixed conductor CA2026 by disposing the workflow test JsonDocument after cloning its reply element. Whole-solution warning-as-error build, format and all 1,509 fast tests pass under both SDK 10.0.404 from dotnet and root SDK 11.0.100; the target remains net10.0. All 39 deterministic records and 431 orchestrator cases pass. All 313 named guarantees are indexed (156 E, 103 P, 15 U, 39 X), not claimed as 313 equivalent passing tests. Cross-surface figure parity remains dependent on gateway/integration work; deployment is unverified. The head names the repair commit; this status/log commit is its descendant. Nothing was pushed.",
   "stages": {
     "O1": "done",
     "O2": "done",
@@ -53,6 +53,7 @@
     }
   ],
   "findings": [
+    "The conductor's root SDK 11.0.100 detects CA2026 in an inline JsonDocument.Parse(body).RootElement.Clone() expression that the prescribed SDK 10.0.404 build accepted. Explicit using disposal fixes the leak without requiring newer target APIs or suppressing analysis.",
     "The captured Resolve/yes/yes conversation performs eligibility reads, not a prepare/commit flow. Actual checkpointed writes are proved separately.",
     "keyword.10 is a clarification, not a successful simulation; keyword.19 uses injection-screened keyword planning rather than an invented refusal.",
     "Global data_catalog runs before client resolution; a bare year can invoke ordinary eligibility fallback and must not be assumed to mean help or review-pack resumption.",
