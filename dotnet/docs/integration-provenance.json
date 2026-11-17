@@ -1,9 +1,9 @@
 {
-  "observed_utc": "2026-11-17T06:24:27.841222+00:00",
+  "observed_utc": "2026-11-17T06:28:48.608969+00:00",
   "product_revision": "006760b",
   "product_and_contract_diff_empty": true,
-  "observer_source_sha256": "a830871f66a29456e21d8fb0e98a39806117e080ac1082f18820e2235a1da007",
-  "observer_commit": "cb10457",
+  "observer_source_sha256": "ca1aad9b9da7e80b06b355c6dc02a0efe8f846035b9e405155d86e8398376ce3",
+  "observer_commit": "a7efcac",
   "release_binaries": {
     "Api": {
       "path": "dotnet\\artifacts\\bin\\TaxCredit.Api\\release\\TaxCredit.Api.dll",

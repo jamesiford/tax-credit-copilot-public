@@ -1,8 +1,8 @@
 {
   "session": "integration",
   "branch": "dotnet/w4-integration",
-  "head": "cb10457",
-  "summary": "NOT READY FOR CUTOVER. Bounded, privacy-safe shadow harness and complete evidence/runbook delivered.\nRelease build/format and 1,559 fast tests pass; 141 distinct heavy cases pass across a disclosed 138/3 initial run and three repaired-prerequisite reruns.\nFinal owned boundary: eight xUnit, 24 Python, 31 inherited SQL fixtures, three templates and three ownership cases pass.\nFresh API: 1,514 steps/2,311 raw fields; independent gateway: 255 HTTP/523 raw fields, adjusted 236/255.\nExact current policy retains 637 unresolved fields; framework is sub-40 cap-exempt, not repaired.\nSeven canonical cross-surface comparisons match; 18 paired synthetic read samples retain first/warm timings and no observed HTTP/transport failures.\nLive approval exists, but capacity/access is unproved due missing Warehouse configuration: zero live data attempts.\nNo protected writes, scratch, deployment, traffic switch, product/contract changes or push. No new product waivers.",
+  "head": "a7efcac",
+  "summary": "NOT READY FOR CUTOVER. Bounded, privacy-safe shadow harness and complete evidence/runbook delivered.\nRelease build/format and 1,559 fast tests pass; 141 distinct heavy cases pass across a disclosed 138/3 initial run and three repaired-prerequisite reruns.\nFinal owned boundary: eight xUnit, 24 Python, 31 inherited SQL fixtures, three templates and three ownership cases pass.\nFresh API: 1,514 steps/2,311 raw fields; independent gateway: 255 HTTP/523 raw fields, adjusted 236/255.\nExact current policy retains 637 unresolved fields; framework is sub-40 cap-exempt, not repaired.\nSeven canonical cross-surface comparisons match; 18 paired synthetic read samples retain first/warm timings and no observed HTTP/transport failures.\nLive approval exists, but capacity/access is unproved due missing Warehouse configuration: zero live data attempts.\nConductor no_halt repair: superseded W3 stop archived byte-for-byte; all 28 required owner decisions retained. Focused Python tests: 24/24.\nNo protected writes, scratch, deployment, traffic switch, product/contract changes or push. No new product waivers.",
   "stages": {
     "I1": "done",
     "I2": "done",
@@ -36,7 +36,7 @@
     {
       "id": "DEV-2",
       "what": "Historical framework-cap halt is not a current scoring blocker.",
-      "why": "Current cap_min_exchanges=40 exempts 17 framework exchanges; nine waived passes/52.94% and all raw differences remain visible.",
+      "why": "Current cap_min_exchanges=40 exempts 17 framework exchanges; nine waived passes/52.94% and all raw differences remain visible. Superseded HALT-integrate-W3.md is preserved byte-for-byte at dotnet/docs/waves/W3-policy-stop.md; the actual conductor checks all HALT*.md in docs roots, not just this session's filename. All substantive owner decisions remain open.",
       "decision_needed": false
     },
     {
