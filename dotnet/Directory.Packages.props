@@ -58,6 +58,8 @@
     <PackageVersion Update="Microsoft.Extensions.DependencyInjection" Version="10.0.13" />
     <!-- END orchestrator -->
     <!-- BEGIN integration: only this session edits between the markers -->
+    <!-- MIT; reuse the stable parser version already exercised by the platform spike. -->
+    <PackageVersion Include="Microsoft.SqlServer.TransactSql.ScriptDom" Version="180.154.0" />
     <!-- END integration -->
   </ItemGroup>
   <!-- Persistence gate repair: configure the approved oracle only when the runner has not supplied one. -->

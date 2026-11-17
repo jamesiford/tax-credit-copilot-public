@@ -13,5 +13,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\TaxCredit.Application\TaxCredit.Application.csproj" />
+    <ProjectReference Include="..\..\spikes\shadow\TaxCredit.Shadow.csproj" />
   </ItemGroup>
 </Project>
