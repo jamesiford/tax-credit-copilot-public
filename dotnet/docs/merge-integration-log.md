@@ -29,7 +29,7 @@
   pre-existing compressed golden `parity/goldens/credit_math.jsonl.gz`.
   Its working-file hash and both parent blobs are identical:
   `82849d5c449dd72feaab3620fa9725853a6854f0`. This is not a text conflict;
-  `git grep -I -n '<<<<<<<\|>>>>>>>'` found no tracked text markers.
+  The text-only Git grep scan found no tracked conflict markers.
 - `git ls-files -u` and `git diff --name-only --diff-filter=U`: empty.
 - `git diff --cached --check`: passed. All staged changes are under `dotnet`.
 
@@ -43,3 +43,5 @@
 - No live system was contacted, no remote was changed and nothing was pushed.
   Existing cutover limitations and producer findings remain unchanged; this
   merge does not claim release readiness or a fresh full replay/heavy gate.
+- The final scan caught the literal marker pattern quoted in this log itself.
+  Removed that quotation and repeated the final checks; no product file changed.
