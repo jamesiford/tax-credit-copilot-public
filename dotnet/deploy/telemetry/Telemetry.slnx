@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Hook\TaxCredit.Deployment.Telemetry.csproj" />
+  <Project Path="Probe\TelemetryProbe.csproj" />
+</Solution>

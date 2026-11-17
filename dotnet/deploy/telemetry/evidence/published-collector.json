@@ -1,0 +1,28 @@
+{
+  "scope": "ordinary published API/gateway; synthetic local SQLite and missing CSV",
+  "path": "local-linux-collector-to-receiver",
+  "services": {
+    "api": {
+      "published_dll_sha256": "3891d50138911a13dd5203f524671c2d03d62f90c398d7b8c8f957b9309572e1",
+      "health_status": 200,
+      "protected_status": 401,
+      "server_trace_receipts": 2,
+      "metric_series_batches": 1,
+      "service_version_attribution": true,
+      "actual_dependency_correlation": false
+    },
+    "gateway": {
+      "published_dll_sha256": "c1343c102ac4e7eb0190a85eed76c7d72d7ac01f0541f1feb7526e49bf24fbb6",
+      "health_status": 200,
+      "protected_status": 401,
+      "server_trace_receipts": 2,
+      "metric_series_batches": 1,
+      "service_version_attribution": true,
+      "actual_dependency_correlation": false
+    }
+  },
+  "privacy_allowlist": "passed",
+  "actual_dependency_correlation": false,
+  "shutdown_scope": "receipt proven before termination; no actual-host graceful-flush claim",
+  "hook_sha256": "a1106346d6c01be55b0b4f6b185cbecf0af300628cc54989ddb4711f3ef2864f"
+}

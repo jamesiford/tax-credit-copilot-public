@@ -1,0 +1,33 @@
+{
+  "receipt_payloads": 8,
+  "trace_spans": 15,
+  "metric_series_batches": 20,
+  "cross_service_parent_edges": 2,
+  "service_version_attributions": 4,
+  "shutdown_seconds": [
+    0.339,
+    0.319,
+    0.363
+  ],
+  "immediate_flush_shutdown_seconds": 0.383,
+  "immediate_flush_process_seconds": 1.563,
+  "collector_refused_shutdown_seconds": 0.581,
+  "disabled_or_invalid_configuration_checks": 6,
+  "custom_source_and_meter_with_hook": true,
+  "custom_source_and_meter_without_hook": false,
+  "privacy_allowlist": "passed",
+  "fixed_diagnostics_checked": false,
+  "duration_seconds": 30.675,
+  "additional_collector_failures": {},
+  "path": "local-linux-collector-to-receiver",
+  "sdk": "10.0.404",
+  "collector_image": "otel/opentelemetry-collector:0.123.0",
+  "runtime": "mcr.microsoft.com/dotnet/aspnet:10.0",
+  "linux_sigterm": true,
+  "scope": "synthetic deployment probe; actual ServiceDefaults compiled unchanged",
+  "hook_sha256": "a1106346d6c01be55b0b4f6b185cbecf0af300628cc54989ddb4711f3ef2864f",
+  "collector_digest": "otel/opentelemetry-collector@sha256:e5e4a13f0ea98e7ca1d1d809be040180540146888d0d764abd4e1277cba87350",
+  "runtime_digest": "mcr.microsoft.com/dotnet/aspnet@sha256:bfd912c83295ce66d4b706ebb8541b9f14259b0e76fbb88b2751f58ce2399d2e",
+  "docker_engine_architecture": "arm64",
+  "runtime_architecture": "arm64"
+}
