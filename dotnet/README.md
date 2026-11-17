@@ -32,7 +32,8 @@ The .NET API can read the same lakehouse the Python product reads, with operatio
 az login                       # an identity that can read the lakehouse SQL endpoint; the Fabric capacity must be Active
 .\dotnet\run-local.ps1         # http://127.0.0.1:8000, the port the Vite dev proxy expects
 .\dotnet\run-local.ps1 -Offline   # synthetic seed data only, no Azure calls
-cd frontend; npm run dev       # http://localhost:5173 (stop the Python API first: both use port 8000)
+.\dotnet\run-worker.ps1        # second terminal: the API only QUEUES runs, the Worker executes them
+cd frontend; npm run dev        # http://localhost:5173 (stop the Python API first: both use port 8000)
 ```
 
 **From Visual Studio instead:** `.\dotnet\configure-local.ps1` writes launch profiles (`TaxCredit.Api - live lakehouse` and
