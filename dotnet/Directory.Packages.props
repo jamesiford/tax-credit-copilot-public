@@ -57,6 +57,8 @@
     <PackageVersion Update="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.13" />
     <PackageVersion Update="Microsoft.Extensions.DependencyInjection" Version="10.0.13" />
     <!-- END orchestrator -->
+    <!-- BEGIN integration: only this session edits between the markers -->
+    <!-- END integration -->
   </ItemGroup>
   <!-- Persistence gate repair: configure the approved oracle only when the runner has not supplied one. -->
   <PropertyGroup Condition="'$(MSBuildProjectName)' == 'TaxCredit.Parity.Tests' and '$(TCC_PYTHON)' == '' and '$(RunSettingsFilePath)' == ''">

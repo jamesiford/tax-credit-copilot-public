@@ -25,5 +25,6 @@
     <Project Path="tests/TaxCredit.Api.Tests/TaxCredit.Api.Tests.csproj" />
     <Project Path="tests/TaxCredit.Gateway.Tests/TaxCredit.Gateway.Tests.csproj" />
     <Project Path="tests/TaxCredit.Orchestrator.Tests/TaxCredit.Orchestrator.Tests.csproj" />
+    <Project Path="tests/TaxCredit.Shadow.Tests/TaxCredit.Shadow.Tests.csproj" />
   </Folder>
 </Solution>
