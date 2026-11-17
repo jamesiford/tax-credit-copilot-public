@@ -39,9 +39,10 @@ def main() -> None:
         ).stdout)[0]
         assert details["Architecture"] == "amd64" and details["Os"] == "linux"
         assert details["Config"]["User"] == "app"
+        assert details["Config"]["Labels"]["org.opencontainers.image.revision"] == commit
         evidence["images"][service] = {
             "id": details["Id"], "architecture": details["Architecture"], "os": details["Os"],
-            "user": details["Config"]["User"], "commit": commit,
+            "user": details["Config"]["User"], "commit": commit, "revision_verified": True,
         }
     output = DEPLOY / ".artifacts" / "images.json"
     output.parent.mkdir(parents=True, exist_ok=True)

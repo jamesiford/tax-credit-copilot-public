@@ -112,6 +112,7 @@ def orchestrator(published: Path | None = None) -> dict:
         proof.wait("/readiness")
         results.update({"sdk_readiness_status": 200, "network": "none", "externally_usable": False})
         results.update(proof.stop())
+        assert results["sigterm_exit"] == 0, "Responses did not complete graceful shutdown."
     finally:
         proof.cleanup()
     return results
@@ -121,7 +122,7 @@ def http_host(service: str) -> dict:
     container = Container(service)
     try:
         container.start()
-        container.wait("/api/health")
+        container.wait("/api/health" if service == "api" else "/channel/health")
         assert docker("exec", container.id, "sh", "-c",
                       "test ! -w /app/resources/backend/rules && sha256sum -c /app/checksums.sha256 >/dev/null").returncode == 0
         result = {"liveness": 200, "network": "none", "nonroot_readonly_resources": True,
@@ -140,6 +141,7 @@ def http_host(service: str) -> dict:
         assert container.request("/__contract__/reset", "POST")[0] == 404
         result.update({"unauthorized": 401, "contract_controls": 404})
         result.update(container.stop())
+        assert result["sigterm_exit"] == 0, "HTTP host did not complete graceful shutdown."
         return result
     finally:
         container.cleanup()

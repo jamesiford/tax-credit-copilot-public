@@ -1,0 +1,33 @@
+name: Existing .NET heavy suites
+on:
+  schedule:
+    - cron: '31 3 * * 0'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  heavy:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.404
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Existing oracle dependencies
+        run: python -m pip install -r backend/requirements.txt
+      - name: Build and run existing heavy tests without live-service approval
+        working-directory: dotnet
+        env:
+          CONTRACT_PYTHON: python
+        shell: pwsh
+        run: |
+          dotnet build TaxCredit.slnx -warnaserror --nologo -v:q -m:1 -nr:false
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          dotnet test TaxCredit.slnx --no-build --no-restore --filter 'Category=heavy' --nologo -v:q -m:1 -nr:false
+          exit $LASTEXITCODE

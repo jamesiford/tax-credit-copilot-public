@@ -16,7 +16,8 @@ WORKDIR /app
 COPY --from=build /out/ ./
 ARG GIT_COMMIT=working-tree
 LABEL org.opencontainers.image.revision=$GIT_COMMIT
-ENV CHANNEL_DEBUG_WHOAMI=false \
+# Align base-image metadata; Responses itself fixes the listener at 8088.
+ENV ASPNETCORE_HTTP_PORTS=8088 CHANNEL_DEBUG_WHOAMI=false \
     KNOWLEDGE_ENABLED=false KNOWLEDGE_PROVIDER=none AI_INJECTION_GUARD=on AI_OUTPUT_POLICY=on \
     AI_GATEWAY_TLS_VERIFY=true GIT_COMMIT=$GIT_COMMIT Logging__LogLevel__Default=None
 RUN find . -type f ! -name checksums.sha256 -print0 | sort -z | xargs -0 sha256sum > /app/checksums.sha256
