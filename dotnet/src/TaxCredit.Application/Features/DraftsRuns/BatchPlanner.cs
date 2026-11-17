@@ -25,25 +25,38 @@ public sealed class BatchPlanner(ISourceReader source, BatchSelection selection,
     {
         ArgumentNullException.ThrowIfNull(request);
         var book = source.ListAccounts().ToDictionary(c => c.AccountId);
-        var footprint = source.Footprint();
         var explicitIds = request.Scope is ScopeKind.One or ScopeKind.List;
         var wanted = explicitIds ? request.Clients : book.Keys.Order().ToArray();
         if (wanted.Any(id => !book.ContainsKey(id)))
         {
             throw BatchRequest.Refuse("unknown_clients", "These clients are not in the client book.", "Remove them or check the ids.");
         }
-        var ids = new List<long>();
+        var allowedIds = new List<long>();
         foreach (var id in wanted)
         {
             var allowed = await authorizer.IsAuthorizedAsync(principals.Current ?? ApiPrincipal.Anonymous, id, cancellationToken).ConfigureAwait(false);
             if (!allowed && explicitIds) { throw new AuthRefusalException(403, "client_refused", "Not authorized for a selected client."); }
-            if (allowed && (request.Scope != ScopeKind.Filter || selection.Matches(id, request.Filter, footprint.GetValueOrDefault(id) ?? []))) { ids.Add(id); }
+            if (allowed) { allowedIds.Add(id); }
         }
+        // The footprint is read lazily and only for the clients that need it: a state criterion needs every candidate,
+        // program derivation needs the selected clients, and an explicit program needs neither.
+        var footprint = new Dictionary<long, IReadOnlyList<string>>();
+        var filtered = request.Scope == ScopeKind.Filter;
+        if (filtered && BatchSelection.NeedsStates(request.Filter)) { Load(footprint, allowedIds); }
+        var ids = filtered ? allowedIds.Where(id => selection.Matches(id, request.Filter, footprint.GetValueOrDefault(id) ?? [])).ToList() : allowedIds;
         if (ids.Count == 0) { throw BatchRequest.Refuse("empty_scope", "The selection matches no clients.", "Check the client ids or the filter."); }
+        if (string.IsNullOrEmpty(request.ProgramCode)) { Load(footprint, ids); }
         var pairs = Pairs(ids, request.ProgramCode, footprint);
         return new BatchPlan(ids, ids.ToDictionary(id => id, id => book[id].Name), pairs, Summary(request, ids, book, pairs));
     }
 
+    private void Load(Dictionary<long, IReadOnlyList<string>> held, IReadOnlyCollection<long> clients)
+    {
+        var missing = clients.Where(id => !held.ContainsKey(id)).ToArray();
+        if (missing.Length == 0) { return; }
+        var read = source.Footprint(missing);
+        foreach (var id in missing) { held[id] = read.GetValueOrDefault(id) ?? []; }
+    }
     internal static PyDict Spec(BatchRequest request, BatchPlan plan)
     {
         var spec = new PyDict().Add("client_count", (long)plan.Clients.Count)
