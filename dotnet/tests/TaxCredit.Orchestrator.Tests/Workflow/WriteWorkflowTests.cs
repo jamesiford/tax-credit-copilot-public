@@ -284,7 +284,8 @@ public sealed class WriteWorkflowTests
         WriteWorkflow flow = new((_, _, _) =>
         {
             calls++;
-            return Task.FromResult(new WriteGatewayReply(200, JsonDocument.Parse(body).RootElement.Clone()));
+            using JsonDocument document = JsonDocument.Parse(body);
+            return Task.FromResult(new WriteGatewayReply(200, document.RootElement.Clone()));
         }, Allowed);
         Assert.Equal(WriteStatus.Refused, (await flow.PrepareAsync(Owner, Request())).Status);
         Assert.Equal(WriteStatus.NothingPending, (await flow.RespondAsync(Owner, "confirm")).Status);
