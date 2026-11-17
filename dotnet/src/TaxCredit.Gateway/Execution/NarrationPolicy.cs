@@ -50,7 +50,7 @@ internal static class NarrationPolicy
         }
         for (var i = 0; i < tokens.Length; i++)
         {
-            if ((tokens[i].Contains('\u2588') || tokens[i].Any(char.IsDigit)) && qualifiers.Any(position => Math.Abs(i - position) <= 3))
+            if ((tokens[i].Contains('\u2588', StringComparison.Ordinal) || tokens[i].Any(char.IsDigit)) && qualifiers.Any(position => Math.Abs(i - position) <= 3))
             { yield return Violation("approximation", "narration style: an approximation qualifier next to a figure", "narration"); }
             if (Rounding.Contains(tokens[i]))
             { yield return Violation("approximation", "narration style: the wording says a figure was rounded or approximated", "narration"); }

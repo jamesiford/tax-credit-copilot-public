@@ -24,6 +24,28 @@ dotnet/
 parity/                          new Python files only: exporters, engine CLI and the committed goldens
 ```
 
+## Run the API locally against live Fabric data
+
+The .NET API can read the same lakehouse the Python product reads, with operational state kept local.
+
+```pwsh
+az login                       # an identity that can read the lakehouse SQL endpoint; the Fabric capacity must be Active
+.\dotnet\run-local.ps1         # http://127.0.0.1:8000, the port the Vite dev proxy expects
+.\dotnet\run-local.ps1 -Offline   # synthetic seed data only, no Azure calls
+cd frontend; npm run dev       # http://localhost:5173 (stop the Python API first: both use port 8000)
+```
+
+`run-local.ps1` reads `backend\.env` (`LAKEHOUSE_SQL_SERVER`, `LAKEHOUSE_SQL_DATABASE`, `SOURCE_SCHEMA`, `AUTH_MODE`) and maps it to the
+.NET names (`SOURCE_SQL_SERVER`, `SOURCE_SQL_DATABASE`, ...). Claims, findings and runs stay in a local SQLite file and artifacts on local
+disk; nothing is written to Fabric unless you pass `-Persistence warehouse`. It sets `AZURE_TOKEN_CREDENTIALS=AzureCliCredential` so the
+signed-in `az` account is the one used (the default credential chain tries Visual Studio and VS Code sign-ins first). `GET /api/ready`
+reports `ready: true` and the account count when the source is reachable. The hosts run with ICU globalization because
+`Microsoft.Data.SqlClient` does not support invariant mode; the test projects keep invariant mode.
+
+Not wired yet: the Foundry AI providers (`FOUNDRY_PROJECT_ENDPOINT` without an invocation factory reports the provider unavailable), the
+sealed `/api/workspace` routes, and Warehouse persistence (the `tcc_ops.finding_audit` table must be provisioned first). See
+[`docs/FINAL-REPORT.md`](docs/FINAL-REPORT.md).
+
 ## Run it
 
 Prerequisites: .NET SDK 10 (`global.json`) and the **CPython 3.12 oracle environment** (the product runs on 3.12; other interpreters are refused):

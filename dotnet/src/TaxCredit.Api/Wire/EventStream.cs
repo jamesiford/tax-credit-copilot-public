@@ -18,7 +18,7 @@ public sealed class EventStream(IAsyncEnumerable<StreamEvent> events) : IResult
         var options = httpContext.RequestServices.GetRequiredService<IOptions<Microsoft.AspNetCore.Http.Json.JsonOptions>>().Value.SerializerOptions;
         await foreach (var frame in events.WithCancellation(httpContext.RequestAborted).ConfigureAwait(false))
         {
-            if (frame.Event.Length == 0 || frame.Event.Contains('\n') || frame.Event.Contains('\r'))
+            if (frame.Event.Length == 0 || frame.Event.Contains('\n', StringComparison.Ordinal) || frame.Event.Contains('\r', StringComparison.Ordinal))
             {
                 throw new InvalidOperationException("An event name must be a nonempty single line.");
             }
