@@ -10,7 +10,8 @@ using TaxCredit.Infrastructure.Sources.Sql;
 namespace TaxCredit.Infrastructure.Sources;
 
 /// <summary>SQL-served logical lakehouse payroll and its catalogue share the certified Domain port.</summary>
-public sealed class SqlClientSource(SourceScanner scanner, PayrollProjector projector, FiscalRuleAdapter fiscal)
+public sealed class SqlClientSource(SourceScanner scanner, PayrollProjector projector, FiscalRuleAdapter fiscal,
+    FootprintGuard? guard = null)
     : IClientPayrollSource, ISourceReader, ISourceCatalogue
 {
     /// <inheritdoc />
@@ -61,11 +62,46 @@ public sealed class SqlClientSource(SourceScanner scanner, PayrollProjector proj
                 .Select(d => d.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)).ToArray());
     }
     /// <inheritdoc />
-    public IReadOnlyDictionary<long, IReadOnlyList<string>> Footprint() =>
-        scanner.ReadAggregate(new SourceQueries(scanner).Footprint())
-            .GroupBy(r => SourceValues.Id(r, "account_id")!.Value).ToDictionary(g => g.Key,
-                g => (IReadOnlyList<string>)g.Select(r => SourceValues.Text(r, "work_state"))
-                    .Where(s => s.Length > 0).Distinct().Order(StringComparer.Ordinal).ToArray());
+    public IReadOnlyDictionary<long, IReadOnlyList<string>> Footprint() => Footprint(ListAccounts().Select(a => a.AccountId).ToArray());
+    /// <inheritdoc />
+    public IReadOnlyDictionary<long, IReadOnlyList<string>> Footprint(IReadOnlyCollection<long> accountIds)
+    {
+        ArgumentNullException.ThrowIfNull(accountIds);
+        if (accountIds.Count == 0) { return new Dictionary<long, IReadOnlyList<string>>(); }
+        var queries = new SourceQueries(scanner);
+        var timeout = guard?.Admit(() => RowEstimate(queries));
+        var states = new Dictionary<long, SortedSet<string>>();
+        try
+        {
+            foreach (var query in queries.Footprint(accountIds, timeout))
+            {
+                foreach (var row in scanner.ReadAggregate(query))
+                {
+                    var id = SourceValues.Id(row, "account_id")!.Value;
+                    if (!states.TryGetValue(id, out var held)) { states[id] = held = new SortedSet<string>(StringComparer.Ordinal); }
+                    var state = SourceValues.Text(row, "work_state");
+                    if (state.Length > 0) { held.Add(state); }
+                }
+            }
+        }
+        catch (SourceTimedOut) when (guard is not null)
+        {
+            guard.RememberTimeout();
+            throw FootprintGuard.TimedOut(timeout ?? guard.TimeoutSeconds);
+        }
+        return states.ToDictionary(p => p.Key, p => (IReadOnlyList<string>)p.Value.ToArray());
+    }
+
+    /// <summary>The catalogue's payroll row count; an endpoint that cannot answer simply has no estimate.</summary>
+    private long? RowEstimate(SourceQueries queries)
+    {
+        try
+        {
+            var row = scanner.ReadAggregate(queries.RowEstimate(guard?.TimeoutSeconds)).FirstOrDefault();
+            return row is not null && row["rows"] is { } value && Convert.ToInt64(value, CultureInfo.InvariantCulture) is > 0 and var rows ? rows : null;
+        }
+        catch (SourceFailureException) { return null; }
+    }
     /// <inheritdoc />
     public IDisposable SharedScope() => scanner.SharedScope();
 }
@@ -106,6 +142,12 @@ public sealed class CsvClientSource(string path, long? fixtureAccountId, FiscalR
     public IReadOnlyDictionary<long, IReadOnlyList<string>> Footprint() => fixtureAccountId is { } id && IsConfigured
         ? new Dictionary<long, IReadOnlyList<string>> { [id] = PayrollScope(id).States }
         : new Dictionary<long, IReadOnlyList<string>>();
+    /// <inheritdoc />
+    public IReadOnlyDictionary<long, IReadOnlyList<string>> Footprint(IReadOnlyCollection<long> accountIds)
+    {
+        ArgumentNullException.ThrowIfNull(accountIds);
+        return fixtureAccountId is { } id && accountIds.Contains(id) ? Footprint() : new Dictionary<long, IReadOnlyList<string>>();
+    }
     /// <inheritdoc />
     public IDisposable SharedScope() => EmptyScope.Instance;
 }

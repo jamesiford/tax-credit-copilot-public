@@ -46,6 +46,7 @@ internal static class RuntimeSourceRegistration
             p.GetRequiredService<LookupResolver>(), holdsClientRules: !IsCsv(settings)));
         services.AddScoped<IFiscalRuleSource>(p => p.GetRequiredService<FiscalRuleAdapter>());
         services.AddScoped(p => new CsvClientSource(settings.Get("PAYROLL_PATH") ?? paths.Csv, 1001, p.GetRequiredService<FiscalRuleAdapter>()));
+        services.AddSingleton(p => new FootprintGuard(settings, p.GetRequiredService<TimeProvider>()));
         services.AddScoped<SqlClientSource>();
         services.AddScoped<IClientPayrollSource>(p => IsCsv(settings) ? p.GetRequiredService<CsvClientSource>() : p.GetRequiredService<SqlClientSource>());
         services.AddScoped<IPayrollSource>(p => p.GetRequiredService<IClientPayrollSource>());

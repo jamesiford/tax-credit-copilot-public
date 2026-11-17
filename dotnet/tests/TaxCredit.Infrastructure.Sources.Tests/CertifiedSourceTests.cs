@@ -28,6 +28,8 @@ public sealed class CertifiedSourceTests
             new AbsentFiscalReader(), SourceTestData.Lookups(), holdsClientRules: false));
         Assert.Equal(9477, ReadCertified(source, 7).Count);
         Assert.Empty(ReadCertified(source, 8));
+        Assert.Equal(source.Footprint()[7], source.Footprint([7L])[7]);
+        Assert.Empty(source.Footprint([8L]));
         Assert.Equal(ReadCertified(source, null), source.LoadPortfolioPayPeriods()[7]);
         Assert.True(source.ClientFiscalWindow(7, 2024, "begins").Assumed);
         using var scope = source.SharedScope();

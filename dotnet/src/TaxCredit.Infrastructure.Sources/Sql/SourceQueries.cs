@@ -22,14 +22,29 @@ public sealed class SourceQueries(SourceScanner scanner)
         return new AnalyticsQuery(sql, [accountId], "Payroll", Outputs("tax_year", "work_state", "pay_date", "rows_in"), Kind: "scope");
     }
 
-    /// <summary>One portfolio GROUP BY, with no per-account payroll loads.</summary>
-    public AnalyticsQuery Footprint()
+    /// <summary>
+    /// Tenant-filtered GROUP BYs, one per batch of at most <see cref="SourceScanner.IdBatchSize"/> clients. Ids are bound
+    /// parameters; a footprint is never an untenanted scan of the whole table.
+    /// </summary>
+    public IReadOnlyList<AnalyticsQuery> Footprint(IEnumerable<long> accountIds, int? timeoutSeconds = null)
     {
+        ArgumentNullException.ThrowIfNull(accountIds);
         var tenant = Ref("Payroll", "account_id", "p");
         var state = State();
-        return new AnalyticsQuery($"SELECT {tenant}, {state} {Joins()} WHERE {HasSpan()} GROUP BY {tenant}, {state}",
-            [], "Payroll", Outputs("account_id", "work_state"), Kind: "footprint");
+        return accountIds.Distinct().Order().Chunk(SourceScanner.IdBatchSize).Select(batch =>
+        {
+            var parameters = string.Join(",", Enumerable.Range(0, batch.Length).Select(i => "@p" + i));
+            var bound = batch.Cast<object?>().ToArray();
+            return new AnalyticsQuery(
+                $"SELECT {tenant}, {state} {Joins()} WHERE {HasSpan()} AND {tenant} IN ({parameters}) GROUP BY {tenant}, {state}",
+                bound, "Payroll", Outputs("account_id", "work_state"), "account_id", bound, "footprint", timeoutSeconds);
+        }).ToArray();
     }
+
+    /// <summary>The catalogue's row count for the payroll table: no scan, and the endpoint may not hold the view.</summary>
+    public AnalyticsQuery RowEstimate(int? timeoutSeconds = null) => new(
+        "SELECT SUM(CAST(row_count AS BIGINT)) FROM sys.dm_db_partition_stats WHERE object_id = OBJECT_ID(@p0) AND index_id IN (0, 1)",
+        [scanner.TableName("Payroll")], "Payroll", Outputs("rows"), Kind: "estimate", TimeoutSeconds: timeoutSeconds);
 
     /// <summary>A count/max observation on raw account payroll, including rows the projector would exclude.</summary>
     public (AnalyticsQuery Query, bool HasModifiedColumn) Fingerprint(long accountId)
