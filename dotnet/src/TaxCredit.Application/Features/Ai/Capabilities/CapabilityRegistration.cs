@@ -1,7 +1,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using TaxCredit.Application.Features.Ai.Capabilities.Bindings;
 using TaxCredit.Application.Features.Ai.Chat;
 using TaxCredit.Application.Ports.Auth;
+using TaxCredit.Application.Ports.Contract;
 using TaxCredit.Application.Ports.Persistence;
 using TaxCredit.Domain.Claims;
 
@@ -33,6 +35,9 @@ public static class CapabilityRegistration
         }
         services.TryAddSingleton(options);
         services.TryAddSingleton(TimeProvider.System);
+        services.TryAddSingleton<IIdSource, CapabilityRandomSources>();
+        services.TryAddSingleton<ISecretSource, CapabilityRandomSources>();
+        services.TryAddSingleton<CapabilityCommitLocks>();
         // DI otherwise selects the injectable declaration constructor with an empty IEnumerable.
         services.TryAddSingleton(_ => new CapabilityCatalog());
         services.TryAddSingleton<ICapabilityReadBridge>(_ => new MissingCapabilityReadBridge());
@@ -47,7 +52,8 @@ public static class CapabilityRegistration
         services.TryAddScoped(provider => new CapabilityWrites(provider.GetRequiredService<IChannelStateRepository>(),
             provider.GetRequiredService<IChannelAuditRepository>(), provider.GetRequiredService<IWriterPolicy>(),
             provider.GetRequiredService<ICapabilityWriteBridge>(), provider.GetRequiredService<CapabilityOptions>(),
-            provider.GetRequiredService<TimeProvider>()));
+            provider.GetRequiredService<TimeProvider>(), provider.GetRequiredService<IIdSource>(),
+            provider.GetRequiredService<ISecretSource>(), provider.GetRequiredService<CapabilityCommitLocks>()));
         services.TryAddScoped(provider => new CapabilityDispatcher(provider.GetRequiredService<CapabilityDirectReads>(),
             provider.GetRequiredService<CapabilityData>(), provider.GetRequiredService<CapabilityWrites>(),
             provider.GetRequiredService<ICapabilityReadBridge>(), provider.GetRequiredService<IWriterEntitlement>(),

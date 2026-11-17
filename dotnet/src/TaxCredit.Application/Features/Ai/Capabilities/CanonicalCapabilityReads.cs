@@ -32,8 +32,8 @@ public sealed class CanonicalCapabilityReads(IMediator mediator, ReadStatutes st
 
     private CapabilityRead Eligibility(JsonObject args)
     {
-        var client = args["client_id"]!.GetValue<long>();
-        var year = args["tax_year"]!.GetValue<int>();
+        var client = CapabilityJson.Integer(args["client_id"]!);
+        var year = checked((int)CapabilityJson.Integer(args["tax_year"]!));
         var asked = args["program_code"]?.GetValue<string>();
         var statute = statutes.ResolveStatute(client, args["state"]?.GetValue<string>(), year, asked, true);
         var method = args["method"]?.GetValue<string>() ?? "min_max";
@@ -51,6 +51,31 @@ public sealed class CanonicalCapabilityReads(IMediator mediator, ReadStatutes st
         evidence["trail_sha256"] = recorder.Steps.Count == 0 ? null
             : ((string)recorder.ToDict()["evidence_hash"]!)[7..];
         return new(facts, evidence);
+    }
+
+    /// <summary>Captures the canonical stored-result credit explanation, not a payroll replay.</summary>
+    public Task<CapabilityRead> WalkthroughAsync(JsonObject args, CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var recorder = new TrailRecorder("Pending");
+        using var trail = TrailContext.Use(recorder);
+        var read = Eligibility(args);
+        if (read.Facts["snapshot"]?["calculated"]?.GetValue<bool>() != true)
+        {
+            throw new CapabilityException(409, "not_calculated", "No calculated run holds this client-year. That is not a zero.");
+        }
+        var credit = read.Facts["credit"]!;
+        if (credit["no_state_pack"]?.GetValue<bool>() == true)
+        {
+            throw new CapabilityException(404, "year_not_authored", credit["message"]!.GetValue<string>());
+        }
+        recorder.Title = $"{credit["credit_name"]} · TY{args["tax_year"]}";
+        recorder.Citation = credit["citation"]?.GetValue<string>() ?? "";
+        var facts = CanonicalPageReads.Object(recorder.ToDict());
+        if (args["program_code"] is not null) { facts["program_code"] = read.Facts["program_code"]?.DeepClone(); }
+        var evidence = read.Provenance!;
+        evidence["trail_sha256"] = ((string)recorder.ToDict()["evidence_hash"]!)[7..];
+        return Task.FromResult(new CapabilityRead(facts, evidence));
     }
 
     private static JsonObject Snapshot(long client, int year, string state, JsonObject context, DateOnly begin, DateOnly end)

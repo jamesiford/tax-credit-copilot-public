@@ -1,0 +1,111 @@
+{
+  "session": "gateway",
+  "branch": "dotnet/w3-gateway",
+  "head": "3b3fae2",
+  "summary": "Delivered the ordinary in-process .NET 10 gateway with official MCP SDK 1.0.0, production capability bridges, trusted execution, numeric integrity and person-bound downloads.\nFixed the conductor's SDK 11 build failure by disabling static-web-asset processing only for the JSON-only gateway; no target, SDK pin, route or comparison changed.\nStrict whole-solution builds pass with SDK 10.0.404 and root-selected SDK 11.0.100, including a nonincremental SDK 11 build after switching SDKs; root format verification passes.\nAll 1,114 fast tests pass with projects serialized. An initial parallel run hit an inherited 100 ms AI timeout test; no tests were modified or excluded.\nReran all 255 gateway and 1,514 API exchanges against ordinary root-launched executables; every ordered failure list exactly matches the original delivery.\nGateway: 528 raw fields; policy diagnostic 233/255, 11 fully waived cases, 56 unresolved fields in 22 cases, no numerical waiver. API: 2,325 raw fields. Replay is board-only, not full parity.\nAll stages remain done and existing limitations remain explicit. Head identifies the tested fix commit; the following documentation commit records this status. Local commits only, proof hosts stopped, no live systems.",
+  "stages": {
+    "G1": "done",
+    "G2": "done",
+    "G3": "done",
+    "G4": "done",
+    "G5": "done",
+    "G6": "done"
+  },
+  "gates_claimed": {
+    "no_halt": true,
+    "commits_present": true,
+    "clean_tree": true,
+    "not_pushed": true,
+    "owned_paths": true,
+    "status_json": true,
+    "report_present": true,
+    "stages_done": true,
+    "dotnet_build": true,
+    "dotnet_format": true,
+    "tests_fast": true,
+    "replay": true
+  },
+  "deviations": [
+    {
+      "id": "DEV-1",
+      "what": "The official SDK executes MCP through a thin bounded channel transport rather than its default HTTP endpoint mapping.",
+      "why": "The channel owns origin/authentication order, person-bound sessions and its existing JSON/error contract. Actual official server/client interoperability and every catalogue schema are tested without forking the SDK.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-2",
+      "what": "Two recorded non-writer Cowork fixed-tool calls are refused once person-derived results carry the intended lane markers.",
+      "why": "Keep the existing application's fail-closed privacy design instead of leaking cohorts or finding evidence. The authorization-preservation policy tension is an owner decision; missing facts and refusal differences remain unresolved on the diagnostic.",
+      "decision_needed": true
+    },
+    {
+      "id": "DEV-3",
+      "what": "The governed catalogue lists eight available datasets, with an explicit note for three unavailable infrastructure datasets.",
+      "why": "No fabricated availability or successful empty aggregate is introduced. The count/list differences and inherited governed refusal-code/field differences remain unwaived.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-4",
+      "what": "Narration audit persists safe verdict/count codes and content hashes, not submitted prose summaries.",
+      "why": "Rejected prose can contain identifiers or hostile content and must not be copied into an audit/log payload merely because the caller supplied a summary.",
+      "decision_needed": false
+    }
+  ],
+  "findings": [
+    "The official SDK truthfully advertises logging; its extra capability is registered as a framework default, not removed to imitate Python.",
+    "Source fixed-tool risk/findings envelopes omit person-only markers although their facts can identify individual employees.",
+    "Python claim previews allocate new IDs for rows that are never stored. Pure .NET previews do not allocate production identities, so later real confirmation/correlation/artifact IDs differ; no dummy draws or identifier waivers were added.",
+    "The source's rendered True boolean is displayed as JSON true; the typed preview and all figures are unchanged.",
+    "The channel must not inherit the portal's optional local writer mode or anonymous contract-reset mode; entitlement applies to previews and commits.",
+    "Verified write-envelope failures previously bypassed application audit. REST and recognizable MCP pre-dispatch write refusals now have one safe refusal audit.",
+    "Unknown download ticket 502 invalid_arguments and replayed ticket 410 confirmation_replayed are intentional F-19/F-20 behavior, not normalized to other statuses.",
+    "All raw gateway cases include Vary differences. Raw failure counts and separately applied policy counts are distinct evidence, not interchangeable passing-test totals.",
+    "Building from the repository root selects SDK 11.0.100 instead of dotnet/global.json's SDK 10.0.404. SDK 11 processes the referenced API's Blazor hot-reload module without a matching gateway asset endpoint. The JSON-only gateway now sets StaticWebAssetsEnabled=false; both SDK builds pass without changing the net10.0 target.",
+    "Running all test projects concurrently with format verification triggered the inherited ResilienceTests.RetryAfterIsHonoredAndHealthyStreamsUseGapNotDuration 100 ms timeout. The complete unchanged fast suite passed with -m:1; no timing thresholds or test filters were weakened."
+  ],
+  "open_questions": [],
+  "needs_human": [
+    {
+      "item": "Reconcile source fixed-tool person-lane omissions with the valid-request authorization-preservation policy.",
+      "why": "The documented privacy lane refuses unentitled Cowork access, while two recordings returned unmarked person-derived risk/findings facts. The safer lane check is retained and the missing results remain visible, not numerically waived."
+    },
+    {
+      "item": "Prove atomic idempotency-key reservation across replicas for different confirmations.",
+      "why": "Host-local key leases and atomic same-confirmation consume prevent tested races. The existing persistence port does not guarantee global different-confirmation key exclusivity across gateway processes."
+    },
+    {
+      "item": "M-01 ingestion overrides of year-resolved wage basis, measuring date and pay codes.",
+      "why": "Inherited behavior conflicts with year-pack precedence but changes figures; preserved exactly for owner reconciliation."
+    },
+    {
+      "item": "First-program credit_math pricing in states with multiple programs.",
+      "why": "Inherited Python pricing is figure-sensitive. The gateway reuses it and adds no new credit_math refusal."
+    },
+    {
+      "item": "Source-version fingerprint strength.",
+      "why": "Row count plus maximum modified timestamp is not a Delta snapshot and cannot detect count/max-preserving edits."
+    },
+    {
+      "item": "Complete/prove unavailable governed datasets and native privacy suppression/distinct support.",
+      "why": "The typed infrastructure port has not proved atomic hidden-person suppression or safe cross-year person identity. Dataset availability and refusal-code/field differences remain explicit."
+    },
+    {
+      "item": "Inherited provider and fiscal boundaries.",
+      "why": "Native monetary AVG, zero-worksite SQL/projector semantics, partial strict leap-day fiscal handling and live artifact publication are not proved by hermetic gateway tests."
+    },
+    {
+      "item": "Inherited replay storage, identity and provenance differences.",
+      "why": "Money-string scale, later genuine IDs, valid long-text storage, provenance and stored-program values remain documented W2 boundaries; no changed tool figures or such values were waived to claim gateway parity."
+    },
+    {
+      "item": "Authorized deployment verification.",
+      "why": "No live Fabric, Foundry, Entra or customer access was approved or attempted. Real deployment grants, native concurrency and byte publication require an authorized environment."
+    }
+  ],
+  "reports": [
+    "dotnet/docs/GATEWAY-REPORT.md",
+    "dotnet/docs/gateway-log.md",
+    "dotnet/docs/replay-gateway-policy.json",
+    "dotnet/docs/improvements/gateway.json"
+  ]
+}

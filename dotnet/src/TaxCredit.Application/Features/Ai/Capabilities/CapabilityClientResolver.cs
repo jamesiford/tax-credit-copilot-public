@@ -24,7 +24,7 @@ internal static class CapabilityClientResolver
             ["client_id"] = chosen,
             ["client_name"] = accounts.FirstOrDefault(account => account.AccountId == chosen)?.Name,
             ["clarify"] = chosen is null,
-            ["reason"] = chosen is null ? reason ?? "no client is selected or named" : null,
+            ["reason"] = chosen is null ? reason ?? "no client is selected" : null,
             ["named"] = new JsonArray(named.Select(account => (JsonNode?)JsonValue.Create(account.AccountId)).ToArray()),
             ["candidates"] = new JsonArray(candidates.Select(account => (JsonNode)new JsonObject
             {

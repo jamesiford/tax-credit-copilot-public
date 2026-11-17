@@ -44,6 +44,8 @@
     <!-- BEGIN routes_ai_agents: only this session edits between the markers -->
     <!-- END routes_ai_agents -->
     <!-- BEGIN gateway: only this session edits between the markers -->
+    <!-- Official MCP SDK, Apache-2.0; stable net10.0 assets. -->
+    <PackageVersion Include="ModelContextProtocol" Version="1.0.0" />
     <!-- END gateway -->
     <!-- BEGIN orchestrator: only this session edits between the markers -->
     <!-- END orchestrator -->
