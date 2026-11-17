@@ -1,0 +1,209 @@
+# Replay report (semantic)
+
+- server interpreter: external server (zlib n/a), oracle: None
+- scenarios: 1
+- exchanges compared: 64
+- failures: 509
+- tolerated (semantic mode only): 0
+
+## p2_run_batches: 64 exchanges, 509 failures, 0 tolerated
+- `GET /api/v2/run-batches` / `list-empty` **status** at `status`: expected `200` actual `501`
+- `GET /api/v2/run-batches` / `list-empty` **missing-field** at `items`: expected `[]` actual `<absent>`
+- `GET /api/v2/run-batches` / `list-empty` **missing-field** at `total`: expected `0` actual `<absent>`
+- `GET /api/v2/run-batches` / `list-empty` **missing-field** at `limit`: expected `25` actual `<absent>`
+- `GET /api/v2/run-batches` / `list-empty` **missing-field** at `offset`: expected `0` actual `<absent>`
+- `GET /api/v2/run-batches` / `list-empty` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /api/v2/run-batches`
+- `POST /api/v2/run-batches` / `dry-run` **status** at `status`: expected `202` actual `501`
+- `POST /api/v2/run-batches` / `dry-run` **missing-field** at `dry_run`: expected `true` actual `<absent>`
+- `POST /api/v2/run-batches` / `dry-run` **missing-field** at `preview`: expected `{"kind":"assess","clients":1,"items":1,"years":[2025],"refresh_once":true,"force":false,"skip_unchanged":false,"skip_coverage":"none_yet","per_client_year_items":false,"skip_candidates_upper_bound":0,"never_run":1,"manifests_read_for":1,"requires_confirmation":false,"confirm_above":25,"max_items":50...(743 chars)` actual `<absent>`
+- `POST /api/v2/run-batches` / `dry-run` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /api/v2/run-batches`
+- `POST /api/v2/run-batches` / `dry-run-all` **status** at `status`: expected `202` actual `501`
+- `POST /api/v2/run-batches` / `dry-run-all` **missing-field** at `dry_run`: expected `true` actual `<absent>`
+- `POST /api/v2/run-batches` / `dry-run-all` **missing-field** at `preview`: expected `{"kind":"assess_and_calculate","clients":4,"items":4,"years":"latest runnable year per client","refresh_once":true,"force":false,"skip_unchanged":false,"skip_coverage":"none_yet","per_client_year_items":false,"skip_candidates_upper_bound":0,"never_run":4,"manifests_read_for":4,"requires_confirmation...(1209 chars)` actual `<absent>`
+- `POST /api/v2/run-batches` / `dry-run-all` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /api/v2/run-batches`
+- `POST /api/v2/run-batches` / `dry-run-list` **status** at `status`: expected `202` actual `501`
+- `POST /api/v2/run-batches` / `dry-run-list` **missing-field** at `dry_run`: expected `true` actual `<absent>`
+- `POST /api/v2/run-batches` / `dry-run-list` **missing-field** at `preview`: expected `{"kind":"calculate","clients":3,"items":3,"years":[2025],"refresh_once":true,"force":false,"skip_unchanged":false,"skip_coverage":"none_yet","per_client_year_items":false,"skip_candidates_upper_bound":0,"never_run":3,"manifests_read_for":3,"requires_confirmation":false,"confirm_above":25,"max_items"...(1034 chars)` actual `<absent>`
+- `POST /api/v2/run-batches` / `dry-run-list` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /api/v2/run-batches`
+- `POST /api/v2/run-batches` / `dry-run-filter` **status** at `status`: expected `422` actual `501`
+- `POST /api/v2/run-batches` / `dry-run-filter` **type** at `detail`: expected `{"detail":"The selection matches no clients. Check the client ids or the filter.","code":"empty_scope","reason":"The selection matches no clients.","remedy":"Check the client ids or the filter."}` actual `Operation not implemented: POST /api/v2/run-batches`
+- `POST /api/v2/run-batches` / `create` **status** at `status`: expected `202` actual `501`
+- `POST /api/v2/run-batches` / `create` **missing-field** at `batch_id`: expected `4000000000004000800000000000001f` actual `<absent>`
+- `POST /api/v2/run-batches` / `create` **missing-field** at `kind`: expected `assess` actual `<absent>`
+- `POST /api/v2/run-batches` / `create` **missing-field** at `scope_kind`: expected `one` actual `<absent>`
+- `POST /api/v2/run-batches` / `create` **missing-field** at `scope_spec`: expected `{"client_count":1,"client_ids":[2001],"clients_sha256":"e8ce31014a2c9f51","force":false,"include_code_commit":false,"kind":"assess","program_code":null,"program_items":1,"refresh_once":true,"skip_unchanged":false,"tax_years":[2025]}` actual `<absent>`
+- `POST /api/v2/run-batches` / `create` **missing-field** at `program_code`: expected `null` actual `<absent>`
+- `POST /api/v2/run-batches` / `create` **missing-field** at `tax_years`: expected `[2025]` actual `<absent>`
+- `POST /api/v2/run-batches` / `create` **missing-field** at `force`: expected `false` actual `<absent>`
+- `POST /api/v2/run-batches` / `create` **missing-field** at `skip_unchanged`: expected `false` actual `<absent>`
+- `POST /api/v2/run-batches` / `create` **missing-field** at `include_code_commit`: expected `false` actual `<absent>`
+- `POST /api/v2/run-batches` / `create` **missing-field** at `refresh_once`: expected `true` actual `<absent>`
+- `POST /api/v2/run-batches` / `create` **missing-field** at `status`: expected `queued` actual `<absent>`
+- `POST /api/v2/run-batches` / `create` **missing-field** at `cancel_requested`: expected `false` actual `<absent>`
+- `POST /api/v2/run-batches` / `create` **missing-field** at `counts`: expected `{"total":1,"queued":1,"running":0,"succeeded":0,"skipped":0,"failed":0,"cancelled":0}` actual `<absent>`
+- `POST /api/v2/run-batches` / `create` **missing-field** at `progress`: expected `{"done":0,"total":1}` actual `<absent>`
+- `POST /api/v2/run-batches` / `create` **missing-field** at `requested_by`: expected `anonymous` actual `<absent>`
+- `POST /api/v2/run-batches` / `create` **missing-field** at `requested_at`: expected `2026-01-15T12:00:00Z` actual `<absent>`
+- `POST /api/v2/run-batches` / `create` **missing-field** at `started_at`: expected `null` actual `<absent>`
+- `POST /api/v2/run-batches` / `create` **missing-field** at `finished_at`: expected `null` actual `<absent>`
+- `POST /api/v2/run-batches` / `create` **missing-field** at `idempotency_key`: expected `contract-1` actual `<absent>`
+- `POST /api/v2/run-batches` / `create` **missing-field** at `dry_run_summary`: expected `{"clients":1,"confirm_above":25,"force":false,"items":1,"kind":"assess","manifests_read_for":1,"max_items":5000,"multi_program_clients":0,"never_run":1,"notes":["Nothing is skipped: every item runs.","Each run replays every authored year of the client's payroll, whatever year it is asked for."],"ove...(581 chars)` actual `<absent>`
+- `POST /api/v2/run-batches` / `create` **missing-field** at `idempotent_replay`: expected `false` actual `<absent>`
+- `POST /api/v2/run-batches` / `create` **missing-field** at `degraded`: expected `[]` actual `<absent>`
+- `POST /api/v2/run-batches` / `create` **missing-field** at `cancelled_now`: expected `null` actual `<absent>`
+- `POST /api/v2/run-batches` / `create` **missing-field** at `requeued`: expected `null` actual `<absent>`
+- `POST /api/v2/run-batches` / `create` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /api/v2/run-batches`
+- `POST /api/v2/run-batches` / `create-replay` **status** at `status`: expected `202` actual `501`
+- `POST /api/v2/run-batches` / `create-replay` **missing-field** at `batch_id`: expected `4000000000004000800000000000001f` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-replay` **missing-field** at `kind`: expected `assess` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-replay` **missing-field** at `scope_kind`: expected `one` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-replay` **missing-field** at `scope_spec`: expected `{"client_count":1,"client_ids":[2001],"clients_sha256":"e8ce31014a2c9f51","force":false,"include_code_commit":false,"kind":"assess","program_code":null,"program_items":1,"refresh_once":true,"skip_unchanged":false,"tax_years":[2025]}` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-replay` **missing-field** at `program_code`: expected `null` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-replay` **missing-field** at `tax_years`: expected `[2025]` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-replay` **missing-field** at `force`: expected `false` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-replay` **missing-field** at `skip_unchanged`: expected `false` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-replay` **missing-field** at `include_code_commit`: expected `false` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-replay` **missing-field** at `refresh_once`: expected `true` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-replay` **missing-field** at `status`: expected `queued` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-replay` **missing-field** at `cancel_requested`: expected `false` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-replay` **missing-field** at `counts`: expected `{"total":1,"queued":1,"running":0,"succeeded":0,"skipped":0,"failed":0,"cancelled":0}` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-replay` **missing-field** at `progress`: expected `{"done":0,"total":1}` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-replay` **missing-field** at `requested_by`: expected `anonymous` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-replay` **missing-field** at `requested_at`: expected `2026-01-15T12:00:00Z` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-replay` **missing-field** at `started_at`: expected `null` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-replay` **missing-field** at `finished_at`: expected `null` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-replay` **missing-field** at `idempotency_key`: expected `contract-1` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-replay` **missing-field** at `dry_run_summary`: expected `{"clients":1,"confirm_above":25,"force":false,"items":1,"kind":"assess","manifests_read_for":1,"max_items":5000,"multi_program_clients":0,"never_run":1,"notes":["Nothing is skipped: every item runs.","Each run replays every authored year of the client's payroll, whatever year it is asked for."],"ove...(581 chars)` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-replay` **missing-field** at `idempotent_replay`: expected `true` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-replay` **missing-field** at `degraded`: expected `[]` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-replay` **missing-field** at `cancelled_now`: expected `null` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-replay` **missing-field** at `requeued`: expected `null` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-replay` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /api/v2/run-batches`
+- `POST /api/v2/run-batches` / `create-same-key-different-body` **status** at `status`: expected `202` actual `501`
+- `POST /api/v2/run-batches` / `create-same-key-different-body` **missing-field** at `batch_id`: expected `4000000000004000800000000000001f` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-same-key-different-body` **missing-field** at `kind`: expected `assess` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-same-key-different-body` **missing-field** at `scope_kind`: expected `one` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-same-key-different-body` **missing-field** at `scope_spec`: expected `{"client_count":1,"client_ids":[2001],"clients_sha256":"e8ce31014a2c9f51","force":false,"include_code_commit":false,"kind":"assess","program_code":null,"program_items":1,"refresh_once":true,"skip_unchanged":false,"tax_years":[2025]}` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-same-key-different-body` **missing-field** at `program_code`: expected `null` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-same-key-different-body` **missing-field** at `tax_years`: expected `[2025]` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-same-key-different-body` **missing-field** at `force`: expected `false` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-same-key-different-body` **missing-field** at `skip_unchanged`: expected `false` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-same-key-different-body` **missing-field** at `include_code_commit`: expected `false` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-same-key-different-body` **missing-field** at `refresh_once`: expected `true` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-same-key-different-body` **missing-field** at `status`: expected `queued` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-same-key-different-body` **missing-field** at `cancel_requested`: expected `false` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-same-key-different-body` **missing-field** at `counts`: expected `{"total":1,"queued":1,"running":0,"succeeded":0,"skipped":0,"failed":0,"cancelled":0}` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-same-key-different-body` **missing-field** at `progress`: expected `{"done":0,"total":1}` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-same-key-different-body` **missing-field** at `requested_by`: expected `anonymous` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-same-key-different-body` **missing-field** at `requested_at`: expected `2026-01-15T12:00:00Z` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-same-key-different-body` **missing-field** at `started_at`: expected `null` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-same-key-different-body` **missing-field** at `finished_at`: expected `null` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-same-key-different-body` **missing-field** at `idempotency_key`: expected `contract-1` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-same-key-different-body` **missing-field** at `dry_run_summary`: expected `{"clients":1,"confirm_above":25,"force":false,"items":1,"kind":"assess","manifests_read_for":1,"max_items":5000,"multi_program_clients":0,"never_run":1,"notes":["Nothing is skipped: every item runs.","Each run replays every authored year of the client's payroll, whatever year it is asked for."],"ove...(581 chars)` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-same-key-different-body` **missing-field** at `idempotent_replay`: expected `true` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-same-key-different-body` **missing-field** at `degraded`: expected `[]` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-same-key-different-body` **missing-field** at `cancelled_now`: expected `null` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-same-key-different-body` **missing-field** at `requeued`: expected `null` actual `<absent>`
+- `POST /api/v2/run-batches` / `create-same-key-different-body` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /api/v2/run-batches`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-queued` **status** at `status`: expected `200` actual `501`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-queued` **missing-field** at `batch_id`: expected `4000000000004000800000000000001f` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-queued` **missing-field** at `kind`: expected `assess` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-queued` **missing-field** at `scope_kind`: expected `one` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-queued` **missing-field** at `scope_spec`: expected `{"client_count":1,"client_ids":[2001],"clients_sha256":"e8ce31014a2c9f51","force":false,"include_code_commit":false,"kind":"assess","program_code":null,"program_items":1,"refresh_once":true,"skip_unchanged":false,"tax_years":[2025]}` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-queued` **missing-field** at `program_code`: expected `null` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-queued` **missing-field** at `tax_years`: expected `[2025]` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-queued` **missing-field** at `force`: expected `false` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-queued` **missing-field** at `skip_unchanged`: expected `false` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-queued` **missing-field** at `include_code_commit`: expected `false` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-queued` **missing-field** at `refresh_once`: expected `true` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-queued` **missing-field** at `status`: expected `queued` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-queued` **missing-field** at `cancel_requested`: expected `false` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-queued` **missing-field** at `counts`: expected `{"total":1,"queued":1,"running":0,"succeeded":0,"skipped":0,"failed":0,"cancelled":0}` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-queued` **missing-field** at `progress`: expected `{"done":0,"total":1}` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-queued` **missing-field** at `requested_by`: expected `anonymous` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-queued` **missing-field** at `requested_at`: expected `2026-01-15T12:00:00Z` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-queued` **missing-field** at `started_at`: expected `null` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-queued` **missing-field** at `finished_at`: expected `null` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-queued` **missing-field** at `idempotency_key`: expected `contract-1` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-queued` **missing-field** at `dry_run_summary`: expected `{"clients":1,"confirm_above":25,"force":false,"items":1,"kind":"assess","manifests_read_for":1,"max_items":5000,"multi_program_clients":0,"never_run":1,"notes":["Nothing is skipped: every item runs.","Each run replays every authored year of the client's payroll, whatever year it is asked for."],"ove...(581 chars)` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-queued` **missing-field** at `idempotent_replay`: expected `false` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-queued` **missing-field** at `degraded`: expected `[]` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-queued` **missing-field** at `cancelled_now`: expected `null` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-queued` **missing-field** at `requeued`: expected `null` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-queued` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /api/v2/run-batches/{batch_id}`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f/items` / `items-queued` **status** at `status`: expected `200` actual `501`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f/items` / `items-queued` **missing-field** at `items`: expected `[{"item_id":"40000000000040008000000000000020","batch_id":"4000000000004000800000000000001f","seq":0,"client_id":2001,"program_code":null,"tax_year":2025,"status":"queued","attempts":0,"run_id":null,"skip_reason":null,"error_dependency":null,"error_message":null,"not_before":null,"started_at":null,"...(319 chars)` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f/items` / `items-queued` **missing-field** at `total`: expected `1` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f/items` / `items-queued` **missing-field** at `limit`: expected `50` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f/items` / `items-queued` **missing-field** at `offset`: expected `0` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f/items` / `items-queued` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /api/v2/run-batches/{batch_id}/items`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-done` **status** at `status`: expected `200` actual `501`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-done` **missing-field** at `batch_id`: expected `4000000000004000800000000000001f` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-done` **missing-field** at `kind`: expected `assess` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-done` **missing-field** at `scope_kind`: expected `one` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-done` **missing-field** at `scope_spec`: expected `{"client_count":1,"client_ids":[2001],"clients_sha256":"e8ce31014a2c9f51","force":false,"include_code_commit":false,"kind":"assess","program_code":null,"program_items":1,"refresh_once":true,"skip_unchanged":false,"tax_years":[2025]}` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-done` **missing-field** at `program_code`: expected `null` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-done` **missing-field** at `tax_years`: expected `[2025]` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-done` **missing-field** at `force`: expected `false` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-done` **missing-field** at `skip_unchanged`: expected `false` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-done` **missing-field** at `include_code_commit`: expected `false` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-done` **missing-field** at `refresh_once`: expected `true` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-done` **missing-field** at `status`: expected `succeeded` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-done` **missing-field** at `cancel_requested`: expected `false` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-done` **missing-field** at `counts`: expected `{"total":1,"queued":0,"running":0,"succeeded":1,"skipped":0,"failed":0,"cancelled":0}` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-done` **missing-field** at `progress`: expected `{"done":1,"total":1}` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-done` **missing-field** at `requested_by`: expected `anonymous` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-done` **missing-field** at `requested_at`: expected `2026-01-15T12:00:00Z` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-done` **missing-field** at `started_at`: expected `2026-01-15T12:00:00Z` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-done` **missing-field** at `finished_at`: expected `2026-01-15T12:00:00Z` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-done` **missing-field** at `idempotency_key`: expected `contract-1` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-done` **missing-field** at `dry_run_summary`: expected `{"clients":1,"confirm_above":25,"force":false,"items":1,"kind":"assess","manifests_read_for":1,"max_items":5000,"multi_program_clients":0,"never_run":1,"notes":["Nothing is skipped: every item runs.","Each run replays every authored year of the client's payroll, whatever year it is asked for."],"ove...(581 chars)` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-done` **missing-field** at `idempotent_replay`: expected `false` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-done` **missing-field** at `degraded`: expected `[]` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-done` **missing-field** at `cancelled_now`: expected `null` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-done` **missing-field** at `requeued`: expected `null` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f` / `get-done` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /api/v2/run-batches/{batch_id}`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f/items` / `items-done` **status** at `status`: expected `200` actual `501`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f/items` / `items-done` **missing-field** at `items`: expected `[{"item_id":"40000000000040008000000000000020","batch_id":"4000000000004000800000000000001f","seq":0,"client_id":2001,"program_code":"GA_JTC","tax_year":2025,"status":"succeeded","attempts":1,"run_id":null,"skip_reason":null,"error_dependency":null,"error_message":null,"not_before":null,"started_at"...(362 chars)` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f/items` / `items-done` **missing-field** at `total`: expected `1` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f/items` / `items-done` **missing-field** at `limit`: expected `50` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f/items` / `items-done` **missing-field** at `offset`: expected `0` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f/items` / `items-done` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /api/v2/run-batches/{batch_id}/items`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f/items` / `items-status` **status** at `status`: expected `200` actual `501`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f/items` / `items-status` **missing-field** at `items`: expected `[{"item_id":"40000000000040008000000000000020","batch_id":"4000000000004000800000000000001f","seq":0,"client_id":2001,"program_code":"GA_JTC","tax_year":2025,"status":"succeeded","attempts":1,"run_id":null,"skip_reason":null,"error_dependency":null,"error_message":null,"not_before":null,"started_at"...(362 chars)` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f/items` / `items-status` **missing-field** at `total`: expected `1` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f/items` / `items-status` **missing-field** at `limit`: expected `50` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f/items` / `items-status` **missing-field** at `offset`: expected `0` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f/items` / `items-status` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /api/v2/run-batches/{batch_id}/items`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f/items` / `items-status-bogus` **status** at `status`: expected `200` actual `501`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f/items` / `items-status-bogus` **missing-field** at `items`: expected `[]` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f/items` / `items-status-bogus` **missing-field** at `total`: expected `0` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f/items` / `items-status-bogus` **missing-field** at `limit`: expected `50` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f/items` / `items-status-bogus` **missing-field** at `offset`: expected `0` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f/items` / `items-status-bogus` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /api/v2/run-batches/{batch_id}/items`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f/items` / `items-limit-0` **missing-field** at `detail[0].ctx`: expected `{"ge":1}` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f/items` / `items-limit-0` **value** at `detail[0].msg`: expected `Input should be greater than or equal to 1` actual `Value violates minimum.`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f/items` / `items-limit-0` **type** at `detail[0].input`: expected `0` actual `0`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f/items` / `items-offset-past` **status** at `status`: expected `200` actual `501`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f/items` / `items-offset-past` **missing-field** at `items`: expected `[]` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f/items` / `items-offset-past` **missing-field** at `total`: expected `1` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f/items` / `items-offset-past` **missing-field** at `limit`: expected `50` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f/items` / `items-offset-past` **missing-field** at `offset`: expected `99` actual `<absent>`
+- `GET /api/v2/run-batches/4000000000004000800000000000001f/items` / `items-offset-past` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /api/v2/run-batches/{batch_id}/items`
+- `POST /api/v2/run-batches/4000000000004000800000000000001f/cancel` / `cancel-finished` **status** at `status`: expected `200` actual `501`
+- `POST /api/v2/run-batches/4000000000004000800000000000001f/cancel` / `cancel-finished` **missing-field** at `batch_id`: expected `4000000000004000800000000000001f` actual `<absent>`
+- `POST /api/v2/run-batches/4000000000004000800000000000001f/cancel` / `cancel-finished` **missing-field** at `kind`: expected `assess` actual `<absent>`
+- `POST /api/v2/run-batches/4000000000004000800000000000001f/cancel` / `cancel-finished` **missing-field** at `scope_kind`: expected `one` actual `<absent>`
+- `POST /api/v2/run-batches/4000000000004000800000000000001f/cancel` / `cancel-finished` **missing-field** at `scope_spec`: expected `{"client_count":1,"client_ids":[2001],"clients_sha256":"e8ce31014a2c9f51","force":false,"include_code_commit":false,"kind":"assess","program_code":null,"program_items":1,"refresh_once":true,"skip_unchanged":false,"tax_years":[2025]}` actual `<absent>`
+- `POST /api/v2/run-batches/4000000000004000800000000000001f/cancel` / `cancel-finished` **missing-field** at `program_code`: expected `null` actual `<absent>`
+- `POST /api/v2/run-batches/4000000000004000800000000000001f/cancel` / `cancel-finished` **missing-field** at `tax_years`: expected `[2025]` actual `<absent>`
+- `POST /api/v2/run-batches/4000000000004000800000000000001f/cancel` / `cancel-finished` **missing-field** at `force`: expected `false` actual `<absent>`
+- `POST /api/v2/run-batches/4000000000004000800000000000001f/cancel` / `cancel-finished` **missing-field** at `skip_unchanged`: expected `false` actual `<absent>`
+- `POST /api/v2/run-batches/4000000000004000800000000000001f/cancel` / `cancel-finished` **missing-field** at `include_code_commit`: expected `false` actual `<absent>`
+- `POST /api/v2/run-batches/4000000000004000800000000000001f/cancel` / `cancel-finished` **missing-field** at `refresh_once`: expected `true` actual `<absent>`
+- `POST /api/v2/run-batches/4000000000004000800000000000001f/cancel` / `cancel-finished` **missing-field** at `status`: expected `succeeded` actual `<absent>`
+- `POST /api/v2/run-batches/4000000000004000800000000000001f/cancel` / `cancel-finished` **missing-field** at `cancel_requested`: expected `true` actual `<absent>`
+- `POST /api/v2/run-batches/4000000000004000800000000000001f/cancel` / `cancel-finished` **missing-field** at `counts`: expected `{"total":1,"queued":0,"running":0,"succeeded":1,"skipped":0,"failed":0,"cancelled":0}` actual `<absent>`
+- `POST /api/v2/run-batches/4000000000004000800000000000001f/cancel` / `cancel-finished` **missing-field** at `progress`: expected `{"done":1,"total":1}` actual `<absent>`
+- `POST /api/v2/run-batches/4000000000004000800000000000001f/cancel` / `cancel-finished` **missing-field** at `requested_by`: expected `anonymous` actual `<absent>`
+- `POST /api/v2/run-batches/4000000000004000800000000000001f/cancel` / `cancel-finished` **missing-field** at `requested_at`: expected `2026-01-15T12:00:00Z` actual `<absent>`

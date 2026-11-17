@@ -1,0 +1,770 @@
+{
+  "improvements": [
+    {
+      "id": "IMP-integrate-W2-1",
+      "kind": "defect_fix",
+      "route": "POST /api/chat",
+      "case": "chat.ask-client",
+      "categories": ["event"],
+      "path_prefix": "events",
+      "finding": "",
+      "reason": "The unconfigured Python portal streams an unrelated fixed demonstration. The merged host instead reads the selected client's authorized canonical facts and explicitly discloses that narration is unavailable. No computed fact is repriced or substituted."
+    },
+    {
+      "id": "IMP-integrate-W2-2",
+      "kind": "defect_fix",
+      "route": "GET /api/v2/portfolio",
+      "categories": ["array-length"],
+      "path_prefix": "items[0].states",
+      "finding": "",
+      "reason": "The bound source adapter supplies its actual payroll footprint. Python's independently unconfigured SQL reader silently returned an empty footprint, even with staged payroll. This covers only the state-list shape, never client populations, identifiers or figures."
+    },
+    {
+      "id": "IMP-integrate-W2-3",
+      "kind": "defect_fix",
+      "route": "GET /api/v2/portfolio",
+      "categories": ["array-length"],
+      "path_prefix": "items[0].priceable_states",
+      "finding": "",
+      "reason": "Priceable states are the genuine source footprint intersected with authored statute coverage, rather than a silently empty unconfigured-reader result. Only this state-list shape is covered; no client total or figure is covered."
+    },
+    {
+      "id": "IMP-integrate-W2-4",
+      "kind": "defect_fix",
+      "route": "GET /api/v2/portfolio",
+      "categories": ["array-length"],
+      "path_prefix": "items[1].states",
+      "finding": "",
+      "reason": "The configured adapter supplies the second client's actual footprint instead of the empty result of Python's independently unconfigured SQL reader. Only the state-list shape is covered, not client counts or figures."
+    },
+    {
+      "id": "IMP-integrate-W2-5",
+      "kind": "defect_fix",
+      "route": "GET /api/v2/portfolio",
+      "categories": ["array-length"],
+      "path_prefix": "items[1].priceable_states",
+      "finding": "",
+      "reason": "The second client's priceable footprint is derived from its real source states and authored packs. An unconfigured sibling adapter no longer silently hides known coverage. No population or monetary field is covered."
+    },
+    {
+      "id": "IMP-integrate-W2-6",
+      "kind": "defect_fix",
+      "route": "GET /api/v2/portfolio",
+      "categories": ["array-length"],
+      "path_prefix": "items[2].states",
+      "finding": "",
+      "reason": "The configured adapter supplies the third client's actual footprint instead of the empty result of Python's independently unconfigured SQL reader. Only the state-list shape is covered, not client counts or figures."
+    },
+    {
+      "id": "IMP-integrate-W2-7",
+      "kind": "defect_fix",
+      "route": "GET /api/v2/portfolio",
+      "categories": ["array-length"],
+      "path_prefix": "items[2].priceable_states",
+      "finding": "",
+      "reason": "The third client's priceable footprint is derived from its real source states and authored packs. An unconfigured sibling adapter no longer silently hides known coverage. No population or monetary field is covered."
+    },
+    {
+      "id": "IMP-integrate-W2-8",
+      "kind": "defect_fix",
+      "route": "GET /api/v2/portfolio",
+      "categories": ["array-length"],
+      "path_prefix": "items[3].states",
+      "finding": "",
+      "reason": "The configured adapter supplies the fourth client's actual footprint instead of the empty result of Python's independently unconfigured SQL reader. Only the state-list shape is covered, not client counts or figures."
+    },
+    {
+      "id": "IMP-integrate-W2-9",
+      "kind": "defect_fix",
+      "route": "GET /api/v2/portfolio",
+      "categories": ["array-length"],
+      "path_prefix": "items[3].priceable_states",
+      "finding": "",
+      "reason": "The fourth client's priceable footprint is derived from its real source states and authored packs. An unconfigured sibling adapter no longer silently hides known coverage. No population or monetary field is covered."
+    },
+    {
+      "id": "IMP-integrate-W2-10",
+      "kind": "defect_fix",
+      "route": "GET /api/v2/portfolio",
+      "case": "portfolio.scope-state",
+      "finding": "F-2",
+      "reason": "A state abbreviation is not an engagement scope. The host returns a JSON 422 refusal instead of reproducing the unhandled Python enum-conversion 500; no valid selection or stored value changes."
+    },
+    {
+      "id": "IMP-integrate-W2-11",
+      "kind": "framework_default",
+      "route": "GET /docs",
+      "categories": ["value"],
+      "path_prefix": "body.text",
+      "finding": "",
+      "reason": "The local documentation links the same public OpenAPI inventory without copying FastAPI's CDN-specific HTML. Framework-generated page bytes are not reproduced. This intentionally remains subject to the unchanged group waiver cap."
+    },
+    {
+      "id": "IMP-integrate-W2-12",
+      "kind": "framework_default",
+      "route": "GET /redoc",
+      "categories": ["value"],
+      "path_prefix": "body.text",
+      "finding": "",
+      "reason": "The native API reference links the public schema without copying FastAPI/ReDoc CDN markup or remote font dependencies. Framework page bytes differ; the unchanged waiver cap still applies."
+    },
+    {
+      "id": "IMP-integrate-W2-13",
+      "kind": "framework_default",
+      "route": "GET /docs/oauth2-redirect",
+      "categories": ["value"],
+      "path_prefix": "body.text",
+      "finding": "",
+      "reason": "No browser OAuth client is configured. The page says so rather than reproducing an unused Swagger-specific window-opener script. It does not change bearer authentication or authorize a caller."
+    },
+    {
+      "id": "IMP-integrate-W2-14",
+      "kind": "defect_fix",
+      "route": "GET /api/health",
+      "case": "cors.simple",
+      "categories": ["header"],
+      "path_prefix": "headers.access-control-allow-origin",
+      "finding": "F-13",
+      "reason": "The configured origin allow-list does not authorize an arbitrary external origin. The host does not recreate permissive wildcard CORS merely to match the recording. The unchanged framework waiver cap still applies."
+    },
+    {
+      "id": "IMP-integrate-W2-15",
+      "kind": "framework_default",
+      "route": "GET /api/v2/portfolio",
+      "categories": ["value"],
+      "path_prefix": "detail[0].type",
+      "finding": "",
+      "reason": "Invalid boolean text still receives JSON detail and 422. Native boolean error-code naming is retained instead of emulating Pydantic; successful fields, locations and application verdicts are unaffected."
+    },
+    {
+      "id": "IMP-integrate-W2-16",
+      "kind": "framework_default",
+      "route": "POST /api/claims",
+      "categories": ["value", "array-length"],
+      "path_prefix": "detail[0].",
+      "finding": "",
+      "reason": "Invalid bodies still receive JSON detail and 422. Native binding retains its own error codes and omits Pydantic's JSON-parser byte-position component; this does not cover status, successful claims or calculated figures."
+    },
+    {
+      "id": "IMP-integrate-W2-17",
+      "kind": "framework_default",
+      "route": "POST /api/claims/cell/{client_id}/{program_code}/{tax_year}/transition",
+      "categories": ["value", "array-length"],
+      "path_prefix": "detail[0].",
+      "finding": "",
+      "reason": "Invalid transitions still receive JSON detail and 422. Native body/enum error-code naming and parser byte-position metadata are not made Pydantic-specific. Status, transition verdicts and stored values are not covered."
+    },
+    {
+      "id": "IMP-integrate-W2-18",
+      "kind": "framework_default",
+      "route": "PUT /api/claims/engagement",
+      "categories": ["value", "array-length"],
+      "path_prefix": "detail[0].",
+      "finding": "",
+      "reason": "Invalid engagement bodies still receive JSON detail and 422. Native error codes and parser byte-position metadata differ from Pydantic; successful values and application schema verdicts are not covered."
+    },
+    {
+      "id": "IMP-integrate-W2-19",
+      "kind": "framework_default",
+      "route": "POST /api/claims/assess",
+      "categories": ["value", "array-length"],
+      "path_prefix": "detail[0].",
+      "finding": "",
+      "reason": "Malformed or null bodies still receive JSON detail and 422. Native body-binding codes and JSON-parser byte-position metadata are framework-specific; no assessment, status or figure is covered."
+    },
+    {
+      "id": "IMP-integrate-W2-20",
+      "kind": "framework_default",
+      "route": "POST /api/rules/{code}/verify",
+      "categories": ["value", "array-length"],
+      "path_prefix": "detail[0].",
+      "finding": "",
+      "reason": "Invalid bodies still receive JSON detail and 422. Native binding retains its own error codes and parser-position metadata rather than emulating Pydantic; this does not cover verification verdicts or successful values."
+    },
+    {
+      "id": "IMP-integrate-W2-21",
+      "kind": "framework_default",
+      "route": "POST /api/rules/ingested/{state}/apply",
+      "categories": ["value", "array-length"],
+      "path_prefix": "detail[0].",
+      "finding": "",
+      "reason": "Invalid bodies still receive JSON detail and 422. Native body-binding codes and JSON-parser byte-position metadata differ from Pydantic; application validation and statute values are not covered."
+    },
+    {
+      "id": "IMP-integrate-W2-22",
+      "kind": "framework_default",
+      "route": "POST /api/findings/{finding_id}/resolve",
+      "categories": ["value", "array-length"],
+      "path_prefix": "detail[0].",
+      "finding": "",
+      "reason": "Invalid bodies still receive JSON detail and 422. Native body-binding error codes and parser-position metadata are retained, without changing resolution decisions or successful values."
+    },
+    {
+      "id": "IMP-integrate-W2-23",
+      "kind": "framework_default",
+      "route": "POST /api/findings/{finding_id}/reopen",
+      "categories": ["value", "array-length"],
+      "path_prefix": "detail[0].",
+      "finding": "",
+      "reason": "Invalid bodies still receive JSON detail and 422. Native body-binding error codes and parser-position metadata are retained, without changing reopening decisions or successful values."
+    },
+    {
+      "id": "IMP-integrate-W2-24",
+      "kind": "framework_default",
+      "route": "POST /api/v2/program-drafts",
+      "categories": ["value", "array-length"],
+      "path_prefix": "detail[0].",
+      "finding": "",
+      "reason": "Invalid bodies still receive JSON detail and 422. Native binding codes and parser-position metadata are not made Pydantic-specific; draft schema keywords, paths, verdicts and successful values are not covered."
+    },
+    {
+      "id": "IMP-integrate-W2-25",
+      "kind": "framework_default",
+      "route": "PUT /api/v2/program-drafts/{draft_id}/documents",
+      "categories": ["value", "array-length"],
+      "path_prefix": "detail[0].",
+      "finding": "",
+      "reason": "Invalid bodies still receive JSON detail and 422. Native binding codes and parser-position metadata differ from Pydantic; document schema keywords, paths, verdicts and successful values are not covered."
+    },
+    {
+      "id": "IMP-integrate-W2-26",
+      "kind": "framework_default",
+      "route": "POST /api/v2/program-drafts/{draft_id}/validate",
+      "categories": ["value", "array-length"],
+      "path_prefix": "detail[0].",
+      "finding": "",
+      "reason": "Invalid HTTP bodies still receive JSON detail and 422. Native body-binding codes and parser-position metadata are retained; actual pack validation keywords, paths and verdicts are not covered."
+    },
+    {
+      "id": "IMP-integrate-W2-27",
+      "kind": "framework_default",
+      "route": "POST /api/v2/program-drafts/{draft_id}/request-review",
+      "categories": ["value", "array-length"],
+      "path_prefix": "detail[0].",
+      "finding": "",
+      "reason": "Malformed HTTP bodies still receive JSON detail and 422. Native binding codes and parser-position metadata are framework-specific; review state, pack verdicts and successful responses are not covered."
+    },
+    {
+      "id": "IMP-integrate-W2-28",
+      "kind": "framework_default",
+      "route": "POST /api/v2/program-drafts/{draft_id}/review",
+      "categories": ["value", "array-length"],
+      "path_prefix": "detail[0].",
+      "finding": "",
+      "reason": "Invalid HTTP bodies still receive JSON detail and 422. Native enum/body error codes and parser-position metadata are retained; review decisions, draft schema verdicts and successful values are not covered."
+    },
+    {
+      "id": "IMP-integrate-W2-29",
+      "kind": "framework_default",
+      "route": "POST /api/v2/program-drafts/{draft_id}/preview",
+      "categories": ["value", "array-length"],
+      "path_prefix": "detail[0].",
+      "finding": "",
+      "reason": "Invalid HTTP bodies still receive JSON detail and 422. Native body/enum error codes and parser-position metadata differ from Pydantic; preview calculations and validation verdicts are not covered."
+    },
+    {
+      "id": "IMP-integrate-W2-30",
+      "kind": "framework_default",
+      "route": "POST /api/v2/program-drafts/{draft_id}/withdraw",
+      "categories": ["value", "array-length"],
+      "path_prefix": "detail[0].",
+      "finding": "",
+      "reason": "Invalid HTTP bodies still receive JSON detail and 422. Native binding codes and parser-position metadata are retained, without changing withdrawal decisions, schema verdicts or successful values."
+    },
+    {
+      "id": "IMP-integrate-W2-31",
+      "kind": "framework_default",
+      "route": "POST /api/v2/program-drafts/{draft_id}/export",
+      "categories": ["value", "array-length"],
+      "path_prefix": "detail[0].",
+      "finding": "",
+      "reason": "Invalid HTTP bodies still receive JSON detail and 422. Native body/boolean error codes and parser-position metadata are retained; exported packs, validation verdicts and successful values are not covered."
+    },
+    {
+      "id": "IMP-integrate-W2-32",
+      "kind": "framework_default",
+      "route": "POST /api/v2/clients/{client_id}/units/{unit_id}/base-year",
+      "categories": ["value", "array-length"],
+      "path_prefix": "detail[0].",
+      "finding": "",
+      "reason": "Invalid bodies still receive JSON detail and 422. Native body-binding codes and parser-position metadata differ from Pydantic; override decisions, durability and successful values are not covered."
+    },
+    {
+      "id": "IMP-integrate-W2-33",
+      "kind": "framework_default",
+      "route": "POST /api/v2/clients/{client_id}/runs",
+      "categories": ["value", "array-length"],
+      "path_prefix": "detail[0].",
+      "finding": "",
+      "reason": "Invalid HTTP bodies still receive JSON detail and 422. Native binding codes and parser-position metadata are retained; authorization, run identities, validation counts and calculated figures are not covered."
+    },
+    {
+      "id": "IMP-integrate-W2-34",
+      "kind": "framework_default",
+      "route": "POST /api/v2/run-batches",
+      "categories": ["value", "array-length"],
+      "path_prefix": "detail[0].",
+      "finding": "",
+      "reason": "Invalid HTTP bodies still receive JSON detail and 422. Native body/enum error codes and parser-position metadata are retained; batch previews, populations, identities and stored run state are not covered."
+    },
+    {
+      "id": "IMP-integrate-W2-35",
+      "kind": "defect_fix",
+      "route": "POST /api/v2/run-batches",
+      "categories": ["value"],
+      "path_prefix": "preview.never_run",
+      "finding": "F-18",
+      "reason": "The preview counts clients without an actual durable successful manifest, not clients missing from the recording harness's disconnected in-memory store. The owner explicitly permits this operational preview counter difference; no calculated figure is covered."
+    },
+    {
+      "id": "IMP-integrate-W2-36",
+      "kind": "defect_fix",
+      "route": "POST /api/v2/run-batches",
+      "categories": ["value"],
+      "path_prefix": "preview.skip_coverage",
+      "finding": "F-18",
+      "reason": "Coverage reports the source fingerprint on the actual durable manifest instead of none_yet from the disconnected recording store. It does not change calculation results or promise that an item will skip."
+    },
+    {
+      "id": "IMP-integrate-W2-38",
+      "kind": "defect_fix",
+      "route": "POST /api/v2/run-batches",
+      "categories": ["extra-field"],
+      "path_prefix": "preview.first_items[0].last_run.",
+      "finding": "F-18",
+      "reason": "When the first sample client has a durable manifest, the preview supplies its recorded run identity, year, completion time and coverage instead of pretending it never ran. Only added last-run fields are covered, not a changed existing identifier or figure."
+    },
+    {
+      "id": "IMP-integrate-W2-39",
+      "kind": "defect_fix",
+      "route": "POST /api/v2/run-batches",
+      "categories": ["value"],
+      "path_prefix": "preview.first_items[0].last_run.state",
+      "finding": "F-18",
+      "reason": "The first sample client truthfully reports has_run when the durable manifest exists, rather than never_run from the disconnected recording store."
+    },
+    {
+      "id": "IMP-integrate-W2-40",
+      "kind": "defect_fix",
+      "route": "POST /api/v2/run-batches",
+      "categories": ["value"],
+      "path_prefix": "preview.first_items[0].last_run.can_skip",
+      "finding": "F-18",
+      "reason": "The first sample client's eligibility for a later skip check follows the durable manifest fingerprint and assumption hashes. It is an upper-bound planning fact, not a calculated eligibility verdict."
+    },
+    {
+      "id": "IMP-integrate-W2-41",
+      "kind": "defect_fix",
+      "route": "POST /api/v2/run-batches",
+      "categories": ["value"],
+      "path_prefix": "preview.first_items[0].last_run.reason",
+      "finding": "F-18",
+      "reason": "The first sample client's successful preview explains the actual durable last-run comparison rather than claiming no earlier run. This is successful-response explanatory text, not an error-text waiver."
+    },
+    {
+      "id": "IMP-integrate-W2-42",
+      "kind": "defect_fix",
+      "route": "POST /api/v2/run-batches",
+      "categories": ["extra-field"],
+      "path_prefix": "preview.first_items[1].last_run.",
+      "finding": "F-18",
+      "reason": "The second sample client's durable manifest supplies additional recorded run identity, year, completion time and coverage. Only added last-run fields are covered; changed existing identifiers and figures remain failures."
+    },
+    {
+      "id": "IMP-integrate-W2-43",
+      "kind": "defect_fix",
+      "route": "POST /api/v2/run-batches",
+      "categories": ["value"],
+      "path_prefix": "preview.first_items[1].last_run.state",
+      "finding": "F-18",
+      "reason": "The second sample client reports its genuine durable has_run state instead of the disconnected recording store's never_run state."
+    },
+    {
+      "id": "IMP-integrate-W2-44",
+      "kind": "defect_fix",
+      "route": "POST /api/v2/run-batches",
+      "categories": ["value"],
+      "path_prefix": "preview.first_items[1].last_run.can_skip",
+      "finding": "F-18",
+      "reason": "The second sample client's skip candidacy uses the real durable manifest's recorded assumptions and source fingerprint, not the disconnected recording store."
+    },
+    {
+      "id": "IMP-integrate-W2-45",
+      "kind": "defect_fix",
+      "route": "POST /api/v2/run-batches",
+      "categories": ["value"],
+      "path_prefix": "preview.first_items[1].last_run.reason",
+      "finding": "F-18",
+      "reason": "The second sample client's successful preview explains the real durable last-run comparison instead of asserting no earlier successful run."
+    },
+    {
+      "id": "IMP-integrate-W2-46",
+      "kind": "defect_fix",
+      "route": "POST /api/v2/run-batches",
+      "categories": ["extra-field"],
+      "path_prefix": "preview.first_items[2].last_run.",
+      "finding": "F-18",
+      "reason": "The third sample client's durable manifest supplies additional recorded run identity, year, completion time and coverage. Only added fields are covered, never changes to existing identifiers or calculated figures."
+    },
+    {
+      "id": "IMP-integrate-W2-47",
+      "kind": "defect_fix",
+      "route": "POST /api/v2/run-batches",
+      "categories": ["value"],
+      "path_prefix": "preview.first_items[2].last_run.state",
+      "finding": "F-18",
+      "reason": "The third sample client reports has_run from the durable successful manifest instead of never_run from a disconnected recording store."
+    },
+    {
+      "id": "IMP-integrate-W2-48",
+      "kind": "defect_fix",
+      "route": "POST /api/v2/run-batches",
+      "categories": ["value"],
+      "path_prefix": "preview.first_items[2].last_run.can_skip",
+      "finding": "F-18",
+      "reason": "The third sample client's skip candidacy reflects the durable source fingerprint and assumption hashes. Actual skip execution still checks the client's data."
+    },
+    {
+      "id": "IMP-integrate-W2-49",
+      "kind": "defect_fix",
+      "route": "POST /api/v2/run-batches",
+      "categories": ["value"],
+      "path_prefix": "preview.first_items[2].last_run.reason",
+      "finding": "F-18",
+      "reason": "The third sample client's successful preview explains its actual durable manifest comparison rather than claiming there was no earlier run."
+    },
+    {
+      "id": "IMP-integrate-W2-50",
+      "kind": "defect_fix",
+      "route": "POST /api/v2/run-batches",
+      "categories": ["extra-field"],
+      "path_prefix": "preview.first_items[3].last_run.",
+      "finding": "F-18",
+      "reason": "The fourth sample client's durable manifest supplies additional recorded run identity, year, completion time and coverage. Only added fields are covered, not changes to existing identifiers or figures."
+    },
+    {
+      "id": "IMP-integrate-W2-51",
+      "kind": "defect_fix",
+      "route": "POST /api/v2/run-batches",
+      "categories": ["value"],
+      "path_prefix": "preview.first_items[3].last_run.state",
+      "finding": "F-18",
+      "reason": "The fourth sample client reports its genuine durable has_run state instead of never_run from the disconnected recording store."
+    },
+    {
+      "id": "IMP-integrate-W2-52",
+      "kind": "defect_fix",
+      "route": "POST /api/v2/run-batches",
+      "categories": ["value"],
+      "path_prefix": "preview.first_items[3].last_run.can_skip",
+      "finding": "F-18",
+      "reason": "The fourth sample client's skip candidacy follows the recorded durable assumptions and source fingerprint rather than the disconnected recording store."
+    },
+    {
+      "id": "IMP-integrate-W2-53",
+      "kind": "defect_fix",
+      "route": "POST /api/v2/run-batches",
+      "categories": ["value"],
+      "path_prefix": "preview.first_items[3].last_run.reason",
+      "finding": "F-18",
+      "reason": "The fourth sample client's successful preview describes the real last-run comparison instead of incorrectly asserting that no successful run exists."
+    },
+    {
+      "id": "IMP-integrate-W2-54",
+      "kind": "defect_fix",
+      "route": "POST /api/v2/run-batches",
+      "categories": ["missing-field"],
+      "path_prefix": "preview.programs.none",
+      "finding": "",
+      "reason": "Separately from F18, the configured source footprint resolves the client's authored program as application/runs/pairs.py intends. The unconfigured recording reader incorrectly produced a program-less bucket. Only removal of that unavailable-program bucket is covered, not changed counts for an existing program or calculated figures."
+    },
+    {
+      "id": "IMP-integrate-W2-55",
+      "kind": "defect_fix",
+      "route": "POST /api/v2/run-batches",
+      "categories": ["extra-field"],
+      "path_prefix": "preview.programs.GA_JTC",
+      "finding": "",
+      "reason": "The source-backed planner reports the genuine authored program in its per-program planning map rather than hiding known coverage behind the unconfigured recording reader's none bucket. This is an added map key with the same client population, not a calculation or an F18 numeric waiver."
+    },
+    {
+      "id": "IMP-integrate-W2-56",
+      "kind": "defect_fix",
+      "route": "POST /api/v2/run-batches",
+      "categories": ["value"],
+      "path_prefix": "dry_run_summary.never_run",
+      "finding": "F-18",
+      "reason": "Accepted and idempotently replayed batches retain the preview's real durable-manifest never-run count, as authorized by durable_manifest_counts. No work-item total, run identity or calculated figure is covered."
+    },
+    {
+      "id": "IMP-integrate-W2-57",
+      "kind": "defect_fix",
+      "route": "POST /api/v2/run-batches",
+      "categories": ["value"],
+      "path_prefix": "dry_run_summary.skip_coverage",
+      "finding": "F-18",
+      "reason": "The accepted batch stores real durable-manifest coverage rather than none_yet from the disconnected recording store. Idempotent responses retain that same accepted preview."
+    },
+    {
+      "id": "IMP-integrate-W2-58",
+      "kind": "defect_fix",
+      "route": "POST /api/v2/run-batches",
+      "categories": ["value"],
+      "path_prefix": "dry_run_summary.skip_candidates_upper_bound",
+      "finding": "F-18",
+      "reason": "The accepted preview stores the real durable-manifest skip-candidate upper bound, explicitly allowed by the owner's operational-counter decision. It does not promise a skip or change a calculated figure."
+    },
+    {
+      "id": "IMP-integrate-W2-59",
+      "kind": "defect_fix",
+      "route": "POST /api/v2/run-batches",
+      "categories": ["missing-field"],
+      "path_prefix": "dry_run_summary.programs.none",
+      "finding": "",
+      "reason": "The accepted preview no longer stores a false program-less bucket when the configured source footprint resolves authored coverage. This source-binding defect is separate from durable-manifest counters and does not waive changed values for existing program keys."
+    },
+    {
+      "id": "IMP-integrate-W2-60",
+      "kind": "defect_fix",
+      "route": "POST /api/v2/run-batches",
+      "categories": ["extra-field"],
+      "path_prefix": "dry_run_summary.programs.GA_JTC",
+      "finding": "",
+      "reason": "The accepted preview stores the actual source-resolved authored-program bucket instead of the unconfigured recording reader's none bucket. Only the added program key is covered, with no change to the client or item population."
+    },
+    {
+      "id": "IMP-integrate-W2-61",
+      "kind": "defect_fix",
+      "route": "GET /api/v2/run-batches/{batch_id}",
+      "categories": ["value"],
+      "path_prefix": "dry_run_summary.never_run",
+      "finding": "F-18",
+      "reason": "Batch detail reads the accepted preview's real durable-manifest never-run count. The owner permits this operational preview counter instead of the recording store's stale count; no calculated figure is covered."
+    },
+    {
+      "id": "IMP-integrate-W2-62",
+      "kind": "defect_fix",
+      "route": "GET /api/v2/run-batches/{batch_id}",
+      "categories": ["value"],
+      "path_prefix": "dry_run_summary.skip_coverage",
+      "finding": "F-18",
+      "reason": "Batch detail preserves the accepted preview's genuine durable-manifest coverage instead of synthesizing none_yet to match the disconnected recording store."
+    },
+    {
+      "id": "IMP-integrate-W2-63",
+      "kind": "defect_fix",
+      "route": "GET /api/v2/run-batches/{batch_id}",
+      "categories": ["value"],
+      "path_prefix": "dry_run_summary.skip_candidates_upper_bound",
+      "finding": "F-18",
+      "reason": "Batch detail returns the stored durable-manifest skip-candidate upper bound from acceptance. This is an authorized operational preview counter, not a calculated figure or completed-work count."
+    },
+    {
+      "id": "IMP-integrate-W2-64",
+      "kind": "defect_fix",
+      "route": "GET /api/v2/run-batches/{batch_id}",
+      "categories": ["missing-field"],
+      "path_prefix": "dry_run_summary.programs.none",
+      "finding": "",
+      "reason": "Batch detail reads the accepted source-backed program map, which correctly omits the unconfigured recording reader's false program-less bucket. No existing program value or population change is covered."
+    },
+    {
+      "id": "IMP-integrate-W2-65",
+      "kind": "defect_fix",
+      "route": "GET /api/v2/run-batches/{batch_id}",
+      "categories": ["extra-field"],
+      "path_prefix": "dry_run_summary.programs.GA_JTC",
+      "finding": "",
+      "reason": "Batch detail reads the genuine source-resolved program bucket recorded at acceptance. The added key corrects a missing sibling source binding and does not change any calculated figure."
+    },
+    {
+      "id": "IMP-integrate-W2-66",
+      "kind": "defect_fix",
+      "route": "POST /api/v2/run-batches/{batch_id}/cancel",
+      "categories": ["value"],
+      "path_prefix": "dry_run_summary.never_run",
+      "finding": "F-18",
+      "reason": "Cancellation returns the batch's accepted durable-manifest preview count, not the disconnected recording store's stale never-run count. Cancellation outcomes and completed-work counts are not covered."
+    },
+    {
+      "id": "IMP-integrate-W2-67",
+      "kind": "defect_fix",
+      "route": "POST /api/v2/run-batches/{batch_id}/cancel",
+      "categories": ["value"],
+      "path_prefix": "dry_run_summary.skip_coverage",
+      "finding": "F-18",
+      "reason": "Cancellation preserves real durable-manifest coverage in the accepted preview; it does not rewrite the preview to the recording store's none_yet state."
+    },
+    {
+      "id": "IMP-integrate-W2-69",
+      "kind": "defect_fix",
+      "route": "POST /api/v2/run-batches/{batch_id}/cancel",
+      "categories": ["missing-field"],
+      "path_prefix": "dry_run_summary.programs.none",
+      "finding": "",
+      "reason": "The cancellation response preserves the source-backed program map and omits the false program-less bucket produced by the recording reader's missing source binding."
+    },
+    {
+      "id": "IMP-integrate-W2-70",
+      "kind": "defect_fix",
+      "route": "POST /api/v2/run-batches/{batch_id}/cancel",
+      "categories": ["extra-field"],
+      "path_prefix": "dry_run_summary.programs.GA_JTC",
+      "finding": "",
+      "reason": "The cancellation response preserves the genuine authored-program bucket from the accepted source-backed preview. No cancellation verdict, stored run identity or calculated figure is covered."
+    },
+    {
+      "id": "IMP-integrate-W2-71",
+      "kind": "defect_fix",
+      "route": "POST /api/v2/run-batches/{batch_id}/retry-failed",
+      "categories": ["value"],
+      "path_prefix": "dry_run_summary.never_run",
+      "finding": "F-18",
+      "reason": "Retry returns the accepted preview's durable-manifest never-run count instead of reproducing the recording store's disconnected state. Retried-work counts and calculation results are not covered."
+    },
+    {
+      "id": "IMP-integrate-W2-72",
+      "kind": "defect_fix",
+      "route": "POST /api/v2/run-batches/{batch_id}/retry-failed",
+      "categories": ["value"],
+      "path_prefix": "dry_run_summary.skip_coverage",
+      "finding": "F-18",
+      "reason": "Retry preserves the accepted preview's actual durable-manifest coverage rather than replacing it with none_yet from the recording store."
+    },
+    {
+      "id": "IMP-integrate-W2-74",
+      "kind": "defect_fix",
+      "route": "POST /api/v2/run-batches/{batch_id}/retry-failed",
+      "categories": ["missing-field"],
+      "path_prefix": "dry_run_summary.programs.none",
+      "finding": "",
+      "reason": "The retry response preserves the accepted source-backed program map instead of the false program-less bucket produced by the unconfigured recording reader."
+    },
+    {
+      "id": "IMP-integrate-W2-75",
+      "kind": "defect_fix",
+      "route": "POST /api/v2/run-batches/{batch_id}/retry-failed",
+      "categories": ["extra-field"],
+      "path_prefix": "dry_run_summary.programs.GA_JTC",
+      "finding": "",
+      "reason": "The retry response retains the genuine source-resolved authored-program bucket from acceptance. Only the added program key is covered, not work outcomes or calculated figures."
+    },
+    {
+      "id": "IMP-integrate-W2-76",
+      "kind": "defect_fix",
+      "route": "GET /api/v2/run-batches",
+      "categories": ["value"],
+      "path_prefix": "items[0].dry_run_summary.never_run",
+      "finding": "F-18",
+      "reason": "The first listed batch reads its accepted durable-manifest never-run count. The owner's exception covers this operational preview counter, never the list total or any calculated figure."
+    },
+    {
+      "id": "IMP-integrate-W2-77",
+      "kind": "defect_fix",
+      "route": "GET /api/v2/run-batches",
+      "categories": ["value"],
+      "path_prefix": "items[0].dry_run_summary.skip_coverage",
+      "finding": "F-18",
+      "reason": "The first listed batch preserves actual durable-manifest coverage in its accepted preview rather than none_yet from the disconnected recording store."
+    },
+    {
+      "id": "IMP-integrate-W2-79",
+      "kind": "defect_fix",
+      "route": "GET /api/v2/run-batches",
+      "categories": ["missing-field"],
+      "path_prefix": "items[0].dry_run_summary.programs.none",
+      "finding": "",
+      "reason": "The first listed batch correctly omits the false program-less bucket after resolving authored programs through the actual source footprint. Only that missing map key is covered."
+    },
+    {
+      "id": "IMP-integrate-W2-80",
+      "kind": "defect_fix",
+      "route": "GET /api/v2/run-batches",
+      "categories": ["extra-field"],
+      "path_prefix": "items[0].dry_run_summary.programs.GA_JTC",
+      "finding": "",
+      "reason": "The first listed batch exposes its accepted source-resolved authored-program bucket instead of hiding known coverage behind the recording reader's none bucket. Existing values and figures are not covered."
+    },
+    {
+      "id": "IMP-integrate-W2-81",
+      "kind": "defect_fix",
+      "route": "GET /api/v2/run-batches",
+      "categories": ["value"],
+      "path_prefix": "items[1].dry_run_summary.never_run",
+      "finding": "F-18",
+      "reason": "The second listed batch reads its accepted preview's real durable-manifest never-run count under the owner's operational-counter exception. List totals and calculated figures remain exact."
+    },
+    {
+      "id": "IMP-integrate-W2-82",
+      "kind": "defect_fix",
+      "route": "GET /api/v2/run-batches",
+      "categories": ["value"],
+      "path_prefix": "items[1].dry_run_summary.skip_coverage",
+      "finding": "F-18",
+      "reason": "The second listed batch preserves actual durable-manifest coverage in its accepted preview rather than fabricating the recording store's none_yet state."
+    },
+    {
+      "id": "IMP-integrate-W2-83",
+      "kind": "defect_fix",
+      "route": "GET /api/v2/run-batches",
+      "categories": ["value"],
+      "path_prefix": "items[1].dry_run_summary.skip_candidates_upper_bound",
+      "finding": "F-18",
+      "reason": "The second listed batch retains its accepted durable-manifest skip upper bound, as permitted for operational preview counters. This does not cover item outcomes or calculated figures."
+    },
+    {
+      "id": "IMP-integrate-W2-84",
+      "kind": "defect_fix",
+      "route": "GET /api/v2/run-batches",
+      "categories": ["missing-field"],
+      "path_prefix": "items[1].dry_run_summary.programs.none",
+      "finding": "",
+      "reason": "The second listed batch correctly omits the false program-less bucket after resolving the actual source footprint. Only the absent bucket key is covered, not a changed existing count."
+    },
+    {
+      "id": "IMP-integrate-W2-85",
+      "kind": "defect_fix",
+      "route": "GET /api/v2/run-batches",
+      "categories": ["extra-field"],
+      "path_prefix": "items[1].dry_run_summary.programs.GA_JTC",
+      "finding": "",
+      "reason": "The second listed batch exposes the genuine authored-program bucket stored by the source-backed planner. This added key is separate from F18 and covers no changed calculation or existing program value."
+    },
+    {
+      "id": "IMP-integrate-W2-86",
+      "kind": "defect_fix",
+      "route": "GET /api/v2/run-batches",
+      "categories": ["value"],
+      "path_prefix": "items[2].dry_run_summary.never_run",
+      "finding": "F-18",
+      "reason": "The third listed batch reads its accepted durable-manifest never-run count instead of a stale count from the disconnected recording store. This is an authorized operational preview counter only."
+    },
+    {
+      "id": "IMP-integrate-W2-87",
+      "kind": "defect_fix",
+      "route": "GET /api/v2/run-batches",
+      "categories": ["value"],
+      "path_prefix": "items[2].dry_run_summary.skip_coverage",
+      "finding": "F-18",
+      "reason": "The third listed batch returns genuine durable-manifest coverage from its accepted preview, not none_yet from the disconnected recording store."
+    },
+    {
+      "id": "IMP-integrate-W2-89",
+      "kind": "defect_fix",
+      "route": "GET /api/v2/run-batches",
+      "categories": ["missing-field"],
+      "path_prefix": "items[2].dry_run_summary.programs.none",
+      "finding": "",
+      "reason": "The third listed batch omits the unconfigured recording reader's false program-less bucket because the source-backed planner resolved authored coverage. Existing numeric values remain unwaived."
+    },
+    {
+      "id": "IMP-integrate-W2-90",
+      "kind": "defect_fix",
+      "route": "GET /api/v2/run-batches",
+      "categories": ["extra-field"],
+      "path_prefix": "items[2].dry_run_summary.programs.GA_JTC",
+      "finding": "",
+      "reason": "The third listed batch exposes its accepted source-resolved authored-program bucket. This added map key corrects the missing sibling source binding, not a calculated result or a durable-manifest counter."
+    }
+  ]
+}

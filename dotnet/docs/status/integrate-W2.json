@@ -1,0 +1,159 @@
+{
+  "session": "integrate-W2",
+  "branch": "dotnet/integration",
+  "head": "cd1f137",
+  "summary": "Applied the owner's new durable_manifest_counts decision using exact registrations, with no runtime/comparator/test/threshold changes. Fresh full replay completes 12 scenarios/1769 steps and exactly reproduces all 3870 raw conductor failures. The 51 new exercised entries cover 220 fields and fully resolve 26 draft cases; registered-only projection is framework 17/17, reads 406/414, claims 291/316, drafts 312/323 (96.6%, 21.1% waived), AI 26/27. All five percentage thresholds are met; this is a verified projection from the supplied official board, not a new external conductor execution. Framework's observed 52.9% waiver share is unchanged and is not reported as below 25%; the latest supplied conductor does not flag it. Strict build, format, 978 fast tests and ten Python regressions pass. Previous 141 distinct heavy passing cases remain applicable. Active HALT retired; remaining exact-ID, status, stored-item program and figure-affecting decisions stay explicit. Nothing pushed; head pins the verified register commit before final documentation.",
+  "stages": {
+    "stage_1_shared_tests_and_composition": "done",
+    "stage_2_harness_and_determinism": "done",
+    "stage_3_measure_and_fix_by_group": "done",
+    "stage_4_verified_policy_thresholds_and_reports": "done"
+  },
+  "gates_claimed": {
+    "build": true,
+    "format": true,
+    "tests_fast": true,
+    "tests_heavy": true,
+    "diagnostic_tests": true,
+    "external_replay_setup_tests": true,
+    "actual_external_replay_matches_independent_scenarios": true,
+    "actual_external_replay_matches_latest_conductor": true,
+    "replay_all_scenarios_executed": true,
+    "replay": true,
+    "replay_thresholds_registered_projection": true,
+    "external_conductor_rerun_after_registration": false,
+    "framework": true,
+    "reads_calc": true,
+    "claims_artifacts_rules": true,
+    "drafts_runs": true,
+    "ai": true,
+    "framework_waiver_cap": false,
+    "drafts_waiver_cap": true,
+    "new_numeric_waivers_only_authorized_preview_counters": true
+  },
+  "deviations": [
+    {
+      "id": "DEV-1",
+      "what": "Previously stopped with a committed HALT; retired its active marker after the owner changed durable-preview policy.",
+      "why": "Earlier numeric prohibitions blocked honest convergence. The updated durable_manifest_counts decision permits exact operational counter registrations, and the supplied conductor now flags only drafts. Historical stopping evidence remains in the report and log.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-2",
+      "what": "Used improvements/integrate-W2.json rather than adding a duplicate converge.json.",
+      "why": "The fixed task rules and finish instructions require the session-named register; duplicate entries would misrepresent waiver ownership.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-3",
+      "what": "Reported exact local policy diagnostics, not the helper's obsolete green labels or an external conductor result.",
+      "why": "The raw semantic replay remains unchanged. Exact method/template grouping, documented error-text tolerances, numeric rejection and waiver shares are explicit and tested.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-4",
+      "what": "Verified heavy cases through the complete 141-case run plus targeted repairs.",
+      "why": "The initial run passed 137 and failed four merged fixtures. Both P2 repairs passed in the four-case rerun; the final 980-case fast-plus-two-heavy run passed the remaining two. Every original heavy case has a passing result; no skip or assertion suppression.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-5",
+      "what": "Distinguished 1769 recorded steps from 1765 HTTP exchanges and four controls.",
+      "why": "The supplied group denominators count HTTP exchanges, while the task's earlier summary includes scenario controls in its exchange label.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-6",
+      "what": "Repaired the actual external replay entry point instead of relying on the auxiliary runner's separate scenario preparation.",
+      "why": "The resumed conductor left authentication disabled and reset P2 scenarios to P1. Declared profile/auth preparation now runs through existing controls before recorded requests. Direct one-host replay reproduces independently prepared evidence; no comparison, recording or threshold changes.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-7",
+      "what": "Use the supplied updated conductor board for gate claims, keeping historical diagnostics separate.",
+      "why": "The newest board passes claims/framework and fails only drafts. Earlier official/local measurements are historical, not substitutes for this board. New registrations are audited against identical fresh raw failures without adding text tolerances.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-8",
+      "what": "Report a registered-only projection instead of claiming an external conductor rerun after registration.",
+      "why": "The fresh full raw replay is exactly equal to the supplied conductor. Every remaining raw field in 26 resolved draft cases is covered by precise new entries or existing official waivers/Vary tolerance. Applying only those additions projects 312/323 drafts cases; no comparator, ownership, tolerance or threshold changed.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-9",
+      "what": "Keep the observed framework waiver share visible without treating it as a new failure absent from the updated conductor summary.",
+      "why": "The supplied board reports framework 17/17 with 9/17 waived (52.9%) and flags only drafts. This session neither changes that accounting nor claims the share is below 25%. Drafts itself stays below the 25% cap at 21.1%.",
+      "decision_needed": false
+    }
+  ],
+  "findings": [
+    "Latest supplied official groups before new registrations: framework 17/17, reads 406/414, claims 291/316, drafts 286/323, AI 26/27. Only drafts is flagged below threshold.",
+    "51 new exercised entries cover 220 fields: 35 F18 entries cover 158 fields and 16 distinct source-binding entries cover 62 fields. All 36 newly covered numeric changes are exact authorized never_run or skip_candidates_upper_bound preview counters.",
+    "Registered-only projection fully resolves 26 draft cases, yielding 312/323 passes (96.6%) and 68/323 waivers (21.1%). Remaining policy fields project 2113 to 1893. Raw failures remain 3870 and are not represented as a zero-failure replay.",
+    "Eleven official draft cases/20 fields remain unwaived: seven identity/base-year durability, one source-state filter status, two stored work-item program-code cases and p2_run_batches:unknown-client at detail.detail (native error omits the echoed unknown client). The historical local diagnostic tolerates that last wording difference and has ten cases/19 fields; it is not used to claim another official pass.",
+    "The old convergence_board.py retains earlier policy/grouping and is not the current gate. The registration audit preserves every supplied official group and threshold except for removing exactly the newly covered draft cases.",
+    "Reads: 8 failed cases and 148 fields. Six concern unavailable-client or bounded-limit statuses; two involve later run identity and exact monetary-string scale.",
+    "Claims retains 25 failed cases within its passing 92.1% threshold: identity, attribution, status, zero-year filter and timestamp differences remain explicit backlog.",
+    "Python's independently unconfigured footprint reader silently returns empty state lists despite staged payroll; the configured source now reports actual states.",
+    "Python's unconfigured portal demonstration can answer an unrelated question; the offline merged host reads authorized canonical facts instead.",
+    "Stored deterministic IDs do not describe the ready-boundary UUID source state: four startup OpenTelemetry allocations are real and must be exported, not replaced with dummy draws.",
+    "Heavy fixture failures exposed stale draft-list authorization, duplicate test creation, omitted operational-table population and the intentionally retained zeroed write-sequence row.",
+    "Native DECIMAL4 formatting differs from some recorded money strings. Equal arithmetic value does not establish money-string scale equivalence.",
+    "Raw replay is execution-complete, not zero-failure semantic parity. The required percentage thresholds pass under the updated policy and audited registrations. Mock gateway remains deferred; sealed and unassigned buckets are visible.",
+    "The resumed conductor's additional failures were a real external setup defect: reset-url sent an empty body and applied no scenario auth. Raw p1_auth/P2-read/P2-batch failures dropped from 1029/888/498 to 182/148/215 after correcting that path.",
+    "The newest fresh one-host replay matches every ordered field of the supplied conductor's 3870 raw failures. No .NET runtime or test changed in this resume. The host was verified responsive and stopped in finally.",
+    "Negative boundary checks confirm no new registration covers changed existing last-run IDs, client/item populations, execution success counts, existing program counts, statuses or certified eligibility figures."
+  ],
+  "open_questions": [
+    "Should genuine source-resolved program codes replace null in stored batch work items as well as their preview maps?",
+    "Which exact real persistence allocation is the first remaining post-assessment UUID divergence?"
+  ],
+  "needs_human": [
+    {
+      "item": "Trace and reconcile remaining genuine ID allocations without removing audit durability.",
+      "why": "Early IDs match after source/assessment repairs, but later finding-audit, lookup and related allocations still diverge. The exact first later boundary is not fully established."
+    },
+    {
+      "item": "Choose the contractual money-string scale for native DECIMAL4 writes.",
+      "why": "Strings such as 3500.0 and 3500.0000 remain different; changing to floating point or applying a numeric waiver is prohibited."
+    },
+    {
+      "item": "Decide native storage bounds versus valid long-text request acceptance.",
+      "why": "Claim/engagement program_code and rules verified_by long values produce 500 where Python accepted them. A deliberate schema or validation contract is needed, not silent valid-value loss."
+    },
+    {
+      "item": "Review safe unavailable-client and enormous-limit behavior for six remaining reads.",
+      "why": "Nonpositive selections must not trigger unsafe cross-client CSV fallback, and extreme limits must remain bounded. Recorded successful envelopes differ."
+    },
+    {
+      "item": "Schedule ordinary remaining feature defects rather than treating them as improvements.",
+      "why": "Anonymous/system attribution, degraded unavailable-portfolio envelope, zero-tax-year filtering, history timestamp precision and the state-filter status outcome remain implementation backlog."
+    },
+    {
+      "item": "Resolve seven remaining draft identity/base-year durability cases.",
+      "why": "These are real durable/identity differences separate from preview counts and cannot be hidden behind the latest-run improvement."
+    },
+    {
+      "item": "Approve a future figure-affecting correction for M01 ingestion overrides.",
+      "why": "Ingestion still overrides year-resolved wage basis, measuring dates and pay codes, contrary to ADR-005. Explicit policy requires preserving the ported result until owner approval."
+    },
+    {
+      "item": "Approve any future change to first-program credit pricing in a multi-program state.",
+      "why": "Credit math intentionally retains Python's first-program pricing; adding a refusal or changing pricing here would alter figures outside approval."
+    },
+    {
+      "item": "Accept the SQL source-fingerprint limitation or choose a stronger version source.",
+      "why": "Per-account row count plus maximum modified date is an observation recorded with runs, not an immutable Delta snapshot."
+    },
+    {
+      "item": "Reconcile genuine source-resolved program codes in stored batch work items.",
+      "why": "Two draft item-list cases retain null-versus-GA_JTC differences. The new source-map registrations deliberately do not waive stored item program values or alter their execution."
+    }
+  ],
+  "reports": [
+    "dotnet\\docs\\ROUTES-CONVERGENCE-REPORT.md",
+    "dotnet\\docs\\integrate-W2-log.md",
+    "dotnet\\docs\\improvements\\integrate-W2.json"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "kind": "existing-semantic-policy",
+  "host": "gateway",
+  "groups": {
+    "gateway": {
+      "cases": 255,
+      "tolerated_fields": 461,
+      "registered_fields": 13,
+      "passed": 236,
+      "waived": 11,
+      "failed": 19,
+      "pass_percent": 92.55,
+      "waived_percent": 4.31,
+      "required_percent": 90,
+      "threshold_met": true,
+      "waiver_share_at_most_25_percent": true
+    }
+  },
+  "policy_pass": true,
+  "exchanges": 255,
+  "raw_differing_fields": 523
+}

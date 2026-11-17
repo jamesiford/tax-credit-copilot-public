@@ -1,0 +1,81 @@
+{
+  "improvements": [
+    {
+      "id": "IMP-gateway-1",
+      "kind": "framework_default",
+      "route": "POST /mcp",
+      "categories": ["extra-field"],
+      "path_prefix": "result.capabilities.logging",
+      "finding": "",
+      "reason": "The official C# SDK advertises its implemented logging capability. Keep that truthful SDK capability rather than forking the SDK or stripping a supported protocol feature to imitate the Python SDK."
+    },
+    {
+      "id": "IMP-gateway-2",
+      "kind": "defect_fix",
+      "route": "POST /mcp",
+      "categories": ["extra-field"],
+      "path_prefix": "error.retryable",
+      "finding": "",
+      "reason": "Pre-session authentication failures use the same channel error code/message/retryable family as every other channel boundary. Authentication is still refused with 401; no application fact or authorization decision changes."
+    },
+    {
+      "id": "IMP-gateway-3",
+      "kind": "defect_fix",
+      "route": "POST /channel/v1/tools/client_at_risk",
+      "case": "tool.client_at_risk.typical",
+      "categories": ["extra-field"],
+      "path_prefix": "user_only_facts",
+      "finding": "",
+      "reason": "The counted cohort contains person-derived rows. Identify cohort as person-only so model-facing consumers cannot mistake it for narration input. The authorized first-party facts and every calculated value remain unchanged."
+    },
+    {
+      "id": "IMP-gateway-4",
+      "kind": "defect_fix",
+      "route": "POST /channel/v1/tools/findings_list",
+      "categories": ["extra-field"],
+      "path_prefix": "user_only_facts",
+      "finding": "",
+      "reason": "Preserve the application envelope's person-only findings marker: instance findings can identify an employee in their evidence. This metadata protects model-facing lane projection without changing the authorized first-party findings."
+    },
+    {
+      "id": "IMP-gateway-5",
+      "kind": "defect_fix",
+      "route": "POST /channel/v1/tools/{tool}",
+      "case": "tool.body-too-large",
+      "categories": ["extra-field"],
+      "path_prefix": "correlation_id",
+      "finding": "",
+      "reason": "A request whose identity and correlation have already been verified keeps that correlation on the 413 response. This removes an observability inconsistency without accepting the oversized body or dispatching a capability."
+    },
+    {
+      "id": "IMP-gateway-6",
+      "kind": "wire_incidental",
+      "route": "POST /channel/v1/tools/finding_reopen_prepare",
+      "case": "tool.finding_reopen_prepare.typical",
+      "categories": ["value"],
+      "path_prefix": "blocks[1].rows[3][2]",
+      "finding": "",
+      "reason": "The rendered boolean cell uses the JSON spelling true instead of Python str(bool)'s True. Both describe the same proposed requires_decision boolean; the typed preview is unchanged and no figure differs."
+    },
+    {
+      "id": "IMP-gateway-7",
+      "kind": "defect_fix",
+      "route": "POST /mcp",
+      "case": "call.client_at_risk.typical",
+      "categories": ["value"],
+      "path_prefix": "result.isError",
+      "finding": "",
+      "reason": "The inherited lane check refuses a non-writer Cowork reader when the new bridge correctly marks a person-derived cohort. Prefer the documented person-lane safety rule to leaking rows. This registers only the error flag, not missing facts or any numeric difference; the authorization-policy tension remains explicitly needs_human."
+    },
+    {
+      "id": "IMP-gateway-8",
+      "kind": "defect_fix",
+      "route": "POST /mcp",
+      "case": "call.findings_list.typical",
+      "categories": ["value"],
+      "path_prefix": "result.isError",
+      "finding": "",
+      "reason": "The existing application findings renderer marks person-derived findings, so its inherited lane check refuses a non-writer Cowork reader. Preserve that fail-closed design. Only the error flag is registered: the missing result and authorization-policy tension stay visible for owner review."
+    }
+  ]
+}

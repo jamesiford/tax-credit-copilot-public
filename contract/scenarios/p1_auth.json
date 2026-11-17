@@ -1,0 +1,1590 @@
+{
+ "name": "p1_auth",
+ "profile": "P1",
+ "auth": {
+  "rate_limit_per_minute": 3
+ },
+ "tokens": {
+  "reader": {
+   "kind": "user",
+   "oid": "00000000-0000-0000-0000-0000000000a1"
+  },
+  "writer": {
+   "kind": "user",
+   "oid": "00000000-0000-0000-0000-0000000000a2"
+  },
+  "restricted": {
+   "kind": "user",
+   "oid": "00000000-0000-0000-0000-0000000000a3"
+  },
+  "expired": {
+   "exp_in": -7200
+  },
+  "not_yet_valid": {
+   "nbf_in": 7200
+  },
+  "wrong_audience": {
+   "aud": "api://some-other-api"
+  },
+  "wrong_tenant": {
+   "iss": "https://login.microsoftonline.com/00000000-0000-0000-0000-0000000000ff/v2.0"
+  },
+  "wrong_issuer_v1": {
+   "iss": "https://sts.windows.net/00000000-0000-0000-0000-0000000000aa/"
+  },
+  "forged": {
+   "key": "other"
+  },
+  "no_scope": {
+   "scp": "openid profile"
+  },
+  "no_role": {
+   "roles": []
+  },
+  "wrong_role": {
+   "roles": [
+    "Reader"
+   ]
+  },
+  "user_with_agent_role": {
+   "roles": [
+    "TCC.User",
+    "TCC.Agent"
+   ]
+  },
+  "missing_exp": {
+   "drop": [
+    "exp"
+   ]
+  },
+  "missing_iat": {
+   "drop": [
+    "iat"
+   ]
+  },
+  "bare_audience": {
+   "aud": "11111111-2222-3333-4444-555555555555"
+  },
+  "agent": {
+   "kind": "agent"
+  },
+  "agent_with_scope": {
+   "kind": "agent",
+   "claims": {
+    "scp": "user_impersonation"
+   }
+  },
+  "agent_wrong_role": {
+   "kind": "agent",
+   "roles": [
+    "TCC.User"
+   ]
+  },
+  "agent_no_role": {
+   "kind": "agent",
+   "roles": []
+  },
+  "agent_named": {
+   "kind": "agent",
+   "claims": {
+    "preferred_username": "x@example.test"
+   }
+  }
+ },
+ "variables": {
+  "exception_id": "t2:E00200:2025-02",
+  "draft_id": "00000000-0000-0000-0000-00000000dead",
+  "batch_id": "00000000-0000-0000-0000-00000000beef",
+  "artifact_id": "00000000-0000-0000-0000-00000000cafe"
+ },
+ "steps": [
+  {
+   "id": "public.health-no-token",
+   "request": {
+    "method": "GET",
+    "path": "/api/health"
+   }
+  },
+  {
+   "id": "public.ready-no-token",
+   "request": {
+    "method": "GET",
+    "path": "/api/ready"
+   }
+  },
+  {
+   "id": "none.me",
+   "request": {
+    "method": "GET",
+    "path": "/api/me"
+   }
+  },
+  {
+   "id": "none.portfolio",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio"
+   }
+  },
+  {
+   "id": "none.post-claims",
+   "request": {
+    "method": "POST",
+    "path": "/api/claims",
+    "json": {
+     "client_id": 1001,
+     "program_code": "GA_JTC",
+     "tax_year": 2023,
+     "status": "claimed",
+     "provenance": "client_asserted",
+     "decided_by": "contract",
+     "claimed_usd": "12000"
+    }
+   }
+  },
+  {
+   "id": "none.unknown-path",
+   "request": {
+    "method": "GET",
+    "path": "/api/nope"
+   }
+  },
+  {
+   "id": "none.docs",
+   "request": {
+    "method": "GET",
+    "path": "/docs"
+   }
+  },
+  {
+   "id": "none.openapi",
+   "request": {
+    "method": "GET",
+    "path": "/openapi.json"
+   }
+  },
+  {
+   "id": "none.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/me/"
+   }
+  },
+  {
+   "id": "none.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/me"
+   }
+  },
+  {
+   "id": "malformed.garbage",
+   "request": {
+    "method": "GET",
+    "path": "/api/me",
+    "headers": {
+     "authorization": "Bearer garbage"
+    }
+   }
+  },
+  {
+   "id": "malformed.basic",
+   "request": {
+    "method": "GET",
+    "path": "/api/me",
+    "headers": {
+     "authorization": "Basic dXNlcjpwYXNz"
+    }
+   }
+  },
+  {
+   "id": "malformed.empty-bearer",
+   "request": {
+    "method": "GET",
+    "path": "/api/me",
+    "headers": {
+     "authorization": "Bearer"
+    }
+   }
+  },
+  {
+   "id": "malformed.no-scheme",
+   "request": {
+    "method": "GET",
+    "path": "/api/me",
+    "headers": {
+     "authorization": "abc"
+    }
+   }
+  },
+  {
+   "id": "malformed.lower-scheme",
+   "request": {
+    "method": "GET",
+    "path": "/api/me",
+    "headers": {
+     "authorization": "bearer garbage"
+    }
+   }
+  },
+  {
+   "id": "malformed.two-parts",
+   "request": {
+    "method": "GET",
+    "path": "/api/me",
+    "headers": {
+     "authorization": "Bearer a b"
+    }
+   }
+  },
+  {
+   "id": "malformed.jwt-shaped",
+   "request": {
+    "method": "GET",
+    "path": "/api/me",
+    "headers": {
+     "authorization": "Bearer a.b.c"
+    }
+   }
+  },
+  {
+   "id": "token.expired",
+   "request": {
+    "method": "GET",
+    "path": "/api/me",
+    "headers": {
+     "authorization": "Bearer {{token.expired}}"
+    }
+   }
+  },
+  {
+   "id": "token.not_yet_valid",
+   "request": {
+    "method": "GET",
+    "path": "/api/me",
+    "headers": {
+     "authorization": "Bearer {{token.not_yet_valid}}"
+    }
+   }
+  },
+  {
+   "id": "token.wrong_audience",
+   "request": {
+    "method": "GET",
+    "path": "/api/me",
+    "headers": {
+     "authorization": "Bearer {{token.wrong_audience}}"
+    }
+   }
+  },
+  {
+   "id": "token.wrong_tenant",
+   "request": {
+    "method": "GET",
+    "path": "/api/me",
+    "headers": {
+     "authorization": "Bearer {{token.wrong_tenant}}"
+    }
+   }
+  },
+  {
+   "id": "token.wrong_issuer_v1",
+   "request": {
+    "method": "GET",
+    "path": "/api/me",
+    "headers": {
+     "authorization": "Bearer {{token.wrong_issuer_v1}}"
+    }
+   }
+  },
+  {
+   "id": "token.forged",
+   "request": {
+    "method": "GET",
+    "path": "/api/me",
+    "headers": {
+     "authorization": "Bearer {{token.forged}}"
+    }
+   }
+  },
+  {
+   "id": "token.missing_exp",
+   "request": {
+    "method": "GET",
+    "path": "/api/me",
+    "headers": {
+     "authorization": "Bearer {{token.missing_exp}}"
+    }
+   }
+  },
+  {
+   "id": "token.missing_iat",
+   "request": {
+    "method": "GET",
+    "path": "/api/me",
+    "headers": {
+     "authorization": "Bearer {{token.missing_iat}}"
+    }
+   }
+  },
+  {
+   "id": "token.no_scope",
+   "request": {
+    "method": "GET",
+    "path": "/api/me",
+    "headers": {
+     "authorization": "Bearer {{token.no_scope}}"
+    }
+   }
+  },
+  {
+   "id": "token.no_role",
+   "request": {
+    "method": "GET",
+    "path": "/api/me",
+    "headers": {
+     "authorization": "Bearer {{token.no_role}}"
+    }
+   }
+  },
+  {
+   "id": "token.wrong_role",
+   "request": {
+    "method": "GET",
+    "path": "/api/me",
+    "headers": {
+     "authorization": "Bearer {{token.wrong_role}}"
+    }
+   }
+  },
+  {
+   "id": "token.user_with_agent_role",
+   "request": {
+    "method": "GET",
+    "path": "/api/me",
+    "headers": {
+     "authorization": "Bearer {{token.user_with_agent_role}}"
+    }
+   }
+  },
+  {
+   "id": "token.agent_with_scope",
+   "request": {
+    "method": "GET",
+    "path": "/api/me",
+    "headers": {
+     "authorization": "Bearer {{token.agent_with_scope}}"
+    }
+   }
+  },
+  {
+   "id": "token.agent_wrong_role",
+   "request": {
+    "method": "GET",
+    "path": "/api/me",
+    "headers": {
+     "authorization": "Bearer {{token.agent_wrong_role}}"
+    }
+   }
+  },
+  {
+   "id": "token.agent_no_role",
+   "request": {
+    "method": "GET",
+    "path": "/api/me",
+    "headers": {
+     "authorization": "Bearer {{token.agent_no_role}}"
+    }
+   }
+  },
+  {
+   "id": "token.agent_named",
+   "request": {
+    "method": "GET",
+    "path": "/api/me",
+    "headers": {
+     "authorization": "Bearer {{token.agent_named}}"
+    }
+   }
+  },
+  {
+   "id": "token.bare-audience-ok",
+   "request": {
+    "method": "GET",
+    "path": "/api/me",
+    "headers": {
+     "authorization": "Bearer {{token.bare_audience}}"
+    }
+   }
+  },
+  {
+   "id": "token.reader-me",
+   "request": {
+    "method": "GET",
+    "path": "/api/me",
+    "headers": {
+     "authorization": "Bearer {{token.reader}}"
+    }
+   }
+  },
+  {
+   "id": "token.writer-me",
+   "request": {
+    "method": "GET",
+    "path": "/api/me",
+    "headers": {
+     "authorization": "Bearer {{token.writer}}"
+    }
+   }
+  },
+  {
+   "id": "token.expired-on-public-health",
+   "request": {
+    "method": "GET",
+    "path": "/api/health",
+    "headers": {
+     "authorization": "Bearer {{token.expired}}"
+    }
+   }
+  },
+  {
+   "id": "reader.claims-create",
+   "request": {
+    "method": "POST",
+    "path": "/api/claims",
+    "json": {
+     "client_id": 1001,
+     "program_code": "GA_JTC",
+     "tax_year": 2023,
+     "status": "claimed",
+     "provenance": "client_asserted",
+     "decided_by": "contract",
+     "claimed_usd": "12000"
+    },
+    "headers": {
+     "authorization": "Bearer {{token.reader}}"
+    }
+   }
+  },
+  {
+   "id": "reader.engagement",
+   "request": {
+    "method": "PUT",
+    "path": "/api/claims/engagement",
+    "json": {
+     "client_id": 1001,
+     "program_code": "GA_JTC",
+     "scope": "in_scope",
+     "note": "contract"
+    },
+    "headers": {
+     "authorization": "Bearer {{token.reader}}"
+    }
+   }
+  },
+  {
+   "id": "reader.assess",
+   "request": {
+    "method": "POST",
+    "path": "/api/claims/assess",
+    "json": {
+     "client_id": 1001,
+     "program_code": "GA_JTC",
+     "tax_years": [
+      2025
+     ],
+     "assessed_by": "contract"
+    },
+    "headers": {
+     "authorization": "Bearer {{token.reader}}"
+    }
+   }
+  },
+  {
+   "id": "reader.transition",
+   "request": {
+    "method": "POST",
+    "path": "/api/claims/cell/1001/GA_JTC/2025/transition",
+    "json": {
+     "status": "proposed",
+     "decided_by": "contract"
+    },
+    "headers": {
+     "authorization": "Bearer {{token.reader}}"
+    }
+   }
+  },
+  {
+   "id": "reader.run",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/clients/1001/runs",
+    "json": {
+     "year": 2025,
+     "state": "GA",
+     "triggered_by": "contract"
+    },
+    "headers": {
+     "authorization": "Bearer {{token.reader}}"
+    }
+   }
+  },
+  {
+   "id": "reader.base-year",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ/base-year",
+    "json": {
+     "base_year": 2024,
+     "state": "GA",
+     "justification": "contract",
+     "triggered_by": "contract"
+    },
+    "headers": {
+     "authorization": "Bearer {{token.reader}}"
+    }
+   }
+  },
+  {
+   "id": "reader.draft-create",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts",
+    "json": {
+     "code": "XX_CONTRACT",
+     "name": "Contract draft",
+     "state": "XX",
+     "years": [
+      2025
+     ],
+     "actor": "contract"
+    },
+    "headers": {
+     "authorization": "Bearer {{token.reader}}"
+    }
+   }
+  },
+  {
+   "id": "reader.finding-resolve",
+   "request": {
+    "method": "POST",
+    "path": "/api/findings/policy:test_of_twos:ALL:2025/resolve",
+    "json": {
+     "client_id": 1001,
+     "tax_year": 2025,
+     "resolution": "accept",
+     "decided_by": "contract"
+    },
+    "headers": {
+     "authorization": "Bearer {{token.reader}}"
+    }
+   }
+  },
+  {
+   "id": "reader.rules-verify",
+   "request": {
+    "method": "POST",
+    "path": "/api/rules/GA_JTC/verify",
+    "json": {
+     "verified_by": "contract",
+     "note": "n"
+    },
+    "headers": {
+     "authorization": "Bearer {{token.reader}}"
+    }
+   }
+  },
+  {
+   "id": "reader.batch-dry-run",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches",
+    "json": {
+     "kind": "assess",
+     "scope": {
+      "kind": "one",
+      "client_ids": [
+       1001
+      ]
+     },
+     "tax_years": [
+      2025
+     ],
+     "dry_run": true
+    },
+    "headers": {
+     "authorization": "Bearer {{token.reader}}"
+    }
+   }
+  },
+  {
+   "id": "writer.claims-create",
+   "request": {
+    "method": "POST",
+    "path": "/api/claims",
+    "json": {
+     "client_id": 1001,
+     "program_code": "GA_JTC",
+     "tax_year": 2023,
+     "status": "claimed",
+     "provenance": "client_asserted",
+     "decided_by": "contract",
+     "claimed_usd": "12000"
+    },
+    "headers": {
+     "authorization": "Bearer {{token.writer}}"
+    }
+   }
+  },
+  {
+   "id": "writer.engagement",
+   "request": {
+    "method": "PUT",
+    "path": "/api/claims/engagement",
+    "json": {
+     "client_id": 1001,
+     "program_code": "GA_JTC",
+     "scope": "in_scope",
+     "note": "contract"
+    },
+    "headers": {
+     "authorization": "Bearer {{token.writer}}"
+    }
+   }
+  },
+  {
+   "id": "writer.assess",
+   "request": {
+    "method": "POST",
+    "path": "/api/claims/assess",
+    "json": {
+     "client_id": 1001,
+     "program_code": "GA_JTC",
+     "tax_years": [
+      2025
+     ],
+     "assessed_by": "contract"
+    },
+    "headers": {
+     "authorization": "Bearer {{token.writer}}"
+    }
+   }
+  },
+  {
+   "id": "writer.transition",
+   "request": {
+    "method": "POST",
+    "path": "/api/claims/cell/1001/GA_JTC/2025/transition",
+    "json": {
+     "status": "proposed",
+     "decided_by": "contract"
+    },
+    "headers": {
+     "authorization": "Bearer {{token.writer}}"
+    }
+   }
+  },
+  {
+   "id": "writer.run",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/clients/1001/runs",
+    "json": {
+     "year": 2025,
+     "state": "GA",
+     "triggered_by": "contract"
+    },
+    "headers": {
+     "authorization": "Bearer {{token.writer}}"
+    }
+   }
+  },
+  {
+   "id": "writer.base-year",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ/base-year",
+    "json": {
+     "base_year": 2024,
+     "state": "GA",
+     "justification": "contract",
+     "triggered_by": "contract"
+    },
+    "headers": {
+     "authorization": "Bearer {{token.writer}}"
+    }
+   }
+  },
+  {
+   "id": "writer.draft-create",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts",
+    "json": {
+     "code": "XX_CONTRACT",
+     "name": "Contract draft",
+     "state": "XX",
+     "years": [
+      2025
+     ],
+     "actor": "contract"
+    },
+    "headers": {
+     "authorization": "Bearer {{token.writer}}"
+    }
+   }
+  },
+  {
+   "id": "writer.finding-resolve",
+   "request": {
+    "method": "POST",
+    "path": "/api/findings/policy:test_of_twos:ALL:2025/resolve",
+    "json": {
+     "client_id": 1001,
+     "tax_year": 2025,
+     "resolution": "accept",
+     "decided_by": "contract"
+    },
+    "headers": {
+     "authorization": "Bearer {{token.writer}}"
+    }
+   }
+  },
+  {
+   "id": "writer.rules-verify",
+   "request": {
+    "method": "POST",
+    "path": "/api/rules/GA_JTC/verify",
+    "json": {
+     "verified_by": "contract",
+     "note": "n"
+    },
+    "headers": {
+     "authorization": "Bearer {{token.writer}}"
+    }
+   }
+  },
+  {
+   "id": "writer.batch-dry-run",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches",
+    "json": {
+     "kind": "assess",
+     "scope": {
+      "kind": "one",
+      "client_ids": [
+       1001
+      ]
+     },
+     "tax_years": [
+      2025
+     ],
+     "dry_run": true
+    },
+    "headers": {
+     "authorization": "Bearer {{token.writer}}"
+    }
+   }
+  },
+  {
+   "id": "reader.read-portfolio",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "headers": {
+     "authorization": "Bearer {{token.reader}}"
+    }
+   }
+  },
+  {
+   "id": "reader.read-units",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units",
+    "query": [
+     [
+      "year",
+      2025
+     ]
+    ],
+    "headers": {
+     "authorization": "Bearer {{token.reader}}"
+    }
+   }
+  },
+  {
+   "id": "ratelimit.writer-batch-1",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches",
+    "json": {
+     "kind": "assess",
+     "scope": {
+      "kind": "one",
+      "client_ids": [
+       1001
+      ]
+     },
+     "tax_years": [
+      2025
+     ],
+     "dry_run": true
+    },
+    "headers": {
+     "authorization": "Bearer {{token.writer}}"
+    }
+   }
+  },
+  {
+   "id": "ratelimit.writer-batch-2",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches",
+    "json": {
+     "kind": "assess",
+     "scope": {
+      "kind": "one",
+      "client_ids": [
+       1001
+      ]
+     },
+     "tax_years": [
+      2025
+     ],
+     "dry_run": true
+    },
+    "headers": {
+     "authorization": "Bearer {{token.writer}}"
+    }
+   }
+  },
+  {
+   "id": "ratelimit.writer-batch-3",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches",
+    "json": {
+     "kind": "assess",
+     "scope": {
+      "kind": "one",
+      "client_ids": [
+       1001
+      ]
+     },
+     "tax_years": [
+      2025
+     ],
+     "dry_run": true
+    },
+    "headers": {
+     "authorization": "Bearer {{token.writer}}"
+    }
+   }
+  },
+  {
+   "id": "ratelimit.writer-batch-4",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches",
+    "json": {
+     "kind": "assess",
+     "scope": {
+      "kind": "one",
+      "client_ids": [
+       1001
+      ]
+     },
+     "tax_years": [
+      2025
+     ],
+     "dry_run": true
+    },
+    "headers": {
+     "authorization": "Bearer {{token.writer}}"
+    }
+   }
+  },
+  {
+   "id": "ratelimit.writer-batch-5",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches",
+    "json": {
+     "kind": "assess",
+     "scope": {
+      "kind": "one",
+      "client_ids": [
+       1001
+      ]
+     },
+     "tax_years": [
+      2025
+     ],
+     "dry_run": true
+    },
+    "headers": {
+     "authorization": "Bearer {{token.writer}}"
+    }
+   }
+  },
+  {
+   "id": "ratelimit.reader-batch-1-own-bucket",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches",
+    "json": {
+     "kind": "assess",
+     "scope": {
+      "kind": "one",
+      "client_ids": [
+       1001
+      ]
+     },
+     "tax_years": [
+      2025
+     ],
+     "dry_run": true
+    },
+    "headers": {
+     "authorization": "Bearer {{token.reader}}"
+    }
+   }
+  },
+  {
+   "id": "ratelimit.writer-other-kind",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/00000000-0000-0000-0000-000000000000/preview",
+    "json": {
+     "dataset": "synthetic_sample"
+    },
+    "headers": {
+     "authorization": "Bearer {{token.writer}}"
+    }
+   }
+  },
+  {
+   "id": "ratelimit.writer-reads-unaffected",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "headers": {
+     "authorization": "Bearer {{token.writer}}"
+    }
+   }
+  },
+  {
+   "id": "client-authz.coverage",
+   "request": {
+    "method": "GET",
+    "path": "/api/claims/coverage/1001",
+    "headers": {
+     "authorization": "Bearer {{token.restricted}}"
+    }
+   }
+  },
+  {
+   "id": "client-authz.units",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units",
+    "headers": {
+     "authorization": "Bearer {{token.restricted}}"
+    }
+   }
+  },
+  {
+   "id": "client-authz.query-account",
+   "request": {
+    "method": "GET",
+    "path": "/api/eligibility/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ],
+    "headers": {
+     "authorization": "Bearer {{token.restricted}}"
+    }
+   }
+  },
+  {
+   "id": "client-authz.body-client",
+   "request": {
+    "method": "POST",
+    "path": "/api/claims/assess",
+    "json": {
+     "client_id": 1001,
+     "assessed_by": "x"
+    },
+    "headers": {
+     "authorization": "Bearer {{token.restricted}}"
+    }
+   }
+  },
+  {
+   "id": "client-authz.batch-names-client",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches",
+    "json": {
+     "kind": "assess",
+     "scope": {
+      "kind": "list",
+      "client_ids": [
+       1001
+      ]
+     },
+     "dry_run": true
+    },
+    "headers": {
+     "authorization": "Bearer {{token.restricted}}"
+    }
+   }
+  },
+  {
+   "id": "client-authz.batch-scope-all",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches",
+    "json": {
+     "kind": "assess",
+     "scope": {
+      "kind": "all"
+     },
+     "dry_run": true
+    },
+    "headers": {
+     "authorization": "Bearer {{token.restricted}}"
+    }
+   }
+  },
+  {
+   "id": "client-authz.unknown-batch-is-404",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches/00000000-0000-0000-0000-000000000000",
+    "headers": {
+     "authorization": "Bearer {{token.restricted}}"
+    }
+   }
+  },
+  {
+   "id": "client-authz.unknown-batch-items-is-404",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches/00000000-0000-0000-0000-000000000000/items",
+    "headers": {
+     "authorization": "Bearer {{token.restricted}}"
+    }
+   }
+  },
+  {
+   "id": "client-authz.artifact-self-authorizing",
+   "request": {
+    "method": "GET",
+    "path": "/api/clients/1001/artifacts/00000000-0000-0000-0000-000000000000",
+    "headers": {
+     "authorization": "Bearer {{token.restricted}}"
+    }
+   }
+  },
+  {
+   "id": "client-authz.portfolio-names-no-client",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "headers": {
+     "authorization": "Bearer {{token.restricted}}"
+    }
+   }
+  },
+  {
+   "id": "client-authz.scope",
+   "request": {
+    "method": "GET",
+    "path": "/api/scope",
+    "headers": {
+     "authorization": "Bearer {{token.restricted}}"
+    }
+   }
+  },
+  {
+   "id": "agent.no-acting-header",
+   "request": {
+    "method": "GET",
+    "path": "/api/me",
+    "headers": {
+     "authorization": "Bearer {{token.agent}}"
+    }
+   }
+  },
+  {
+   "id": "agent.me-acting",
+   "request": {
+    "method": "GET",
+    "path": "/api/me",
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-tcc-acting-user": "eyJjaGFubmVsIjoidGVhbXMiLCJuYW1lIjoiQWN0aW5nIFBlcnNvbiIsIm9pZCI6IjAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDBhMiIsInRpZCI6IjAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDBhYSIsInVwbiI6ImFjdGluZ0BleGFtcGxlLnRlc3QifQ"
+    }
+   }
+  },
+  {
+   "id": "agent.acting-reader",
+   "request": {
+    "method": "GET",
+    "path": "/api/me",
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-tcc-acting-user": "eyJhc3N1cmFuY2UiOiJkZWxlZ2F0ZWQiLCJjaGFubmVsIjoidGVhbXMiLCJuYW1lIjoiQWN0aW5nIFBlcnNvbiIsIm9pZCI6IjAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDBhMSIsInRpZCI6IjAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDBhYSIsInVwbiI6ImFjdGluZ0BleGFtcGxlLnRlc3QifQ"
+    }
+   }
+  },
+  {
+   "id": "agent.header-empty",
+   "request": {
+    "method": "GET",
+    "path": "/api/me",
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-tcc-acting-user": ""
+    }
+   }
+  },
+  {
+   "id": "agent.header-not-base64",
+   "request": {
+    "method": "GET",
+    "path": "/api/me",
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-tcc-acting-user": "not base64!"
+    }
+   }
+  },
+  {
+   "id": "agent.header-not-json",
+   "request": {
+    "method": "GET",
+    "path": "/api/me",
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-tcc-acting-user": "YWJj"
+    }
+   }
+  },
+  {
+   "id": "agent.header-wrong-tenant",
+   "request": {
+    "method": "GET",
+    "path": "/api/me",
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-tcc-acting-user": "eyJvaWQiOiIwMDAwMDAwMC0wMDAwLTAwMDAtMDAwMC0wMDAwMDAwMDAwYTIiLCJ0aWQiOiIwMDAwMDAwMC0wMDAwLTAwMDAtMDAwMC0wMDAwMDAwMDAwZmYifQ"
+    }
+   }
+  },
+  {
+   "id": "agent.header-bad-oid",
+   "request": {
+    "method": "GET",
+    "path": "/api/me",
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-tcc-acting-user": "eyJvaWQiOiJub3BlIiwidGlkIjoiMDAwMDAwMDAtMDAwMC0wMDAwLTAwMDAtMDAwMDAwMDAwMGFhIn0"
+    }
+   }
+  },
+  {
+   "id": "agent.header-bad-channel",
+   "request": {
+    "method": "GET",
+    "path": "/api/me",
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-tcc-acting-user": "eyJjaGFubmVsIjoiZmF4IiwibmFtZSI6IkFjdGluZyBQZXJzb24iLCJvaWQiOiIwMDAwMDAwMC0wMDAwLTAwMDAtMDAwMC0wMDAwMDAwMDAwYTIiLCJ0aWQiOiIwMDAwMDAwMC0wMDAwLTAwMDAtMDAwMC0wMDAwMDAwMDAwYWEiLCJ1cG4iOiJhY3RpbmdAZXhhbXBsZS50ZXN0In0"
+    }
+   }
+  },
+  {
+   "id": "agent.header-bad-assurance",
+   "request": {
+    "method": "GET",
+    "path": "/api/me",
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-tcc-acting-user": "eyJhc3N1cmFuY2UiOiJ0cnVzdC1tZSIsImNoYW5uZWwiOiJ0ZWFtcyIsIm5hbWUiOiJBY3RpbmcgUGVyc29uIiwib2lkIjoiMDAwMDAwMDAtMDAwMC0wMDAwLTAwMDAtMDAwMDAwMDAwMGEyIiwidGlkIjoiMDAwMDAwMDAtMDAwMC0wMDAwLTAwMDAtMDAwMDAwMDAwMGFhIiwidXBuIjoiYWN0aW5nQGV4YW1wbGUudGVzdCJ9"
+    }
+   }
+  },
+  {
+   "id": "agent.header-too-large",
+   "request": {
+    "method": "GET",
+    "path": "/api/me",
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-tcc-acting-user": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+    }
+   }
+  },
+  {
+   "id": "agent.header-long-name",
+   "request": {
+    "method": "GET",
+    "path": "/api/me",
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-tcc-acting-user": "eyJjaGFubmVsIjoidGVhbXMiLCJuYW1lIjoibm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5ubm5uIiwib2lkIjoiMDAwMDAwMDAtMDAwMC0wMDAwLTAwMDAtMDAwMDAwMDAwMGEyIiwidGlkIjoiMDAwMDAwMDAtMDAwMC0wMDAwLTAwMDAtMDAwMDAwMDAwMGFhIiwidXBuIjoiYWN0aW5nQGV4YW1wbGUudGVzdCJ9"
+    }
+   }
+  },
+  {
+   "id": "user.acting-header-ignored",
+   "request": {
+    "method": "GET",
+    "path": "/api/me",
+    "headers": {
+     "authorization": "Bearer {{token.reader}}",
+     "x-tcc-acting-user": "eyJjaGFubmVsIjoidGVhbXMiLCJuYW1lIjoiQWN0aW5nIFBlcnNvbiIsIm9pZCI6IjAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDBhMiIsInRpZCI6IjAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDBhYSIsInVwbiI6ImFjdGluZ0BleGFtcGxlLnRlc3QifQ"
+    }
+   }
+  },
+  {
+   "id": "agent.forbidden-assess",
+   "request": {
+    "method": "POST",
+    "path": "/api/claims/assess",
+    "json": {
+     "client_id": 1001,
+     "program_code": "GA_JTC",
+     "tax_years": [
+      2025
+     ],
+     "assessed_by": "contract"
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-tcc-acting-user": "eyJjaGFubmVsIjoidGVhbXMiLCJuYW1lIjoiQWN0aW5nIFBlcnNvbiIsIm9pZCI6IjAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDBhMiIsInRpZCI6IjAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDBhYSIsInVwbiI6ImFjdGluZ0BleGFtcGxlLnRlc3QifQ"
+    }
+   }
+  },
+  {
+   "id": "agent.forbidden-run",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/clients/1001/runs",
+    "json": {
+     "year": 2025,
+     "state": "GA",
+     "triggered_by": "contract"
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-tcc-acting-user": "eyJjaGFubmVsIjoidGVhbXMiLCJuYW1lIjoiQWN0aW5nIFBlcnNvbiIsIm9pZCI6IjAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDBhMiIsInRpZCI6IjAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDBhYSIsInVwbiI6ImFjdGluZ0BleGFtcGxlLnRlc3QifQ"
+    }
+   }
+  },
+  {
+   "id": "agent.forbidden-batch",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches",
+    "json": {
+     "kind": "assess",
+     "scope": {
+      "kind": "one",
+      "client_ids": [
+       1001
+      ]
+     },
+     "tax_years": [
+      2025
+     ],
+     "dry_run": true
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-tcc-acting-user": "eyJjaGFubmVsIjoidGVhbXMiLCJuYW1lIjoiQWN0aW5nIFBlcnNvbiIsIm9pZCI6IjAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDBhMiIsInRpZCI6IjAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDBhYSIsInVwbiI6ImFjdGluZ0BleGFtcGxlLnRlc3QifQ"
+    }
+   }
+  },
+  {
+   "id": "agent.forbidden-draft-create",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts",
+    "json": {
+     "code": "XX_CONTRACT",
+     "name": "Contract draft",
+     "state": "XX",
+     "years": [
+      2025
+     ],
+     "actor": "contract"
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-tcc-acting-user": "eyJjaGFubmVsIjoidGVhbXMiLCJuYW1lIjoiQWN0aW5nIFBlcnNvbiIsIm9pZCI6IjAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDBhMiIsInRpZCI6IjAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDBhYSIsInVwbiI6ImFjdGluZ0BleGFtcGxlLnRlc3QifQ"
+    }
+   }
+  },
+  {
+   "id": "agent.forbidden-draft-put",
+   "request": {
+    "method": "PUT",
+    "path": "/api/v2/program-drafts/x/documents",
+    "json": {
+     "expected_version": 1,
+     "pack": null
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-tcc-acting-user": "eyJjaGFubmVsIjoidGVhbXMiLCJuYW1lIjoiQWN0aW5nIFBlcnNvbiIsIm9pZCI6IjAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDBhMiIsInRpZCI6IjAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDBhYSIsInVwbiI6ImFjdGluZ0BleGFtcGxlLnRlc3QifQ"
+    }
+   }
+  },
+  {
+   "id": "agent.forbidden-rules-verify",
+   "request": {
+    "method": "POST",
+    "path": "/api/rules/GA_JTC/verify",
+    "json": {
+     "verified_by": "contract",
+     "note": "n"
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-tcc-acting-user": "eyJjaGFubmVsIjoidGVhbXMiLCJuYW1lIjoiQWN0aW5nIFBlcnNvbiIsIm9pZCI6IjAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDBhMiIsInRpZCI6IjAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDBhYSIsInVwbiI6ImFjdGluZ0BleGFtcGxlLnRlc3QifQ"
+    }
+   }
+  },
+  {
+   "id": "agent.forbidden-workspace-refresh",
+   "request": {
+    "method": "POST",
+    "path": "/api/workspace/refresh",
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-tcc-acting-user": "eyJjaGFubmVsIjoidGVhbXMiLCJuYW1lIjoiQWN0aW5nIFBlcnNvbiIsIm9pZCI6IjAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDBhMiIsInRpZCI6IjAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDBhYSIsInVwbiI6ImFjdGluZ0BleGFtcGxlLnRlc3QifQ"
+    }
+   }
+  },
+  {
+   "id": "agent.forbidden-checked-before-header",
+   "request": {
+    "method": "POST",
+    "path": "/api/claims/assess",
+    "json": {
+     "client_id": 1001,
+     "program_code": "GA_JTC",
+     "tax_years": [
+      2025
+     ],
+     "assessed_by": "contract"
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}"
+    }
+   }
+  },
+  {
+   "id": "agent.read-allowed",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-tcc-acting-user": "eyJjaGFubmVsIjoidGVhbXMiLCJuYW1lIjoiQWN0aW5nIFBlcnNvbiIsIm9pZCI6IjAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDBhMSIsInRpZCI6IjAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDBhYSIsInVwbiI6ImFjdGluZ0BleGFtcGxlLnRlc3QifQ"
+    }
+   }
+  },
+  {
+   "id": "agent.read-draft-list",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts",
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-tcc-acting-user": "eyJjaGFubmVsIjoidGVhbXMiLCJuYW1lIjoiQWN0aW5nIFBlcnNvbiIsIm9pZCI6IjAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDBhMSIsInRpZCI6IjAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDBhYSIsInVwbiI6ImFjdGluZ0BleGFtcGxlLnRlc3QifQ"
+    }
+   }
+  },
+  {
+   "id": "agent.write-claims-as-writer",
+   "request": {
+    "method": "POST",
+    "path": "/api/claims",
+    "json": {
+     "client_id": 1001,
+     "program_code": "GA_JTC",
+     "tax_year": 2023,
+     "status": "claimed",
+     "provenance": "client_asserted",
+     "decided_by": "contract",
+     "claimed_usd": "12000"
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-tcc-acting-user": "eyJjaGFubmVsIjoidGVhbXMiLCJuYW1lIjoiQWN0aW5nIFBlcnNvbiIsIm9pZCI6IjAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDBhMiIsInRpZCI6IjAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDBhYSIsInVwbiI6ImFjdGluZ0BleGFtcGxlLnRlc3QifQ"
+    }
+   }
+  },
+  {
+   "id": "agent.write-transition-as-writer",
+   "request": {
+    "method": "POST",
+    "path": "/api/claims/cell/1001/GA_JTC/2025/transition",
+    "json": {
+     "status": "proposed",
+     "decided_by": "acting@example.test"
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-tcc-acting-user": "eyJjaGFubmVsIjoidGVhbXMiLCJuYW1lIjoiQWN0aW5nIFBlcnNvbiIsIm9pZCI6IjAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDBhMiIsInRpZCI6IjAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDBhYSIsInVwbiI6ImFjdGluZ0BleGFtcGxlLnRlc3QifQ"
+    }
+   }
+  },
+  {
+   "id": "agent.write-transition-as-reader",
+   "request": {
+    "method": "POST",
+    "path": "/api/claims/cell/1001/GA_JTC/2025/transition",
+    "json": {
+     "status": "proposed",
+     "decided_by": "acting@example.test"
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-tcc-acting-user": "eyJjaGFubmVsIjoidGVhbXMiLCJuYW1lIjoiQWN0aW5nIFBlcnNvbiIsIm9pZCI6IjAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDBhMSIsInRpZCI6IjAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDBhYSIsInVwbiI6ImFjdGluZ0BleGFtcGxlLnRlc3QifQ"
+    }
+   }
+  },
+  {
+   "id": "agent.capabilities-list",
+   "request": {
+    "method": "GET",
+    "path": "/api/capabilities",
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-tcc-acting-user": "eyJjaGFubmVsIjoidGVhbXMiLCJuYW1lIjoiQWN0aW5nIFBlcnNvbiIsIm9pZCI6IjAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDBhMSIsInRpZCI6IjAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDBhYSIsInVwbiI6ImFjdGluZ0BleGFtcGxlLnRlc3QifQ"
+    }
+   }
+  },
+  {
+   "id": "agent.capabilities-book-rank",
+   "request": {
+    "method": "POST",
+    "path": "/api/capabilities/book_rank",
+    "json": {
+     "args": {}
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-tcc-acting-user": "eyJjaGFubmVsIjoidGVhbXMiLCJuYW1lIjoiQWN0aW5nIFBlcnNvbiIsIm9pZCI6IjAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDBhMSIsInRpZCI6IjAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDBhYSIsInVwbiI6ImFjdGluZ0BleGFtcGxlLnRlc3QifQ"
+    }
+   }
+  },
+  {
+   "id": "agent.audit-channel",
+   "request": {
+    "method": "GET",
+    "path": "/api/audit/channel",
+    "query": [
+     [
+      "user_oid",
+      "00000000-0000-0000-0000-0000000000a1"
+     ]
+    ],
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-tcc-acting-user": "eyJjaGFubmVsIjoidGVhbXMiLCJuYW1lIjoiQWN0aW5nIFBlcnNvbiIsIm9pZCI6IjAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDBhMSIsInRpZCI6IjAwMDAwMDAwLTAwMDAtMDAwMC0wMDAwLTAwMDAwMDAwMDBhYSIsInVwbiI6ImFjdGluZ0BleGFtcGxlLnRlc3QifQ"
+    }
+   }
+  },
+  {
+   "id": "cors.preflight-no-token",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/claims",
+    "headers": {
+     "origin": "https://example.test",
+     "access-control-request-method": "POST",
+     "access-control-request-headers": "authorization,content-type,x-tcc-acting-user"
+    }
+   }
+  },
+  {
+   "id": "cors.simple-with-token",
+   "request": {
+    "method": "GET",
+    "path": "/api/me",
+    "headers": {
+     "authorization": "Bearer {{token.reader}}",
+     "origin": "https://example.test"
+    }
+   }
+  },
+  {
+   "id": "cors.simple-401",
+   "request": {
+    "method": "GET",
+    "path": "/api/me",
+    "headers": {
+     "origin": "https://example.test"
+    }
+   }
+  },
+  {
+   "id": "cors.simple-403",
+   "request": {
+    "method": "GET",
+    "path": "/api/me",
+    "headers": {
+     "authorization": "Bearer {{token.no_role}}",
+     "origin": "https://example.test"
+    }
+   }
+  },
+  {
+   "id": "cors.preflight-put",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/claims/engagement",
+    "headers": {
+     "origin": "https://example.test",
+     "access-control-request-method": "PUT"
+    }
+   }
+  },
+  {
+   "id": "cors.preflight-patch-disallowed",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/claims",
+    "headers": {
+     "origin": "https://example.test",
+     "access-control-request-method": "PATCH"
+    }
+   }
+  },
+  {
+   "id": "cors.preflight-delete-disallowed",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/claims",
+    "headers": {
+     "origin": "https://example.test",
+     "access-control-request-method": "DELETE"
+    }
+   }
+  }
+ ]
+}

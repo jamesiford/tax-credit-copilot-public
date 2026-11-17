@@ -1,0 +1,261 @@
+# Replay report (semantic)
+
+- server interpreter: external server (zlib n/a), oracle: None
+- scenarios: 1
+- exchanges compared: 114
+- failures: 275
+- tolerated (semantic mode only): 46
+
+## p1_auth: 114 exchanges, 275 failures, 46 tolerated
+- `GET /api/ready` / `public.ready-no-token` **missing-field** at `source_schema.reads`: expected `{"tables":{},"cache":{"hits":0,"misses":0,"negative_hits":0,"evictions":0,"single_flight_waits":0},"rows":0,"bytes":0}` actual `<absent>`
+- `GET /api/ready` / `public.ready-no-token` **extra-field** at `source_schema.accounts`: expected `<absent>` actual `1`
+- `GET /api/ready` / `public.ready-no-token` **extra-field** at `source_schema.problem`: expected `<absent>` actual `null`
+- `GET /api/ready` / `public.ready-no-token` **value** at `source_schema.status`: expected `skipped` actual `ready`
+- `GET /docs` / `none.docs` **value** at `body.text`: expected `
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link type="text/css" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css">
+    <link rel="shortcut icon" href="https://fastapi.tiangolo.com/img/...(1021 chars)` actual `<!doctype html><html lang="en"><meta charset="utf-8"><title>API documentation</title><body><h1>Tax Credit Copilot API</h1><p>Walking skeleton: unimplemented operations return 501.</p><a href="/openapi.json">OpenAPI schema inventory</a></body></html>`
+- `GET /api/me/` / `none.trailing-slash` **status** at `status`: expected `307` actual `401`
+- `GET /api/me/` / `none.trailing-slash` **header** at `headers.content-type`: expected `<absent>` actual `application/json`
+- `GET /api/me/` / `none.trailing-slash` **header** at `headers.location`: expected `{origin}/api/me` actual `<absent>`
+- `GET /api/me/` / `none.trailing-slash` **header** at `headers.www-authenticate`: expected `<absent>` actual `Bearer`
+- `GET /api/me/` / `none.trailing-slash` **body-kind** at `body`: expected `empty` actual `json`
+- `GET /api/me` / `malformed.garbage` **value** at `detail`: expected `invalid token: DecodeError` actual `invalid token`
+- `GET /api/me` / `malformed.lower-scheme` **value** at `detail`: expected `invalid token: DecodeError` actual `invalid token`
+- `GET /api/me` / `malformed.two-parts` **value** at `detail`: expected `invalid token: DecodeError` actual `invalid token`
+- `GET /api/me` / `malformed.jwt-shaped` **value** at `detail`: expected `invalid token: DecodeError` actual `invalid token`
+- `GET /api/me` / `token.expired` **value** at `detail`: expected `invalid token: ExpiredSignatureError` actual `invalid token`
+- `GET /api/me` / `token.not_yet_valid` **value** at `detail`: expected `invalid token: ImmatureSignatureError` actual `invalid token`
+- `GET /api/me` / `token.wrong_audience` **value** at `detail`: expected `invalid token: InvalidAudienceError` actual `invalid token`
+- `GET /api/me` / `token.wrong_tenant` **value** at `detail`: expected `invalid token: InvalidIssuerError` actual `invalid token`
+- `GET /api/me` / `token.wrong_issuer_v1` **value** at `detail`: expected `invalid token: InvalidIssuerError` actual `invalid token`
+- `GET /api/me` / `token.forged` **value** at `detail`: expected `invalid token: InvalidSignatureError` actual `invalid token`
+- `GET /api/me` / `token.missing_exp` **value** at `detail`: expected `invalid token: MissingRequiredClaimError` actual `invalid token`
+- `GET /api/me` / `token.missing_iat` **value** at `detail`: expected `invalid token: MissingRequiredClaimError` actual `invalid token`
+- `GET /api/me` / `token.bare-audience-ok` **status** at `status`: expected `200` actual `501`
+- `GET /api/me` / `token.bare-audience-ok` **missing-field** at `auth_mode`: expected `entra` actual `<absent>`
+- `GET /api/me` / `token.bare-audience-ok` **missing-field** at `authenticated`: expected `true` actual `<absent>`
+- `GET /api/me` / `token.bare-audience-ok` **missing-field** at `upn`: expected `analyst@example.test` actual `<absent>`
+- `GET /api/me` / `token.bare-audience-ok` **missing-field** at `oid`: expected `00000000-0000-0000-0000-0000000000a1` actual `<absent>`
+- `GET /api/me` / `token.bare-audience-ok` **missing-field** at `name`: expected `Ana Lyst` actual `<absent>`
+- `GET /api/me` / `token.bare-audience-ok` **missing-field** at `roles`: expected `["TCC.User"]` actual `<absent>`
+- `GET /api/me` / `token.bare-audience-ok` **missing-field** at `principal_type`: expected `user` actual `<absent>`
+- `GET /api/me` / `token.bare-audience-ok` **missing-field** at `acting_for`: expected `null` actual `<absent>`
+- `GET /api/me` / `token.bare-audience-ok` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /api/me`
+- `GET /api/me` / `token.reader-me` **status** at `status`: expected `200` actual `501`
+- `GET /api/me` / `token.reader-me` **missing-field** at `auth_mode`: expected `entra` actual `<absent>`
+- `GET /api/me` / `token.reader-me` **missing-field** at `authenticated`: expected `true` actual `<absent>`
+- `GET /api/me` / `token.reader-me` **missing-field** at `upn`: expected `analyst@example.test` actual `<absent>`
+- `GET /api/me` / `token.reader-me` **missing-field** at `oid`: expected `00000000-0000-0000-0000-0000000000a1` actual `<absent>`
+- `GET /api/me` / `token.reader-me` **missing-field** at `name`: expected `Ana Lyst` actual `<absent>`
+- `GET /api/me` / `token.reader-me` **missing-field** at `roles`: expected `["TCC.User"]` actual `<absent>`
+- `GET /api/me` / `token.reader-me` **missing-field** at `principal_type`: expected `user` actual `<absent>`
+- `GET /api/me` / `token.reader-me` **missing-field** at `acting_for`: expected `null` actual `<absent>`
+- `GET /api/me` / `token.reader-me` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /api/me`
+- `GET /api/me` / `token.writer-me` **status** at `status`: expected `200` actual `501`
+- `GET /api/me` / `token.writer-me` **missing-field** at `auth_mode`: expected `entra` actual `<absent>`
+- `GET /api/me` / `token.writer-me` **missing-field** at `authenticated`: expected `true` actual `<absent>`
+- `GET /api/me` / `token.writer-me` **missing-field** at `upn`: expected `analyst@example.test` actual `<absent>`
+- `GET /api/me` / `token.writer-me` **missing-field** at `oid`: expected `00000000-0000-0000-0000-0000000000a2` actual `<absent>`
+- `GET /api/me` / `token.writer-me` **missing-field** at `name`: expected `Ana Lyst` actual `<absent>`
+- `GET /api/me` / `token.writer-me` **missing-field** at `roles`: expected `["TCC.User"]` actual `<absent>`
+- `GET /api/me` / `token.writer-me` **missing-field** at `principal_type`: expected `user` actual `<absent>`
+- `GET /api/me` / `token.writer-me` **missing-field** at `acting_for`: expected `null` actual `<absent>`
+- `GET /api/me` / `token.writer-me` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /api/me`
+- `POST /api/claims/assess` / `reader.assess` **value** at `assessed[0].claim_id`: expected `40000000-0000-4000-8000-000000000009` actual `40000000-0000-4000-8000-000000000004`
+- `POST /api/v2/clients/1001/runs` / `reader.run` **status** at `status`: expected `200` actual `501`
+- `POST /api/v2/clients/1001/runs` / `reader.run` **missing-field** at `run_id`: expected `4000000000004000800000000000000a` actual `<absent>`
+- `POST /api/v2/clients/1001/runs` / `reader.run` **missing-field** at `client_id`: expected `1001` actual `<absent>`
+- `POST /api/v2/clients/1001/runs` / `reader.run` **missing-field** at `tax_year`: expected `2025` actual `<absent>`
+- `POST /api/v2/clients/1001/runs` / `reader.run` **missing-field** at `state`: expected `GA` actual `<absent>`
+- `POST /api/v2/clients/1001/runs` / `reader.run` **missing-field** at `program_code`: expected `GA_JTC` actual `<absent>`
+- `POST /api/v2/clients/1001/runs` / `reader.run` **missing-field** at `run_status`: expected `success` actual `<absent>`
+- `POST /api/v2/clients/1001/runs` / `reader.run` **missing-field** at `run_started_at`: expected `2026-01-15T12:00:00Z` actual `<absent>`
+- `POST /api/v2/clients/1001/runs` / `reader.run` **missing-field** at `run_completed_at`: expected `2026-01-15T12:00:00Z` actual `<absent>`
+- `POST /api/v2/clients/1001/runs` / `reader.run` **missing-field** at `calculation_id`: expected `9e9a9edc79a44dce8ea0d3be5147883b87a1298e2ccf5619947c8e40d3cbf0cd` actual `<absent>`
+- `POST /api/v2/clients/1001/runs` / `reader.run` **missing-field** at `code_commit`: expected `0000000000000000000000000000000000c0ffee` actual `<absent>`
+- `POST /api/v2/clients/1001/runs` / `reader.run` **missing-field** at `rows_written`: expected `{"run_manifest":1,"employee_period_fact":5281,"employee_eligibility":376,"onezero_matrix":2898,"unit_month_summary":16,"run_method_summary":4,"unit_year_master":16,"unit_credit_installment":40}` actual `<absent>`
+- `POST /api/v2/clients/1001/runs` / `reader.run` **missing-field** at `validation`: expected `{"queries_run":20,"violations":[]}` actual `<absent>`
+- `POST /api/v2/clients/1001/runs` / `reader.run` **missing-field** at `summary`: expected `{"employees_evaluated":107,"min_max_eligible":77,"pay_period_eligible":72}` actual `<absent>`
+- `POST /api/v2/clients/1001/runs` / `reader.run` **missing-field** at `claim`: expected `{"assessed":2,"declined":1}` actual `<absent>`
+- `POST /api/v2/clients/1001/runs` / `reader.run` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /api/v2/clients/{client_id}/runs`
+- `POST /api/v2/run-batches` / `reader.batch-dry-run` **status** at `status`: expected `202` actual `501`
+- `POST /api/v2/run-batches` / `reader.batch-dry-run` **missing-field** at `dry_run`: expected `true` actual `<absent>`
+- `POST /api/v2/run-batches` / `reader.batch-dry-run` **missing-field** at `preview`: expected `{"kind":"assess","clients":1,"items":1,"years":[2025],"refresh_once":true,"force":false,"skip_unchanged":false,"skip_coverage":"none_yet","per_client_year_items":false,"skip_candidates_upper_bound":0,"never_run":1,"manifests_read_for":1,"requires_confirmation":false,"confirm_above":25,"max_items":50...(744 chars)` actual `<absent>`
+- `POST /api/v2/run-batches` / `reader.batch-dry-run` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /api/v2/run-batches`
+- `POST /api/claims` / `writer.claims-create` **value** at `claim_id`: expected `40000000-0000-4000-8000-00000000000f` actual `40000000-0000-4000-8000-000000000007`
+- `POST /api/claims/assess` / `writer.assess` **value** at `assessed[0].claim_id`: expected `40000000-0000-4000-8000-000000000011` actual `40000000-0000-4000-8000-000000000008`
+- `POST /api/claims/cell/1001/GA_JTC/2025/transition` / `writer.transition` **value** at `claim_id`: expected `40000000-0000-4000-8000-000000000012` actual `40000000-0000-4000-8000-000000000009`
+- `POST /api/v2/clients/1001/runs` / `writer.run` **status** at `status`: expected `200` actual `501`
+- `POST /api/v2/clients/1001/runs` / `writer.run` **missing-field** at `run_id`: expected `40000000000040008000000000000013` actual `<absent>`
+- `POST /api/v2/clients/1001/runs` / `writer.run` **missing-field** at `client_id`: expected `1001` actual `<absent>`
+- `POST /api/v2/clients/1001/runs` / `writer.run` **missing-field** at `tax_year`: expected `2025` actual `<absent>`
+- `POST /api/v2/clients/1001/runs` / `writer.run` **missing-field** at `state`: expected `GA` actual `<absent>`
+- `POST /api/v2/clients/1001/runs` / `writer.run` **missing-field** at `program_code`: expected `GA_JTC` actual `<absent>`
+- `POST /api/v2/clients/1001/runs` / `writer.run` **missing-field** at `run_status`: expected `success` actual `<absent>`
+- `POST /api/v2/clients/1001/runs` / `writer.run` **missing-field** at `run_started_at`: expected `2026-01-15T12:00:00Z` actual `<absent>`
+- `POST /api/v2/clients/1001/runs` / `writer.run` **missing-field** at `run_completed_at`: expected `2026-01-15T12:00:00Z` actual `<absent>`
+- `POST /api/v2/clients/1001/runs` / `writer.run` **missing-field** at `calculation_id`: expected `9e9a9edc79a44dce8ea0d3be5147883b87a1298e2ccf5619947c8e40d3cbf0cd` actual `<absent>`
+- `POST /api/v2/clients/1001/runs` / `writer.run` **missing-field** at `code_commit`: expected `0000000000000000000000000000000000c0ffee` actual `<absent>`
+- `POST /api/v2/clients/1001/runs` / `writer.run` **missing-field** at `rows_written`: expected `{"run_manifest":1,"employee_period_fact":5281,"employee_eligibility":376,"onezero_matrix":2898,"unit_month_summary":16,"run_method_summary":4,"unit_year_master":16,"unit_credit_installment":40}` actual `<absent>`
+- `POST /api/v2/clients/1001/runs` / `writer.run` **missing-field** at `validation`: expected `{"queries_run":20,"violations":[]}` actual `<absent>`
+- `POST /api/v2/clients/1001/runs` / `writer.run` **missing-field** at `summary`: expected `{"employees_evaluated":107,"min_max_eligible":77,"pay_period_eligible":72}` actual `<absent>`
+- `POST /api/v2/clients/1001/runs` / `writer.run` **missing-field** at `claim`: expected `{"assessed":2,"declined":1}` actual `<absent>`
+- `POST /api/v2/clients/1001/runs` / `writer.run` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /api/v2/clients/{client_id}/runs`
+- `POST /api/v2/clients/1001/units/GA_ATL_HQ/base-year` / `writer.base-year` **status** at `status`: expected `200` actual `501`
+- `POST /api/v2/clients/1001/units/GA_ATL_HQ/base-year` / `writer.base-year` **missing-field** at `recorded`: expected `true` actual `<absent>`
+- `POST /api/v2/clients/1001/units/GA_ATL_HQ/base-year` / `writer.base-year` **missing-field** at `override_id`: expected `40000000000040008000000000000018` actual `<absent>`
+- `POST /api/v2/clients/1001/units/GA_ATL_HQ/base-year` / `writer.base-year` **missing-field** at `worksite_id`: expected `GA_ATL_HQ` actual `<absent>`
+- `POST /api/v2/clients/1001/units/GA_ATL_HQ/base-year` / `writer.base-year` **missing-field** at `base_year`: expected `2024` actual `<absent>`
+- `POST /api/v2/clients/1001/units/GA_ATL_HQ/base-year` / `writer.base-year` **missing-field** at `replaced`: expected `2024` actual `<absent>`
+- `POST /api/v2/clients/1001/units/GA_ATL_HQ/base-year` / `writer.base-year` **missing-field** at `recalculation`: expected `started` actual `<absent>`
+- `POST /api/v2/clients/1001/units/GA_ATL_HQ/base-year` / `writer.base-year` **missing-field** at `durable`: expected `false` actual `<absent>`
+- `POST /api/v2/clients/1001/units/GA_ATL_HQ/base-year` / `writer.base-year` **missing-field** at `note`: expected `Saved. The client is being recalculated from the chosen base; the grid updates when the new run lands. The previous run stays in Gold as history.` actual `<absent>`
+- `POST /api/v2/clients/1001/units/GA_ATL_HQ/base-year` / `writer.base-year` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /api/v2/clients/{client_id}/units/{unit_id}/base-year`
+- `POST /api/v2/program-drafts` / `writer.draft-create` **status** at `status`: expected `201` actual `501`
+- `POST /api/v2/program-drafts` / `writer.draft-create` **missing-field** at `draft_id`: expected `4000000000004000800000000000001e` actual `<absent>`
+- `POST /api/v2/program-drafts` / `writer.draft-create` **missing-field** at `proposed_code`: expected `XX_CONTRACT` actual `<absent>`
+- `POST /api/v2/program-drafts` / `writer.draft-create` **missing-field** at `name`: expected `Contract draft` actual `<absent>`
+- `POST /api/v2/program-drafts` / `writer.draft-create` **missing-field** at `jurisdiction_level`: expected `state` actual `<absent>`
+- `POST /api/v2/program-drafts` / `writer.draft-create` **missing-field** at `state`: expected `XX` actual `<absent>`
+- `POST /api/v2/program-drafts` / `writer.draft-create` **missing-field** at `status`: expected `draft` actual `<absent>`
+- `POST /api/v2/program-drafts` / `writer.draft-create` **missing-field** at `version`: expected `1` actual `<absent>`
+- `POST /api/v2/program-drafts` / `writer.draft-create` **missing-field** at `created_by`: expected `analyst@example.test` actual `<absent>`
+- `POST /api/v2/program-drafts` / `writer.draft-create` **missing-field** at `created_at`: expected `2026-01-15T12:00:00+00:00` actual `<absent>`
+- `POST /api/v2/program-drafts` / `writer.draft-create` **missing-field** at `updated_by`: expected `analyst@example.test` actual `<absent>`
+- `POST /api/v2/program-drafts` / `writer.draft-create` **missing-field** at `updated_at`: expected `2026-01-15T12:00:00+00:00` actual `<absent>`
+- `POST /api/v2/program-drafts` / `writer.draft-create` **missing-field** at `pack_file`: expected `xx_contract.json` actual `<absent>`
+- `POST /api/v2/program-drafts` / `writer.draft-create` **missing-field** at `validation_errors`: expected `null` actual `<absent>`
+- `POST /api/v2/program-drafts` / `writer.draft-create` **missing-field** at `verification`: expected `not_verified` actual `<absent>`
+- `POST /api/v2/program-drafts` / `writer.draft-create` **missing-field** at `has_runtime_authority`: expected `false` actual `<absent>`
+- `POST /api/v2/program-drafts` / `writer.draft-create` **missing-field** at `documents`: expected `{"pack":{"_prototype_verification":"DRAFT skeleton. No value here is verified. Fill every null from a cited source, validate, then have it reviewed before any real client use.","rule_pack_version":"0.0.1","jurisdiction":{"level":"state","code":"XX","name":"Contract draft"},"credit":{"code":"XX_CONTR...(2389 chars)` actual `<absent>`
+- `POST /api/v2/program-drafts` / `writer.draft-create` **missing-field** at `content_sha256`: expected `60551b649bbdbed27ebdfe08c5030a533d27acd6b5822dc5df70b8db6fec3c58` actual `<absent>`
+- `POST /api/v2/program-drafts` / `writer.draft-create` **missing-field** at `validation`: expected `null` actual `<absent>`
+- `POST /api/v2/program-drafts` / `writer.draft-create` **missing-field** at `validation_current`: expected `false` actual `<absent>`
+- `POST /api/v2/program-drafts` / `writer.draft-create` **missing-field** at `review`: expected `{"requested_by":null,"reviewer":null,"decision":null,"comment":null,"decided_at":null,"approved_sha256":null}` actual `<absent>`
+- `POST /api/v2/program-drafts` / `writer.draft-create` **missing-field** at `export`: expected `{"exported_at":null,"bundle_sha256":null}` actual `<absent>`
+- `POST /api/v2/program-drafts` / `writer.draft-create` **missing-field** at `allowed_actions`: expected `["edit","validate","preview","withdraw"]` actual `<absent>`
+- `POST /api/v2/program-drafts` / `writer.draft-create` **missing-field** at `events`: expected `[]` actual `<absent>`
+- `POST /api/v2/program-drafts` / `writer.draft-create` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /api/v2/program-drafts`
+- `POST /api/v2/run-batches` / `writer.batch-dry-run` **status** at `status`: expected `202` actual `501`
+- `POST /api/v2/run-batches` / `writer.batch-dry-run` **missing-field** at `dry_run`: expected `true` actual `<absent>`
+- `POST /api/v2/run-batches` / `writer.batch-dry-run` **missing-field** at `preview`: expected `{"kind":"assess","clients":1,"items":1,"years":[2025],"refresh_once":true,"force":false,"skip_unchanged":false,"skip_coverage":"none_yet","per_client_year_items":false,"skip_candidates_upper_bound":0,"never_run":1,"manifests_read_for":1,"requires_confirmation":false,"confirm_above":25,"max_items":50...(744 chars)` actual `<absent>`
+- `POST /api/v2/run-batches` / `writer.batch-dry-run` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /api/v2/run-batches`
+- `GET /api/v2/portfolio` / `reader.read-portfolio` **value** at `items[0].claim_id`: expected `40000000-0000-4000-8000-00000000001d` actual `40000000-0000-4000-8000-000000000009`
+- `GET /api/v2/portfolio` / `reader.read-portfolio` **value** at `items[0].client_name`: expected `Reference Dataset Client` actual `Synthetic fixture`
+- `GET /api/v2/clients/1001/units` / `reader.read-units` **status** at `status`: expected `200` actual `501`
+- `GET /api/v2/clients/1001/units` / `reader.read-units` **missing-field** at `calculation_state`: expected `calculated` actual `<absent>`
+- `GET /api/v2/clients/1001/units` / `reader.read-units` **missing-field** at `run`: expected `{"run_id":"40000000000040008000000000000019","produced_at":"2026-01-15 12:00:00","started_at":"2026-01-15 12:00:00","calculation_id":"9e9a9edc79a44dce8ea0d3be5147883b87a1298e2ccf5619947c8e40d3cbf0cd","code_commit":"0000000000000000000000000000000000c0ffee","rule_pack_version":"rules/ga_jtc/2025.json...(488 chars)` actual `<absent>`
+- `GET /api/v2/clients/1001/units` / `reader.read-units` **missing-field** at `newer_run_in_flight`: expected `false` actual `<absent>`
+- `GET /api/v2/clients/1001/units` / `reader.read-units` **missing-field** at `in_flight`: expected `null` actual `<absent>`
+- `GET /api/v2/clients/1001/units` / `reader.read-units` **missing-field** at `message`: expected `null` actual `<absent>`
+- `GET /api/v2/clients/1001/units` / `reader.read-units` **missing-field** at `client_id`: expected `1001` actual `<absent>`
+- `GET /api/v2/clients/1001/units` / `reader.read-units` **missing-field** at `state`: expected `null` actual `<absent>`
+- `GET /api/v2/clients/1001/units` / `reader.read-units` **missing-field** at `year`: expected `2025` actual `<absent>`
+- `GET /api/v2/clients/1001/units` / `reader.read-units` **missing-field** at `method`: expected `min_max` actual `<absent>`
+- `GET /api/v2/clients/1001/units` / `reader.read-units` **missing-field** at `limit`: expected `25` actual `<absent>`
+- `GET /api/v2/clients/1001/units` / `reader.read-units` **missing-field** at `offset`: expected `0` actual `<absent>`
+- `GET /api/v2/clients/1001/units` / `reader.read-units` **missing-field** at `items`: expected `[{"client_id":1001,"worksite_id":"GA_ATL_HQ","entity_fein":"58-1234567","program_code":"GA_JTC","method":"min_max","tax_year":2025,"average_headcount":17.25,"is_base_year":false,"base_average_headcount":9.17,"base_year_source":"override","net_new_vs_base":8.08,"months_reachable":11,"year_complete":t...(3449 chars)` actual `<absent>`
+- `GET /api/v2/clients/1001/units` / `reader.read-units` **missing-field** at `total`: expected `4` actual `<absent>`
+- `GET /api/v2/clients/1001/units` / `reader.read-units` **missing-field** at `months`: expected `[{"client_id":1001,"tax_year":2025,"method":"min_max","run_id":"40000000000040008000000000000019","worksite_id":"GA_ATL_HQ","month_01":17.0,"month_02":17.0,"month_03":19.0,"month_04":19.0,"month_05":18.0,"month_06":18.0,"month_07":18.0,"month_08":18.0,"month_09":18.0,"month_10":18.0,"month_11":18.0,...(1634 chars)` actual `<absent>`
+- `GET /api/v2/clients/1001/units` / `reader.read-units` **missing-field** at `installments`: expected `[{"worksite_id":"GA_ATL_HQ","tax_year":2025,"claimable_usd":"28280.0","projected":false,"creation_year":2025},{"worksite_id":"GA_ATL_HQ","tax_year":2026,"claimable_usd":"28280.0","projected":true,"creation_year":2025},{"worksite_id":"GA_ATL_HQ","tax_year":2027,"claimable_usd":"28280.0","projected":t...(2170 chars)` actual `<absent>`
+- `GET /api/v2/clients/1001/units` / `reader.read-units` **missing-field** at `unit_totals`: expected `[{"worksite_id":"GA_ATL_HQ","total_annual_credit_usd":"28280.0","final_high_water_mark":17.25,"total_tranche_lifetime_usd":"141400.0"},{"worksite_id":"GA_CUM_OPS","total_annual_credit_usd":"30905.0","final_high_water_mark":19.25,"total_tranche_lifetime_usd":"154525.0"},{"worksite_id":"GA_MAC_OPS","t...(535 chars)` actual `<absent>`
+- `GET /api/v2/clients/1001/units` / `reader.read-units` **missing-field** at `units`: expected `[{"worksite_id":"GA_ATL_HQ","name":"Atlanta HQ","county":"Fulton","city":"Atlanta"},{"worksite_id":"GA_CUM_OPS","name":"Cumberland Center","county":"Cobb","city":"Cumberland"},{"worksite_id":"GA_MAC_OPS","name":"Macon Operations","county":"Bibb","city":"Macon"},{"worksite_id":"GA_SAV_DC","name":"Sav...(365 chars)` actual `<absent>`
+- `GET /api/v2/clients/1001/units` / `reader.read-units` **missing-field** at `years`: expected `[2025]` actual `<absent>`
+- `GET /api/v2/clients/1001/units` / `reader.read-units` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /api/v2/clients/{client_id}/units`
+- `POST /api/v2/run-batches` / `ratelimit.writer-batch-1` **status** at `status`: expected `202` actual `501`
+- `POST /api/v2/run-batches` / `ratelimit.writer-batch-1` **missing-field** at `dry_run`: expected `true` actual `<absent>`
+- `POST /api/v2/run-batches` / `ratelimit.writer-batch-1` **missing-field** at `preview`: expected `{"kind":"assess","clients":1,"items":1,"years":[2025],"refresh_once":true,"force":false,"skip_unchanged":false,"skip_coverage":"none_yet","per_client_year_items":false,"skip_candidates_upper_bound":0,"never_run":1,"manifests_read_for":1,"requires_confirmation":false,"confirm_above":25,"max_items":50...(744 chars)` actual `<absent>`
+- `POST /api/v2/run-batches` / `ratelimit.writer-batch-1` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /api/v2/run-batches`
+- `POST /api/v2/run-batches` / `ratelimit.writer-batch-2` **status** at `status`: expected `202` actual `501`
+- `POST /api/v2/run-batches` / `ratelimit.writer-batch-2` **missing-field** at `dry_run`: expected `true` actual `<absent>`
+- `POST /api/v2/run-batches` / `ratelimit.writer-batch-2` **missing-field** at `preview`: expected `{"kind":"assess","clients":1,"items":1,"years":[2025],"refresh_once":true,"force":false,"skip_unchanged":false,"skip_coverage":"none_yet","per_client_year_items":false,"skip_candidates_upper_bound":0,"never_run":1,"manifests_read_for":1,"requires_confirmation":false,"confirm_above":25,"max_items":50...(744 chars)` actual `<absent>`
+- `POST /api/v2/run-batches` / `ratelimit.writer-batch-2` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /api/v2/run-batches`
+- `POST /api/v2/run-batches` / `ratelimit.reader-batch-1-own-bucket` **status** at `status`: expected `202` actual `501`
+- `POST /api/v2/run-batches` / `ratelimit.reader-batch-1-own-bucket` **missing-field** at `dry_run`: expected `true` actual `<absent>`
+- `POST /api/v2/run-batches` / `ratelimit.reader-batch-1-own-bucket` **missing-field** at `preview`: expected `{"kind":"assess","clients":1,"items":1,"years":[2025],"refresh_once":true,"force":false,"skip_unchanged":false,"skip_coverage":"none_yet","per_client_year_items":false,"skip_candidates_upper_bound":0,"never_run":1,"manifests_read_for":1,"requires_confirmation":false,"confirm_above":25,"max_items":50...(744 chars)` actual `<absent>`
+- `POST /api/v2/run-batches` / `ratelimit.reader-batch-1-own-bucket` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /api/v2/run-batches`
+- `POST /api/v2/program-drafts/00000000-0000-0000-0000-000000000000/preview` / `ratelimit.writer-other-kind` **status** at `status`: expected `404` actual `501`
+- `POST /api/v2/program-drafts/00000000-0000-0000-0000-000000000000/preview` / `ratelimit.writer-other-kind` **type** at `detail`: expected `{"code":"draft_not_found","reason":"no draft '00000000-0000-0000-0000-000000000000'"}` actual `Operation not implemented: POST /api/v2/program-drafts/{draft_id}/preview`
+- `GET /api/v2/portfolio` / `ratelimit.writer-reads-unaffected` **value** at `items[0].claim_id`: expected `40000000-0000-4000-8000-00000000001d` actual `40000000-0000-4000-8000-000000000009`
+- `GET /api/v2/portfolio` / `ratelimit.writer-reads-unaffected` **value** at `items[0].client_name`: expected `Reference Dataset Client` actual `Synthetic fixture`
+- `POST /api/v2/run-batches` / `client-authz.batch-scope-all` **status** at `status`: expected `422` actual `501`
+- `POST /api/v2/run-batches` / `client-authz.batch-scope-all` **type** at `detail`: expected `{"detail":"The selection matches no clients. Check the client ids or the filter.","code":"empty_scope","reason":"The selection matches no clients.","remedy":"Check the client ids or the filter."}` actual `Operation not implemented: POST /api/v2/run-batches`
+- `GET /api/v2/run-batches/00000000-0000-0000-0000-000000000000` / `client-authz.unknown-batch-is-404` **status** at `status`: expected `404` actual `501`
+- `GET /api/v2/run-batches/00000000-0000-0000-0000-000000000000` / `client-authz.unknown-batch-is-404` **value** at `detail`: expected `Unknown run batch 00000000-0000-0000-0000-000000000000.` actual `Operation not implemented: GET /api/v2/run-batches/{batch_id}`
+- `GET /api/v2/run-batches/00000000-0000-0000-0000-000000000000/items` / `client-authz.unknown-batch-items-is-404` **status** at `status`: expected `404` actual `501`
+- `GET /api/v2/run-batches/00000000-0000-0000-0000-000000000000/items` / `client-authz.unknown-batch-items-is-404` **value** at `detail`: expected `Unknown run batch 00000000-0000-0000-0000-000000000000.` actual `Operation not implemented: GET /api/v2/run-batches/{batch_id}/items`
+- `GET /api/v2/portfolio` / `client-authz.portfolio-names-no-client` **value** at `items[0].claim_id`: expected `40000000-0000-4000-8000-00000000001d` actual `40000000-0000-4000-8000-000000000009`
+- `GET /api/v2/portfolio` / `client-authz.portfolio-names-no-client` **value** at `items[0].client_name`: expected `Reference Dataset Client` actual `Synthetic fixture`
+- `GET /api/scope` / `client-authz.scope` **status** at `status`: expected `200` actual `501`
+- `GET /api/scope` / `client-authz.scope` **missing-field** at `clients`: expected `[{"account_id":1001,"name":"Reference Dataset Client","billing_state":"GA","employees":null,"synthetic":false,"industry":null}]` actual `<absent>`
+- `GET /api/scope` / `client-authz.scope` **missing-field** at `programs`: expected `[{"program_code":"CO_EZ","name":"Colorado Enterprise Zone Job Credit","citation":"C.R.S. § 39-30-105","jurisdiction":{"level":"state","code":"CO","name":"Colorado"},"authored_years":[],"placeholder_years":[],"year_scoped":false,"calculable":false,"not_calculable_reason":"No year-scoped rule packs au...(3282 chars)` actual `<absent>`
+- `GET /api/scope` / `client-authz.scope` **missing-field** at `years`: expected `{"authored":[2019,2020,2021,2022,2023,2024,2025,2026],"latest":2026,"window_years":6,"default_window":[2021,2022,2023,2024,2025,2026]}` actual `<absent>`
+- `GET /api/scope` / `client-authz.scope` **missing-field** at `data_source`: expected `csv` actual `<absent>`
+- `GET /api/scope` / `client-authz.scope` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /api/scope`
+- `GET /api/me` / `agent.me-acting` **status** at `status`: expected `200` actual `501`
+- `GET /api/me` / `agent.me-acting` **missing-field** at `auth_mode`: expected `entra` actual `<absent>`
+- `GET /api/me` / `agent.me-acting` **missing-field** at `authenticated`: expected `true` actual `<absent>`
+- `GET /api/me` / `agent.me-acting` **missing-field** at `upn`: expected `null` actual `<absent>`
+- `GET /api/me` / `agent.me-acting` **missing-field** at `oid`: expected `00000000-0000-0000-0000-0000000000b1` actual `<absent>`
+- `GET /api/me` / `agent.me-acting` **missing-field** at `name`: expected `null` actual `<absent>`
+- `GET /api/me` / `agent.me-acting` **missing-field** at `roles`: expected `["TCC.Agent"]` actual `<absent>`
+- `GET /api/me` / `agent.me-acting` **missing-field** at `principal_type`: expected `agent` actual `<absent>`
+- `GET /api/me` / `agent.me-acting` **missing-field** at `acting_for`: expected `{"oid":"00000000-0000-0000-0000-0000000000a2","name":"Acting Person","upn":"acting@example.test","assurance":"channel-asserted","channel":"teams"}` actual `<absent>`
+- `GET /api/me` / `agent.me-acting` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /api/me`
+- `GET /api/me` / `agent.acting-reader` **status** at `status`: expected `200` actual `501`
+- `GET /api/me` / `agent.acting-reader` **missing-field** at `auth_mode`: expected `entra` actual `<absent>`
+- `GET /api/me` / `agent.acting-reader` **missing-field** at `authenticated`: expected `true` actual `<absent>`
+- `GET /api/me` / `agent.acting-reader` **missing-field** at `upn`: expected `null` actual `<absent>`
+- `GET /api/me` / `agent.acting-reader` **missing-field** at `oid`: expected `00000000-0000-0000-0000-0000000000b1` actual `<absent>`
+- `GET /api/me` / `agent.acting-reader` **missing-field** at `name`: expected `null` actual `<absent>`
+- `GET /api/me` / `agent.acting-reader` **missing-field** at `roles`: expected `["TCC.Agent"]` actual `<absent>`
+- (tolerated) `POST /api/claims/assess` / `reader.assess` **number-lexeme** at `assessed[0].average_headcount`: expected `61.0` actual `61`
+- (tolerated) `POST /api/claims/assess` / `reader.assess` **number-lexeme** at `assessed[0].base_average_headcount`: expected `40.0` actual `40`
+- (tolerated) `POST /api/claims/assess` / `reader.assess` **number-lexeme** at `assessed[0].threshold_jobs`: expected `2.0` actual `2`
+- (tolerated) `POST /api/claims/assess` / `reader.assess` **number-lexeme** at `assessed[0].net_new_jobs`: expected `21.0` actual `21`
+- (tolerated) `POST /api/claims/assess` / `reader.assess` **number-lexeme** at `assessed[0].jobs_to_threshold`: expected `0.0` actual `0`
+- (tolerated) `POST /api/claims/assess` / `reader.assess` **number-lexeme** at `assessed[0].jobs_margin`: expected `19.0` actual `19`
+- (tolerated) `POST /api/claims/assess` / `writer.assess` **number-lexeme** at `assessed[0].average_headcount`: expected `61.0` actual `61`
+- (tolerated) `POST /api/claims/assess` / `writer.assess` **number-lexeme** at `assessed[0].base_average_headcount`: expected `40.0` actual `40`
+- (tolerated) `POST /api/claims/assess` / `writer.assess` **number-lexeme** at `assessed[0].threshold_jobs`: expected `2.0` actual `2`
+- (tolerated) `POST /api/claims/assess` / `writer.assess` **number-lexeme** at `assessed[0].net_new_jobs`: expected `21.0` actual `21`
+- (tolerated) `POST /api/claims/assess` / `writer.assess` **number-lexeme** at `assessed[0].jobs_to_threshold`: expected `0.0` actual `0`
+- (tolerated) `POST /api/claims/assess` / `writer.assess` **number-lexeme** at `assessed[0].jobs_margin`: expected `19.0` actual `19`
+- (tolerated) `POST /api/claims/cell/1001/GA_JTC/2025/transition` / `writer.transition` **number-lexeme** at `average_headcount`: expected `61.0` actual `61`
+- (tolerated) `POST /api/claims/cell/1001/GA_JTC/2025/transition` / `writer.transition` **number-lexeme** at `base_average_headcount`: expected `40.0` actual `40`
+- (tolerated) `POST /api/claims/cell/1001/GA_JTC/2025/transition` / `writer.transition` **number-lexeme** at `threshold_jobs`: expected `2.0` actual `2`
+- (tolerated) `POST /api/claims/cell/1001/GA_JTC/2025/transition` / `writer.transition` **number-lexeme** at `net_new_jobs`: expected `21.0` actual `21`
+- (tolerated) `POST /api/claims/cell/1001/GA_JTC/2025/transition` / `writer.transition` **number-lexeme** at `jobs_to_threshold`: expected `0.0` actual `0`
+- (tolerated) `POST /api/claims/cell/1001/GA_JTC/2025/transition` / `writer.transition` **number-lexeme** at `jobs_margin`: expected `19.0` actual `19`
+- (tolerated) `GET /api/v2/portfolio` / `reader.read-portfolio` **number-lexeme** at `items[0].average_headcount`: expected `61.0` actual `61`
+- (tolerated) `GET /api/v2/portfolio` / `reader.read-portfolio` **number-lexeme** at `items[0].base_average_headcount`: expected `40.0` actual `40`
+- (tolerated) `GET /api/v2/portfolio` / `reader.read-portfolio` **number-lexeme** at `items[0].threshold_jobs`: expected `2.0` actual `2`
+- (tolerated) `GET /api/v2/portfolio` / `reader.read-portfolio` **number-lexeme** at `items[0].net_new_jobs`: expected `21.0` actual `21`
+- (tolerated) `GET /api/v2/portfolio` / `reader.read-portfolio` **number-lexeme** at `items[0].jobs_to_threshold`: expected `0.0` actual `0`
+- (tolerated) `GET /api/v2/portfolio` / `reader.read-portfolio` **number-lexeme** at `items[0].jobs_margin`: expected `19.0` actual `19`
+- (tolerated) `GET /api/v2/portfolio` / `reader.read-portfolio` **number-lexeme** at `items[0].gap_jobs`: expected `0.0` actual `0`
+- (tolerated) `GET /api/v2/portfolio` / `ratelimit.writer-reads-unaffected` **number-lexeme** at `items[0].average_headcount`: expected `61.0` actual `61`
+- (tolerated) `GET /api/v2/portfolio` / `ratelimit.writer-reads-unaffected` **number-lexeme** at `items[0].base_average_headcount`: expected `40.0` actual `40`
+- (tolerated) `GET /api/v2/portfolio` / `ratelimit.writer-reads-unaffected` **number-lexeme** at `items[0].threshold_jobs`: expected `2.0` actual `2`
+- (tolerated) `GET /api/v2/portfolio` / `ratelimit.writer-reads-unaffected` **number-lexeme** at `items[0].net_new_jobs`: expected `21.0` actual `21`
+- (tolerated) `GET /api/v2/portfolio` / `ratelimit.writer-reads-unaffected` **number-lexeme** at `items[0].jobs_to_threshold`: expected `0.0` actual `0`
+- (tolerated) `GET /api/v2/portfolio` / `ratelimit.writer-reads-unaffected` **number-lexeme** at `items[0].jobs_margin`: expected `19.0` actual `19`
+- (tolerated) `GET /api/v2/portfolio` / `ratelimit.writer-reads-unaffected` **number-lexeme** at `items[0].gap_jobs`: expected `0.0` actual `0`
+- (tolerated) `GET /api/v2/portfolio` / `client-authz.portfolio-names-no-client` **number-lexeme** at `items[0].average_headcount`: expected `61.0` actual `61`
+- (tolerated) `GET /api/v2/portfolio` / `client-authz.portfolio-names-no-client` **number-lexeme** at `items[0].base_average_headcount`: expected `40.0` actual `40`
+- (tolerated) `GET /api/v2/portfolio` / `client-authz.portfolio-names-no-client` **number-lexeme** at `items[0].threshold_jobs`: expected `2.0` actual `2`
+- (tolerated) `GET /api/v2/portfolio` / `client-authz.portfolio-names-no-client` **number-lexeme** at `items[0].net_new_jobs`: expected `21.0` actual `21`
+- (tolerated) `GET /api/v2/portfolio` / `client-authz.portfolio-names-no-client` **number-lexeme** at `items[0].jobs_to_threshold`: expected `0.0` actual `0`
+- (tolerated) `GET /api/v2/portfolio` / `client-authz.portfolio-names-no-client` **number-lexeme** at `items[0].jobs_margin`: expected `19.0` actual `19`
+- (tolerated) `GET /api/v2/portfolio` / `client-authz.portfolio-names-no-client` **number-lexeme** at `items[0].gap_jobs`: expected `0.0` actual `0`
+- (tolerated) `GET /api/v2/portfolio` / `agent.read-allowed` **number-lexeme** at `items[0].average_headcount`: expected `61.0` actual `61`
+- (tolerated) `GET /api/v2/portfolio` / `agent.read-allowed` **number-lexeme** at `items[0].base_average_headcount`: expected `40.0` actual `40`
+- (tolerated) `GET /api/v2/portfolio` / `agent.read-allowed` **number-lexeme** at `items[0].threshold_jobs`: expected `2.0` actual `2`
+- (tolerated) `GET /api/v2/portfolio` / `agent.read-allowed` **number-lexeme** at `items[0].net_new_jobs`: expected `21.0` actual `21`
+- (tolerated) `GET /api/v2/portfolio` / `agent.read-allowed` **number-lexeme** at `items[0].jobs_to_threshold`: expected `0.0` actual `0`
+- (tolerated) `GET /api/v2/portfolio` / `agent.read-allowed` **number-lexeme** at `items[0].jobs_margin`: expected `19.0` actual `19`
+- (tolerated) `GET /api/v2/portfolio` / `agent.read-allowed` **number-lexeme** at `items[0].gap_jobs`: expected `0.0` actual `0`

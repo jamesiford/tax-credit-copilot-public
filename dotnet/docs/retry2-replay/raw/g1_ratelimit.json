@@ -1,0 +1,795 @@
+{
+ "mode": "semantic",
+ "interpreter": {
+  "python": "external server",
+  "zlib": "n/a",
+  "oracle": null,
+  "allow_other_python": false
+ },
+ "scenarios": [
+  {
+   "scenario": "g1_ratelimit",
+   "exchanges": 10,
+   "failures": [
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.1",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.1",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.1",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "blocks",
+     "expected": "[{\"kind\":\"paragraph\",\"rows\":[],\"text\":\"1 of 1 clients have been assessed. Ranked by what inaction costs, in the order the page shows.\"},{\"kind\":\"table\",\"rows\":[[\"#\",\"Client\",\"Reason\",\"Programme\",\"Tax year\",\"Identified\",\"Jobs margin\"],[\"1\",\"Reference Dataset Client\",\"Identified\",\"GA_JTC\",\"2025\",\"$66,...(323 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.1",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "disclaimer",
+     "expected": "Not tax advice: these figures are computed from payroll by this software and must be reviewed by a qualified tax professional before any filing or claim.",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.1",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "facts",
+     "expected": "{\"assessed_clients\":1,\"calculated\":true,\"claimed_is_unverified\":false,\"clients\":[{\"client_name\":\"Reference Dataset Client\",\"credit_earned_on_trend_usd\":null,\"identified_usd\":\"66500\",\"jobs_margin\":19.0,\"position\":1,\"program_code\":\"GA_JTC\",\"provenance_verified\":true,\"reason\":\"Identified\",\"tax_year\":20...(655 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.1",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "provenance",
+     "expected": "{\"assumption_set_id\":null,\"rule_pack_version\":null,\"run_id\":null,\"source\":\"recorded claims; no run\",\"trail_sha256\":null}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.1",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "tool",
+     "expected": "book_rank",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.1",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "warnings",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.1",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "correlation_id",
+     "expected": "rl-1",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.1",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /channel/v1/tools/{tool}"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.2",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.2",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.2",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "blocks",
+     "expected": "[{\"kind\":\"paragraph\",\"rows\":[],\"text\":\"1 of 1 clients have been assessed. Ranked by what inaction costs, in the order the page shows.\"},{\"kind\":\"table\",\"rows\":[[\"#\",\"Client\",\"Reason\",\"Programme\",\"Tax year\",\"Identified\",\"Jobs margin\"],[\"1\",\"Reference Dataset Client\",\"Identified\",\"GA_JTC\",\"2025\",\"$66,...(323 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.2",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "disclaimer",
+     "expected": "Not tax advice: these figures are computed from payroll by this software and must be reviewed by a qualified tax professional before any filing or claim.",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.2",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "facts",
+     "expected": "{\"assessed_clients\":1,\"calculated\":true,\"claimed_is_unverified\":false,\"clients\":[{\"client_name\":\"Reference Dataset Client\",\"credit_earned_on_trend_usd\":null,\"identified_usd\":\"66500\",\"jobs_margin\":19.0,\"position\":1,\"program_code\":\"GA_JTC\",\"provenance_verified\":true,\"reason\":\"Identified\",\"tax_year\":20...(655 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.2",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "provenance",
+     "expected": "{\"assumption_set_id\":null,\"rule_pack_version\":null,\"run_id\":null,\"source\":\"recorded claims; no run\",\"trail_sha256\":null}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.2",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "tool",
+     "expected": "book_rank",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.2",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "warnings",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.2",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "correlation_id",
+     "expected": "rl-2",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.2",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /channel/v1/tools/{tool}"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.3",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.3",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.3",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "blocks",
+     "expected": "[{\"kind\":\"paragraph\",\"rows\":[],\"text\":\"1 of 1 clients have been assessed. Ranked by what inaction costs, in the order the page shows.\"},{\"kind\":\"table\",\"rows\":[[\"#\",\"Client\",\"Reason\",\"Programme\",\"Tax year\",\"Identified\",\"Jobs margin\"],[\"1\",\"Reference Dataset Client\",\"Identified\",\"GA_JTC\",\"2025\",\"$66,...(323 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.3",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "disclaimer",
+     "expected": "Not tax advice: these figures are computed from payroll by this software and must be reviewed by a qualified tax professional before any filing or claim.",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.3",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "facts",
+     "expected": "{\"assessed_clients\":1,\"calculated\":true,\"claimed_is_unverified\":false,\"clients\":[{\"client_name\":\"Reference Dataset Client\",\"credit_earned_on_trend_usd\":null,\"identified_usd\":\"66500\",\"jobs_margin\":19.0,\"position\":1,\"program_code\":\"GA_JTC\",\"provenance_verified\":true,\"reason\":\"Identified\",\"tax_year\":20...(655 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.3",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "provenance",
+     "expected": "{\"assumption_set_id\":null,\"rule_pack_version\":null,\"run_id\":null,\"source\":\"recorded claims; no run\",\"trail_sha256\":null}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.3",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "tool",
+     "expected": "book_rank",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.3",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "warnings",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.3",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "correlation_id",
+     "expected": "rl-3",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.3",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /channel/v1/tools/{tool}"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.4",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.4",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.4",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "blocks",
+     "expected": "[{\"kind\":\"paragraph\",\"rows\":[],\"text\":\"1 of 1 clients have been assessed. Ranked by what inaction costs, in the order the page shows.\"},{\"kind\":\"table\",\"rows\":[[\"#\",\"Client\",\"Reason\",\"Programme\",\"Tax year\",\"Identified\",\"Jobs margin\"],[\"1\",\"Reference Dataset Client\",\"Identified\",\"GA_JTC\",\"2025\",\"$66,...(323 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.4",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "disclaimer",
+     "expected": "Not tax advice: these figures are computed from payroll by this software and must be reviewed by a qualified tax professional before any filing or claim.",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.4",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "facts",
+     "expected": "{\"assessed_clients\":1,\"calculated\":true,\"claimed_is_unverified\":false,\"clients\":[{\"client_name\":\"Reference Dataset Client\",\"credit_earned_on_trend_usd\":null,\"identified_usd\":\"66500\",\"jobs_margin\":19.0,\"position\":1,\"program_code\":\"GA_JTC\",\"provenance_verified\":true,\"reason\":\"Identified\",\"tax_year\":20...(655 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.4",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "provenance",
+     "expected": "{\"assumption_set_id\":null,\"rule_pack_version\":null,\"run_id\":null,\"source\":\"recorded claims; no run\",\"trail_sha256\":null}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.4",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "tool",
+     "expected": "book_rank",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.4",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "warnings",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.4",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "correlation_id",
+     "expected": "rl-4",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.4",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /channel/v1/tools/{tool}"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.5",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.5",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.5",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "blocks",
+     "expected": "[{\"kind\":\"paragraph\",\"rows\":[],\"text\":\"1 of 1 clients have been assessed. Ranked by what inaction costs, in the order the page shows.\"},{\"kind\":\"table\",\"rows\":[[\"#\",\"Client\",\"Reason\",\"Programme\",\"Tax year\",\"Identified\",\"Jobs margin\"],[\"1\",\"Reference Dataset Client\",\"Identified\",\"GA_JTC\",\"2025\",\"$66,...(323 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.5",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "disclaimer",
+     "expected": "Not tax advice: these figures are computed from payroll by this software and must be reviewed by a qualified tax professional before any filing or claim.",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.5",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "facts",
+     "expected": "{\"assessed_clients\":1,\"calculated\":true,\"claimed_is_unverified\":false,\"clients\":[{\"client_name\":\"Reference Dataset Client\",\"credit_earned_on_trend_usd\":null,\"identified_usd\":\"66500\",\"jobs_margin\":19.0,\"position\":1,\"program_code\":\"GA_JTC\",\"provenance_verified\":true,\"reason\":\"Identified\",\"tax_year\":20...(655 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.5",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "provenance",
+     "expected": "{\"assumption_set_id\":null,\"rule_pack_version\":null,\"run_id\":null,\"source\":\"recorded claims; no run\",\"trail_sha256\":null}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.5",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "tool",
+     "expected": "book_rank",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.5",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "warnings",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.5",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "correlation_id",
+     "expected": "rl-5",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.5",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /channel/v1/tools/{tool}"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.6",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.6",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.6",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "blocks",
+     "expected": "[{\"kind\":\"paragraph\",\"rows\":[],\"text\":\"1 of 1 clients have been assessed. Ranked by what inaction costs, in the order the page shows.\"},{\"kind\":\"table\",\"rows\":[[\"#\",\"Client\",\"Reason\",\"Programme\",\"Tax year\",\"Identified\",\"Jobs margin\"],[\"1\",\"Reference Dataset Client\",\"Identified\",\"GA_JTC\",\"2025\",\"$66,...(323 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.6",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "disclaimer",
+     "expected": "Not tax advice: these figures are computed from payroll by this software and must be reviewed by a qualified tax professional before any filing or claim.",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.6",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "facts",
+     "expected": "{\"assessed_clients\":1,\"calculated\":true,\"claimed_is_unverified\":false,\"clients\":[{\"client_name\":\"Reference Dataset Client\",\"credit_earned_on_trend_usd\":null,\"identified_usd\":\"66500\",\"jobs_margin\":19.0,\"position\":1,\"program_code\":\"GA_JTC\",\"provenance_verified\":true,\"reason\":\"Identified\",\"tax_year\":20...(655 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.6",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "provenance",
+     "expected": "{\"assumption_set_id\":null,\"rule_pack_version\":null,\"run_id\":null,\"source\":\"recorded claims; no run\",\"trail_sha256\":null}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.6",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "tool",
+     "expected": "book_rank",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.6",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "warnings",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.6",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "correlation_id",
+     "expected": "rl-6",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.6",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /channel/v1/tools/{tool}"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.7",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "status",
+     "path": "status",
+     "expected": "429",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.7",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "header",
+     "path": "headers.retry-after",
+     "expected": "11",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.7",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.7",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "error",
+     "expected": "{\"code\":\"rate_limited\",\"message\":\"too many calls; slow down\",\"retryable\":true,\"retry_after_seconds\":11}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.7",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "correlation_id",
+     "expected": "rl-7",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.7",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /channel/v1/tools/{tool}"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.8",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "status",
+     "path": "status",
+     "expected": "429",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.8",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "header",
+     "path": "headers.retry-after",
+     "expected": "11",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.8",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.8",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "error",
+     "expected": "{\"code\":\"rate_limited\",\"message\":\"too many calls; slow down\",\"retryable\":true,\"retry_after_seconds\":11}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.8",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "correlation_id",
+     "expected": "rl-8",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.8",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /channel/v1/tools/{tool}"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.other-person",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.other-person",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.other-person",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "blocks",
+     "expected": "[{\"kind\":\"paragraph\",\"rows\":[],\"text\":\"1 of 1 clients have been assessed. Ranked by what inaction costs, in the order the page shows.\"},{\"kind\":\"table\",\"rows\":[[\"#\",\"Client\",\"Reason\",\"Programme\",\"Tax year\",\"Identified\",\"Jobs margin\"],[\"1\",\"Reference Dataset Client\",\"Identified\",\"GA_JTC\",\"2025\",\"$66,...(323 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.other-person",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "disclaimer",
+     "expected": "Not tax advice: these figures are computed from payroll by this software and must be reviewed by a qualified tax professional before any filing or claim.",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.other-person",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "facts",
+     "expected": "{\"assessed_clients\":1,\"calculated\":true,\"claimed_is_unverified\":false,\"clients\":[{\"client_name\":\"Reference Dataset Client\",\"credit_earned_on_trend_usd\":null,\"identified_usd\":\"66500\",\"jobs_margin\":19.0,\"position\":1,\"program_code\":\"GA_JTC\",\"provenance_verified\":true,\"reason\":\"Identified\",\"tax_year\":20...(655 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.other-person",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "provenance",
+     "expected": "{\"assumption_set_id\":null,\"rule_pack_version\":null,\"run_id\":null,\"source\":\"recorded claims; no run\",\"trail_sha256\":null}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.other-person",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "tool",
+     "expected": "book_rank",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.other-person",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "warnings",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.other-person",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "missing-field",
+     "path": "correlation_id",
+     "expected": "rl-w",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.other-person",
+     "route": "POST /channel/v1/tools/book_rank",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /channel/v1/tools/{tool}"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.health-unaffected",
+     "route": "GET /channel/health",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.health-unaffected",
+     "route": "GET /channel/health",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.health-unaffected",
+     "route": "GET /channel/health",
+     "category": "missing-field",
+     "path": "status",
+     "expected": "ok",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_ratelimit",
+     "case": "ratelimit.health-unaffected",
+     "route": "GET /channel/health",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /channel/health"
+    }
+   ],
+   "tolerated": []
+  }
+ ],
+ "exchanges": 10,
+ "failure_count": 86,
+ "tolerated_count": 0
+}

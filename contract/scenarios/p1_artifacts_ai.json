@@ -1,0 +1,414 @@
+{
+ "name": "p1_artifacts_ai",
+ "profile": "P1",
+ "variables": {
+  "exception_id": "t2:E00200:2025-02",
+  "draft_id": "00000000-0000-0000-0000-00000000dead",
+  "batch_id": "00000000-0000-0000-0000-00000000beef",
+  "artifact_id": "00000000-0000-0000-0000-00000000cafe"
+ },
+ "steps": [
+  {
+   "id": "boot.unit",
+   "note": "capture an employee token and id from the unit drill",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "limit",
+      2
+     ]
+    ]
+   },
+   "capture": {
+    "token": "body.employees.0.record_token",
+    "employee_id": "body.employees.0.employee_id"
+   }
+  },
+  {
+   "id": "boot.findings",
+   "note": "capture a finding id",
+   "request": {
+    "method": "GET",
+    "path": "/api/findings/1001/2025"
+   },
+   "capture": {
+    "finding_id": "body.findings.0.finding_id"
+   }
+  },
+  {
+   "id": "package.create",
+   "request": {
+    "method": "POST",
+    "path": "/api/clients/1001/packages",
+    "query": [
+     [
+      "tax_year",
+      2025
+     ]
+    ]
+   },
+   "capture": {
+    "artifact_id": "body.artifact_id"
+   }
+  },
+  {
+   "id": "package.create-again",
+   "request": {
+    "method": "POST",
+    "path": "/api/clients/1001/packages",
+    "query": [
+     [
+      "tax_year",
+      2025
+     ]
+    ]
+   }
+  },
+  {
+   "id": "package.no-year",
+   "request": {
+    "method": "POST",
+    "path": "/api/clients/1001/packages"
+   }
+  },
+  {
+   "id": "package.year-abc",
+   "request": {
+    "method": "POST",
+    "path": "/api/clients/1001/packages",
+    "query": [
+     [
+      "tax_year",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "package.unknown-client",
+   "request": {
+    "method": "POST",
+    "path": "/api/clients/999999/packages",
+    "query": [
+     [
+      "tax_year",
+      2025
+     ]
+    ]
+   }
+  },
+  {
+   "id": "package.year-uncalculated",
+   "request": {
+    "method": "POST",
+    "path": "/api/clients/1001/packages",
+    "query": [
+     [
+      "tax_year",
+      2019
+     ]
+    ]
+   }
+  },
+  {
+   "id": "artifact.download",
+   "request": {
+    "method": "GET",
+    "path": "/api/clients/1001/artifacts/{{artifact_id}}"
+   }
+  },
+  {
+   "id": "artifact.download-head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/clients/1001/artifacts/{{artifact_id}}"
+   }
+  },
+  {
+   "id": "artifact.wrong-client",
+   "request": {
+    "method": "GET",
+    "path": "/api/clients/999999/artifacts/{{artifact_id}}"
+   }
+  },
+  {
+   "id": "artifact.unknown",
+   "request": {
+    "method": "GET",
+    "path": "/api/clients/1001/artifacts/00000000-0000-0000-0000-000000000000"
+   }
+  },
+  {
+   "id": "artifact.bad-id",
+   "request": {
+    "method": "GET",
+    "path": "/api/clients/1001/artifacts/not-a-uuid"
+   }
+  },
+  {
+   "id": "capabilities.list",
+   "request": {
+    "method": "GET",
+    "path": "/api/capabilities"
+   }
+  },
+  {
+   "id": "capabilities.unknown-tool",
+   "request": {
+    "method": "POST",
+    "path": "/api/capabilities/no_such_tool",
+    "json": {
+     "args": {}
+    }
+   }
+  },
+  {
+   "id": "capabilities.book-rank",
+   "request": {
+    "method": "POST",
+    "path": "/api/capabilities/book_rank",
+    "json": {
+     "args": {}
+    }
+   }
+  },
+  {
+   "id": "capabilities.book-rank-bad-arg",
+   "request": {
+    "method": "POST",
+    "path": "/api/capabilities/book_rank",
+    "json": {
+     "args": {
+      "limit": "abc"
+     }
+    }
+   }
+  },
+  {
+   "id": "capabilities.client-situation",
+   "request": {
+    "method": "POST",
+    "path": "/api/capabilities/client_situation",
+    "json": {
+     "args": {
+      "client_id": 1001
+     }
+    }
+   }
+  },
+  {
+   "id": "capabilities.client-situation-missing-arg",
+   "request": {
+    "method": "POST",
+    "path": "/api/capabilities/client_situation",
+    "json": {
+     "args": {}
+    }
+   }
+  },
+  {
+   "id": "capabilities.client-eligibility",
+   "request": {
+    "method": "POST",
+    "path": "/api/capabilities/client_eligibility",
+    "json": {
+     "args": {
+      "client_id": 1001,
+      "tax_year": 2025
+     }
+    }
+   }
+  },
+  {
+   "id": "capabilities.args-not-object",
+   "request": {
+    "method": "POST",
+    "path": "/api/capabilities/book_rank",
+    "json": {
+     "args": [
+      1
+     ]
+    }
+   }
+  },
+  {
+   "id": "capabilities.idempotency-key-too-long",
+   "request": {
+    "method": "POST",
+    "path": "/api/capabilities/book_rank",
+    "json": {
+     "args": {},
+     "idempotency_key": "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk"
+    }
+   }
+  },
+  {
+   "id": "capabilities.debug-tool",
+   "request": {
+    "method": "POST",
+    "path": "/api/capabilities/channel_ping",
+    "json": {
+     "args": {}
+    }
+   }
+  },
+  {
+   "id": "chat.ask",
+   "request": {
+    "method": "POST",
+    "path": "/api/chat",
+    "json": {
+     "message": "Who should we call first?"
+    }
+   }
+  },
+  {
+   "id": "chat.ask-client",
+   "request": {
+    "method": "POST",
+    "path": "/api/chat",
+    "json": {
+     "message": "Give me a brief",
+     "client_id": 1001,
+     "tax_year": 2025,
+     "state": "GA"
+    }
+   }
+  },
+  {
+   "id": "chat.empty-message",
+   "request": {
+    "method": "POST",
+    "path": "/api/chat",
+    "json": {
+     "message": ""
+    }
+   }
+  },
+  {
+   "id": "chat.history",
+   "request": {
+    "method": "POST",
+    "path": "/api/chat",
+    "json": {
+     "message": "and their trend?",
+     "client_id": 1001,
+     "history": [
+      {
+       "role": "user",
+       "content": "brief"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "chat.bad-history",
+   "request": {
+    "method": "POST",
+    "path": "/api/chat",
+    "json": {
+     "message": "x",
+     "history": "abc"
+    }
+   }
+  },
+  {
+   "id": "summary.portfolio",
+   "request": {
+    "method": "POST",
+    "path": "/api/summary",
+    "json": {
+     "page": "portfolio"
+    }
+   }
+  },
+  {
+   "id": "summary.client",
+   "request": {
+    "method": "POST",
+    "path": "/api/summary",
+    "json": {
+     "page": "client",
+     "client_id": 1001,
+     "tax_year": 2025,
+     "state": "GA"
+    }
+   }
+  },
+  {
+   "id": "summary.unit",
+   "request": {
+    "method": "POST",
+    "path": "/api/summary",
+    "json": {
+     "page": "unit",
+     "client_id": 1001,
+     "tax_year": 2025,
+     "worksite_id": "GA_ATL_HQ"
+    }
+   }
+  },
+  {
+   "id": "summary.employee",
+   "request": {
+    "method": "POST",
+    "path": "/api/summary",
+    "json": {
+     "page": "employee",
+     "client_id": 1001,
+     "tax_year": 2025,
+     "record_token": "{{token}}"
+    }
+   }
+  },
+  {
+   "id": "summary.bad-page",
+   "request": {
+    "method": "POST",
+    "path": "/api/summary",
+    "json": {
+     "page": "bogus"
+    }
+   }
+  },
+  {
+   "id": "summary.client-without-client",
+   "request": {
+    "method": "POST",
+    "path": "/api/summary",
+    "json": {
+     "page": "client"
+    }
+   }
+  },
+  {
+   "id": "summary.short-token",
+   "request": {
+    "method": "POST",
+    "path": "/api/summary",
+    "json": {
+     "page": "employee",
+     "record_token": "short"
+    }
+   }
+  },
+  {
+   "id": "summary.bad-month",
+   "request": {
+    "method": "POST",
+    "path": "/api/summary",
+    "json": {
+     "page": "unit",
+     "month": 13
+    }
+   }
+  }
+ ]
+}

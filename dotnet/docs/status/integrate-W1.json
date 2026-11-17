@@ -1,0 +1,53 @@
+{
+  "session": "integrate-W1",
+  "branch": "dotnet/integration",
+  "head": "e640162",
+  "summary": "Removed the duplicate Microsoft.Data.SqlClient 7.1.2 declaration; clean compilation confirms the reported parity-test compiler errors no longer occur. Tagged five measured slow Persistence methods as heavy without changing assertions. Build and format pass; all 781 fast tests and all seven reclassified cases pass. Semantic replay produced 12 reports covering 1769 exchanges, with framework 29/39 (74.36%) and controls 4/4, unchanged from the skeleton baseline. Replay acceptance is board-only; deferred HTTP business/gateway groups remain red. No ported behavior or calculated figure changed. Head identifies the verified implementation/report commit before this status-only commit.",
+  "stages": {
+    "preflight": "done",
+    "stage1": "done",
+    "stage2": "done"
+  },
+  "gates_claimed": {
+    "dotnet_build": true,
+    "dotnet_format": true,
+    "tests_fast": true,
+    "replay": true,
+    "no_halt": true,
+    "commits_present": true,
+    "clean_tree": true,
+    "not_pushed": true,
+    "owned_paths": true,
+    "status_json": true,
+    "report_present": true
+  },
+  "deviations": [],
+  "findings": [
+    "NU1506: Microsoft.Data.SqlClient 7.1.2 was declared twice across the Persistence and Sources/Auth/AI central-package sections. Removing only the duplicate fixes restore and compilation without changing the package graph.",
+    "The supplied CS1503/CS0246 parity-test diagnostics do not recur after package repair, including a full warning-as-error rebuild. No speculative namespace or project-reference edits were needed.",
+    "Five Persistence test methods measured 23.50-29.20 seconds during the integrated fast run. Their seven cases now carry the required heavy trait; unchanged assertions pass in a focused run.",
+    "A two-second startup probe timed out before readiness. A bounded retry of transient connection/timeouts succeeded; health/reset returned 200 and no helper remains.",
+    "The raw semantic replay board exactly matches the merged skeleton baseline. Deferred business/gateway endpoints remain red; this session claims board production, not complete HTTP parity."
+  ],
+  "open_questions": [],
+  "needs_human": [
+    {
+      "item": "Inherited M-01 ingestion overrides of year-resolved values",
+      "why": "The design permits filling missing statute, not overriding authored wage basis, measuring dates or pay codes. The certified behavior is unchanged because correcting it changes calculated figures."
+    },
+    {
+      "item": "Inherited first-program pricing in multi-program credit math",
+      "why": "The certified Python-compatible result remains unchanged; a different selection or new refusal would change valid-request figures."
+    },
+    {
+      "item": "Inherited strict leap-day fiscal-shift boundary",
+      "why": "The Sources/Auth/AI session reports a partial contextual fiscal port. Correcting the certified Domain seam is outside integration repair and requires owner authorization."
+    }
+  ],
+  "reports": [
+    "dotnet/docs/integrate-W1-log.md",
+    "dotnet/docs/replay-integrate-W1-board.json",
+    "dotnet/docs/improvements/integrate-W1.json",
+    "dotnet/docs/status/integrate-W1.json"
+  ]
+}

@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>TaxCredit.Shadow</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SqlServer.TransactSql.ScriptDom" />
+    <Compile Include="..\platform\Runner\ScratchGuard.cs" Link="Inherited\ScratchGuard.cs" />
+    <None Include="sql-catalogue.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

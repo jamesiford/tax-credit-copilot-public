@@ -1,0 +1,2911 @@
+{
+ "mode": "semantic",
+ "interpreter": {
+  "python": "external server",
+  "zlib": "n/a",
+  "oracle": null,
+  "allow_other_python": false
+ },
+ "scenarios": [
+  {
+   "scenario": "p1_auth",
+   "exchanges": 114,
+   "failures": [
+    {
+     "scenario": "p1_auth",
+     "case": "public.ready-no-token",
+     "route": "GET /api/ready",
+     "category": "missing-field",
+     "path": "source_schema.reads",
+     "expected": "{\"tables\":{},\"cache\":{\"hits\":0,\"misses\":0,\"negative_hits\":0,\"evictions\":0,\"single_flight_waits\":0},\"rows\":0,\"bytes\":0}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "public.ready-no-token",
+     "route": "GET /api/ready",
+     "category": "extra-field",
+     "path": "source_schema.accounts",
+     "expected": "<absent>",
+     "actual": "1"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "public.ready-no-token",
+     "route": "GET /api/ready",
+     "category": "extra-field",
+     "path": "source_schema.problem",
+     "expected": "<absent>",
+     "actual": "null"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "public.ready-no-token",
+     "route": "GET /api/ready",
+     "category": "value",
+     "path": "source_schema.status",
+     "expected": "skipped",
+     "actual": "ready"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "none.docs",
+     "route": "GET /docs",
+     "category": "value",
+     "path": "body.text",
+     "expected": "\n    <!DOCTYPE html>\n    <html>\n    <head>\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <link type=\"text/css\" rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css\">\n    <link rel=\"shortcut icon\" href=\"https://fastapi.tiangolo.com/img/...(1021 chars)",
+     "actual": "<!doctype html><html lang=\"en\"><meta charset=\"utf-8\"><title>API documentation</title><body><h1>Tax Credit Copilot API</h1><p>Walking skeleton: unimplemented operations return 501.</p><a href=\"/openapi.json\">OpenAPI schema inventory</a></body></html>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "none.trailing-slash",
+     "route": "GET /api/me/",
+     "category": "status",
+     "path": "status",
+     "expected": "307",
+     "actual": "401"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "none.trailing-slash",
+     "route": "GET /api/me/",
+     "category": "header",
+     "path": "headers.content-type",
+     "expected": "<absent>",
+     "actual": "application/json"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "none.trailing-slash",
+     "route": "GET /api/me/",
+     "category": "header",
+     "path": "headers.location",
+     "expected": "{origin}/api/me",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "none.trailing-slash",
+     "route": "GET /api/me/",
+     "category": "header",
+     "path": "headers.www-authenticate",
+     "expected": "<absent>",
+     "actual": "Bearer"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "none.trailing-slash",
+     "route": "GET /api/me/",
+     "category": "body-kind",
+     "path": "body",
+     "expected": "empty",
+     "actual": "json"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "malformed.garbage",
+     "route": "GET /api/me",
+     "category": "value",
+     "path": "detail",
+     "expected": "invalid token: DecodeError",
+     "actual": "invalid token"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "malformed.lower-scheme",
+     "route": "GET /api/me",
+     "category": "value",
+     "path": "detail",
+     "expected": "invalid token: DecodeError",
+     "actual": "invalid token"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "malformed.two-parts",
+     "route": "GET /api/me",
+     "category": "value",
+     "path": "detail",
+     "expected": "invalid token: DecodeError",
+     "actual": "invalid token"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "malformed.jwt-shaped",
+     "route": "GET /api/me",
+     "category": "value",
+     "path": "detail",
+     "expected": "invalid token: DecodeError",
+     "actual": "invalid token"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "token.expired",
+     "route": "GET /api/me",
+     "category": "value",
+     "path": "detail",
+     "expected": "invalid token: ExpiredSignatureError",
+     "actual": "invalid token"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "token.not_yet_valid",
+     "route": "GET /api/me",
+     "category": "value",
+     "path": "detail",
+     "expected": "invalid token: ImmatureSignatureError",
+     "actual": "invalid token"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "token.wrong_audience",
+     "route": "GET /api/me",
+     "category": "value",
+     "path": "detail",
+     "expected": "invalid token: InvalidAudienceError",
+     "actual": "invalid token"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "token.wrong_tenant",
+     "route": "GET /api/me",
+     "category": "value",
+     "path": "detail",
+     "expected": "invalid token: InvalidIssuerError",
+     "actual": "invalid token"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "token.wrong_issuer_v1",
+     "route": "GET /api/me",
+     "category": "value",
+     "path": "detail",
+     "expected": "invalid token: InvalidIssuerError",
+     "actual": "invalid token"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "token.forged",
+     "route": "GET /api/me",
+     "category": "value",
+     "path": "detail",
+     "expected": "invalid token: InvalidSignatureError",
+     "actual": "invalid token"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "token.missing_exp",
+     "route": "GET /api/me",
+     "category": "value",
+     "path": "detail",
+     "expected": "invalid token: MissingRequiredClaimError",
+     "actual": "invalid token"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "token.missing_iat",
+     "route": "GET /api/me",
+     "category": "value",
+     "path": "detail",
+     "expected": "invalid token: MissingRequiredClaimError",
+     "actual": "invalid token"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "token.bare-audience-ok",
+     "route": "GET /api/me",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "token.bare-audience-ok",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "auth_mode",
+     "expected": "entra",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "token.bare-audience-ok",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "authenticated",
+     "expected": "true",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "token.bare-audience-ok",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "upn",
+     "expected": "analyst@example.test",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "token.bare-audience-ok",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "oid",
+     "expected": "00000000-0000-0000-0000-0000000000a1",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "token.bare-audience-ok",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "name",
+     "expected": "Ana Lyst",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "token.bare-audience-ok",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "roles",
+     "expected": "[\"TCC.User\"]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "token.bare-audience-ok",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "principal_type",
+     "expected": "user",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "token.bare-audience-ok",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "acting_for",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "token.bare-audience-ok",
+     "route": "GET /api/me",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/me"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "token.reader-me",
+     "route": "GET /api/me",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "token.reader-me",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "auth_mode",
+     "expected": "entra",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "token.reader-me",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "authenticated",
+     "expected": "true",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "token.reader-me",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "upn",
+     "expected": "analyst@example.test",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "token.reader-me",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "oid",
+     "expected": "00000000-0000-0000-0000-0000000000a1",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "token.reader-me",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "name",
+     "expected": "Ana Lyst",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "token.reader-me",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "roles",
+     "expected": "[\"TCC.User\"]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "token.reader-me",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "principal_type",
+     "expected": "user",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "token.reader-me",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "acting_for",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "token.reader-me",
+     "route": "GET /api/me",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/me"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "token.writer-me",
+     "route": "GET /api/me",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "token.writer-me",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "auth_mode",
+     "expected": "entra",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "token.writer-me",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "authenticated",
+     "expected": "true",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "token.writer-me",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "upn",
+     "expected": "analyst@example.test",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "token.writer-me",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "oid",
+     "expected": "00000000-0000-0000-0000-0000000000a2",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "token.writer-me",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "name",
+     "expected": "Ana Lyst",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "token.writer-me",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "roles",
+     "expected": "[\"TCC.User\"]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "token.writer-me",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "principal_type",
+     "expected": "user",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "token.writer-me",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "acting_for",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "token.writer-me",
+     "route": "GET /api/me",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/me"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.assess",
+     "route": "POST /api/claims/assess",
+     "category": "value",
+     "path": "assessed[0].claim_id",
+     "expected": "40000000-0000-4000-8000-000000000009",
+     "actual": "40000000-0000-4000-8000-000000000004"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.run",
+     "route": "POST /api/v2/clients/1001/runs",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.run",
+     "route": "POST /api/v2/clients/1001/runs",
+     "category": "missing-field",
+     "path": "run_id",
+     "expected": "4000000000004000800000000000000a",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.run",
+     "route": "POST /api/v2/clients/1001/runs",
+     "category": "missing-field",
+     "path": "client_id",
+     "expected": "1001",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.run",
+     "route": "POST /api/v2/clients/1001/runs",
+     "category": "missing-field",
+     "path": "tax_year",
+     "expected": "2025",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.run",
+     "route": "POST /api/v2/clients/1001/runs",
+     "category": "missing-field",
+     "path": "state",
+     "expected": "GA",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.run",
+     "route": "POST /api/v2/clients/1001/runs",
+     "category": "missing-field",
+     "path": "program_code",
+     "expected": "GA_JTC",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.run",
+     "route": "POST /api/v2/clients/1001/runs",
+     "category": "missing-field",
+     "path": "run_status",
+     "expected": "success",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.run",
+     "route": "POST /api/v2/clients/1001/runs",
+     "category": "missing-field",
+     "path": "run_started_at",
+     "expected": "2026-01-15T12:00:00Z",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.run",
+     "route": "POST /api/v2/clients/1001/runs",
+     "category": "missing-field",
+     "path": "run_completed_at",
+     "expected": "2026-01-15T12:00:00Z",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.run",
+     "route": "POST /api/v2/clients/1001/runs",
+     "category": "missing-field",
+     "path": "calculation_id",
+     "expected": "9e9a9edc79a44dce8ea0d3be5147883b87a1298e2ccf5619947c8e40d3cbf0cd",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.run",
+     "route": "POST /api/v2/clients/1001/runs",
+     "category": "missing-field",
+     "path": "code_commit",
+     "expected": "0000000000000000000000000000000000c0ffee",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.run",
+     "route": "POST /api/v2/clients/1001/runs",
+     "category": "missing-field",
+     "path": "rows_written",
+     "expected": "{\"run_manifest\":1,\"employee_period_fact\":5281,\"employee_eligibility\":376,\"onezero_matrix\":2898,\"unit_month_summary\":16,\"run_method_summary\":4,\"unit_year_master\":16,\"unit_credit_installment\":40}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.run",
+     "route": "POST /api/v2/clients/1001/runs",
+     "category": "missing-field",
+     "path": "validation",
+     "expected": "{\"queries_run\":20,\"violations\":[]}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.run",
+     "route": "POST /api/v2/clients/1001/runs",
+     "category": "missing-field",
+     "path": "summary",
+     "expected": "{\"employees_evaluated\":107,\"min_max_eligible\":77,\"pay_period_eligible\":72}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.run",
+     "route": "POST /api/v2/clients/1001/runs",
+     "category": "missing-field",
+     "path": "claim",
+     "expected": "{\"assessed\":2,\"declined\":1}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.run",
+     "route": "POST /api/v2/clients/1001/runs",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /api/v2/clients/{client_id}/runs"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.batch-dry-run",
+     "route": "POST /api/v2/run-batches",
+     "category": "status",
+     "path": "status",
+     "expected": "202",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.batch-dry-run",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "dry_run",
+     "expected": "true",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.batch-dry-run",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "preview",
+     "expected": "{\"kind\":\"assess\",\"clients\":1,\"items\":1,\"years\":[2025],\"refresh_once\":true,\"force\":false,\"skip_unchanged\":false,\"skip_coverage\":\"none_yet\",\"per_client_year_items\":false,\"skip_candidates_upper_bound\":0,\"never_run\":1,\"manifests_read_for\":1,\"requires_confirmation\":false,\"confirm_above\":25,\"max_items\":50...(744 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.batch-dry-run",
+     "route": "POST /api/v2/run-batches",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /api/v2/run-batches"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.claims-create",
+     "route": "POST /api/claims",
+     "category": "value",
+     "path": "claim_id",
+     "expected": "40000000-0000-4000-8000-00000000000f",
+     "actual": "40000000-0000-4000-8000-000000000007"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.assess",
+     "route": "POST /api/claims/assess",
+     "category": "value",
+     "path": "assessed[0].claim_id",
+     "expected": "40000000-0000-4000-8000-000000000011",
+     "actual": "40000000-0000-4000-8000-000000000008"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.transition",
+     "route": "POST /api/claims/cell/1001/GA_JTC/2025/transition",
+     "category": "value",
+     "path": "claim_id",
+     "expected": "40000000-0000-4000-8000-000000000012",
+     "actual": "40000000-0000-4000-8000-000000000009"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.run",
+     "route": "POST /api/v2/clients/1001/runs",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.run",
+     "route": "POST /api/v2/clients/1001/runs",
+     "category": "missing-field",
+     "path": "run_id",
+     "expected": "40000000000040008000000000000013",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.run",
+     "route": "POST /api/v2/clients/1001/runs",
+     "category": "missing-field",
+     "path": "client_id",
+     "expected": "1001",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.run",
+     "route": "POST /api/v2/clients/1001/runs",
+     "category": "missing-field",
+     "path": "tax_year",
+     "expected": "2025",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.run",
+     "route": "POST /api/v2/clients/1001/runs",
+     "category": "missing-field",
+     "path": "state",
+     "expected": "GA",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.run",
+     "route": "POST /api/v2/clients/1001/runs",
+     "category": "missing-field",
+     "path": "program_code",
+     "expected": "GA_JTC",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.run",
+     "route": "POST /api/v2/clients/1001/runs",
+     "category": "missing-field",
+     "path": "run_status",
+     "expected": "success",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.run",
+     "route": "POST /api/v2/clients/1001/runs",
+     "category": "missing-field",
+     "path": "run_started_at",
+     "expected": "2026-01-15T12:00:00Z",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.run",
+     "route": "POST /api/v2/clients/1001/runs",
+     "category": "missing-field",
+     "path": "run_completed_at",
+     "expected": "2026-01-15T12:00:00Z",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.run",
+     "route": "POST /api/v2/clients/1001/runs",
+     "category": "missing-field",
+     "path": "calculation_id",
+     "expected": "9e9a9edc79a44dce8ea0d3be5147883b87a1298e2ccf5619947c8e40d3cbf0cd",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.run",
+     "route": "POST /api/v2/clients/1001/runs",
+     "category": "missing-field",
+     "path": "code_commit",
+     "expected": "0000000000000000000000000000000000c0ffee",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.run",
+     "route": "POST /api/v2/clients/1001/runs",
+     "category": "missing-field",
+     "path": "rows_written",
+     "expected": "{\"run_manifest\":1,\"employee_period_fact\":5281,\"employee_eligibility\":376,\"onezero_matrix\":2898,\"unit_month_summary\":16,\"run_method_summary\":4,\"unit_year_master\":16,\"unit_credit_installment\":40}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.run",
+     "route": "POST /api/v2/clients/1001/runs",
+     "category": "missing-field",
+     "path": "validation",
+     "expected": "{\"queries_run\":20,\"violations\":[]}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.run",
+     "route": "POST /api/v2/clients/1001/runs",
+     "category": "missing-field",
+     "path": "summary",
+     "expected": "{\"employees_evaluated\":107,\"min_max_eligible\":77,\"pay_period_eligible\":72}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.run",
+     "route": "POST /api/v2/clients/1001/runs",
+     "category": "missing-field",
+     "path": "claim",
+     "expected": "{\"assessed\":2,\"declined\":1}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.run",
+     "route": "POST /api/v2/clients/1001/runs",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /api/v2/clients/{client_id}/runs"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.base-year",
+     "route": "POST /api/v2/clients/1001/units/GA_ATL_HQ/base-year",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.base-year",
+     "route": "POST /api/v2/clients/1001/units/GA_ATL_HQ/base-year",
+     "category": "missing-field",
+     "path": "recorded",
+     "expected": "true",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.base-year",
+     "route": "POST /api/v2/clients/1001/units/GA_ATL_HQ/base-year",
+     "category": "missing-field",
+     "path": "override_id",
+     "expected": "40000000000040008000000000000018",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.base-year",
+     "route": "POST /api/v2/clients/1001/units/GA_ATL_HQ/base-year",
+     "category": "missing-field",
+     "path": "worksite_id",
+     "expected": "GA_ATL_HQ",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.base-year",
+     "route": "POST /api/v2/clients/1001/units/GA_ATL_HQ/base-year",
+     "category": "missing-field",
+     "path": "base_year",
+     "expected": "2024",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.base-year",
+     "route": "POST /api/v2/clients/1001/units/GA_ATL_HQ/base-year",
+     "category": "missing-field",
+     "path": "replaced",
+     "expected": "2024",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.base-year",
+     "route": "POST /api/v2/clients/1001/units/GA_ATL_HQ/base-year",
+     "category": "missing-field",
+     "path": "recalculation",
+     "expected": "started",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.base-year",
+     "route": "POST /api/v2/clients/1001/units/GA_ATL_HQ/base-year",
+     "category": "missing-field",
+     "path": "durable",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.base-year",
+     "route": "POST /api/v2/clients/1001/units/GA_ATL_HQ/base-year",
+     "category": "missing-field",
+     "path": "note",
+     "expected": "Saved. The client is being recalculated from the chosen base; the grid updates when the new run lands. The previous run stays in Gold as history.",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.base-year",
+     "route": "POST /api/v2/clients/1001/units/GA_ATL_HQ/base-year",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /api/v2/clients/{client_id}/units/{unit_id}/base-year"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.draft-create",
+     "route": "POST /api/v2/program-drafts",
+     "category": "status",
+     "path": "status",
+     "expected": "201",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.draft-create",
+     "route": "POST /api/v2/program-drafts",
+     "category": "missing-field",
+     "path": "draft_id",
+     "expected": "4000000000004000800000000000001e",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.draft-create",
+     "route": "POST /api/v2/program-drafts",
+     "category": "missing-field",
+     "path": "proposed_code",
+     "expected": "XX_CONTRACT",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.draft-create",
+     "route": "POST /api/v2/program-drafts",
+     "category": "missing-field",
+     "path": "name",
+     "expected": "Contract draft",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.draft-create",
+     "route": "POST /api/v2/program-drafts",
+     "category": "missing-field",
+     "path": "jurisdiction_level",
+     "expected": "state",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.draft-create",
+     "route": "POST /api/v2/program-drafts",
+     "category": "missing-field",
+     "path": "state",
+     "expected": "XX",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.draft-create",
+     "route": "POST /api/v2/program-drafts",
+     "category": "missing-field",
+     "path": "status",
+     "expected": "draft",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.draft-create",
+     "route": "POST /api/v2/program-drafts",
+     "category": "missing-field",
+     "path": "version",
+     "expected": "1",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.draft-create",
+     "route": "POST /api/v2/program-drafts",
+     "category": "missing-field",
+     "path": "created_by",
+     "expected": "analyst@example.test",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.draft-create",
+     "route": "POST /api/v2/program-drafts",
+     "category": "missing-field",
+     "path": "created_at",
+     "expected": "2026-01-15T12:00:00+00:00",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.draft-create",
+     "route": "POST /api/v2/program-drafts",
+     "category": "missing-field",
+     "path": "updated_by",
+     "expected": "analyst@example.test",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.draft-create",
+     "route": "POST /api/v2/program-drafts",
+     "category": "missing-field",
+     "path": "updated_at",
+     "expected": "2026-01-15T12:00:00+00:00",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.draft-create",
+     "route": "POST /api/v2/program-drafts",
+     "category": "missing-field",
+     "path": "pack_file",
+     "expected": "xx_contract.json",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.draft-create",
+     "route": "POST /api/v2/program-drafts",
+     "category": "missing-field",
+     "path": "validation_errors",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.draft-create",
+     "route": "POST /api/v2/program-drafts",
+     "category": "missing-field",
+     "path": "verification",
+     "expected": "not_verified",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.draft-create",
+     "route": "POST /api/v2/program-drafts",
+     "category": "missing-field",
+     "path": "has_runtime_authority",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.draft-create",
+     "route": "POST /api/v2/program-drafts",
+     "category": "missing-field",
+     "path": "documents",
+     "expected": "{\"pack\":{\"_prototype_verification\":\"DRAFT skeleton. No value here is verified. Fill every null from a cited source, validate, then have it reviewed before any real client use.\",\"rule_pack_version\":\"0.0.1\",\"jurisdiction\":{\"level\":\"state\",\"code\":\"XX\",\"name\":\"Contract draft\"},\"credit\":{\"code\":\"XX_CONTR...(2389 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.draft-create",
+     "route": "POST /api/v2/program-drafts",
+     "category": "missing-field",
+     "path": "content_sha256",
+     "expected": "60551b649bbdbed27ebdfe08c5030a533d27acd6b5822dc5df70b8db6fec3c58",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.draft-create",
+     "route": "POST /api/v2/program-drafts",
+     "category": "missing-field",
+     "path": "validation",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.draft-create",
+     "route": "POST /api/v2/program-drafts",
+     "category": "missing-field",
+     "path": "validation_current",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.draft-create",
+     "route": "POST /api/v2/program-drafts",
+     "category": "missing-field",
+     "path": "review",
+     "expected": "{\"requested_by\":null,\"reviewer\":null,\"decision\":null,\"comment\":null,\"decided_at\":null,\"approved_sha256\":null}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.draft-create",
+     "route": "POST /api/v2/program-drafts",
+     "category": "missing-field",
+     "path": "export",
+     "expected": "{\"exported_at\":null,\"bundle_sha256\":null}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.draft-create",
+     "route": "POST /api/v2/program-drafts",
+     "category": "missing-field",
+     "path": "allowed_actions",
+     "expected": "[\"edit\",\"validate\",\"preview\",\"withdraw\"]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.draft-create",
+     "route": "POST /api/v2/program-drafts",
+     "category": "missing-field",
+     "path": "events",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.draft-create",
+     "route": "POST /api/v2/program-drafts",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /api/v2/program-drafts"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.batch-dry-run",
+     "route": "POST /api/v2/run-batches",
+     "category": "status",
+     "path": "status",
+     "expected": "202",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.batch-dry-run",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "dry_run",
+     "expected": "true",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.batch-dry-run",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "preview",
+     "expected": "{\"kind\":\"assess\",\"clients\":1,\"items\":1,\"years\":[2025],\"refresh_once\":true,\"force\":false,\"skip_unchanged\":false,\"skip_coverage\":\"none_yet\",\"per_client_year_items\":false,\"skip_candidates_upper_bound\":0,\"never_run\":1,\"manifests_read_for\":1,\"requires_confirmation\":false,\"confirm_above\":25,\"max_items\":50...(744 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.batch-dry-run",
+     "route": "POST /api/v2/run-batches",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /api/v2/run-batches"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.read-portfolio",
+     "route": "GET /api/v2/portfolio",
+     "category": "value",
+     "path": "items[0].claim_id",
+     "expected": "40000000-0000-4000-8000-00000000001d",
+     "actual": "40000000-0000-4000-8000-000000000009"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.read-portfolio",
+     "route": "GET /api/v2/portfolio",
+     "category": "value",
+     "path": "items[0].client_name",
+     "expected": "Reference Dataset Client",
+     "actual": "Synthetic fixture"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.read-units",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.read-units",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "calculation_state",
+     "expected": "calculated",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.read-units",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "run",
+     "expected": "{\"run_id\":\"40000000000040008000000000000019\",\"produced_at\":\"2026-01-15 12:00:00\",\"started_at\":\"2026-01-15 12:00:00\",\"calculation_id\":\"9e9a9edc79a44dce8ea0d3be5147883b87a1298e2ccf5619947c8e40d3cbf0cd\",\"code_commit\":\"0000000000000000000000000000000000c0ffee\",\"rule_pack_version\":\"rules/ga_jtc/2025.json...(488 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.read-units",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "newer_run_in_flight",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.read-units",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "in_flight",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.read-units",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "message",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.read-units",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "client_id",
+     "expected": "1001",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.read-units",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "state",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.read-units",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "year",
+     "expected": "2025",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.read-units",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "method",
+     "expected": "min_max",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.read-units",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "limit",
+     "expected": "25",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.read-units",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "offset",
+     "expected": "0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.read-units",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "items",
+     "expected": "[{\"client_id\":1001,\"worksite_id\":\"GA_ATL_HQ\",\"entity_fein\":\"58-1234567\",\"program_code\":\"GA_JTC\",\"method\":\"min_max\",\"tax_year\":2025,\"average_headcount\":17.25,\"is_base_year\":false,\"base_average_headcount\":9.17,\"base_year_source\":\"override\",\"net_new_vs_base\":8.08,\"months_reachable\":11,\"year_complete\":t...(3449 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.read-units",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "total",
+     "expected": "4",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.read-units",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "months",
+     "expected": "[{\"client_id\":1001,\"tax_year\":2025,\"method\":\"min_max\",\"run_id\":\"40000000000040008000000000000019\",\"worksite_id\":\"GA_ATL_HQ\",\"month_01\":17.0,\"month_02\":17.0,\"month_03\":19.0,\"month_04\":19.0,\"month_05\":18.0,\"month_06\":18.0,\"month_07\":18.0,\"month_08\":18.0,\"month_09\":18.0,\"month_10\":18.0,\"month_11\":18.0,...(1634 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.read-units",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "installments",
+     "expected": "[{\"worksite_id\":\"GA_ATL_HQ\",\"tax_year\":2025,\"claimable_usd\":\"28280.0\",\"projected\":false,\"creation_year\":2025},{\"worksite_id\":\"GA_ATL_HQ\",\"tax_year\":2026,\"claimable_usd\":\"28280.0\",\"projected\":true,\"creation_year\":2025},{\"worksite_id\":\"GA_ATL_HQ\",\"tax_year\":2027,\"claimable_usd\":\"28280.0\",\"projected\":t...(2170 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.read-units",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "unit_totals",
+     "expected": "[{\"worksite_id\":\"GA_ATL_HQ\",\"total_annual_credit_usd\":\"28280.0\",\"final_high_water_mark\":17.25,\"total_tranche_lifetime_usd\":\"141400.0\"},{\"worksite_id\":\"GA_CUM_OPS\",\"total_annual_credit_usd\":\"30905.0\",\"final_high_water_mark\":19.25,\"total_tranche_lifetime_usd\":\"154525.0\"},{\"worksite_id\":\"GA_MAC_OPS\",\"t...(535 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.read-units",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "units",
+     "expected": "[{\"worksite_id\":\"GA_ATL_HQ\",\"name\":\"Atlanta HQ\",\"county\":\"Fulton\",\"city\":\"Atlanta\"},{\"worksite_id\":\"GA_CUM_OPS\",\"name\":\"Cumberland Center\",\"county\":\"Cobb\",\"city\":\"Cumberland\"},{\"worksite_id\":\"GA_MAC_OPS\",\"name\":\"Macon Operations\",\"county\":\"Bibb\",\"city\":\"Macon\"},{\"worksite_id\":\"GA_SAV_DC\",\"name\":\"Sav...(365 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.read-units",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "years",
+     "expected": "[2025]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.read-units",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/v2/clients/{client_id}/units"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "ratelimit.writer-batch-1",
+     "route": "POST /api/v2/run-batches",
+     "category": "status",
+     "path": "status",
+     "expected": "202",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "ratelimit.writer-batch-1",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "dry_run",
+     "expected": "true",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "ratelimit.writer-batch-1",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "preview",
+     "expected": "{\"kind\":\"assess\",\"clients\":1,\"items\":1,\"years\":[2025],\"refresh_once\":true,\"force\":false,\"skip_unchanged\":false,\"skip_coverage\":\"none_yet\",\"per_client_year_items\":false,\"skip_candidates_upper_bound\":0,\"never_run\":1,\"manifests_read_for\":1,\"requires_confirmation\":false,\"confirm_above\":25,\"max_items\":50...(744 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "ratelimit.writer-batch-1",
+     "route": "POST /api/v2/run-batches",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /api/v2/run-batches"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "ratelimit.writer-batch-2",
+     "route": "POST /api/v2/run-batches",
+     "category": "status",
+     "path": "status",
+     "expected": "202",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "ratelimit.writer-batch-2",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "dry_run",
+     "expected": "true",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "ratelimit.writer-batch-2",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "preview",
+     "expected": "{\"kind\":\"assess\",\"clients\":1,\"items\":1,\"years\":[2025],\"refresh_once\":true,\"force\":false,\"skip_unchanged\":false,\"skip_coverage\":\"none_yet\",\"per_client_year_items\":false,\"skip_candidates_upper_bound\":0,\"never_run\":1,\"manifests_read_for\":1,\"requires_confirmation\":false,\"confirm_above\":25,\"max_items\":50...(744 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "ratelimit.writer-batch-2",
+     "route": "POST /api/v2/run-batches",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /api/v2/run-batches"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "ratelimit.reader-batch-1-own-bucket",
+     "route": "POST /api/v2/run-batches",
+     "category": "status",
+     "path": "status",
+     "expected": "202",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "ratelimit.reader-batch-1-own-bucket",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "dry_run",
+     "expected": "true",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "ratelimit.reader-batch-1-own-bucket",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "preview",
+     "expected": "{\"kind\":\"assess\",\"clients\":1,\"items\":1,\"years\":[2025],\"refresh_once\":true,\"force\":false,\"skip_unchanged\":false,\"skip_coverage\":\"none_yet\",\"per_client_year_items\":false,\"skip_candidates_upper_bound\":0,\"never_run\":1,\"manifests_read_for\":1,\"requires_confirmation\":false,\"confirm_above\":25,\"max_items\":50...(744 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "ratelimit.reader-batch-1-own-bucket",
+     "route": "POST /api/v2/run-batches",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /api/v2/run-batches"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "ratelimit.writer-other-kind",
+     "route": "POST /api/v2/program-drafts/00000000-0000-0000-0000-000000000000/preview",
+     "category": "status",
+     "path": "status",
+     "expected": "404",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "ratelimit.writer-other-kind",
+     "route": "POST /api/v2/program-drafts/00000000-0000-0000-0000-000000000000/preview",
+     "category": "type",
+     "path": "detail",
+     "expected": "{\"code\":\"draft_not_found\",\"reason\":\"no draft '00000000-0000-0000-0000-000000000000'\"}",
+     "actual": "Operation not implemented: POST /api/v2/program-drafts/{draft_id}/preview"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "ratelimit.writer-reads-unaffected",
+     "route": "GET /api/v2/portfolio",
+     "category": "value",
+     "path": "items[0].claim_id",
+     "expected": "40000000-0000-4000-8000-00000000001d",
+     "actual": "40000000-0000-4000-8000-000000000009"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "ratelimit.writer-reads-unaffected",
+     "route": "GET /api/v2/portfolio",
+     "category": "value",
+     "path": "items[0].client_name",
+     "expected": "Reference Dataset Client",
+     "actual": "Synthetic fixture"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "client-authz.batch-scope-all",
+     "route": "POST /api/v2/run-batches",
+     "category": "status",
+     "path": "status",
+     "expected": "422",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "client-authz.batch-scope-all",
+     "route": "POST /api/v2/run-batches",
+     "category": "type",
+     "path": "detail",
+     "expected": "{\"detail\":\"The selection matches no clients. Check the client ids or the filter.\",\"code\":\"empty_scope\",\"reason\":\"The selection matches no clients.\",\"remedy\":\"Check the client ids or the filter.\"}",
+     "actual": "Operation not implemented: POST /api/v2/run-batches"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "client-authz.unknown-batch-is-404",
+     "route": "GET /api/v2/run-batches/00000000-0000-0000-0000-000000000000",
+     "category": "status",
+     "path": "status",
+     "expected": "404",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "client-authz.unknown-batch-is-404",
+     "route": "GET /api/v2/run-batches/00000000-0000-0000-0000-000000000000",
+     "category": "value",
+     "path": "detail",
+     "expected": "Unknown run batch 00000000-0000-0000-0000-000000000000.",
+     "actual": "Operation not implemented: GET /api/v2/run-batches/{batch_id}"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "client-authz.unknown-batch-items-is-404",
+     "route": "GET /api/v2/run-batches/00000000-0000-0000-0000-000000000000/items",
+     "category": "status",
+     "path": "status",
+     "expected": "404",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "client-authz.unknown-batch-items-is-404",
+     "route": "GET /api/v2/run-batches/00000000-0000-0000-0000-000000000000/items",
+     "category": "value",
+     "path": "detail",
+     "expected": "Unknown run batch 00000000-0000-0000-0000-000000000000.",
+     "actual": "Operation not implemented: GET /api/v2/run-batches/{batch_id}/items"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "client-authz.portfolio-names-no-client",
+     "route": "GET /api/v2/portfolio",
+     "category": "value",
+     "path": "items[0].claim_id",
+     "expected": "40000000-0000-4000-8000-00000000001d",
+     "actual": "40000000-0000-4000-8000-000000000009"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "client-authz.portfolio-names-no-client",
+     "route": "GET /api/v2/portfolio",
+     "category": "value",
+     "path": "items[0].client_name",
+     "expected": "Reference Dataset Client",
+     "actual": "Synthetic fixture"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "client-authz.scope",
+     "route": "GET /api/scope",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "client-authz.scope",
+     "route": "GET /api/scope",
+     "category": "missing-field",
+     "path": "clients",
+     "expected": "[{\"account_id\":1001,\"name\":\"Reference Dataset Client\",\"billing_state\":\"GA\",\"employees\":null,\"synthetic\":false,\"industry\":null}]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "client-authz.scope",
+     "route": "GET /api/scope",
+     "category": "missing-field",
+     "path": "programs",
+     "expected": "[{\"program_code\":\"CO_EZ\",\"name\":\"Colorado Enterprise Zone Job Credit\",\"citation\":\"C.R.S. \u00a7 39-30-105\",\"jurisdiction\":{\"level\":\"state\",\"code\":\"CO\",\"name\":\"Colorado\"},\"authored_years\":[],\"placeholder_years\":[],\"year_scoped\":false,\"calculable\":false,\"not_calculable_reason\":\"No year-scoped rule packs au...(3282 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "client-authz.scope",
+     "route": "GET /api/scope",
+     "category": "missing-field",
+     "path": "years",
+     "expected": "{\"authored\":[2019,2020,2021,2022,2023,2024,2025,2026],\"latest\":2026,\"window_years\":6,\"default_window\":[2021,2022,2023,2024,2025,2026]}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "client-authz.scope",
+     "route": "GET /api/scope",
+     "category": "missing-field",
+     "path": "data_source",
+     "expected": "csv",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "client-authz.scope",
+     "route": "GET /api/scope",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/scope"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.me-acting",
+     "route": "GET /api/me",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.me-acting",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "auth_mode",
+     "expected": "entra",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.me-acting",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "authenticated",
+     "expected": "true",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.me-acting",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "upn",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.me-acting",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "oid",
+     "expected": "00000000-0000-0000-0000-0000000000b1",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.me-acting",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "name",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.me-acting",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "roles",
+     "expected": "[\"TCC.Agent\"]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.me-acting",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "principal_type",
+     "expected": "agent",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.me-acting",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "acting_for",
+     "expected": "{\"oid\":\"00000000-0000-0000-0000-0000000000a2\",\"name\":\"Acting Person\",\"upn\":\"acting@example.test\",\"assurance\":\"channel-asserted\",\"channel\":\"teams\"}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.me-acting",
+     "route": "GET /api/me",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/me"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.acting-reader",
+     "route": "GET /api/me",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.acting-reader",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "auth_mode",
+     "expected": "entra",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.acting-reader",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "authenticated",
+     "expected": "true",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.acting-reader",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "upn",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.acting-reader",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "oid",
+     "expected": "00000000-0000-0000-0000-0000000000b1",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.acting-reader",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "name",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.acting-reader",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "roles",
+     "expected": "[\"TCC.Agent\"]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.acting-reader",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "principal_type",
+     "expected": "agent",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.acting-reader",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "acting_for",
+     "expected": "{\"oid\":\"00000000-0000-0000-0000-0000000000a1\",\"name\":\"Acting Person\",\"upn\":\"acting@example.test\",\"assurance\":\"delegated\",\"channel\":\"teams\"}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.acting-reader",
+     "route": "GET /api/me",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/me"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.header-not-base64",
+     "route": "GET /api/me",
+     "category": "value",
+     "path": "detail",
+     "expected": "acting-user header is not base64url",
+     "actual": "acting-user header is not valid base64url JSON"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.header-not-json",
+     "route": "GET /api/me",
+     "category": "value",
+     "path": "detail",
+     "expected": "acting-user header is not valid JSON",
+     "actual": "acting-user header is not valid base64url JSON"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.header-bad-channel",
+     "route": "GET /api/me",
+     "category": "value",
+     "path": "detail",
+     "expected": "acting-user channel must be one of teams, m365-copilot, cowork, api-test",
+     "actual": "acting-user channel is not recognised"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "user.acting-header-ignored",
+     "route": "GET /api/me",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "user.acting-header-ignored",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "auth_mode",
+     "expected": "entra",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "user.acting-header-ignored",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "authenticated",
+     "expected": "true",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "user.acting-header-ignored",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "upn",
+     "expected": "analyst@example.test",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "user.acting-header-ignored",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "oid",
+     "expected": "00000000-0000-0000-0000-0000000000a1",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "user.acting-header-ignored",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "name",
+     "expected": "Ana Lyst",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "user.acting-header-ignored",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "roles",
+     "expected": "[\"TCC.User\"]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "user.acting-header-ignored",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "principal_type",
+     "expected": "user",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "user.acting-header-ignored",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "acting_for",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "user.acting-header-ignored",
+     "route": "GET /api/me",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/me"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.read-allowed",
+     "route": "GET /api/v2/portfolio",
+     "category": "value",
+     "path": "items[0].claim_id",
+     "expected": "40000000-0000-4000-8000-00000000001d",
+     "actual": "40000000-0000-4000-8000-000000000009"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.read-allowed",
+     "route": "GET /api/v2/portfolio",
+     "category": "value",
+     "path": "items[0].client_name",
+     "expected": "Reference Dataset Client",
+     "actual": "Synthetic fixture"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.read-draft-list",
+     "route": "GET /api/v2/program-drafts",
+     "category": "status",
+     "path": "status",
+     "expected": "403",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.read-draft-list",
+     "route": "GET /api/v2/program-drafts",
+     "category": "value",
+     "path": "detail",
+     "expected": "the command's author is not the user the agent acts for",
+     "actual": "Operation not implemented: GET /api/v2/program-drafts"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.write-claims-as-writer",
+     "route": "POST /api/claims",
+     "category": "value",
+     "path": "claim_id",
+     "expected": "40000000-0000-4000-8000-00000000001f",
+     "actual": "40000000-0000-4000-8000-00000000000d"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.capabilities-list",
+     "route": "GET /api/capabilities",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.capabilities-list",
+     "route": "GET /api/capabilities",
+     "category": "missing-field",
+     "path": "tools",
+     "expected": "[{\"name\":\"book_rank\",\"description\":\"WHOLE BOOK only: which clients to call across every client, ranked by a named reason, in the page's own order. Needs no client. Never use it for a question about one client (a client named, or \\\"them\\\" or \\\"this client\\\"): use that client's tools.\",\"kind\":\"read\",\"...(35326 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.capabilities-list",
+     "route": "GET /api/capabilities",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/capabilities"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.capabilities-book-rank",
+     "route": "POST /api/capabilities/book_rank",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "403"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.capabilities-book-rank",
+     "route": "POST /api/capabilities/book_rank",
+     "category": "missing-field",
+     "path": "blocks",
+     "expected": "[{\"kind\":\"paragraph\",\"rows\":[],\"text\":\"1 of 1 clients have been assessed. Ranked by what inaction costs, in the order the page shows.\"},{\"kind\":\"table\",\"rows\":[[\"#\",\"Client\",\"Reason\",\"Programme\",\"Tax year\",\"Identified\",\"Jobs margin\"],[\"1\",\"Reference Dataset Client\",\"Identified\",\"GA_JTC\",\"2025\",\"$66,...(323 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.capabilities-book-rank",
+     "route": "POST /api/capabilities/book_rank",
+     "category": "missing-field",
+     "path": "disclaimer",
+     "expected": "Not tax advice: these figures are computed from payroll by this software and must be reviewed by a qualified tax professional before any filing or claim.",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.capabilities-book-rank",
+     "route": "POST /api/capabilities/book_rank",
+     "category": "missing-field",
+     "path": "facts",
+     "expected": "{\"assessed_clients\":1,\"calculated\":true,\"claimed_is_unverified\":false,\"clients\":[{\"client_name\":\"Reference Dataset Client\",\"credit_earned_on_trend_usd\":null,\"identified_usd\":\"66500\",\"jobs_margin\":19.0,\"position\":1,\"program_code\":\"GA_JTC\",\"provenance_verified\":true,\"reason\":\"Identified\",\"tax_year\":20...(655 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.capabilities-book-rank",
+     "route": "POST /api/capabilities/book_rank",
+     "category": "missing-field",
+     "path": "provenance",
+     "expected": "{\"assumption_set_id\":null,\"rule_pack_version\":null,\"run_id\":null,\"source\":\"recorded claims; no run\",\"trail_sha256\":null}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.capabilities-book-rank",
+     "route": "POST /api/capabilities/book_rank",
+     "category": "missing-field",
+     "path": "tool",
+     "expected": "book_rank",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.capabilities-book-rank",
+     "route": "POST /api/capabilities/book_rank",
+     "category": "missing-field",
+     "path": "warnings",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.capabilities-book-rank",
+     "route": "POST /api/capabilities/book_rank",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "this user is not entitled to make changes"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.audit-channel",
+     "route": "GET /api/audit/channel",
+     "category": "value",
+     "path": "detail",
+     "expected": "the channel agent may not read the channel audit trail",
+     "actual": "This read requires a person."
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "cors.preflight-no-token",
+     "route": "OPTIONS /api/claims",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "204"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "cors.preflight-no-token",
+     "route": "OPTIONS /api/claims",
+     "category": "header",
+     "path": "headers.access-control-allow-headers",
+     "expected": "authorization,content-type,x-tcc-acting-user",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "cors.preflight-no-token",
+     "route": "OPTIONS /api/claims",
+     "category": "header",
+     "path": "headers.access-control-allow-methods",
+     "expected": "GET, POST, PUT, OPTIONS",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "cors.preflight-no-token",
+     "route": "OPTIONS /api/claims",
+     "category": "header",
+     "path": "headers.access-control-allow-origin",
+     "expected": "*",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "cors.preflight-no-token",
+     "route": "OPTIONS /api/claims",
+     "category": "header",
+     "path": "headers.access-control-max-age",
+     "expected": "600",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "cors.preflight-no-token",
+     "route": "OPTIONS /api/claims",
+     "category": "header",
+     "path": "headers.content-type",
+     "expected": "text/plain; charset=utf-8",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "cors.preflight-no-token",
+     "route": "OPTIONS /api/claims",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers, Access-Control-Request-Private-Network",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "cors.preflight-no-token",
+     "route": "OPTIONS /api/claims",
+     "category": "body-kind",
+     "path": "body",
+     "expected": "text",
+     "actual": "empty"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "cors.simple-with-token",
+     "route": "GET /api/me",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "cors.simple-with-token",
+     "route": "GET /api/me",
+     "category": "header",
+     "path": "headers.access-control-allow-origin",
+     "expected": "*",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "cors.simple-with-token",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "auth_mode",
+     "expected": "entra",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "cors.simple-with-token",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "authenticated",
+     "expected": "true",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "cors.simple-with-token",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "upn",
+     "expected": "analyst@example.test",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "cors.simple-with-token",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "oid",
+     "expected": "00000000-0000-0000-0000-0000000000a1",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "cors.simple-with-token",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "name",
+     "expected": "Ana Lyst",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "cors.simple-with-token",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "roles",
+     "expected": "[\"TCC.User\"]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "cors.simple-with-token",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "principal_type",
+     "expected": "user",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "cors.simple-with-token",
+     "route": "GET /api/me",
+     "category": "missing-field",
+     "path": "acting_for",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "cors.simple-with-token",
+     "route": "GET /api/me",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/me"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "cors.simple-401",
+     "route": "GET /api/me",
+     "category": "header",
+     "path": "headers.access-control-allow-origin",
+     "expected": "*",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "cors.simple-403",
+     "route": "GET /api/me",
+     "category": "header",
+     "path": "headers.access-control-allow-origin",
+     "expected": "*",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "cors.preflight-put",
+     "route": "OPTIONS /api/claims/engagement",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "204"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "cors.preflight-put",
+     "route": "OPTIONS /api/claims/engagement",
+     "category": "header",
+     "path": "headers.access-control-allow-methods",
+     "expected": "GET, POST, PUT, OPTIONS",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "cors.preflight-put",
+     "route": "OPTIONS /api/claims/engagement",
+     "category": "header",
+     "path": "headers.access-control-allow-origin",
+     "expected": "*",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "cors.preflight-put",
+     "route": "OPTIONS /api/claims/engagement",
+     "category": "header",
+     "path": "headers.access-control-max-age",
+     "expected": "600",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "cors.preflight-put",
+     "route": "OPTIONS /api/claims/engagement",
+     "category": "header",
+     "path": "headers.content-type",
+     "expected": "text/plain; charset=utf-8",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "cors.preflight-put",
+     "route": "OPTIONS /api/claims/engagement",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers, Access-Control-Request-Private-Network",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "cors.preflight-put",
+     "route": "OPTIONS /api/claims/engagement",
+     "category": "body-kind",
+     "path": "body",
+     "expected": "text",
+     "actual": "empty"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "cors.preflight-patch-disallowed",
+     "route": "OPTIONS /api/claims",
+     "category": "status",
+     "path": "status",
+     "expected": "400",
+     "actual": "204"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "cors.preflight-patch-disallowed",
+     "route": "OPTIONS /api/claims",
+     "category": "header",
+     "path": "headers.access-control-allow-methods",
+     "expected": "GET, POST, PUT, OPTIONS",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "cors.preflight-patch-disallowed",
+     "route": "OPTIONS /api/claims",
+     "category": "header",
+     "path": "headers.access-control-allow-origin",
+     "expected": "*",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "cors.preflight-patch-disallowed",
+     "route": "OPTIONS /api/claims",
+     "category": "header",
+     "path": "headers.access-control-max-age",
+     "expected": "600",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "cors.preflight-patch-disallowed",
+     "route": "OPTIONS /api/claims",
+     "category": "header",
+     "path": "headers.content-type",
+     "expected": "text/plain; charset=utf-8",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "cors.preflight-patch-disallowed",
+     "route": "OPTIONS /api/claims",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers, Access-Control-Request-Private-Network",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "cors.preflight-patch-disallowed",
+     "route": "OPTIONS /api/claims",
+     "category": "body-kind",
+     "path": "body",
+     "expected": "text",
+     "actual": "empty"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "cors.preflight-delete-disallowed",
+     "route": "OPTIONS /api/claims",
+     "category": "status",
+     "path": "status",
+     "expected": "400",
+     "actual": "204"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "cors.preflight-delete-disallowed",
+     "route": "OPTIONS /api/claims",
+     "category": "header",
+     "path": "headers.access-control-allow-methods",
+     "expected": "GET, POST, PUT, OPTIONS",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "cors.preflight-delete-disallowed",
+     "route": "OPTIONS /api/claims",
+     "category": "header",
+     "path": "headers.access-control-allow-origin",
+     "expected": "*",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "cors.preflight-delete-disallowed",
+     "route": "OPTIONS /api/claims",
+     "category": "header",
+     "path": "headers.access-control-max-age",
+     "expected": "600",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "cors.preflight-delete-disallowed",
+     "route": "OPTIONS /api/claims",
+     "category": "header",
+     "path": "headers.content-type",
+     "expected": "text/plain; charset=utf-8",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "cors.preflight-delete-disallowed",
+     "route": "OPTIONS /api/claims",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "Origin, Access-Control-Request-Method, Access-Control-Request-Headers, Access-Control-Request-Private-Network",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "cors.preflight-delete-disallowed",
+     "route": "OPTIONS /api/claims",
+     "category": "body-kind",
+     "path": "body",
+     "expected": "text",
+     "actual": "empty"
+    }
+   ],
+   "tolerated": [
+    {
+     "scenario": "p1_auth",
+     "case": "reader.assess",
+     "route": "POST /api/claims/assess",
+     "category": "number-lexeme",
+     "path": "assessed[0].average_headcount",
+     "expected": "61.0",
+     "actual": "61"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.assess",
+     "route": "POST /api/claims/assess",
+     "category": "number-lexeme",
+     "path": "assessed[0].base_average_headcount",
+     "expected": "40.0",
+     "actual": "40"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.assess",
+     "route": "POST /api/claims/assess",
+     "category": "number-lexeme",
+     "path": "assessed[0].threshold_jobs",
+     "expected": "2.0",
+     "actual": "2"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.assess",
+     "route": "POST /api/claims/assess",
+     "category": "number-lexeme",
+     "path": "assessed[0].net_new_jobs",
+     "expected": "21.0",
+     "actual": "21"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.assess",
+     "route": "POST /api/claims/assess",
+     "category": "number-lexeme",
+     "path": "assessed[0].jobs_to_threshold",
+     "expected": "0.0",
+     "actual": "0"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.assess",
+     "route": "POST /api/claims/assess",
+     "category": "number-lexeme",
+     "path": "assessed[0].jobs_margin",
+     "expected": "19.0",
+     "actual": "19"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.assess",
+     "route": "POST /api/claims/assess",
+     "category": "number-lexeme",
+     "path": "assessed[0].average_headcount",
+     "expected": "61.0",
+     "actual": "61"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.assess",
+     "route": "POST /api/claims/assess",
+     "category": "number-lexeme",
+     "path": "assessed[0].base_average_headcount",
+     "expected": "40.0",
+     "actual": "40"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.assess",
+     "route": "POST /api/claims/assess",
+     "category": "number-lexeme",
+     "path": "assessed[0].threshold_jobs",
+     "expected": "2.0",
+     "actual": "2"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.assess",
+     "route": "POST /api/claims/assess",
+     "category": "number-lexeme",
+     "path": "assessed[0].net_new_jobs",
+     "expected": "21.0",
+     "actual": "21"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.assess",
+     "route": "POST /api/claims/assess",
+     "category": "number-lexeme",
+     "path": "assessed[0].jobs_to_threshold",
+     "expected": "0.0",
+     "actual": "0"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.assess",
+     "route": "POST /api/claims/assess",
+     "category": "number-lexeme",
+     "path": "assessed[0].jobs_margin",
+     "expected": "19.0",
+     "actual": "19"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.transition",
+     "route": "POST /api/claims/cell/1001/GA_JTC/2025/transition",
+     "category": "number-lexeme",
+     "path": "average_headcount",
+     "expected": "61.0",
+     "actual": "61"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.transition",
+     "route": "POST /api/claims/cell/1001/GA_JTC/2025/transition",
+     "category": "number-lexeme",
+     "path": "base_average_headcount",
+     "expected": "40.0",
+     "actual": "40"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.transition",
+     "route": "POST /api/claims/cell/1001/GA_JTC/2025/transition",
+     "category": "number-lexeme",
+     "path": "threshold_jobs",
+     "expected": "2.0",
+     "actual": "2"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.transition",
+     "route": "POST /api/claims/cell/1001/GA_JTC/2025/transition",
+     "category": "number-lexeme",
+     "path": "net_new_jobs",
+     "expected": "21.0",
+     "actual": "21"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.transition",
+     "route": "POST /api/claims/cell/1001/GA_JTC/2025/transition",
+     "category": "number-lexeme",
+     "path": "jobs_to_threshold",
+     "expected": "0.0",
+     "actual": "0"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "writer.transition",
+     "route": "POST /api/claims/cell/1001/GA_JTC/2025/transition",
+     "category": "number-lexeme",
+     "path": "jobs_margin",
+     "expected": "19.0",
+     "actual": "19"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.read-portfolio",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].average_headcount",
+     "expected": "61.0",
+     "actual": "61"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.read-portfolio",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].base_average_headcount",
+     "expected": "40.0",
+     "actual": "40"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.read-portfolio",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].threshold_jobs",
+     "expected": "2.0",
+     "actual": "2"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.read-portfolio",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].net_new_jobs",
+     "expected": "21.0",
+     "actual": "21"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.read-portfolio",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].jobs_to_threshold",
+     "expected": "0.0",
+     "actual": "0"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.read-portfolio",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].jobs_margin",
+     "expected": "19.0",
+     "actual": "19"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "reader.read-portfolio",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].gap_jobs",
+     "expected": "0.0",
+     "actual": "0"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "ratelimit.writer-reads-unaffected",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].average_headcount",
+     "expected": "61.0",
+     "actual": "61"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "ratelimit.writer-reads-unaffected",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].base_average_headcount",
+     "expected": "40.0",
+     "actual": "40"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "ratelimit.writer-reads-unaffected",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].threshold_jobs",
+     "expected": "2.0",
+     "actual": "2"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "ratelimit.writer-reads-unaffected",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].net_new_jobs",
+     "expected": "21.0",
+     "actual": "21"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "ratelimit.writer-reads-unaffected",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].jobs_to_threshold",
+     "expected": "0.0",
+     "actual": "0"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "ratelimit.writer-reads-unaffected",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].jobs_margin",
+     "expected": "19.0",
+     "actual": "19"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "ratelimit.writer-reads-unaffected",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].gap_jobs",
+     "expected": "0.0",
+     "actual": "0"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "client-authz.portfolio-names-no-client",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].average_headcount",
+     "expected": "61.0",
+     "actual": "61"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "client-authz.portfolio-names-no-client",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].base_average_headcount",
+     "expected": "40.0",
+     "actual": "40"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "client-authz.portfolio-names-no-client",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].threshold_jobs",
+     "expected": "2.0",
+     "actual": "2"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "client-authz.portfolio-names-no-client",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].net_new_jobs",
+     "expected": "21.0",
+     "actual": "21"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "client-authz.portfolio-names-no-client",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].jobs_to_threshold",
+     "expected": "0.0",
+     "actual": "0"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "client-authz.portfolio-names-no-client",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].jobs_margin",
+     "expected": "19.0",
+     "actual": "19"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "client-authz.portfolio-names-no-client",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].gap_jobs",
+     "expected": "0.0",
+     "actual": "0"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.read-allowed",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].average_headcount",
+     "expected": "61.0",
+     "actual": "61"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.read-allowed",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].base_average_headcount",
+     "expected": "40.0",
+     "actual": "40"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.read-allowed",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].threshold_jobs",
+     "expected": "2.0",
+     "actual": "2"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.read-allowed",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].net_new_jobs",
+     "expected": "21.0",
+     "actual": "21"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.read-allowed",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].jobs_to_threshold",
+     "expected": "0.0",
+     "actual": "0"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.read-allowed",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].jobs_margin",
+     "expected": "19.0",
+     "actual": "19"
+    },
+    {
+     "scenario": "p1_auth",
+     "case": "agent.read-allowed",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].gap_jobs",
+     "expected": "0.0",
+     "actual": "0"
+    }
+   ]
+  }
+ ],
+ "exchanges": 114,
+ "failure_count": 275,
+ "tolerated_count": 46
+}

@@ -1,0 +1,66 @@
+name: Explicit private .NET application deployment
+on:
+  workflow_dispatch:
+    inputs:
+      service:
+        type: choice
+        options: [api, gateway]
+        required: true
+      native_prerequisites_verified:
+        description: Approved schema, grants, trust, parity, privacy and readiness prerequisites are closed
+        type: boolean
+        default: false
+        required: true
+permissions:
+  contents: read
+  id-token: write
+concurrency:
+  group: dotnet-private-application-deployment
+  cancel-in-progress: false
+jobs:
+  application:
+    if: inputs.native_prerequisites_verified && vars.DOTNET_RELEASE_APPROVAL == 'approved'
+    environment: dotnet-preproduction
+    runs-on: [self-hosted, linux, tcc-dotnet-vnet]
+    env:
+      TCC_DOTNET_ACTIVATE: '1'
+      DOTNET_ENVIRONMENT_NAME: ${{ vars.DOTNET_ENVIRONMENT_NAME }}
+      DOTNET_RESOURCE_GROUP_NAME: ${{ vars.DOTNET_RESOURCE_GROUP_NAME }}
+      DOTNET_TARGET_SUBSCRIPTION: ${{ vars.DOTNET_AZURE_SUBSCRIPTION_ID }}
+      DOTNET_API_APP_NAME: ${{ vars.DOTNET_API_APP_NAME }}
+      DOTNET_GATEWAY_APP_NAME: ${{ vars.DOTNET_GATEWAY_APP_NAME }}
+      GIT_COMMIT: ${{ github.sha }}
+      DOTNET_SERVICE: ${{ inputs.service }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.404
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ vars.DOTNET_PUBLISHER_CLIENT_ID }}
+          tenant-id: ${{ vars.DOTNET_AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.DOTNET_AZURE_SUBSCRIPTION_ID }}
+      - name: Assert pre-provisioned private .NET ownership, stack, identity and runtime revision
+        shell: pwsh
+        run: ./dotnet/deploy/guard-target.ps1 -Service $env:DOTNET_SERVICE
+      - name: Publish and verify only the selected .NET application
+        shell: pwsh
+        run: |
+          python dotnet/deploy/publish.py --service $env:DOTNET_SERVICE --runtime linux-x64
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          python dotnet/deploy/package_zip.py --service $env:DOTNET_SERVICE
+          exit $LASTEXITCODE
+      - name: Deploy code only using OIDC; no provision, migration, grant or seed hooks
+        shell: pwsh
+        run: |
+          $key = "DOTNET_$($env:DOTNET_SERVICE.ToUpperInvariant())_APP_NAME"
+          $name = [Environment]::GetEnvironmentVariable($key)
+          $zip = "dotnet/deploy/.artifacts/$($env:DOTNET_SERVICE).zip"
+          az webapp deploy --subscription $env:DOTNET_TARGET_SUBSCRIPTION --resource-group $env:DOTNET_RESOURCE_GROUP_NAME --name $name --type zip --src-path $zip --only-show-errors --output none 2>$null
+          if ($LASTEXITCODE) { throw 'Private .NET code deployment failed; inspect approved platform diagnostics.' }

@@ -1,0 +1,199 @@
+{
+  "oracle": "CPython 3.12; application.program_drafts.bundle.build_bundle",
+  "input": {
+    "id": "4000000000004000800000000000f00d",
+    "code": "ZY_DRAFT_JTC",
+    "name": "Zedland Two Jobs Credit",
+    "state": "ZY",
+    "at": "2026-01-15T12:00:00+00:00",
+    "pack": {
+      "_prototype_verification": "FICTIONAL draft for tests. Every value is invented and flagged; it is not law.",
+      "rule_pack_version": "0.0.1",
+      "jurisdiction": {
+        "level": "state",
+        "code": "ZY",
+        "name": "Zedland Two (fictional)"
+      },
+      "credit": {
+        "code": "ZY_DRAFT_JTC",
+        "name": "ZY_DRAFT_JTC (fictional)",
+        "statutory_citation": "Fictional Code \u00a7 0-0-0"
+      },
+      "tax_year_convention": {
+        "label": "begins",
+        "_prototype_verify": true
+      },
+      "filing": {
+        "window": "Fictional filing window",
+        "cycle": "annual",
+        "_prototype_verify": true
+      },
+      "thresholds": {
+        "minimum_new_jobs": 1,
+        "minimum_hours_per_week_full_time": 30,
+        "_prototype_verify": true
+      },
+      "benefit": {
+        "amount_per_qualifying_job_usd": 1200,
+        "benefit_period_years": 3,
+        "carryforward_years": 5,
+        "currency": "USD",
+        "_prototype_verify": true
+      },
+      "one_zero": {
+        "min_weekly_hours": 30.0,
+        "min_weekly_wages": 400.0,
+        "wage_basis": "regular",
+        "geographic_granularity": "statewide",
+        "pt_aggregation": false,
+        "headcount_unit_field": "Worksite_ID",
+        "entity_combination": "permitted",
+        "_prototype_verify": true,
+        "wage_floor_basis": {
+          "note": "invented for tests",
+          "_prototype_verify": true
+        }
+      },
+      "_bundle_fixture": {
+        "text": "caf\u00e9 \u00a7 \ud83d\ude00 \u0000 \u007f \u2028",
+        "numbers": [
+          -0.0,
+          1e-07,
+          1e+20,
+          1180591620717411303424
+        ]
+      }
+    },
+    "years": {
+      "2024": {
+        "_prototype_verification": "FICTIONAL draft for tests. Every value is invented and flagged; it is not law.",
+        "rule_pack_version": "0.0.1+ty2024",
+        "jurisdiction": {
+          "level": "state",
+          "code": "ZY",
+          "name": "Zedland Two (fictional)"
+        },
+        "credit": {
+          "code": "ZY_DRAFT_JTC",
+          "name": "ZY_DRAFT_JTC (fictional)",
+          "statutory_citation": "Fictional Code \u00a7 0-0-0"
+        },
+        "tax_year_convention": {
+          "label": "begins",
+          "_prototype_verify": true
+        },
+        "filing": {
+          "window": "Fictional filing window",
+          "cycle": "annual",
+          "_prototype_verify": true
+        },
+        "thresholds": {
+          "minimum_new_jobs": 1,
+          "minimum_hours_per_week_full_time": 30,
+          "_prototype_verify": true
+        },
+        "benefit": {
+          "amount_per_qualifying_job_usd": 1200,
+          "benefit_period_years": 3,
+          "carryforward_years": 5,
+          "currency": "USD",
+          "_prototype_verify": true
+        },
+        "one_zero": {
+          "min_weekly_hours": 30.0,
+          "min_weekly_wages": 400.0,
+          "wage_basis": "regular",
+          "geographic_granularity": "statewide",
+          "pt_aggregation": false,
+          "headcount_unit_field": "Worksite_ID",
+          "entity_combination": "permitted",
+          "_prototype_verify": true,
+          "wage_floor_basis": {
+            "note": "invented for tests",
+            "_prototype_verify": true
+          }
+        },
+        "tax_year": 2024,
+        "_year_provenance": {
+          "source": "invented for tests",
+          "adr": "ADR-005"
+        }
+      },
+      "2025": {
+        "_prototype_verification": "FICTIONAL draft for tests. Every value is invented and flagged; it is not law.",
+        "rule_pack_version": "0.0.1+ty2025",
+        "jurisdiction": {
+          "level": "state",
+          "code": "ZY",
+          "name": "Zedland Two (fictional)"
+        },
+        "credit": {
+          "code": "ZY_DRAFT_JTC",
+          "name": "ZY_DRAFT_JTC (fictional)",
+          "statutory_citation": "Fictional Code \u00a7 0-0-0"
+        },
+        "tax_year_convention": {
+          "label": "begins",
+          "_prototype_verify": true
+        },
+        "filing": {
+          "window": "Fictional filing window",
+          "cycle": "annual",
+          "_prototype_verify": true
+        },
+        "thresholds": {
+          "minimum_new_jobs": 1,
+          "minimum_hours_per_week_full_time": 30,
+          "_prototype_verify": true
+        },
+        "benefit": {
+          "amount_per_qualifying_job_usd": 1200,
+          "benefit_period_years": 3,
+          "carryforward_years": 5,
+          "currency": "USD",
+          "_prototype_verify": true
+        },
+        "one_zero": {
+          "min_weekly_hours": 30.0,
+          "min_weekly_wages": 400.0,
+          "wage_basis": "regular",
+          "geographic_granularity": "statewide",
+          "pt_aggregation": false,
+          "headcount_unit_field": "Worksite_ID",
+          "entity_combination": "permitted",
+          "_prototype_verify": true,
+          "wage_floor_basis": {
+            "note": "invented for tests",
+            "_prototype_verify": true
+          }
+        },
+        "tax_year": 2025,
+        "_year_provenance": {
+          "source": "invented for tests",
+          "adr": "ADR-005"
+        }
+      }
+    },
+    "validation": {
+      "valid": true,
+      "content_sha256": "f31620f5486404049920d18089f9d5a73f0898dd2fc2a142d71eb033a65b96cd",
+      "errors": 0,
+      "warnings": 0,
+      "infos": 0,
+      "findings": [],
+      "truncated": false,
+      "verification": "not_verified"
+    },
+    "content_sha256": "f31620f5486404049920d18089f9d5a73f0898dd2fc2a142d71eb033a65b96cd"
+  },
+  "members": {
+    "COMMIT-CHECKLIST.md": "# Commit checklist: ZY_DRAFT_JTC (Zedland Two Jobs Credit)\n\nThis bundle is a PROPOSAL. Nothing in it is verified, and importing it into a deployment does nothing until the files are\ncommitted and deployed (ADR-005). Statute stays human-authored and version controlled.\n\n## 1. Who must verify the statute (before anything else)\n- [ ] A qualified person who is neither the author nor the reviewer of the draft checks EVERY statutory value in every file\n      against the primary source (the statute or the authority's published guidance), and records the source in\n      `credit.statutory_citation` and each year's `_year_provenance.source`.\n- [ ] Only then remove the `_prototype_verify` flags they confirmed. Do not add `_verified` to a pack from this bundle.\n\n## 2. Put the files in the repository\n- [ ] `rules/zy_draft_jtc.json` -> `backend/rules/zy_draft_jtc.json`\n- [ ] `rules/zy_draft_jtc/2024.json` -> `backend/rules/zy_draft_jtc/2024.json`\n- [ ] `rules/zy_draft_jtc/2025.json` -> `backend/rules/zy_draft_jtc/2025.json`\n- [ ] Add the entry in `registry-patch.json` to `backend/rules/registry/programs.json` (lifecycle stays `described`; `calculable` is\n      derived from authored year packs and is never typed).\n\n## 3. Tests to add (customer-neutral, fictional or published values only)\n- [ ] `backend/tests/test_zy_draft_jtc_pack.py`: `validate_all()` reports no error for `zy_draft_jtc.json` and its years.\n- [ ] A pricing test at hand-computed inputs taken from the cited source (not from this tool's output) for each of: 2024, 2025.\n- [ ] The program appears in `GET /api/v2/programs` as calculable for exactly its authored years, and is selectable in the\n      run dialog and the engagement controls with no frontend change.\n\n## 4. Changelog (same commit)\n- Added program `ZY_DRAFT_JTC` (Zedland Two Jobs Credit, ZY): rule pack and year packs for 2024, 2025. Statute values are not verified until a person verifies each against the primary source; the program is calculable only for authored years. Operators: deploy this release; no settings or migrations.\n\n## 5. Gates and deploy\n- [ ] `python scripts/validate-rule-pack.py`, the backend fast gate, the full backend suite, the frontend tests and build.\n- [ ] Commit, review and deploy the normal way (`azd up`). There is no database switch and no runtime toggle: the program becomes\n      calculable when the deployed rules folder holds its year packs.\n\nYear packs in this bundle: rules/zy_draft_jtc/2024.json, rules/zy_draft_jtc/2025.json.\n",
+    "manifest.json": "{\n  \"approved_sha256\": \"f31620f5486404049920d18089f9d5a73f0898dd2fc2a142d71eb033a65b96cd\",\n  \"changelog_line\": \"- Added program `ZY_DRAFT_JTC` (Zedland Two Jobs Credit, ZY): rule pack and year packs for 2024, 2025. Statute values are not verified until a person verifies each against the primary source; the program is calculable only for authored years. Operators: deploy this release; no settings or migrations.\",\n  \"content_sha256\": \"f31620f5486404049920d18089f9d5a73f0898dd2fc2a142d71eb033a65b96cd\",\n  \"draft_id\": \"4000000000004000800000000000f00d\",\n  \"files\": [\n    {\n      \"bytes\": 2505,\n      \"path\": \"COMMIT-CHECKLIST.md\",\n      \"sha256\": \"89fc1e8333f7c58bb79e3032e364f3a59e397155a4f0d8d59b9dc2580ac42534\"\n    },\n    {\n      \"bytes\": 583,\n      \"path\": \"registry-patch.json\",\n      \"sha256\": \"eee47c727c070248de2d0ae5150dcbc97934365b7dd12c2c762acd408e16ddac\"\n    },\n    {\n      \"bytes\": 414,\n      \"path\": \"review-record.json\",\n      \"sha256\": \"c36d5f666ac34fe9651cac9038b13d78c62e0374cdcc6bd16ff5290d29706c99\"\n    },\n    {\n      \"bytes\": 1442,\n      \"path\": \"rules/zy_draft_jtc.json\",\n      \"sha256\": \"28b09219c5fc72dcb1557f0a37230ffb8e7a2aab578f09550183a3acf6287fc1\"\n    },\n    {\n      \"bytes\": 1395,\n      \"path\": \"rules/zy_draft_jtc/2024.json\",\n      \"sha256\": \"04bf6d4b8b57b33fd873d336f3e1331795439b006b9ed1d06b00fd50df4ffbfe\"\n    },\n    {\n      \"bytes\": 1395,\n      \"path\": \"rules/zy_draft_jtc/2025.json\",\n      \"sha256\": \"25dfc1e0ccde051bf6ada1f8b3987f98efebcc916da046fda6f52f81c8f93b1c\"\n    },\n    {\n      \"bytes\": 314,\n      \"path\": \"validation-report.json\",\n      \"sha256\": \"c79478fb49cb29cccd422ca5c4a1fbeb5f03eaa8a5c2bc8707a2d9795610967c\"\n    }\n  ],\n  \"has_runtime_authority\": false,\n  \"kind\": \"program-draft-bundle\",\n  \"name\": \"Zedland Two Jobs Credit\",\n  \"proposed_code\": \"ZY_DRAFT_JTC\",\n  \"schema_version\": 1,\n  \"state\": \"ZY\",\n  \"verification\": \"not_verified\"\n}\n",
+    "registry-patch.json": "{\n  \"add_to\": \"backend/rules/registry/programs.json\",\n  \"programs\": [\n    {\n      \"code\": \"ZY_DRAFT_JTC\",\n      \"engine_profile\": {\n        \"credit_model\": \"per_net_new_job\",\n        \"headcount_model\": \"one_zero\"\n      },\n      \"jurisdiction\": {\n        \"code\": \"ZY\",\n        \"level\": \"state\"\n      },\n      \"lifecycle\": \"described\",\n      \"name\": \"Zedland Two Jobs Credit\",\n      \"notes\": \"Added from a reviewed draft. Statute values are not verified until a person verifies each against the primary source.\",\n      \"pack_file\": \"zy_draft_jtc.json\",\n      \"state\": \"ZY\"\n    }\n  ]\n}\n",
+    "review-record.json": "{\n  \"approved_content_sha256\": \"f31620f5486404049920d18089f9d5a73f0898dd2fc2a142d71eb033a65b96cd\",\n  \"comment\": null,\n  \"decided_at\": \"2026-01-15T12:00:00+00:00\",\n  \"decision\": \"approve\",\n  \"history\": [\n    {\n      \"actor\": \"bob\",\n      \"at\": \"2026-01-15T12:00:00+00:00\",\n      \"event\": \"approved\",\n      \"seq\": 1,\n      \"to_status\": \"approved_for_export\"\n    }\n  ],\n  \"requested_by\": \"ann\",\n  \"reviewer\": \"bob\"\n}\n",
+    "rules/zy_draft_jtc.json": "{\n  \"_bundle_fixture\": {\n    \"numbers\": [\n      -0.0,\n      1e-07,\n      1e+20,\n      1180591620717411303424\n    ],\n    \"text\": \"caf\u00e9 \u00a7 \ud83d\ude00 \\u0000 \u007f \u2028\"\n  },\n  \"_prototype_verification\": \"FICTIONAL draft for tests. Every value is invented and flagged; it is not law.\",\n  \"benefit\": {\n    \"_prototype_verify\": true,\n    \"amount_per_qualifying_job_usd\": 1200,\n    \"benefit_period_years\": 3,\n    \"carryforward_years\": 5,\n    \"currency\": \"USD\"\n  },\n  \"credit\": {\n    \"code\": \"ZY_DRAFT_JTC\",\n    \"name\": \"ZY_DRAFT_JTC (fictional)\",\n    \"statutory_citation\": \"Fictional Code \u00a7 0-0-0\"\n  },\n  \"filing\": {\n    \"_prototype_verify\": true,\n    \"cycle\": \"annual\",\n    \"window\": \"Fictional filing window\"\n  },\n  \"jurisdiction\": {\n    \"code\": \"ZY\",\n    \"level\": \"state\",\n    \"name\": \"Zedland Two (fictional)\"\n  },\n  \"one_zero\": {\n    \"_prototype_verify\": true,\n    \"entity_combination\": \"permitted\",\n    \"geographic_granularity\": \"statewide\",\n    \"headcount_unit_field\": \"Worksite_ID\",\n    \"min_weekly_hours\": 30.0,\n    \"min_weekly_wages\": 400.0,\n    \"pt_aggregation\": false,\n    \"wage_basis\": \"regular\",\n    \"wage_floor_basis\": {\n      \"_prototype_verify\": true,\n      \"note\": \"invented for tests\"\n    }\n  },\n  \"rule_pack_version\": \"0.0.1\",\n  \"tax_year_convention\": {\n    \"_prototype_verify\": true,\n    \"label\": \"begins\"\n  },\n  \"thresholds\": {\n    \"_prototype_verify\": true,\n    \"minimum_hours_per_week_full_time\": 30,\n    \"minimum_new_jobs\": 1\n  }\n}\n",
+    "rules/zy_draft_jtc/2024.json": "{\n  \"_prototype_verification\": \"FICTIONAL draft for tests. Every value is invented and flagged; it is not law.\",\n  \"_year_provenance\": {\n    \"adr\": \"ADR-005\",\n    \"source\": \"invented for tests\"\n  },\n  \"benefit\": {\n    \"_prototype_verify\": true,\n    \"amount_per_qualifying_job_usd\": 1200,\n    \"benefit_period_years\": 3,\n    \"carryforward_years\": 5,\n    \"currency\": \"USD\"\n  },\n  \"credit\": {\n    \"code\": \"ZY_DRAFT_JTC\",\n    \"name\": \"ZY_DRAFT_JTC (fictional)\",\n    \"statutory_citation\": \"Fictional Code \u00a7 0-0-0\"\n  },\n  \"filing\": {\n    \"_prototype_verify\": true,\n    \"cycle\": \"annual\",\n    \"window\": \"Fictional filing window\"\n  },\n  \"jurisdiction\": {\n    \"code\": \"ZY\",\n    \"level\": \"state\",\n    \"name\": \"Zedland Two (fictional)\"\n  },\n  \"one_zero\": {\n    \"_prototype_verify\": true,\n    \"entity_combination\": \"permitted\",\n    \"geographic_granularity\": \"statewide\",\n    \"headcount_unit_field\": \"Worksite_ID\",\n    \"min_weekly_hours\": 30.0,\n    \"min_weekly_wages\": 400.0,\n    \"pt_aggregation\": false,\n    \"wage_basis\": \"regular\",\n    \"wage_floor_basis\": {\n      \"_prototype_verify\": true,\n      \"note\": \"invented for tests\"\n    }\n  },\n  \"rule_pack_version\": \"0.0.1+ty2024\",\n  \"tax_year\": 2024,\n  \"tax_year_convention\": {\n    \"_prototype_verify\": true,\n    \"label\": \"begins\"\n  },\n  \"thresholds\": {\n    \"_prototype_verify\": true,\n    \"minimum_hours_per_week_full_time\": 30,\n    \"minimum_new_jobs\": 1\n  }\n}\n",
+    "rules/zy_draft_jtc/2025.json": "{\n  \"_prototype_verification\": \"FICTIONAL draft for tests. Every value is invented and flagged; it is not law.\",\n  \"_year_provenance\": {\n    \"adr\": \"ADR-005\",\n    \"source\": \"invented for tests\"\n  },\n  \"benefit\": {\n    \"_prototype_verify\": true,\n    \"amount_per_qualifying_job_usd\": 1200,\n    \"benefit_period_years\": 3,\n    \"carryforward_years\": 5,\n    \"currency\": \"USD\"\n  },\n  \"credit\": {\n    \"code\": \"ZY_DRAFT_JTC\",\n    \"name\": \"ZY_DRAFT_JTC (fictional)\",\n    \"statutory_citation\": \"Fictional Code \u00a7 0-0-0\"\n  },\n  \"filing\": {\n    \"_prototype_verify\": true,\n    \"cycle\": \"annual\",\n    \"window\": \"Fictional filing window\"\n  },\n  \"jurisdiction\": {\n    \"code\": \"ZY\",\n    \"level\": \"state\",\n    \"name\": \"Zedland Two (fictional)\"\n  },\n  \"one_zero\": {\n    \"_prototype_verify\": true,\n    \"entity_combination\": \"permitted\",\n    \"geographic_granularity\": \"statewide\",\n    \"headcount_unit_field\": \"Worksite_ID\",\n    \"min_weekly_hours\": 30.0,\n    \"min_weekly_wages\": 400.0,\n    \"pt_aggregation\": false,\n    \"wage_basis\": \"regular\",\n    \"wage_floor_basis\": {\n      \"_prototype_verify\": true,\n      \"note\": \"invented for tests\"\n    }\n  },\n  \"rule_pack_version\": \"0.0.1+ty2025\",\n  \"tax_year\": 2025,\n  \"tax_year_convention\": {\n    \"_prototype_verify\": true,\n    \"label\": \"begins\"\n  },\n  \"thresholds\": {\n    \"_prototype_verify\": true,\n    \"minimum_hours_per_week_full_time\": 30,\n    \"minimum_new_jobs\": 1\n  }\n}\n",
+    "validation-report.json": "{\n  \"note\": \"Valid means well-formed, not verified.\",\n  \"result\": {\n    \"content_sha256\": \"f31620f5486404049920d18089f9d5a73f0898dd2fc2a142d71eb033a65b96cd\",\n    \"errors\": 0,\n    \"findings\": [],\n    \"infos\": 0,\n    \"truncated\": false,\n    \"valid\": true,\n    \"verification\": \"not_verified\",\n    \"warnings\": 0\n  }\n}\n"
+  }
+}

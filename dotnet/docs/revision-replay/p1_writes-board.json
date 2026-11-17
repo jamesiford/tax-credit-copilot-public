@@ -1,0 +1,46 @@
+{
+  "mode": "semantic",
+  "groups": {
+    "claims_artifacts_rules": {
+      "cases": 151,
+      "passed": 26,
+      "failed": 125,
+      "pass_percent": 17.22,
+      "status": "red"
+    },
+    "drafts_runs": {
+      "cases": 37,
+      "passed": 4,
+      "failed": 33,
+      "pass_percent": 10.81,
+      "status": "red"
+    },
+    "reads_calc": {
+      "cases": 104,
+      "passed": 12,
+      "failed": 92,
+      "pass_percent": 11.54,
+      "status": "red"
+    },
+    "workspace_sealed": {
+      "cases": 74,
+      "passed": 21,
+      "failed": 53,
+      "pass_percent": 28.38,
+      "status": "red"
+    }
+  },
+  "failure_categories": {
+    "p1_writes": {
+      "status": 40,
+      "missing-field": 285,
+      "extra-field": 19,
+      "value": 406,
+      "type": 44,
+      "array-length": 21,
+      "header": 3
+    }
+  },
+  "waived_cases": 0,
+  "note": "Raw replay results, no waivers. Deferred business and gateway groups are red by design."
+}

@@ -1,0 +1,209 @@
+# Replay report (semantic)
+
+- server interpreter: external server (zlib n/a), oracle: None
+- scenarios: 1
+- exchanges compared: 175
+- failures: 870
+- tolerated (semantic mode only): 0
+
+## p1_program_drafts: 175 exchanges, 870 failures, 0 tolerated
+- `POST /api/v2/program-drafts` / `create` **status** at `status`: expected `201` actual `501`
+- `POST /api/v2/program-drafts` / `create` **missing-field** at `draft_id`: expected `40000000000040008000000000000008` actual `<absent>`
+- `POST /api/v2/program-drafts` / `create` **missing-field** at `proposed_code`: expected `ZY_DRAFT_JTC` actual `<absent>`
+- `POST /api/v2/program-drafts` / `create` **missing-field** at `name`: expected `Zedland Two Jobs Credit` actual `<absent>`
+- `POST /api/v2/program-drafts` / `create` **missing-field** at `jurisdiction_level`: expected `state` actual `<absent>`
+- `POST /api/v2/program-drafts` / `create` **missing-field** at `state`: expected `ZY` actual `<absent>`
+- `POST /api/v2/program-drafts` / `create` **missing-field** at `status`: expected `draft` actual `<absent>`
+- `POST /api/v2/program-drafts` / `create` **missing-field** at `version`: expected `1` actual `<absent>`
+- `POST /api/v2/program-drafts` / `create` **missing-field** at `created_by`: expected `ann` actual `<absent>`
+- `POST /api/v2/program-drafts` / `create` **missing-field** at `created_at`: expected `2026-01-15T12:00:00+00:00` actual `<absent>`
+- `POST /api/v2/program-drafts` / `create` **missing-field** at `updated_by`: expected `ann` actual `<absent>`
+- `POST /api/v2/program-drafts` / `create` **missing-field** at `updated_at`: expected `2026-01-15T12:00:00+00:00` actual `<absent>`
+- `POST /api/v2/program-drafts` / `create` **missing-field** at `pack_file`: expected `zy_draft_jtc.json` actual `<absent>`
+- `POST /api/v2/program-drafts` / `create` **missing-field** at `validation_errors`: expected `null` actual `<absent>`
+- `POST /api/v2/program-drafts` / `create` **missing-field** at `verification`: expected `not_verified` actual `<absent>`
+- `POST /api/v2/program-drafts` / `create` **missing-field** at `has_runtime_authority`: expected `false` actual `<absent>`
+- `POST /api/v2/program-drafts` / `create` **missing-field** at `documents`: expected `{"pack":{"_prototype_verification":"DRAFT skeleton. No value here is verified. Fill every null from a cited source, validate, then have it reviewed before any real client use.","rule_pack_version":"0.0.1","jurisdiction":{"level":"state","code":"ZY","name":"Zedland Two Jobs Credit"},"credit":{"code":...(3693 chars)` actual `<absent>`
+- `POST /api/v2/program-drafts` / `create` **missing-field** at `content_sha256`: expected `4fa2d01259b43d2239f2163199456b82b4ebfe0f50fee093291f9760525a8745` actual `<absent>`
+- `POST /api/v2/program-drafts` / `create` **missing-field** at `validation`: expected `null` actual `<absent>`
+- `POST /api/v2/program-drafts` / `create` **missing-field** at `validation_current`: expected `false` actual `<absent>`
+- `POST /api/v2/program-drafts` / `create` **missing-field** at `review`: expected `{"requested_by":null,"reviewer":null,"decision":null,"comment":null,"decided_at":null,"approved_sha256":null}` actual `<absent>`
+- `POST /api/v2/program-drafts` / `create` **missing-field** at `export`: expected `{"exported_at":null,"bundle_sha256":null}` actual `<absent>`
+- `POST /api/v2/program-drafts` / `create` **missing-field** at `allowed_actions`: expected `["edit","validate","preview","withdraw"]` actual `<absent>`
+- `POST /api/v2/program-drafts` / `create` **missing-field** at `events`: expected `[]` actual `<absent>`
+- `POST /api/v2/program-drafts` / `create` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /api/v2/program-drafts`
+- `POST /api/v2/program-drafts` / `create-duplicate-code` **status** at `status`: expected `409` actual `501`
+- `POST /api/v2/program-drafts` / `create-duplicate-code` **type** at `detail`: expected `{"code":"draft_conflict","reason":"a draft for ZY_DRAFT_JTC is already open"}` actual `Operation not implemented: POST /api/v2/program-drafts`
+- `POST /api/v2/program-drafts` / `create-bad-code` **status** at `status`: expected `422` actual `501`
+- `POST /api/v2/program-drafts` / `create-bad-code` **type** at `detail`: expected `{"code":"draft_invalid","reason":"a program code is upper case letters, digits and underscores, starting with a letter (for example ZZ_DEMO_JTC)"}` actual `Operation not implemented: POST /api/v2/program-drafts`
+- `POST /api/v2/program-drafts` / `create-long-code` **missing-field** at `detail[0].ctx`: expected `{"max_length":64}` actual `<absent>`
+- `POST /api/v2/program-drafts` / `create-long-code` **value** at `detail[0].msg`: expected `String should have at most 64 characters` actual `Value is too long.`
+- `GET /api/v2/program-drafts/40000000000040008000000000000008` / `get` **status** at `status`: expected `200` actual `501`
+- `GET /api/v2/program-drafts/40000000000040008000000000000008` / `get` **missing-field** at `draft_id`: expected `40000000000040008000000000000008` actual `<absent>`
+- `GET /api/v2/program-drafts/40000000000040008000000000000008` / `get` **missing-field** at `proposed_code`: expected `ZY_DRAFT_JTC` actual `<absent>`
+- `GET /api/v2/program-drafts/40000000000040008000000000000008` / `get` **missing-field** at `name`: expected `Zedland Two Jobs Credit` actual `<absent>`
+- `GET /api/v2/program-drafts/40000000000040008000000000000008` / `get` **missing-field** at `jurisdiction_level`: expected `state` actual `<absent>`
+- `GET /api/v2/program-drafts/40000000000040008000000000000008` / `get` **missing-field** at `state`: expected `ZY` actual `<absent>`
+- `GET /api/v2/program-drafts/40000000000040008000000000000008` / `get` **missing-field** at `status`: expected `draft` actual `<absent>`
+- `GET /api/v2/program-drafts/40000000000040008000000000000008` / `get` **missing-field** at `version`: expected `1` actual `<absent>`
+- `GET /api/v2/program-drafts/40000000000040008000000000000008` / `get` **missing-field** at `created_by`: expected `ann` actual `<absent>`
+- `GET /api/v2/program-drafts/40000000000040008000000000000008` / `get` **missing-field** at `created_at`: expected `2026-01-15T12:00:00+00:00` actual `<absent>`
+- `GET /api/v2/program-drafts/40000000000040008000000000000008` / `get` **missing-field** at `updated_by`: expected `ann` actual `<absent>`
+- `GET /api/v2/program-drafts/40000000000040008000000000000008` / `get` **missing-field** at `updated_at`: expected `2026-01-15T12:00:00+00:00` actual `<absent>`
+- `GET /api/v2/program-drafts/40000000000040008000000000000008` / `get` **missing-field** at `pack_file`: expected `zy_draft_jtc.json` actual `<absent>`
+- `GET /api/v2/program-drafts/40000000000040008000000000000008` / `get` **missing-field** at `validation_errors`: expected `null` actual `<absent>`
+- `GET /api/v2/program-drafts/40000000000040008000000000000008` / `get` **missing-field** at `verification`: expected `not_verified` actual `<absent>`
+- `GET /api/v2/program-drafts/40000000000040008000000000000008` / `get` **missing-field** at `has_runtime_authority`: expected `false` actual `<absent>`
+- `GET /api/v2/program-drafts/40000000000040008000000000000008` / `get` **missing-field** at `documents`: expected `{"pack":{"_prototype_verification":"DRAFT skeleton. No value here is verified. Fill every null from a cited source, validate, then have it reviewed before any real client use.","benefit":{"_prototype_verify":true,"amount_per_qualifying_job_usd":null,"benefit_period_years":null,"carryforward_years":n...(3693 chars)` actual `<absent>`
+- `GET /api/v2/program-drafts/40000000000040008000000000000008` / `get` **missing-field** at `content_sha256`: expected `4fa2d01259b43d2239f2163199456b82b4ebfe0f50fee093291f9760525a8745` actual `<absent>`
+- `GET /api/v2/program-drafts/40000000000040008000000000000008` / `get` **missing-field** at `validation`: expected `null` actual `<absent>`
+- `GET /api/v2/program-drafts/40000000000040008000000000000008` / `get` **missing-field** at `validation_current`: expected `false` actual `<absent>`
+- `GET /api/v2/program-drafts/40000000000040008000000000000008` / `get` **missing-field** at `review`: expected `{"requested_by":null,"reviewer":null,"decision":null,"comment":null,"decided_at":null,"approved_sha256":null}` actual `<absent>`
+- `GET /api/v2/program-drafts/40000000000040008000000000000008` / `get` **missing-field** at `export`: expected `{"exported_at":null,"bundle_sha256":null}` actual `<absent>`
+- `GET /api/v2/program-drafts/40000000000040008000000000000008` / `get` **missing-field** at `allowed_actions`: expected `["edit","validate","preview","withdraw"]` actual `<absent>`
+- `GET /api/v2/program-drafts/40000000000040008000000000000008` / `get` **missing-field** at `events`: expected `[{"seq":1,"event_type":"created","actor":"ann","at":"2026-01-15T12:00:00+00:00","from_status":"draft","to_status":"draft","detail":{"years":["2024","2025"]}}]` actual `<absent>`
+- `GET /api/v2/program-drafts/40000000000040008000000000000008` / `get` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /api/v2/program-drafts/{draft_id}`
+- `GET /api/v2/program-drafts` / `list` **status** at `status`: expected `200` actual `501`
+- `GET /api/v2/program-drafts` / `list` **missing-field** at `items`: expected `[{"draft_id":"40000000000040008000000000000008","proposed_code":"ZY_DRAFT_JTC","name":"Zedland Two Jobs Credit","jurisdiction_level":"state","state":"ZY","status":"draft","version":1,"created_by":"ann","created_at":"2026-01-15T12:00:00+00:00","updated_by":"ann","updated_at":"2026-01-15T12:00:00+00:0...(421 chars)` actual `<absent>`
+- `GET /api/v2/program-drafts` / `list` **missing-field** at `total`: expected `1` actual `<absent>`
+- `GET /api/v2/program-drafts` / `list` **missing-field** at `limit`: expected `50` actual `<absent>`
+- `GET /api/v2/program-drafts` / `list` **missing-field** at `offset`: expected `0` actual `<absent>`
+- `GET /api/v2/program-drafts` / `list` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /api/v2/program-drafts`
+- `GET /api/v2/program-drafts` / `list-status` **status** at `status`: expected `200` actual `501`
+- `GET /api/v2/program-drafts` / `list-status` **missing-field** at `items`: expected `[{"draft_id":"40000000000040008000000000000008","proposed_code":"ZY_DRAFT_JTC","name":"Zedland Two Jobs Credit","jurisdiction_level":"state","state":"ZY","status":"draft","version":1,"created_by":"ann","created_at":"2026-01-15T12:00:00+00:00","updated_by":"ann","updated_at":"2026-01-15T12:00:00+00:0...(421 chars)` actual `<absent>`
+- `GET /api/v2/program-drafts` / `list-status` **missing-field** at `total`: expected `1` actual `<absent>`
+- `GET /api/v2/program-drafts` / `list-status` **missing-field** at `limit`: expected `50` actual `<absent>`
+- `GET /api/v2/program-drafts` / `list-status` **missing-field** at `offset`: expected `0` actual `<absent>`
+- `GET /api/v2/program-drafts` / `list-status` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /api/v2/program-drafts`
+- `GET /api/v2/program-drafts` / `list-status-bogus` **status** at `status`: expected `200` actual `501`
+- `GET /api/v2/program-drafts` / `list-status-bogus` **missing-field** at `items`: expected `[]` actual `<absent>`
+- `GET /api/v2/program-drafts` / `list-status-bogus` **missing-field** at `total`: expected `0` actual `<absent>`
+- `GET /api/v2/program-drafts` / `list-status-bogus` **missing-field** at `limit`: expected `50` actual `<absent>`
+- `GET /api/v2/program-drafts` / `list-status-bogus` **missing-field** at `offset`: expected `0` actual `<absent>`
+- `GET /api/v2/program-drafts` / `list-status-bogus` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /api/v2/program-drafts`
+- `GET /api/v2/program-drafts` / `list-limit-0` **missing-field** at `detail[0].ctx`: expected `{"ge":1}` actual `<absent>`
+- `GET /api/v2/program-drafts` / `list-limit-0` **value** at `detail[0].msg`: expected `Input should be greater than or equal to 1` actual `Value violates minimum.`
+- `GET /api/v2/program-drafts` / `list-limit-0` **type** at `detail[0].input`: expected `0` actual `0`
+- `GET /api/v2/program-drafts` / `list-offset-past` **status** at `status`: expected `200` actual `501`
+- `GET /api/v2/program-drafts` / `list-offset-past` **missing-field** at `items`: expected `[]` actual `<absent>`
+- `GET /api/v2/program-drafts` / `list-offset-past` **missing-field** at `total`: expected `1` actual `<absent>`
+- `GET /api/v2/program-drafts` / `list-offset-past` **missing-field** at `limit`: expected `50` actual `<absent>`
+- `GET /api/v2/program-drafts` / `list-offset-past` **missing-field** at `offset`: expected `99` actual `<absent>`
+- `GET /api/v2/program-drafts` / `list-offset-past` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /api/v2/program-drafts`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate-empty-scaffold` **status** at `status`: expected `200` actual `501`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate-empty-scaffold` **missing-field** at `draft_id`: expected `40000000000040008000000000000008` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate-empty-scaffold` **missing-field** at `proposed_code`: expected `ZY_DRAFT_JTC` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate-empty-scaffold` **missing-field** at `name`: expected `Zedland Two Jobs Credit` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate-empty-scaffold` **missing-field** at `jurisdiction_level`: expected `state` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate-empty-scaffold` **missing-field** at `state`: expected `ZY` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate-empty-scaffold` **missing-field** at `status`: expected `needs_changes` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate-empty-scaffold` **missing-field** at `version`: expected `2` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate-empty-scaffold` **missing-field** at `created_by`: expected `ann` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate-empty-scaffold` **missing-field** at `created_at`: expected `2026-01-15T12:00:00+00:00` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate-empty-scaffold` **missing-field** at `updated_by`: expected `ann` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate-empty-scaffold` **missing-field** at `updated_at`: expected `2026-01-15T12:00:00+00:00` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate-empty-scaffold` **missing-field** at `pack_file`: expected `zy_draft_jtc.json` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate-empty-scaffold` **missing-field** at `validation_errors`: expected `32` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate-empty-scaffold` **missing-field** at `verification`: expected `not_verified` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate-empty-scaffold` **missing-field** at `has_runtime_authority`: expected `false` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate-empty-scaffold` **missing-field** at `documents`: expected `{"pack":{"_prototype_verification":"DRAFT skeleton. No value here is verified. Fill every null from a cited source, validate, then have it reviewed before any real client use.","benefit":{"_prototype_verify":true,"amount_per_qualifying_job_usd":null,"benefit_period_years":null,"carryforward_years":n...(3693 chars)` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate-empty-scaffold` **missing-field** at `content_sha256`: expected `4fa2d01259b43d2239f2163199456b82b4ebfe0f50fee093291f9760525a8745` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate-empty-scaffold` **missing-field** at `validation`: expected `{"content_sha256":"4fa2d01259b43d2239f2163199456b82b4ebfe0f50fee093291f9760525a8745","valid":false,"errors":32,"warnings":0,"infos":18,"findings":[{"file":"pack","severity":"error","code":"todo_placeholder","path":"/credit/statutory_citation","message":"still holds scaffolding text: replace it with ...(7291 chars)` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate-empty-scaffold` **missing-field** at `validation_current`: expected `true` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate-empty-scaffold` **missing-field** at `review`: expected `{"requested_by":null,"reviewer":null,"decision":null,"comment":null,"decided_at":null,"approved_sha256":null}` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate-empty-scaffold` **missing-field** at `export`: expected `{"exported_at":null,"bundle_sha256":null}` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate-empty-scaffold` **missing-field** at `allowed_actions`: expected `["edit","validate","preview","withdraw"]` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate-empty-scaffold` **missing-field** at `events`: expected `[]` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate-empty-scaffold` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /api/v2/program-drafts/{draft_id}/validate`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/request-review` / `request-review-while-invalid` **status** at `status`: expected `422` actual `501`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/request-review` / `request-review-while-invalid` **type** at `detail`: expected `{"code":"review_refused","reason":"the draft has 32 validation error(s); fix them before asking for review"}` actual `Operation not implemented: POST /api/v2/program-drafts/{draft_id}/request-review`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-stale-version` **status** at `status`: expected `409` actual `501`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-stale-version` **type** at `detail`: expected `{"code":"draft_conflict","reason":"draft 40000000000040008000000000000008 is at version 2, not 999; reload it"}` actual `Operation not implemented: PUT /api/v2/program-drafts/{draft_id}/documents`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-wrong-code` **status** at `status`: expected `200` actual `422`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-wrong-code` **missing-field** at `draft_id`: expected `40000000000040008000000000000008` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-wrong-code` **missing-field** at `proposed_code`: expected `ZY_DRAFT_JTC` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-wrong-code` **missing-field** at `name`: expected `Zedland Two Jobs Credit` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-wrong-code` **missing-field** at `jurisdiction_level`: expected `state` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-wrong-code` **missing-field** at `state`: expected `ZY` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-wrong-code` **missing-field** at `status`: expected `draft` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-wrong-code` **missing-field** at `version`: expected `3` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-wrong-code` **missing-field** at `created_by`: expected `ann` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-wrong-code` **missing-field** at `created_at`: expected `2026-01-15T12:00:00+00:00` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-wrong-code` **missing-field** at `updated_by`: expected `ann` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-wrong-code` **missing-field** at `updated_at`: expected `2026-01-15T12:00:00+00:00` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-wrong-code` **missing-field** at `pack_file`: expected `zy_draft_jtc.json` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-wrong-code` **missing-field** at `validation_errors`: expected `32` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-wrong-code` **missing-field** at `verification`: expected `not_verified` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-wrong-code` **missing-field** at `has_runtime_authority`: expected `false` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-wrong-code` **missing-field** at `documents`: expected `{"pack":{"_prototype_verification":"FICTIONAL draft for tests. Every value is invented and flagged; it is not law.","rule_pack_version":"0.0.1","jurisdiction":{"level":"state","code":"ZY","name":"Zedland Two (fictional)"},"credit":{"code":"ZZ_OTHER","name":"ZY_DRAFT_JTC (fictional)","statutory_citat...(3310 chars)` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-wrong-code` **missing-field** at `content_sha256`: expected `0b72a2f22327de39b9cf994c301d842def82f746464e1869c6e8fd2f9a7dbf64` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-wrong-code` **missing-field** at `validation`: expected `{"content_sha256":"4fa2d01259b43d2239f2163199456b82b4ebfe0f50fee093291f9760525a8745","valid":false,"errors":32,"warnings":0,"infos":18,"findings":[{"file":"pack","severity":"error","code":"todo_placeholder","path":"/credit/statutory_citation","message":"still holds scaffolding text: replace it with ...(5933 chars)` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-wrong-code` **missing-field** at `validation_current`: expected `false` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-wrong-code` **missing-field** at `review`: expected `{"requested_by":null,"reviewer":null,"decision":null,"comment":null,"decided_at":null,"approved_sha256":null}` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-wrong-code` **missing-field** at `export`: expected `{"exported_at":null,"bundle_sha256":null}` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-wrong-code` **missing-field** at `allowed_actions`: expected `["edit","validate","preview","withdraw"]` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-wrong-code` **missing-field** at `events`: expected `[]` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-wrong-code` **extra-field** at `detail`: expected `<absent>` actual `[{"type":"int_parsing","loc":["body","expected_version"],"msg":"Expected integer.","input":"capture-failed"}]`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-fill` **status** at `status`: expected `200` actual `422`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-fill` **missing-field** at `draft_id`: expected `40000000000040008000000000000008` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-fill` **missing-field** at `proposed_code`: expected `ZY_DRAFT_JTC` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-fill` **missing-field** at `name`: expected `Zedland Two Jobs Credit` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-fill` **missing-field** at `jurisdiction_level`: expected `state` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-fill` **missing-field** at `state`: expected `ZY` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-fill` **missing-field** at `status`: expected `draft` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-fill` **missing-field** at `version`: expected `4` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-fill` **missing-field** at `created_by`: expected `ann` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-fill` **missing-field** at `created_at`: expected `2026-01-15T12:00:00+00:00` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-fill` **missing-field** at `updated_by`: expected `ann` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-fill` **missing-field** at `updated_at`: expected `2026-01-15T12:00:00+00:00` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-fill` **missing-field** at `pack_file`: expected `zy_draft_jtc.json` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-fill` **missing-field** at `validation_errors`: expected `32` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-fill` **missing-field** at `verification`: expected `not_verified` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-fill` **missing-field** at `has_runtime_authority`: expected `false` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-fill` **missing-field** at `documents`: expected `{"pack":{"_prototype_verification":"FICTIONAL draft for tests. Every value is invented and flagged; it is not law.","rule_pack_version":"0.0.1","jurisdiction":{"level":"state","code":"ZY","name":"Zedland Two (fictional)"},"credit":{"code":"ZY_DRAFT_JTC","name":"ZY_DRAFT_JTC (fictional)","statutory_c...(3314 chars)` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-fill` **missing-field** at `content_sha256`: expected `423c8bed524d76cc28d9d87d555ba8441ec27d8355b9414e3588295c0300f7ed` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-fill` **missing-field** at `validation`: expected `{"content_sha256":"4fa2d01259b43d2239f2163199456b82b4ebfe0f50fee093291f9760525a8745","valid":false,"errors":32,"warnings":0,"infos":18,"findings":[{"file":"pack","severity":"error","code":"todo_placeholder","path":"/credit/statutory_citation","message":"still holds scaffolding text: replace it with ...(5933 chars)` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-fill` **missing-field** at `validation_current`: expected `false` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-fill` **missing-field** at `review`: expected `{"requested_by":null,"reviewer":null,"decision":null,"comment":null,"decided_at":null,"approved_sha256":null}` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-fill` **missing-field** at `export`: expected `{"exported_at":null,"bundle_sha256":null}` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-fill` **missing-field** at `allowed_actions`: expected `["edit","validate","preview","withdraw"]` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-fill` **missing-field** at `events`: expected `[]` actual `<absent>`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-fill` **extra-field** at `detail`: expected `<absent>` actual `[{"type":"int_parsing","loc":["body","expected_version"],"msg":"Expected integer.","input":"capture-failed"}]`
+- `PUT /api/v2/program-drafts/40000000000040008000000000000008/documents` / `documents-oversize-note` **type** at `detail`: expected `{"code":"draft_invalid","reason":"document 'pack' is larger than 8000 characters; split the notes out or shorten it"}` actual `[{"type":"int_parsing","loc":["body","expected_version"],"msg":"Expected integer.","input":"capture-failed"}]`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate` **status** at `status`: expected `200` actual `501`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate` **missing-field** at `draft_id`: expected `40000000000040008000000000000008` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate` **missing-field** at `proposed_code`: expected `ZY_DRAFT_JTC` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate` **missing-field** at `name`: expected `Zedland Two Jobs Credit` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate` **missing-field** at `jurisdiction_level`: expected `state` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate` **missing-field** at `state`: expected `ZY` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate` **missing-field** at `status`: expected `draft` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate` **missing-field** at `version`: expected `5` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate` **missing-field** at `created_by`: expected `ann` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate` **missing-field** at `created_at`: expected `2026-01-15T12:00:00+00:00` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate` **missing-field** at `updated_by`: expected `ann` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate` **missing-field** at `updated_at`: expected `2026-01-15T12:00:00+00:00` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate` **missing-field** at `pack_file`: expected `zy_draft_jtc.json` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate` **missing-field** at `validation_errors`: expected `0` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate` **missing-field** at `verification`: expected `not_verified` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate` **missing-field** at `has_runtime_authority`: expected `false` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate` **missing-field** at `documents`: expected `{"pack":{"_prototype_verification":"FICTIONAL draft for tests. Every value is invented and flagged; it is not law.","benefit":{"_prototype_verify":true,"amount_per_qualifying_job_usd":1200,"benefit_period_years":3,"carryforward_years":5,"currency":"USD"},"credit":{"code":"ZY_DRAFT_JTC","name":"ZY_DR...(3314 chars)` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate` **missing-field** at `content_sha256`: expected `423c8bed524d76cc28d9d87d555ba8441ec27d8355b9414e3588295c0300f7ed` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate` **missing-field** at `validation`: expected `{"content_sha256":"423c8bed524d76cc28d9d87d555ba8441ec27d8355b9414e3588295c0300f7ed","valid":true,"errors":0,"warnings":0,"infos":18,"findings":[{"file":"pack","severity":"info","code":"unverified","path":"/benefit","message":"carries _prototype_verify: not verified"},{"file":"pack","severity":"info...(2585 chars)` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate` **missing-field** at `validation_current`: expected `true` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate` **missing-field** at `review`: expected `{"requested_by":null,"reviewer":null,"decision":null,"comment":null,"decided_at":null,"approved_sha256":null}` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate` **missing-field** at `export`: expected `{"exported_at":null,"bundle_sha256":null}` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate` **missing-field** at `allowed_actions`: expected `["edit","validate","request_review","preview","withdraw"]` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate` **missing-field** at `events`: expected `[]` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /api/v2/program-drafts/{draft_id}/validate`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate-null-body` **status** at `status`: expected `200` actual `501`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate-null-body` **missing-field** at `draft_id`: expected `40000000000040008000000000000008` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate-null-body` **missing-field** at `proposed_code`: expected `ZY_DRAFT_JTC` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate-null-body` **missing-field** at `name`: expected `Zedland Two Jobs Credit` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate-null-body` **missing-field** at `jurisdiction_level`: expected `state` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate-null-body` **missing-field** at `state`: expected `ZY` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate-null-body` **missing-field** at `status`: expected `draft` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate-null-body` **missing-field** at `version`: expected `6` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate-null-body` **missing-field** at `created_by`: expected `ann` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate-null-body` **missing-field** at `created_at`: expected `2026-01-15T12:00:00+00:00` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate-null-body` **missing-field** at `updated_by`: expected `anonymous` actual `<absent>`
+- `POST /api/v2/program-drafts/40000000000040008000000000000008/validate` / `validate-null-body` **missing-field** at `updated_at`: expected `2026-01-15T12:00:00+00:00` actual `<absent>`

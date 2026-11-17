@@ -1,0 +1,96 @@
+{
+  "session": "skeleton",
+  "branch": "dotnet/w1-skeleton",
+  "head": "7000de8",
+  "summary": "Fixed the conductor's reset 404: its dotnet-run inventory marker now supplies the explicit startup hook argument without overriding an opt-out or enabling ordinary/deployed hosts. Reran the unmodified conductor replay gate: 1769 exchanges, framework 11/19 (57.9%), zero framework waivers, PASS. Whole-solution build and format pass; all 141 fast tests and three launch regression tests pass. The local wrapper's broader classification remains 29/39 (74.36%); the conductor score is authoritative. Deferred business/gateway groups remain red by design. The head identifies the prior finish commit; this correction and updated finish evidence are committed together.",
+  "stages": {
+    "preflight": "done",
+    "stage1": "done",
+    "stage2": "done",
+    "stage3": "done",
+    "stage4": "done",
+    "stage5": "done"
+  },
+  "gates_claimed": {
+    "no_halt": true,
+    "commits_present": true,
+    "clean_tree": true,
+    "not_pushed": true,
+    "owned_paths": true,
+    "status_json": true,
+    "report_present": true,
+    "dotnet_build": true,
+    "dotnet_format": true,
+    "tests_fast": true,
+    "replay": true
+  },
+  "deviations": [
+    {
+      "id": "DEV-1",
+      "what": "Created the mandatory skeleton reports, log, improvements and status under dotnet/docs.",
+      "why": "The conductor's explicit resume instruction requires these outputs and supersedes the original documentation ownership conflict; no unrelated path was changed.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-2",
+      "what": "Provided both improvements/W1-skeleton.json and improvements/skeleton.json with identical entries.",
+      "why": "The prompt names both files. Stage 4 is the primary register, the fixed-rule name is a compatibility copy, and a test prevents drift.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-3",
+      "what": "Retained native routing, explicit-origin CORS and self-contained documentation instead of matching incidental framework recordings.",
+      "why": "The pre-approved policy forbids reproduction of framework artifacts. These remain visible raw misses; the framework threshold passes without any waiver.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-4",
+      "what": "Implemented all eleven captured workspace routes, not the ten mentioned in the scope prose.",
+      "why": "The authoritative inventory includes eleven operations; dropping one would violate the complete operation surface.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-5",
+      "what": "Bridge the conductor's TCC_CONTRACT_DIR inventory marker to --TCC_CONTRACT_HOOKS=1 for dotnet run.",
+      "why": "The unmodified conductor omits the required hook flag and disables launch profiles. The project launch bridge preserves runtime flag gating, explicit opt-outs and ordinary/deployed hook defaults.",
+      "decision_needed": false
+    }
+  ],
+  "findings": [
+    "F-6: missing workspace assumptions were plain-text 500; the host returns dependency-unavailable JSON 503.",
+    "F-4: negative proximity bands now return validation JSON 422 instead of an unhandled 500.",
+    "F-3: client identifiers outside Int64 storage range now return validation JSON 422.",
+    "F-1: absolute simulation magnitude above 10000 is refused with JSON 422 before computation.",
+    "Native trailing/case routing, explicit CORS and local documentation intentionally differ from incidental Python framework output.",
+    "The unchanged replay posts an empty reset object; the wrapper selects the scenario profile through the reset URL.",
+    "Relative raw-report paths could fail after the child changed directory and reuse stale reports. Absolute paths, prior-report removal and two focused tests now prevent false success.",
+    "Real persistence seeding, JWT verification, business handlers and data-dependent P2 readiness counters are deferred adapters, not fabricated skeleton functionality.",
+    "Slow parity assertions are unchanged; the fast test-run envelope fell from the unclassified 19m12s parity baseline to 8.997s across all four populated test projects.",
+    "The actual conductor launcher supplies TCC_CONTRACT_DIR, not TCC_CONTRACT_HOOKS. Its empty reset request now returns 200 through the scoped launch bridge.",
+    "The conductor scores framework 11/19 (57.9%), not the local wrapper's 29/39, because its exact-template classifier leaves wrong-method and native path variants unassigned. The unmodified conductor gate passes with zero framework waivers."
+  ],
+  "open_questions": [],
+  "needs_human": [
+    {
+      "item": "M-01: review ingestion overrides of year-resolved wage_basis, measuring_date and pay codes.",
+      "why": "ADR-005's year-resolved precedence conflicts with the captured behavior. Changing it moves calculated figures, so the certified port remains unchanged pending the owner decision."
+    },
+    {
+      "item": "Review credit_math pricing the first program when a state has several programs.",
+      "why": "The pre-approved policy preserves this figure-affecting behavior. Typed run-resolution refusals remain where already ported; no new credit_math refusal was added."
+    },
+    {
+      "item": "Review the operational simulation magnitude ceiling of 10000.",
+      "why": "F-1 requires a bound but specifies no threshold. The chosen ceiling refuses runaway input without introducing statute or changing a calculated figure."
+    }
+  ],
+  "reports": [
+    "dotnet/docs/HOST-ARCHITECTURE.md",
+    "dotnet/docs/route-groups.json",
+    "dotnet/docs/replay-skeleton-board.json",
+    "dotnet/docs/improvements/W1-skeleton.json",
+    "dotnet/docs/improvements/skeleton.json",
+    "dotnet/docs/skeleton-log.md",
+    "dotnet/docs/status/skeleton.json"
+  ]
+}

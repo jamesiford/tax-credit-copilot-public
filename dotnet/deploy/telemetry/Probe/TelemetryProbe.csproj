@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <ItemGroup>
+    <!-- Compile the unmodified actual defaults, without building any product project. -->
+    <Compile Include="..\..\..\src\TaxCredit.ServiceDefaults\Extensions.cs" Link="ServiceDefaults.cs" />
+    <!-- Independent pins matching the inspected product graph. OpenTelemetry: Apache-2.0;
+         Microsoft.Extensions.Http.Resilience: MIT (exact restored NuGet licence metadata). -->
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.20.1" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.20.2" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.20.1" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.20.0" />
+    <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="10.0.0" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>TaxCredit.Infrastructure</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="JsonSchema.Net" />
+    <ProjectReference Include="..\TaxCredit.Application\TaxCredit.Application.csproj" />
+  </ItemGroup>
+</Project>

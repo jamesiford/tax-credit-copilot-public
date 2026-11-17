@@ -1,0 +1,48 @@
+{
+  "complete": true,
+  "services": {
+    "api": {
+      "liveness": 200,
+      "network": "none",
+      "nonroot_readonly_resources": true,
+      "checksums_verified": true,
+      "readiness_status": 200,
+      "ready": false,
+      "unauthorized": 401,
+      "contract_controls": 404,
+      "sigterm_exit": 0,
+      "stop_seconds": 0.5
+    },
+    "gateway": {
+      "liveness": 200,
+      "network": "none",
+      "nonroot_readonly_resources": true,
+      "checksums_verified": true,
+      "static_readiness_false_positive": true,
+      "unauthorized": 401,
+      "contract_controls": 404,
+      "sigterm_exit": 0,
+      "stop_seconds": 0.516
+    },
+    "worker": {
+      "once_exit": 0,
+      "progress_observed": 0,
+      "invalid_configuration_refused": true,
+      "emulated_abort_not_reaped": true,
+      "abnormal_exit_verified": false,
+      "http_health_invented": false,
+      "app_service_available": false,
+      "sigterm_exit": 143,
+      "stop_seconds": 0.344
+    },
+    "orchestrator": {
+      "default_ingress_exit": 78,
+      "nonisolated_proof_exit": 78,
+      "sdk_readiness_status": 200,
+      "network": "none",
+      "externally_usable": false,
+      "sigterm_exit": 0,
+      "stop_seconds": 0.453
+    }
+  }
+}

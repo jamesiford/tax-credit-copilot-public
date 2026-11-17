@@ -1,0 +1,454 @@
+{
+  "kind": "read-only policy diagnostic, not an external conductor execution",
+  "mode": "semantic",
+  "policy": "W3 gateway prompt: global free error wording and Vary; exact registers; numeric changes refused except exact F-18 durable counters",
+  "threshold": "board only",
+  "totals": {
+    "cases": 255,
+    "globally_tolerated_fields": 459,
+    "registered_fields": 13,
+    "passed_cases": 233,
+    "waived_cases": 11,
+    "failed_cases": 22,
+    "raw_failing_fields": 528
+  },
+  "scenarios": [
+    {
+      "scenario": "g1_mcp",
+      "cases": 103,
+      "globally_tolerated_fields": 215,
+      "registered_fields": 8,
+      "passed_cases": 98,
+      "waived_cases": 6,
+      "failed_cases": 5,
+      "raw_failing_fields": 254,
+      "raw_report_sha256": "ec45836eb82cbe5d8af28bff40aa54823abad300446988583b74b20218342bc3"
+    },
+    {
+      "scenario": "g1_ratelimit",
+      "cases": 10,
+      "globally_tolerated_fields": 12,
+      "passed_cases": 10,
+      "waived_cases": 0,
+      "raw_failing_fields": 12,
+      "raw_report_sha256": "033e91a15cb0072a79c756e16e7fc37608cc55f95f1312c6ebdad865d24b2ae4"
+    },
+    {
+      "scenario": "g1_rest",
+      "cases": 142,
+      "globally_tolerated_fields": 232,
+      "passed_cases": 125,
+      "waived_cases": 5,
+      "registered_fields": 5,
+      "failed_cases": 17,
+      "raw_failing_fields": 262,
+      "raw_report_sha256": "9bd550dc1d91e2fcf5bc24006fb15988736164d98052c09b09dfc01c0df3c056"
+    }
+  ],
+  "register_field_hits": {
+    "IMP-gateway-2": 2,
+    "IMP-gateway-1": 4,
+    "IMP-gateway-7": 1,
+    "IMP-gateway-8": 1,
+    "IMP-gateway-3": 1,
+    "IMP-gateway-4": 2,
+    "IMP-gateway-6": 1,
+    "IMP-gateway-5": 1
+  },
+  "remaining_fields": [
+    {
+      "scenario": "g1_mcp",
+      "case": "call.client_at_risk.typical",
+      "route": "POST /mcp",
+      "category": "value",
+      "path": "result.content[0].text"
+    },
+    {
+      "scenario": "g1_mcp",
+      "case": "call.client_at_risk.typical",
+      "route": "POST /mcp",
+      "category": "missing-field",
+      "path": "result.structuredContent.blocks"
+    },
+    {
+      "scenario": "g1_mcp",
+      "case": "call.client_at_risk.typical",
+      "route": "POST /mcp",
+      "category": "missing-field",
+      "path": "result.structuredContent.disclaimer"
+    },
+    {
+      "scenario": "g1_mcp",
+      "case": "call.client_at_risk.typical",
+      "route": "POST /mcp",
+      "category": "missing-field",
+      "path": "result.structuredContent.facts"
+    },
+    {
+      "scenario": "g1_mcp",
+      "case": "call.client_at_risk.typical",
+      "route": "POST /mcp",
+      "category": "missing-field",
+      "path": "result.structuredContent.provenance"
+    },
+    {
+      "scenario": "g1_mcp",
+      "case": "call.client_at_risk.typical",
+      "route": "POST /mcp",
+      "category": "missing-field",
+      "path": "result.structuredContent.tool"
+    },
+    {
+      "scenario": "g1_mcp",
+      "case": "call.client_at_risk.typical",
+      "route": "POST /mcp",
+      "category": "missing-field",
+      "path": "result.structuredContent.warnings"
+    },
+    {
+      "scenario": "g1_mcp",
+      "case": "call.client_at_risk.typical",
+      "route": "POST /mcp",
+      "category": "extra-field",
+      "path": "result.structuredContent.error"
+    },
+    {
+      "scenario": "g1_mcp",
+      "case": "call.findings_list.typical",
+      "route": "POST /mcp",
+      "category": "value",
+      "path": "result.content[0].text"
+    },
+    {
+      "scenario": "g1_mcp",
+      "case": "call.findings_list.typical",
+      "route": "POST /mcp",
+      "category": "missing-field",
+      "path": "result.structuredContent.blocks"
+    },
+    {
+      "scenario": "g1_mcp",
+      "case": "call.findings_list.typical",
+      "route": "POST /mcp",
+      "category": "missing-field",
+      "path": "result.structuredContent.disclaimer"
+    },
+    {
+      "scenario": "g1_mcp",
+      "case": "call.findings_list.typical",
+      "route": "POST /mcp",
+      "category": "missing-field",
+      "path": "result.structuredContent.facts"
+    },
+    {
+      "scenario": "g1_mcp",
+      "case": "call.findings_list.typical",
+      "route": "POST /mcp",
+      "category": "missing-field",
+      "path": "result.structuredContent.provenance"
+    },
+    {
+      "scenario": "g1_mcp",
+      "case": "call.findings_list.typical",
+      "route": "POST /mcp",
+      "category": "missing-field",
+      "path": "result.structuredContent.tool"
+    },
+    {
+      "scenario": "g1_mcp",
+      "case": "call.findings_list.typical",
+      "route": "POST /mcp",
+      "category": "missing-field",
+      "path": "result.structuredContent.warnings"
+    },
+    {
+      "scenario": "g1_mcp",
+      "case": "call.findings_list.typical",
+      "route": "POST /mcp",
+      "category": "extra-field",
+      "path": "result.structuredContent.error"
+    },
+    {
+      "scenario": "g1_mcp",
+      "case": "call.data_catalog.typical",
+      "route": "POST /mcp",
+      "category": "value",
+      "path": "result.content[0].text"
+    },
+    {
+      "scenario": "g1_mcp",
+      "case": "call.data_catalog.typical",
+      "route": "POST /mcp",
+      "category": "array-length",
+      "path": "result.structuredContent.blocks"
+    },
+    {
+      "scenario": "g1_mcp",
+      "case": "call.data_catalog.typical",
+      "route": "POST /mcp",
+      "category": "array-length",
+      "path": "result.structuredContent.blocks[1].rows"
+    },
+    {
+      "scenario": "g1_mcp",
+      "case": "call.data_catalog.typical",
+      "route": "POST /mcp",
+      "category": "value",
+      "path": "result.structuredContent.blocks[3].text"
+    },
+    {
+      "scenario": "g1_mcp",
+      "case": "call.data_catalog.typical",
+      "route": "POST /mcp",
+      "category": "value",
+      "path": "result.structuredContent.blocks[4].text"
+    },
+    {
+      "scenario": "g1_mcp",
+      "case": "call.data_catalog.typical",
+      "route": "POST /mcp",
+      "category": "value",
+      "path": "result.structuredContent.facts.dataset_count"
+    },
+    {
+      "scenario": "g1_mcp",
+      "case": "call.data_catalog.typical",
+      "route": "POST /mcp",
+      "category": "array-length",
+      "path": "result.structuredContent.facts.datasets"
+    },
+    {
+      "scenario": "g1_mcp",
+      "case": "call.data_catalog.typical",
+      "route": "POST /mcp",
+      "category": "array-length",
+      "path": "result.structuredContent.facts.notes"
+    },
+    {
+      "scenario": "g1_mcp",
+      "case": "call.data_catalog.typical",
+      "route": "POST /mcp",
+      "category": "value",
+      "path": "result.structuredContent.facts.notes[1]"
+    },
+    {
+      "scenario": "g1_mcp",
+      "case": "call.data_catalog.typical",
+      "route": "POST /mcp",
+      "category": "value",
+      "path": "result.structuredContent.facts.notes[2]"
+    },
+    {
+      "scenario": "g1_mcp",
+      "case": "call.data_query.typical",
+      "route": "POST /mcp",
+      "category": "value",
+      "path": "result.content[0].text"
+    },
+    {
+      "scenario": "g1_mcp",
+      "case": "call.data_query.typical",
+      "route": "POST /mcp",
+      "category": "value",
+      "path": "result.structuredContent.error.code"
+    },
+    {
+      "scenario": "g1_mcp",
+      "case": "call.data_distinct_values.typical",
+      "route": "POST /mcp",
+      "category": "value",
+      "path": "result.content[0].text"
+    },
+    {
+      "scenario": "g1_mcp",
+      "case": "call.data_distinct_values.typical",
+      "route": "POST /mcp",
+      "category": "missing-field",
+      "path": "result.structuredContent.error.field"
+    },
+    {
+      "scenario": "g1_mcp",
+      "case": "call.data_distinct_values.typical",
+      "route": "POST /mcp",
+      "category": "value",
+      "path": "result.structuredContent.error.code"
+    },
+    {
+      "scenario": "g1_rest",
+      "case": "tool.data_catalog.typical",
+      "route": "POST /channel/v1/tools/data_catalog",
+      "category": "array-length",
+      "path": "blocks"
+    },
+    {
+      "scenario": "g1_rest",
+      "case": "tool.data_catalog.typical",
+      "route": "POST /channel/v1/tools/data_catalog",
+      "category": "array-length",
+      "path": "blocks[1].rows"
+    },
+    {
+      "scenario": "g1_rest",
+      "case": "tool.data_catalog.typical",
+      "route": "POST /channel/v1/tools/data_catalog",
+      "category": "value",
+      "path": "blocks[3].text"
+    },
+    {
+      "scenario": "g1_rest",
+      "case": "tool.data_catalog.typical",
+      "route": "POST /channel/v1/tools/data_catalog",
+      "category": "value",
+      "path": "facts.dataset_count"
+    },
+    {
+      "scenario": "g1_rest",
+      "case": "tool.data_catalog.typical",
+      "route": "POST /channel/v1/tools/data_catalog",
+      "category": "array-length",
+      "path": "facts.datasets"
+    },
+    {
+      "scenario": "g1_rest",
+      "case": "tool.data_catalog.typical",
+      "route": "POST /channel/v1/tools/data_catalog",
+      "category": "array-length",
+      "path": "facts.notes"
+    },
+    {
+      "scenario": "g1_rest",
+      "case": "tool.data_catalog.typical",
+      "route": "POST /channel/v1/tools/data_catalog",
+      "category": "value",
+      "path": "facts.notes[1]"
+    },
+    {
+      "scenario": "g1_rest",
+      "case": "tool.data_distinct_values.typical",
+      "route": "POST /channel/v1/tools/data_distinct_values",
+      "category": "missing-field",
+      "path": "error.field"
+    },
+    {
+      "scenario": "g1_rest",
+      "case": "tool.data_distinct_values.typical",
+      "route": "POST /channel/v1/tools/data_distinct_values",
+      "category": "value",
+      "path": "error.code"
+    },
+    {
+      "scenario": "g1_rest",
+      "case": "tool.claim_transition_prepare.typical",
+      "route": "POST /channel/v1/tools/claim_transition_prepare",
+      "category": "value",
+      "path": "facts.confirmation.confirmation_id"
+    },
+    {
+      "scenario": "g1_rest",
+      "case": "tool.claim_record_prepare.typical",
+      "route": "POST /channel/v1/tools/claim_record_prepare",
+      "category": "value",
+      "path": "facts.confirmation.confirmation_id"
+    },
+    {
+      "scenario": "g1_rest",
+      "case": "tool.engagement_set_prepare.typical",
+      "route": "POST /channel/v1/tools/engagement_set_prepare",
+      "category": "value",
+      "path": "facts.confirmation.confirmation_id"
+    },
+    {
+      "scenario": "g1_rest",
+      "case": "tool.base_year_set_prepare.typical",
+      "route": "POST /channel/v1/tools/base_year_set_prepare",
+      "category": "value",
+      "path": "facts.confirmation.confirmation_id"
+    },
+    {
+      "scenario": "g1_rest",
+      "case": "tool.claim_package_create_prepare.typical",
+      "route": "POST /channel/v1/tools/claim_package_create_prepare",
+      "category": "value",
+      "path": "facts.confirmation.confirmation_id"
+    },
+    {
+      "scenario": "g1_rest",
+      "case": "tool.delegated-book-rank",
+      "route": "POST /channel/v1/tools/book_rank",
+      "category": "value",
+      "path": "correlation_id"
+    },
+    {
+      "scenario": "g1_rest",
+      "case": "narration.delegated",
+      "route": "POST /channel/v1/audit/narration",
+      "category": "value",
+      "path": "correlation_id"
+    },
+    {
+      "scenario": "g1_rest",
+      "case": "download.unknown-ticket",
+      "route": "GET /channel/v1/downloads/not-a-ticket",
+      "category": "value",
+      "path": "correlation_id"
+    },
+    {
+      "scenario": "g1_rest",
+      "case": "download.unknown-ticket-with-token",
+      "route": "GET /channel/v1/downloads/not-a-ticket",
+      "category": "value",
+      "path": "correlation_id"
+    },
+    {
+      "scenario": "g1_rest",
+      "case": "write.prepare",
+      "route": "POST /channel/v1/tools/finding_resolve_prepare",
+      "category": "value",
+      "path": "facts.confirmation.confirmation_id"
+    },
+    {
+      "scenario": "g1_rest",
+      "case": "write.claim-package-prepare",
+      "route": "POST /channel/v1/tools/claim_package_create_prepare",
+      "category": "value",
+      "path": "facts.confirmation.confirmation_id"
+    },
+    {
+      "scenario": "g1_rest",
+      "case": "write.claim-package-commit",
+      "route": "POST /channel/v1/tools/claim_package_create_commit",
+      "category": "value",
+      "path": "facts.result.artifact_id"
+    },
+    {
+      "scenario": "g1_rest",
+      "case": "write.claim-package-commit",
+      "route": "POST /channel/v1/tools/claim_package_create_commit",
+      "category": "value",
+      "path": "facts.result.download_path"
+    },
+    {
+      "scenario": "g1_rest",
+      "case": "download.other-user",
+      "route": "GET /channel/v1/downloads/AAAAAAAAAAoAAAAAAAAACgAAAAAAAAAKAAAAAAAAAAo",
+      "category": "value",
+      "path": "correlation_id"
+    },
+    {
+      "scenario": "g1_rest",
+      "case": "download.owner",
+      "route": "GET /channel/v1/downloads/AAAAAAAAAAoAAAAAAAAACgAAAAAAAAAKAAAAAAAAAAo",
+      "category": "header",
+      "path": "headers.x-correlation-id"
+    },
+    {
+      "scenario": "g1_rest",
+      "case": "download.owner-again-single-use",
+      "route": "GET /channel/v1/downloads/AAAAAAAAAAoAAAAAAAAACgAAAAAAAAAKAAAAAAAAAAo",
+      "category": "value",
+      "path": "correlation_id"
+    }
+  ],
+  "rejected_numeric_register_matches": [],
+  "note": "No comparator, recording, threshold or raw failure was edited. Missing numerical facts and genuine authorization changes remain unresolved."
+}

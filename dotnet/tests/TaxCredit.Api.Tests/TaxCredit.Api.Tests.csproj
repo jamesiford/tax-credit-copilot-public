@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>TaxCredit.Api.Tests</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" />
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\TaxCredit.Api\TaxCredit.Api.csproj" />
+    <ProjectReference Include="..\..\src\TaxCredit.Application\TaxCredit.Application.csproj" />
+    <ProjectReference Include="..\..\src\TaxCredit.Domain\TaxCredit.Domain.csproj" />
+  </ItemGroup>
+</Project>

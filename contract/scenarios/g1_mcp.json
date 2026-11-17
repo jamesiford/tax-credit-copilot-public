@@ -1,0 +1,2634 @@
+{
+ "name": "g1_mcp",
+ "profile": "G1",
+ "tokens": {
+  "user": {
+   "kind": "user",
+   "oid": "00000000-0000-0000-0000-0000000000a1",
+   "aud": "api://contract-gateway",
+   "scp": "Channel.Access",
+   "roles": [],
+   "claims": {
+    "azp": "00000000-0000-0000-0000-0000000000c1"
+   }
+  },
+  "writer_user": {
+   "kind": "user",
+   "oid": "00000000-0000-0000-0000-0000000000a2",
+   "aud": "api://contract-gateway",
+   "scp": "Channel.Access",
+   "roles": [],
+   "claims": {
+    "azp": "00000000-0000-0000-0000-0000000000c1"
+   }
+  },
+  "agent": {
+   "kind": "agent",
+   "aud": "api://contract-gateway",
+   "roles": [
+    "Channel.Invoke"
+   ],
+   "claims": {
+    "azp": "00000000-0000-0000-0000-0000000000c1"
+   }
+  },
+  "agent_no_role": {
+   "kind": "agent",
+   "aud": "api://contract-gateway",
+   "roles": [],
+   "claims": {
+    "azp": "00000000-0000-0000-0000-0000000000c1"
+   }
+  },
+  "agent_with_scope": {
+   "kind": "agent",
+   "aud": "api://contract-gateway",
+   "roles": [
+    "Channel.Invoke"
+   ],
+   "claims": {
+    "scp": "Channel.Access"
+   }
+  },
+  "expired": {
+   "kind": "user",
+   "aud": "api://contract-gateway",
+   "scp": "Channel.Access",
+   "roles": [],
+   "exp_in": -7200
+  },
+  "forged": {
+   "kind": "user",
+   "aud": "api://contract-gateway",
+   "scp": "Channel.Access",
+   "roles": [],
+   "key": "other"
+  },
+  "wrong_audience": {
+   "kind": "user",
+   "aud": "api://not-the-gateway",
+   "scp": "Channel.Access",
+   "roles": []
+  },
+  "no_scope": {
+   "kind": "user",
+   "aud": "api://contract-gateway",
+   "scp": "openid",
+   "roles": []
+  },
+  "mixed": {
+   "kind": "user",
+   "aud": "api://contract-gateway",
+   "scp": "Channel.Access",
+   "roles": [
+    "Channel.Invoke"
+   ]
+  },
+  "other_tenant_user": {
+   "kind": "user",
+   "aud": "api://contract-gateway",
+   "scp": "Channel.Access",
+   "roles": [],
+   "tid": "00000000-0000-0000-0000-0000000000ff"
+  },
+  "no_oid": {
+   "kind": "user",
+   "aud": "api://contract-gateway",
+   "scp": "Channel.Access",
+   "roles": [],
+   "drop": [
+    "oid"
+   ]
+  }
+ },
+ "steps": [
+  {
+   "id": "no-token",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 1,
+     "method": "initialize",
+     "params": {}
+    }
+   }
+  },
+  {
+   "id": "garbage-token",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 1,
+     "method": "initialize",
+     "params": {}
+    },
+    "headers": {
+     "authorization": "Bearer x"
+    }
+   }
+  },
+  {
+   "id": "initialize",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 1,
+     "method": "initialize",
+     "params": {
+      "protocolVersion": "2025-06-18",
+      "capabilities": {},
+      "clientInfo": {
+       "name": "contract",
+       "version": "1"
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream"
+    }
+   },
+   "capture": {
+    "sid": "header.mcp-session-id"
+   }
+  },
+  {
+   "id": "initialize-old-version",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 2,
+     "method": "initialize",
+     "params": {
+      "protocolVersion": "2024-01-01"
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream"
+    }
+   }
+  },
+  {
+   "id": "initialize-no-params",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 3,
+     "method": "initialize"
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream"
+    }
+   }
+  },
+  {
+   "id": "initialized-notification",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "method": "notifications/initialized"
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "ping",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 4,
+     "method": "ping"
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "tools-list",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 5,
+     "method": "tools/list"
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "tools-list-no-session",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 5,
+     "method": "tools/list"
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "tools-list-unknown-session",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 5,
+     "method": "tools/list"
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "nope"
+    }
+   }
+  },
+  {
+   "id": "tools-list-bad-protocol-version",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 5,
+     "method": "tools/list"
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "1999-01-01"
+    }
+   }
+  },
+  {
+   "id": "tools-list-bad-origin",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 5,
+     "method": "tools/list"
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18",
+     "origin": "https://evil.example"
+    }
+   }
+  },
+  {
+   "id": "unknown-method",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 6,
+     "method": "no/such"
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "null-id",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": null,
+     "method": "ping"
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "bool-id",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": true,
+     "method": "ping"
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "not-jsonrpc",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "hello": 1
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "batch-array",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": [
+     {
+      "jsonrpc": "2.0",
+      "id": 7,
+      "method": "ping"
+     }
+    ],
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "not-json",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "body_text": "{nope",
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "empty-body",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "client-response-ignored",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 9,
+     "result": {}
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "tools-call-missing-name",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 10,
+     "method": "tools/call",
+     "params": {}
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "tools-call-unknown-tool",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 11,
+     "method": "tools/call",
+     "params": {
+      "name": "no_such_tool",
+      "arguments": {}
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "tools-call-arguments-not-object",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 12,
+     "method": "tools/call",
+     "params": {
+      "name": "book_rank",
+      "arguments": [
+       1
+      ]
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "get-405",
+   "request": {
+    "method": "GET",
+    "path": "/mcp",
+    "headers": {
+     "authorization": "Bearer {{token.user}}"
+    }
+   }
+  },
+  {
+   "id": "get-no-token",
+   "request": {
+    "method": "GET",
+    "path": "/mcp"
+   }
+  },
+  {
+   "id": "call.book_rank.typical",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 100,
+     "method": "tools/call",
+     "params": {
+      "name": "book_rank",
+      "arguments": {}
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.book_rank.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 101,
+     "method": "tools/call",
+     "params": {
+      "name": "book_rank",
+      "arguments": {
+       "zz_unknown_argument": 1
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.client_resolve.typical",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 102,
+     "method": "tools/call",
+     "params": {
+      "name": "client_resolve",
+      "arguments": {
+       "name_or_text": "x"
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.client_resolve.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 103,
+     "method": "tools/call",
+     "params": {
+      "name": "client_resolve",
+      "arguments": {
+       "name_or_text": {
+        "nested": 1
+       }
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.client_situation.typical",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 104,
+     "method": "tools/call",
+     "params": {
+      "name": "client_situation",
+      "arguments": {
+       "client_id": 1001
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.client_situation.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 105,
+     "method": "tools/call",
+     "params": {
+      "name": "client_situation",
+      "arguments": {
+       "client_id": "abc"
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.client_eligibility.typical",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 106,
+     "method": "tools/call",
+     "params": {
+      "name": "client_eligibility",
+      "arguments": {
+       "client_id": 1001,
+       "tax_year": 2025
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.client_eligibility.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 107,
+     "method": "tools/call",
+     "params": {
+      "name": "client_eligibility",
+      "arguments": {
+       "client_id": "abc",
+       "tax_year": 2025
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.client_trend.typical",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 108,
+     "method": "tools/call",
+     "params": {
+      "name": "client_trend",
+      "arguments": {
+       "client_id": 1001
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.client_trend.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 109,
+     "method": "tools/call",
+     "params": {
+      "name": "client_trend",
+      "arguments": {
+       "client_id": "abc"
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.client_at_risk.typical",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 110,
+     "method": "tools/call",
+     "params": {
+      "name": "client_at_risk",
+      "arguments": {
+       "client_id": 1001,
+       "tax_year": 2025
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.client_at_risk.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 111,
+     "method": "tools/call",
+     "params": {
+      "name": "client_at_risk",
+      "arguments": {
+       "client_id": "abc",
+       "tax_year": 2025
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.client_discovery.typical",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 112,
+     "method": "tools/call",
+     "params": {
+      "name": "client_discovery",
+      "arguments": {
+       "client_id": 1001
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.client_discovery.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 113,
+     "method": "tools/call",
+     "params": {
+      "name": "client_discovery",
+      "arguments": {
+       "client_id": "abc"
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.simulate.typical",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 114,
+     "method": "tools/call",
+     "params": {
+      "name": "simulate",
+      "arguments": {
+       "client_id": 1001,
+       "tax_year": 2025,
+       "worksite_id": "GA_ATL_HQ"
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.simulate.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 115,
+     "method": "tools/call",
+     "params": {
+      "name": "simulate",
+      "arguments": {
+       "client_id": "abc",
+       "tax_year": 2025,
+       "worksite_id": "GA_ATL_HQ"
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.calc_walkthrough.typical",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 116,
+     "method": "tools/call",
+     "params": {
+      "name": "calc_walkthrough",
+      "arguments": {
+       "client_id": 1001,
+       "tax_year": 2025
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.calc_walkthrough.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 117,
+     "method": "tools/call",
+     "params": {
+      "name": "calc_walkthrough",
+      "arguments": {
+       "client_id": "abc",
+       "tax_year": 2025
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.employee_drill.typical",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 118,
+     "method": "tools/call",
+     "params": {
+      "name": "employee_drill",
+      "arguments": {
+       "client_id": 1001,
+       "record_token": "x",
+       "tax_year": 2025
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.employee_drill.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 119,
+     "method": "tools/call",
+     "params": {
+      "name": "employee_drill",
+      "arguments": {
+       "client_id": "abc",
+       "record_token": "x",
+       "tax_year": 2025
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.findings_list.typical",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 120,
+     "method": "tools/call",
+     "params": {
+      "name": "findings_list",
+      "arguments": {
+       "client_id": 1001,
+       "tax_year": 2025
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.findings_list.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 121,
+     "method": "tools/call",
+     "params": {
+      "name": "findings_list",
+      "arguments": {
+       "client_id": "abc",
+       "tax_year": 2025
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.claim_cell_history.typical",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 122,
+     "method": "tools/call",
+     "params": {
+      "name": "claim_cell_history",
+      "arguments": {
+       "client_id": 1001,
+       "program_code": "GA_JTC",
+       "tax_year": 2025
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.claim_cell_history.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 123,
+     "method": "tools/call",
+     "params": {
+      "name": "claim_cell_history",
+      "arguments": {
+       "client_id": "abc",
+       "program_code": "GA_JTC",
+       "tax_year": 2025
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.data_catalog.typical",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 124,
+     "method": "tools/call",
+     "params": {
+      "name": "data_catalog",
+      "arguments": {}
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.data_catalog.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 125,
+     "method": "tools/call",
+     "params": {
+      "name": "data_catalog",
+      "arguments": {
+       "zz_unknown_argument": 1
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.data_query.typical",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 126,
+     "method": "tools/call",
+     "params": {
+      "name": "data_query",
+      "arguments": {
+       "dataset": "employee_period_fact",
+       "client_id": 1001
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.data_query.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 127,
+     "method": "tools/call",
+     "params": {
+      "name": "data_query",
+      "arguments": {
+       "dataset": {
+        "nested": 1
+       },
+       "client_id": 1001
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.data_distinct_values.typical",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 128,
+     "method": "tools/call",
+     "params": {
+      "name": "data_distinct_values",
+      "arguments": {
+       "client_id": 1001,
+       "dataset": "employee_period_fact",
+       "column": "x"
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.data_distinct_values.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 129,
+     "method": "tools/call",
+     "params": {
+      "name": "data_distinct_values",
+      "arguments": {
+       "client_id": "abc",
+       "dataset": "employee_period_fact",
+       "column": "x"
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.verify_figures.typical",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 130,
+     "method": "tools/call",
+     "params": {
+      "name": "verify_figures",
+      "arguments": {
+       "draft_text": "x"
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.verify_figures.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 131,
+     "method": "tools/call",
+     "params": {
+      "name": "verify_figures",
+      "arguments": {
+       "draft_text": {
+        "nested": 1
+       }
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.run_batch_status.typical",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 132,
+     "method": "tools/call",
+     "params": {
+      "name": "run_batch_status",
+      "arguments": {}
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.run_batch_status.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 133,
+     "method": "tools/call",
+     "params": {
+      "name": "run_batch_status",
+      "arguments": {
+       "zz_unknown_argument": 1
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.run_batch_list.typical",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 134,
+     "method": "tools/call",
+     "params": {
+      "name": "run_batch_list",
+      "arguments": {}
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.run_batch_list.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 135,
+     "method": "tools/call",
+     "params": {
+      "name": "run_batch_list",
+      "arguments": {
+       "zz_unknown_argument": 1
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.program_catalog.typical",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 136,
+     "method": "tools/call",
+     "params": {
+      "name": "program_catalog",
+      "arguments": {}
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.program_catalog.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 137,
+     "method": "tools/call",
+     "params": {
+      "name": "program_catalog",
+      "arguments": {
+       "zz_unknown_argument": 1
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.claim_package_link.typical",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 138,
+     "method": "tools/call",
+     "params": {
+      "name": "claim_package_link",
+      "arguments": {
+       "client_id": 1001,
+       "tax_year": 2025
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.claim_package_link.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 139,
+     "method": "tools/call",
+     "params": {
+      "name": "claim_package_link",
+      "arguments": {
+       "client_id": "abc",
+       "tax_year": 2025
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.finding_resolve_prepare.typical",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 140,
+     "method": "tools/call",
+     "params": {
+      "name": "finding_resolve_prepare",
+      "arguments": {
+       "client_id": 1001,
+       "tax_year": 2025,
+       "finding_id": "policy:test_of_twos:ALL:2025",
+       "resolution": "accept"
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.finding_resolve_prepare.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 141,
+     "method": "tools/call",
+     "params": {
+      "name": "finding_resolve_prepare",
+      "arguments": {
+       "client_id": "abc",
+       "tax_year": 2025,
+       "finding_id": "policy:test_of_twos:ALL:2025",
+       "resolution": "accept"
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.finding_resolve_commit.typical",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 142,
+     "method": "tools/call",
+     "params": {
+      "name": "finding_resolve_commit",
+      "arguments": {
+       "confirmation_token": "x",
+       "idempotency_key": "x",
+       "arguments": {
+        "client_id": 1001,
+        "tax_year": 2025,
+        "finding_id": "policy:test_of_twos:ALL:2025",
+        "resolution": "accept"
+       }
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.finding_resolve_commit.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 143,
+     "method": "tools/call",
+     "params": {
+      "name": "finding_resolve_commit",
+      "arguments": {
+       "confirmation_token": {
+        "nested": 1
+       },
+       "idempotency_key": "x",
+       "arguments": {
+        "client_id": 1001,
+        "tax_year": 2025,
+        "finding_id": "policy:test_of_twos:ALL:2025",
+        "resolution": "accept"
+       }
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.finding_reopen_prepare.typical",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 144,
+     "method": "tools/call",
+     "params": {
+      "name": "finding_reopen_prepare",
+      "arguments": {
+       "client_id": 1001,
+       "finding_id": "policy:test_of_twos:ALL:2025"
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.finding_reopen_prepare.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 145,
+     "method": "tools/call",
+     "params": {
+      "name": "finding_reopen_prepare",
+      "arguments": {
+       "client_id": "abc",
+       "finding_id": "policy:test_of_twos:ALL:2025"
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.finding_reopen_commit.typical",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 146,
+     "method": "tools/call",
+     "params": {
+      "name": "finding_reopen_commit",
+      "arguments": {
+       "confirmation_token": "x",
+       "idempotency_key": "x",
+       "arguments": {
+        "client_id": 1001,
+        "finding_id": "policy:test_of_twos:ALL:2025"
+       }
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.finding_reopen_commit.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 147,
+     "method": "tools/call",
+     "params": {
+      "name": "finding_reopen_commit",
+      "arguments": {
+       "confirmation_token": {
+        "nested": 1
+       },
+       "idempotency_key": "x",
+       "arguments": {
+        "client_id": 1001,
+        "finding_id": "policy:test_of_twos:ALL:2025"
+       }
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.claim_transition_prepare.typical",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 148,
+     "method": "tools/call",
+     "params": {
+      "name": "claim_transition_prepare",
+      "arguments": {
+       "client_id": 1001,
+       "program_code": "GA_JTC",
+       "tax_year": 2025,
+       "status": "proposed"
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.claim_transition_prepare.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 149,
+     "method": "tools/call",
+     "params": {
+      "name": "claim_transition_prepare",
+      "arguments": {
+       "client_id": "abc",
+       "program_code": "GA_JTC",
+       "tax_year": 2025,
+       "status": "proposed"
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.claim_transition_commit.typical",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 150,
+     "method": "tools/call",
+     "params": {
+      "name": "claim_transition_commit",
+      "arguments": {
+       "confirmation_token": "x",
+       "idempotency_key": "x",
+       "arguments": {
+        "client_id": 1001,
+        "program_code": "GA_JTC",
+        "tax_year": 2025,
+        "status": "proposed"
+       }
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.claim_transition_commit.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 151,
+     "method": "tools/call",
+     "params": {
+      "name": "claim_transition_commit",
+      "arguments": {
+       "confirmation_token": {
+        "nested": 1
+       },
+       "idempotency_key": "x",
+       "arguments": {
+        "client_id": 1001,
+        "program_code": "GA_JTC",
+        "tax_year": 2025,
+        "status": "proposed"
+       }
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.claim_record_prepare.typical",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 152,
+     "method": "tools/call",
+     "params": {
+      "name": "claim_record_prepare",
+      "arguments": {
+       "client_id": 1001,
+       "program_code": "GA_JTC",
+       "tax_year": 2025,
+       "status": "proposed"
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.claim_record_prepare.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 153,
+     "method": "tools/call",
+     "params": {
+      "name": "claim_record_prepare",
+      "arguments": {
+       "client_id": "abc",
+       "program_code": "GA_JTC",
+       "tax_year": 2025,
+       "status": "proposed"
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.claim_record_commit.typical",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 154,
+     "method": "tools/call",
+     "params": {
+      "name": "claim_record_commit",
+      "arguments": {
+       "confirmation_token": "x",
+       "idempotency_key": "x",
+       "arguments": {
+        "client_id": 1001,
+        "program_code": "GA_JTC",
+        "tax_year": 2025,
+        "status": "proposed"
+       }
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.claim_record_commit.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 155,
+     "method": "tools/call",
+     "params": {
+      "name": "claim_record_commit",
+      "arguments": {
+       "confirmation_token": {
+        "nested": 1
+       },
+       "idempotency_key": "x",
+       "arguments": {
+        "client_id": 1001,
+        "program_code": "GA_JTC",
+        "tax_year": 2025,
+        "status": "proposed"
+       }
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.engagement_set_prepare.typical",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 156,
+     "method": "tools/call",
+     "params": {
+      "name": "engagement_set_prepare",
+      "arguments": {
+       "client_id": 1001,
+       "program_code": "GA_JTC",
+       "scope": "in_scope"
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.engagement_set_prepare.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 157,
+     "method": "tools/call",
+     "params": {
+      "name": "engagement_set_prepare",
+      "arguments": {
+       "client_id": "abc",
+       "program_code": "GA_JTC",
+       "scope": "in_scope"
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.engagement_set_commit.typical",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 158,
+     "method": "tools/call",
+     "params": {
+      "name": "engagement_set_commit",
+      "arguments": {
+       "confirmation_token": "x",
+       "idempotency_key": "x",
+       "arguments": {
+        "client_id": 1001,
+        "program_code": "GA_JTC",
+        "scope": "in_scope"
+       }
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.engagement_set_commit.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 159,
+     "method": "tools/call",
+     "params": {
+      "name": "engagement_set_commit",
+      "arguments": {
+       "confirmation_token": {
+        "nested": 1
+       },
+       "idempotency_key": "x",
+       "arguments": {
+        "client_id": 1001,
+        "program_code": "GA_JTC",
+        "scope": "in_scope"
+       }
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.base_year_set_prepare.typical",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 160,
+     "method": "tools/call",
+     "params": {
+      "name": "base_year_set_prepare",
+      "arguments": {
+       "client_id": 1001,
+       "unit_id": "GA_ATL_HQ",
+       "base_year": 2024
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.base_year_set_prepare.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 161,
+     "method": "tools/call",
+     "params": {
+      "name": "base_year_set_prepare",
+      "arguments": {
+       "client_id": "abc",
+       "unit_id": "GA_ATL_HQ",
+       "base_year": 2024
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.base_year_set_commit.typical",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 162,
+     "method": "tools/call",
+     "params": {
+      "name": "base_year_set_commit",
+      "arguments": {
+       "confirmation_token": "x",
+       "idempotency_key": "x",
+       "arguments": {
+        "client_id": 1001,
+        "unit_id": "GA_ATL_HQ",
+        "base_year": 2024
+       }
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.base_year_set_commit.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 163,
+     "method": "tools/call",
+     "params": {
+      "name": "base_year_set_commit",
+      "arguments": {
+       "confirmation_token": {
+        "nested": 1
+       },
+       "idempotency_key": "x",
+       "arguments": {
+        "client_id": 1001,
+        "unit_id": "GA_ATL_HQ",
+        "base_year": 2024
+       }
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.claim_package_create_prepare.typical",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 164,
+     "method": "tools/call",
+     "params": {
+      "name": "claim_package_create_prepare",
+      "arguments": {
+       "client_id": 1001,
+       "tax_year": 2025
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.claim_package_create_prepare.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 165,
+     "method": "tools/call",
+     "params": {
+      "name": "claim_package_create_prepare",
+      "arguments": {
+       "client_id": "abc",
+       "tax_year": 2025
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.claim_package_create_commit.typical",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 166,
+     "method": "tools/call",
+     "params": {
+      "name": "claim_package_create_commit",
+      "arguments": {
+       "confirmation_token": "x",
+       "idempotency_key": "x",
+       "arguments": {
+        "client_id": 1001,
+        "tax_year": 2025
+       }
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.claim_package_create_commit.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 167,
+     "method": "tools/call",
+     "params": {
+      "name": "claim_package_create_commit",
+      "arguments": {
+       "confirmation_token": {
+        "nested": 1
+       },
+       "idempotency_key": "x",
+       "arguments": {
+        "client_id": 1001,
+        "tax_year": 2025
+       }
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.run_batch_prepare.typical",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 168,
+     "method": "tools/call",
+     "params": {
+      "name": "run_batch_prepare",
+      "arguments": {
+       "scope": {
+        "kind": "one"
+       }
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.run_batch_prepare.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 169,
+     "method": "tools/call",
+     "params": {
+      "name": "run_batch_prepare",
+      "arguments": {
+       "scope": "abc"
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.run_batch_commit.typical",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 170,
+     "method": "tools/call",
+     "params": {
+      "name": "run_batch_commit",
+      "arguments": {
+       "confirmation_token": "x",
+       "idempotency_key": "x",
+       "arguments": {
+        "scope": {
+         "kind": "one"
+        }
+       }
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "call.run_batch_commit.invalid",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 171,
+     "method": "tools/call",
+     "params": {
+      "name": "run_batch_commit",
+      "arguments": {
+       "confirmation_token": {
+        "nested": 1
+       },
+       "idempotency_key": "x",
+       "arguments": {
+        "scope": {
+         "kind": "one"
+        }
+       }
+      }
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "other-user-session",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 300,
+     "method": "tools/list"
+    },
+    "headers": {
+     "authorization": "Bearer {{token.writer_user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "delete-other-user",
+   "request": {
+    "method": "DELETE",
+    "path": "/mcp",
+    "headers": {
+     "authorization": "Bearer {{token.writer_user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "delete",
+   "request": {
+    "method": "DELETE",
+    "path": "/mcp",
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "after-delete",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 301,
+     "method": "tools/list"
+    },
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "delete-again",
+   "request": {
+    "method": "DELETE",
+    "path": "/mcp",
+    "headers": {
+     "authorization": "Bearer {{token.user}}",
+     "content-type": "application/json",
+     "accept": "application/json, text/event-stream",
+     "mcp-session-id": "{{sid}}",
+     "mcp-protocol-version": "2025-06-18"
+    }
+   }
+  },
+  {
+   "id": "agent-initialize",
+   "request": {
+    "method": "POST",
+    "path": "/mcp",
+    "json": {
+     "jsonrpc": "2.0",
+     "id": 1,
+     "method": "initialize",
+     "params": {
+      "protocolVersion": "2025-06-18"
+     }
+    },
+    "headers": {
+     "authorization": "Bearer {{token.agent}}",
+     "x-acting-user-oid": "00000000-0000-0000-0000-0000000000a1",
+     "x-acting-user-name": "Acting Person",
+     "x-acting-tenant": "00000000-0000-0000-0000-0000000000aa",
+     "x-channel": "teams",
+     "x-conversation-id": "conv-1",
+     "x-correlation-id": "corr-1",
+     "content-type": "application/json"
+    }
+   }
+  }
+ ]
+}

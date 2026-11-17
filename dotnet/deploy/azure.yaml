@@ -1,0 +1,47 @@
+# yaml-language-server: $schema=https://aka.ms/azure-dev/v1.0/azure.yaml.json
+name: tax-credit-copilot-dotnet
+resourceGroup: ${DOTNET_RESOURCE_GROUP_NAME}
+requiredVersions:
+  azd: ">=1.36.0 <2.0.0"
+infra:
+  provider: terraform
+  path: ../../infra-dotnet
+services:
+  dotnet-api:
+    project: ./services/api
+    language: dotnet
+    host: appservice
+    resourceName: ${DOTNET_API_APP_NAME}
+    hooks:
+      predeploy:
+        shell: pwsh
+        run: ../../guard-target.ps1 -Service api
+        continueOnError: false
+        interactive: false
+  dotnet-worker:
+    project: ./services/worker
+    language: dotnet
+    host: appservice
+    hooks:
+      predeploy:
+        shell: pwsh
+        run: ../../guard-target.ps1 -Service worker
+        continueOnError: false
+        interactive: false
+  dotnet-gateway:
+    project: ./services/gateway
+    language: dotnet
+    host: appservice
+    resourceName: ${DOTNET_GATEWAY_APP_NAME}
+    hooks:
+      predeploy:
+        shell: pwsh
+        run: ../../guard-target.ps1 -Service gateway
+        continueOnError: false
+        interactive: false
+hooks:
+  preprovision:
+    shell: pwsh
+    run: ./guard-target.ps1 -Service infrastructure
+    continueOnError: false
+    interactive: false

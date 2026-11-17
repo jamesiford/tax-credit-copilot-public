@@ -1,0 +1,89 @@
+{
+  "session": "composition",
+  "branch": "dotnet/w1b-composition",
+  "head": "81a6ef4",
+  "summary": "Shared production API/Worker composition, pre-build feature discovery, real trust/reset/source/byte controls and durable transactional execution are implemented.\nPersistence repairs cover selected years, durable override order and unbounded draft paging.\nBuild/format pass; 712 fast tests, seven API heavy tests and three CPython launch tests pass.\nAll twelve semantic scenarios / 1769 exchanges completed with zero waivers.\nFramework raw scores are 26/39 wrapper and 8/19 exact membership; real readiness differences remain visible in this board-only wave.\nBusiness/gateway handlers and live native/private-reference certification remain deferred.\nThe historical 781-test claim sums to 681 in its listed counts; no baseline tests were deleted.\nThe head identifies the verified implementation commit; the following local commit contains reports/status.",
+  "stages": {
+    "C1": "done",
+    "C2": "done",
+    "C3": "done",
+    "C4": "done",
+    "C5": "done",
+    "C6": "done",
+    "C7": "done"
+  },
+  "gates_claimed": {
+    "no_halt": true,
+    "commits_present": true,
+    "clean_tree": true,
+    "not_pushed": true,
+    "owned_paths": true,
+    "status_json": true,
+    "report_present": true,
+    "dotnet_build": true,
+    "dotnet_format": true,
+    "tests_fast": true,
+    "replay": true
+  },
+  "deviations": [
+    {
+      "id": "DEV-1",
+      "what": "Readiness exposes real source-account observations rather than captured skipped/scan-counter placeholders.",
+      "why": "The task requires real settled observations, not fabricated parity counters. Raw replay failures remain visible; no waiver or old 50-percent threshold pass is claimed.",
+      "decision_needed": true
+    },
+    {
+      "id": "DEV-2",
+      "what": "The measured initial fast baseline is 681 by the historical report's own enumerated assembly counts, not its stated 781.",
+      "why": "The final measured 712 equals those counts plus 20 API and 11 Persistence cases. Existing tests were not deleted.",
+      "decision_needed": false
+    }
+  ],
+  "findings": [
+    "Seed loading consumes no runtime UUID calls; the live sequence must resume after synthetic seed high-water marks, independently of secrets.",
+    "Assigning an AsyncLocal principal inside awaited access validation does not reliably propagate into endpoints; explicit middleware push/restore is required.",
+    "Python F-14 valid-request exceptions are intentionally retained by supplied policy; F-15 draft-list reads need no invented actor.",
+    "Lost historical override order at identical timestamps cannot be recovered; deterministic backfill is not proof of intent.",
+    "P1 readiness now reports observed source state, reducing exact framework raw score from 11/19 to 8/19; the wave is board-only with zero waivers.",
+    "M-01 ingestion precedence, first-program credit math, contextual leap fiscal handling, zero-worksite projection and native monetary AVG remain figure-sensitive boundaries."
+  ],
+  "open_questions": [
+    "Which stable readiness observation shape should replace the recorded placeholder fields before applying the previous framework threshold?",
+    "What lease duration and renewal boundary are required for measured long native calculations?"
+  ],
+  "needs_human": [
+    {
+      "item": "Readiness contract and historical baseline bookkeeping",
+      "why": "Review the truthful observation wire shape and reconcile the historical 781-versus-681 arithmetic; neither was hidden by waiver or altered tests."
+    },
+    {
+      "item": "Deployed schema and historical override decisions",
+      "why": "Provision the documented forward-only native additions, verify actual transaction/grant behavior, and review equal-timestamp legacy choices before enabling writers."
+    },
+    {
+      "item": "Figure-sensitive inherited behavior",
+      "why": "Owner decisions are needed for M-01 ingestion precedence, first-program credit math, strict leap-window context, zero-worksite SQL/projector differences and native monetary AVG."
+    },
+    {
+      "item": "Native operational and source freshness certification",
+      "why": "No live service was authorized. Cross-replica publication, pooling/token refresh and count/max-preserving edits are not certified by local/fake tests."
+    },
+    {
+      "item": "Long synchronous work and production AI",
+      "why": "Lease expiry rolls back rather than accepting stale ownership; long runs need measured sizing/renewal design. Foundry invocation needs an installed factory and separate approval."
+    },
+    {
+      "item": "Private reference and next-wave business handlers",
+      "why": "No private payroll was loaded; certified constants remain untouched. Business HTTP/gateway implementations are outside composition and still return stubs."
+    }
+  ],
+  "reports": [
+    "dotnet/docs/COMPOSITION-REPORT.md",
+    "dotnet/docs/HOST-ARCHITECTURE.md",
+    "dotnet/docs/COMPOSITION-SCHEMA-PROVISIONING.md",
+    "dotnet/docs/composition-log.md",
+    "dotnet/docs/improvements/composition.json",
+    "dotnet/docs/replay-composition-board.json",
+    "dotnet/docs/replay-composition-framework.json"
+  ]
+}

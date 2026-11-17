@@ -1,0 +1,39 @@
+{
+  "kind": "local-source-build",
+  "commit": "2e8ba289d4aec2c2c0494e41ba58e296fb84c6bf",
+  "offline_feed": true,
+  "images": {
+    "api": {
+      "id": "sha256:2d1704e833bb2df690b26bf53e22f0767494fb62166022060db1d4af67525688",
+      "architecture": "amd64",
+      "os": "linux",
+      "user": "app",
+      "commit": "2e8ba289d4aec2c2c0494e41ba58e296fb84c6bf",
+      "revision_verified": true
+    },
+    "worker": {
+      "id": "sha256:efd58a13070778b5ea777534f9c92afe9a23b8ff7a665feef73378a31748b57c",
+      "architecture": "amd64",
+      "os": "linux",
+      "user": "app",
+      "commit": "2e8ba289d4aec2c2c0494e41ba58e296fb84c6bf",
+      "revision_verified": true
+    },
+    "gateway": {
+      "id": "sha256:773a127006cb74c7e44a6b9711e55e7916f7da7189bda2e2fe95490bcb9de7a2",
+      "architecture": "amd64",
+      "os": "linux",
+      "user": "app",
+      "commit": "2e8ba289d4aec2c2c0494e41ba58e296fb84c6bf",
+      "revision_verified": true
+    },
+    "orchestrator": {
+      "id": "sha256:c1594ea9052e3cc0f3629af314aee721ad359b031974234882697d9f0d229336",
+      "architecture": "amd64",
+      "os": "linux",
+      "user": "app",
+      "commit": "2e8ba289d4aec2c2c0494e41ba58e296fb84c6bf",
+      "revision_verified": true
+    }
+  }
+}

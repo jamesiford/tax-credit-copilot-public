@@ -1,0 +1,4602 @@
+{
+ "mode": "semantic",
+ "interpreter": {
+  "python": "external server",
+  "zlib": "n/a",
+  "oracle": null,
+  "allow_other_python": false
+ },
+ "scenarios": [
+  {
+   "scenario": "p2_run_batches",
+   "exchanges": 64,
+   "failures": [
+    {
+     "scenario": "p2_run_batches",
+     "case": "list-empty",
+     "route": "GET /api/v2/run-batches",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "list-empty",
+     "route": "GET /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "items",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "list-empty",
+     "route": "GET /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "total",
+     "expected": "0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "list-empty",
+     "route": "GET /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "limit",
+     "expected": "25",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "list-empty",
+     "route": "GET /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "offset",
+     "expected": "0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "list-empty",
+     "route": "GET /api/v2/run-batches",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/v2/run-batches"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "dry-run",
+     "route": "POST /api/v2/run-batches",
+     "category": "status",
+     "path": "status",
+     "expected": "202",
+     "actual": "501"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "dry-run",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "dry_run",
+     "expected": "true",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "dry-run",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "preview",
+     "expected": "{\"kind\":\"assess\",\"clients\":1,\"items\":1,\"years\":[2025],\"refresh_once\":true,\"force\":false,\"skip_unchanged\":false,\"skip_coverage\":\"none_yet\",\"per_client_year_items\":false,\"skip_candidates_upper_bound\":0,\"never_run\":1,\"manifests_read_for\":1,\"requires_confirmation\":false,\"confirm_above\":25,\"max_items\":50...(743 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "dry-run",
+     "route": "POST /api/v2/run-batches",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /api/v2/run-batches"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "dry-run-all",
+     "route": "POST /api/v2/run-batches",
+     "category": "status",
+     "path": "status",
+     "expected": "202",
+     "actual": "501"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "dry-run-all",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "dry_run",
+     "expected": "true",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "dry-run-all",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "preview",
+     "expected": "{\"kind\":\"assess_and_calculate\",\"clients\":4,\"items\":4,\"years\":\"latest runnable year per client\",\"refresh_once\":true,\"force\":false,\"skip_unchanged\":false,\"skip_coverage\":\"none_yet\",\"per_client_year_items\":false,\"skip_candidates_upper_bound\":0,\"never_run\":4,\"manifests_read_for\":4,\"requires_confirmation...(1209 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "dry-run-all",
+     "route": "POST /api/v2/run-batches",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /api/v2/run-batches"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "dry-run-list",
+     "route": "POST /api/v2/run-batches",
+     "category": "status",
+     "path": "status",
+     "expected": "202",
+     "actual": "501"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "dry-run-list",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "dry_run",
+     "expected": "true",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "dry-run-list",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "preview",
+     "expected": "{\"kind\":\"calculate\",\"clients\":3,\"items\":3,\"years\":[2025],\"refresh_once\":true,\"force\":false,\"skip_unchanged\":false,\"skip_coverage\":\"none_yet\",\"per_client_year_items\":false,\"skip_candidates_upper_bound\":0,\"never_run\":3,\"manifests_read_for\":3,\"requires_confirmation\":false,\"confirm_above\":25,\"max_items\"...(1034 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "dry-run-list",
+     "route": "POST /api/v2/run-batches",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /api/v2/run-batches"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "dry-run-filter",
+     "route": "POST /api/v2/run-batches",
+     "category": "status",
+     "path": "status",
+     "expected": "422",
+     "actual": "501"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "dry-run-filter",
+     "route": "POST /api/v2/run-batches",
+     "category": "type",
+     "path": "detail",
+     "expected": "{\"detail\":\"The selection matches no clients. Check the client ids or the filter.\",\"code\":\"empty_scope\",\"reason\":\"The selection matches no clients.\",\"remedy\":\"Check the client ids or the filter.\"}",
+     "actual": "Operation not implemented: POST /api/v2/run-batches"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create",
+     "route": "POST /api/v2/run-batches",
+     "category": "status",
+     "path": "status",
+     "expected": "202",
+     "actual": "501"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "batch_id",
+     "expected": "4000000000004000800000000000001f",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "kind",
+     "expected": "assess",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "scope_kind",
+     "expected": "one",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "scope_spec",
+     "expected": "{\"client_count\":1,\"client_ids\":[2001],\"clients_sha256\":\"e8ce31014a2c9f51\",\"force\":false,\"include_code_commit\":false,\"kind\":\"assess\",\"program_code\":null,\"program_items\":1,\"refresh_once\":true,\"skip_unchanged\":false,\"tax_years\":[2025]}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "program_code",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "tax_years",
+     "expected": "[2025]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "force",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "skip_unchanged",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "include_code_commit",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "refresh_once",
+     "expected": "true",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "status",
+     "expected": "queued",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "cancel_requested",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "counts",
+     "expected": "{\"total\":1,\"queued\":1,\"running\":0,\"succeeded\":0,\"skipped\":0,\"failed\":0,\"cancelled\":0}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "progress",
+     "expected": "{\"done\":0,\"total\":1}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "requested_by",
+     "expected": "anonymous",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "requested_at",
+     "expected": "2026-01-15T12:00:00Z",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "started_at",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "finished_at",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "idempotency_key",
+     "expected": "contract-1",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "dry_run_summary",
+     "expected": "{\"clients\":1,\"confirm_above\":25,\"force\":false,\"items\":1,\"kind\":\"assess\",\"manifests_read_for\":1,\"max_items\":5000,\"multi_program_clients\":0,\"never_run\":1,\"notes\":[\"Nothing is skipped: every item runs.\",\"Each run replays every authored year of the client's payroll, whatever year it is asked for.\"],\"ove...(581 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "idempotent_replay",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "degraded",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "cancelled_now",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "requeued",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create",
+     "route": "POST /api/v2/run-batches",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /api/v2/run-batches"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-replay",
+     "route": "POST /api/v2/run-batches",
+     "category": "status",
+     "path": "status",
+     "expected": "202",
+     "actual": "501"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-replay",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "batch_id",
+     "expected": "4000000000004000800000000000001f",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-replay",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "kind",
+     "expected": "assess",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-replay",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "scope_kind",
+     "expected": "one",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-replay",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "scope_spec",
+     "expected": "{\"client_count\":1,\"client_ids\":[2001],\"clients_sha256\":\"e8ce31014a2c9f51\",\"force\":false,\"include_code_commit\":false,\"kind\":\"assess\",\"program_code\":null,\"program_items\":1,\"refresh_once\":true,\"skip_unchanged\":false,\"tax_years\":[2025]}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-replay",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "program_code",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-replay",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "tax_years",
+     "expected": "[2025]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-replay",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "force",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-replay",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "skip_unchanged",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-replay",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "include_code_commit",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-replay",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "refresh_once",
+     "expected": "true",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-replay",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "status",
+     "expected": "queued",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-replay",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "cancel_requested",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-replay",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "counts",
+     "expected": "{\"total\":1,\"queued\":1,\"running\":0,\"succeeded\":0,\"skipped\":0,\"failed\":0,\"cancelled\":0}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-replay",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "progress",
+     "expected": "{\"done\":0,\"total\":1}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-replay",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "requested_by",
+     "expected": "anonymous",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-replay",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "requested_at",
+     "expected": "2026-01-15T12:00:00Z",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-replay",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "started_at",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-replay",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "finished_at",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-replay",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "idempotency_key",
+     "expected": "contract-1",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-replay",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "dry_run_summary",
+     "expected": "{\"clients\":1,\"confirm_above\":25,\"force\":false,\"items\":1,\"kind\":\"assess\",\"manifests_read_for\":1,\"max_items\":5000,\"multi_program_clients\":0,\"never_run\":1,\"notes\":[\"Nothing is skipped: every item runs.\",\"Each run replays every authored year of the client's payroll, whatever year it is asked for.\"],\"ove...(581 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-replay",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "idempotent_replay",
+     "expected": "true",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-replay",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "degraded",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-replay",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "cancelled_now",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-replay",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "requeued",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-replay",
+     "route": "POST /api/v2/run-batches",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /api/v2/run-batches"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-same-key-different-body",
+     "route": "POST /api/v2/run-batches",
+     "category": "status",
+     "path": "status",
+     "expected": "202",
+     "actual": "501"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-same-key-different-body",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "batch_id",
+     "expected": "4000000000004000800000000000001f",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-same-key-different-body",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "kind",
+     "expected": "assess",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-same-key-different-body",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "scope_kind",
+     "expected": "one",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-same-key-different-body",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "scope_spec",
+     "expected": "{\"client_count\":1,\"client_ids\":[2001],\"clients_sha256\":\"e8ce31014a2c9f51\",\"force\":false,\"include_code_commit\":false,\"kind\":\"assess\",\"program_code\":null,\"program_items\":1,\"refresh_once\":true,\"skip_unchanged\":false,\"tax_years\":[2025]}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-same-key-different-body",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "program_code",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-same-key-different-body",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "tax_years",
+     "expected": "[2025]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-same-key-different-body",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "force",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-same-key-different-body",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "skip_unchanged",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-same-key-different-body",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "include_code_commit",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-same-key-different-body",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "refresh_once",
+     "expected": "true",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-same-key-different-body",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "status",
+     "expected": "queued",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-same-key-different-body",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "cancel_requested",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-same-key-different-body",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "counts",
+     "expected": "{\"total\":1,\"queued\":1,\"running\":0,\"succeeded\":0,\"skipped\":0,\"failed\":0,\"cancelled\":0}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-same-key-different-body",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "progress",
+     "expected": "{\"done\":0,\"total\":1}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-same-key-different-body",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "requested_by",
+     "expected": "anonymous",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-same-key-different-body",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "requested_at",
+     "expected": "2026-01-15T12:00:00Z",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-same-key-different-body",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "started_at",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-same-key-different-body",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "finished_at",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-same-key-different-body",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "idempotency_key",
+     "expected": "contract-1",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-same-key-different-body",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "dry_run_summary",
+     "expected": "{\"clients\":1,\"confirm_above\":25,\"force\":false,\"items\":1,\"kind\":\"assess\",\"manifests_read_for\":1,\"max_items\":5000,\"multi_program_clients\":0,\"never_run\":1,\"notes\":[\"Nothing is skipped: every item runs.\",\"Each run replays every authored year of the client's payroll, whatever year it is asked for.\"],\"ove...(581 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-same-key-different-body",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "idempotent_replay",
+     "expected": "true",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-same-key-different-body",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "degraded",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-same-key-different-body",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "cancelled_now",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-same-key-different-body",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "requeued",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-same-key-different-body",
+     "route": "POST /api/v2/run-batches",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /api/v2/run-batches"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-queued",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-queued",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "batch_id",
+     "expected": "4000000000004000800000000000001f",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-queued",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "kind",
+     "expected": "assess",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-queued",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "scope_kind",
+     "expected": "one",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-queued",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "scope_spec",
+     "expected": "{\"client_count\":1,\"client_ids\":[2001],\"clients_sha256\":\"e8ce31014a2c9f51\",\"force\":false,\"include_code_commit\":false,\"kind\":\"assess\",\"program_code\":null,\"program_items\":1,\"refresh_once\":true,\"skip_unchanged\":false,\"tax_years\":[2025]}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-queued",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "program_code",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-queued",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "tax_years",
+     "expected": "[2025]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-queued",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "force",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-queued",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "skip_unchanged",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-queued",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "include_code_commit",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-queued",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "refresh_once",
+     "expected": "true",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-queued",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "status",
+     "expected": "queued",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-queued",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "cancel_requested",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-queued",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "counts",
+     "expected": "{\"total\":1,\"queued\":1,\"running\":0,\"succeeded\":0,\"skipped\":0,\"failed\":0,\"cancelled\":0}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-queued",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "progress",
+     "expected": "{\"done\":0,\"total\":1}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-queued",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "requested_by",
+     "expected": "anonymous",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-queued",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "requested_at",
+     "expected": "2026-01-15T12:00:00Z",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-queued",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "started_at",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-queued",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "finished_at",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-queued",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "idempotency_key",
+     "expected": "contract-1",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-queued",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "dry_run_summary",
+     "expected": "{\"clients\":1,\"confirm_above\":25,\"force\":false,\"items\":1,\"kind\":\"assess\",\"manifests_read_for\":1,\"max_items\":5000,\"multi_program_clients\":0,\"never_run\":1,\"notes\":[\"Nothing is skipped: every item runs.\",\"Each run replays every authored year of the client's payroll, whatever year it is asked for.\"],\"ove...(581 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-queued",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "idempotent_replay",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-queued",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "degraded",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-queued",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "cancelled_now",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-queued",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "requeued",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-queued",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/v2/run-batches/{batch_id}"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-queued",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f/items",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-queued",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f/items",
+     "category": "missing-field",
+     "path": "items",
+     "expected": "[{\"item_id\":\"40000000000040008000000000000020\",\"batch_id\":\"4000000000004000800000000000001f\",\"seq\":0,\"client_id\":2001,\"program_code\":null,\"tax_year\":2025,\"status\":\"queued\",\"attempts\":0,\"run_id\":null,\"skip_reason\":null,\"error_dependency\":null,\"error_message\":null,\"not_before\":null,\"started_at\":null,\"...(319 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-queued",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f/items",
+     "category": "missing-field",
+     "path": "total",
+     "expected": "1",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-queued",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f/items",
+     "category": "missing-field",
+     "path": "limit",
+     "expected": "50",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-queued",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f/items",
+     "category": "missing-field",
+     "path": "offset",
+     "expected": "0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-queued",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f/items",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/v2/run-batches/{batch_id}/items"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-done",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-done",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "batch_id",
+     "expected": "4000000000004000800000000000001f",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-done",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "kind",
+     "expected": "assess",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-done",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "scope_kind",
+     "expected": "one",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-done",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "scope_spec",
+     "expected": "{\"client_count\":1,\"client_ids\":[2001],\"clients_sha256\":\"e8ce31014a2c9f51\",\"force\":false,\"include_code_commit\":false,\"kind\":\"assess\",\"program_code\":null,\"program_items\":1,\"refresh_once\":true,\"skip_unchanged\":false,\"tax_years\":[2025]}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-done",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "program_code",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-done",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "tax_years",
+     "expected": "[2025]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-done",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "force",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-done",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "skip_unchanged",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-done",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "include_code_commit",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-done",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "refresh_once",
+     "expected": "true",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-done",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "status",
+     "expected": "succeeded",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-done",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "cancel_requested",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-done",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "counts",
+     "expected": "{\"total\":1,\"queued\":0,\"running\":0,\"succeeded\":1,\"skipped\":0,\"failed\":0,\"cancelled\":0}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-done",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "progress",
+     "expected": "{\"done\":1,\"total\":1}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-done",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "requested_by",
+     "expected": "anonymous",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-done",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "requested_at",
+     "expected": "2026-01-15T12:00:00Z",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-done",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "started_at",
+     "expected": "2026-01-15T12:00:00Z",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-done",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "finished_at",
+     "expected": "2026-01-15T12:00:00Z",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-done",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "idempotency_key",
+     "expected": "contract-1",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-done",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "dry_run_summary",
+     "expected": "{\"clients\":1,\"confirm_above\":25,\"force\":false,\"items\":1,\"kind\":\"assess\",\"manifests_read_for\":1,\"max_items\":5000,\"multi_program_clients\":0,\"never_run\":1,\"notes\":[\"Nothing is skipped: every item runs.\",\"Each run replays every authored year of the client's payroll, whatever year it is asked for.\"],\"ove...(581 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-done",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "idempotent_replay",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-done",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "degraded",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-done",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "cancelled_now",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-done",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "missing-field",
+     "path": "requeued",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-done",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/v2/run-batches/{batch_id}"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-done",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f/items",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-done",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f/items",
+     "category": "missing-field",
+     "path": "items",
+     "expected": "[{\"item_id\":\"40000000000040008000000000000020\",\"batch_id\":\"4000000000004000800000000000001f\",\"seq\":0,\"client_id\":2001,\"program_code\":\"GA_JTC\",\"tax_year\":2025,\"status\":\"succeeded\",\"attempts\":1,\"run_id\":null,\"skip_reason\":null,\"error_dependency\":null,\"error_message\":null,\"not_before\":null,\"started_at\"...(362 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-done",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f/items",
+     "category": "missing-field",
+     "path": "total",
+     "expected": "1",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-done",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f/items",
+     "category": "missing-field",
+     "path": "limit",
+     "expected": "50",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-done",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f/items",
+     "category": "missing-field",
+     "path": "offset",
+     "expected": "0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-done",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f/items",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/v2/run-batches/{batch_id}/items"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-status",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f/items",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-status",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f/items",
+     "category": "missing-field",
+     "path": "items",
+     "expected": "[{\"item_id\":\"40000000000040008000000000000020\",\"batch_id\":\"4000000000004000800000000000001f\",\"seq\":0,\"client_id\":2001,\"program_code\":\"GA_JTC\",\"tax_year\":2025,\"status\":\"succeeded\",\"attempts\":1,\"run_id\":null,\"skip_reason\":null,\"error_dependency\":null,\"error_message\":null,\"not_before\":null,\"started_at\"...(362 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-status",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f/items",
+     "category": "missing-field",
+     "path": "total",
+     "expected": "1",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-status",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f/items",
+     "category": "missing-field",
+     "path": "limit",
+     "expected": "50",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-status",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f/items",
+     "category": "missing-field",
+     "path": "offset",
+     "expected": "0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-status",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f/items",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/v2/run-batches/{batch_id}/items"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-status-bogus",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f/items",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-status-bogus",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f/items",
+     "category": "missing-field",
+     "path": "items",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-status-bogus",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f/items",
+     "category": "missing-field",
+     "path": "total",
+     "expected": "0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-status-bogus",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f/items",
+     "category": "missing-field",
+     "path": "limit",
+     "expected": "50",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-status-bogus",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f/items",
+     "category": "missing-field",
+     "path": "offset",
+     "expected": "0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-status-bogus",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f/items",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/v2/run-batches/{batch_id}/items"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-limit-0",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f/items",
+     "category": "missing-field",
+     "path": "detail[0].ctx",
+     "expected": "{\"ge\":1}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-limit-0",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f/items",
+     "category": "value",
+     "path": "detail[0].msg",
+     "expected": "Input should be greater than or equal to 1",
+     "actual": "Value violates minimum."
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-limit-0",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f/items",
+     "category": "type",
+     "path": "detail[0].input",
+     "expected": "0",
+     "actual": "0"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-offset-past",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f/items",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-offset-past",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f/items",
+     "category": "missing-field",
+     "path": "items",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-offset-past",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f/items",
+     "category": "missing-field",
+     "path": "total",
+     "expected": "1",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-offset-past",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f/items",
+     "category": "missing-field",
+     "path": "limit",
+     "expected": "50",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-offset-past",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f/items",
+     "category": "missing-field",
+     "path": "offset",
+     "expected": "99",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-offset-past",
+     "route": "GET /api/v2/run-batches/4000000000004000800000000000001f/items",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/v2/run-batches/{batch_id}/items"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-finished",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/cancel",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-finished",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/cancel",
+     "category": "missing-field",
+     "path": "batch_id",
+     "expected": "4000000000004000800000000000001f",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-finished",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/cancel",
+     "category": "missing-field",
+     "path": "kind",
+     "expected": "assess",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-finished",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/cancel",
+     "category": "missing-field",
+     "path": "scope_kind",
+     "expected": "one",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-finished",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/cancel",
+     "category": "missing-field",
+     "path": "scope_spec",
+     "expected": "{\"client_count\":1,\"client_ids\":[2001],\"clients_sha256\":\"e8ce31014a2c9f51\",\"force\":false,\"include_code_commit\":false,\"kind\":\"assess\",\"program_code\":null,\"program_items\":1,\"refresh_once\":true,\"skip_unchanged\":false,\"tax_years\":[2025]}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-finished",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/cancel",
+     "category": "missing-field",
+     "path": "program_code",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-finished",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/cancel",
+     "category": "missing-field",
+     "path": "tax_years",
+     "expected": "[2025]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-finished",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/cancel",
+     "category": "missing-field",
+     "path": "force",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-finished",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/cancel",
+     "category": "missing-field",
+     "path": "skip_unchanged",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-finished",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/cancel",
+     "category": "missing-field",
+     "path": "include_code_commit",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-finished",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/cancel",
+     "category": "missing-field",
+     "path": "refresh_once",
+     "expected": "true",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-finished",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/cancel",
+     "category": "missing-field",
+     "path": "status",
+     "expected": "succeeded",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-finished",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/cancel",
+     "category": "missing-field",
+     "path": "cancel_requested",
+     "expected": "true",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-finished",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/cancel",
+     "category": "missing-field",
+     "path": "counts",
+     "expected": "{\"total\":1,\"queued\":0,\"running\":0,\"succeeded\":1,\"skipped\":0,\"failed\":0,\"cancelled\":0}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-finished",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/cancel",
+     "category": "missing-field",
+     "path": "progress",
+     "expected": "{\"done\":1,\"total\":1}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-finished",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/cancel",
+     "category": "missing-field",
+     "path": "requested_by",
+     "expected": "anonymous",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-finished",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/cancel",
+     "category": "missing-field",
+     "path": "requested_at",
+     "expected": "2026-01-15T12:00:00Z",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-finished",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/cancel",
+     "category": "missing-field",
+     "path": "started_at",
+     "expected": "2026-01-15T12:00:00Z",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-finished",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/cancel",
+     "category": "missing-field",
+     "path": "finished_at",
+     "expected": "2026-01-15T12:00:00Z",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-finished",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/cancel",
+     "category": "missing-field",
+     "path": "idempotency_key",
+     "expected": "contract-1",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-finished",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/cancel",
+     "category": "missing-field",
+     "path": "dry_run_summary",
+     "expected": "{\"clients\":1,\"confirm_above\":25,\"force\":false,\"items\":1,\"kind\":\"assess\",\"manifests_read_for\":1,\"max_items\":5000,\"multi_program_clients\":0,\"never_run\":1,\"notes\":[\"Nothing is skipped: every item runs.\",\"Each run replays every authored year of the client's payroll, whatever year it is asked for.\"],\"ove...(581 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-finished",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/cancel",
+     "category": "missing-field",
+     "path": "idempotent_replay",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-finished",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/cancel",
+     "category": "missing-field",
+     "path": "degraded",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-finished",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/cancel",
+     "category": "missing-field",
+     "path": "cancelled_now",
+     "expected": "0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-finished",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/cancel",
+     "category": "missing-field",
+     "path": "requeued",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-finished",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/cancel",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /api/v2/run-batches/{batch_id}/cancel"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-nothing-failed",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/retry-failed",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-nothing-failed",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/retry-failed",
+     "category": "missing-field",
+     "path": "batch_id",
+     "expected": "4000000000004000800000000000001f",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-nothing-failed",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/retry-failed",
+     "category": "missing-field",
+     "path": "kind",
+     "expected": "assess",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-nothing-failed",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/retry-failed",
+     "category": "missing-field",
+     "path": "scope_kind",
+     "expected": "one",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-nothing-failed",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/retry-failed",
+     "category": "missing-field",
+     "path": "scope_spec",
+     "expected": "{\"client_count\":1,\"client_ids\":[2001],\"clients_sha256\":\"e8ce31014a2c9f51\",\"force\":false,\"include_code_commit\":false,\"kind\":\"assess\",\"program_code\":null,\"program_items\":1,\"refresh_once\":true,\"skip_unchanged\":false,\"tax_years\":[2025]}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-nothing-failed",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/retry-failed",
+     "category": "missing-field",
+     "path": "program_code",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-nothing-failed",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/retry-failed",
+     "category": "missing-field",
+     "path": "tax_years",
+     "expected": "[2025]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-nothing-failed",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/retry-failed",
+     "category": "missing-field",
+     "path": "force",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-nothing-failed",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/retry-failed",
+     "category": "missing-field",
+     "path": "skip_unchanged",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-nothing-failed",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/retry-failed",
+     "category": "missing-field",
+     "path": "include_code_commit",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-nothing-failed",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/retry-failed",
+     "category": "missing-field",
+     "path": "refresh_once",
+     "expected": "true",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-nothing-failed",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/retry-failed",
+     "category": "missing-field",
+     "path": "status",
+     "expected": "succeeded",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-nothing-failed",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/retry-failed",
+     "category": "missing-field",
+     "path": "cancel_requested",
+     "expected": "true",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-nothing-failed",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/retry-failed",
+     "category": "missing-field",
+     "path": "counts",
+     "expected": "{\"total\":1,\"queued\":0,\"running\":0,\"succeeded\":1,\"skipped\":0,\"failed\":0,\"cancelled\":0}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-nothing-failed",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/retry-failed",
+     "category": "missing-field",
+     "path": "progress",
+     "expected": "{\"done\":1,\"total\":1}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-nothing-failed",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/retry-failed",
+     "category": "missing-field",
+     "path": "requested_by",
+     "expected": "anonymous",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-nothing-failed",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/retry-failed",
+     "category": "missing-field",
+     "path": "requested_at",
+     "expected": "2026-01-15T12:00:00Z",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-nothing-failed",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/retry-failed",
+     "category": "missing-field",
+     "path": "started_at",
+     "expected": "2026-01-15T12:00:00Z",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-nothing-failed",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/retry-failed",
+     "category": "missing-field",
+     "path": "finished_at",
+     "expected": "2026-01-15T12:00:00Z",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-nothing-failed",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/retry-failed",
+     "category": "missing-field",
+     "path": "idempotency_key",
+     "expected": "contract-1",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-nothing-failed",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/retry-failed",
+     "category": "missing-field",
+     "path": "dry_run_summary",
+     "expected": "{\"clients\":1,\"confirm_above\":25,\"force\":false,\"items\":1,\"kind\":\"assess\",\"manifests_read_for\":1,\"max_items\":5000,\"multi_program_clients\":0,\"never_run\":1,\"notes\":[\"Nothing is skipped: every item runs.\",\"Each run replays every authored year of the client's payroll, whatever year it is asked for.\"],\"ove...(581 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-nothing-failed",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/retry-failed",
+     "category": "missing-field",
+     "path": "idempotent_replay",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-nothing-failed",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/retry-failed",
+     "category": "missing-field",
+     "path": "degraded",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-nothing-failed",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/retry-failed",
+     "category": "missing-field",
+     "path": "cancelled_now",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-nothing-failed",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/retry-failed",
+     "category": "missing-field",
+     "path": "requeued",
+     "expected": "0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-nothing-failed",
+     "route": "POST /api/v2/run-batches/4000000000004000800000000000001f/retry-failed",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /api/v2/run-batches/{batch_id}/retry-failed"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "skip-unchanged",
+     "route": "POST /api/v2/run-batches",
+     "category": "status",
+     "path": "status",
+     "expected": "202",
+     "actual": "501"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "skip-unchanged",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "batch_id",
+     "expected": "40000000000040008000000000000024",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "skip-unchanged",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "kind",
+     "expected": "assess",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "skip-unchanged",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "scope_kind",
+     "expected": "one",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "skip-unchanged",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "scope_spec",
+     "expected": "{\"client_count\":1,\"client_ids\":[2001],\"clients_sha256\":\"e8ce31014a2c9f51\",\"force\":false,\"include_code_commit\":false,\"kind\":\"assess\",\"program_code\":null,\"program_items\":1,\"refresh_once\":true,\"skip_unchanged\":true,\"tax_years\":[2025]}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "skip-unchanged",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "program_code",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "skip-unchanged",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "tax_years",
+     "expected": "[2025]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "skip-unchanged",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "force",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "skip-unchanged",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "skip_unchanged",
+     "expected": "true",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "skip-unchanged",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "include_code_commit",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "skip-unchanged",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "refresh_once",
+     "expected": "true",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "skip-unchanged",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "status",
+     "expected": "queued",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "skip-unchanged",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "cancel_requested",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "skip-unchanged",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "counts",
+     "expected": "{\"total\":1,\"queued\":1,\"running\":0,\"succeeded\":0,\"skipped\":0,\"failed\":0,\"cancelled\":0}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "skip-unchanged",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "progress",
+     "expected": "{\"done\":0,\"total\":1}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "skip-unchanged",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "requested_by",
+     "expected": "anonymous",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "skip-unchanged",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "requested_at",
+     "expected": "2026-01-15T12:00:00Z",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "skip-unchanged",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "started_at",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "skip-unchanged",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "finished_at",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "skip-unchanged",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "idempotency_key",
+     "expected": "contract-2",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "skip-unchanged",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "dry_run_summary",
+     "expected": "{\"clients\":1,\"confirm_above\":25,\"force\":false,\"items\":1,\"kind\":\"assess\",\"manifests_read_for\":1,\"max_items\":5000,\"multi_program_clients\":0,\"never_run\":1,\"notes\":[\"Whether a client is skipped as unchanged is decided when its item starts; this is an upper bound, not a promise.\",\"Each run replays every ...(656 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "skip-unchanged",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "idempotent_replay",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "skip-unchanged",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "degraded",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "skip-unchanged",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "cancelled_now",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "skip-unchanged",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "requeued",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "skip-unchanged",
+     "route": "POST /api/v2/run-batches",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /api/v2/run-batches"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-skip-unchanged",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000024",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-skip-unchanged",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000024",
+     "category": "missing-field",
+     "path": "batch_id",
+     "expected": "40000000000040008000000000000024",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-skip-unchanged",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000024",
+     "category": "missing-field",
+     "path": "kind",
+     "expected": "assess",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-skip-unchanged",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000024",
+     "category": "missing-field",
+     "path": "scope_kind",
+     "expected": "one",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-skip-unchanged",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000024",
+     "category": "missing-field",
+     "path": "scope_spec",
+     "expected": "{\"client_count\":1,\"client_ids\":[2001],\"clients_sha256\":\"e8ce31014a2c9f51\",\"force\":false,\"include_code_commit\":false,\"kind\":\"assess\",\"program_code\":null,\"program_items\":1,\"refresh_once\":true,\"skip_unchanged\":true,\"tax_years\":[2025]}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-skip-unchanged",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000024",
+     "category": "missing-field",
+     "path": "program_code",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-skip-unchanged",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000024",
+     "category": "missing-field",
+     "path": "tax_years",
+     "expected": "[2025]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-skip-unchanged",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000024",
+     "category": "missing-field",
+     "path": "force",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-skip-unchanged",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000024",
+     "category": "missing-field",
+     "path": "skip_unchanged",
+     "expected": "true",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-skip-unchanged",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000024",
+     "category": "missing-field",
+     "path": "include_code_commit",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-skip-unchanged",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000024",
+     "category": "missing-field",
+     "path": "refresh_once",
+     "expected": "true",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-skip-unchanged",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000024",
+     "category": "missing-field",
+     "path": "status",
+     "expected": "succeeded",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-skip-unchanged",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000024",
+     "category": "missing-field",
+     "path": "cancel_requested",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-skip-unchanged",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000024",
+     "category": "missing-field",
+     "path": "counts",
+     "expected": "{\"total\":1,\"queued\":0,\"running\":0,\"succeeded\":1,\"skipped\":0,\"failed\":0,\"cancelled\":0}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-skip-unchanged",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000024",
+     "category": "missing-field",
+     "path": "progress",
+     "expected": "{\"done\":1,\"total\":1}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-skip-unchanged",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000024",
+     "category": "missing-field",
+     "path": "requested_by",
+     "expected": "anonymous",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-skip-unchanged",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000024",
+     "category": "missing-field",
+     "path": "requested_at",
+     "expected": "2026-01-15T12:00:00Z",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-skip-unchanged",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000024",
+     "category": "missing-field",
+     "path": "started_at",
+     "expected": "2026-01-15T12:00:00Z",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-skip-unchanged",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000024",
+     "category": "missing-field",
+     "path": "finished_at",
+     "expected": "2026-01-15T12:00:00Z",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-skip-unchanged",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000024",
+     "category": "missing-field",
+     "path": "idempotency_key",
+     "expected": "contract-2",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-skip-unchanged",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000024",
+     "category": "missing-field",
+     "path": "dry_run_summary",
+     "expected": "{\"clients\":1,\"confirm_above\":25,\"force\":false,\"items\":1,\"kind\":\"assess\",\"manifests_read_for\":1,\"max_items\":5000,\"multi_program_clients\":0,\"never_run\":1,\"notes\":[\"Whether a client is skipped as unchanged is decided when its item starts; this is an upper bound, not a promise.\",\"Each run replays every ...(656 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-skip-unchanged",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000024",
+     "category": "missing-field",
+     "path": "idempotent_replay",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-skip-unchanged",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000024",
+     "category": "missing-field",
+     "path": "degraded",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-skip-unchanged",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000024",
+     "category": "missing-field",
+     "path": "cancelled_now",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-skip-unchanged",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000024",
+     "category": "missing-field",
+     "path": "requeued",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-skip-unchanged",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000024",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/v2/run-batches/{batch_id}"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-skip-unchanged",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000024/items",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-skip-unchanged",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000024/items",
+     "category": "missing-field",
+     "path": "items",
+     "expected": "[{\"item_id\":\"40000000000040008000000000000025\",\"batch_id\":\"40000000000040008000000000000024\",\"seq\":0,\"client_id\":2001,\"program_code\":\"GA_JTC\",\"tax_year\":2025,\"status\":\"succeeded\",\"attempts\":1,\"run_id\":null,\"skip_reason\":null,\"error_dependency\":null,\"error_message\":null,\"not_before\":null,\"started_at\"...(362 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-skip-unchanged",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000024/items",
+     "category": "missing-field",
+     "path": "total",
+     "expected": "1",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-skip-unchanged",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000024/items",
+     "category": "missing-field",
+     "path": "limit",
+     "expected": "50",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-skip-unchanged",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000024/items",
+     "category": "missing-field",
+     "path": "offset",
+     "expected": "0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-skip-unchanged",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000024/items",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/v2/run-batches/{batch_id}/items"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-calculate-all",
+     "route": "POST /api/v2/run-batches",
+     "category": "status",
+     "path": "status",
+     "expected": "202",
+     "actual": "501"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-calculate-all",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "batch_id",
+     "expected": "40000000000040008000000000000029",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-calculate-all",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "kind",
+     "expected": "assess_and_calculate",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-calculate-all",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "scope_kind",
+     "expected": "all",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-calculate-all",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "scope_spec",
+     "expected": "{\"client_count\":4,\"client_ids\":[2001,2002,2003,2004],\"clients_sha256\":\"33e29c9b7d7c9ba1\",\"force\":true,\"include_code_commit\":false,\"kind\":\"assess_and_calculate\",\"program_code\":null,\"program_items\":4,\"refresh_once\":true,\"skip_unchanged\":false,\"tax_years\":[2025]}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-calculate-all",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "program_code",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-calculate-all",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "tax_years",
+     "expected": "[2025]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-calculate-all",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "force",
+     "expected": "true",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-calculate-all",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "skip_unchanged",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-calculate-all",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "include_code_commit",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-calculate-all",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "refresh_once",
+     "expected": "true",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-calculate-all",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "status",
+     "expected": "queued",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-calculate-all",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "cancel_requested",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-calculate-all",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "counts",
+     "expected": "{\"total\":4,\"queued\":4,\"running\":0,\"succeeded\":0,\"skipped\":0,\"failed\":0,\"cancelled\":0}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-calculate-all",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "progress",
+     "expected": "{\"done\":0,\"total\":4}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-calculate-all",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "requested_by",
+     "expected": "anonymous",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-calculate-all",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "requested_at",
+     "expected": "2026-01-15T12:00:00Z",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-calculate-all",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "started_at",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-calculate-all",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "finished_at",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-calculate-all",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "idempotency_key",
+     "expected": "contract-3",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-calculate-all",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "dry_run_summary",
+     "expected": "{\"clients\":4,\"confirm_above\":25,\"force\":true,\"items\":4,\"kind\":\"assess_and_calculate\",\"manifests_read_for\":4,\"max_items\":5000,\"multi_program_clients\":0,\"never_run\":4,\"notes\":[\"Nothing is skipped: every item runs.\",\"Each run replays every authored year of the client's payroll, whatever year it is aske...(594 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-calculate-all",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "idempotent_replay",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-calculate-all",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "degraded",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-calculate-all",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "cancelled_now",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-calculate-all",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "requeued",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "create-calculate-all",
+     "route": "POST /api/v2/run-batches",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /api/v2/run-batches"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-calculate-queued",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-calculate-queued",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "batch_id",
+     "expected": "40000000000040008000000000000029",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-calculate-queued",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "kind",
+     "expected": "assess_and_calculate",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-calculate-queued",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "scope_kind",
+     "expected": "all",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-calculate-queued",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "scope_spec",
+     "expected": "{\"client_count\":4,\"client_ids\":[2001,2002,2003,2004],\"clients_sha256\":\"33e29c9b7d7c9ba1\",\"force\":true,\"include_code_commit\":false,\"kind\":\"assess_and_calculate\",\"program_code\":null,\"program_items\":4,\"refresh_once\":true,\"skip_unchanged\":false,\"tax_years\":[2025]}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-calculate-queued",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "program_code",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-calculate-queued",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "tax_years",
+     "expected": "[2025]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-calculate-queued",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "force",
+     "expected": "true",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-calculate-queued",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "skip_unchanged",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-calculate-queued",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "include_code_commit",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-calculate-queued",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "refresh_once",
+     "expected": "true",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-calculate-queued",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "status",
+     "expected": "queued",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-calculate-queued",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "cancel_requested",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-calculate-queued",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "counts",
+     "expected": "{\"total\":4,\"queued\":4,\"running\":0,\"succeeded\":0,\"skipped\":0,\"failed\":0,\"cancelled\":0}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-calculate-queued",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "progress",
+     "expected": "{\"done\":0,\"total\":4}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-calculate-queued",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "requested_by",
+     "expected": "anonymous",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-calculate-queued",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "requested_at",
+     "expected": "2026-01-15T12:00:00Z",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-calculate-queued",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "started_at",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-calculate-queued",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "finished_at",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-calculate-queued",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "idempotency_key",
+     "expected": "contract-3",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-calculate-queued",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "dry_run_summary",
+     "expected": "{\"clients\":4,\"confirm_above\":25,\"force\":true,\"items\":4,\"kind\":\"assess_and_calculate\",\"manifests_read_for\":4,\"max_items\":5000,\"multi_program_clients\":0,\"never_run\":4,\"notes\":[\"Nothing is skipped: every item runs.\",\"Each run replays every authored year of the client's payroll, whatever year it is aske...(594 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-calculate-queued",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "idempotent_replay",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-calculate-queued",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "degraded",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-calculate-queued",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "cancelled_now",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-calculate-queued",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "requeued",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-calculate-queued",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/v2/run-batches/{batch_id}"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-queued",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/cancel",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-queued",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/cancel",
+     "category": "missing-field",
+     "path": "batch_id",
+     "expected": "40000000000040008000000000000029",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-queued",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/cancel",
+     "category": "missing-field",
+     "path": "kind",
+     "expected": "assess_and_calculate",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-queued",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/cancel",
+     "category": "missing-field",
+     "path": "scope_kind",
+     "expected": "all",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-queued",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/cancel",
+     "category": "missing-field",
+     "path": "scope_spec",
+     "expected": "{\"client_count\":4,\"client_ids\":[2001,2002,2003,2004],\"clients_sha256\":\"33e29c9b7d7c9ba1\",\"force\":true,\"include_code_commit\":false,\"kind\":\"assess_and_calculate\",\"program_code\":null,\"program_items\":4,\"refresh_once\":true,\"skip_unchanged\":false,\"tax_years\":[2025]}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-queued",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/cancel",
+     "category": "missing-field",
+     "path": "program_code",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-queued",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/cancel",
+     "category": "missing-field",
+     "path": "tax_years",
+     "expected": "[2025]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-queued",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/cancel",
+     "category": "missing-field",
+     "path": "force",
+     "expected": "true",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-queued",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/cancel",
+     "category": "missing-field",
+     "path": "skip_unchanged",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-queued",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/cancel",
+     "category": "missing-field",
+     "path": "include_code_commit",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-queued",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/cancel",
+     "category": "missing-field",
+     "path": "refresh_once",
+     "expected": "true",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-queued",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/cancel",
+     "category": "missing-field",
+     "path": "status",
+     "expected": "cancelled",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-queued",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/cancel",
+     "category": "missing-field",
+     "path": "cancel_requested",
+     "expected": "true",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-queued",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/cancel",
+     "category": "missing-field",
+     "path": "counts",
+     "expected": "{\"total\":4,\"queued\":0,\"running\":0,\"succeeded\":0,\"skipped\":0,\"failed\":0,\"cancelled\":4}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-queued",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/cancel",
+     "category": "missing-field",
+     "path": "progress",
+     "expected": "{\"done\":4,\"total\":4}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-queued",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/cancel",
+     "category": "missing-field",
+     "path": "requested_by",
+     "expected": "anonymous",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-queued",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/cancel",
+     "category": "missing-field",
+     "path": "requested_at",
+     "expected": "2026-01-15T12:00:00Z",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-queued",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/cancel",
+     "category": "missing-field",
+     "path": "started_at",
+     "expected": "2026-01-15T12:00:00Z",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-queued",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/cancel",
+     "category": "missing-field",
+     "path": "finished_at",
+     "expected": "2026-01-15T12:00:00Z",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-queued",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/cancel",
+     "category": "missing-field",
+     "path": "idempotency_key",
+     "expected": "contract-3",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-queued",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/cancel",
+     "category": "missing-field",
+     "path": "dry_run_summary",
+     "expected": "{\"clients\":4,\"confirm_above\":25,\"force\":true,\"items\":4,\"kind\":\"assess_and_calculate\",\"manifests_read_for\":4,\"max_items\":5000,\"multi_program_clients\":0,\"never_run\":4,\"notes\":[\"Nothing is skipped: every item runs.\",\"Each run replays every authored year of the client's payroll, whatever year it is aske...(594 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-queued",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/cancel",
+     "category": "missing-field",
+     "path": "idempotent_replay",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-queued",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/cancel",
+     "category": "missing-field",
+     "path": "degraded",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-queued",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/cancel",
+     "category": "missing-field",
+     "path": "cancelled_now",
+     "expected": "4",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-queued",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/cancel",
+     "category": "missing-field",
+     "path": "requeued",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-queued",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/cancel",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /api/v2/run-batches/{batch_id}/cancel"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-cancelled",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-cancelled",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "batch_id",
+     "expected": "40000000000040008000000000000029",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-cancelled",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "kind",
+     "expected": "assess_and_calculate",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-cancelled",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "scope_kind",
+     "expected": "all",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-cancelled",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "scope_spec",
+     "expected": "{\"client_count\":4,\"client_ids\":[2001,2002,2003,2004],\"clients_sha256\":\"33e29c9b7d7c9ba1\",\"force\":true,\"include_code_commit\":false,\"kind\":\"assess_and_calculate\",\"program_code\":null,\"program_items\":4,\"refresh_once\":true,\"skip_unchanged\":false,\"tax_years\":[2025]}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-cancelled",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "program_code",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-cancelled",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "tax_years",
+     "expected": "[2025]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-cancelled",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "force",
+     "expected": "true",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-cancelled",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "skip_unchanged",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-cancelled",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "include_code_commit",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-cancelled",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "refresh_once",
+     "expected": "true",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-cancelled",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "status",
+     "expected": "cancelled",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-cancelled",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "cancel_requested",
+     "expected": "true",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-cancelled",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "counts",
+     "expected": "{\"total\":4,\"queued\":0,\"running\":0,\"succeeded\":0,\"skipped\":0,\"failed\":0,\"cancelled\":4}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-cancelled",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "progress",
+     "expected": "{\"done\":4,\"total\":4}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-cancelled",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "requested_by",
+     "expected": "anonymous",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-cancelled",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "requested_at",
+     "expected": "2026-01-15T12:00:00Z",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-cancelled",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "started_at",
+     "expected": "2026-01-15T12:00:00Z",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-cancelled",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "finished_at",
+     "expected": "2026-01-15T12:00:00Z",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-cancelled",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "idempotency_key",
+     "expected": "contract-3",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-cancelled",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "dry_run_summary",
+     "expected": "{\"clients\":4,\"confirm_above\":25,\"force\":true,\"items\":4,\"kind\":\"assess_and_calculate\",\"manifests_read_for\":4,\"max_items\":5000,\"multi_program_clients\":0,\"never_run\":4,\"notes\":[\"Nothing is skipped: every item runs.\",\"Each run replays every authored year of the client's payroll, whatever year it is aske...(594 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-cancelled",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "idempotent_replay",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-cancelled",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "degraded",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-cancelled",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "cancelled_now",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-cancelled",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "missing-field",
+     "path": "requeued",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-cancelled",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/v2/run-batches/{batch_id}"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-cancelled",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029/items",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-cancelled",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029/items",
+     "category": "missing-field",
+     "path": "items",
+     "expected": "[{\"item_id\":\"4000000000004000800000000000002a\",\"batch_id\":\"40000000000040008000000000000029\",\"seq\":0,\"client_id\":2001,\"program_code\":null,\"tax_year\":2025,\"status\":\"cancelled\",\"attempts\":0,\"run_id\":null,\"skip_reason\":null,\"error_dependency\":null,\"error_message\":null,\"not_before\":null,\"started_at\":nul...(1357 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-cancelled",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029/items",
+     "category": "missing-field",
+     "path": "total",
+     "expected": "4",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-cancelled",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029/items",
+     "category": "missing-field",
+     "path": "limit",
+     "expected": "50",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-cancelled",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029/items",
+     "category": "missing-field",
+     "path": "offset",
+     "expected": "0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-cancelled",
+     "route": "GET /api/v2/run-batches/40000000000040008000000000000029/items",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/v2/run-batches/{batch_id}/items"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-after-cancel",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/retry-failed",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-after-cancel",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/retry-failed",
+     "category": "missing-field",
+     "path": "batch_id",
+     "expected": "40000000000040008000000000000029",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-after-cancel",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/retry-failed",
+     "category": "missing-field",
+     "path": "kind",
+     "expected": "assess_and_calculate",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-after-cancel",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/retry-failed",
+     "category": "missing-field",
+     "path": "scope_kind",
+     "expected": "all",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-after-cancel",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/retry-failed",
+     "category": "missing-field",
+     "path": "scope_spec",
+     "expected": "{\"client_count\":4,\"client_ids\":[2001,2002,2003,2004],\"clients_sha256\":\"33e29c9b7d7c9ba1\",\"force\":true,\"include_code_commit\":false,\"kind\":\"assess_and_calculate\",\"program_code\":null,\"program_items\":4,\"refresh_once\":true,\"skip_unchanged\":false,\"tax_years\":[2025]}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-after-cancel",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/retry-failed",
+     "category": "missing-field",
+     "path": "program_code",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-after-cancel",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/retry-failed",
+     "category": "missing-field",
+     "path": "tax_years",
+     "expected": "[2025]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-after-cancel",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/retry-failed",
+     "category": "missing-field",
+     "path": "force",
+     "expected": "true",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-after-cancel",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/retry-failed",
+     "category": "missing-field",
+     "path": "skip_unchanged",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-after-cancel",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/retry-failed",
+     "category": "missing-field",
+     "path": "include_code_commit",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-after-cancel",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/retry-failed",
+     "category": "missing-field",
+     "path": "refresh_once",
+     "expected": "true",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-after-cancel",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/retry-failed",
+     "category": "missing-field",
+     "path": "status",
+     "expected": "cancelled",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-after-cancel",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/retry-failed",
+     "category": "missing-field",
+     "path": "cancel_requested",
+     "expected": "true",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-after-cancel",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/retry-failed",
+     "category": "missing-field",
+     "path": "counts",
+     "expected": "{\"total\":4,\"queued\":0,\"running\":0,\"succeeded\":0,\"skipped\":0,\"failed\":0,\"cancelled\":4}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-after-cancel",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/retry-failed",
+     "category": "missing-field",
+     "path": "progress",
+     "expected": "{\"done\":4,\"total\":4}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-after-cancel",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/retry-failed",
+     "category": "missing-field",
+     "path": "requested_by",
+     "expected": "anonymous",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-after-cancel",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/retry-failed",
+     "category": "missing-field",
+     "path": "requested_at",
+     "expected": "2026-01-15T12:00:00Z",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-after-cancel",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/retry-failed",
+     "category": "missing-field",
+     "path": "started_at",
+     "expected": "2026-01-15T12:00:00Z",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-after-cancel",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/retry-failed",
+     "category": "missing-field",
+     "path": "finished_at",
+     "expected": "2026-01-15T12:00:00Z",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-after-cancel",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/retry-failed",
+     "category": "missing-field",
+     "path": "idempotency_key",
+     "expected": "contract-3",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-after-cancel",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/retry-failed",
+     "category": "missing-field",
+     "path": "dry_run_summary",
+     "expected": "{\"clients\":4,\"confirm_above\":25,\"force\":true,\"items\":4,\"kind\":\"assess_and_calculate\",\"manifests_read_for\":4,\"max_items\":5000,\"multi_program_clients\":0,\"never_run\":4,\"notes\":[\"Nothing is skipped: every item runs.\",\"Each run replays every authored year of the client's payroll, whatever year it is aske...(594 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-after-cancel",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/retry-failed",
+     "category": "missing-field",
+     "path": "idempotent_replay",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-after-cancel",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/retry-failed",
+     "category": "missing-field",
+     "path": "degraded",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-after-cancel",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/retry-failed",
+     "category": "missing-field",
+     "path": "cancelled_now",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-after-cancel",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/retry-failed",
+     "category": "missing-field",
+     "path": "requeued",
+     "expected": "0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-after-cancel",
+     "route": "POST /api/v2/run-batches/40000000000040008000000000000029/retry-failed",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /api/v2/run-batches/{batch_id}/retry-failed"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "unknown-client",
+     "route": "POST /api/v2/run-batches",
+     "category": "status",
+     "path": "status",
+     "expected": "422",
+     "actual": "501"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "unknown-client",
+     "route": "POST /api/v2/run-batches",
+     "category": "type",
+     "path": "detail",
+     "expected": "{\"detail\":\"These clients are not in the client book: 999999. Remove them or check the ids.\",\"code\":\"unknown_clients\",\"reason\":\"These clients are not in the client book: 999999.\",\"remedy\":\"Remove them or check the ids.\"}",
+     "actual": "Operation not implemented: POST /api/v2/run-batches"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "empty-list",
+     "route": "POST /api/v2/run-batches",
+     "category": "status",
+     "path": "status",
+     "expected": "422",
+     "actual": "501"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "empty-list",
+     "route": "POST /api/v2/run-batches",
+     "category": "type",
+     "path": "detail",
+     "expected": "{\"detail\":\"No client ids were given. Check the client ids or the filter.\",\"code\":\"empty_scope\",\"reason\":\"No client ids were given.\",\"remedy\":\"Check the client ids or the filter.\"}",
+     "actual": "Operation not implemented: POST /api/v2/run-batches"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "bad-kind",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "detail[0].ctx",
+     "expected": "{\"expected\":\"'assess', 'calculate' or 'assess_and_calculate'\"}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "bad-kind",
+     "route": "POST /api/v2/run-batches",
+     "category": "value",
+     "path": "detail[0].msg",
+     "expected": "Input should be 'assess', 'calculate' or 'assess_and_calculate'",
+     "actual": "Value is not one of the allowed choices."
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "bad-scope-kind",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "detail[0].ctx",
+     "expected": "{\"expected\":\"'one', 'list', 'filter' or 'all'\"}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "bad-scope-kind",
+     "route": "POST /api/v2/run-batches",
+     "category": "value",
+     "path": "detail[0].msg",
+     "expected": "Input should be 'one', 'list', 'filter' or 'all'",
+     "actual": "Value is not one of the allowed choices."
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "long-idempotency-key",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "detail[0].ctx",
+     "expected": "{\"max_length\":128}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "long-idempotency-key",
+     "route": "POST /api/v2/run-batches",
+     "category": "value",
+     "path": "detail[0].msg",
+     "expected": "String should have at most 128 characters",
+     "actual": "Value is too long."
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "list-status",
+     "route": "GET /api/v2/run-batches",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "list-status",
+     "route": "GET /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "items",
+     "expected": "[{\"batch_id\":\"4000000000004000800000000000001f\",\"kind\":\"assess\",\"scope_kind\":\"one\",\"scope_spec\":{\"client_count\":1,\"client_ids\":[2001],\"clients_sha256\":\"e8ce31014a2c9f51\",\"force\":false,\"include_code_commit\":false,\"kind\":\"assess\",\"program_code\":null,\"program_items\":1,\"refresh_once\":true,\"skip_unchange...(3017 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "list-status",
+     "route": "GET /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "total",
+     "expected": "2",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "list-status",
+     "route": "GET /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "limit",
+     "expected": "25",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "list-status",
+     "route": "GET /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "offset",
+     "expected": "0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "list-status",
+     "route": "GET /api/v2/run-batches",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/v2/run-batches"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "list-status-bogus",
+     "route": "GET /api/v2/run-batches",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "list-status-bogus",
+     "route": "GET /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "items",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "list-status-bogus",
+     "route": "GET /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "total",
+     "expected": "0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "list-status-bogus",
+     "route": "GET /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "limit",
+     "expected": "25",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "list-status-bogus",
+     "route": "GET /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "offset",
+     "expected": "0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "list-status-bogus",
+     "route": "GET /api/v2/run-batches",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/v2/run-batches"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "list-after",
+     "route": "GET /api/v2/run-batches",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "list-after",
+     "route": "GET /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "items",
+     "expected": "[{\"batch_id\":\"4000000000004000800000000000001f\",\"kind\":\"assess\",\"scope_kind\":\"one\",\"scope_spec\":{\"client_count\":1,\"client_ids\":[2001],\"clients_sha256\":\"e8ce31014a2c9f51\",\"force\":false,\"include_code_commit\":false,\"kind\":\"assess\",\"program_code\":null,\"program_items\":1,\"refresh_once\":true,\"skip_unchange...(4542 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "list-after",
+     "route": "GET /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "total",
+     "expected": "3",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "list-after",
+     "route": "GET /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "limit",
+     "expected": "25",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "list-after",
+     "route": "GET /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "offset",
+     "expected": "0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "list-after",
+     "route": "GET /api/v2/run-batches",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/v2/run-batches"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "list-limit-1",
+     "route": "GET /api/v2/run-batches",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "list-limit-1",
+     "route": "GET /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "items",
+     "expected": "[{\"batch_id\":\"4000000000004000800000000000001f\",\"kind\":\"assess\",\"scope_kind\":\"one\",\"scope_spec\":{\"client_count\":1,\"client_ids\":[2001],\"clients_sha256\":\"e8ce31014a2c9f51\",\"force\":false,\"include_code_commit\":false,\"kind\":\"assess\",\"program_code\":null,\"program_items\":1,\"refresh_once\":true,\"skip_unchange...(1472 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "list-limit-1",
+     "route": "GET /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "total",
+     "expected": "3",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "list-limit-1",
+     "route": "GET /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "limit",
+     "expected": "1",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "list-limit-1",
+     "route": "GET /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "offset",
+     "expected": "0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "list-limit-1",
+     "route": "GET /api/v2/run-batches",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/v2/run-batches"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "list-offset-past",
+     "route": "GET /api/v2/run-batches",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "list-offset-past",
+     "route": "GET /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "items",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "list-offset-past",
+     "route": "GET /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "total",
+     "expected": "3",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "list-offset-past",
+     "route": "GET /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "limit",
+     "expected": "25",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "list-offset-past",
+     "route": "GET /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "offset",
+     "expected": "99",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "list-offset-past",
+     "route": "GET /api/v2/run-batches",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/v2/run-batches"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "list-limit-0",
+     "route": "GET /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "detail[0].ctx",
+     "expected": "{\"ge\":1}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "list-limit-0",
+     "route": "GET /api/v2/run-batches",
+     "category": "value",
+     "path": "detail[0].msg",
+     "expected": "Input should be greater than or equal to 1",
+     "actual": "Value violates minimum."
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "list-limit-0",
+     "route": "GET /api/v2/run-batches",
+     "category": "type",
+     "path": "detail[0].input",
+     "expected": "0",
+     "actual": "0"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-unknown",
+     "route": "GET /api/v2/run-batches/00000000-0000-0000-0000-000000000000",
+     "category": "status",
+     "path": "status",
+     "expected": "404",
+     "actual": "501"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-unknown",
+     "route": "GET /api/v2/run-batches/00000000-0000-0000-0000-000000000000",
+     "category": "value",
+     "path": "detail",
+     "expected": "Unknown run batch 00000000-0000-0000-0000-000000000000.",
+     "actual": "Operation not implemented: GET /api/v2/run-batches/{batch_id}"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-unknown",
+     "route": "POST /api/v2/run-batches/00000000-0000-0000-0000-000000000000/cancel",
+     "category": "status",
+     "path": "status",
+     "expected": "404",
+     "actual": "501"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "cancel-unknown",
+     "route": "POST /api/v2/run-batches/00000000-0000-0000-0000-000000000000/cancel",
+     "category": "value",
+     "path": "detail",
+     "expected": "Unknown run batch 00000000-0000-0000-0000-000000000000.",
+     "actual": "Operation not implemented: POST /api/v2/run-batches/{batch_id}/cancel"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-unknown",
+     "route": "POST /api/v2/run-batches/00000000-0000-0000-0000-000000000000/retry-failed",
+     "category": "status",
+     "path": "status",
+     "expected": "404",
+     "actual": "501"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "retry-unknown",
+     "route": "POST /api/v2/run-batches/00000000-0000-0000-0000-000000000000/retry-failed",
+     "category": "value",
+     "path": "detail",
+     "expected": "Unknown run batch 00000000-0000-0000-0000-000000000000.",
+     "actual": "Operation not implemented: POST /api/v2/run-batches/{batch_id}/retry-failed"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-unknown",
+     "route": "GET /api/v2/run-batches/00000000-0000-0000-0000-000000000000/items",
+     "category": "status",
+     "path": "status",
+     "expected": "404",
+     "actual": "501"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "items-unknown",
+     "route": "GET /api/v2/run-batches/00000000-0000-0000-0000-000000000000/items",
+     "category": "value",
+     "path": "detail",
+     "expected": "Unknown run batch 00000000-0000-0000-0000-000000000000.",
+     "actual": "Operation not implemented: GET /api/v2/run-batches/{batch_id}/items"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "post-api-v2-run-batches.wrong-method-get",
+     "route": "GET /api/v2/run-batches",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "post-api-v2-run-batches.wrong-method-get",
+     "route": "GET /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "items",
+     "expected": "[{\"batch_id\":\"4000000000004000800000000000001f\",\"kind\":\"assess\",\"scope_kind\":\"one\",\"scope_spec\":{\"client_count\":1,\"client_ids\":[2001],\"clients_sha256\":\"e8ce31014a2c9f51\",\"force\":false,\"include_code_commit\":false,\"kind\":\"assess\",\"program_code\":null,\"program_items\":1,\"refresh_once\":true,\"skip_unchange...(4542 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "post-api-v2-run-batches.wrong-method-get",
+     "route": "GET /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "total",
+     "expected": "3",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "post-api-v2-run-batches.wrong-method-get",
+     "route": "GET /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "limit",
+     "expected": "25",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "post-api-v2-run-batches.wrong-method-get",
+     "route": "GET /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "offset",
+     "expected": "0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "post-api-v2-run-batches.wrong-method-get",
+     "route": "GET /api/v2/run-batches",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/v2/run-batches"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "post-api-v2-run-batches.wrong-method-delete",
+     "route": "DELETE /api/v2/run-batches",
+     "category": "header",
+     "path": "headers.allow",
+     "expected": "POST",
+     "actual": "GET, POST"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "post-api-v2-run-batches.body-empty-body",
+     "route": "POST /api/v2/run-batches",
+     "category": "value",
+     "path": "detail[0].msg",
+     "expected": "Field required",
+     "actual": "Field required."
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "post-api-v2-run-batches.body-not-json",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "detail[0].ctx",
+     "expected": "{\"error\":\"Expecting property name enclosed in double quotes\"}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "post-api-v2-run-batches.body-not-json",
+     "route": "POST /api/v2/run-batches",
+     "category": "array-length",
+     "path": "detail[0].loc",
+     "expected": "2",
+     "actual": "1"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "post-api-v2-run-batches.body-not-json",
+     "route": "POST /api/v2/run-batches",
+     "category": "value",
+     "path": "detail[0].msg",
+     "expected": "JSON decode error",
+     "actual": "The body must contain valid JSON."
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "post-api-v2-run-batches.body-not-json",
+     "route": "POST /api/v2/run-batches",
+     "category": "type",
+     "path": "detail[0].input",
+     "expected": "{}",
+     "actual": "null"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "post-api-v2-run-batches.body-json-array",
+     "route": "POST /api/v2/run-batches",
+     "category": "value",
+     "path": "detail[0].msg",
+     "expected": "Input should be a valid dictionary or object to extract fields from",
+     "actual": "Expected object."
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "post-api-v2-run-batches.body-json-string",
+     "route": "POST /api/v2/run-batches",
+     "category": "value",
+     "path": "detail[0].msg",
+     "expected": "Input should be a valid dictionary or object to extract fields from",
+     "actual": "Expected object."
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "post-api-v2-run-batches.body-json-null",
+     "route": "POST /api/v2/run-batches",
+     "category": "value",
+     "path": "detail[0].type",
+     "expected": "missing",
+     "actual": "model_attributes_type"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "post-api-v2-run-batches.body-json-null",
+     "route": "POST /api/v2/run-batches",
+     "category": "value",
+     "path": "detail[0].msg",
+     "expected": "Field required",
+     "actual": "Expected object."
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "post-api-v2-run-batches.body-empty-object",
+     "route": "POST /api/v2/run-batches",
+     "category": "value",
+     "path": "detail[0].msg",
+     "expected": "Field required",
+     "actual": "Field required."
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "post-api-v2-run-batches.body-wrong-content-type",
+     "route": "POST /api/v2/run-batches",
+     "category": "value",
+     "path": "detail[0].type",
+     "expected": "model_attributes_type",
+     "actual": "json_invalid"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "post-api-v2-run-batches.body-wrong-content-type",
+     "route": "POST /api/v2/run-batches",
+     "category": "value",
+     "path": "detail[0].msg",
+     "expected": "Input should be a valid dictionary or object to extract fields from",
+     "actual": "The body must contain valid JSON."
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "post-api-v2-run-batches.body-wrong-content-type",
+     "route": "POST /api/v2/run-batches",
+     "category": "type",
+     "path": "detail[0].input",
+     "expected": "a=b",
+     "actual": "null"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "post-api-v2-run-batches.body-wrong-type-kind",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "detail[0].ctx",
+     "expected": "{\"expected\":\"'assess', 'calculate' or 'assess_and_calculate'\"}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "post-api-v2-run-batches.body-wrong-type-kind",
+     "route": "POST /api/v2/run-batches",
+     "category": "value",
+     "path": "detail[0].type",
+     "expected": "literal_error",
+     "actual": "string_type"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "post-api-v2-run-batches.body-wrong-type-kind",
+     "route": "POST /api/v2/run-batches",
+     "category": "value",
+     "path": "detail[0].msg",
+     "expected": "Input should be 'assess', 'calculate' or 'assess_and_calculate'",
+     "actual": "Expected string."
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "post-api-v2-run-batches.body-missing-scope",
+     "route": "POST /api/v2/run-batches",
+     "category": "value",
+     "path": "detail[0].msg",
+     "expected": "Field required",
+     "actual": "Field required."
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "post-api-v2-run-batches.body-long-string-kind",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "detail[0].ctx",
+     "expected": "{\"expected\":\"'assess', 'calculate' or 'assess_and_calculate'\"}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "post-api-v2-run-batches.body-long-string-kind",
+     "route": "POST /api/v2/run-batches",
+     "category": "value",
+     "path": "detail[0].msg",
+     "expected": "Input should be 'assess', 'calculate' or 'assess_and_calculate'",
+     "actual": "Value is not one of the allowed choices."
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "post-api-v2-run-batches.body-unicode-kind",
+     "route": "POST /api/v2/run-batches",
+     "category": "missing-field",
+     "path": "detail[0].ctx",
+     "expected": "{\"expected\":\"'assess', 'calculate' or 'assess_and_calculate'\"}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "post-api-v2-run-batches.body-unicode-kind",
+     "route": "POST /api/v2/run-batches",
+     "category": "value",
+     "path": "detail[0].msg",
+     "expected": "Input should be 'assess', 'calculate' or 'assess_and_calculate'",
+     "actual": "Value is not one of the allowed choices."
+    },
+    {
+     "scenario": "p2_run_batches",
+     "case": "get-api-v2-run-batches.wrong-method-post",
+     "route": "POST /api/v2/run-batches",
+     "category": "value",
+     "path": "detail[0].msg",
+     "expected": "Field required",
+     "actual": "Field required."
+    }
+   ],
+   "tolerated": []
+  }
+ ],
+ "exchanges": 64,
+ "failure_count": 509,
+ "tolerated_count": 0
+}

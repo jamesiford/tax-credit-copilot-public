@@ -1,0 +1,989 @@
+{
+ "name": "p1_query_edges",
+ "profile": "P1",
+ "variables": {
+  "exception_id": "t2:E00200:2025-02",
+  "draft_id": "00000000-0000-0000-0000-00000000dead",
+  "batch_id": "00000000-0000-0000-0000-00000000beef",
+  "artifact_id": "00000000-0000-0000-0000-00000000cafe"
+ },
+ "steps": [
+  {
+   "id": "boot.unit",
+   "note": "capture an employee token and id from the unit drill",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "limit",
+      2
+     ]
+    ]
+   },
+   "capture": {
+    "token": "body.employees.0.record_token",
+    "employee_id": "body.employees.0.employee_id"
+   }
+  },
+  {
+   "id": "boot.findings",
+   "note": "capture a finding id",
+   "request": {
+    "method": "GET",
+    "path": "/api/findings/1001/2025"
+   },
+   "capture": {
+    "finding_id": "body.findings.0.finding_id"
+   }
+  },
+  {
+   "id": "portfolio.default",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": []
+   }
+  },
+  {
+   "id": "portfolio.year",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "year",
+      2025
+     ]
+    ]
+   }
+  },
+  {
+   "id": "portfolio.year-none",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "year",
+      1999
+     ]
+    ]
+   }
+  },
+  {
+   "id": "portfolio.sort-priority-desc",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "sort",
+      "priority"
+     ],
+     [
+      "order",
+      "desc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "portfolio.sort-identified",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "sort",
+      "identified"
+     ],
+     [
+      "order",
+      "desc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "portfolio.sort-bogus",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "sort",
+      "bogus"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "portfolio.order-bogus",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "order",
+      "sideways"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "portfolio.limit-0",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "limit",
+      0
+     ]
+    ]
+   }
+  },
+  {
+   "id": "portfolio.limit-1",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "limit",
+      1
+     ]
+    ]
+   }
+  },
+  {
+   "id": "portfolio.limit-over-max",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "limit",
+      100000
+     ]
+    ]
+   }
+  },
+  {
+   "id": "portfolio.limit-neg",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "limit",
+      -5
+     ]
+    ]
+   }
+  },
+  {
+   "id": "portfolio.offset-past-end",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "offset",
+      999
+     ]
+    ]
+   }
+  },
+  {
+   "id": "portfolio.offset-neg",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "offset",
+      -1
+     ]
+    ]
+   }
+  },
+  {
+   "id": "portfolio.limit-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "limit",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "portfolio.limit-float",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "limit",
+      "1.5"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "portfolio.limit-empty",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "limit",
+      ""
+     ]
+    ]
+   }
+  },
+  {
+   "id": "portfolio.repeated-limit",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "limit",
+      1
+     ],
+     [
+      "limit",
+      2
+     ]
+    ]
+   }
+  },
+  {
+   "id": "portfolio.repeated-status",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "status",
+      "assessed"
+     ],
+     [
+      "status",
+      "claimed"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "portfolio.status-bogus",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "status",
+      "bogus"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "portfolio.near-true",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "near",
+      "true"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "portfolio.near-bogus",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "near",
+      "maybe"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "portfolio.program",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "program",
+      "GA_JTC"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "portfolio.program-unknown",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "program",
+      "ZZ_NONE"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "portfolio.scope",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "scope",
+      "all"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "portfolio.outcome",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "outcome",
+      "unclaimed"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "portfolio.unicode-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "program",
+      "Zoë☃"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "portfolio.long-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "program",
+      "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "portfolio.encoded-plus",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "program",
+      "a+b c%20d"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "portfolio.raw-query-dupe-keys",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "raw_query": "limit=1&limit=2&&=x&flag&year=2025"
+   }
+  },
+  {
+   "id": "eligibility.limit-0",
+   "request": {
+    "method": "GET",
+    "path": "/api/eligibility/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "limit",
+      0
+     ]
+    ]
+   }
+  },
+  {
+   "id": "eligibility.limit-1",
+   "request": {
+    "method": "GET",
+    "path": "/api/eligibility/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "limit",
+      1
+     ],
+     [
+      "offset",
+      1
+     ]
+    ]
+   }
+  },
+  {
+   "id": "eligibility.offset-past-end",
+   "request": {
+    "method": "GET",
+    "path": "/api/eligibility/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "offset",
+      99999
+     ]
+    ]
+   }
+  },
+  {
+   "id": "eligibility.limit-over-max",
+   "request": {
+    "method": "GET",
+    "path": "/api/eligibility/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "limit",
+      1000000
+     ]
+    ]
+   }
+  },
+  {
+   "id": "eligibility.sort-employee-desc",
+   "request": {
+    "method": "GET",
+    "path": "/api/eligibility/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "sort",
+      "employee"
+     ],
+     [
+      "order",
+      "desc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "eligibility.q-unicode",
+   "request": {
+    "method": "GET",
+    "path": "/api/eligibility/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "q",
+      "Zoë"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "eligibility.status-both",
+   "request": {
+    "method": "GET",
+    "path": "/api/eligibility/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "status",
+      "both"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "eligibility.near-floor",
+   "request": {
+    "method": "GET",
+    "path": "/api/eligibility/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "near_floor",
+      "true"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "unit.limit-1",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "limit",
+      1
+     ]
+    ]
+   }
+  },
+  {
+   "id": "unit.offset-past-end",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "offset",
+      99999
+     ]
+    ]
+   }
+  },
+  {
+   "id": "unit.sort-bogus",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "sort",
+      "bogus"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "unit.filter-bad",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "filter",
+      "~"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "unit.filter-good",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "filter",
+      "avg_weekly_hours:>=30"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "unit.month-0",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "month",
+      0
+     ]
+    ]
+   }
+  },
+  {
+   "id": "unit.month-13",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "month",
+      13
+     ]
+    ]
+   }
+  },
+  {
+   "id": "unit.month-3",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "month",
+      3
+     ]
+    ]
+   }
+  },
+  {
+   "id": "unit.near-min-hours",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "near_min_hours",
+      5
+     ]
+    ]
+   }
+  },
+  {
+   "id": "units.limit-1",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units",
+    "query": [
+     [
+      "limit",
+      1
+     ]
+    ]
+   }
+  },
+  {
+   "id": "units.offset-past-end",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units",
+    "query": [
+     [
+      "offset",
+      99999
+     ]
+    ]
+   }
+  },
+  {
+   "id": "units.year-none",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units",
+    "query": [
+     [
+      "year",
+      1999
+     ]
+    ]
+   }
+  },
+  {
+   "id": "units.state-bogus",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units",
+    "query": [
+     [
+      "state",
+      "ZZ"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "units.method-bogus",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units",
+    "query": [
+     [
+      "method",
+      "bogus"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "units.method-pp",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units",
+    "query": [
+     [
+      "method",
+      "pay_period"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "unknown.client-unknown",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/999999/units",
+    "query": []
+   }
+  },
+  {
+   "id": "unknown.client-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/0/units",
+    "query": []
+   }
+  },
+  {
+   "id": "unknown.client-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/-1/units",
+    "query": []
+   }
+  },
+  {
+   "id": "unknown.client-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/99999999999999999999/units",
+    "query": []
+   }
+  },
+  {
+   "id": "unknown.coverage-unknown",
+   "request": {
+    "method": "GET",
+    "path": "/api/claims/coverage/999999",
+    "query": []
+   }
+  },
+  {
+   "id": "unknown.cell-unknown",
+   "request": {
+    "method": "GET",
+    "path": "/api/claims/cell/1001/ZZ_NONE/2025",
+    "query": []
+   }
+  },
+  {
+   "id": "unknown.scope-unknown",
+   "request": {
+    "method": "GET",
+    "path": "/api/scope/client/999999",
+    "query": []
+   }
+  },
+  {
+   "id": "unknown.situation-unknown",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/999999/situation",
+    "query": []
+   }
+  },
+  {
+   "id": "unknown.employee-unknown-token",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/employees/not-a-real-token-1234",
+    "query": []
+   }
+  },
+  {
+   "id": "unknown.program-unknown",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/programs/ZZ_NONE",
+    "query": []
+   }
+  },
+  {
+   "id": "unknown.draft-unknown",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts/00000000-0000-0000-0000-000000000000",
+    "query": []
+   }
+  },
+  {
+   "id": "unknown.batch-unknown",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches/00000000-0000-0000-0000-000000000000",
+    "query": []
+   }
+  },
+  {
+   "id": "unknown.batch-bad-id",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches/not-a-uuid",
+    "query": []
+   }
+  },
+  {
+   "id": "unknown.rules-ingested-unknown-state",
+   "request": {
+    "method": "GET",
+    "path": "/api/rules/ingested/ZZ",
+    "query": []
+   }
+  },
+  {
+   "id": "unknown.designations-unknown-state",
+   "request": {
+    "method": "GET",
+    "path": "/api/designations/ZZ",
+    "query": []
+   }
+  },
+  {
+   "id": "unknown.year-future",
+   "request": {
+    "method": "GET",
+    "path": "/api/eligibility/2099",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "unknown.year-past",
+   "request": {
+    "method": "GET",
+    "path": "/api/progress/1900",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  }
+ ]
+}

@@ -1,0 +1,209 @@
+# Replay report (semantic)
+
+- server interpreter: external server (zlib n/a), oracle: None
+- scenarios: 1
+- exchanges compared: 103
+- failures: 602
+- tolerated (semantic mode only): 0
+
+## g1_mcp: 103 exchanges, 602 failures, 0 tolerated
+- `POST /mcp` / `no-token` **status** at `status`: expected `401` actual `501`
+- `POST /mcp` / `no-token` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /mcp` / `no-token` **header** at `headers.www-authenticate`: expected `Bearer` actual `<absent>`
+- `POST /mcp` / `no-token` **missing-field** at `error`: expected `{"code":"unauthenticated","message":"no bearer token"}` actual `<absent>`
+- `POST /mcp` / `no-token` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /mcp`
+- `POST /mcp` / `garbage-token` **status** at `status`: expected `401` actual `501`
+- `POST /mcp` / `garbage-token` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /mcp` / `garbage-token` **header** at `headers.www-authenticate`: expected `Bearer` actual `<absent>`
+- `POST /mcp` / `garbage-token` **missing-field** at `error`: expected `{"code":"unauthenticated","message":"invalid token: DecodeError"}` actual `<absent>`
+- `POST /mcp` / `garbage-token` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /mcp`
+- `POST /mcp` / `initialize` **status** at `status`: expected `200` actual `501`
+- `POST /mcp` / `initialize` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /mcp` / `initialize` **missing-field** at `jsonrpc`: expected `2.0` actual `<absent>`
+- `POST /mcp` / `initialize` **missing-field** at `id`: expected `1` actual `<absent>`
+- `POST /mcp` / `initialize` **missing-field** at `result`: expected `{"protocolVersion":"2025-06-18","capabilities":{"tools":{"listChanged":false}},"serverInfo":{"name":"tcc-channel-gateway","version":"0.1.0"},"instructions":"Every figure these tools return is the platform's own. Quote figures exactly as written."}` actual `<absent>`
+- `POST /mcp` / `initialize` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /mcp`
+- `POST /mcp` / `initialize-old-version` **status** at `status`: expected `200` actual `501`
+- `POST /mcp` / `initialize-old-version` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /mcp` / `initialize-old-version` **missing-field** at `jsonrpc`: expected `2.0` actual `<absent>`
+- `POST /mcp` / `initialize-old-version` **missing-field** at `id`: expected `2` actual `<absent>`
+- `POST /mcp` / `initialize-old-version` **missing-field** at `result`: expected `{"protocolVersion":"2025-11-25","capabilities":{"tools":{"listChanged":false}},"serverInfo":{"name":"tcc-channel-gateway","version":"0.1.0"},"instructions":"Every figure these tools return is the platform's own. Quote figures exactly as written."}` actual `<absent>`
+- `POST /mcp` / `initialize-old-version` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /mcp`
+- `POST /mcp` / `initialize-no-params` **status** at `status`: expected `200` actual `501`
+- `POST /mcp` / `initialize-no-params` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /mcp` / `initialize-no-params` **missing-field** at `jsonrpc`: expected `2.0` actual `<absent>`
+- `POST /mcp` / `initialize-no-params` **missing-field** at `id`: expected `3` actual `<absent>`
+- `POST /mcp` / `initialize-no-params` **missing-field** at `result`: expected `{"protocolVersion":"2025-11-25","capabilities":{"tools":{"listChanged":false}},"serverInfo":{"name":"tcc-channel-gateway","version":"0.1.0"},"instructions":"Every figure these tools return is the platform's own. Quote figures exactly as written."}` actual `<absent>`
+- `POST /mcp` / `initialize-no-params` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /mcp`
+- `POST /mcp` / `initialized-notification` **status** at `status`: expected `202` actual `501`
+- `POST /mcp` / `initialized-notification` **header** at `headers.content-type`: expected `<absent>` actual `application/json`
+- `POST /mcp` / `initialized-notification` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /mcp` / `initialized-notification` **body-kind** at `body`: expected `empty` actual `json`
+- `POST /mcp` / `ping` **status** at `status`: expected `200` actual `501`
+- `POST /mcp` / `ping` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /mcp` / `ping` **missing-field** at `jsonrpc`: expected `2.0` actual `<absent>`
+- `POST /mcp` / `ping` **missing-field** at `id`: expected `4` actual `<absent>`
+- `POST /mcp` / `ping` **missing-field** at `result`: expected `{}` actual `<absent>`
+- `POST /mcp` / `ping` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /mcp`
+- `POST /mcp` / `tools-list` **status** at `status`: expected `200` actual `501`
+- `POST /mcp` / `tools-list` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /mcp` / `tools-list` **missing-field** at `jsonrpc`: expected `2.0` actual `<absent>`
+- `POST /mcp` / `tools-list` **missing-field** at `id`: expected `5` actual `<absent>`
+- `POST /mcp` / `tools-list` **missing-field** at `result`: expected `{"tools":[{"name":"book_rank","title":"Book rank","description":"WHOLE BOOK only: which clients to call across every client, ranked by a named reason, in the page's own order. Needs no client. Never use it for a question about one client (a client named, or \"them\" or \"this client\"): use that cli...(38231 chars)` actual `<absent>`
+- `POST /mcp` / `tools-list` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /mcp`
+- `POST /mcp` / `tools-list-no-session` **status** at `status`: expected `400` actual `501`
+- `POST /mcp` / `tools-list-no-session` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /mcp` / `tools-list-no-session` **missing-field** at `jsonrpc`: expected `2.0` actual `<absent>`
+- `POST /mcp` / `tools-list-no-session` **missing-field** at `id`: expected `5` actual `<absent>`
+- `POST /mcp` / `tools-list-no-session` **missing-field** at `error`: expected `{"code":-32600,"message":"the Mcp-Session-Id header is required once initialised"}` actual `<absent>`
+- `POST /mcp` / `tools-list-no-session` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /mcp`
+- `POST /mcp` / `tools-list-unknown-session` **status** at `status`: expected `404` actual `501`
+- `POST /mcp` / `tools-list-unknown-session` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /mcp` / `tools-list-unknown-session` **missing-field** at `jsonrpc`: expected `2.0` actual `<absent>`
+- `POST /mcp` / `tools-list-unknown-session` **missing-field** at `id`: expected `5` actual `<absent>`
+- `POST /mcp` / `tools-list-unknown-session` **missing-field** at `error`: expected `{"code":-32600,"message":"unknown session; initialise again"}` actual `<absent>`
+- `POST /mcp` / `tools-list-unknown-session` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /mcp`
+- `POST /mcp` / `tools-list-bad-protocol-version` **status** at `status`: expected `400` actual `501`
+- `POST /mcp` / `tools-list-bad-protocol-version` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /mcp` / `tools-list-bad-protocol-version` **missing-field** at `jsonrpc`: expected `2.0` actual `<absent>`
+- `POST /mcp` / `tools-list-bad-protocol-version` **missing-field** at `id`: expected `null` actual `<absent>`
+- `POST /mcp` / `tools-list-bad-protocol-version` **missing-field** at `error`: expected `{"code":-32600,"message":"unsupported MCP-Protocol-Version: 1999-01-01"}` actual `<absent>`
+- `POST /mcp` / `tools-list-bad-protocol-version` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /mcp`
+- `POST /mcp` / `tools-list-bad-origin` **status** at `status`: expected `403` actual `501`
+- `POST /mcp` / `tools-list-bad-origin` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /mcp` / `tools-list-bad-origin` **missing-field** at `error`: expected `{"code":"origin_not_allowed","message":"this Origin is not allowed","retryable":false}` actual `<absent>`
+- `POST /mcp` / `tools-list-bad-origin` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /mcp`
+- `POST /mcp` / `unknown-method` **status** at `status`: expected `200` actual `501`
+- `POST /mcp` / `unknown-method` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /mcp` / `unknown-method` **missing-field** at `jsonrpc`: expected `2.0` actual `<absent>`
+- `POST /mcp` / `unknown-method` **missing-field** at `id`: expected `6` actual `<absent>`
+- `POST /mcp` / `unknown-method` **missing-field** at `error`: expected `{"code":-32601,"message":"method not found: no/such"}` actual `<absent>`
+- `POST /mcp` / `unknown-method` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /mcp`
+- `POST /mcp` / `null-id` **status** at `status`: expected `400` actual `501`
+- `POST /mcp` / `null-id` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /mcp` / `null-id` **missing-field** at `jsonrpc`: expected `2.0` actual `<absent>`
+- `POST /mcp` / `null-id` **missing-field** at `id`: expected `null` actual `<absent>`
+- `POST /mcp` / `null-id` **missing-field** at `error`: expected `{"code":-32600,"message":"a request id is a string or an integer"}` actual `<absent>`
+- `POST /mcp` / `null-id` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /mcp`
+- `POST /mcp` / `bool-id` **status** at `status`: expected `400` actual `501`
+- `POST /mcp` / `bool-id` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /mcp` / `bool-id` **missing-field** at `jsonrpc`: expected `2.0` actual `<absent>`
+- `POST /mcp` / `bool-id` **missing-field** at `id`: expected `null` actual `<absent>`
+- `POST /mcp` / `bool-id` **missing-field** at `error`: expected `{"code":-32600,"message":"a request id is a string or an integer"}` actual `<absent>`
+- `POST /mcp` / `bool-id` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /mcp`
+- `POST /mcp` / `not-jsonrpc` **status** at `status`: expected `400` actual `501`
+- `POST /mcp` / `not-jsonrpc` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /mcp` / `not-jsonrpc` **missing-field** at `jsonrpc`: expected `2.0` actual `<absent>`
+- `POST /mcp` / `not-jsonrpc` **missing-field** at `id`: expected `null` actual `<absent>`
+- `POST /mcp` / `not-jsonrpc` **missing-field** at `error`: expected `{"code":-32600,"message":"expected one JSON-RPC 2.0 message"}` actual `<absent>`
+- `POST /mcp` / `not-jsonrpc` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /mcp`
+- `POST /mcp` / `batch-array` **status** at `status`: expected `400` actual `501`
+- `POST /mcp` / `batch-array` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /mcp` / `batch-array` **missing-field** at `jsonrpc`: expected `2.0` actual `<absent>`
+- `POST /mcp` / `batch-array` **missing-field** at `id`: expected `null` actual `<absent>`
+- `POST /mcp` / `batch-array` **missing-field** at `error`: expected `{"code":-32600,"message":"expected one JSON-RPC 2.0 message"}` actual `<absent>`
+- `POST /mcp` / `batch-array` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /mcp`
+- `POST /mcp` / `not-json` **status** at `status`: expected `400` actual `501`
+- `POST /mcp` / `not-json` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /mcp` / `not-json` **missing-field** at `jsonrpc`: expected `2.0` actual `<absent>`
+- `POST /mcp` / `not-json` **missing-field** at `id`: expected `null` actual `<absent>`
+- `POST /mcp` / `not-json` **missing-field** at `error`: expected `{"code":-32700,"message":"the body is not JSON"}` actual `<absent>`
+- `POST /mcp` / `not-json` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /mcp`
+- `POST /mcp` / `empty-body` **status** at `status`: expected `400` actual `501`
+- `POST /mcp` / `empty-body` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /mcp` / `empty-body` **missing-field** at `jsonrpc`: expected `2.0` actual `<absent>`
+- `POST /mcp` / `empty-body` **missing-field** at `id`: expected `null` actual `<absent>`
+- `POST /mcp` / `empty-body` **missing-field** at `error`: expected `{"code":-32700,"message":"the body is not JSON"}` actual `<absent>`
+- `POST /mcp` / `empty-body` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /mcp`
+- `POST /mcp` / `client-response-ignored` **status** at `status`: expected `202` actual `501`
+- `POST /mcp` / `client-response-ignored` **header** at `headers.content-type`: expected `<absent>` actual `application/json`
+- `POST /mcp` / `client-response-ignored` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /mcp` / `client-response-ignored` **body-kind** at `body`: expected `empty` actual `json`
+- `POST /mcp` / `tools-call-missing-name` **status** at `status`: expected `200` actual `501`
+- `POST /mcp` / `tools-call-missing-name` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /mcp` / `tools-call-missing-name` **missing-field** at `jsonrpc`: expected `2.0` actual `<absent>`
+- `POST /mcp` / `tools-call-missing-name` **missing-field** at `id`: expected `10` actual `<absent>`
+- `POST /mcp` / `tools-call-missing-name` **missing-field** at `error`: expected `{"code":-32602,"message":"tools/call needs a tool name and an arguments object"}` actual `<absent>`
+- `POST /mcp` / `tools-call-missing-name` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /mcp`
+- `POST /mcp` / `tools-call-unknown-tool` **status** at `status`: expected `200` actual `501`
+- `POST /mcp` / `tools-call-unknown-tool` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /mcp` / `tools-call-unknown-tool` **missing-field** at `jsonrpc`: expected `2.0` actual `<absent>`
+- `POST /mcp` / `tools-call-unknown-tool` **missing-field** at `id`: expected `11` actual `<absent>`
+- `POST /mcp` / `tools-call-unknown-tool` **missing-field** at `error`: expected `{"code":-32602,"message":"unknown tool: no_such_tool"}` actual `<absent>`
+- `POST /mcp` / `tools-call-unknown-tool` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /mcp`
+- `POST /mcp` / `tools-call-arguments-not-object` **status** at `status`: expected `200` actual `501`
+- `POST /mcp` / `tools-call-arguments-not-object` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /mcp` / `tools-call-arguments-not-object` **missing-field** at `jsonrpc`: expected `2.0` actual `<absent>`
+- `POST /mcp` / `tools-call-arguments-not-object` **missing-field** at `id`: expected `12` actual `<absent>`
+- `POST /mcp` / `tools-call-arguments-not-object` **missing-field** at `error`: expected `{"code":-32602,"message":"tools/call needs a tool name and an arguments object"}` actual `<absent>`
+- `POST /mcp` / `tools-call-arguments-not-object` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /mcp`
+- `GET /mcp` / `get-405` **status** at `status`: expected `405` actual `501`
+- `GET /mcp` / `get-405` **header** at `headers.allow`: expected `POST, DELETE` actual `<absent>`
+- `GET /mcp` / `get-405` **header** at `headers.content-type`: expected `<absent>` actual `application/json`
+- `GET /mcp` / `get-405` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `GET /mcp` / `get-405` **body-kind** at `body`: expected `empty` actual `json`
+- `GET /mcp` / `get-no-token` **status** at `status`: expected `405` actual `501`
+- `GET /mcp` / `get-no-token` **header** at `headers.allow`: expected `POST, DELETE` actual `<absent>`
+- `GET /mcp` / `get-no-token` **header** at `headers.content-type`: expected `<absent>` actual `application/json`
+- `GET /mcp` / `get-no-token` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `GET /mcp` / `get-no-token` **body-kind** at `body`: expected `empty` actual `json`
+- `POST /mcp` / `call.book_rank.typical` **status** at `status`: expected `200` actual `501`
+- `POST /mcp` / `call.book_rank.typical` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /mcp` / `call.book_rank.typical` **missing-field** at `jsonrpc`: expected `2.0` actual `<absent>`
+- `POST /mcp` / `call.book_rank.typical` **missing-field** at `id`: expected `100` actual `<absent>`
+- `POST /mcp` / `call.book_rank.typical` **missing-field** at `result`: expected `{"content":[{"type":"text","text":"VERBATIM — quote figures exactly as written.\n\n1 of 1 clients have been assessed. Ranked by what inaction costs, in the order the page shows.\n\n| # | Client | Reason | Programme | Tax year | Identified | Jobs margin |\n| --- | --- | --- | --- | --- | --- | --- |\...(1961 chars)` actual `<absent>`
+- `POST /mcp` / `call.book_rank.typical` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /mcp`
+- `POST /mcp` / `call.book_rank.invalid` **status** at `status`: expected `200` actual `501`
+- `POST /mcp` / `call.book_rank.invalid` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /mcp` / `call.book_rank.invalid` **missing-field** at `jsonrpc`: expected `2.0` actual `<absent>`
+- `POST /mcp` / `call.book_rank.invalid` **missing-field** at `id`: expected `101` actual `<absent>`
+- `POST /mcp` / `call.book_rank.invalid` **missing-field** at `result`: expected `{"content":[{"type":"text","text":"The request did not go through (invalid_arguments): arguments: Additional properties are not allowed ('zz_unknown_argument' was unexpected)"}],"structuredContent":{"error":{"code":"invalid_arguments","message":"arguments: Additional properties are not allowed ('zz_...(422 chars)` actual `<absent>`
+- `POST /mcp` / `call.book_rank.invalid` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /mcp`
+- `POST /mcp` / `call.client_resolve.typical` **status** at `status`: expected `200` actual `501`
+- `POST /mcp` / `call.client_resolve.typical` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /mcp` / `call.client_resolve.typical` **missing-field** at `jsonrpc`: expected `2.0` actual `<absent>`
+- `POST /mcp` / `call.client_resolve.typical` **missing-field** at `id`: expected `102` actual `<absent>`
+- `POST /mcp` / `call.client_resolve.typical` **missing-field** at `result`: expected `{"content":[{"type":"text","text":"VERBATIM — quote figures exactly as written.\n\nWhich client do you mean? (no client is selected)\n\n- Reference Dataset Client\n\nNot tax advice: these figures are computed from payroll by this software and must be reviewed by a qualified tax professional before a...(1100 chars)` actual `<absent>`
+- `POST /mcp` / `call.client_resolve.typical` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /mcp`
+- `POST /mcp` / `call.client_resolve.invalid` **status** at `status`: expected `200` actual `501`
+- `POST /mcp` / `call.client_resolve.invalid` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /mcp` / `call.client_resolve.invalid` **missing-field** at `jsonrpc`: expected `2.0` actual `<absent>`
+- `POST /mcp` / `call.client_resolve.invalid` **missing-field** at `id`: expected `103` actual `<absent>`
+- `POST /mcp` / `call.client_resolve.invalid` **missing-field** at `result`: expected `{"content":[{"type":"text","text":"The request did not go through (invalid_arguments): name_or_text: {'nested': 1} is not of type 'string'"}],"structuredContent":{"error":{"code":"invalid_arguments","message":"name_or_text: {'nested': 1} is not of type 'string'","retryable":false},"correlation_id":"...(350 chars)` actual `<absent>`
+- `POST /mcp` / `call.client_resolve.invalid` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /mcp`
+- `POST /mcp` / `call.client_situation.typical` **status** at `status`: expected `200` actual `501`
+- `POST /mcp` / `call.client_situation.typical` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /mcp` / `call.client_situation.typical` **missing-field** at `jsonrpc`: expected `2.0` actual `<absent>`
+- `POST /mcp` / `call.client_situation.typical` **missing-field** at `id`: expected `104` actual `<absent>`
+- `POST /mcp` / `call.client_situation.typical` **missing-field** at `result`: expected `{"content":[{"type":"text","text":"VERBATIM — quote figures exactly as written.\n\n### Reference Dataset Client\n\n2 recorded cells. Identified credit: $66,500.\n\n| Reason | Programme | Tax year | Identified | Jobs margin |\n| --- | --- | --- | --- | --- |\n| Identified | GA_JTC | 2025 | $66,500 | ...(2102 chars)` actual `<absent>`
+- `POST /mcp` / `call.client_situation.typical` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /mcp`
+- `POST /mcp` / `call.client_situation.invalid` **status** at `status`: expected `200` actual `501`
+- `POST /mcp` / `call.client_situation.invalid` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /mcp` / `call.client_situation.invalid` **missing-field** at `jsonrpc`: expected `2.0` actual `<absent>`
+- `POST /mcp` / `call.client_situation.invalid` **missing-field** at `id`: expected `105` actual `<absent>`
+- `POST /mcp` / `call.client_situation.invalid` **missing-field** at `result`: expected `{"content":[{"type":"text","text":"The request did not go through (invalid_arguments): client_id: 'abc' is not of type 'integer'"}],"structuredContent":{"error":{"code":"invalid_arguments","message":"client_id: 'abc' is not of type 'integer'","retryable":false},"correlation_id":"40000000000040008000...(330 chars)` actual `<absent>`
+- `POST /mcp` / `call.client_situation.invalid` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /mcp`
+- `POST /mcp` / `call.client_eligibility.typical` **status** at `status`: expected `200` actual `501`
+- `POST /mcp` / `call.client_eligibility.typical` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /mcp` / `call.client_eligibility.typical` **missing-field** at `jsonrpc`: expected `2.0` actual `<absent>`
+- `POST /mcp` / `call.client_eligibility.typical` **missing-field** at `id`: expected `106` actual `<absent>`
+- `POST /mcp` / `call.client_eligibility.typical` **missing-field** at `result`: expected `{"content":[{"type":"text","text":"VERBATIM — quote figures exactly as written.\n\n### Georgia Jobs Tax Credit · TY2025\n\n| Measure | Value |\n| --- | --- |\n| Average headcount | 64.17 |\n| Prior-year average headcount | 40.42 |\n| Qualifying jobs | 21.75 |\n| Annual credit | $76,125 |\n| Lifetime...(2459 chars)` actual `<absent>`
+- `POST /mcp` / `call.client_eligibility.typical` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /mcp`
+- `POST /mcp` / `call.client_eligibility.invalid` **status** at `status`: expected `200` actual `501`
+- `POST /mcp` / `call.client_eligibility.invalid` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /mcp` / `call.client_eligibility.invalid` **missing-field** at `jsonrpc`: expected `2.0` actual `<absent>`
+- `POST /mcp` / `call.client_eligibility.invalid` **missing-field** at `id`: expected `107` actual `<absent>`
+- `POST /mcp` / `call.client_eligibility.invalid` **missing-field** at `result`: expected `{"content":[{"type":"text","text":"The request did not go through (invalid_arguments): client_id: 'abc' is not of type 'integer'"}],"structuredContent":{"error":{"code":"invalid_arguments","message":"client_id: 'abc' is not of type 'integer'","retryable":false},"correlation_id":"40000000000040008000...(330 chars)` actual `<absent>`
+- `POST /mcp` / `call.client_eligibility.invalid` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /mcp`
+- `POST /mcp` / `call.client_trend.typical` **status** at `status`: expected `200` actual `501`
+- `POST /mcp` / `call.client_trend.typical` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /mcp` / `call.client_trend.typical` **missing-field** at `jsonrpc`: expected `2.0` actual `<absent>`
+- `POST /mcp` / `call.client_trend.typical` **missing-field** at `id`: expected `108` actual `<absent>`
+- `POST /mcp` / `call.client_trend.typical` **missing-field** at `result`: expected `{"content":[{"type":"text","text":"VERBATIM — quote figures exactly as written.\n\n| Tax year | Average headcount | Eligible | Evaluated | Annual credit |  |\n| --- | --- | --- | --- | --- | --- |\n| 2024 | 40.00 | 49 | 81 | $0 | Base year |\n| 2025 | 61.00 | 72 | 107 | $73,500 |  |\n\nEligible empl...(2291 chars)` actual `<absent>`
+- `POST /mcp` / `call.client_trend.typical` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /mcp`
+- `POST /mcp` / `call.client_trend.invalid` **status** at `status`: expected `200` actual `501`
+- `POST /mcp` / `call.client_trend.invalid` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /mcp` / `call.client_trend.invalid` **missing-field** at `jsonrpc`: expected `2.0` actual `<absent>`
+- `POST /mcp` / `call.client_trend.invalid` **missing-field** at `id`: expected `109` actual `<absent>`
+- `POST /mcp` / `call.client_trend.invalid` **missing-field** at `result`: expected `{"content":[{"type":"text","text":"The request did not go through (invalid_arguments): client_id: 'abc' is not of type 'integer'"}],"structuredContent":{"error":{"code":"invalid_arguments","message":"client_id: 'abc' is not of type 'integer'","retryable":false},"correlation_id":"40000000000040008000...(330 chars)` actual `<absent>`
+- `POST /mcp` / `call.client_trend.invalid` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /mcp`

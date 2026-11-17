@@ -1,0 +1,259 @@
+# Replay report (semantic)
+
+- server interpreter: external server (zlib n/a), oracle: None
+- scenarios: 1
+- exchanges compared: 74
+- failures: 867
+- tolerated (semantic mode only): 289
+
+## p2_reads_writes: 74 exchanges, 867 failures, 289 tolerated
+- `GET /api/v2/clients/2001/units` / `boot.unit` **status** at `status`: expected `200` actual `501`
+- `GET /api/v2/clients/2001/units` / `boot.unit` **missing-field** at `calculation_state`: expected `calculated` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `boot.unit` **missing-field** at `run`: expected `{"run_id":"40000000000040008000000000000001","produced_at":"2026-01-15 12:00:00","started_at":"2026-01-15 12:00:00","calculation_id":"5e937f14db4332c10d7127ecae3d5f3c5a6f739d9f116d221d8f7230a8097ba9","code_commit":"0000000000000000000000000000000000c0ffee","rule_pack_version":"rules/ga_jtc/2025.json...(481 chars)` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `boot.unit` **missing-field** at `newer_run_in_flight`: expected `false` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `boot.unit` **missing-field** at `in_flight`: expected `null` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `boot.unit` **missing-field** at `message`: expected `null` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `boot.unit` **missing-field** at `client_id`: expected `2001` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `boot.unit` **missing-field** at `state`: expected `null` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `boot.unit` **missing-field** at `year`: expected `2025` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `boot.unit` **missing-field** at `method`: expected `min_max` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `boot.unit` **missing-field** at `limit`: expected `2` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `boot.unit` **missing-field** at `offset`: expected `0` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `boot.unit` **missing-field** at `items`: expected `[{"client_id":2001,"worksite_id":"GA_GA-001","entity_fein":"001000001","program_code":"GA_JTC","method":"min_max","tax_year":2025,"average_headcount":24.08,"is_base_year":false,"base_average_headcount":18.33,"base_year_source":"inferred","net_new_vs_base":5.75,"months_reachable":11,"year_complete":t...(1726 chars)` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `boot.unit` **missing-field** at `total`: expected `6` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `boot.unit` **missing-field** at `months`: expected `[{"client_id":2001,"tax_year":2025,"method":"min_max","run_id":"40000000000040008000000000000001","worksite_id":"GA_GA-001","month_01":24.0,"month_02":24.0,"month_03":24.0,"month_04":24.0,"month_05":24.0,"month_06":24.0,"month_07":24.0,"month_08":24.0,"month_09":24.0,"month_10":24.0,"month_11":24.0,...(2454 chars)` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `boot.unit` **missing-field** at `installments`: expected `[{"worksite_id":"GA_GA-001","tax_year":2021,"claimable_usd":"25095.0","projected":false,"creation_year":2021},{"worksite_id":"GA_GA-001","tax_year":2022,"claimable_usd":"27440.0","projected":false,"creation_year":2021},{"worksite_id":"GA_GA-001","tax_year":2023,"claimable_usd":"27440.0","projected":...(4331 chars)` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `boot.unit` **missing-field** at `unit_totals`: expected `[{"worksite_id":"GA_GA-001","total_annual_credit_usd":"120820.0","final_high_water_mark":26.17,"total_tranche_lifetime_usd":"128730.0"},{"worksite_id":"GA_GA-004","total_annual_credit_usd":"119350.0","final_high_water_mark":26.17,"total_tranche_lifetime_usd":"185325.0"},{"worksite_id":"GA_GA-007","t...(804 chars)` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `boot.unit` **missing-field** at `units`: expected `[{"worksite_id":"GA_GA-001","name":"GA_GA-001","county":"","city":""},{"worksite_id":"GA_GA-004","name":"GA_GA-004","county":"","city":""}]` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `boot.unit` **missing-field** at `years`: expected `[2025]` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `boot.unit` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /api/v2/clients/{client_id}/units`
+- `GET /api/v2/portfolio` / `portfolio.default` **array-length** at `items[0].states`: expected `0` actual `3`
+- `GET /api/v2/portfolio` / `portfolio.default` **array-length** at `items[0].priceable_states`: expected `0` actual `1`
+- `GET /api/v2/portfolio` / `portfolio.default` **array-length** at `items[1].states`: expected `0` actual `1`
+- `GET /api/v2/portfolio` / `portfolio.default` **array-length** at `items[1].priceable_states`: expected `0` actual `1`
+- `GET /api/v2/portfolio` / `portfolio.default` **array-length** at `items[2].states`: expected `0` actual `2`
+- `GET /api/v2/portfolio` / `portfolio.default` **array-length** at `items[2].priceable_states`: expected `0` actual `1`
+- `GET /api/v2/portfolio` / `portfolio.default` **array-length** at `items[3].states`: expected `0` actual `2`
+- `GET /api/v2/portfolio` / `portfolio.default` **array-length** at `items[3].priceable_states`: expected `0` actual `1`
+- `GET /api/v2/portfolio` / `portfolio.year` **array-length** at `items[0].states`: expected `0` actual `1`
+- `GET /api/v2/portfolio` / `portfolio.year` **array-length** at `items[0].priceable_states`: expected `0` actual `1`
+- `GET /api/v2/portfolio` / `portfolio.year` **array-length** at `items[1].states`: expected `0` actual `3`
+- `GET /api/v2/portfolio` / `portfolio.year` **array-length** at `items[1].priceable_states`: expected `0` actual `1`
+- `GET /api/v2/portfolio` / `portfolio.year` **array-length** at `items[2].states`: expected `0` actual `2`
+- `GET /api/v2/portfolio` / `portfolio.year` **array-length** at `items[2].priceable_states`: expected `0` actual `1`
+- `GET /api/v2/portfolio` / `portfolio.year` **array-length** at `items[3].states`: expected `0` actual `2`
+- `GET /api/v2/portfolio` / `portfolio.year` **array-length** at `items[3].priceable_states`: expected `0` actual `1`
+- `GET /api/v2/portfolio` / `portfolio.sort-priority-desc` **array-length** at `items[0].states`: expected `0` actual `3`
+- `GET /api/v2/portfolio` / `portfolio.sort-priority-desc` **array-length** at `items[0].priceable_states`: expected `0` actual `1`
+- `GET /api/v2/portfolio` / `portfolio.sort-priority-desc` **array-length** at `items[1].states`: expected `0` actual `2`
+- `GET /api/v2/portfolio` / `portfolio.sort-priority-desc` **array-length** at `items[1].priceable_states`: expected `0` actual `1`
+- `GET /api/v2/portfolio` / `portfolio.sort-priority-desc` **array-length** at `items[2].states`: expected `0` actual `1`
+- `GET /api/v2/portfolio` / `portfolio.sort-priority-desc` **array-length** at `items[2].priceable_states`: expected `0` actual `1`
+- `GET /api/v2/portfolio` / `portfolio.sort-priority-desc` **array-length** at `items[3].states`: expected `0` actual `2`
+- `GET /api/v2/portfolio` / `portfolio.sort-priority-desc` **array-length** at `items[3].priceable_states`: expected `0` actual `1`
+- `GET /api/v2/portfolio` / `portfolio.sort-identified` **array-length** at `items[0].states`: expected `0` actual `2`
+- `GET /api/v2/portfolio` / `portfolio.sort-identified` **array-length** at `items[0].priceable_states`: expected `0` actual `1`
+- `GET /api/v2/portfolio` / `portfolio.sort-identified` **array-length** at `items[1].states`: expected `0` actual `3`
+- `GET /api/v2/portfolio` / `portfolio.sort-identified` **array-length** at `items[1].priceable_states`: expected `0` actual `1`
+- `GET /api/v2/portfolio` / `portfolio.sort-identified` **array-length** at `items[2].states`: expected `0` actual `1`
+- `GET /api/v2/portfolio` / `portfolio.sort-identified` **array-length** at `items[2].priceable_states`: expected `0` actual `1`
+- `GET /api/v2/portfolio` / `portfolio.sort-identified` **array-length** at `items[3].states`: expected `0` actual `2`
+- `GET /api/v2/portfolio` / `portfolio.sort-identified` **array-length** at `items[3].priceable_states`: expected `0` actual `1`
+- `GET /api/v2/portfolio` / `portfolio.limit-2-offset-1` **array-length** at `items[0].states`: expected `0` actual `1`
+- `GET /api/v2/portfolio` / `portfolio.limit-2-offset-1` **array-length** at `items[0].priceable_states`: expected `0` actual `1`
+- `GET /api/v2/portfolio` / `portfolio.limit-2-offset-1` **array-length** at `items[1].states`: expected `0` actual `2`
+- `GET /api/v2/portfolio` / `portfolio.limit-2-offset-1` **array-length** at `items[1].priceable_states`: expected `0` actual `1`
+- `GET /api/v2/portfolio` / `portfolio.near` **array-length** at `items[0].states`: expected `0` actual `3`
+- `GET /api/v2/portfolio` / `portfolio.near` **array-length** at `items[0].priceable_states`: expected `0` actual `1`
+- `GET /api/v2/portfolio` / `portfolio.near` **array-length** at `items[1].states`: expected `0` actual `1`
+- `GET /api/v2/portfolio` / `portfolio.near` **array-length** at `items[1].priceable_states`: expected `0` actual `1`
+- `GET /api/v2/portfolio` / `portfolio.status-assessed` **array-length** at `items[0].states`: expected `0` actual `3`
+- `GET /api/v2/portfolio` / `portfolio.status-assessed` **array-length** at `items[0].priceable_states`: expected `0` actual `1`
+- `GET /api/v2/portfolio` / `portfolio.status-assessed` **array-length** at `items[1].states`: expected `0` actual `1`
+- `GET /api/v2/portfolio` / `portfolio.status-assessed` **array-length** at `items[1].priceable_states`: expected `0` actual `1`
+- `GET /api/v2/portfolio` / `portfolio.status-assessed` **array-length** at `items[2].states`: expected `0` actual `2`
+- `GET /api/v2/portfolio` / `portfolio.status-assessed` **array-length** at `items[2].priceable_states`: expected `0` actual `1`
+- `GET /api/v2/portfolio` / `portfolio.status-assessed` **array-length** at `items[3].states`: expected `0` actual `2`
+- `GET /api/v2/portfolio` / `portfolio.status-assessed` **array-length** at `items[3].priceable_states`: expected `0` actual `1`
+- `GET /api/v2/portfolio` / `portfolio.program` **array-length** at `items[0].states`: expected `0` actual `3`
+- `GET /api/v2/portfolio` / `portfolio.program` **array-length** at `items[0].priceable_states`: expected `0` actual `1`
+- `GET /api/v2/portfolio` / `portfolio.program` **array-length** at `items[1].states`: expected `0` actual `1`
+- `GET /api/v2/portfolio` / `portfolio.program` **array-length** at `items[1].priceable_states`: expected `0` actual `1`
+- `GET /api/v2/portfolio` / `portfolio.program` **array-length** at `items[2].states`: expected `0` actual `2`
+- `GET /api/v2/portfolio` / `portfolio.program` **array-length** at `items[2].priceable_states`: expected `0` actual `1`
+- `GET /api/v2/portfolio` / `portfolio.program` **array-length** at `items[3].states`: expected `0` actual `2`
+- `GET /api/v2/portfolio` / `portfolio.program` **array-length** at `items[3].priceable_states`: expected `0` actual `1`
+- `GET /api/v2/portfolio` / `portfolio.limit-0` **missing-field** at `detail[0].ctx`: expected `{"ge":1}` actual `<absent>`
+- `GET /api/v2/portfolio` / `portfolio.limit-0` **value** at `detail[0].msg`: expected `Input should be greater than or equal to 1` actual `Value violates minimum.`
+- `GET /api/v2/portfolio` / `portfolio.limit-0` **type** at `detail[0].input`: expected `0` actual `0`
+- `GET /api/v2/portfolio` / `portfolio.scope-state` **status** at `status`: expected `500` actual `422`
+- `GET /api/v2/portfolio` / `portfolio.scope-state` **header** at `headers.content-type`: expected `text/plain; charset=utf-8` actual `application/json`
+- `GET /api/v2/portfolio` / `portfolio.scope-state` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `GET /api/v2/portfolio` / `portfolio.scope-state` **body-kind** at `body`: expected `text` actual `json`
+- `GET /api/scope` / `scope` **status** at `status`: expected `200` actual `501`
+- `GET /api/scope` / `scope` **missing-field** at `clients`: expected `[{"account_id":2001,"name":"Cascade Retail Partners","billing_state":"GA","employees":571,"synthetic":true,"industry":"Retail"},{"account_id":2004,"name":"Halloway Foods","billing_state":"GA","employees":166,"synthetic":true,"industry":"Food service"},{"account_id":2003,"name":"Ironbridge Logistics"...(529 chars)` actual `<absent>`
+- `GET /api/scope` / `scope` **missing-field** at `programs`: expected `[{"program_code":"CO_EZ","name":"Colorado Enterprise Zone Job Credit","citation":"C.R.S. § 39-30-105","jurisdiction":{"level":"state","code":"CO","name":"Colorado"},"authored_years":[],"placeholder_years":[],"year_scoped":false,"calculable":false,"not_calculable_reason":"No year-scoped rule packs au...(3282 chars)` actual `<absent>`
+- `GET /api/scope` / `scope` **missing-field** at `years`: expected `{"authored":[2019,2020,2021,2022,2023,2024,2025,2026],"latest":2026,"window_years":6,"default_window":[2021,2022,2023,2024,2025,2026]}` actual `<absent>`
+- `GET /api/scope` / `scope` **missing-field** at `data_source`: expected `lakehouse` actual `<absent>`
+- `GET /api/scope` / `scope` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /api/scope`
+- `GET /api/me` / `me` **status** at `status`: expected `200` actual `501`
+- `GET /api/me` / `me` **missing-field** at `auth_mode`: expected `none` actual `<absent>`
+- `GET /api/me` / `me` **missing-field** at `authenticated`: expected `false` actual `<absent>`
+- `GET /api/me` / `me` **missing-field** at `upn`: expected `null` actual `<absent>`
+- `GET /api/me` / `me` **missing-field** at `oid`: expected `null` actual `<absent>`
+- `GET /api/me` / `me` **missing-field** at `name`: expected `null` actual `<absent>`
+- `GET /api/me` / `me` **missing-field** at `roles`: expected `[]` actual `<absent>`
+- `GET /api/me` / `me` **missing-field** at `principal_type`: expected `user` actual `<absent>`
+- `GET /api/me` / `me` **missing-field** at `acting_for`: expected `null` actual `<absent>`
+- `GET /api/me` / `me` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /api/me`
+- `GET /api/ready` / `ready` **missing-field** at `source_schema.errors`: expected `[]` actual `<absent>`
+- `GET /api/ready` / `ready` **missing-field** at `source_schema.warnings`: expected `[]` actual `<absent>`
+- `GET /api/ready` / `ready` **missing-field** at `source_schema.reads`: expected `{"tables":{"Entity":{"reads":136,"rows":170,"bytes":6698,"seconds":0.136,"unfiltered_reads":0,"max_columns":4,"version":null},"EntityFiscalYearRules":{"reads":136,"rows":532,"bytes":42570,"seconds":0.136,"unfiltered_reads":132,"max_columns":6,"version":null},"Account":{"reads":5,"rows":8,"bytes":445...(1306 chars)` actual `<absent>`
+- `GET /api/ready` / `ready` **extra-field** at `source_schema.accounts`: expected `<absent>` actual `4`
+- `GET /api/ready` / `ready` **extra-field** at `source_schema.problem`: expected `<absent>` actual `null`
+- `GET /api/ready` / `ready` **value** at `source_schema.status`: expected `ok` actual `ready`
+- `GET /api/scope/client/2001` / `client2001.scope` **status** at `status`: expected `200` actual `501`
+- `GET /api/scope/client/2001` / `client2001.scope` **missing-field** at `account_id`: expected `2001` actual `<absent>`
+- `GET /api/scope/client/2001` / `client2001.scope` **missing-field** at `states`: expected `["GA","NC","SC"]` actual `<absent>`
+- `GET /api/scope/client/2001` / `client2001.scope` **missing-field** at `programs`: expected `[{"program_code":"GA_JTC","name":"Georgia Jobs Tax Credit","citation":"OCGA § 48-7-40","jurisdiction":{"level":"state","code":"GA","name":"Georgia"},"authored_years":[2019,2020,2021,2022,2023,2024,2025,2026],"placeholder_years":[2026],"year_scoped":true,"calculable":true,"not_calculable_reason":""},...(1057 chars)` actual `<absent>`
+- `GET /api/scope/client/2001` / `client2001.scope` **missing-field** at `payroll_years`: expected `[2020,2021,2022,2023,2024,2025,2026]` actual `<absent>`
+- `GET /api/scope/client/2001` / `client2001.scope` **missing-field** at `calculable_years`: expected `[2020,2021,2022,2023,2024,2025,2026]` actual `<absent>`
+- `GET /api/scope/client/2001` / `client2001.scope` **missing-field** at `payroll_without_statute`: expected `[]` actual `<absent>`
+- `GET /api/scope/client/2001` / `client2001.scope` **missing-field** at `months_of_payroll`: expected `{"2020":12,"2021":12,"2022":12,"2023":12,"2024":12,"2025":12,"2026":8}` actual `<absent>`
+- `GET /api/scope/client/2001` / `client2001.scope` **missing-field** at `complete_years`: expected `[2020,2021,2022,2023,2024,2025]` actual `<absent>`
+- `GET /api/scope/client/2001` / `client2001.scope` **missing-field** at `open_years`: expected `[2026]` actual `<absent>`
+- `GET /api/scope/client/2001` / `client2001.scope` **missing-field** at `default_year`: expected `2025` actual `<absent>`
+- `GET /api/scope/client/2001` / `client2001.scope` **missing-field** at `rows`: expected `84718` actual `<absent>`
+- `GET /api/scope/client/2001` / `client2001.scope` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /api/scope/client/{account_id}`
+- `GET /api/v2/clients/2001/units` / `client2001.units` **status** at `status`: expected `200` actual `501`
+- `GET /api/v2/clients/2001/units` / `client2001.units` **missing-field** at `calculation_state`: expected `calculated` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `client2001.units` **missing-field** at `run`: expected `{"run_id":"40000000000040008000000000000001","produced_at":"2026-01-15 12:00:00","started_at":"2026-01-15 12:00:00","calculation_id":"5e937f14db4332c10d7127ecae3d5f3c5a6f739d9f116d221d8f7230a8097ba9","code_commit":"0000000000000000000000000000000000c0ffee","rule_pack_version":"rules/ga_jtc/2025.json...(481 chars)` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `client2001.units` **missing-field** at `newer_run_in_flight`: expected `false` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `client2001.units` **missing-field** at `in_flight`: expected `null` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `client2001.units` **missing-field** at `message`: expected `null` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `client2001.units` **missing-field** at `client_id`: expected `2001` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `client2001.units` **missing-field** at `state`: expected `null` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `client2001.units` **missing-field** at `year`: expected `2025` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `client2001.units` **missing-field** at `method`: expected `min_max` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `client2001.units` **missing-field** at `limit`: expected `5` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `client2001.units` **missing-field** at `offset`: expected `0` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `client2001.units` **missing-field** at `items`: expected `[{"client_id":2001,"worksite_id":"GA_GA-001","entity_fein":"001000001","program_code":"GA_JTC","method":"min_max","tax_year":2025,"average_headcount":24.08,"is_base_year":false,"base_average_headcount":18.33,"base_year_source":"inferred","net_new_vs_base":5.75,"months_reachable":11,"year_complete":t...(4304 chars)` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `client2001.units` **missing-field** at `total`: expected `6` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `client2001.units` **missing-field** at `months`: expected `[{"client_id":2001,"tax_year":2025,"method":"min_max","run_id":"40000000000040008000000000000001","worksite_id":"GA_GA-001","month_01":24.0,"month_02":24.0,"month_03":24.0,"month_04":24.0,"month_05":24.0,"month_06":24.0,"month_07":24.0,"month_08":24.0,"month_09":24.0,"month_10":24.0,"month_11":24.0,...(2454 chars)` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `client2001.units` **missing-field** at `installments`: expected `[{"worksite_id":"GA_GA-001","tax_year":2021,"claimable_usd":"25095.0","projected":false,"creation_year":2021},{"worksite_id":"GA_GA-001","tax_year":2022,"claimable_usd":"27440.0","projected":false,"creation_year":2021},{"worksite_id":"GA_GA-001","tax_year":2023,"claimable_usd":"27440.0","projected":...(4331 chars)` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `client2001.units` **missing-field** at `unit_totals`: expected `[{"worksite_id":"GA_GA-001","total_annual_credit_usd":"120820.0","final_high_water_mark":26.17,"total_tranche_lifetime_usd":"128730.0"},{"worksite_id":"GA_GA-004","total_annual_credit_usd":"119350.0","final_high_water_mark":26.17,"total_tranche_lifetime_usd":"185325.0"},{"worksite_id":"GA_GA-007","t...(804 chars)` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `client2001.units` **missing-field** at `units`: expected `[{"worksite_id":"GA_GA-001","name":"GA_GA-001","county":"","city":""},{"worksite_id":"GA_GA-004","name":"GA_GA-004","county":"","city":""},{"worksite_id":"GA_GA-007","name":"GA_GA-007","county":"","city":""},{"worksite_id":"GA_GA-010","name":"GA_GA-010","county":"","city":""},{"worksite_id":"GA_GA-0...(346 chars)` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `client2001.units` **missing-field** at `years`: expected `[2025]` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `client2001.units` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /api/v2/clients/{client_id}/units`
+- `GET /api/v2/clients/2001/units` / `client2001.units-pp` **status** at `status`: expected `200` actual `501`
+- `GET /api/v2/clients/2001/units` / `client2001.units-pp` **missing-field** at `calculation_state`: expected `calculated` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `client2001.units-pp` **missing-field** at `run`: expected `{"run_id":"40000000000040008000000000000001","produced_at":"2026-01-15 12:00:00","started_at":"2026-01-15 12:00:00","calculation_id":"5e937f14db4332c10d7127ecae3d5f3c5a6f739d9f116d221d8f7230a8097ba9","code_commit":"0000000000000000000000000000000000c0ffee","rule_pack_version":"rules/ga_jtc/2025.json...(481 chars)` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `client2001.units-pp` **missing-field** at `newer_run_in_flight`: expected `false` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `client2001.units-pp` **missing-field** at `in_flight`: expected `null` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `client2001.units-pp` **missing-field** at `message`: expected `null` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `client2001.units-pp` **missing-field** at `client_id`: expected `2001` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `client2001.units-pp` **missing-field** at `state`: expected `null` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `client2001.units-pp` **missing-field** at `year`: expected `2025` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `client2001.units-pp` **missing-field** at `method`: expected `pay_period` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `client2001.units-pp` **missing-field** at `limit`: expected `5` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `client2001.units-pp` **missing-field** at `offset`: expected `0` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `client2001.units-pp` **missing-field** at `items`: expected `[{"client_id":2001,"worksite_id":"GA_GA-001","entity_fein":"001000001","program_code":"GA_JTC","method":"pay_period","tax_year":2025,"average_headcount":23.92,"is_base_year":false,"base_average_headcount":18.33,"base_year_source":"inferred","net_new_vs_base":5.59,"months_reachable":11,"year_complete...(4319 chars)` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `client2001.units-pp` **missing-field** at `total`: expected `6` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `client2001.units-pp` **missing-field** at `months`: expected `[{"client_id":2001,"tax_year":2025,"method":"pay_period","run_id":"40000000000040008000000000000001","worksite_id":"GA_GA-001","month_01":24.0,"month_02":24.0,"month_03":24.0,"month_04":24.0,"month_05":24.0,"month_06":24.0,"month_07":24.0,"month_08":24.0,"month_09":24.0,"month_10":24.0,"month_11":23...(2472 chars)` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `client2001.units-pp` **missing-field** at `installments`: expected `[{"worksite_id":"GA_GA-001","tax_year":2021,"claimable_usd":"25095.0","projected":false,"creation_year":2021},{"worksite_id":"GA_GA-001","tax_year":2022,"claimable_usd":"27440.0","projected":false,"creation_year":2021},{"worksite_id":"GA_GA-001","tax_year":2023,"claimable_usd":"27440.0","projected":...(4331 chars)` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `client2001.units-pp` **missing-field** at `unit_totals`: expected `[{"worksite_id":"GA_GA-001","total_annual_credit_usd":"120260.0","final_high_water_mark":26.17,"total_tranche_lifetime_usd":"128170.0"},{"worksite_id":"GA_GA-004","total_annual_credit_usd":"119350.0","final_high_water_mark":26.17,"total_tranche_lifetime_usd":"185325.0"},{"worksite_id":"GA_GA-007","t...(804 chars)` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `client2001.units-pp` **missing-field** at `units`: expected `[{"worksite_id":"GA_GA-001","name":"GA_GA-001","county":"","city":""},{"worksite_id":"GA_GA-004","name":"GA_GA-004","county":"","city":""},{"worksite_id":"GA_GA-007","name":"GA_GA-007","county":"","city":""},{"worksite_id":"GA_GA-010","name":"GA_GA-010","county":"","city":""},{"worksite_id":"GA_GA-0...(346 chars)` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `client2001.units-pp` **missing-field** at `years`: expected `[2025]` actual `<absent>`
+- `GET /api/v2/clients/2001/units` / `client2001.units-pp` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /api/v2/clients/{client_id}/units`
+- `GET /api/v2/clients/2001/runs/latest` / `client2001.run-latest` **status** at `status`: expected `404` actual `501`
+- `GET /api/v2/clients/2001/runs/latest` / `client2001.run-latest` **value** at `detail`: expected `client 2001 has not been calculated yet` actual `Operation not implemented: GET /api/v2/clients/{client_id}/runs/latest`
+- `GET /api/eligibility/2025` / `client2001.eligibility` **status** at `status`: expected `200` actual `501`
+- `GET /api/eligibility/2025` / `client2001.eligibility` **missing-field** at `account_id`: expected `2001` actual `<absent>`
+- `GET /api/eligibility/2025` / `client2001.eligibility` **missing-field** at `state`: expected `GA` actual `<absent>`
+- `GET /api/eligibility/2025` / `client2001.eligibility` **missing-field** at `program_code`: expected `GA_JTC` actual `<absent>`
+- `GET /api/eligibility/2025` / `client2001.eligibility` **missing-field** at `tax_year`: expected `2025` actual `<absent>`
+- `GET /api/eligibility/2025` / `client2001.eligibility` **missing-field** at `thresholds`: expected `{"program_code":"GA_JTC","tax_year":2025,"minimum_average_weekly_hours":35.0,"minimum_average_weekly_wages_usd":680.0,"wage_table_year_basis":"source_tax_year","regulation":"110-9-1-.02(1)(a) and 110-9-1-.03(3)(b)1","source_tax_year":2025,"dol_report_year":2024,"lowest_wage_county":"Taliaferro","ann...(385 chars)` actual `<absent>`
+- `GET /api/eligibility/2025` / `client2001.eligibility` **missing-field** at `fiscal`: expected `{"begin":"2025-01-01","end":"2025-12-31","tax_year":2025,"label_convention":"begins","basis":"client_rules","assumed":false,"is_calendar":true,"convention_matters":false,"tax_year_if_labelled_by_end":2025,"tax_year_if_labelled_by_begin":2025,"note":"From EntityFiscalYearRules for account 2001 (Calen...(383 chars)` actual `<absent>`
+- `GET /api/eligibility/2025` / `client2001.eligibility` **missing-field** at `calculation_state`: expected `calculated` actual `<absent>`
+- `GET /api/eligibility/2025` / `client2001.eligibility` **missing-field** at `run`: expected `{"run_id":"40000000000040008000000000000001","client_id":2001,"program_code":"GA_JTC","tax_year":2025,"fiscal_year_begin":"2025-01-01","fiscal_year_end":"2025-12-31","step1_assumption_set_id":"GDS-STEP1-2026-08-25-v8","onezero_assumption_set_id":"GDS-ONEZERO-2026-08-24-v7","rule_pack_version":"rules...(622 chars)` actual `<absent>`
+- `GET /api/eligibility/2025` / `client2001.eligibility` **missing-field** at `statute_matches_run`: expected `{"matches":true,"verdict_disagreements":0,"resolved_rule_pack_source":"rules/ga_jtc/2025.json"}` actual `<absent>`
+- `GET /api/eligibility/2025` / `client2001.eligibility` **missing-field** at `employees_evaluated`: expected `202` actual `<absent>`
+- `GET /api/eligibility/2025` / `client2001.eligibility` **missing-field** at `min_max_eligible`: expected `144` actual `<absent>`
+- `GET /api/eligibility/2025` / `client2001.eligibility` **missing-field** at `pay_period_eligible`: expected `143` actual `<absent>`
+- `GET /api/eligibility/2025` / `client2001.eligibility` **missing-field** at `near_floor`: expected `11` actual `<absent>`
+- `GET /api/eligibility/2025` / `client2001.eligibility` **missing-field** at `eligible_either_method`: expected `144` actual `<absent>`
+- `GET /api/eligibility/2025` / `client2001.eligibility` **missing-field** at `reconciliation`: expected `{"eligible_both":143,"min_max_only":1,"pay_period_only":0,"neither":58}` actual `<absent>`
+- `GET /api/eligibility/2025` / `client2001.eligibility` **missing-field** at `total`: expected `202` actual `<absent>`
+- `GET /api/eligibility/2025` / `client2001.eligibility` **missing-field** at `rows`: expected `[{"record_token":"1fa76cc3c266b97358da90ff","employee_id":"200100001","status":"both","near_floor":false,"totals":{"hours":1998.69,"wages":66330.79},"min_max":{"weeks":52.14,"avg_hours":38.33,"avg_wages":1272.1,"passed_hours":true,"passed_wages":true,"eligible":true},"pay_period":{"weeks":52.0,"avg_...(1176 chars)` actual `<absent>`
+- `GET /api/eligibility/2025` / `client2001.eligibility` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /api/eligibility/{tax_year}`
+- `GET /api/progress/2025` / `client2001.progress` **status** at `status`: expected `200` actual `501`
+- `GET /api/progress/2025` / `client2001.progress` **missing-field** at `_roadmap_tag`: expected `N2` actual `<absent>`
+- `GET /api/progress/2025` / `client2001.progress` **missing-field** at `_story`: expected `FCST-01` actual `<absent>`
+- `GET /api/progress/2025` / `client2001.progress` **missing-field** at `state`: expected `GA` actual `<absent>`
+- `GET /api/progress/2025` / `client2001.progress` **missing-field** at `program_code`: expected `GA_JTC` actual `<absent>`
+- `GET /api/progress/2025` / `client2001.progress` **missing-field** at `tax_year`: expected `2025` actual `<absent>`
+- `GET /api/progress/2025` / `client2001.progress` **missing-field** at `as_of`: expected `2025-08-31` actual `<absent>`
+- `GET /api/progress/2025` / `client2001.progress` **missing-field** at `months_elapsed`: expected `8` actual `<absent>`
+- `GET /api/progress/2025` / `client2001.progress` **missing-field** at `ytd_average_headcount`: expected `132.12` actual `<absent>`
+- `GET /api/progress/2025` / `client2001.progress` **missing-field** at `projected_average_headcount`: expected `132.12` actual `<absent>`
+- `GET /api/progress/2025` / `client2001.progress` **missing-field** at `prior_year_average_headcount`: expected `122.24` actual `<absent>`
+- `GET /api/progress/2025` / `client2001.progress` **missing-field** at `threshold`: expected `2.0` actual `<absent>`
+- `GET /api/progress/2025` / `client2001.progress` **missing-field** at `finish_line_headcount`: expected `124.24` actual `<absent>`
+- `GET /api/progress/2025` / `client2001.progress` **missing-field** at `gap_to_finish`: expected `0.0` actual `<absent>`
+- `GET /api/progress/2025` / `client2001.progress` **missing-field** at `projected_net_new`: expected `9.88` actual `<absent>`
+- `GET /api/progress/2025` / `client2001.progress` **missing-field** at `on_track`: expected `true` actual `<absent>`
+- `GET /api/progress/2025` / `client2001.progress` **missing-field** at `projected_annual_credit_usd`: expected `27580` actual `<absent>`
+- `GET /api/progress/2025` / `client2001.progress` **missing-field** at `projected_lifetime_credit_usd`: expected `137900` actual `<absent>`
+- `GET /api/progress/2025` / `client2001.progress` **missing-field** at `credit_code`: expected `GA_JTC` actual `<absent>`
+- `GET /api/progress/2025` / `client2001.progress` **missing-field** at `credit_name`: expected `Georgia Jobs Tax Credit` actual `<absent>`
+- `GET /api/progress/2025` / `client2001.progress` **missing-field** at `method_note`: expected `Linear run-rate from 8 month(s) of 2025 actuals (YTD Average Monthly Headcount 132.12); assumes the current run-rate holds through year-end. No seasonality applied.` actual `<absent>`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.default` **number-lexeme** at `items[0].threshold_jobs`: expected `2.0` actual `2`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.default` **number-lexeme** at `items[1].threshold_jobs`: expected `2.0` actual `2`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.default` **number-lexeme** at `items[2].threshold_jobs`: expected `2.0` actual `2`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.default` **number-lexeme** at `items[2].net_new_jobs`: expected `24.0` actual `24`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.default` **number-lexeme** at `items[2].jobs_to_threshold`: expected `0.0` actual `0`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.default` **number-lexeme** at `items[2].jobs_margin`: expected `22.0` actual `22`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.default` **number-lexeme** at `items[2].gap_jobs`: expected `0.0` actual `0`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.default` **number-lexeme** at `items[3].threshold_jobs`: expected `2.0` actual `2`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.default` **number-lexeme** at `items[3].jobs_to_threshold`: expected `0.0` actual `0`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.default` **number-lexeme** at `items[3].gap_jobs`: expected `0.0` actual `0`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.year` **number-lexeme** at `items[0].threshold_jobs`: expected `2.0` actual `2`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.year` **number-lexeme** at `items[0].jobs_to_threshold`: expected `0.0` actual `0`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.year` **number-lexeme** at `items[0].gap_jobs`: expected `0.0` actual `0`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.year` **number-lexeme** at `items[1].threshold_jobs`: expected `2.0` actual `2`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.year` **number-lexeme** at `items[1].jobs_to_threshold`: expected `0.0` actual `0`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.year` **number-lexeme** at `items[1].gap_jobs`: expected `0.0` actual `0`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.year` **key-order** at `items[2]`: expected `["claim_id","client_id","entity_id","program_code","tax_year","status","provenance","provenance_verified","identified_usd","claimed_usd","certified_usd","variance_usd","variance_is_computable","opportunity_usd","average_headcount","base_average_headcount","threshold_jobs","is_base_year","net_new_job...(703 chars)` actual `["claim_id","client_id","entity_id","program_code","tax_year","status","provenance","provenance_verified","identified_usd","claimed_usd","certified_usd","variance_usd","variance_is_computable","opportunity_usd","average_headcount","base_average_headcount","threshold_jobs","is_base_year","net_new_job...(703 chars)`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.year` **key-order** at `items[3]`: expected `["claim_id","client_id","entity_id","program_code","tax_year","status","provenance","provenance_verified","identified_usd","claimed_usd","certified_usd","variance_usd","variance_is_computable","opportunity_usd","average_headcount","base_average_headcount","threshold_jobs","is_base_year","net_new_job...(703 chars)` actual `["claim_id","client_id","entity_id","program_code","tax_year","status","provenance","provenance_verified","identified_usd","claimed_usd","certified_usd","variance_usd","variance_is_computable","opportunity_usd","average_headcount","base_average_headcount","threshold_jobs","is_base_year","net_new_job...(703 chars)`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.sort-priority-desc` **number-lexeme** at `items[0].threshold_jobs`: expected `2.0` actual `2`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.sort-priority-desc` **number-lexeme** at `items[0].net_new_jobs`: expected `0.0` actual `0`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.sort-priority-desc` **number-lexeme** at `items[0].jobs_to_threshold`: expected `2.0` actual `2`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.sort-priority-desc` **number-lexeme** at `items[0].jobs_margin`: expected `-2.0` actual `-2`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.sort-priority-desc` **number-lexeme** at `items[0].gap_jobs`: expected `2.0` actual `2`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.sort-priority-desc` **number-lexeme** at `items[1].average_headcount`: expected `64.0` actual `64`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.sort-priority-desc` **number-lexeme** at `items[1].base_average_headcount`: expected `64.0` actual `64`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.sort-priority-desc` **number-lexeme** at `items[1].threshold_jobs`: expected `2.0` actual `2`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.sort-priority-desc` **number-lexeme** at `items[1].net_new_jobs`: expected `0.0` actual `0`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.sort-priority-desc` **number-lexeme** at `items[1].jobs_to_threshold`: expected `2.0` actual `2`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.sort-priority-desc` **number-lexeme** at `items[1].jobs_margin`: expected `-2.0` actual `-2`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.sort-priority-desc` **number-lexeme** at `items[1].gap_jobs`: expected `2.0` actual `2`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.sort-priority-desc` **number-lexeme** at `items[2].average_headcount`: expected `73.0` actual `73`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.sort-priority-desc` **number-lexeme** at `items[2].base_average_headcount`: expected `73.0` actual `73`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.sort-priority-desc` **number-lexeme** at `items[2].threshold_jobs`: expected `2.0` actual `2`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.sort-priority-desc` **number-lexeme** at `items[2].net_new_jobs`: expected `0.0` actual `0`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.sort-priority-desc` **number-lexeme** at `items[2].jobs_to_threshold`: expected `2.0` actual `2`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.sort-priority-desc` **number-lexeme** at `items[2].jobs_margin`: expected `-2.0` actual `-2`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.sort-priority-desc` **number-lexeme** at `items[2].gap_jobs`: expected `2.0` actual `2`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.sort-priority-desc` **number-lexeme** at `items[3].threshold_jobs`: expected `2.0` actual `2`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.sort-priority-desc` **number-lexeme** at `items[3].net_new_jobs`: expected `0.0` actual `0`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.sort-priority-desc` **number-lexeme** at `items[3].jobs_to_threshold`: expected `2.0` actual `2`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.sort-priority-desc` **number-lexeme** at `items[3].jobs_margin`: expected `-2.0` actual `-2`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.sort-priority-desc` **number-lexeme** at `items[3].gap_jobs`: expected `2.0` actual `2`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.sort-identified` **number-lexeme** at `items[0].threshold_jobs`: expected `2.0` actual `2`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.sort-identified` **number-lexeme** at `items[0].net_new_jobs`: expected `24.0` actual `24`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.sort-identified` **number-lexeme** at `items[0].jobs_to_threshold`: expected `0.0` actual `0`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.sort-identified` **number-lexeme** at `items[0].jobs_margin`: expected `22.0` actual `22`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.sort-identified` **number-lexeme** at `items[0].gap_jobs`: expected `0.0` actual `0`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.sort-identified` **number-lexeme** at `items[1].threshold_jobs`: expected `2.0` actual `2`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.sort-identified` **number-lexeme** at `items[1].jobs_to_threshold`: expected `0.0` actual `0`
+- (tolerated) `GET /api/v2/portfolio` / `portfolio.sort-identified` **number-lexeme** at `items[1].gap_jobs`: expected `0.0` actual `0`
