@@ -19619,7 +19619,7 @@
       "scope": "framework waiver cap below forty exchanges",
       "reason": "Current cap_min_exchanges=40 exempts the small framework group. Its raw differences and waiver percentage remain visible. The inherited W3 halt is historical, not a current authorization to emulate framework HTML or unsafe CORS.",
       "evidence": [
-        "dotnet/docs/HALT-integrate-W3.md",
+        "dotnet/docs/waves/W3-policy-stop.md",
         "dotnet/docs/GATEWAY-CONVERGENCE-REPORT.md",
         "dotnet/spikes/shadow/policy.py"
       ],

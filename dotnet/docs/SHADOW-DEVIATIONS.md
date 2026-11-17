@@ -612,7 +612,7 @@ Current cap_min_exchanges=40 exempts the small framework group. Its raw differen
 
 **Owner:** conductor policy owner. **Disposition:** Resolved for current scoring only; not an approval of other failures or cutover. **Review:** resolved or evidence boundary.
 
-Evidence: `dotnet/docs/HALT-integrate-W3.md`; `dotnet/docs/GATEWAY-CONVERGENCE-REPORT.md`; `dotnet/spikes/shadow/policy.py`.
+Evidence: `dotnet/docs/waves/W3-policy-stop.md`; `dotnet/docs/GATEWAY-CONVERGENCE-REPORT.md`; `dotnet/spikes/shadow/policy.py`.
 
 ### DEC-CONTAINER - ZIP/XLSX Tier-D exceptions
 
