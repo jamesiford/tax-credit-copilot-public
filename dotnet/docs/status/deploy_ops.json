@@ -1,0 +1,133 @@
+{
+  "session": "deploy_ops",
+  "branch": "dotnet/w4-deploy_ops",
+  "head": "c6ece2a",
+  "summary": "Delivered independent .NET 10 assets, four linux/amd64 images, guarded azd/Terraform, configuration, optional telemetry, dormant CI and Python handoff. Conductor follow-up relocates the inherited W3 halt record to INHERITED-W3-RELEASE-BLOCKERS.md without changing its evidence or unresolved decisions; the no-halt check now covers HALT*.md, not just literal HALT.md. Existing build/format, 1,551 fast tests, mocked Terraform and actionlint proofs remain unchanged; artifact revision is 2e8ba28. API policy remains blocked, gateway has 19 failures, and Worker/ingress/native prerequisites remain explicit. No deployment, push or product changes.",
+  "stages": {
+    "D1": "partial",
+    "D2": "done",
+    "D3": "done",
+    "D4": "partial",
+    "D5": "partial",
+    "D6": "done"
+  },
+  "gates_claimed": {
+    "no_halt": true,
+    "commits_present": true,
+    "clean_tree": true,
+    "not_pushed": true,
+    "owned_paths": true,
+    "status_json": true,
+    "report_present": true,
+    "stages_done": true,
+    "build": true,
+    "format": true,
+    "fast_tests": true,
+    "configuration_tests": true,
+    "mocked_terraform": true,
+    "actionlint": true,
+    "linux_images": true,
+    "published_smoke": true,
+    "telemetry_receipts": true,
+    "api_replay_policy": false,
+    "gateway_replay_policy": true,
+    "native_deployment": false
+  },
+  "deviations": [
+    {
+      "id": "DEV-1",
+      "what": "The preparation plan is recorded in the owned running log, not a root .azure plan.",
+      "why": "The explicit task ownership boundary prohibits creating root preparation assets; no cloud deployment lifecycle was invoked.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-2",
+      "what": "Native build-platform SDK cross-publishes linux-x64 images.",
+      "why": "The available Linux engine is arm64; emulated amd64 SDK execution exited 139. All final runtime images are verified linux/amd64 and nonroot.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-3",
+      "what": "The measured Docker build uses an explicitly selected bounded offline feed of 113 exact public package archives.",
+      "why": "Container NuGet HTTPS failed NU1301/OpenSSL handshake. Archive checks plus fresh locked restore succeeded without TLS bypass; online vulnerability-feed audit is not claimed.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-4",
+      "what": "Orchestrator proof requires a kernel-isolated network namespace, not a purported loopback URL override.",
+      "why": "The installed Responses SDK binds AnyIP 8088 despite --urls/ASPNETCORE_URLS. Default and nonisolated launches exit 78; external ingress remains disabled.",
+      "decision_needed": true
+    },
+    {
+      "id": "DEV-5",
+      "what": "Worker has a portable image but its App Service topology is explicitly refused.",
+      "why": "The Generic Host exposes no HTTP lifecycle/progress health seam. A dummy web sidecar would falsely report a dead poller as healthy.",
+      "decision_needed": true
+    },
+    {
+      "id": "DEV-6",
+      "what": "Relocated the inherited W3 policy-stop record to INHERITED-W3-RELEASE-BLOCKERS.md and repaired its current report links.",
+      "why": "The conductor's no_halt check rejects inherited HALT-prefixed files too. The full original record and unresolved release decisions are preserved; historical W3 gate claims, replay comparisons and thresholds remain unchanged.",
+      "decision_needed": false
+    }
+  ],
+  "findings": [
+    "API readiness returns HTTP 200 with ready=false; gateway readiness is constant HTTP 200/true even with an unavailable source. Status-only probes do not establish dependency health.",
+    "API replay: 1,514 exchanges and 2,311 raw differing fields; framework waivers 9/17=52.94% exceed the unchanged 25% cap. Gateway: 255 exchanges, 523 raw fields, 236 passed/19 failed, 11 waived, 92.55% threshold pass is not parity.",
+    "Worker invalid deployed configuration refusal was observed under qemu, but uncaught target signal 6 was not reaped. Abnormal exit remains unverified; daemon SIGTERM 143 is not graceful-drain proof. Ordinary finite Worker and two existing accepted-work/publication tests passed.",
+    "Both public synthetic payroll CSVs, embedded prompt .resx and embedded source mapping are genuinely consumed build/runtime inputs. Private extract, environment files, databases and contract seeds are excluded.",
+    "SOURCE_SCHEMA absent means tcc_source; empty means dbo. SOURCE_MAPPING_FILE and Python lease/concurrency settings do not control ordinary .NET composition.",
+    "Gateway composes application services in-process and needs source/Gold/ops/Blob privileges. Existing Python gateway SQL profile is audit-only; lakehouse grant tool refuses the configured gateway principal and must not be bypassed.",
+    "The five native schema additions are absent from current authored migrations. The unchanged Python migration runner can execute an approved forward migration but cannot supply missing DDL.",
+    "Actual API/gateway each exported two server spans and one metric series through the optional Hook; actual dependency correlation is absent. Two dependency-parent edges and exit-flush timings are controlled synthetic probe evidence.",
+    "Configured infrastructure diagnostics export AllMetrics only, with HTTP/console categories excluded and host log levels None. Direct orchestrator console logging and inherited gateway privacy boundaries are not thereby fixed.",
+    "Full azd environment/package orchestration, OIDC/private SCM promotion and native Fabric/Blob/Entra/Foundry behavior were not executed. The owned MSBuild packaging primitive and official manifest schema were validated.",
+    "M-01 ingestion precedence, first-program multi-program pricing, zero-worksite SQL/projector, leap-window context and native money/AVG remain unchanged figure-sensitive owner decisions.",
+    "The count/max-modified source marker is not a transactional Delta snapshot. The 600-second lease lacks periodic renewal; restart loses host-local tickets/confirmations and there is no gateway unknown-result recovery endpoint.",
+    "No new replay waiver or application dependency was added. The conductor rejected the inherited HALT-prefixed W3 record, which is now preserved in INHERITED-W3-RELEASE-BLOCKERS.md. No HALT-prefixed Markdown remains; the W3 policy/release stop itself is unresolved."
+  ],
+  "open_questions": [
+    "Approved non-HTTP Worker hosting/supervision or an application-owned lifecycle-coupled progress/health seam remains unselected.",
+    "The verified upstream subject/employer-binding ingress and future durable recovery/multi-replica design require owner selection before external orchestrator activation.",
+    "Native migration/backfill handling of historical equal-timestamp override intent requires review; the original order cannot be recovered.",
+    "The owner must resolve the inherited figure-sensitive and privacy/parity findings before cutover, without reclassifying changed figures as improvements."
+  ],
+  "needs_human": [
+    {
+      "item": "Author and approve the five native forward schema additions and service-specific grants using the existing Python operator path.",
+      "why": "Required DDL is not authored/applied; Fabric NOT ENFORCED uniqueness is not proof. Pause all writers, review historical ordering and verify independent native transactions, fencing, publication, pooling and numeric scale."
+    },
+    {
+      "item": "Supply real Worker supervision and native amd64 abnormal-exit/drain proof.",
+      "why": "App Service expects HTTP startup health; this Generic Host has none, and emulation did not reliably reap the configuration abort. The topology stays unavailable."
+    },
+    {
+      "item": "Implement verified person/client ingress and direct-origin isolation before enabling orchestrator.",
+      "why": "Mapped headers and opaque user keys are not authenticated identity or employer authorization; URL configuration does not constrain the SDK listener."
+    },
+    {
+      "item": "Close dependency-readiness, privacy, parity and figure-sensitive application decisions.",
+      "why": "API semantic policy is still blocked, gateway has 19 failures, readiness routes are insufficient and safe telemetry does not sanitize direct console paths or resolve calculation boundaries."
+    },
+    {
+      "item": "Approve native environment, private OIDC publisher, schema/grants and artifact promotion, then verify served revision and native behavior.",
+      "why": "No live deployment or automatic provisioning was authorized. The .NET backend/targets must remain independent; online package audit, existing full heavy gate and consumer-side private SCM/image checks remain release work."
+    }
+  ],
+  "reports": [
+    "dotnet/docs/DEPLOY-REPORT.md",
+    "dotnet/docs/INHERITED-W3-RELEASE-BLOCKERS.md",
+    "dotnet/deploy/README.md",
+    "dotnet/deploy/DEPLOYMENT-MATRIX.md",
+    "dotnet/deploy/CONFIGURATION.md",
+    "dotnet/deploy/configuration/config-proof.md",
+    "dotnet/deploy/HYBRID-OPS.md",
+    "infra-dotnet/README.md",
+    "infra-dotnet/VALIDATION.md",
+    "dotnet/deploy/telemetry/README.md",
+    "dotnet/deploy/evidence/README.md",
+    "dotnet/deploy/evidence/provenance.json",
+    ".github-dotnet/README.md",
+    "dotnet/docs/deploy_ops-log.md"
+  ]
+}

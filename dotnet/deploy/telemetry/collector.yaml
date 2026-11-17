@@ -1,0 +1,36 @@
+# Local-only sidecar. Production: private ingress and operator-approved TLS/backend.
+# Never enable a logs pipeline or a debug/file exporter for application payloads.
+receivers:
+  otlp:
+    protocols:
+      http:
+        endpoint: 0.0.0.0:4318
+processors:
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: 64
+    spike_limit_mib: 16
+  batch:
+    timeout: 1s
+exporters:
+  otlphttp/receipt:
+    endpoint: ${env:TCC_RECEIPT_ENDPOINT}
+    encoding: json
+    compression: none
+    retry_on_failure:
+      enabled: false
+    sending_queue:
+      enabled: false
+service:
+  telemetry:
+    logs:
+      level: error
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [otlphttp/receipt]
+    metrics:
+      receivers: [otlp]
+      processors: [memory_limiter, batch]
+      exporters: [otlphttp/receipt]

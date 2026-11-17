@@ -1,0 +1,18 @@
+{
+  "kind": "actual-publication-repeat-zip",
+  "commit": "2e8ba289d4aec2c2c0494e41ba58e296fb84c6bf",
+  "services": {
+    "api": {
+      "sha256": "0cf8175921834fafb1ae1883b9f016fc941ee7fa79aabc5d109c15ea16d197f1",
+      "bytes": 25479108,
+      "entries": 180,
+      "repeated_identically": true
+    },
+    "gateway": {
+      "sha256": "332028dee5664051439257192c5be96756361eae1f551759a93c6283134006e4",
+      "bytes": 26171108,
+      "entries": 187,
+      "repeated_identically": true
+    }
+  }
+}

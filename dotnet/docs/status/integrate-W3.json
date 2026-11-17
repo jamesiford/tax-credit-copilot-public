@@ -130,7 +130,7 @@
   ],
   "reports": [
     "dotnet/docs/GATEWAY-CONVERGENCE-REPORT.md",
-    "dotnet/docs/HALT-integrate-W3.md",
+    "dotnet/docs/INHERITED-W3-RELEASE-BLOCKERS.md",
     "dotnet/docs/HOST-ARCHITECTURE.md",
     "dotnet/docs/integrate-W3-log.md",
     "dotnet/docs/improvements/integrate-W3.json",

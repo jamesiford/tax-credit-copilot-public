@@ -1,0 +1,394 @@
+{
+  "schema_version": 1,
+  "reference": "docs/architecture/ENV-VARS.md",
+  "services": ["api", "worker", "gateway", "orchestrator"],
+  "semantics": {
+    "group_inheritance": "Expand names into separate records; defaults[name], targets[name], required_by_name[name] override group fields. A service omitted from consumers has no runtime consumer. Overrides are explicit service-specific classifications; unsupported_consumers[service] lists read-but-ineffective settings.",
+    "absent_consumer": "Absent: setting has no effect; unset and empty both ignored. No runtime default or requirement.",
+    "source": "Non-secret deployment metadata only. Never copy process settings, credentials or customer identifiers into this inventory.",
+    "paths": "Evidence paths are repository-relative; SD means dotnet/src/TaxCredit.ServiceDefaults/Hosting, OR means dotnet/src/TaxCredit.Orchestrator/Hosting, GW means dotnet/src/TaxCredit.Gateway.",
+    "classifications": ["unchanged", "translated", "Python-ops-only", "platform-injected", "unsupported", "irrelevant"]
+  },
+  "groups": [
+    {
+      "names": ["ENVIRONMENT"],
+      "classification": "unchanged",
+      "consumers": {"api": "SD/RuntimeConfiguration.cs; RuntimeRegistration.Validate", "worker": "SD/RuntimeConfiguration.cs; RuntimeRegistration.Validate", "gateway": "SD/RuntimeConfiguration.cs; RuntimeRegistration.Validate"},
+      "required": "Deployment contract: explicit nonlocal; runtime otherwise silently selects local defaults",
+      "unset": "local", "empty": "Nonlocal; deployed validation applies",
+      "source": "Deployment posture manifest"
+    },
+    {
+      "names": ["DATA_CLASSIFICATION"],
+      "classification": "unchanged",
+      "consumers": {"api": "SD/RuntimeConfiguration.cs; RuntimeSourceRegistration.Lookups; RuntimeCalculationRegistration", "worker": "SD/RuntimeConfiguration.cs; RuntimeSourceRegistration.Lookups; RuntimeCalculationRegistration", "gateway": "SD/RuntimeConfiguration.cs; RuntimeSourceRegistration.Lookups; RuntimeCalculationRegistration"},
+      "required": "Deployment contract: explicit synthetic or customer; runtime does not validate the enum",
+      "unset": "synthetic", "empty": "Not synthetic; strict lookup posture, but no classification validation",
+      "source": "Reviewed workload classification, never inferred"
+    },
+    {
+      "names": ["AUTH_MODE"],
+      "classification": "unchanged",
+      "consumers": {"api": "SD/RuntimeConfiguration.cs; RuntimeTrustRegistration.Configuration", "worker": "SD/RuntimeConfiguration.cs; RuntimeTrustRegistration.Configuration", "gateway": "GW/GatewayHost.cs forcibly sets entra"},
+      "required": "Deployment contract: entra; shared composition does not pass anonymous demo opt-in to AuthConfiguration",
+      "unset": "none when local; entra otherwise; gateway always entra",
+      "empty": "AuthConfiguration treats empty as entra, but downstream exact comparisons differ; contract rejects",
+      "source": "Explicit deployment posture"
+    },
+    {
+      "names": ["DATA_SOURCE"],
+      "classification": "translated",
+      "consumers": {"api": "SD/RuntimeConfiguration.cs; RuntimeSourceRegistration.IsCsv", "worker": "SD/RuntimeConfiguration.cs; RuntimeSourceRegistration.IsCsv", "gateway": "SD/RuntimeConfiguration.cs; RuntimeSourceRegistration.IsCsv"},
+      "required": "Deployed: exact lakehouse; this selects SQL, not Delta",
+      "unset": "csv", "empty": "Rejected; not Python blank-to-lakehouse behavior",
+      "source": "Literal lakehouse in deployed configuration"
+    },
+    {
+      "names": ["WAREHOUSE_SERVER", "WAREHOUSE_DATABASE", "LAKEHOUSE_SQL_SERVER", "LAKEHOUSE_SQL_DATABASE"],
+      "classification": "translated",
+      "targets": {"WAREHOUSE_SERVER": "FABRIC_SQL_SERVER", "WAREHOUSE_DATABASE": "FABRIC_SQL_DATABASE", "LAKEHOUSE_SQL_SERVER": "SOURCE_SQL_SERVER", "LAKEHOUSE_SQL_DATABASE": "SOURCE_SQL_DATABASE"},
+      "consumers": {"api": "SD/RuntimeRegistration.cs and RuntimeSourceRegistration.cs (target names only)", "worker": "SD/RuntimeRegistration.cs and RuntimeSourceRegistration.cs (target names only)", "gateway": "SD/RuntimeRegistration.cs and RuntimeSourceRegistration.cs (target names only)"},
+      "required": "Explicit target endpoints required; no .NET fallback from source host to Warehouse or source database to item name",
+      "unset": "Legacy names ignored; target Warehouse required, target source unconfigured",
+      "empty": "Legacy names ignored; target Warehouse rejects whitespace, target source unconfigured",
+      "source": "Guarded existing SQL endpoint host and database metadata; explicit translation, not automatic alias"
+    },
+    {
+      "names": ["SOURCE_SCHEMA"],
+      "classification": "unchanged",
+      "consumers": {"api": "SD/RuntimeSourceRegistration.cs; Infrastructure.Sources/Sql/SourceScanner.cs", "worker": "SD/RuntimeSourceRegistration.cs; Infrastructure.Sources/Sql/SourceScanner.cs", "gateway": "SD/RuntimeSourceRegistration.cs; Infrastructure.Sources/Sql/SourceScanner.cs"},
+      "required": "Optional; explicitly select actual SQL schema",
+      "unset": "tcc_source via ??; not the old azd flex default",
+      "empty": "Trimmed empty: [dbo].[table], metadata dbo; HasBlankSchemaWarning=true; never tcc_source",
+      "source": "Reviewed source SQL schema; empty requires operator confirmation"
+    },
+    {
+      "names": ["FABRIC_WORKSPACE", "FABRIC_LAKEHOUSE"],
+      "classification": "unsupported",
+      "consumers": {"api": "Api/Endpoints/WorkspaceSealed/WorkspaceSealedEndpoints.cs only: missing-reference error selection"},
+      "required": "Not required for SQL payroll; item names are not SQL endpoint discovery",
+      "unset": "Sealed loopback views may name missing settings", "empty": "Same as unset",
+      "source": "Optional Fabric item metadata only; resolve real SQL endpoint separately",
+      "note": "No OneLake consumer. FABRIC_LAKEHOUSE may be translated manually to SOURCE_SQL_DATABASE only after verifying SQL database metadata."
+    },
+    {
+      "names": ["SOURCE_TABLE_PREFIX", "SOURCE_TABLE_CASE", "SOURCE_TABLE_MAP", "SOURCE_MAPPING_FILE", "SOURCE_SCHEMA_VALIDATION", "WORKSITE_LOCATION_SOURCE", "NULL_PAY_DATE_POLICY", "SOURCE_CACHE_MB", "SOURCE_CACHE_ACCOUNTS", "SOURCE_MAX_ACCOUNT_ROWS", "SOURCE_VERSION_CHECK_SECONDS", "SOURCE_SILVER", "SOURCE_READ_MODE", "SOURCE_FALLBACK", "PORTFOLIO_FOOTPRINT_MODE", "PORTFOLIO_FOOTPRINT_MAX_ROWS", "PORTFOLIO_FOOTPRINT_TIMEOUT_SECONDS", "ONELAKE_ENDPOINT", "ONELAKE_PATH_STYLE"],
+      "classification": "unsupported", "consumers": {},
+      "required": "Never emit as a working control",
+      "unset": "Absent consumer", "empty": "Absent consumer",
+      "source": "None; blocked legacy application controls",
+      "note": "RuntimeSourceRegistration calls SourceMapping.Load() with no patch; SourceScanner default maximumRows=1000000. Python mapping/cache/Delta/footprint flags cannot change that graph."
+    },
+    {
+      "names": ["PAY_CODE_POLICY", "FISCAL_RULES_POLICY"],
+      "classification": "unchanged",
+      "consumers": {"api": "SD/RuntimeSourceRegistration.Lookups; Infrastructure.Sources/Lookups/SourceLookupOptions", "worker": "SD/RuntimeSourceRegistration.Lookups; Infrastructure.Sources/Lookups/SourceLookupOptions", "gateway": "SD/RuntimeSourceRegistration.Lookups; Infrastructure.Sources/Lookups/SourceLookupOptions"},
+      "required": "Optional strict or assume",
+      "defaults": {"PAY_CODE_POLICY": "strict unless DATA_CLASSIFICATION exactly synthetic; then assume", "FISCAL_RULES_POLICY": "assume"},
+      "unset": "See defaults", "empty": "SourceLookupOptions rejects unknown policy",
+      "source": "Reviewed lookup policy"
+    },
+    {
+      "names": ["CLAIM_STORE", "FINDING_STORE", "RUN_MANIFEST_STORE", "OVERRIDE_STORE", "ARTIFACT_REPOSITORY", "LOOKUP_STORE"],
+      "classification": "translated",
+      "target": "TCC_PERSISTENCE_PROVIDER",
+      "consumers": {"api": "SD/RuntimeRegistration.cs; Infrastructure.Persistence/PersistenceRegistration.cs (target only)", "worker": "SD/RuntimeRegistration.cs; Infrastructure.Persistence/PersistenceRegistration.cs (target only)", "gateway": "SD/RuntimeRegistration.cs; Infrastructure.Persistence/PersistenceRegistration.cs (target only)"},
+      "required": "One target warehouse for ALL Gold/ops repositories; independent legacy selectors do not exist",
+      "unset": "Legacy ignored; target defaults sqlite", "empty": "Legacy ignored; target empty rejected",
+      "source": "Literal warehouse; one FABRIC_SQL destination"
+    },
+    {
+      "names": ["CHANNEL_STORE"],
+      "classification": "translated", "target": "TCC_PERSISTENCE_PROVIDER",
+      "consumers": {"gateway": "GW/ChannelEndpoints.cs readiness LABEL only; persistence uses SD/RuntimeRegistration.cs"},
+      "required": "Do not emit; cannot select persistence independently",
+      "unset": "Gateway label falls back to TCC_PERSISTENCE_PROVIDER", "empty": "Empty label only, no store change",
+      "source": "Use shared warehouse provider, not this legacy label",
+      "note": "API/Worker ignore it; channel readiness is declarative, not a dependency probe."
+    },
+    {
+      "names": ["CHANNEL_WRITER_SOURCE", "CHANNEL_WRITER_GROUP_ID", "CHANNEL_ENFORCE_WRITER_FOR_USERS"],
+      "classification": "unchanged",
+      "consumers": {"api": "SD/RuntimeTrustRegistration.cs; RuntimeWriters.cs", "worker": "SD/RuntimeTrustRegistration.cs; RuntimeWriters.cs", "gateway": "SD/RuntimeTrustRegistration.cs; RuntimeWriters.cs; GW/GatewayHost.cs always enforces writer"},
+      "required": "Source allowlist|entra_group|either; group GUID when not allowlist; deployed contract enforces users",
+      "defaults": {"CHANNEL_WRITER_SOURCE": "allowlist", "CHANNEL_WRITER_GROUP_ID": "absent", "CHANNEL_ENFORCE_WRITER_FOR_USERS": "false"},
+      "unset": "See defaults",
+      "empty": "Source rejected; group invalid when required; enforce flag false",
+      "source": "Approved entitlement policy and Entra group metadata; database allowlist managed by operator",
+      "note": "Enforce flag accepts true/1/yes and false/0/no or blank; not on/off."
+    },
+    {
+      "names": ["AUTH_TENANT_ID", "API_AUDIENCE"],
+      "classification": "unchanged",
+      "consumers": {"api": "SD/RuntimeTrustRegistration.Configuration; Infrastructure.Auth/AuthConfiguration.cs", "worker": "SD/RuntimeTrustRegistration.Configuration; Infrastructure.Auth/AuthConfiguration.cs", "gateway": "SD/RuntimeTrustRegistration.Configuration; Infrastructure.Auth/AuthConfiguration.cs"},
+      "required": "Entra: tenant GUID and nonblank audience; contract requires GUID or api://GUID audience",
+      "unset": "No deployed fallback, including no AZURE_TENANT_ID fallback",
+      "empty": "Rejected",
+      "source": "API app registration and trusted tenant metadata; API_AUDIENCE may be comma-separated accepted registration forms",
+      "note": "Gateway composes shared trust too; GATEWAY_AUDIENCE is not a substitute."
+    },
+    {
+      "names": ["TENANT_ID", "GATEWAY_AUDIENCE", "CHANNEL_GATEWAY_AUDIENCE", "CHANNEL_GATEWAY_URL"],
+      "classification": "unchanged",
+      "consumer_names": {"gateway": ["TENANT_ID", "GATEWAY_AUDIENCE"], "orchestrator": ["TENANT_ID", "CHANNEL_GATEWAY_AUDIENCE", "CHANNEL_GATEWAY_URL"]},
+      "consumers": {"gateway": "GW/ChannelConfiguration.cs and Trust/ChannelAuthenticator.cs: TENANT_ID, GATEWAY_AUDIENCE only", "orchestrator": "OR/RuntimeSettings.cs and Boundary/GatewaySettings.cs: TENANT_ID, CHANNEL_GATEWAY_AUDIENCE, CHANNEL_GATEWAY_URL only"},
+      "required_by_name": {"TENANT_ID": "Gateway and orchestrator tenant GUID (gateway runtime falls back AUTH_TENANT_ID); contract explicit and matching", "GATEWAY_AUDIENCE": "Gateway audience, separate from API_AUDIENCE", "CHANNEL_GATEWAY_AUDIENCE": "Orchestrator gateway audience; must match gateway GATEWAY_AUDIENCE", "CHANNEL_GATEWAY_URL": "Orchestrator HTTPS gateway URL, no userinfo/query/fragment"},
+      "unset": "Required for applicable service (gateway tenant has AUTH_TENANT_ID fallback)", "empty": "Rejected for applicable service",
+      "source": "Gateway registration/tenant and private ingress endpoint metadata",
+      "note": "No audience is automatically copied or inferred. Existing constructors only require nonblank audiences; deployment validator deliberately strengthens shape."
+    },
+    {
+      "names": ["AZURE_CLIENT_ID", "AZURE_TENANT_ID", "AZURE_TOKEN_CREDENTIALS"],
+      "classification": "unchanged",
+      "consumers": {"api": "Azure.Identity DefaultAzureCredential in RuntimeRegistration/RuntimeArtifacts/RuntimeAuthClients", "worker": "Azure.Identity DefaultAzureCredential in RuntimeRegistration/RuntimeArtifacts", "gateway": "Azure.Identity DefaultAzureCredential in shared runtime", "orchestrator": "Azure.Identity DefaultAzureCredential in OR/OrchestratorRuntime.cs"},
+      "required": "Client id selects attached user-assigned managed identity; SDK credential-chain inputs are not application auth tenant fallback",
+      "unset": "SDK DefaultAzureCredential behavior; no application override", "empty": "SDK-specific; deployment contract rejects empty supplied SDK controls",
+      "source": "Platform identity attachment metadata; never client secrets",
+      "note": "AZURE_TENANT_ID is NOT consumed as AUTH_TENANT_ID by .NET composition. SDK 1.17.1 owns AZURE_TOKEN_CREDENTIALS; recommended deployed prod, explicit managed identity identity attachment still required."
+    },
+    {
+      "names": ["ARTIFACT_STORE", "ARTIFACT_BLOB_ACCOUNT_URL", "ARTIFACT_LOCAL_ROOT", "OPERATIONAL_DB"],
+      "classification": "unchanged",
+      "consumers": {"api": "SD/RuntimeArtifacts.cs and RuntimePaths.cs", "worker": "SD/RuntimeArtifacts.cs and RuntimePaths.cs", "gateway": "SD/RuntimeArtifacts.cs and RuntimePaths.cs"},
+      "required_by_name": {"ARTIFACT_STORE": "Deployed exact blob", "ARTIFACT_BLOB_ACCOUNT_URL": "Required when blob; deployment contract HTTPS account origin", "ARTIFACT_LOCAL_ROOT": "Local-only; no deployed persistence role", "OPERATIONAL_DB": "Local-only; ignored when warehouse"},
+      "defaults": {"ARTIFACT_STORE": "local", "ARTIFACT_BLOB_ACCOUNT_URL": "none", "ARTIFACT_LOCAL_ROOT": "<root>/dotnet/artifacts/local/bytes", "OPERATIONAL_DB": "<root>/dotnet/artifacts/local/operations.db"},
+      "unset": "See defaults", "empty": "Store rejected; URL invalid; local paths preserve empty rather than fallback",
+      "source": "Blob endpoint metadata or explicit local scratch location; never storage keys"
+    },
+    {
+      "names": ["RULES_DIR"],
+      "classification": "unchanged",
+      "consumers": {"api": "SD/RuntimePaths.cs", "worker": "SD/RuntimePaths.cs", "gateway": "SD/RuntimePaths.cs"},
+      "required": "Optional override; deployment contract nonblank if set",
+      "unset": "<TCC_REPOSITORY_ROOT>/backend/rules", "empty": "Preserved as empty path, not fallback; reject",
+      "source": "Read-only authored resource staging path"
+    },
+    {
+      "names": ["PROGRAM_DRAFT_REQUIRE_SECOND_REVIEWER"],
+      "classification": "unchanged",
+      "consumers": {"api": "Application/Features/DraftsRuns/DraftLifecycle.RequiresSecondReviewer", "gateway": "Application/Features/DraftsRuns/DraftLifecycle.RequiresSecondReviewer"},
+      "required": "Deployment contract true",
+      "unset": "true nonlocal; false local", "empty": "Same as unset",
+      "source": "Reviewed draft segregation-of-duties policy",
+      "note": "Accepts true/1/yes/on and false/0/no/off; unlike RuntimeRegistration.Flag."
+    },
+    {
+      "names": ["RATE_LIMIT_PER_MINUTE"],
+      "classification": "unchanged",
+      "consumers": {"api": "SD/RuntimeLimits.cs; Infrastructure.Auth/ApiRateLimitOptions.cs", "worker": "SD/RuntimeTrustRegistration.cs validation", "gateway": "SD/RuntimeLimits.cs"},
+      "required": "Optional integer 0..1000000", "unset": "60", "empty": "Parser fallback 60",
+      "source": "Reviewed per-process API limit; zero disables"
+    },
+    {
+      "names": ["RUN_WORKER_STALE_SECONDS"],
+      "classification": "translated", "target": "RUN_STALE_WORKER_SECONDS",
+      "consumers": {"api": "Application/Features/DraftsRuns/ReadBatches.cs (target only)", "gateway": "Application/Features/DraftsRuns/ReadBatches.cs (target only)"},
+      "required": "Optional; health reporting only, no scheduling effect",
+      "unset": "Target defaults 60, not Python 300", "empty": "Target unparsable -> 60",
+      "source": "Reviewed queue stale-report threshold"
+    },
+    {
+      "names": ["GIT_COMMIT"],
+      "classification": "unchanged",
+      "consumers": {"api": "SD/RuntimeCalculationRegistration.cs", "worker": "SD/RuntimeCalculationRegistration.cs", "gateway": "SD/RuntimeCalculationRegistration.cs"},
+      "required": "Deployment contract immutable build revision",
+      "unset": "working-tree (or synthetic hook value); never git subprocess",
+      "empty": "Preserved; reject",
+      "source": "Build revision; not an operator's incidental working tree"
+    },
+    {
+      "names": ["CHANNEL_ALLOWED_CALLER_APP_IDS", "CHANNEL_CALLER_CHANNELS", "CHANNEL_RATE_LIMIT_PER_MINUTE", "CHANNEL_MCP_ALLOWED_ORIGINS"],
+      "classification": "unchanged",
+      "consumers": {"gateway": "GW/ChannelConfiguration.cs; Trust/ChannelAuthenticator.cs; Mcp/McpEndpoint.cs"},
+      "required": "Optional; production caller/channel binding should be explicit",
+      "defaults": {"CHANNEL_ALLOWED_CALLER_APP_IDS": "empty: role-only", "CHANNEL_CALLER_CHANNELS": "empty: enum-level trust", "CHANNEL_RATE_LIMIT_PER_MINUTE": "60", "CHANNEL_MCP_ALLOWED_ORIGINS": "empty: deny every browser Origin"},
+      "unset": "See defaults", "empty": "Lists empty; rate empty rejected",
+      "source": "Trusted caller registration metadata, approved channel binding and browser origins",
+      "note": "Rate 1..6000, host-local. Origin matching is exact; deployment validator rejects malformed origins even though current host does not parse the list at startup."
+    },
+    {
+      "names": ["CHANNEL_DEBUG_WHOAMI"],
+      "classification": "unchanged",
+      "consumers": {"gateway": "GW/Execution/ChannelCatalog.cs", "orchestrator": "OR/RuntimeSettings.cs; Boundary/IdentityOptions.cs"},
+      "required": "Deployment contract off",
+      "unset": "off", "empty": "off",
+      "source": "Explicit off; diagnostic identity surfaces must not be enabled",
+      "note": "Gateway enables only exact 1/true/on, orchestrator accepts ordinary case-insensitive boolean forms."
+    },
+    {
+      "names": ["CHANNEL_NAME", "CHANNEL_MAX_TOOL_CALLS", "CHANNEL_CONFIRM_TTL_SECONDS", "CHANNEL_STATE_TTL_SECONDS", "CHANNEL_REQUEST_TIMEOUT_SECONDS", "CHANNEL_TURN_TIMEOUT_SECONDS", "CHANNEL_IDENTITY_SOURCES"],
+      "classification": "unchanged",
+      "consumers": {"orchestrator": "OR/RuntimeSettings.cs; Boundary/IdentityOptions.cs"},
+      "required": "Optional; no gateway timeout consumer in in-process host",
+      "defaults": {"CHANNEL_NAME": "teams", "CHANNEL_MAX_TOOL_CALLS": "8 (1..20)", "CHANNEL_CONFIRM_TTL_SECONDS": "300 (30..3600); API/gateway do not consume it", "CHANNEL_STATE_TTL_SECONDS": "3600 (60..86400)", "CHANNEL_REQUEST_TIMEOUT_SECONDS": "40 (5..300), orchestrator ONLY", "CHANNEL_TURN_TIMEOUT_SECONDS": "90 (10..600)", "CHANNEL_IDENTITY_SOURCES": "original-subject,platform,agent-user-id"},
+      "unset": "See defaults", "empty": "Trimmed empty -> defaults",
+      "source": "Reviewed bounded turn/session policy; ingress must establish authenticated subject separately",
+      "note": "client-headers opt-in is not authentication. API/gateway confirmation TTL is not wired to this Python setting."
+    },
+    {
+      "names": ["FOUNDRY_PROJECT_ENDPOINT"],
+      "classification": "unchanged",
+      "overrides": {"orchestrator": "platform-injected"},
+      "consumers": {"api": "SD/RuntimeAiRegistration.cs; RuntimeStatus.cs: status flag only", "worker": "SD/RuntimeAiRegistration.cs: offline status only", "gateway": "SD/RuntimeAiRegistration.cs: offline status only", "orchestrator": "OR/ProviderClients.Foundry; Framework/FoundryModelClientFactory.cs"},
+      "required": "Orchestrator foundry provider requires HTTPS endpoint; API/gateway never become model-ready from it",
+      "unset": "API offline disabled; orchestrator foundry startup fails",
+      "empty": "API disabled; orchestrator Text fallback then required failure",
+      "source": "Platform-injected reserved endpoint for hosted orchestrator; optional project metadata elsewhere",
+      "note": "Orchestrator uses real Azure OpenAI v1 chat factory. API runtime has no invocation factory."
+    },
+    {
+      "names": ["FOUNDRY_AGENT_NAME", "FOUNDRY_AGENT_VERSION", "AZURE_AI_MODEL_DEPLOYMENT_NAME"],
+      "classification": "platform-injected",
+      "consumers": {"orchestrator": "OR/RuntimeSettings.cs"},
+      "required": "Platform owns reserved values",
+      "defaults": {"FOUNDRY_AGENT_NAME": "tcc-channel-orchestrator", "FOUNDRY_AGENT_VERSION": "0", "AZURE_AI_MODEL_DEPLOYMENT_NAME": "gpt-5.4-mini ultimate model fallback"},
+      "unset": "See defaults", "empty": "Trimmed empty -> defaults",
+      "source": "Hosted agent platform only; do not emit as customer app settings"
+    },
+    {
+      "names": ["FOUNDRY_MODEL", "AI_MODEL_ROUTER", "AI_MODEL_NARRATOR", "AI_MODEL_ANALYSIS", "AI_MODEL_ROUTER__FOUNDRY", "AI_MODEL_NARRATOR__FOUNDRY", "AI_MODEL_ANALYSIS__FOUNDRY", "AI_MODEL_ROUTER__GATEWAY", "AI_MODEL_NARRATOR__GATEWAY", "AI_MODEL_ANALYSIS__GATEWAY", "AI_PROVIDER_CHAIN", "AI_PROVIDER_CHAIN__ROUTER", "AI_PROVIDER_CHAIN__NARRATOR", "AI_PROVIDER_CHAIN__ANALYSIS"],
+      "classification": "unchanged",
+      "consumers": {"orchestrator": "OR/RuntimeSettings.Deployment and Chains; ProviderClients.cs"},
+      "required": "Every selected provider/role must resolve model; only foundry and gateway chains",
+      "unset": "Chain foundry; model provider-specific > role > FOUNDRY_MODEL > AZURE_AI_MODEL_DEPLOYMENT_NAME > gpt-5.4-mini for foundry; gateway has no fallback",
+      "empty": "Trimmed empty -> fallback; comma-only chain rejected",
+      "source": "Approved model deployment names/role routing; not user input",
+      "note": "API/Worker/gateway shared RuntimeAiRegistration ignores ALL these controls; fixed offline foundry registry."
+    },
+    {
+      "names": ["AI_EGRESS_POLICY", "AI_TOKEN_BUDGET_DAILY", "AI_TOKEN_BUDGET_PER_PRINCIPAL_DAILY", "AI_INJECTION_GUARD", "AI_OUTPUT_POLICY", "AI_OUTPUT_ALLOWED_HOSTS", "AI_CALL_TIMEOUT_SECONDS", "AI_RETRY_MAX_ATTEMPTS", "AI_RETRY_BASE_SECONDS", "AI_RETRY_MAX_SECONDS", "AI_TOTAL_DEADLINE_SECONDS", "AI_BREAKER_FAILURE_THRESHOLD", "AI_BREAKER_RESET_SECONDS", "AI_BULKHEAD_MAX_CONCURRENT"],
+      "classification": "unchanged",
+      "consumers": {"orchestrator": "OR/RuntimeSettings.cs; Infrastructure.Ai/Resilience/ResilienceSettings.cs"},
+      "required": "Safety guards on; valid bounded numbers; deployment contract explicit safe egress and token budgets",
+      "defaults": {"AI_EGRESS_POLICY": "allow_all (deployment contract strengthens to aggregates_only or block)", "AI_TOKEN_BUDGET_DAILY": "none; nonnegative Int64", "AI_TOKEN_BUDGET_PER_PRINCIPAL_DAILY": "none; nonnegative Int64", "AI_INJECTION_GUARD": "on; off rejected", "AI_OUTPUT_POLICY": "on; off rejected", "AI_OUTPUT_ALLOWED_HOSTS": "empty list", "AI_CALL_TIMEOUT_SECONDS": "30 (>0..3600)", "AI_RETRY_MAX_ATTEMPTS": "3 (1..10)", "AI_RETRY_BASE_SECONDS": "0.5 (0..3600)", "AI_RETRY_MAX_SECONDS": "8 (0..3600)", "AI_TOTAL_DEADLINE_SECONDS": "45 (>0..3600)", "AI_BREAKER_FAILURE_THRESHOLD": "5 (1..1000)", "AI_BREAKER_RESET_SECONDS": "30 (>0..3600)", "AI_BULKHEAD_MAX_CONCURRENT": "8 (1..1000)"},
+      "unset": "See defaults", "empty": "Trimmed empty -> defaults",
+      "source": "Reviewed AI safety/resilience policy; no prompt or response contents",
+      "note": "Not wired as environment controls by API/Worker/gateway composition."
+    },
+    {
+      "names": ["AI_MODEL_ROUTER__FOUNDRY_CONNECTION", "AI_MODEL_NARRATOR__FOUNDRY_CONNECTION", "AI_MODEL_ANALYSIS__FOUNDRY_CONNECTION"],
+      "classification": "unsupported", "consumers": {},
+      "required": "Never emit; foundry_connection provider rejected by orchestrator and not wired by API composition",
+      "unset": "Absent consumer", "empty": "Absent consumer",
+      "source": "None; no BYOM prompt-agent factory in current .NET hosts"
+    },
+    {
+      "names": ["AI_GATEWAY_ENDPOINT", "AI_GATEWAY_AUTH", "AI_GATEWAY_API_STYLE", "AI_GATEWAY_API_VERSION", "AI_GATEWAY_API_KEY", "AI_GATEWAY_API_KEY_HEADER", "AI_GATEWAY_API_KEY_PREFIX", "AI_GATEWAY_OAUTH_TOKEN_URL", "AI_GATEWAY_OAUTH_CLIENT_ID", "AI_GATEWAY_OAUTH_CLIENT_SECRET", "AI_GATEWAY_OAUTH_SCOPE", "AI_GATEWAY_ENTRA_AUDIENCE", "AI_GATEWAY_EXTRA_HEADERS", "AI_GATEWAY_TIMEOUT_SECONDS", "AI_GATEWAY_CONNECT_TIMEOUT_SECONDS", "AI_GATEWAY_TLS_VERIFY", "AI_GATEWAY_STREAMING", "AI_GATEWAY_SUPPORTS_TOOLS"],
+      "classification": "unchanged",
+      "consumers": {"orchestrator": "OR/ProviderClients.cs; Infrastructure.Ai/Gateway/GatewaySettings.cs; Infrastructure.Ai/Auth"},
+      "required": "When gateway selected: HTTPS endpoint, explicit auth and all role models; api_key requires key, oauth requires token URL/client/secret, entra requires audience; deployed contract only entra_token",
+      "defaults": {"AI_GATEWAY_ENDPOINT": "none", "AI_GATEWAY_AUTH": "none (no default; literal none accepted by runtime but refused by deployment contract)", "AI_GATEWAY_API_STYLE": "openai_v1", "AI_GATEWAY_API_VERSION": "2024-10-21", "AI_GATEWAY_API_KEY": "none; secret excluded from examples", "AI_GATEWAY_API_KEY_HEADER": "Authorization", "AI_GATEWAY_API_KEY_PREFIX": "Bearer plus trailing space", "AI_GATEWAY_OAUTH_TOKEN_URL": "none", "AI_GATEWAY_OAUTH_CLIENT_ID": "none", "AI_GATEWAY_OAUTH_CLIENT_SECRET": "none; secret excluded from examples", "AI_GATEWAY_OAUTH_SCOPE": "empty token scope; cache audience falls back endpoint authority", "AI_GATEWAY_ENTRA_AUDIENCE": "none", "AI_GATEWAY_EXTRA_HEADERS": "empty string-valued JSON object", "AI_GATEWAY_TIMEOUT_SECONDS": "30 (>0..3600)", "AI_GATEWAY_CONNECT_TIMEOUT_SECONDS": "5 (>0..3600)", "AI_GATEWAY_TLS_VERIFY": "true; false refused", "AI_GATEWAY_STREAMING": "true", "AI_GATEWAY_SUPPORTS_TOOLS": "true"},
+      "unset": "See defaults", "empty": "Text settings fallback; required settings fail; Raw API key prefix preserves empty (unlike unset)",
+      "source": "Approved model gateway metadata and managed identity; deployment emits no key/secret",
+      "note": "API/Worker/channel-gateway composition does NOT wire model gateway settings. Actual .NET constructor allows endpoint path (unlike Python); validator requires base origin to prevent ambiguous routing. TLS handler never disables verification."
+    },
+    {
+      "names": ["KNOWLEDGE_ENABLED", "KNOWLEDGE_PROVIDER", "KNOWLEDGE_TOP"],
+      "classification": "unchanged",
+      "consumers": {"orchestrator": "OR/RuntimeSettings.cs; OrchestratorRuntime.cs"},
+      "required": "Deployment contract disabled; enabled runtime only implements synthetic fake",
+      "defaults": {"KNOWLEDGE_ENABLED": "false", "KNOWLEDGE_PROVIDER": "none", "KNOWLEDGE_TOP": "3 (1..10)"},
+      "unset": "See defaults", "empty": "Trimmed empty -> defaults",
+      "source": "Literal off/none; foundry-iq unavailable"
+    },
+    {
+      "names": ["APPLICATIONINSIGHTS_CONNECTION_STRING"],
+      "classification": "unsupported",
+      "overrides": {"orchestrator": "platform-injected"},
+      "consumers": {"api": "SD/RuntimeStatus.cs boolean telemetry_configured only", "gateway": "SD/RuntimeStatus.cs boolean telemetry_configured only", "orchestrator": "Hosted agent platform reserved input; no application exporter registration"},
+      "required": "Not proof of exported telemetry; no exporter installed by ServiceDefaults",
+      "unset": "Configured flag false", "empty": "Configured flag false",
+      "source": "Platform monitoring metadata, never log or include actual connection string",
+      "note": "Reserved platform input for hosted orchestrator is not evidence that .NET emits telemetry."
+    },
+    {
+      "names": ["ALLOW_ANONYMOUS_SYNTHETIC", "LOG_LEVEL", "TCC_STRANDED_RUN_MINUTES", "WAREHOUSE_ODBC_DRIVER", "WAREHOUSE_CONNECT_TIMEOUT", "WAREHOUSE_POOL_MAX_IDLE", "WAREHOUSE_POOL_MAX_AGE_SECONDS", "DATA_QUERY_TIMEOUT_SECONDS", "DATA_QUERY_MAX_ROWS", "DATA_QUERY_RATE_PER_MINUTE", "DATA_QUERY_MAX_CONCURRENCY", "DATA_MIN_GROUP_SIZE", "DATA_QUERY_SOURCE_ENABLED", "DATA_QUERY_SQLITE_DIR", "GOLD_SCHEMA", "OPS_SCHEMA", "RUN_BATCH_MAX_ITEMS", "RUN_BATCH_CONFIRM_ABOVE", "RUN_WORKER_CONCURRENCY", "RUN_ITEM_MAX_ATTEMPTS", "RUN_WORKER_INLINE", "RUN_LEASE_SECONDS", "RUN_HEARTBEAT_SECONDS", "RUN_WORKER_POLL_SECONDS", "RUN_BACKOFF_BASE_SECONDS", "PROGRAM_REGISTRY_FILE", "PROGRAM_PREVIEW_ALLOW_CUSTOMER_DATA", "PROGRAM_EXPORT_ALLOW_LOCAL_WRITE", "OUTPUTS_RETENTION_DAYS", "TELEMETRY_ENABLED", "APPLICATIONINSIGHTS_AUTHENTICATION_STRING", "AI_FOUNDRY_CONNECTION_NAME", "AI_AGENT_VERSION_PINS", "CAPABILITY_TIMEOUT_SECONDS", "CHANNEL_RESOLVE_DISPLAY_NAMES", "TCC_WARM_ON_START", "TCC_WARM_CLIENTS", "TCC_KEEPALIVE_SECONDS"],
+      "classification": "unsupported", "consumers": {},
+      "required": "Do not advertise as functioning .NET configuration",
+      "unset": "Absent environment consumer; hardcoded or separately typed policy may exist", "empty": "Absent consumer",
+      "source": "None; application-owned missing configuration seams",
+      "note": "RunExecutionOptions fixed lease 600s/max attempts 3; QueueWorker serial poll 1s; no periodic heartbeat during synchronous calculation. Gold/ops SQL schemas fixed tcc_gold/tcc_ops. PROGRAM_REGISTRY_FILE absent: registry read under RULES_DIR."
+    },
+    {
+      "names": ["RUN_WORKER_IDENTITY_CLIENT_ID"],
+      "classification": "translated", "target": "AZURE_CLIENT_ID",
+      "consumers": {"worker": "Azure.Identity DefaultAzureCredential (target only)"},
+      "required": "Optional separate Worker identity must be set on Worker process directly",
+      "unset": "Legacy ignored; no automatic API identity inheritance by separate host", "empty": "Legacy ignored",
+      "source": "Attached Worker user-assigned managed identity metadata"
+    },
+    {
+      "names": ["PORT", "WEBSITES_PORT"],
+      "classification": "translated", "target": "ASPNETCORE_URLS",
+      "consumers": {"api": "ASP.NET Core host configuration (target only)", "gateway": "ASP.NET Core host configuration (target only)"},
+      "required": "API/gateway HTTP listener must agree with platform/image port; no Worker HTTP listener; orchestrator preview SDK ignores URL override and binds [::]:8088",
+      "unset": "API/gateway host default; orchestrator SDK [::]:8088", "empty": "Legacy ignored; no orchestrator confinement from URL settings",
+      "source": "API/gateway deployment listener contract; platform WEBSITES_PORT alone cannot rebind Kestrel; orchestrator containment requires isolated kernel network namespace"
+    },
+    {
+      "names": ["SCM_DO_BUILD_DURING_DEPLOYMENT", "WEBSITES_CONTAINER_START_TIME_LIMIT", "WEBSITE_RUN_FROM_PACKAGE"],
+      "classification": "platform-injected",
+      "consumers": {"api": "App Service platform, not executable", "gateway": "App Service platform, not executable"},
+      "required": "Platform only, not .NET runtime settings",
+      "unset": "Platform behavior", "empty": "Platform behavior",
+      "source": "App Service platform; prepublished DLL deployments do not use Python build/startup"
+    },
+    {
+      "names": ["OVERRIDE_USE_MI_FIC_ASSERTION_CLIENTID"],
+      "classification": "platform-injected", "consumers": {},
+      "required": "None: old web Easy Auth consumer only",
+      "unset": "No .NET executable effect", "empty": "No .NET executable effect",
+      "source": "Existing Python web platform only"
+    },
+    {
+      "names": ["ASPNETCORE_ENVIRONMENT", "Logging__LogLevel__Default", "Logging__LogLevel__Microsoft", "Logging__LogLevel__System", "Logging__Console__LogLevel__Default"],
+      "classification": "unchanged",
+      "consumer_names": {"worker": ["Logging__LogLevel__Default", "Logging__LogLevel__Microsoft", "Logging__LogLevel__System", "Logging__Console__LogLevel__Default"]},
+      "consumers": {"api": "ASP.NET Core WebApplication.CreateBuilder standard environment/configuration/logging providers", "gateway": "ASP.NET Core WebApplication.CreateBuilder standard environment/configuration/logging providers", "worker": "Host.CreateApplicationBuilder standard configuration/logging providers"},
+      "required": "Deployment sets Production and safe log suppression until privacy-safe telemetry path is certified",
+      "unset": "Framework defaults; API/gateway ASP.NET Hosting.Diagnostics has explicit Warning filter",
+      "empty": "Framework behavior; contract rejects empty supplied controls",
+      "source": "Non-secret framework hosting and logging posture",
+      "note": "The standalone orchestrator builds LoggerFactory.AddSimpleConsole without AddConfiguration; these logging switches are NOT proof of suppressing its direct logger."
+    },
+    {
+      "names": ["TF_VAR_git_commit", "TF_VAR_environment_name", "TF_VAR_location", "TF_VAR_resource_group_name"],
+      "classification": "Python-ops-only", "consumers": {},
+      "required": "Existing Python Terraform CI inputs, not executable configuration",
+      "unset": "No .NET runtime default", "empty": "No .NET runtime effect",
+      "source": "Existing Python deployment workflow metadata; .NET templates own independent state and explicit mapping"
+    },
+    {
+      "names": ["WAREHOUSE_PLATFORM", "FABRIC_WORKSPACE_ID", "FABRIC_WAREHOUSE_ID", "TCC_FABRIC_CREATED", "SQL_SERVER_FQDN", "SQL_DATABASE_NAME", "TCC_SQL_CREATED", "API_IDENTITY_NAME", "API_IDENTITY_CLIENT_ID", "API_IDENTITY_PRINCIPAL_ID", "TCC_DATA_QUERY_SOURCE_ENABLED", "TCC_PROFILE", "AZURE_SUBSCRIPTION_ID", "AZURE_ENV_NAME", "AZURE_LOCATION", "AZURE_RESOURCE_GROUP", "TF_BACKEND_RESOURCE_GROUP", "TF_BACKEND_STORAGE_ACCOUNT", "TF_BACKEND_CONTAINER", "TF_VARS_JSON", "ARM_USE_OIDC", "FABRIC_CLIENT_ID", "FABRIC_TENANT_ID", "FABRIC_USE_OIDC", "GITHUB_ENV", "TCC_ENABLE_M365_CHANNEL", "TCC_CHANNEL_GATEWAY_AUDIENCE", "TCC_CHANNEL_WRITER_SOURCE", "TCC_CHANNEL_WRITER_GROUP_ID", "TCC_CHANNEL_RESOLVE_DISPLAY_NAMES", "TCC_DATA_QUERY_TIMEOUT_SECONDS", "TCC_DATA_QUERY_MAX_ROWS", "TCC_DATA_QUERY_RATE_PER_MINUTE", "TCC_DATA_QUERY_MAX_CONCURRENCY", "TCC_LAKEHOUSE_SQL_SERVER", "TCC_LAKEHOUSE_SQL_DATABASE", "TCC_TENANT_ID", "FABRIC_CAPACITY_ADMIN", "TCC_WEB_CLIENT_ID", "TCC_API_CLIENT_ID", "TCC_API_AUDIENCE", "TCC_APP_SUBNET_ID", "TCC_PRIVATE_ENDPOINT_SUBNET_ID", "TCC_FABRIC_WORKSPACE_ID", "TCC_FABRIC_WORKSPACE_NAME", "TCC_FABRIC_LAKEHOUSE_NAME", "TCC_FABRIC_WAREHOUSE_ID", "TCC_WAREHOUSE_SERVER", "TCC_WAREHOUSE_DATABASE", "TCC_WAREHOUSE_PLATFORM", "TCC_SQL_ADMIN_GROUP_OBJECT_ID", "TCC_SQL_ADMIN_GROUP_NAME", "FOUNDRY_MODEL_VERSION", "TCC_APP_SERVICE_SKU", "TCC_FOUNDRY_PUBLIC_NETWORK_ACCESS", "TCC_FOUNDRY_ALLOWED_IP_RANGES", "FOUNDRY_MODEL_SKU", "TCC_ALLOW_SEED"],
+      "classification": "Python-ops-only", "consumers": {},
+      "required": "Not .NET runtime inputs; retain guarded existing Python/operator/azd/CI semantics separately",
+      "unset": "No .NET runtime default", "empty": "No .NET runtime effect",
+      "source": "Existing Python operator inputs, OIDC deployment metadata or Terraform outputs; no automatic .NET alias",
+      "note": "Translate deliberately into reviewed .NET target names where needed; never run destructive bootstrap on existing Warehouse. WAREHOUSE_PLATFORM is operator metadata, not a .NET driver switch."
+    },
+    {
+      "names": ["API_BASE_URL", "API_BACKEND_URL", "API_BACKEND_HOST", "VITE_API_BASE", "WEB_CONCURRENCY", "PYTHONNOUSERSITE", "FIXTURE_ACCOUNT_ID", "FLEX_ACCOUNT_ID", "FABRIC_EMPLOYEES_TABLE", "REFERENCE_ACCOUNT_ID", "REFERENCE_ACCOUNT_NAME", "REFERENCE_ACCESS_OUTPUT_PATH", "WEBIQ_API_KEY", "WEBIQ_BEARER_TOKEN", "WEBIQ_BASE_URL", "COSMOS_ENDPOINT", "COSMOS_DATABASE", "COSMOS_ACCOUNT_NAME", "TCC_REPO_ROOT", "TCC_REQUIRE_PARITY", "TCC_FABRIC_TESTS", "TCC_SQL_TESTS", "TCC_AZURE_TESTS", "CONTAINER_APPS_LOCATION", "SERVICE_API_IMAGE_NAME", "SERVICE_WEB_IMAGE_NAME", "AZURE_PRINCIPAL_ID", "API_APP_NAME", "WEB_APP_NAME", "WEB_BASE_URL", "CHANNEL_APP_NAME", "CHANNEL_BASE_URL", "GATEWAY_IDENTITY_NAME", "AZURE_CONTAINER_REGISTRY_ENDPOINT", "AZURE_CONTAINER_REGISTRY_NAME", "AZURE_CONTAINER_APPS_ENVIRONMENT_NAME"],
+      "classification": "irrelevant", "consumers": {},
+      "required": "None for these four .NET executables",
+      "unset": "No .NET runtime default", "empty": "No .NET runtime effect",
+      "source": "Other executable, removed platform output, Python fixture/test-only or unsupported live retrieval",
+      "note": "Gateway calls application services in-process: API_BASE_URL is not its backend. FIXTURE_ACCOUNT_ID is not wired; local CSV is hardcoded account 1001."
+    },
+    {
+      "names": ["TCC_PERSISTENCE_PROVIDER", "FABRIC_SQL_SERVER", "FABRIC_SQL_DATABASE", "SOURCE_SQL_SERVER", "SOURCE_SQL_DATABASE", "TCC_REPOSITORY_ROOT", "TCC_SEED_ROOT", "PAYROLL_PATH", "TCC_CONTRACT_HOOKS", "TCC_WORKER_ONCE", "TCC_CONTRACT_PROFILE", "CLIENT_ALLOWLIST", "RUN_STALE_WORKER_SECONDS", "CORS_ORIGINS", "TCC_FEATURE_ASSEMBLIES", "ASPNETCORE_URLS"],
+      "classification": "unchanged",
+      "unsupported_consumers": {"orchestrator": ["ASPNETCORE_URLS"]},
+      "consumer_names": {
+        "api": ["TCC_PERSISTENCE_PROVIDER", "FABRIC_SQL_SERVER", "FABRIC_SQL_DATABASE", "SOURCE_SQL_SERVER", "SOURCE_SQL_DATABASE", "TCC_REPOSITORY_ROOT", "TCC_SEED_ROOT", "PAYROLL_PATH", "TCC_CONTRACT_HOOKS", "TCC_CONTRACT_PROFILE", "CLIENT_ALLOWLIST", "RUN_STALE_WORKER_SECONDS", "CORS_ORIGINS", "TCC_FEATURE_ASSEMBLIES", "ASPNETCORE_URLS"],
+        "worker": ["TCC_PERSISTENCE_PROVIDER", "FABRIC_SQL_SERVER", "FABRIC_SQL_DATABASE", "SOURCE_SQL_SERVER", "SOURCE_SQL_DATABASE", "TCC_REPOSITORY_ROOT", "TCC_SEED_ROOT", "PAYROLL_PATH", "TCC_CONTRACT_HOOKS", "CLIENT_ALLOWLIST", "TCC_WORKER_ONCE"],
+        "gateway": ["TCC_PERSISTENCE_PROVIDER", "FABRIC_SQL_SERVER", "FABRIC_SQL_DATABASE", "SOURCE_SQL_SERVER", "SOURCE_SQL_DATABASE", "TCC_REPOSITORY_ROOT", "TCC_SEED_ROOT", "PAYROLL_PATH", "TCC_CONTRACT_HOOKS", "TCC_CONTRACT_PROFILE", "CLIENT_ALLOWLIST", "RUN_STALE_WORKER_SECONDS", "CORS_ORIGINS", "TCC_FEATURE_ASSEMBLIES", "ASPNETCORE_URLS"],
+        "orchestrator": ["ASPNETCORE_URLS"]
+      },
+      "consumers": {"api": "SD/RuntimeRegistration.cs; RuntimePaths.cs; RuntimeTrustRegistration.cs; Api/Hosting/HostComposition.cs; FeatureDiscovery.cs", "worker": "SD shared runtime; Worker/Program.cs for TCC_WORKER_ONCE; no HTTP/CORS/feature assembly consumers", "gateway": "SD shared runtime; GW/GatewayHost.cs; Api/Hosting/HostComposition.cs", "orchestrator": "OR/ResponsesHosting.cs attempts UseUrls; measured preview AgentHost SDK ListenAnyIP overrides it and binds http://[::]:8088 even with loopback CLI/env; ineffective address control"},
+      "required_by_name": {"TCC_PERSISTENCE_PROVIDER": "Deployed exact warehouse", "FABRIC_SQL_SERVER": "Warehouse host required", "FABRIC_SQL_DATABASE": "Warehouse database required", "SOURCE_SQL_SERVER": "Lakehouse SQL host required functionally", "SOURCE_SQL_DATABASE": "Lakehouse SQL database required functionally", "TCC_REPOSITORY_ROOT": "Published resource root required; NOT TCC_RESOURCE_ROOT", "TCC_SEED_ROOT": "No production seed directory needed hooks off", "PAYROLL_PATH": "CSV-only; do not emit deployed", "TCC_CONTRACT_HOOKS": "Deployed disabled; only exact 1 activates", "TCC_WORKER_ONCE": "Worker-only exact 1 or --once; deployment must be off", "TCC_CONTRACT_PROFILE": "Hook-only local seed profile", "CLIENT_ALLOWLIST": "Signed client access requires nonempty object mapping effective OID to client-id arrays", "RUN_STALE_WORKER_SECONDS": "Health report threshold only", "CORS_ORIGINS": "Explicit approved portal origins; not authentication", "TCC_FEATURE_ASSEMBLIES": "Trusted startup-only code loading; deployment contract forbids", "ASPNETCORE_URLS": "API/gateway explicit bind; orchestrator override unsupported: preview SDK ListenAnyIP on 8088 wins, never a confinement control"},
+      "defaults": {"TCC_PERSISTENCE_PROVIDER": "sqlite", "FABRIC_SQL_SERVER": "none", "FABRIC_SQL_DATABASE": "none", "SOURCE_SQL_SERVER": "empty/unconfigured", "SOURCE_SQL_DATABASE": "empty/unconfigured", "TCC_REPOSITORY_ROOT": "upward discovery requires backend/rules and docs/data/schema", "TCC_SEED_ROOT": "<root>/contract/seed", "PAYROLL_PATH": "<root>/backend/data/payroll_pay_periods.csv; CSV-only", "TCC_CONTRACT_HOOKS": "disabled", "TCC_WORKER_ONCE": "disabled", "TCC_CONTRACT_PROFILE": "P1 when hooks on", "CLIENT_ALLOWLIST": "deny all signed client access", "RUN_STALE_WORKER_SECONDS": "60", "CORS_ORIGINS": "http://localhost:5173", "TCC_FEATURE_ASSEMBLIES": "none", "ASPNETCORE_URLS": "API/gateway host default; orchestrator SDK http://[::]:8088 even with attempted override"},
+      "unset": "See defaults", "empty": "Provider/required paths rejected by deployment contract; hooks/once off; allowlist deny; sources unconfigured; stale falls back60; CORS empty allowed; assemblies empty none",
+      "source": "Reviewed .NET runtime metadata, resource package paths and caller/client entitlement policy; never secret or fixture/customer data"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+<Project>
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <TccService>api</TccService>
+    <UserSecretsId>taxcredit-dotnet-deploy-api</UserSecretsId>
+  </PropertyGroup>
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+  <Import Project="..\Packaging.targets" />
+</Project>

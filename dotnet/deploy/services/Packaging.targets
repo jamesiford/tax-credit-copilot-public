@@ -1,0 +1,10 @@
+<Project>
+  <PropertyGroup>
+    <TccPublishScript>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../publish.ps1'))</TccPublishScript>
+  </PropertyGroup>
+  <!-- azd initializes user-secrets on this deployment-owned proxy, never on a product project. -->
+  <Target Name="Publish">
+    <Error Condition="'$(PublishDir)' == ''" Text="A dedicated empty PublishDir is required." />
+    <Exec Command="pwsh -NoLogo -NoProfile -File &quot;$(TccPublishScript)&quot; -Service $(TccService) -Output &quot;$(PublishDir)&quot; -Runtime linux-x64" />
+  </Target>
+</Project>
