@@ -73,3 +73,46 @@
 - No new register entry: these restore recorded contract behavior rather than
   introduce a deliberate difference. No stored timestamp, figure or
   authenticated authorization outcome was changed.
+
+## Final policy audit
+
+- Added a read-only dual-host audit with exact route ownership, existing text
+  tolerances, approved F-18 preview exceptions and existing native-doc HTML
+  registrations. No comparator, recording, threshold or existing diagnostic
+  was changed. Three new boundary tests and twelve existing policy/setup
+  tests pass. Numeric JSON figures, monetary strings and IDs remain unwaived.
+- Baseline under one consistent policy: framework 17/17; reads 406/414;
+  claims 291/316; drafts 313/323; AI 27/27; gateway 233/255.
+- After repairs: framework 17/17; reads 406/414; claims 295/316;
+  drafts 313/323; AI 27/27; gateway 236/255.
+- These are fresh local policy audits, not a claim that the external conductor
+  ran. The historical strict diagnostic additionally rejects three registered
+  HTML documents because it treats digits in markup as numeric figures.
+- All named percentage thresholds pass, but framework still relies on 9/17
+  registrations (52.94%), above the inherited 25% waiver limit. W2 explicitly
+  recorded this conflict; it is not silently resolved by percentage success.
+  At least four native HTML cases plus the required safer CORS case already
+  exceed four of seventeen. Reproducing CDN markup or permissive CORS solely
+  to reduce this count would violate the task policy.
+- Preserve that policy blocker in the final HALT/status rather than weaken a
+  cap, change comparisons or claim unconditional convergence.
+- Runner explicitly pins local SQLite/CSV/artifact mode and disables model
+  endpoints/telemetry so ambient shared-machine settings cannot opt replay
+  into external systems.
+
+## Final verification and stop
+
+- Final strict build: zero warnings/errors. Final format check passes.
+  Final fast run: 1,551 passed, zero failed/skipped. Fifteen Python
+  policy/external-setup regressions also pass.
+- Final replays completed on both ordinary executables with the hardened
+  runner: API 1,514 steps / 2,311 raw fields; gateway 255 / 523.
+  Every ordered failure list exactly equals the preceding post-fix full run.
+  Final evidence: `artifacts/w3-final-fast`, `artifacts/w3-final-replay`.
+- Verified the actual API/gateway executable processes are no longer running;
+  no owned host is left listening.
+- No new improvement entry; the session register is explicitly empty.
+  No comparator, recording, threshold, dependency or existing assertion changed.
+- Wrote the convergence report and Stage-4 HALT explaining the inherited
+  framework cap conflict, both boards, exact remaining clusters and owner
+  decisions. Do not interpret passing percentage targets as a cap waiver.
