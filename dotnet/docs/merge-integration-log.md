@@ -32,4 +32,14 @@
   `git grep -I -n '<<<<<<<\|>>>>>>>'` found no tracked text markers.
 - `git ls-files -u` and `git diff --name-only --diff-filter=U`: empty.
 - `git diff --cached --check`: passed. All staged changes are under `dotnet`.
-- Pending: merge commit, source-branch ancestry and clean-tree confirmation.
+
+## Stage 2: confirming
+
+- Merge commit `2fc188c` has parents `a44a07e` and `3598469`.
+- `git merge-base --is-ancestor dotnet/w4-integration HEAD`: passed.
+- `git status --short`: empty after the merge commit.
+- The finish status records `2fc188c` as the verified merge revision; the
+  subsequent documentation-only commit records these results and the status.
+- No live system was contacted, no remote was changed and nothing was pushed.
+  Existing cutover limitations and producer findings remain unchanged; this
+  merge does not claim release readiness or a fresh full replay/heavy gate.
