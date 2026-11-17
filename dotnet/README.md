@@ -35,6 +35,12 @@ az login                       # an identity that can read the lakehouse SQL end
 cd frontend; npm run dev       # http://localhost:5173 (stop the Python API first: both use port 8000)
 ```
 
+**From Visual Studio instead:** `.\dotnet\configure-local.ps1` writes launch profiles (`TaxCredit.Api - live lakehouse` and
+`TaxCredit.Api - offline`) to `src\TaxCredit.Api\Properties\launchSettings.json` (gitignored, it holds your lakehouse host name). Set
+`TaxCredit.Api` as the startup project, pick the profile beside the Run button and press Run. `-Session` also exports the variables into
+the current PowerShell session. The frontend is not part of the solution; run `npm run dev` in a terminal. The Aspire `TaxCredit.AppHost`
+starts a local SQL Server container, not the live lakehouse.
+
 `run-local.ps1` reads `backend\.env` (`LAKEHOUSE_SQL_SERVER`, `LAKEHOUSE_SQL_DATABASE`, `SOURCE_SCHEMA`, `AUTH_MODE`) and maps it to the
 .NET names (`SOURCE_SQL_SERVER`, `SOURCE_SQL_DATABASE`, ...). Claims, findings and runs stay in a local SQLite file and artifacts on local
 disk; nothing is written to Fabric unless you pass `-Persistence warehouse`. It sets `AZURE_TOKEN_CREDENTIALS=AzureCliCredential` so the
