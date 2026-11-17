@@ -52,7 +52,25 @@ $target = Join-Path $PSScriptRoot 'src\TaxCredit.Api\Properties\launchSettings.j
 New-Item -ItemType Directory -Force (Split-Path $target) | Out-Null
 $launch | ConvertTo-Json -Depth 6 | Set-Content $target -Encoding utf8
 Write-Host "Wrote $target" -ForegroundColor Green
-Write-Host "In Visual Studio: set TaxCredit.Api as the startup project, choose the profile next to the Run button, press Run." -ForegroundColor Cyan
+
+# The API only queues runs; the Worker executes them, so it gets the same two profiles.
+function New-WorkerProfile($variables) {
+    $merged = [ordered]@{ DOTNET_ENVIRONMENT = 'Production' }
+    foreach ($key in $variables.Keys) { $merged[$key] = $variables[$key] }
+    [ordered]@{ commandName = 'Project'; dotnetRunMessages = $true; environmentVariables = $merged }
+}
+$workerLaunch = [ordered]@{
+    profiles = [ordered]@{
+        'TaxCredit.Worker - live lakehouse' = New-WorkerProfile $live
+        'TaxCredit.Worker - offline'        = New-WorkerProfile $offline
+    }
+}
+$workerTarget = Join-Path $PSScriptRoot 'src\TaxCredit.Worker\Properties\launchSettings.json'
+New-Item -ItemType Directory -Force (Split-Path $workerTarget) | Out-Null
+$workerLaunch | ConvertTo-Json -Depth 6 | Set-Content $workerTarget -Encoding utf8
+Write-Host "Wrote $workerTarget" -ForegroundColor Green
+Write-Host "In Visual Studio: right-click the solution > Configure Startup Projects > Multiple startup projects: TaxCredit.Api = Start and TaxCredit.Worker = Start, then pick each project's profile next to the Run button and press Run." -ForegroundColor Cyan
+Write-Host "Runs are queued by the API and executed by the Worker: without the Worker a run stays 'queued'." -ForegroundColor Yellow
 
 if ($Persistence -eq 'warehouse') {
     Write-Host 'Warehouse persistence: claims, findings and runs WRITE to the Fabric Warehouse (unvalidated; needs tcc_ops.finding_audit).' -ForegroundColor Yellow
