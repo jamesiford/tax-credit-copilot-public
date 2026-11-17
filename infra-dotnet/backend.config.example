@@ -1,0 +1,9 @@
+# Copy to backend.config (ignored), supplying existing, dedicated .NET backend references.
+# No backend resource is created or adopted by this stack. No keys/SAS/passwords.
+resource_group_name  = "rg-dotnet-state-example"
+storage_account_name = "dotnetstateexample"
+container_name      = "tfstate-dotnet"
+key                 = "tax-credit-copilot-dotnet.tfstate"
+use_azuread_auth     = true
+# Use a separate backend container/account per .NET environment, or an explicitly
+# .NET-prefixed environment key. Never point at the Python backend tuple.
