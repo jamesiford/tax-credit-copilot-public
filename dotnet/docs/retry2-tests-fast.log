@@ -1,0 +1,35 @@
+Test run for C:\Projects\GitHub\tcc-dotnet-w2-claims\dotnet\artifacts\bin\TaxCredit.Architecture.Tests\debug\TaxCredit.Architecture.Tests.dll (.NETCoreApp,Version=v10.0)
+Test run for C:\Projects\GitHub\tcc-dotnet-w2-claims\dotnet\artifacts\bin\TaxCredit.Domain.Tests\debug\TaxCredit.Domain.Tests.dll (.NETCoreApp,Version=v10.0)
+Test run for C:\Projects\GitHub\tcc-dotnet-w2-claims\dotnet\artifacts\bin\TaxCredit.Infrastructure.Auth.Tests\debug\TaxCredit.Infrastructure.Auth.Tests.dll (.NETCoreApp,Version=v10.0)
+Test run for C:\Projects\GitHub\tcc-dotnet-w2-claims\dotnet\artifacts\bin\TaxCredit.Infrastructure.Ai.Tests\debug\TaxCredit.Infrastructure.Ai.Tests.dll (.NETCoreApp,Version=v10.0)
+Test run for C:\Projects\GitHub\tcc-dotnet-w2-claims\dotnet\artifacts\bin\TaxCredit.Infrastructure.Persistence.Tests\debug\TaxCredit.Infrastructure.Persistence.Tests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+Test run for C:\Projects\GitHub\tcc-dotnet-w2-claims\dotnet\artifacts\bin\TaxCredit.Infrastructure.Sources.Tests\debug\TaxCredit.Infrastructure.Sources.Tests.dll (.NETCoreApp,Version=v10.0)
+Test run for C:\Projects\GitHub\tcc-dotnet-w2-claims\dotnet\artifacts\bin\TaxCredit.Api.Tests\debug\TaxCredit.Api.Tests.dll (.NETCoreApp,Version=v10.0)
+Test run for C:\Projects\GitHub\tcc-dotnet-w2-claims\dotnet\artifacts\bin\TaxCredit.Parity.Tests\debug\TaxCredit.Parity.Tests.dll (.NETCoreApp,Version=v10.0)
+A total of 1 test files matched the specified pattern.
+A total of 1 test files matched the specified pattern.
+A total of 1 test files matched the specified pattern.
+A total of 1 test files matched the specified pattern.
+A total of 1 test files matched the specified pattern.
+A total of 1 test files matched the specified pattern.
+
+Passed!  - Failed:     0, Passed:    18, Skipped:     0, Total:    18, Duration: 1 s - TaxCredit.Domain.Tests.dll (net10.0)
+A total of 1 test files matched the specified pattern.
+
+Passed!  - Failed:     0, Passed:    16, Skipped:     0, Total:    16, Duration: 4 s - TaxCredit.Architecture.Tests.dll (net10.0)
+[xUnit.net 00:00:18.99]     TaxCredit.Api.Tests.Framework.ProviderSelectionTests.Native_SQL_Blob_and_group_policy_select_real_adapters_without_opening_a_live_connection [FAIL]
+
+Passed!  - Failed:     0, Passed:   167, Skipped:     0, Total:   167, Duration: 10 s - TaxCredit.Infrastructure.Ai.Tests.dll (net10.0)
+[xUnit.net 00:00:33.24]     TaxCredit.Api.Tests.Framework.RegistryTests.A_real_operation_replaces_only_its_stub_without_ambiguity [FAIL]
+[xUnit.net 00:00:33.30]     TaxCredit.Api.Tests.Framework.DiscoveryTests.Production_discovery_registers_services_before_build_and_replaces_exactly_one_stub [FAIL]
+
+Passed!  - Failed:     0, Passed:   108, Skipped:     0, Total:   108, Duration: 22 s - TaxCredit.Infrastructure.Sources.Tests.dll (net10.0)
+
+Passed!  - Failed:     0, Passed:   147, Skipped:     0, Total:   147, Duration: 1 m 2 s - TaxCredit.Infrastructure.Auth.Tests.dll (net10.0)
+
+Passed!  - Failed:     0, Passed:    61, Skipped:     0, Total:    61, Duration: 1 m 12 s - TaxCredit.Parity.Tests.dll (net10.0)
+
+Failed!  - Failed:     3, Passed:    71, Skipped:     0, Total:    74, Duration: 2 m 16 s - TaxCredit.Api.Tests.dll (net10.0)
+
+Passed!  - Failed:     0, Passed:   129, Skipped:     0, Total:   129, Duration: 2 m 17 s - TaxCredit.Infrastructure.Persistence.Tests.dll (net10.0)

@@ -1,0 +1,125 @@
+{
+  "session": "routes_reads",
+  "branch": "dotnet/w2-routes_reads",
+  "head": "c253ade",
+  "summary": "HARD-STOP-3: repeated attempts cannot satisfy the fixed count/error policies and replay gate simultaneously; HALT-routes_reads.md records the actual required decisions.\nAll 29 operations and application seams remain implemented at c253ade; the earlier composition defects are fixed and are not the reason for this stop.\nThird retry strict build and whole formatter pass; all 741 fast tests pass, including 95 API tests.\nThe latest conductor again reports 332/414 (80.2%) after waivers, with 207/414 (50.0%) waived against its 25% cap.\nAll 82 unwaived cases remain exactly partitioned: 37 wrong P2 setup, 2 auth setup, 30 shared bounds, 11 required-count conflicts and 2 missing sibling-write envelopes.\nProperly configured complete local replays have 1769 exchanges, 6765 raw failing fields and P2 38/40, differing only in required honest counts and free 404 wording.\nExplicit needs_human decisions distinguish setup correction, conflicting numerical expectations, Tier C policy/cap and sibling integration; no authorization to change these accompanied the repeated failure.\nNo product code, register, recorded figure, comparison, test or threshold was weakened. The mandatory stop makes no_halt and replay honestly false.",
+  "stages": {
+    "stage_1_application_boundary": "done",
+    "stage_2_stored_scope_drill": "done",
+    "stage_3_calculation_ingestion": "done",
+    "stage_4_ordinary_host_handoff": "partial"
+  },
+  "gates_claimed": {
+    "no_halt": false,
+    "commits_present": true,
+    "clean_tree": true,
+    "not_pushed": true,
+    "owned_paths": true,
+    "status_json": true,
+    "report_present": true,
+    "dotnet_build": true,
+    "dotnet_format": true,
+    "tests_fast": true,
+    "replay": false
+  },
+  "deviations": [
+    {
+      "id": "DEV-1",
+      "what": "Unfiltered unit population metadata uses unbounded existing Gold ports when a page limit is present.",
+      "why": "Stage 2 requires page-independent totals, but Python/W1 recordings bound them by displayed rows. P1 limit-1 is 21/10 rather than recorded 1/1; P2 detail is 26/13 rather than 3/3. No numeric improvement waiver exists.",
+      "decision_needed": true
+    },
+    {
+      "id": "DEV-2",
+      "what": "Reviews and ingestion exception annotations use durable versioned lookup records rather than private process-global state.",
+      "why": "Reopening and reset behavior must use the existing persistence boundaries. The certified writer and Claims finding lifecycle are unchanged.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-3",
+      "what": "No fake IPortfolioReferenceData adapter is supplied.",
+      "why": "W1 pay-period ports contain no hire dates. Sibling consumers need a genuine outer binding for the separate synthetic annual-payroll reference and worksite metadata.",
+      "decision_needed": true
+    },
+    {
+      "id": "DEV-4",
+      "what": "ReadsCalc handlers own a normal DI operation scope and feature-default routes yield to explicit host routes.",
+      "why": "This corrects source/fiscal capture and duplicate probe composition without changing shared mediator, hosting, infrastructure or tests. Ordinary reset/auth regression cases and the whole fast suite pass.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-5",
+      "what": "Accepted Gold reads resolve statute lazily; non-strict fiscal policy explicitly labels an assumed calendar when the payroll source is unconfigured.",
+      "why": "An accepted read must not require payroll adapter construction. Strict fiscal policy still refuses, and source-backed calculations still report an unavailable dependency rather than empty success.",
+      "decision_needed": false
+    }
+  ],
+  "findings": [
+    "The initial HALT incorrectly concluded that mediator lifetime, framework probe composition and standalone provider validation required unowned edits. Operation scopes and explicit-route defaults resolve all three inside ReadsCalc.",
+    "One normal host now passes P1-to-P2-to-P1 source/fiscal reselection, including the April fiscal start; auth changes do not reuse local client rights.",
+    "Accepted eligibility and units remain readable without configured payroll; strict fiscal selection and source-backed forecasts refuse explicitly.",
+    "W1 GoldReader.PeopleTotal and Python recordings return the limited displayed count for unfiltered population metadata; Stage 2 explicitly forbids that behavior.",
+    "The raw semantic comparer still compares Tier C validation wording and structural error metadata, although the task permits the JSON detail family with free message text. The current conductor cap is 25%, superseding the earlier 20% planning value.",
+    "The second conductor board reports 332/414 (80.2%) after waivers, with 207/414 (50.0%) waived. Its 82 unwaived owned cases partition exactly into 37 P2 setup, 2 auth setup, 30 shared identity/page bounds, 11 required honest-count metadata and 2 missing sibling-write envelopes.",
+    "The conductor's P2 scope reports csv rather than lakehouse; restricted-client auth probes return 200 instead of 403. Independent same-host experiments reproduced both: default reset selects P1/csv/one client, explicit P2 reset selects lakehouse/four clients; the same in-memory restricted token gets 200/200 locally and 403/403 after explicit Entra configuration. The external replay does not apply scenario.profile or scenario.auth automatically. ReadsCalc must not infer either from the requested account or token.",
+    "Existing shared positive-Int64 identity and maximum-10000 page binding produce deliberate 422 refusals for nonpositive identities and huge page limits; no global binder or infrastructure cap was bypassed.",
+    "F-3 and F-4 reach deliberate JSON 422 refusals through existing binding/validation boundaries; F-1 magnitude is bounded.",
+    "Captured ingestion precedence M-01 and first-program credit_math pricing remain unchanged because correcting them changes figures.",
+    "FS-01/FS-11, CQ-02/CQ-05 and CAP-10 retain their documented legacy fiscal/filter/QC boundaries.",
+    "Source count/max fingerprints are not Delta snapshots or count/max-preserving edit detection; strict leap-window bridge coverage remains partial.",
+    "Missing sibling claim/run/base-year/rebase handlers cause later run-identity and override discrepancies; those are not fabricated or registered as numerical improvements."
+  ],
+  "open_questions": [
+    "The unchanged-number replay policy conflicts with the explicit page-independent population metadata requirement.",
+    "Tier C error-family/message policy and the replay waiver cap need a consistent integration interpretation.",
+    "The legacy employee-review route lacks tenant scope and retains a documented client-zero namespace."
+  ],
+  "needs_human": [
+    {
+      "item": "HARD-STOP-3: settle the count/error-policy contradictions before another unchanged replay retry.",
+      "why": "Repeated implementation and verification attempts now return the identical 82-case conductor partition. Preserving Stage 2 page-independent populations cannot also equal the recorded page sizes; reproducing Pydantic internals conflicts with the explicit no-framework-emulation policy. The mandatory hard-stop path is documented in HALT-routes_reads.md, with no_halt and replay honestly false. This is not the earlier, resolved composition-scope halt."
+    },
+    {
+      "item": "Reconcile defective unfiltered-count recordings with the explicit page-independence requirement.",
+      "why": "Honest totals change recorded numbers, which cannot be waived. Recordings/comparisons were not weakened and the focused host test requires honest totals."
+    },
+    {
+      "item": "Reconcile free Tier C messages/error metadata with the replay waiver cap.",
+      "why": "The conductor reports 207/414 waived (50.0%) against its current 25% cap. Even the prior configured local replay has 177 error/header-only cases (42.75%). Decide whether policy-free Tier C differences are excluded from the cap, or explicitly authorize a compatible error serializer despite the current no-Pydantic-emulation instruction. No comparison, threshold or register scope was weakened."
+    },
+    {
+      "item": "Configure the external replay's profile and authentication for each scenario before measuring owned routes.",
+      "why": "The conductor's P2 scope reports csv instead of lakehouse, and its two restricted-client probes return 200. A fresh default-reset complete P2 replay independently matches only 2/40 owned cases (927 all-group failing fields); explicit P2 reset on the same host reports lakehouse/four clients. The raw replay posts its reset URL verbatim and mints tokens without applying scenario.auth. Supply reset?profile=P2 and the scenario's auth/env overlay, without clearing it afterward through another unqualified reset. Do not request product-side account/token inference as a workaround."
+    },
+    {
+      "item": "Decide how the replay treats 30 invalid-identity or oversized-page cases refused by existing shared bounds.",
+      "why": "The inherited positive-Int64 identity binder and maximum-10000 SQL page contract refuse them with 422. Reproducing inconsistent Python empty-success/404 behavior or bypassing the adapter bound would require a separately authorized shared-contract change, not numerical replay fabrication."
+    },
+    {
+      "item": "Integrate sibling claim/run/base-year/rebase implementations before judging dependent owned read envelopes.",
+      "why": "Their 501 setup writes cannot create the expected run identity, override provenance or accepted results. ReadsCalc neither maps their routes nor fabricates their effects."
+    },
+    {
+      "item": "Supply the outer IPortfolioReferenceData adapter for sibling portfolio/discovery consumers.",
+      "why": "Hire dates are absent from W1 pay-period ports; a first-paycheck surrogate or fake zero is not legitimate."
+    },
+    {
+      "item": "Review M-01 ingestion precedence, multi-program first-pack pricing and retained legacy fiscal boundaries separately.",
+      "why": "The task explicitly forbids route-layer corrections that change their calculated figures."
+    },
+    {
+      "item": "Decide tenant scoping for the legacy employee review contract.",
+      "why": "Its URL/body does not identify a client; changing the existing employee-key namespace requires an API contract decision."
+    }
+  ],
+  "reports": [
+    "dotnet/docs/HALT-routes_reads.md",
+    "dotnet/docs/ROUTES-READS-REPORT.md",
+    "dotnet/docs/routes_reads-log.md",
+    "dotnet/docs/routes_reads-portfolio-handoff.md",
+    "dotnet/docs/routes_reads-calculations-handoff.md",
+    "dotnet/docs/port-map.md",
+    "dotnet/docs/improvements/routes_reads.json",
+    "dotnet/docs/status/routes_reads.json"
+  ]
+}

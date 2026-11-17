@@ -1,0 +1,165 @@
+{
+  "mode": "semantic",
+  "groups": {
+    "ai": {
+      "cases": 31,
+      "passed": 3,
+      "failed": 28,
+      "pass_percent": 9.68,
+      "status": "red"
+    },
+    "claims_artifacts_rules": {
+      "cases": 397,
+      "passed": 70,
+      "failed": 327,
+      "pass_percent": 17.63,
+      "status": "red"
+    },
+    "control": {
+      "cases": 4,
+      "passed": 4,
+      "failed": 0,
+      "pass_percent": 100.0,
+      "status": "green"
+    },
+    "drafts_runs": {
+      "cases": 398,
+      "passed": 64,
+      "failed": 334,
+      "pass_percent": 16.08,
+      "status": "red"
+    },
+    "framework": {
+      "cases": 39,
+      "passed": 26,
+      "failed": 13,
+      "pass_percent": 66.67,
+      "status": "green"
+    },
+    "gateway": {
+      "cases": 255,
+      "passed": 0,
+      "failed": 255,
+      "pass_percent": 0.0,
+      "status": "red"
+    },
+    "reads_calc": {
+      "cases": 520,
+      "passed": 103,
+      "failed": 417,
+      "pass_percent": 19.81,
+      "status": "red"
+    },
+    "workspace_sealed": {
+      "cases": 125,
+      "passed": 57,
+      "failed": 68,
+      "pass_percent": 45.6,
+      "status": "red"
+    }
+  },
+  "failure_categories": {
+    "g1_mcp": {
+      "status": 103,
+      "header": 114,
+      "missing-field": 282,
+      "extra-field": 96,
+      "body-kind": 7
+    },
+    "g1_ratelimit": {
+      "status": 10,
+      "header": 12,
+      "missing-field": 54,
+      "extra-field": 10
+    },
+    "g1_rest": {
+      "status": 140,
+      "header": 155,
+      "missing-field": 419,
+      "extra-field": 141,
+      "body-kind": 2
+    },
+    "p1_artifacts_ai": {
+      "status": 26,
+      "missing-field": 78,
+      "extra-field": 12,
+      "header": 30,
+      "body-kind": 10,
+      "value": 14
+    },
+    "p1_auth": {
+      "missing-field": 363,
+      "extra-field": 34,
+      "value": 23,
+      "status": 45,
+      "header": 27,
+      "body-kind": 5,
+      "type": 3
+    },
+    "p1_program_drafts": {
+      "status": 72,
+      "missing-field": 582,
+      "extra-field": 35,
+      "type": 55,
+      "value": 100,
+      "header": 14,
+      "body-kind": 4,
+      "array-length": 8
+    },
+    "p1_query_edges": {
+      "status": 62,
+      "missing-field": 778,
+      "extra-field": 45,
+      "value": 24,
+      "type": 6,
+      "header": 4,
+      "body-kind": 2
+    },
+    "p1_reads": {
+      "status": 279,
+      "missing-field": 1669,
+      "extra-field": 168,
+      "value": 149,
+      "type": 60,
+      "header": 136,
+      "body-kind": 62
+    },
+    "p1_workspace_unavailable": {
+      "status": 9,
+      "missing-field": 88,
+      "extra-field": 5,
+      "header": 2,
+      "body-kind": 1,
+      "value": 10
+    },
+    "p1_writes": {
+      "status": 79,
+      "missing-field": 649,
+      "extra-field": 45,
+      "value": 344,
+      "type": 45,
+      "array-length": 21,
+      "header": 3
+    },
+    "p2_reads_writes": {
+      "status": 71,
+      "missing-field": 971,
+      "extra-field": 66,
+      "value": 8,
+      "type": 1,
+      "header": 2,
+      "body-kind": 1
+    },
+    "p2_run_batches": {
+      "status": 38,
+      "missing-field": 407,
+      "extra-field": 31,
+      "type": 7,
+      "value": 24,
+      "header": 1,
+      "array-length": 1
+    }
+  },
+  "waived_cases": 0,
+  "note": "Raw replay results, no waivers. Deferred business and gateway groups are red by design."
+}

@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>TaxCredit.ServiceDefaults</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TaxCredit.Application\TaxCredit.Application.csproj" />
+    <ProjectReference Include="..\TaxCredit.Infrastructure\TaxCredit.Infrastructure.csproj" />
+    <ProjectReference Include="..\TaxCredit.Infrastructure.Persistence\TaxCredit.Infrastructure.Persistence.csproj" />
+    <ProjectReference Include="..\TaxCredit.Infrastructure.Sources\TaxCredit.Infrastructure.Sources.csproj" />
+    <ProjectReference Include="..\TaxCredit.Infrastructure.Auth\TaxCredit.Infrastructure.Auth.csproj" />
+    <ProjectReference Include="..\TaxCredit.Infrastructure.Ai\TaxCredit.Infrastructure.Ai.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.Extensions.Http.Resilience" />
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Http" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" />
+  </ItemGroup>
+</Project>

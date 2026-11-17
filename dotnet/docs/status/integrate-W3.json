@@ -1,0 +1,140 @@
+{
+  "session": "integrate-W3",
+  "branch": "dotnet/integration",
+  "head": "203e74c",
+  "summary": "Fixed shared governed-query validation/refusal metadata, anonymous HTTP attribution and finding-history timestamp rendering. Added repeatable isolated API/gateway replay and a separate read-only policy audit. Strict build, format and 1551 fast tests pass; 15 Python policy/setup tests pass. Both complete replays ran repeatedly: API 1514 steps/2311 raw fields; gateway 255/523. Final ordered failure lists exactly reproduce the post-fix run. Local percentage board: framework 17/17, reads 406/414, claims 295/316, drafts 313/323, AI 27/27, gateway 236/255. All named percentage targets pass, but unconditional convergence stops at the inherited framework waiver cap: 9/17, 52.94%, exceeds 25%. HALT and reports explain the policy conflict; no threshold or comparison was weakened and no new waiver added. Head identifies the tested implementation/tooling commit; the following documentation commit records this status. Local commits only; no live systems or owned hosts left running.",
+  "stages": {
+    "stage_1_shared_composition_and_tests": "done",
+    "stage_2_harness_and_determinism": "partial",
+    "stage_3_measure_and_fix_clusters": "done",
+    "stage_4_final_gates_and_policy_stop": "partial"
+  },
+  "gates_claimed": {
+    "build": true,
+    "dotnet_build": true,
+    "format": true,
+    "dotnet_format": true,
+    "tests_fast": true,
+    "python_policy_and_setup_tests": true,
+    "api_replay_executed": true,
+    "gateway_replay_executed": true,
+    "replay_all_scenarios_executed": true,
+    "replay_ordered_failures_repeatable": true,
+    "local_policy_percentage_targets": true,
+    "framework": true,
+    "reads_calc": true,
+    "claims_artifacts_rules": true,
+    "drafts_runs": true,
+    "ai": true,
+    "gateway": true,
+    "framework_waiver_cap": false,
+    "other_required_group_waiver_caps": true,
+    "replay_raw_zero_differences": false,
+    "external_conductor_rerun": false,
+    "unconditional_convergence": false,
+    "replay": false,
+    "no_halt": false,
+    "stages_done": false,
+    "owned_paths": true,
+    "not_pushed": true,
+    "commits_present": true,
+    "status_json": true,
+    "report_present": true
+  },
+  "deviations": [
+    {
+      "id": "DEV-1",
+      "what": "The reported standalone gateway composition failure did not reproduce on the supplied merged branch.",
+      "why": "The ordinary gateway already references and composes application/runtime services in-process. Proved repeatability and corrected stale documentation rather than add duplicate registrations or a second API listener.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-2",
+      "what": "The final board is explicitly a local policy audit, not an external conductor result.",
+      "why": "Raw semantic replay is unchanged. The historical diagnostic predates the approved F-18 exception and treats digits in native HTML as numeric figures. The new read-only audit documents exact current policy application and exposes waiver shares separately.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-3",
+      "what": "Stopped under the Stage-4 gate/policy rule despite passing all named percentage targets.",
+      "why": "Framework retains 9/17 waived cases, above the inherited 25% cap. W2 disclosed the same conflict. Reproducing framework markup or unsafe CORS solely to reduce the share would violate the task; no cap or comparison was changed.",
+      "decision_needed": true
+    },
+    {
+      "id": "DEV-4",
+      "what": "Used the fixed session-named improvements/integrate-W3.json, intentionally empty.",
+      "why": "Production repairs restore recorded intended behavior and need no deliberate-difference waiver. A second converge-w3 register would duplicate ownership and contradict the fixed finish rule.",
+      "decision_needed": false
+    }
+  ],
+  "findings": [
+    "Initial merged strict build, format and all 1545 fast tests already passed; no stale test, duplicate registration or dependency conflict reproduced.",
+    "The supplied gateway 83/255 summary is not the measured baseline on the correct two hosts. Fresh local gateway baseline is 233/255 under documented policy; after real repairs it is 236/255.",
+    "Empty employee queries incorrectly hit raw-person authorization before semantic validation; distinct unknown/blocked/non-category columns also needed separate refusals and column metadata. Four new cases prove no invalid question reaches the provider.",
+    "Anonymous local HTTP writes were misattributed as system. Shared defaults now say anonymous while authenticated-person attribution and explicit engine/package defaults are unchanged.",
+    "Finding history leaked provider timestamp padding. Canonical instant hydration preserves meaningful microseconds without changing stored timestamps or audit durability.",
+    "Final raw reports contain 2834 differing fields across 1769 steps; they are not zero-difference replay passes. The local policy audit retains all unresolved fields and source-report hashes.",
+    "Framework waiver cases are four native documentation exchanges, four readiness descriptions and one safer CORS exchange. Documentation plus CORS alone is 5/17, already above the inherited cap.",
+    "Gateway remains 19 failed cases/49 fields: two person-lane refusals/16 fields, two governed catalogues/17 fields, fifteen genuine identity cases/16 fields. No changed tool figure or missing fact was waived.",
+    "Python claim previews allocate temporary identities; pure .NET previews do not. Later confirmations, correlations and package identities diverge. No dummy draws or response-ID rewriting were introduced.",
+    "The typed governed-query port supports eight warehouse datasets; three source-data datasets remain unavailable. Their catalogue count differences are visible and unwaived.",
+    "Remaining API backlog is reads 8 cases/148 fields, claims 21/100 and drafts 10/19; these include monetary-string scale, IDs, storage bounds, degraded availability and stored program/base-year semantics.",
+    "M-01 ingestion precedence and first-program credit pricing remain figure-sensitive inherited behavior. Row-count/max-modified source fingerprints are observations, not immutable snapshots.",
+    "All final ordered failure lists exactly equal the previous post-fix complete run. The actual host executable processes were checked absent after runner cleanup."
+  ],
+  "open_questions": [
+    "How should the inherited framework waiver cap account for registered native documentation, safer CORS and truthful readiness without requiring forbidden framework-artifact emulation?",
+    "How should the owner reconcile fixed-tool person-lane privacy with recorded valid-request authorization outcomes?"
+  ],
+  "needs_human": [
+    {
+      "item": "Resolve the inherited framework waiver accounting/cap policy.",
+      "why": "Immediate convergence blocker: framework percentage is 100%, but 9/17 cases are waived (52.94%) against the inherited 25% limit. This session neither relaxes the cap nor assumes the W2 conductor's silence changed it."
+    },
+    {
+      "item": "Reconcile person-derived fixed-tool facts with valid-request authorization preservation.",
+      "why": "Two MCP Cowork calls return employee_level_not_allowed where Python returned unmarked person-derived facts. Existing safer lane checks remain unchanged; missing facts and authorization differences remain unwaived."
+    },
+    {
+      "item": "Resolve genuine deterministic identity histories without dummy allocations.",
+      "why": "Pure previews omit Python's throwaway claim IDs, while durable audits have their own real allocations. Later confirmation, correlation, run, override and artifact identities remain visible; removing durability or spending dummy IDs is prohibited."
+    },
+    {
+      "item": "Choose contractual native money-string scale and valid long-text storage behavior.",
+      "why": "Native DECIMAL4 strings differ from recorded shorter strings; some valid long strings exceed storage bounds. No float conversion, truncation or changed-figure waiver is acceptable."
+    },
+    {
+      "item": "Complete source-data governed-query and inherited provider/fiscal proofs.",
+      "why": "Raw payroll, location and pay-code query bindings, safe cross-year distinct-person suppression, native monetary AVG, zero-worksite SQL semantics, strict leap-day fiscal behavior and live artifact publication remain unproved or incomplete."
+    },
+    {
+      "item": "Approve any figure-affecting M-01 or first-program pricing correction.",
+      "why": "M-01 contradicts year-pack precedence, but both it and first-program multi-program pricing affect figures and are deliberately preserved pending owner reconciliation."
+    },
+    {
+      "item": "Accept the source-version observation limit or choose a stronger source.",
+      "why": "Row count plus maximum modified timestamp misses count/max-preserving edits and is not an immutable source snapshot."
+    },
+    {
+      "item": "Define cross-replica idempotency, uncertain-write recovery and workflow retention.",
+      "why": "Existing host-local leases and atomic same-confirmation consume do not prove global different-confirmation key reservation; no agreed result-recovery endpoint or process/replica durability protocol exists."
+    },
+    {
+      "item": "Prove trusted orchestrator ingress/employer binding in W4.",
+      "why": "Platform-injected original-subject headers need authenticated ingress that strips spoofable assertions. No live identity, deployment grants or private payroll access was authorized here."
+    },
+    {
+      "item": "Retain remaining orchestrator configuration and coverage decisions.",
+      "why": "Optional safety-control off-switches remain explicitly refused; complete model-scripted cross-surface golden matrices, live retrieval/network probes and the previously unverified named guarantees remain outside this hermetic convergence evidence."
+    }
+  ],
+  "reports": [
+    "dotnet/docs/GATEWAY-CONVERGENCE-REPORT.md",
+    "dotnet/docs/INHERITED-W3-RELEASE-BLOCKERS.md",
+    "dotnet/docs/HOST-ARCHITECTURE.md",
+    "dotnet/docs/integrate-W3-log.md",
+    "dotnet/docs/improvements/integrate-W3.json",
+    "dotnet/docs/run_wave_replays.py",
+    "dotnet/docs/wave_replay_report.py"
+  ]
+}

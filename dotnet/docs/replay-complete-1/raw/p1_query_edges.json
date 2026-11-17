@@ -1,0 +1,5314 @@
+{
+ "mode": "semantic",
+ "interpreter": {
+  "python": "external server",
+  "zlib": "n/a",
+  "oracle": null,
+  "allow_other_python": false
+ },
+ "scenarios": [
+  {
+   "scenario": "p1_query_edges",
+   "exchanges": 71,
+   "failures": [
+    {
+     "scenario": "p1_query_edges",
+     "case": "boot.unit",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "boot.unit",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "calculation_state",
+     "expected": "calculated",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "boot.unit",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "run",
+     "expected": "{\"run_id\":\"40000000000040008000000000000001\",\"produced_at\":\"2026-01-15 12:00:00\",\"started_at\":\"2026-01-15 12:00:00\",\"calculation_id\":\"9e9a9edc79a44dce8ea0d3be5147883b87a1298e2ccf5619947c8e40d3cbf0cd\",\"code_commit\":\"0000000000000000000000000000000000c0ffee\",\"rule_pack_version\":\"rules/ga_jtc/2025.json...(473 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "boot.unit",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "newer_run_in_flight",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "boot.unit",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "in_flight",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "boot.unit",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "message",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "boot.unit",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "client_id",
+     "expected": "1001",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "boot.unit",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "state",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "boot.unit",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "year",
+     "expected": "2025",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "boot.unit",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "method",
+     "expected": "min_max",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "boot.unit",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "month_filter",
+     "expected": "{\"month_index\":null}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "boot.unit",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "filters_applied",
+     "expected": "{}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "boot.unit",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "near_filters_applied",
+     "expected": "{}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "boot.unit",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "unit",
+     "expected": "{\"client_id\":1001,\"worksite_id\":\"GA_ATL_HQ\",\"entity_fein\":\"58-1234567\",\"program_code\":\"GA_JTC\",\"method\":\"min_max\",\"tax_year\":2025,\"average_headcount\":17.25,\"is_base_year\":false,\"base_average_headcount\":9.17,\"base_year_source\":\"inferred\",\"net_new_vs_base\":8.08,\"months_reachable\":11,\"year_complete\":tr...(808 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "boot.unit",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "months",
+     "expected": "{\"client_id\":1001,\"tax_year\":2025,\"method\":\"min_max\",\"run_id\":\"40000000000040008000000000000001\",\"worksite_id\":\"GA_ATL_HQ\",\"month_01\":17.0,\"month_02\":17.0,\"month_03\":19.0,\"month_04\":19.0,\"month_05\":18.0,\"month_06\":18.0,\"month_07\":18.0,\"month_08\":18.0,\"month_09\":18.0,\"month_10\":18.0,\"month_11\":18.0,\"...(407 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "boot.unit",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "employees",
+     "expected": "[{\"employee_id\":\"E00048\",\"record_token\":\"e75b41d8333131b91396d9e5\",\"worksite_id\":\"GA_ATL_HQ\",\"entity_fein\":\"58-1234567\",\"first_pps\":\"2024-12-23\",\"last_ppe\":\"2025-05-04\",\"weight\":1.0,\"month_01\":1.0,\"month_02\":1.0,\"month_03\":1.0,\"month_04\":1.0,\"month_05\":0.0,\"month_06\":0.0,\"month_07\":0.0,\"month_08\":0....(1058 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "boot.unit",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "near_threshold",
+     "expected": "[{\"employee_id\":\"E00067\",\"record_token\":\"8ba8e33f494280f845e7fe52\",\"avg_weekly_hours\":34.76,\"avg_weekly_wages\":1742.6,\"weeks_worked\":51.86,\"total_hours\":1802.8,\"total_wages\":90366.21,\"first_start\":\"2024-12-23\",\"last_end\":\"2025-12-21\",\"additional_weekly_hours\":0.24,\"projected_weekly_hours\":35.0,\"exce...(1618 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "boot.unit",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "thresholds",
+     "expected": "{\"min_weekly_hours\":35.0,\"min_weekly_wages\":680.0,\"resolved\":true}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "boot.unit",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "total",
+     "expected": "2",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "boot.unit",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "total_unfiltered",
+     "expected": "2",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "boot.unit",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "near_total_unfiltered",
+     "expected": "2",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "boot.unit",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/v2/clients/{client_id}/units/{unit_id}"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.default",
+     "route": "GET /api/v2/portfolio",
+     "category": "value",
+     "path": "items[0].client_name",
+     "expected": "Reference Dataset Client",
+     "actual": "Synthetic fixture"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.year",
+     "route": "GET /api/v2/portfolio",
+     "category": "value",
+     "path": "items[0].client_name",
+     "expected": "Reference Dataset Client",
+     "actual": "Synthetic fixture"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.year-none",
+     "route": "GET /api/v2/portfolio",
+     "category": "value",
+     "path": "items[0].client_name",
+     "expected": "Reference Dataset Client",
+     "actual": "Synthetic fixture"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.sort-priority-desc",
+     "route": "GET /api/v2/portfolio",
+     "category": "value",
+     "path": "items[0].client_name",
+     "expected": "Reference Dataset Client",
+     "actual": "Synthetic fixture"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.sort-identified",
+     "route": "GET /api/v2/portfolio",
+     "category": "value",
+     "path": "items[0].client_name",
+     "expected": "Reference Dataset Client",
+     "actual": "Synthetic fixture"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.sort-bogus",
+     "route": "GET /api/v2/portfolio",
+     "category": "value",
+     "path": "items[0].client_name",
+     "expected": "Reference Dataset Client",
+     "actual": "Synthetic fixture"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.order-bogus",
+     "route": "GET /api/v2/portfolio",
+     "category": "value",
+     "path": "items[0].client_name",
+     "expected": "Reference Dataset Client",
+     "actual": "Synthetic fixture"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.limit-0",
+     "route": "GET /api/v2/portfolio",
+     "category": "missing-field",
+     "path": "detail[0].ctx",
+     "expected": "{\"ge\":1}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.limit-0",
+     "route": "GET /api/v2/portfolio",
+     "category": "value",
+     "path": "detail[0].msg",
+     "expected": "Input should be greater than or equal to 1",
+     "actual": "Value violates minimum."
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.limit-0",
+     "route": "GET /api/v2/portfolio",
+     "category": "type",
+     "path": "detail[0].input",
+     "expected": "0",
+     "actual": "0"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.limit-1",
+     "route": "GET /api/v2/portfolio",
+     "category": "value",
+     "path": "items[0].client_name",
+     "expected": "Reference Dataset Client",
+     "actual": "Synthetic fixture"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.limit-over-max",
+     "route": "GET /api/v2/portfolio",
+     "category": "value",
+     "path": "items[0].client_name",
+     "expected": "Reference Dataset Client",
+     "actual": "Synthetic fixture"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.limit-neg",
+     "route": "GET /api/v2/portfolio",
+     "category": "missing-field",
+     "path": "detail[0].ctx",
+     "expected": "{\"ge\":1}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.limit-neg",
+     "route": "GET /api/v2/portfolio",
+     "category": "value",
+     "path": "detail[0].msg",
+     "expected": "Input should be greater than or equal to 1",
+     "actual": "Value violates minimum."
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.limit-neg",
+     "route": "GET /api/v2/portfolio",
+     "category": "type",
+     "path": "detail[0].input",
+     "expected": "-5",
+     "actual": "-5"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.offset-neg",
+     "route": "GET /api/v2/portfolio",
+     "category": "missing-field",
+     "path": "detail[0].ctx",
+     "expected": "{\"ge\":0}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.offset-neg",
+     "route": "GET /api/v2/portfolio",
+     "category": "value",
+     "path": "detail[0].msg",
+     "expected": "Input should be greater than or equal to 0",
+     "actual": "Value violates minimum."
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.offset-neg",
+     "route": "GET /api/v2/portfolio",
+     "category": "type",
+     "path": "detail[0].input",
+     "expected": "-1",
+     "actual": "-1"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.limit-abc",
+     "route": "GET /api/v2/portfolio",
+     "category": "value",
+     "path": "detail[0].msg",
+     "expected": "Input should be a valid integer, unable to parse string as an integer",
+     "actual": "Expected integer."
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.limit-float",
+     "route": "GET /api/v2/portfolio",
+     "category": "value",
+     "path": "detail[0].msg",
+     "expected": "Input should be a valid integer, unable to parse string as an integer",
+     "actual": "Expected integer."
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.limit-empty",
+     "route": "GET /api/v2/portfolio",
+     "category": "value",
+     "path": "detail[0].msg",
+     "expected": "Input should be a valid integer, unable to parse string as an integer",
+     "actual": "Expected integer."
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.repeated-limit",
+     "route": "GET /api/v2/portfolio",
+     "category": "value",
+     "path": "items[0].client_name",
+     "expected": "Reference Dataset Client",
+     "actual": "Synthetic fixture"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.near-bogus",
+     "route": "GET /api/v2/portfolio",
+     "category": "value",
+     "path": "detail[0].type",
+     "expected": "bool_parsing",
+     "actual": "boolean_type"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.near-bogus",
+     "route": "GET /api/v2/portfolio",
+     "category": "value",
+     "path": "detail[0].msg",
+     "expected": "Input should be a valid boolean, unable to interpret input",
+     "actual": "Expected boolean."
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.program",
+     "route": "GET /api/v2/portfolio",
+     "category": "value",
+     "path": "items[0].client_name",
+     "expected": "Reference Dataset Client",
+     "actual": "Synthetic fixture"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.program-unknown",
+     "route": "GET /api/v2/portfolio",
+     "category": "value",
+     "path": "items[0].client_name",
+     "expected": "Reference Dataset Client",
+     "actual": "Synthetic fixture"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.scope",
+     "route": "GET /api/v2/portfolio",
+     "category": "status",
+     "path": "status",
+     "expected": "500",
+     "actual": "422"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.scope",
+     "route": "GET /api/v2/portfolio",
+     "category": "header",
+     "path": "headers.content-type",
+     "expected": "text/plain; charset=utf-8",
+     "actual": "application/json"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.scope",
+     "route": "GET /api/v2/portfolio",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.scope",
+     "route": "GET /api/v2/portfolio",
+     "category": "body-kind",
+     "path": "body",
+     "expected": "text",
+     "actual": "json"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.outcome",
+     "route": "GET /api/v2/portfolio",
+     "category": "value",
+     "path": "items[0].client_name",
+     "expected": "Reference Dataset Client",
+     "actual": "Synthetic fixture"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.unicode-query",
+     "route": "GET /api/v2/portfolio",
+     "category": "value",
+     "path": "items[0].client_name",
+     "expected": "Reference Dataset Client",
+     "actual": "Synthetic fixture"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.long-query",
+     "route": "GET /api/v2/portfolio",
+     "category": "value",
+     "path": "items[0].client_name",
+     "expected": "Reference Dataset Client",
+     "actual": "Synthetic fixture"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.encoded-plus",
+     "route": "GET /api/v2/portfolio",
+     "category": "value",
+     "path": "items[0].client_name",
+     "expected": "Reference Dataset Client",
+     "actual": "Synthetic fixture"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.raw-query-dupe-keys",
+     "route": "GET /api/v2/portfolio",
+     "category": "value",
+     "path": "items[0].client_name",
+     "expected": "Reference Dataset Client",
+     "actual": "Synthetic fixture"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.limit-0",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "detail[0].ctx",
+     "expected": "{\"ge\":1}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.limit-0",
+     "route": "GET /api/eligibility/2025",
+     "category": "value",
+     "path": "detail[0].msg",
+     "expected": "Input should be greater than or equal to 1",
+     "actual": "Value violates minimum."
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.limit-0",
+     "route": "GET /api/eligibility/2025",
+     "category": "type",
+     "path": "detail[0].input",
+     "expected": "0",
+     "actual": "0"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.limit-1",
+     "route": "GET /api/eligibility/2025",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.limit-1",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "account_id",
+     "expected": "1001",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.limit-1",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "state",
+     "expected": "GA",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.limit-1",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "program_code",
+     "expected": "GA_JTC",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.limit-1",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "tax_year",
+     "expected": "2025",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.limit-1",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "thresholds",
+     "expected": "{\"program_code\":\"GA_JTC\",\"tax_year\":2025,\"minimum_average_weekly_hours\":35.0,\"minimum_average_weekly_wages_usd\":680.0,\"wage_table_year_basis\":\"source_tax_year\",\"regulation\":\"110-9-1-.02(1)(a) and 110-9-1-.03(3)(b)1\",\"source_tax_year\":2025,\"dol_report_year\":2024,\"lowest_wage_county\":\"Taliaferro\",\"ann...(385 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.limit-1",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "fiscal",
+     "expected": "{\"begin\":\"2025-01-01\",\"end\":\"2025-12-31\",\"tax_year\":2025,\"label_convention\":\"begins\",\"basis\":\"assumed_calendar\",\"assumed\":true,\"is_calendar\":true,\"convention_matters\":false,\"tax_year_if_labelled_by_end\":2025,\"tax_year_if_labelled_by_begin\":2025,\"note\":\"No fiscal-year rule on file for this client, so...(483 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.limit-1",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "calculation_state",
+     "expected": "calculated",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.limit-1",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "run",
+     "expected": "{\"run_id\":\"40000000000040008000000000000001\",\"client_id\":1001,\"program_code\":\"GA_JTC\",\"tax_year\":2025,\"fiscal_year_begin\":\"2025-01-01\",\"fiscal_year_end\":\"2025-12-31\",\"step1_assumption_set_id\":\"GDS-STEP1-2026-08-25-v8\",\"onezero_assumption_set_id\":\"GDS-ONEZERO-2026-08-24-v7\",\"rule_pack_version\":\"rules...(614 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.limit-1",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "statute_matches_run",
+     "expected": "{\"matches\":true,\"verdict_disagreements\":0,\"resolved_rule_pack_source\":\"rules/ga_jtc/2025.json\"}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.limit-1",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "employees_evaluated",
+     "expected": "107",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.limit-1",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "min_max_eligible",
+     "expected": "77",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.limit-1",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "pay_period_eligible",
+     "expected": "72",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.limit-1",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "near_floor",
+     "expected": "11",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.limit-1",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "eligible_either_method",
+     "expected": "77",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.limit-1",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "reconciliation",
+     "expected": "{\"eligible_both\":72,\"min_max_only\":5,\"pay_period_only\":0,\"neither\":30}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.limit-1",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "total",
+     "expected": "107",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.limit-1",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "rows",
+     "expected": "[{\"record_token\":\"e623861c8254e94d6b17b7ce\",\"employee_id\":\"E00002\",\"status\":\"both\",\"near_floor\":false,\"totals\":{\"hours\":1948.77,\"wages\":65874.98},\"min_max\":{\"weeks\":50.86,\"avg_hours\":38.32,\"avg_wages\":1295.29,\"passed_hours\":true,\"passed_wages\":true,\"eligible\":true},\"pay_period\":{\"weeks\":52.0,\"avg_ho...(389 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.limit-1",
+     "route": "GET /api/eligibility/2025",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/eligibility/{tax_year}"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.offset-past-end",
+     "route": "GET /api/eligibility/2025",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.offset-past-end",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "account_id",
+     "expected": "1001",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.offset-past-end",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "state",
+     "expected": "GA",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.offset-past-end",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "program_code",
+     "expected": "GA_JTC",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.offset-past-end",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "tax_year",
+     "expected": "2025",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.offset-past-end",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "thresholds",
+     "expected": "{\"program_code\":\"GA_JTC\",\"tax_year\":2025,\"minimum_average_weekly_hours\":35.0,\"minimum_average_weekly_wages_usd\":680.0,\"wage_table_year_basis\":\"source_tax_year\",\"regulation\":\"110-9-1-.02(1)(a) and 110-9-1-.03(3)(b)1\",\"source_tax_year\":2025,\"dol_report_year\":2024,\"lowest_wage_county\":\"Taliaferro\",\"ann...(385 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.offset-past-end",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "fiscal",
+     "expected": "{\"begin\":\"2025-01-01\",\"end\":\"2025-12-31\",\"tax_year\":2025,\"label_convention\":\"begins\",\"basis\":\"assumed_calendar\",\"assumed\":true,\"is_calendar\":true,\"convention_matters\":false,\"tax_year_if_labelled_by_end\":2025,\"tax_year_if_labelled_by_begin\":2025,\"note\":\"No fiscal-year rule on file for this client, so...(483 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.offset-past-end",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "calculation_state",
+     "expected": "calculated",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.offset-past-end",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "run",
+     "expected": "{\"run_id\":\"40000000000040008000000000000001\",\"client_id\":1001,\"program_code\":\"GA_JTC\",\"tax_year\":2025,\"fiscal_year_begin\":\"2025-01-01\",\"fiscal_year_end\":\"2025-12-31\",\"step1_assumption_set_id\":\"GDS-STEP1-2026-08-25-v8\",\"onezero_assumption_set_id\":\"GDS-ONEZERO-2026-08-24-v7\",\"rule_pack_version\":\"rules...(614 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.offset-past-end",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "statute_matches_run",
+     "expected": "{\"matches\":true,\"verdict_disagreements\":0,\"resolved_rule_pack_source\":\"rules/ga_jtc/2025.json\"}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.offset-past-end",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "employees_evaluated",
+     "expected": "107",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.offset-past-end",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "min_max_eligible",
+     "expected": "77",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.offset-past-end",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "pay_period_eligible",
+     "expected": "72",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.offset-past-end",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "near_floor",
+     "expected": "11",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.offset-past-end",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "eligible_either_method",
+     "expected": "77",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.offset-past-end",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "reconciliation",
+     "expected": "{\"eligible_both\":72,\"min_max_only\":5,\"pay_period_only\":0,\"neither\":30}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.offset-past-end",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "total",
+     "expected": "107",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.offset-past-end",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "rows",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.offset-past-end",
+     "route": "GET /api/eligibility/2025",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/eligibility/{tax_year}"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.limit-over-max",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "detail[0].ctx",
+     "expected": "{\"le\":500}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.limit-over-max",
+     "route": "GET /api/eligibility/2025",
+     "category": "value",
+     "path": "detail[0].msg",
+     "expected": "Input should be less than or equal to 500",
+     "actual": "Value violates maximum."
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.limit-over-max",
+     "route": "GET /api/eligibility/2025",
+     "category": "type",
+     "path": "detail[0].input",
+     "expected": "1000000",
+     "actual": "1000000"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.sort-employee-desc",
+     "route": "GET /api/eligibility/2025",
+     "category": "status",
+     "path": "status",
+     "expected": "422",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.sort-employee-desc",
+     "route": "GET /api/eligibility/2025",
+     "category": "value",
+     "path": "detail",
+     "expected": "sort must be one of ('employee_id', 'status', 'near_floor', 'total_hours', 'total_wages', 'mm_weeks', 'mm_hours', 'pp_weeks', 'pp_hours'), got 'employee'",
+     "actual": "Operation not implemented: GET /api/eligibility/{tax_year}"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.q-unicode",
+     "route": "GET /api/eligibility/2025",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.q-unicode",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "account_id",
+     "expected": "1001",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.q-unicode",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "state",
+     "expected": "GA",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.q-unicode",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "program_code",
+     "expected": "GA_JTC",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.q-unicode",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "tax_year",
+     "expected": "2025",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.q-unicode",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "thresholds",
+     "expected": "{\"program_code\":\"GA_JTC\",\"tax_year\":2025,\"minimum_average_weekly_hours\":35.0,\"minimum_average_weekly_wages_usd\":680.0,\"wage_table_year_basis\":\"source_tax_year\",\"regulation\":\"110-9-1-.02(1)(a) and 110-9-1-.03(3)(b)1\",\"source_tax_year\":2025,\"dol_report_year\":2024,\"lowest_wage_county\":\"Taliaferro\",\"ann...(385 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.q-unicode",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "fiscal",
+     "expected": "{\"begin\":\"2025-01-01\",\"end\":\"2025-12-31\",\"tax_year\":2025,\"label_convention\":\"begins\",\"basis\":\"assumed_calendar\",\"assumed\":true,\"is_calendar\":true,\"convention_matters\":false,\"tax_year_if_labelled_by_end\":2025,\"tax_year_if_labelled_by_begin\":2025,\"note\":\"No fiscal-year rule on file for this client, so...(483 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.q-unicode",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "calculation_state",
+     "expected": "calculated",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.q-unicode",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "run",
+     "expected": "{\"run_id\":\"40000000000040008000000000000001\",\"client_id\":1001,\"program_code\":\"GA_JTC\",\"tax_year\":2025,\"fiscal_year_begin\":\"2025-01-01\",\"fiscal_year_end\":\"2025-12-31\",\"step1_assumption_set_id\":\"GDS-STEP1-2026-08-25-v8\",\"onezero_assumption_set_id\":\"GDS-ONEZERO-2026-08-24-v7\",\"rule_pack_version\":\"rules...(614 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.q-unicode",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "statute_matches_run",
+     "expected": "{\"matches\":true,\"verdict_disagreements\":0,\"resolved_rule_pack_source\":\"rules/ga_jtc/2025.json\"}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.q-unicode",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "employees_evaluated",
+     "expected": "107",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.q-unicode",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "min_max_eligible",
+     "expected": "77",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.q-unicode",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "pay_period_eligible",
+     "expected": "72",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.q-unicode",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "near_floor",
+     "expected": "11",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.q-unicode",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "eligible_either_method",
+     "expected": "77",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.q-unicode",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "reconciliation",
+     "expected": "{\"eligible_both\":72,\"min_max_only\":5,\"pay_period_only\":0,\"neither\":30}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.q-unicode",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "total",
+     "expected": "0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.q-unicode",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "rows",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.q-unicode",
+     "route": "GET /api/eligibility/2025",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/eligibility/{tax_year}"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.status-both",
+     "route": "GET /api/eligibility/2025",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.status-both",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "account_id",
+     "expected": "1001",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.status-both",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "state",
+     "expected": "GA",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.status-both",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "program_code",
+     "expected": "GA_JTC",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.status-both",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "tax_year",
+     "expected": "2025",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.status-both",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "thresholds",
+     "expected": "{\"program_code\":\"GA_JTC\",\"tax_year\":2025,\"minimum_average_weekly_hours\":35.0,\"minimum_average_weekly_wages_usd\":680.0,\"wage_table_year_basis\":\"source_tax_year\",\"regulation\":\"110-9-1-.02(1)(a) and 110-9-1-.03(3)(b)1\",\"source_tax_year\":2025,\"dol_report_year\":2024,\"lowest_wage_county\":\"Taliaferro\",\"ann...(385 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.status-both",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "fiscal",
+     "expected": "{\"begin\":\"2025-01-01\",\"end\":\"2025-12-31\",\"tax_year\":2025,\"label_convention\":\"begins\",\"basis\":\"assumed_calendar\",\"assumed\":true,\"is_calendar\":true,\"convention_matters\":false,\"tax_year_if_labelled_by_end\":2025,\"tax_year_if_labelled_by_begin\":2025,\"note\":\"No fiscal-year rule on file for this client, so...(483 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.status-both",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "calculation_state",
+     "expected": "calculated",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.status-both",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "run",
+     "expected": "{\"run_id\":\"40000000000040008000000000000001\",\"client_id\":1001,\"program_code\":\"GA_JTC\",\"tax_year\":2025,\"fiscal_year_begin\":\"2025-01-01\",\"fiscal_year_end\":\"2025-12-31\",\"step1_assumption_set_id\":\"GDS-STEP1-2026-08-25-v8\",\"onezero_assumption_set_id\":\"GDS-ONEZERO-2026-08-24-v7\",\"rule_pack_version\":\"rules...(614 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.status-both",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "statute_matches_run",
+     "expected": "{\"matches\":true,\"verdict_disagreements\":0,\"resolved_rule_pack_source\":\"rules/ga_jtc/2025.json\"}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.status-both",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "employees_evaluated",
+     "expected": "107",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.status-both",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "min_max_eligible",
+     "expected": "77",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.status-both",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "pay_period_eligible",
+     "expected": "72",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.status-both",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "near_floor",
+     "expected": "11",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.status-both",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "eligible_either_method",
+     "expected": "77",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.status-both",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "reconciliation",
+     "expected": "{\"eligible_both\":72,\"min_max_only\":5,\"pay_period_only\":0,\"neither\":30}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.status-both",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "total",
+     "expected": "72",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.status-both",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "rows",
+     "expected": "[{\"record_token\":\"0ad59c7b10f410528bd5a1d1\",\"employee_id\":\"E00001\",\"status\":\"both\",\"near_floor\":false,\"totals\":{\"hours\":2004.86,\"wages\":56748.14},\"min_max\":{\"weeks\":51.86,\"avg_hours\":38.66,\"avg_wages\":1094.32,\"passed_hours\":true,\"passed_wages\":true,\"eligible\":true},\"pay_period\":{\"weeks\":52.0,\"avg_ho...(19378 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.status-both",
+     "route": "GET /api/eligibility/2025",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/eligibility/{tax_year}"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.near-floor",
+     "route": "GET /api/eligibility/2025",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.near-floor",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "account_id",
+     "expected": "1001",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.near-floor",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "state",
+     "expected": "GA",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.near-floor",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "program_code",
+     "expected": "GA_JTC",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.near-floor",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "tax_year",
+     "expected": "2025",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.near-floor",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "thresholds",
+     "expected": "{\"program_code\":\"GA_JTC\",\"tax_year\":2025,\"minimum_average_weekly_hours\":35.0,\"minimum_average_weekly_wages_usd\":680.0,\"wage_table_year_basis\":\"source_tax_year\",\"regulation\":\"110-9-1-.02(1)(a) and 110-9-1-.03(3)(b)1\",\"source_tax_year\":2025,\"dol_report_year\":2024,\"lowest_wage_county\":\"Taliaferro\",\"ann...(385 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.near-floor",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "fiscal",
+     "expected": "{\"begin\":\"2025-01-01\",\"end\":\"2025-12-31\",\"tax_year\":2025,\"label_convention\":\"begins\",\"basis\":\"assumed_calendar\",\"assumed\":true,\"is_calendar\":true,\"convention_matters\":false,\"tax_year_if_labelled_by_end\":2025,\"tax_year_if_labelled_by_begin\":2025,\"note\":\"No fiscal-year rule on file for this client, so...(483 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.near-floor",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "calculation_state",
+     "expected": "calculated",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.near-floor",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "run",
+     "expected": "{\"run_id\":\"40000000000040008000000000000001\",\"client_id\":1001,\"program_code\":\"GA_JTC\",\"tax_year\":2025,\"fiscal_year_begin\":\"2025-01-01\",\"fiscal_year_end\":\"2025-12-31\",\"step1_assumption_set_id\":\"GDS-STEP1-2026-08-25-v8\",\"onezero_assumption_set_id\":\"GDS-ONEZERO-2026-08-24-v7\",\"rule_pack_version\":\"rules...(614 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.near-floor",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "statute_matches_run",
+     "expected": "{\"matches\":true,\"verdict_disagreements\":0,\"resolved_rule_pack_source\":\"rules/ga_jtc/2025.json\"}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.near-floor",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "employees_evaluated",
+     "expected": "107",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.near-floor",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "min_max_eligible",
+     "expected": "77",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.near-floor",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "pay_period_eligible",
+     "expected": "72",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.near-floor",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "near_floor",
+     "expected": "11",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.near-floor",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "eligible_either_method",
+     "expected": "77",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.near-floor",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "reconciliation",
+     "expected": "{\"eligible_both\":72,\"min_max_only\":5,\"pay_period_only\":0,\"neither\":30}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.near-floor",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "total",
+     "expected": "11",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.near-floor",
+     "route": "GET /api/eligibility/2025",
+     "category": "missing-field",
+     "path": "rows",
+     "expected": "[{\"record_token\":\"ffbd9e314fa15f19bdb0a804\",\"employee_id\":\"E00004\",\"status\":\"min_max_only\",\"near_floor\":true,\"totals\":{\"hours\":1816.78,\"wages\":51900.52},\"min_max\":{\"weeks\":51.86,\"avg_hours\":35.03,\"avg_wages\":1000.84,\"passed_hours\":true,\"passed_wages\":true,\"eligible\":true},\"pay_period\":{\"weeks\":52.0,...(4323 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "eligibility.near-floor",
+     "route": "GET /api/eligibility/2025",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/eligibility/{tax_year}"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.limit-1",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.limit-1",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "calculation_state",
+     "expected": "calculated",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.limit-1",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "run",
+     "expected": "{\"run_id\":\"40000000000040008000000000000001\",\"produced_at\":\"2026-01-15 12:00:00\",\"started_at\":\"2026-01-15 12:00:00\",\"calculation_id\":\"9e9a9edc79a44dce8ea0d3be5147883b87a1298e2ccf5619947c8e40d3cbf0cd\",\"code_commit\":\"0000000000000000000000000000000000c0ffee\",\"rule_pack_version\":\"rules/ga_jtc/2025.json...(473 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.limit-1",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "newer_run_in_flight",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.limit-1",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "in_flight",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.limit-1",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "message",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.limit-1",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "client_id",
+     "expected": "1001",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.limit-1",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "state",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.limit-1",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "year",
+     "expected": "2025",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.limit-1",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "method",
+     "expected": "min_max",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.limit-1",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "month_filter",
+     "expected": "{\"month_index\":null}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.limit-1",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "filters_applied",
+     "expected": "{}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.limit-1",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "near_filters_applied",
+     "expected": "{}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.limit-1",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "unit",
+     "expected": "{\"client_id\":1001,\"worksite_id\":\"GA_ATL_HQ\",\"entity_fein\":\"58-1234567\",\"program_code\":\"GA_JTC\",\"method\":\"min_max\",\"tax_year\":2025,\"average_headcount\":17.25,\"is_base_year\":false,\"base_average_headcount\":9.17,\"base_year_source\":\"inferred\",\"net_new_vs_base\":8.08,\"months_reachable\":11,\"year_complete\":tr...(808 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.limit-1",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "months",
+     "expected": "{\"client_id\":1001,\"tax_year\":2025,\"method\":\"min_max\",\"run_id\":\"40000000000040008000000000000001\",\"worksite_id\":\"GA_ATL_HQ\",\"month_01\":17.0,\"month_02\":17.0,\"month_03\":19.0,\"month_04\":19.0,\"month_05\":18.0,\"month_06\":18.0,\"month_07\":18.0,\"month_08\":18.0,\"month_09\":18.0,\"month_10\":18.0,\"month_11\":18.0,\"...(407 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.limit-1",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "employees",
+     "expected": "[{\"employee_id\":\"E00048\",\"record_token\":\"e75b41d8333131b91396d9e5\",\"worksite_id\":\"GA_ATL_HQ\",\"entity_fein\":\"58-1234567\",\"first_pps\":\"2024-12-23\",\"last_ppe\":\"2025-05-04\",\"weight\":1.0,\"month_01\":1.0,\"month_02\":1.0,\"month_03\":1.0,\"month_04\":1.0,\"month_05\":0.0,\"month_06\":0.0,\"month_07\":0.0,\"month_08\":0....(531 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.limit-1",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "near_threshold",
+     "expected": "[{\"employee_id\":\"E00067\",\"record_token\":\"8ba8e33f494280f845e7fe52\",\"avg_weekly_hours\":34.76,\"avg_weekly_wages\":1742.6,\"weeks_worked\":51.86,\"total_hours\":1802.8,\"total_wages\":90366.21,\"first_start\":\"2024-12-23\",\"last_end\":\"2025-12-21\",\"additional_weekly_hours\":0.24,\"projected_weekly_hours\":35.0,\"exce...(673 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.limit-1",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "thresholds",
+     "expected": "{\"min_weekly_hours\":35.0,\"min_weekly_wages\":680.0,\"resolved\":true}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.limit-1",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "total",
+     "expected": "1",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.limit-1",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "total_unfiltered",
+     "expected": "1",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.limit-1",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "near_total_unfiltered",
+     "expected": "1",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.limit-1",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/v2/clients/{client_id}/units/{unit_id}"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.offset-past-end",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.offset-past-end",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "calculation_state",
+     "expected": "calculated",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.offset-past-end",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "run",
+     "expected": "{\"run_id\":\"40000000000040008000000000000001\",\"produced_at\":\"2026-01-15 12:00:00\",\"started_at\":\"2026-01-15 12:00:00\",\"calculation_id\":\"9e9a9edc79a44dce8ea0d3be5147883b87a1298e2ccf5619947c8e40d3cbf0cd\",\"code_commit\":\"0000000000000000000000000000000000c0ffee\",\"rule_pack_version\":\"rules/ga_jtc/2025.json...(473 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.offset-past-end",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "newer_run_in_flight",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.offset-past-end",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "in_flight",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.offset-past-end",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "message",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.offset-past-end",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "client_id",
+     "expected": "1001",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.offset-past-end",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "state",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.offset-past-end",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "year",
+     "expected": "2025",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.offset-past-end",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "method",
+     "expected": "min_max",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.offset-past-end",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "month_filter",
+     "expected": "{\"month_index\":null}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.offset-past-end",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "filters_applied",
+     "expected": "{}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.offset-past-end",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "near_filters_applied",
+     "expected": "{}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.offset-past-end",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "unit",
+     "expected": "{\"client_id\":1001,\"worksite_id\":\"GA_ATL_HQ\",\"entity_fein\":\"58-1234567\",\"program_code\":\"GA_JTC\",\"method\":\"min_max\",\"tax_year\":2025,\"average_headcount\":17.25,\"is_base_year\":false,\"base_average_headcount\":9.17,\"base_year_source\":\"inferred\",\"net_new_vs_base\":8.08,\"months_reachable\":11,\"year_complete\":tr...(808 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.offset-past-end",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "months",
+     "expected": "{\"client_id\":1001,\"tax_year\":2025,\"method\":\"min_max\",\"run_id\":\"40000000000040008000000000000001\",\"worksite_id\":\"GA_ATL_HQ\",\"month_01\":17.0,\"month_02\":17.0,\"month_03\":19.0,\"month_04\":19.0,\"month_05\":18.0,\"month_06\":18.0,\"month_07\":18.0,\"month_08\":18.0,\"month_09\":18.0,\"month_10\":18.0,\"month_11\":18.0,\"...(407 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.offset-past-end",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "employees",
+     "expected": "[{\"employee_id\":\"E00048\",\"record_token\":\"e75b41d8333131b91396d9e5\",\"worksite_id\":\"GA_ATL_HQ\",\"entity_fein\":\"58-1234567\",\"first_pps\":\"2024-12-23\",\"last_ppe\":\"2025-05-04\",\"weight\":1.0,\"month_01\":1.0,\"month_02\":1.0,\"month_03\":1.0,\"month_04\":1.0,\"month_05\":0.0,\"month_06\":0.0,\"month_07\":0.0,\"month_08\":0....(11141 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.offset-past-end",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "near_threshold",
+     "expected": "[{\"employee_id\":\"E00067\",\"record_token\":\"8ba8e33f494280f845e7fe52\",\"avg_weekly_hours\":34.76,\"avg_weekly_wages\":1742.6,\"weeks_worked\":51.86,\"total_hours\":1802.8,\"total_wages\":90366.21,\"first_start\":\"2024-12-23\",\"last_end\":\"2025-12-21\",\"additional_weekly_hours\":0.24,\"projected_weekly_hours\":35.0,\"exce...(9195 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.offset-past-end",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "thresholds",
+     "expected": "{\"min_weekly_hours\":35.0,\"min_weekly_wages\":680.0,\"resolved\":true}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.offset-past-end",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "total",
+     "expected": "21",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.offset-past-end",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "total_unfiltered",
+     "expected": "21",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.offset-past-end",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "near_total_unfiltered",
+     "expected": "10",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.offset-past-end",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/v2/clients/{client_id}/units/{unit_id}"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.sort-bogus",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "status",
+     "path": "status",
+     "expected": "422",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.sort-bogus",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "value",
+     "path": "detail",
+     "expected": "sort must be one of avg_weekly_hours, avg_weekly_wages, employee_id, total_hours, weeks_worked",
+     "actual": "Operation not implemented: GET /api/v2/clients/{client_id}/units/{unit_id}"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.filter-bad",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.filter-bad",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "calculation_state",
+     "expected": "calculated",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.filter-bad",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "run",
+     "expected": "{\"run_id\":\"40000000000040008000000000000001\",\"produced_at\":\"2026-01-15 12:00:00\",\"started_at\":\"2026-01-15 12:00:00\",\"calculation_id\":\"9e9a9edc79a44dce8ea0d3be5147883b87a1298e2ccf5619947c8e40d3cbf0cd\",\"code_commit\":\"0000000000000000000000000000000000c0ffee\",\"rule_pack_version\":\"rules/ga_jtc/2025.json...(473 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.filter-bad",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "newer_run_in_flight",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.filter-bad",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "in_flight",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.filter-bad",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "message",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.filter-bad",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "client_id",
+     "expected": "1001",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.filter-bad",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "state",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.filter-bad",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "year",
+     "expected": "2025",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.filter-bad",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "method",
+     "expected": "min_max",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.filter-bad",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "month_filter",
+     "expected": "{\"month_index\":null}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.filter-bad",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "filters_applied",
+     "expected": "{}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.filter-bad",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "near_filters_applied",
+     "expected": "{}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.filter-bad",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "unit",
+     "expected": "{\"client_id\":1001,\"worksite_id\":\"GA_ATL_HQ\",\"entity_fein\":\"58-1234567\",\"program_code\":\"GA_JTC\",\"method\":\"min_max\",\"tax_year\":2025,\"average_headcount\":17.25,\"is_base_year\":false,\"base_average_headcount\":9.17,\"base_year_source\":\"inferred\",\"net_new_vs_base\":8.08,\"months_reachable\":11,\"year_complete\":tr...(808 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.filter-bad",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "months",
+     "expected": "{\"client_id\":1001,\"tax_year\":2025,\"method\":\"min_max\",\"run_id\":\"40000000000040008000000000000001\",\"worksite_id\":\"GA_ATL_HQ\",\"month_01\":17.0,\"month_02\":17.0,\"month_03\":19.0,\"month_04\":19.0,\"month_05\":18.0,\"month_06\":18.0,\"month_07\":18.0,\"month_08\":18.0,\"month_09\":18.0,\"month_10\":18.0,\"month_11\":18.0,\"...(407 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.filter-bad",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "employees",
+     "expected": "[{\"employee_id\":\"E00048\",\"record_token\":\"e75b41d8333131b91396d9e5\",\"worksite_id\":\"GA_ATL_HQ\",\"entity_fein\":\"58-1234567\",\"first_pps\":\"2024-12-23\",\"last_ppe\":\"2025-05-04\",\"weight\":1.0,\"month_01\":1.0,\"month_02\":1.0,\"month_03\":1.0,\"month_04\":1.0,\"month_05\":0.0,\"month_06\":0.0,\"month_07\":0.0,\"month_08\":0....(11141 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.filter-bad",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "near_threshold",
+     "expected": "[{\"employee_id\":\"E00067\",\"record_token\":\"8ba8e33f494280f845e7fe52\",\"avg_weekly_hours\":34.76,\"avg_weekly_wages\":1742.6,\"weeks_worked\":51.86,\"total_hours\":1802.8,\"total_wages\":90366.21,\"first_start\":\"2024-12-23\",\"last_end\":\"2025-12-21\",\"additional_weekly_hours\":0.24,\"projected_weekly_hours\":35.0,\"exce...(9195 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.filter-bad",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "thresholds",
+     "expected": "{\"min_weekly_hours\":35.0,\"min_weekly_wages\":680.0,\"resolved\":true}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.filter-bad",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "total",
+     "expected": "21",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.filter-bad",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "total_unfiltered",
+     "expected": "21",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.filter-bad",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "near_total_unfiltered",
+     "expected": "10",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.filter-bad",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/v2/clients/{client_id}/units/{unit_id}"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.filter-good",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.filter-good",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "calculation_state",
+     "expected": "calculated",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.filter-good",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "run",
+     "expected": "{\"run_id\":\"40000000000040008000000000000001\",\"produced_at\":\"2026-01-15 12:00:00\",\"started_at\":\"2026-01-15 12:00:00\",\"calculation_id\":\"9e9a9edc79a44dce8ea0d3be5147883b87a1298e2ccf5619947c8e40d3cbf0cd\",\"code_commit\":\"0000000000000000000000000000000000c0ffee\",\"rule_pack_version\":\"rules/ga_jtc/2025.json...(473 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.filter-good",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "newer_run_in_flight",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.filter-good",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "in_flight",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.filter-good",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "message",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.filter-good",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "client_id",
+     "expected": "1001",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.filter-good",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "state",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.filter-good",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "year",
+     "expected": "2025",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.filter-good",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "method",
+     "expected": "min_max",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.filter-good",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "month_filter",
+     "expected": "{\"month_index\":null}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.filter-good",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "filters_applied",
+     "expected": "{\"avg_weekly_hours\":\">=30\"}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.filter-good",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "near_filters_applied",
+     "expected": "{}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.filter-good",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "unit",
+     "expected": "{\"client_id\":1001,\"worksite_id\":\"GA_ATL_HQ\",\"entity_fein\":\"58-1234567\",\"program_code\":\"GA_JTC\",\"method\":\"min_max\",\"tax_year\":2025,\"average_headcount\":17.25,\"is_base_year\":false,\"base_average_headcount\":9.17,\"base_year_source\":\"inferred\",\"net_new_vs_base\":8.08,\"months_reachable\":11,\"year_complete\":tr...(808 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.filter-good",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "months",
+     "expected": "{\"client_id\":1001,\"tax_year\":2025,\"method\":\"min_max\",\"run_id\":\"40000000000040008000000000000001\",\"worksite_id\":\"GA_ATL_HQ\",\"month_01\":17.0,\"month_02\":17.0,\"month_03\":19.0,\"month_04\":19.0,\"month_05\":18.0,\"month_06\":18.0,\"month_07\":18.0,\"month_08\":18.0,\"month_09\":18.0,\"month_10\":18.0,\"month_11\":18.0,\"...(407 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.filter-good",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "employees",
+     "expected": "[{\"employee_id\":\"E00048\",\"record_token\":\"e75b41d8333131b91396d9e5\",\"worksite_id\":\"GA_ATL_HQ\",\"entity_fein\":\"58-1234567\",\"first_pps\":\"2024-12-23\",\"last_ppe\":\"2025-05-04\",\"weight\":1.0,\"month_01\":1.0,\"month_02\":1.0,\"month_03\":1.0,\"month_04\":1.0,\"month_05\":0.0,\"month_06\":0.0,\"month_07\":0.0,\"month_08\":0....(11141 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.filter-good",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "near_threshold",
+     "expected": "[{\"employee_id\":\"E00067\",\"record_token\":\"8ba8e33f494280f845e7fe52\",\"avg_weekly_hours\":34.76,\"avg_weekly_wages\":1742.6,\"weeks_worked\":51.86,\"total_hours\":1802.8,\"total_wages\":90366.21,\"first_start\":\"2024-12-23\",\"last_end\":\"2025-12-21\",\"additional_weekly_hours\":0.24,\"projected_weekly_hours\":35.0,\"exce...(9195 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.filter-good",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "thresholds",
+     "expected": "{\"min_weekly_hours\":35.0,\"min_weekly_wages\":680.0,\"resolved\":true}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.filter-good",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "total",
+     "expected": "21",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.filter-good",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "total_unfiltered",
+     "expected": "21",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.filter-good",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "near_total_unfiltered",
+     "expected": "10",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.filter-good",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/v2/clients/{client_id}/units/{unit_id}"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.month-0",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "status",
+     "path": "status",
+     "expected": "422",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.month-0",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "value",
+     "path": "detail",
+     "expected": "month must be between 1 and 12",
+     "actual": "Operation not implemented: GET /api/v2/clients/{client_id}/units/{unit_id}"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.month-13",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "status",
+     "path": "status",
+     "expected": "422",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.month-13",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "value",
+     "path": "detail",
+     "expected": "month must be between 1 and 12",
+     "actual": "Operation not implemented: GET /api/v2/clients/{client_id}/units/{unit_id}"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.month-3",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.month-3",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "calculation_state",
+     "expected": "calculated",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.month-3",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "run",
+     "expected": "{\"run_id\":\"40000000000040008000000000000001\",\"produced_at\":\"2026-01-15 12:00:00\",\"started_at\":\"2026-01-15 12:00:00\",\"calculation_id\":\"9e9a9edc79a44dce8ea0d3be5147883b87a1298e2ccf5619947c8e40d3cbf0cd\",\"code_commit\":\"0000000000000000000000000000000000c0ffee\",\"rule_pack_version\":\"rules/ga_jtc/2025.json...(473 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.month-3",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "newer_run_in_flight",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.month-3",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "in_flight",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.month-3",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "message",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.month-3",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "client_id",
+     "expected": "1001",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.month-3",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "state",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.month-3",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "year",
+     "expected": "2025",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.month-3",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "method",
+     "expected": "min_max",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.month-3",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "month_filter",
+     "expected": "{\"month_index\":3}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.month-3",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "filters_applied",
+     "expected": "{}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.month-3",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "near_filters_applied",
+     "expected": "{}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.month-3",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "unit",
+     "expected": "{\"client_id\":1001,\"worksite_id\":\"GA_ATL_HQ\",\"entity_fein\":\"58-1234567\",\"program_code\":\"GA_JTC\",\"method\":\"min_max\",\"tax_year\":2025,\"average_headcount\":17.25,\"is_base_year\":false,\"base_average_headcount\":9.17,\"base_year_source\":\"inferred\",\"net_new_vs_base\":8.08,\"months_reachable\":11,\"year_complete\":tr...(808 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.month-3",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "months",
+     "expected": "{\"client_id\":1001,\"tax_year\":2025,\"method\":\"min_max\",\"run_id\":\"40000000000040008000000000000001\",\"worksite_id\":\"GA_ATL_HQ\",\"month_01\":17.0,\"month_02\":17.0,\"month_03\":19.0,\"month_04\":19.0,\"month_05\":18.0,\"month_06\":18.0,\"month_07\":18.0,\"month_08\":18.0,\"month_09\":18.0,\"month_10\":18.0,\"month_11\":18.0,\"...(407 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.month-3",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "employees",
+     "expected": "[{\"employee_id\":\"E00048\",\"record_token\":\"e75b41d8333131b91396d9e5\",\"worksite_id\":\"GA_ATL_HQ\",\"entity_fein\":\"58-1234567\",\"first_pps\":\"2024-12-23\",\"last_ppe\":\"2025-05-04\",\"weight\":1.0,\"month_01\":1.0,\"month_02\":1.0,\"month_03\":1.0,\"month_04\":1.0,\"month_05\":0.0,\"month_06\":0.0,\"month_07\":0.0,\"month_08\":0....(10084 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.month-3",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "near_threshold",
+     "expected": "[{\"employee_id\":\"E00067\",\"record_token\":\"8ba8e33f494280f845e7fe52\",\"avg_weekly_hours\":34.76,\"avg_weekly_wages\":1742.6,\"weeks_worked\":51.86,\"total_hours\":1802.8,\"total_wages\":90366.21,\"first_start\":\"2024-12-23\",\"last_end\":\"2025-12-21\",\"additional_weekly_hours\":0.24,\"projected_weekly_hours\":35.0,\"exce...(9195 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.month-3",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "thresholds",
+     "expected": "{\"min_weekly_hours\":35.0,\"min_weekly_wages\":680.0,\"resolved\":true}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.month-3",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "total",
+     "expected": "19",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.month-3",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "total_unfiltered",
+     "expected": "19",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.month-3",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "near_total_unfiltered",
+     "expected": "10",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.month-3",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/v2/clients/{client_id}/units/{unit_id}"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.near-min-hours",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.near-min-hours",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "calculation_state",
+     "expected": "calculated",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.near-min-hours",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "run",
+     "expected": "{\"run_id\":\"40000000000040008000000000000001\",\"produced_at\":\"2026-01-15 12:00:00\",\"started_at\":\"2026-01-15 12:00:00\",\"calculation_id\":\"9e9a9edc79a44dce8ea0d3be5147883b87a1298e2ccf5619947c8e40d3cbf0cd\",\"code_commit\":\"0000000000000000000000000000000000c0ffee\",\"rule_pack_version\":\"rules/ga_jtc/2025.json...(473 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.near-min-hours",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "newer_run_in_flight",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.near-min-hours",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "in_flight",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.near-min-hours",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "message",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.near-min-hours",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "client_id",
+     "expected": "1001",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.near-min-hours",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "state",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.near-min-hours",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "year",
+     "expected": "2025",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.near-min-hours",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "method",
+     "expected": "min_max",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.near-min-hours",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "month_filter",
+     "expected": "{\"month_index\":null}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.near-min-hours",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "filters_applied",
+     "expected": "{}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.near-min-hours",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "near_filters_applied",
+     "expected": "{}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.near-min-hours",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "unit",
+     "expected": "{\"client_id\":1001,\"worksite_id\":\"GA_ATL_HQ\",\"entity_fein\":\"58-1234567\",\"program_code\":\"GA_JTC\",\"method\":\"min_max\",\"tax_year\":2025,\"average_headcount\":17.25,\"is_base_year\":false,\"base_average_headcount\":9.17,\"base_year_source\":\"inferred\",\"net_new_vs_base\":8.08,\"months_reachable\":11,\"year_complete\":tr...(808 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.near-min-hours",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "months",
+     "expected": "{\"client_id\":1001,\"tax_year\":2025,\"method\":\"min_max\",\"run_id\":\"40000000000040008000000000000001\",\"worksite_id\":\"GA_ATL_HQ\",\"month_01\":17.0,\"month_02\":17.0,\"month_03\":19.0,\"month_04\":19.0,\"month_05\":18.0,\"month_06\":18.0,\"month_07\":18.0,\"month_08\":18.0,\"month_09\":18.0,\"month_10\":18.0,\"month_11\":18.0,\"...(407 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.near-min-hours",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "employees",
+     "expected": "[{\"employee_id\":\"E00048\",\"record_token\":\"e75b41d8333131b91396d9e5\",\"worksite_id\":\"GA_ATL_HQ\",\"entity_fein\":\"58-1234567\",\"first_pps\":\"2024-12-23\",\"last_ppe\":\"2025-05-04\",\"weight\":1.0,\"month_01\":1.0,\"month_02\":1.0,\"month_03\":1.0,\"month_04\":1.0,\"month_05\":0.0,\"month_06\":0.0,\"month_07\":0.0,\"month_08\":0....(11141 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.near-min-hours",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "near_threshold",
+     "expected": "[{\"employee_id\":\"E00067\",\"record_token\":\"8ba8e33f494280f845e7fe52\",\"avg_weekly_hours\":34.76,\"avg_weekly_wages\":1742.6,\"weeks_worked\":51.86,\"total_hours\":1802.8,\"total_wages\":90366.21,\"first_start\":\"2024-12-23\",\"last_end\":\"2025-12-21\",\"additional_weekly_hours\":0.24,\"projected_weekly_hours\":35.0,\"exce...(9195 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.near-min-hours",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "thresholds",
+     "expected": "{\"min_weekly_hours\":35.0,\"min_weekly_wages\":680.0,\"resolved\":true}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.near-min-hours",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "total",
+     "expected": "21",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.near-min-hours",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "total_unfiltered",
+     "expected": "21",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.near-min-hours",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "missing-field",
+     "path": "near_total_unfiltered",
+     "expected": "10",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unit.near-min-hours",
+     "route": "GET /api/v2/clients/1001/units/GA_ATL_HQ",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/v2/clients/{client_id}/units/{unit_id}"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.limit-1",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.limit-1",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "calculation_state",
+     "expected": "calculated",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.limit-1",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "run",
+     "expected": "{\"run_id\":\"40000000000040008000000000000001\",\"produced_at\":\"2026-01-15 12:00:00\",\"started_at\":\"2026-01-15 12:00:00\",\"calculation_id\":\"9e9a9edc79a44dce8ea0d3be5147883b87a1298e2ccf5619947c8e40d3cbf0cd\",\"code_commit\":\"0000000000000000000000000000000000c0ffee\",\"rule_pack_version\":\"rules/ga_jtc/2025.json...(473 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.limit-1",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "newer_run_in_flight",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.limit-1",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "in_flight",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.limit-1",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "message",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.limit-1",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "client_id",
+     "expected": "1001",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.limit-1",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "state",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.limit-1",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "year",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.limit-1",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "method",
+     "expected": "min_max",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.limit-1",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "limit",
+     "expected": "1",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.limit-1",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "offset",
+     "expected": "0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.limit-1",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "items",
+     "expected": "[{\"client_id\":1001,\"worksite_id\":\"GA_ATL_HQ\",\"entity_fein\":\"58-1234567\",\"program_code\":\"GA_JTC\",\"method\":\"min_max\",\"tax_year\":2024,\"average_headcount\":9.17,\"is_base_year\":true,\"base_average_headcount\":9.17,\"base_year_source\":\"inferred\",\"net_new_vs_base\":null,\"months_reachable\":11,\"year_complete\":tru...(849 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.limit-1",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "total",
+     "expected": "8",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.limit-1",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "months",
+     "expected": "[{\"client_id\":1001,\"tax_year\":2024,\"method\":\"min_max\",\"run_id\":\"40000000000040008000000000000001\",\"worksite_id\":\"GA_ATL_HQ\",\"month_01\":9.0,\"month_02\":9.0,\"month_03\":9.0,\"month_04\":9.0,\"month_05\":9.0,\"month_06\":10.0,\"month_07\":9.0,\"month_08\":10.0,\"month_09\":11.0,\"month_10\":11.0,\"month_11\":11.0,\"month...(402 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.limit-1",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "installments",
+     "expected": "[{\"worksite_id\":\"GA_ATL_HQ\",\"tax_year\":2025,\"claimable_usd\":\"28280.0\",\"projected\":false,\"creation_year\":2025},{\"worksite_id\":\"GA_ATL_HQ\",\"tax_year\":2026,\"claimable_usd\":\"28280.0\",\"projected\":true,\"creation_year\":2025},{\"worksite_id\":\"GA_ATL_HQ\",\"tax_year\":2027,\"claimable_usd\":\"28280.0\",\"projected\":t...(2170 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.limit-1",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "unit_totals",
+     "expected": "[{\"worksite_id\":\"GA_ATL_HQ\",\"total_annual_credit_usd\":\"28280.0\",\"final_high_water_mark\":17.25,\"total_tranche_lifetime_usd\":\"141400.0\"}]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.limit-1",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "units",
+     "expected": "[{\"worksite_id\":\"GA_ATL_HQ\",\"name\":\"Atlanta HQ\",\"county\":\"Fulton\",\"city\":\"Atlanta\"}]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.limit-1",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "years",
+     "expected": "[2024]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.limit-1",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/v2/clients/{client_id}/units"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.offset-past-end",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.offset-past-end",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "calculation_state",
+     "expected": "calculated",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.offset-past-end",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "run",
+     "expected": "{\"run_id\":\"40000000000040008000000000000001\",\"produced_at\":\"2026-01-15 12:00:00\",\"started_at\":\"2026-01-15 12:00:00\",\"calculation_id\":\"9e9a9edc79a44dce8ea0d3be5147883b87a1298e2ccf5619947c8e40d3cbf0cd\",\"code_commit\":\"0000000000000000000000000000000000c0ffee\",\"rule_pack_version\":\"rules/ga_jtc/2025.json...(473 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.offset-past-end",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "newer_run_in_flight",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.offset-past-end",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "in_flight",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.offset-past-end",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "message",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.offset-past-end",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "client_id",
+     "expected": "1001",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.offset-past-end",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "state",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.offset-past-end",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "year",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.offset-past-end",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "method",
+     "expected": "min_max",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.offset-past-end",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "limit",
+     "expected": "25",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.offset-past-end",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "offset",
+     "expected": "99999",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.offset-past-end",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "items",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.offset-past-end",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "total",
+     "expected": "0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.offset-past-end",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "months",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.offset-past-end",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "installments",
+     "expected": "[{\"worksite_id\":\"GA_ATL_HQ\",\"tax_year\":2025,\"claimable_usd\":\"28280.0\",\"projected\":false,\"creation_year\":2025},{\"worksite_id\":\"GA_ATL_HQ\",\"tax_year\":2026,\"claimable_usd\":\"28280.0\",\"projected\":true,\"creation_year\":2025},{\"worksite_id\":\"GA_ATL_HQ\",\"tax_year\":2027,\"claimable_usd\":\"28280.0\",\"projected\":t...(2170 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.offset-past-end",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "unit_totals",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.offset-past-end",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "units",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.offset-past-end",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "years",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.offset-past-end",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/v2/clients/{client_id}/units"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.year-none",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.year-none",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "calculation_state",
+     "expected": "calculated",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.year-none",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "run",
+     "expected": "{\"run_id\":\"40000000000040008000000000000001\",\"produced_at\":\"2026-01-15 12:00:00\",\"started_at\":\"2026-01-15 12:00:00\",\"calculation_id\":\"9e9a9edc79a44dce8ea0d3be5147883b87a1298e2ccf5619947c8e40d3cbf0cd\",\"code_commit\":\"0000000000000000000000000000000000c0ffee\",\"rule_pack_version\":\"rules/ga_jtc/2025.json...(473 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.year-none",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "newer_run_in_flight",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.year-none",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "in_flight",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.year-none",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "message",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.year-none",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "client_id",
+     "expected": "1001",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.year-none",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "state",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.year-none",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "year",
+     "expected": "1999",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.year-none",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "method",
+     "expected": "min_max",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.year-none",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "limit",
+     "expected": "25",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.year-none",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "offset",
+     "expected": "0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.year-none",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "items",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.year-none",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "total",
+     "expected": "0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.year-none",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "months",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.year-none",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "installments",
+     "expected": "[{\"worksite_id\":\"GA_ATL_HQ\",\"tax_year\":2025,\"claimable_usd\":\"28280.0\",\"projected\":false,\"creation_year\":2025},{\"worksite_id\":\"GA_ATL_HQ\",\"tax_year\":2026,\"claimable_usd\":\"28280.0\",\"projected\":true,\"creation_year\":2025},{\"worksite_id\":\"GA_ATL_HQ\",\"tax_year\":2027,\"claimable_usd\":\"28280.0\",\"projected\":t...(2170 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.year-none",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "unit_totals",
+     "expected": "[{\"worksite_id\":\"GA_ATL_HQ\",\"total_annual_credit_usd\":\"28280.0\",\"final_high_water_mark\":17.25,\"total_tranche_lifetime_usd\":\"141400.0\"},{\"worksite_id\":\"GA_CUM_OPS\",\"total_annual_credit_usd\":\"30905.0\",\"final_high_water_mark\":19.25,\"total_tranche_lifetime_usd\":\"154525.0\"},{\"worksite_id\":\"GA_MAC_OPS\",\"t...(535 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.year-none",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "units",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.year-none",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "years",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.year-none",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/v2/clients/{client_id}/units"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.state-bogus",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.state-bogus",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "calculation_state",
+     "expected": "calculated",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.state-bogus",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "run",
+     "expected": "{\"run_id\":\"40000000000040008000000000000001\",\"produced_at\":\"2026-01-15 12:00:00\",\"started_at\":\"2026-01-15 12:00:00\",\"calculation_id\":\"9e9a9edc79a44dce8ea0d3be5147883b87a1298e2ccf5619947c8e40d3cbf0cd\",\"code_commit\":\"0000000000000000000000000000000000c0ffee\",\"rule_pack_version\":\"rules/ga_jtc/2025.json...(473 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.state-bogus",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "newer_run_in_flight",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.state-bogus",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "in_flight",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.state-bogus",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "message",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.state-bogus",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "client_id",
+     "expected": "1001",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.state-bogus",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "state",
+     "expected": "ZZ",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.state-bogus",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "year",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.state-bogus",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "method",
+     "expected": "min_max",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.state-bogus",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "limit",
+     "expected": "25",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.state-bogus",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "offset",
+     "expected": "0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.state-bogus",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "items",
+     "expected": "[{\"client_id\":1001,\"worksite_id\":\"GA_ATL_HQ\",\"entity_fein\":\"58-1234567\",\"program_code\":\"GA_JTC\",\"method\":\"min_max\",\"tax_year\":2024,\"average_headcount\":9.17,\"is_base_year\":true,\"base_average_headcount\":9.17,\"base_year_source\":\"inferred\",\"net_new_vs_base\":null,\"months_reachable\":11,\"year_complete\":tru...(6848 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.state-bogus",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "total",
+     "expected": "8",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.state-bogus",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "months",
+     "expected": "[{\"client_id\":1001,\"tax_year\":2024,\"method\":\"min_max\",\"run_id\":\"40000000000040008000000000000001\",\"worksite_id\":\"GA_ATL_HQ\",\"month_01\":9.0,\"month_02\":9.0,\"month_03\":9.0,\"month_04\":9.0,\"month_05\":9.0,\"month_06\":10.0,\"month_07\":9.0,\"month_08\":10.0,\"month_09\":11.0,\"month_10\":11.0,\"month_11\":11.0,\"month...(3257 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.state-bogus",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "installments",
+     "expected": "[{\"worksite_id\":\"GA_ATL_HQ\",\"tax_year\":2025,\"claimable_usd\":\"28280.0\",\"projected\":false,\"creation_year\":2025},{\"worksite_id\":\"GA_ATL_HQ\",\"tax_year\":2026,\"claimable_usd\":\"28280.0\",\"projected\":true,\"creation_year\":2025},{\"worksite_id\":\"GA_ATL_HQ\",\"tax_year\":2027,\"claimable_usd\":\"28280.0\",\"projected\":t...(2170 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.state-bogus",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "unit_totals",
+     "expected": "[{\"worksite_id\":\"GA_ATL_HQ\",\"total_annual_credit_usd\":\"28280.0\",\"final_high_water_mark\":17.25,\"total_tranche_lifetime_usd\":\"141400.0\"},{\"worksite_id\":\"GA_CUM_OPS\",\"total_annual_credit_usd\":\"30905.0\",\"final_high_water_mark\":19.25,\"total_tranche_lifetime_usd\":\"154525.0\"},{\"worksite_id\":\"GA_MAC_OPS\",\"t...(535 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.state-bogus",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "units",
+     "expected": "[{\"worksite_id\":\"GA_ATL_HQ\",\"name\":\"Atlanta HQ\",\"county\":\"Fulton\",\"city\":\"Atlanta\"},{\"worksite_id\":\"GA_CUM_OPS\",\"name\":\"Cumberland Center\",\"county\":\"Cobb\",\"city\":\"Cumberland\"},{\"worksite_id\":\"GA_MAC_OPS\",\"name\":\"Macon Operations\",\"county\":\"Bibb\",\"city\":\"Macon\"},{\"worksite_id\":\"GA_SAV_DC\",\"name\":\"Sav...(365 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.state-bogus",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "years",
+     "expected": "[2024,2025]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.state-bogus",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/v2/clients/{client_id}/units"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.method-bogus",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "status",
+     "path": "status",
+     "expected": "422",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.method-bogus",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "value",
+     "path": "detail",
+     "expected": "method must be min_max | pay_period",
+     "actual": "Operation not implemented: GET /api/v2/clients/{client_id}/units"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.method-pp",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.method-pp",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "calculation_state",
+     "expected": "calculated",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.method-pp",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "run",
+     "expected": "{\"run_id\":\"40000000000040008000000000000001\",\"produced_at\":\"2026-01-15 12:00:00\",\"started_at\":\"2026-01-15 12:00:00\",\"calculation_id\":\"9e9a9edc79a44dce8ea0d3be5147883b87a1298e2ccf5619947c8e40d3cbf0cd\",\"code_commit\":\"0000000000000000000000000000000000c0ffee\",\"rule_pack_version\":\"rules/ga_jtc/2025.json...(473 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.method-pp",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "newer_run_in_flight",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.method-pp",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "in_flight",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.method-pp",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "message",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.method-pp",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "client_id",
+     "expected": "1001",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.method-pp",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "state",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.method-pp",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "year",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.method-pp",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "method",
+     "expected": "pay_period",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.method-pp",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "limit",
+     "expected": "25",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.method-pp",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "offset",
+     "expected": "0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.method-pp",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "items",
+     "expected": "[{\"client_id\":1001,\"worksite_id\":\"GA_ATL_HQ\",\"entity_fein\":\"58-1234567\",\"program_code\":\"GA_JTC\",\"method\":\"pay_period\",\"tax_year\":2024,\"average_headcount\":8.92,\"is_base_year\":true,\"base_average_headcount\":8.92,\"base_year_source\":\"inferred\",\"net_new_vs_base\":null,\"months_reachable\":11,\"year_complete\":...(6871 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.method-pp",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "total",
+     "expected": "8",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.method-pp",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "months",
+     "expected": "[{\"client_id\":1001,\"tax_year\":2024,\"method\":\"pay_period\",\"run_id\":\"40000000000040008000000000000001\",\"worksite_id\":\"GA_ATL_HQ\",\"month_01\":9.0,\"month_02\":9.0,\"month_03\":9.0,\"month_04\":9.0,\"month_05\":9.0,\"month_06\":10.0,\"month_07\":9.0,\"month_08\":10.0,\"month_09\":11.0,\"month_10\":10.0,\"month_11\":10.0,\"mo...(3282 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.method-pp",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "installments",
+     "expected": "[{\"worksite_id\":\"GA_ATL_HQ\",\"tax_year\":2025,\"claimable_usd\":\"22155.0\",\"projected\":false,\"creation_year\":2025},{\"worksite_id\":\"GA_ATL_HQ\",\"tax_year\":2026,\"claimable_usd\":\"22155.0\",\"projected\":true,\"creation_year\":2025},{\"worksite_id\":\"GA_ATL_HQ\",\"tax_year\":2027,\"claimable_usd\":\"22155.0\",\"projected\":t...(2170 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.method-pp",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "unit_totals",
+     "expected": "[{\"worksite_id\":\"GA_ATL_HQ\",\"total_annual_credit_usd\":\"22155.0\",\"final_high_water_mark\":15.25,\"total_tranche_lifetime_usd\":\"110775.0\"},{\"worksite_id\":\"GA_CUM_OPS\",\"total_annual_credit_usd\":\"27405.0\",\"final_high_water_mark\":18.25,\"total_tranche_lifetime_usd\":\"137025.0\"},{\"worksite_id\":\"GA_MAC_OPS\",\"t...(536 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.method-pp",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "units",
+     "expected": "[{\"worksite_id\":\"GA_ATL_HQ\",\"name\":\"Atlanta HQ\",\"county\":\"Fulton\",\"city\":\"Atlanta\"},{\"worksite_id\":\"GA_CUM_OPS\",\"name\":\"Cumberland Center\",\"county\":\"Cobb\",\"city\":\"Cumberland\"},{\"worksite_id\":\"GA_MAC_OPS\",\"name\":\"Macon Operations\",\"county\":\"Bibb\",\"city\":\"Macon\"},{\"worksite_id\":\"GA_SAV_DC\",\"name\":\"Sav...(365 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.method-pp",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "missing-field",
+     "path": "years",
+     "expected": "[2024,2025]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "units.method-pp",
+     "route": "GET /api/v2/clients/1001/units",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/v2/clients/{client_id}/units"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-unknown",
+     "route": "GET /api/v2/clients/999999/units",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-unknown",
+     "route": "GET /api/v2/clients/999999/units",
+     "category": "missing-field",
+     "path": "calculation_state",
+     "expected": "not_calculated",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-unknown",
+     "route": "GET /api/v2/clients/999999/units",
+     "category": "missing-field",
+     "path": "run",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-unknown",
+     "route": "GET /api/v2/clients/999999/units",
+     "category": "missing-field",
+     "path": "newer_run_in_flight",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-unknown",
+     "route": "GET /api/v2/clients/999999/units",
+     "category": "missing-field",
+     "path": "in_flight",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-unknown",
+     "route": "GET /api/v2/clients/999999/units",
+     "category": "missing-field",
+     "path": "message",
+     "expected": "Not yet calculated. Run the calculation to see figures.",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-unknown",
+     "route": "GET /api/v2/clients/999999/units",
+     "category": "missing-field",
+     "path": "client_id",
+     "expected": "999999",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-unknown",
+     "route": "GET /api/v2/clients/999999/units",
+     "category": "missing-field",
+     "path": "state",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-unknown",
+     "route": "GET /api/v2/clients/999999/units",
+     "category": "missing-field",
+     "path": "year",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-unknown",
+     "route": "GET /api/v2/clients/999999/units",
+     "category": "missing-field",
+     "path": "method",
+     "expected": "min_max",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-unknown",
+     "route": "GET /api/v2/clients/999999/units",
+     "category": "missing-field",
+     "path": "limit",
+     "expected": "25",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-unknown",
+     "route": "GET /api/v2/clients/999999/units",
+     "category": "missing-field",
+     "path": "offset",
+     "expected": "0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-unknown",
+     "route": "GET /api/v2/clients/999999/units",
+     "category": "missing-field",
+     "path": "items",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-unknown",
+     "route": "GET /api/v2/clients/999999/units",
+     "category": "missing-field",
+     "path": "total",
+     "expected": "0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-unknown",
+     "route": "GET /api/v2/clients/999999/units",
+     "category": "missing-field",
+     "path": "months",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-unknown",
+     "route": "GET /api/v2/clients/999999/units",
+     "category": "missing-field",
+     "path": "installments",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-unknown",
+     "route": "GET /api/v2/clients/999999/units",
+     "category": "missing-field",
+     "path": "unit_totals",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-unknown",
+     "route": "GET /api/v2/clients/999999/units",
+     "category": "missing-field",
+     "path": "units",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-unknown",
+     "route": "GET /api/v2/clients/999999/units",
+     "category": "missing-field",
+     "path": "years",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-unknown",
+     "route": "GET /api/v2/clients/999999/units",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/v2/clients/{client_id}/units"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-zero",
+     "route": "GET /api/v2/clients/0/units",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "422"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-zero",
+     "route": "GET /api/v2/clients/0/units",
+     "category": "missing-field",
+     "path": "calculation_state",
+     "expected": "not_calculated",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-zero",
+     "route": "GET /api/v2/clients/0/units",
+     "category": "missing-field",
+     "path": "run",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-zero",
+     "route": "GET /api/v2/clients/0/units",
+     "category": "missing-field",
+     "path": "newer_run_in_flight",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-zero",
+     "route": "GET /api/v2/clients/0/units",
+     "category": "missing-field",
+     "path": "in_flight",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-zero",
+     "route": "GET /api/v2/clients/0/units",
+     "category": "missing-field",
+     "path": "message",
+     "expected": "Not yet calculated. Run the calculation to see figures.",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-zero",
+     "route": "GET /api/v2/clients/0/units",
+     "category": "missing-field",
+     "path": "client_id",
+     "expected": "0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-zero",
+     "route": "GET /api/v2/clients/0/units",
+     "category": "missing-field",
+     "path": "state",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-zero",
+     "route": "GET /api/v2/clients/0/units",
+     "category": "missing-field",
+     "path": "year",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-zero",
+     "route": "GET /api/v2/clients/0/units",
+     "category": "missing-field",
+     "path": "method",
+     "expected": "min_max",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-zero",
+     "route": "GET /api/v2/clients/0/units",
+     "category": "missing-field",
+     "path": "limit",
+     "expected": "25",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-zero",
+     "route": "GET /api/v2/clients/0/units",
+     "category": "missing-field",
+     "path": "offset",
+     "expected": "0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-zero",
+     "route": "GET /api/v2/clients/0/units",
+     "category": "missing-field",
+     "path": "items",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-zero",
+     "route": "GET /api/v2/clients/0/units",
+     "category": "missing-field",
+     "path": "total",
+     "expected": "0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-zero",
+     "route": "GET /api/v2/clients/0/units",
+     "category": "missing-field",
+     "path": "months",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-zero",
+     "route": "GET /api/v2/clients/0/units",
+     "category": "missing-field",
+     "path": "installments",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-zero",
+     "route": "GET /api/v2/clients/0/units",
+     "category": "missing-field",
+     "path": "unit_totals",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-zero",
+     "route": "GET /api/v2/clients/0/units",
+     "category": "missing-field",
+     "path": "units",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-zero",
+     "route": "GET /api/v2/clients/0/units",
+     "category": "missing-field",
+     "path": "years",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-zero",
+     "route": "GET /api/v2/clients/0/units",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "[{\"type\":\"int_parsing\",\"loc\":[\"path\",\"client_id\"],\"msg\":\"Expected an integer within the supported range.\",\"input\":0}]"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-negative",
+     "route": "GET /api/v2/clients/-1/units",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "422"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-negative",
+     "route": "GET /api/v2/clients/-1/units",
+     "category": "missing-field",
+     "path": "calculation_state",
+     "expected": "not_calculated",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-negative",
+     "route": "GET /api/v2/clients/-1/units",
+     "category": "missing-field",
+     "path": "run",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-negative",
+     "route": "GET /api/v2/clients/-1/units",
+     "category": "missing-field",
+     "path": "newer_run_in_flight",
+     "expected": "false",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-negative",
+     "route": "GET /api/v2/clients/-1/units",
+     "category": "missing-field",
+     "path": "in_flight",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-negative",
+     "route": "GET /api/v2/clients/-1/units",
+     "category": "missing-field",
+     "path": "message",
+     "expected": "Not yet calculated. Run the calculation to see figures.",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-negative",
+     "route": "GET /api/v2/clients/-1/units",
+     "category": "missing-field",
+     "path": "client_id",
+     "expected": "-1",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-negative",
+     "route": "GET /api/v2/clients/-1/units",
+     "category": "missing-field",
+     "path": "state",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-negative",
+     "route": "GET /api/v2/clients/-1/units",
+     "category": "missing-field",
+     "path": "year",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-negative",
+     "route": "GET /api/v2/clients/-1/units",
+     "category": "missing-field",
+     "path": "method",
+     "expected": "min_max",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-negative",
+     "route": "GET /api/v2/clients/-1/units",
+     "category": "missing-field",
+     "path": "limit",
+     "expected": "25",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-negative",
+     "route": "GET /api/v2/clients/-1/units",
+     "category": "missing-field",
+     "path": "offset",
+     "expected": "0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-negative",
+     "route": "GET /api/v2/clients/-1/units",
+     "category": "missing-field",
+     "path": "items",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-negative",
+     "route": "GET /api/v2/clients/-1/units",
+     "category": "missing-field",
+     "path": "total",
+     "expected": "0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-negative",
+     "route": "GET /api/v2/clients/-1/units",
+     "category": "missing-field",
+     "path": "months",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-negative",
+     "route": "GET /api/v2/clients/-1/units",
+     "category": "missing-field",
+     "path": "installments",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-negative",
+     "route": "GET /api/v2/clients/-1/units",
+     "category": "missing-field",
+     "path": "unit_totals",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-negative",
+     "route": "GET /api/v2/clients/-1/units",
+     "category": "missing-field",
+     "path": "units",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-negative",
+     "route": "GET /api/v2/clients/-1/units",
+     "category": "missing-field",
+     "path": "years",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-negative",
+     "route": "GET /api/v2/clients/-1/units",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "[{\"type\":\"int_parsing\",\"loc\":[\"path\",\"client_id\"],\"msg\":\"Expected an integer within the supported range.\",\"input\":-1}]"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-huge",
+     "route": "GET /api/v2/clients/99999999999999999999/units",
+     "category": "status",
+     "path": "status",
+     "expected": "500",
+     "actual": "422"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-huge",
+     "route": "GET /api/v2/clients/99999999999999999999/units",
+     "category": "header",
+     "path": "headers.content-type",
+     "expected": "text/plain; charset=utf-8",
+     "actual": "application/json"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-huge",
+     "route": "GET /api/v2/clients/99999999999999999999/units",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.client-huge",
+     "route": "GET /api/v2/clients/99999999999999999999/units",
+     "category": "body-kind",
+     "path": "body",
+     "expected": "text",
+     "actual": "json"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.cell-unknown",
+     "route": "GET /api/claims/cell/1001/ZZ_NONE/2025",
+     "category": "value",
+     "path": "detail",
+     "expected": "No claim recorded for client 1001, ZZ_NONE, TY2025.",
+     "actual": "No claim recorded for this cell."
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.scope-unknown",
+     "route": "GET /api/scope/client/999999",
+     "category": "status",
+     "path": "status",
+     "expected": "404",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.scope-unknown",
+     "route": "GET /api/scope/client/999999",
+     "category": "value",
+     "path": "detail",
+     "expected": "Unknown client 999999. Known accounts: 1001.",
+     "actual": "Operation not implemented: GET /api/scope/client/{account_id}"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.employee-unknown-token",
+     "route": "GET /api/v2/employees/not-a-real-token-1234",
+     "category": "status",
+     "path": "status",
+     "expected": "422",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.employee-unknown-token",
+     "route": "GET /api/v2/employees/not-a-real-token-1234",
+     "category": "value",
+     "path": "detail",
+     "expected": "year is required",
+     "actual": "Operation not implemented: GET /api/v2/employees/{record_token}"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.program-unknown",
+     "route": "GET /api/v2/programs/ZZ_NONE",
+     "category": "status",
+     "path": "status",
+     "expected": "404",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.program-unknown",
+     "route": "GET /api/v2/programs/ZZ_NONE",
+     "category": "value",
+     "path": "detail",
+     "expected": "no program 'ZZ_NONE' in the registry",
+     "actual": "Operation not implemented: GET /api/v2/programs/{code}"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.draft-unknown",
+     "route": "GET /api/v2/program-drafts/00000000-0000-0000-0000-000000000000",
+     "category": "status",
+     "path": "status",
+     "expected": "404",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.draft-unknown",
+     "route": "GET /api/v2/program-drafts/00000000-0000-0000-0000-000000000000",
+     "category": "type",
+     "path": "detail",
+     "expected": "{\"code\":\"draft_not_found\",\"reason\":\"no draft '00000000-0000-0000-0000-000000000000'\"}",
+     "actual": "Operation not implemented: GET /api/v2/program-drafts/{draft_id}"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.batch-unknown",
+     "route": "GET /api/v2/run-batches/00000000-0000-0000-0000-000000000000",
+     "category": "status",
+     "path": "status",
+     "expected": "404",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.batch-unknown",
+     "route": "GET /api/v2/run-batches/00000000-0000-0000-0000-000000000000",
+     "category": "value",
+     "path": "detail",
+     "expected": "Unknown run batch 00000000-0000-0000-0000-000000000000.",
+     "actual": "Operation not implemented: GET /api/v2/run-batches/{batch_id}"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.batch-bad-id",
+     "route": "GET /api/v2/run-batches/not-a-uuid",
+     "category": "status",
+     "path": "status",
+     "expected": "404",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.batch-bad-id",
+     "route": "GET /api/v2/run-batches/not-a-uuid",
+     "category": "value",
+     "path": "detail",
+     "expected": "Unknown run batch not-a-uuid.",
+     "actual": "Operation not implemented: GET /api/v2/run-batches/{batch_id}"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.rules-ingested-unknown-state",
+     "route": "GET /api/rules/ingested/ZZ",
+     "category": "value",
+     "path": "detail",
+     "expected": "No ingested rule config for ZZ (GA only in this pass).",
+     "actual": "No captured ingested rule config for this state."
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.designations-unknown-state",
+     "route": "GET /api/designations/ZZ",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.designations-unknown-state",
+     "route": "GET /api/designations/ZZ",
+     "category": "missing-field",
+     "path": "_roadmap_tag",
+     "expected": "L2",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.designations-unknown-state",
+     "route": "GET /api/designations/ZZ",
+     "category": "missing-field",
+     "path": "_story",
+     "expected": "CALC-08",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.designations-unknown-state",
+     "route": "GET /api/designations/ZZ",
+     "category": "missing-field",
+     "path": "_prototype_verify",
+     "expected": "true",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.designations-unknown-state",
+     "route": "GET /api/designations/ZZ",
+     "category": "missing-field",
+     "path": "_disc_ref",
+     "expected": "DISC-10",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.designations-unknown-state",
+     "route": "GET /api/designations/ZZ",
+     "category": "missing-field",
+     "path": "state",
+     "expected": "ZZ",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.designations-unknown-state",
+     "route": "GET /api/designations/ZZ",
+     "category": "missing-field",
+     "path": "tax_year",
+     "expected": "2025",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.designations-unknown-state",
+     "route": "GET /api/designations/ZZ",
+     "category": "missing-field",
+     "path": "base_year",
+     "expected": "2021",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.designations-unknown-state",
+     "route": "GET /api/designations/ZZ",
+     "category": "missing-field",
+     "path": "site_count",
+     "expected": "0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.designations-unknown-state",
+     "route": "GET /api/designations/ZZ",
+     "category": "missing-field",
+     "path": "parallel_calc_site_count",
+     "expected": "0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.designations-unknown-state",
+     "route": "GET /api/designations/ZZ",
+     "category": "missing-field",
+     "path": "sites",
+     "expected": "[]",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.designations-unknown-state",
+     "route": "GET /api/designations/ZZ",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: GET /api/designations/{state}"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.year-future",
+     "route": "GET /api/eligibility/2099",
+     "category": "status",
+     "path": "status",
+     "expected": "404",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.year-future",
+     "route": "GET /api/eligibility/2099",
+     "category": "value",
+     "path": "detail",
+     "expected": "no rule pack for ga_jtc tax year 2099. Authored years: 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026. ADR-005: statute is not inherited across years \u2014 author the year or decline to calculate it.",
+     "actual": "Operation not implemented: GET /api/eligibility/{tax_year}"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.year-past",
+     "route": "GET /api/progress/1900",
+     "category": "status",
+     "path": "status",
+     "expected": "404",
+     "actual": "501"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "unknown.year-past",
+     "route": "GET /api/progress/1900",
+     "category": "value",
+     "path": "detail",
+     "expected": "no calculated run holds GA tax year 1900 for account 1001",
+     "actual": "Operation not implemented: GET /api/progress/{tax_year}"
+    }
+   ],
+   "tolerated": [
+    {
+     "scenario": "p1_query_edges",
+     "case": "boot.findings",
+     "route": "GET /api/findings/1001/2025",
+     "category": "number-lexeme",
+     "path": "findings[0].population.total_hours",
+     "expected": "160.0",
+     "actual": "160"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "boot.findings",
+     "route": "GET /api/findings/1001/2025",
+     "category": "number-lexeme",
+     "path": "findings[0].population.sample[0].units[0].hours",
+     "expected": "120.0",
+     "actual": "120"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "boot.findings",
+     "route": "GET /api/findings/1001/2025",
+     "category": "number-lexeme",
+     "path": "findings[0].population.sample[0].units[1].hours",
+     "expected": "40.0",
+     "actual": "40"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "boot.findings",
+     "route": "GET /api/findings/1001/2025",
+     "category": "number-lexeme",
+     "path": "findings[1].evidence.units[0].hours",
+     "expected": "40.0",
+     "actual": "40"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "boot.findings",
+     "route": "GET /api/findings/1001/2025",
+     "category": "number-lexeme",
+     "path": "findings[1].evidence.units[1].hours",
+     "expected": "80.0",
+     "actual": "80"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.default",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].average_headcount",
+     "expected": "61.0",
+     "actual": "61"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.default",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].base_average_headcount",
+     "expected": "40.0",
+     "actual": "40"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.default",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].threshold_jobs",
+     "expected": "2.0",
+     "actual": "2"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.default",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].net_new_jobs",
+     "expected": "21.0",
+     "actual": "21"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.default",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].jobs_to_threshold",
+     "expected": "0.0",
+     "actual": "0"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.default",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].jobs_margin",
+     "expected": "19.0",
+     "actual": "19"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.default",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].gap_jobs",
+     "expected": "0.0",
+     "actual": "0"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.year",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].average_headcount",
+     "expected": "61.0",
+     "actual": "61"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.year",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].base_average_headcount",
+     "expected": "40.0",
+     "actual": "40"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.year",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].threshold_jobs",
+     "expected": "2.0",
+     "actual": "2"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.year",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].net_new_jobs",
+     "expected": "21.0",
+     "actual": "21"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.year",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].jobs_to_threshold",
+     "expected": "0.0",
+     "actual": "0"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.year",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].jobs_margin",
+     "expected": "19.0",
+     "actual": "19"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.year",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].gap_jobs",
+     "expected": "0.0",
+     "actual": "0"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.year-none",
+     "route": "GET /api/v2/portfolio",
+     "category": "key-order",
+     "path": "items[0]",
+     "expected": "[\"claim_id\",\"client_id\",\"entity_id\",\"program_code\",\"tax_year\",\"status\",\"provenance\",\"provenance_verified\",\"identified_usd\",\"claimed_usd\",\"certified_usd\",\"variance_usd\",\"variance_is_computable\",\"opportunity_usd\",\"average_headcount\",\"base_average_headcount\",\"threshold_jobs\",\"is_base_year\",\"net_new_job...(703 chars)",
+     "actual": "[\"claim_id\",\"client_id\",\"entity_id\",\"program_code\",\"tax_year\",\"status\",\"provenance\",\"provenance_verified\",\"identified_usd\",\"claimed_usd\",\"certified_usd\",\"variance_usd\",\"variance_is_computable\",\"opportunity_usd\",\"average_headcount\",\"base_average_headcount\",\"threshold_jobs\",\"is_base_year\",\"net_new_job...(703 chars)"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.sort-priority-desc",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].average_headcount",
+     "expected": "40.0",
+     "actual": "40"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.sort-priority-desc",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].base_average_headcount",
+     "expected": "40.0",
+     "actual": "40"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.sort-priority-desc",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].threshold_jobs",
+     "expected": "2.0",
+     "actual": "2"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.sort-priority-desc",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].net_new_jobs",
+     "expected": "0.0",
+     "actual": "0"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.sort-priority-desc",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].jobs_to_threshold",
+     "expected": "2.0",
+     "actual": "2"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.sort-priority-desc",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].jobs_margin",
+     "expected": "-2.0",
+     "actual": "-2"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.sort-priority-desc",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].gap_jobs",
+     "expected": "2.0",
+     "actual": "2"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.sort-identified",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].average_headcount",
+     "expected": "61.0",
+     "actual": "61"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.sort-identified",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].base_average_headcount",
+     "expected": "40.0",
+     "actual": "40"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.sort-identified",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].threshold_jobs",
+     "expected": "2.0",
+     "actual": "2"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.sort-identified",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].net_new_jobs",
+     "expected": "21.0",
+     "actual": "21"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.sort-identified",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].jobs_to_threshold",
+     "expected": "0.0",
+     "actual": "0"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.sort-identified",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].jobs_margin",
+     "expected": "19.0",
+     "actual": "19"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.sort-identified",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].gap_jobs",
+     "expected": "0.0",
+     "actual": "0"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.sort-bogus",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].average_headcount",
+     "expected": "40.0",
+     "actual": "40"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.sort-bogus",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].base_average_headcount",
+     "expected": "40.0",
+     "actual": "40"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.sort-bogus",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].threshold_jobs",
+     "expected": "2.0",
+     "actual": "2"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.sort-bogus",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].net_new_jobs",
+     "expected": "0.0",
+     "actual": "0"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.sort-bogus",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].jobs_to_threshold",
+     "expected": "2.0",
+     "actual": "2"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.sort-bogus",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].jobs_margin",
+     "expected": "-2.0",
+     "actual": "-2"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.sort-bogus",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].gap_jobs",
+     "expected": "2.0",
+     "actual": "2"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.order-bogus",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].average_headcount",
+     "expected": "61.0",
+     "actual": "61"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.order-bogus",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].base_average_headcount",
+     "expected": "40.0",
+     "actual": "40"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.order-bogus",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].threshold_jobs",
+     "expected": "2.0",
+     "actual": "2"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.order-bogus",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].net_new_jobs",
+     "expected": "21.0",
+     "actual": "21"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.order-bogus",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].jobs_to_threshold",
+     "expected": "0.0",
+     "actual": "0"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.order-bogus",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].jobs_margin",
+     "expected": "19.0",
+     "actual": "19"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.order-bogus",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].gap_jobs",
+     "expected": "0.0",
+     "actual": "0"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.limit-1",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].average_headcount",
+     "expected": "61.0",
+     "actual": "61"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.limit-1",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].base_average_headcount",
+     "expected": "40.0",
+     "actual": "40"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.limit-1",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].threshold_jobs",
+     "expected": "2.0",
+     "actual": "2"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.limit-1",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].net_new_jobs",
+     "expected": "21.0",
+     "actual": "21"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.limit-1",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].jobs_to_threshold",
+     "expected": "0.0",
+     "actual": "0"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.limit-1",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].jobs_margin",
+     "expected": "19.0",
+     "actual": "19"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.limit-1",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].gap_jobs",
+     "expected": "0.0",
+     "actual": "0"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.limit-over-max",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].average_headcount",
+     "expected": "61.0",
+     "actual": "61"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.limit-over-max",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].base_average_headcount",
+     "expected": "40.0",
+     "actual": "40"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.limit-over-max",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].threshold_jobs",
+     "expected": "2.0",
+     "actual": "2"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.limit-over-max",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].net_new_jobs",
+     "expected": "21.0",
+     "actual": "21"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.limit-over-max",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].jobs_to_threshold",
+     "expected": "0.0",
+     "actual": "0"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.limit-over-max",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].jobs_margin",
+     "expected": "19.0",
+     "actual": "19"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.limit-over-max",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].gap_jobs",
+     "expected": "0.0",
+     "actual": "0"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.repeated-limit",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].average_headcount",
+     "expected": "61.0",
+     "actual": "61"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.repeated-limit",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].base_average_headcount",
+     "expected": "40.0",
+     "actual": "40"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.repeated-limit",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].threshold_jobs",
+     "expected": "2.0",
+     "actual": "2"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.repeated-limit",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].net_new_jobs",
+     "expected": "21.0",
+     "actual": "21"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.repeated-limit",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].jobs_to_threshold",
+     "expected": "0.0",
+     "actual": "0"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.repeated-limit",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].jobs_margin",
+     "expected": "19.0",
+     "actual": "19"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.repeated-limit",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].gap_jobs",
+     "expected": "0.0",
+     "actual": "0"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.program",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].average_headcount",
+     "expected": "61.0",
+     "actual": "61"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.program",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].base_average_headcount",
+     "expected": "40.0",
+     "actual": "40"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.program",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].threshold_jobs",
+     "expected": "2.0",
+     "actual": "2"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.program",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].net_new_jobs",
+     "expected": "21.0",
+     "actual": "21"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.program",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].jobs_to_threshold",
+     "expected": "0.0",
+     "actual": "0"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.program",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].jobs_margin",
+     "expected": "19.0",
+     "actual": "19"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.program",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].gap_jobs",
+     "expected": "0.0",
+     "actual": "0"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.program-unknown",
+     "route": "GET /api/v2/portfolio",
+     "category": "key-order",
+     "path": "items[0]",
+     "expected": "[\"claim_id\",\"client_id\",\"entity_id\",\"program_code\",\"tax_year\",\"status\",\"provenance\",\"provenance_verified\",\"identified_usd\",\"claimed_usd\",\"certified_usd\",\"variance_usd\",\"variance_is_computable\",\"opportunity_usd\",\"average_headcount\",\"base_average_headcount\",\"threshold_jobs\",\"is_base_year\",\"net_new_job...(703 chars)",
+     "actual": "[\"claim_id\",\"client_id\",\"entity_id\",\"program_code\",\"tax_year\",\"status\",\"provenance\",\"provenance_verified\",\"identified_usd\",\"claimed_usd\",\"certified_usd\",\"variance_usd\",\"variance_is_computable\",\"opportunity_usd\",\"average_headcount\",\"base_average_headcount\",\"threshold_jobs\",\"is_base_year\",\"net_new_job...(703 chars)"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.outcome",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].average_headcount",
+     "expected": "61.0",
+     "actual": "61"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.outcome",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].base_average_headcount",
+     "expected": "40.0",
+     "actual": "40"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.outcome",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].threshold_jobs",
+     "expected": "2.0",
+     "actual": "2"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.outcome",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].net_new_jobs",
+     "expected": "21.0",
+     "actual": "21"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.outcome",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].jobs_to_threshold",
+     "expected": "0.0",
+     "actual": "0"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.outcome",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].jobs_margin",
+     "expected": "19.0",
+     "actual": "19"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.outcome",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].gap_jobs",
+     "expected": "0.0",
+     "actual": "0"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.unicode-query",
+     "route": "GET /api/v2/portfolio",
+     "category": "key-order",
+     "path": "items[0]",
+     "expected": "[\"claim_id\",\"client_id\",\"entity_id\",\"program_code\",\"tax_year\",\"status\",\"provenance\",\"provenance_verified\",\"identified_usd\",\"claimed_usd\",\"certified_usd\",\"variance_usd\",\"variance_is_computable\",\"opportunity_usd\",\"average_headcount\",\"base_average_headcount\",\"threshold_jobs\",\"is_base_year\",\"net_new_job...(703 chars)",
+     "actual": "[\"claim_id\",\"client_id\",\"entity_id\",\"program_code\",\"tax_year\",\"status\",\"provenance\",\"provenance_verified\",\"identified_usd\",\"claimed_usd\",\"certified_usd\",\"variance_usd\",\"variance_is_computable\",\"opportunity_usd\",\"average_headcount\",\"base_average_headcount\",\"threshold_jobs\",\"is_base_year\",\"net_new_job...(703 chars)"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.long-query",
+     "route": "GET /api/v2/portfolio",
+     "category": "key-order",
+     "path": "items[0]",
+     "expected": "[\"claim_id\",\"client_id\",\"entity_id\",\"program_code\",\"tax_year\",\"status\",\"provenance\",\"provenance_verified\",\"identified_usd\",\"claimed_usd\",\"certified_usd\",\"variance_usd\",\"variance_is_computable\",\"opportunity_usd\",\"average_headcount\",\"base_average_headcount\",\"threshold_jobs\",\"is_base_year\",\"net_new_job...(703 chars)",
+     "actual": "[\"claim_id\",\"client_id\",\"entity_id\",\"program_code\",\"tax_year\",\"status\",\"provenance\",\"provenance_verified\",\"identified_usd\",\"claimed_usd\",\"certified_usd\",\"variance_usd\",\"variance_is_computable\",\"opportunity_usd\",\"average_headcount\",\"base_average_headcount\",\"threshold_jobs\",\"is_base_year\",\"net_new_job...(703 chars)"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.encoded-plus",
+     "route": "GET /api/v2/portfolio",
+     "category": "key-order",
+     "path": "items[0]",
+     "expected": "[\"claim_id\",\"client_id\",\"entity_id\",\"program_code\",\"tax_year\",\"status\",\"provenance\",\"provenance_verified\",\"identified_usd\",\"claimed_usd\",\"certified_usd\",\"variance_usd\",\"variance_is_computable\",\"opportunity_usd\",\"average_headcount\",\"base_average_headcount\",\"threshold_jobs\",\"is_base_year\",\"net_new_job...(703 chars)",
+     "actual": "[\"claim_id\",\"client_id\",\"entity_id\",\"program_code\",\"tax_year\",\"status\",\"provenance\",\"provenance_verified\",\"identified_usd\",\"claimed_usd\",\"certified_usd\",\"variance_usd\",\"variance_is_computable\",\"opportunity_usd\",\"average_headcount\",\"base_average_headcount\",\"threshold_jobs\",\"is_base_year\",\"net_new_job...(703 chars)"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.raw-query-dupe-keys",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].average_headcount",
+     "expected": "61.0",
+     "actual": "61"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.raw-query-dupe-keys",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].base_average_headcount",
+     "expected": "40.0",
+     "actual": "40"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.raw-query-dupe-keys",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].threshold_jobs",
+     "expected": "2.0",
+     "actual": "2"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.raw-query-dupe-keys",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].net_new_jobs",
+     "expected": "21.0",
+     "actual": "21"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.raw-query-dupe-keys",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].jobs_to_threshold",
+     "expected": "0.0",
+     "actual": "0"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.raw-query-dupe-keys",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].jobs_margin",
+     "expected": "19.0",
+     "actual": "19"
+    },
+    {
+     "scenario": "p1_query_edges",
+     "case": "portfolio.raw-query-dupe-keys",
+     "route": "GET /api/v2/portfolio",
+     "category": "number-lexeme",
+     "path": "items[0].gap_jobs",
+     "expected": "0.0",
+     "actual": "0"
+    }
+   ]
+  }
+ ],
+ "exchanges": 71,
+ "failure_count": 494,
+ "tolerated_count": 94
+}

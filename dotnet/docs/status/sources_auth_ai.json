@@ -1,0 +1,75 @@
+{
+  "session": "sources_auth_ai",
+  "branch": "dotnet/w1-sources_auth_ai",
+  "head": "42a6c4c",
+  "summary": "Fixed the conductor's missing-oracle environment at the independent testhost launch boundary. Owned central props persist the approved existing CPython3.12 path for bare test runs without machine/user environment changes; explicit oracle/runsettings remain authoritative. Re-ran whole SDK10.0.404 build, format and bare non-heavy test gate with parent TCC_PYTHON removed: all605 tests pass, including152 parity tests in7m1s; build has zero warnings/errors. Source/auth/AI/artifact implementations remain verified; S2 remains partial at the documented existing Domain strict leap-shift seam. No private certification, live services, HTTP replay or pushes. Head identifies the verified correction/report commit preceding this status-only commit.",
+  "stages": {
+    "S1": "done",
+    "S2": "partial",
+    "S3": "done",
+    "S4": "done",
+    "S5": "done",
+    "S6": "done"
+  },
+  "gates_claimed": {
+    "no_halt": true,
+    "commits_present": true,
+    "clean_tree": true,
+    "not_pushed": true,
+    "owned_paths": true,
+    "status_json": true,
+    "report_present": true,
+    "dotnet_build": true,
+    "dotnet_format": true,
+    "tests_fast": true
+  },
+  "deviations": [
+    {
+      "id": "DEV-1",
+      "what": "The conductor's follow-up explicitly authorizes the required session documentation and removal of the original halt.",
+      "why": "Implementation proceeds within the owned adapter folders and the session-specific report, log, improvements and status paths.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-2",
+      "what": "Added testhost oracle launch configuration inside the owned sources_auth_ai central-props section, alongside its package declarations.",
+      "why": "The conductor does not inherit our shell-local environment. VSTestCLIRunSettings supplies the approved existing executable only for test projects with no explicit oracle/runsettings. This fixes bare gates without editing unowned parity code or shared machine settings.",
+      "decision_needed": false
+    }
+  ],
+  "findings": [
+    "Shell-local TCC_PYTHON did not persist into the conductor's independent process. Test-only central VSTestCLIRunSettings now supplies the approved existing oracle when no explicit configuration is given; interpreter validation remains unchanged.",
+    "The newest Azure SDK graph conflicts with the shared DI10.0.0 package baseline; compatible stable MIT versions are used without changing another session's package declarations.",
+    "SDK discovery follows the working directory: running from dotnet selects pinned10.0.404; root runs had selected SDK11. Preview constructor syntax was removed without changing the SDK or language settings.",
+    "Public exception classes must be sealed or abstract. Source/auth bases are now abstract with sealed concrete refusals; ModelException is sealed. The architecture rule and exact exception assertions remain enforced.",
+    "Malformed stored override dates now fail at lookup parsing even under assume. Python SQL COALESCE and projector falsy-worksite behavior are both preserved pending figure-impact review."
+  ],
+  "open_questions": [],
+  "needs_human": [
+    {
+      "item": "Python projection and SQL disagree on zero worksite state fallback.",
+      "why": "The projector uses falsy-worksite fallback; Python SQL uses COALESCE, so zero worksite can produce SC versus an empty state. Both paths remain unchanged, with an explicit regression test. Reconciliation could change program selection and calculated figures and requires owner review."
+    },
+    {
+      "item": "Strict unrepresentable leap-day shifts need a contextual certified Domain fiscal port.",
+      "why": "For a stored 2024-02-29 through 2025-02-28 rule, begins TY2025 and ends TY2024 are refused by the rich adapter, but the certified Domain resolver assumes calendar. Its fiscal port lacks requested year/convention. The owned adapter cannot correct this without a Domain seam change; S2 is explicitly partial and regression evidence names this boundary."
+    },
+    {
+      "item": "M-01: captured ingestion overrides year-resolved wage basis, measuring date and pay codes.",
+      "why": "The design says ingestion may fill but not override authored statute. This path affects calculated figures and remains unchanged in the certified RuleLibrary pending the owner's decision."
+    },
+    {
+      "item": "Credit math prices the first program when a state has several programs.",
+      "why": "The certified credit math retains Python's numeric path; typed multi-program refusals remain upstream. Adding another refusal here would change figures and needs owner review."
+    },
+    {
+      "item": "Reconcile the Azure SDK/SqlClient package graph with the integration branches.",
+      "why": "Shared DI remains pinned at 10.0.0. Newer Blob/credential versions require later shared .NET package patches; compatible stable MIT SDK versions were selected locally."
+    }
+  ],
+  "reports": [
+    "dotnet/docs/SOURCES-AUTH-AI-REPORT.md",
+    "dotnet/docs/sources_auth_ai-log.md",
+    "dotnet/docs/improvements/sources_auth_ai.json"
+  ]
+}

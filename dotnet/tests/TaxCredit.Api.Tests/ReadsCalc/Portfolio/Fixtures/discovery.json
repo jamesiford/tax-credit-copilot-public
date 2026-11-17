@@ -1,0 +1,58 @@
+{
+  "hits": [
+    {
+      "credit_code": "FED_WOTC",
+      "credit_name": "Federal Work Opportunity Tax Credit (lite)",
+      "jurisdiction": "US",
+      "citation": "IRC § 51",
+      "qualifying_jobs": 44,
+      "basis": "new_hires_in_window",
+      "annual_credit_usd": 105600,
+      "benefit_period_years": 1,
+      "lifetime_credit_usd": 105600
+    },
+    {
+      "credit_code": "NC_JTEC",
+      "credit_name": "North Carolina Job Expansion Tax Credit",
+      "jurisdiction": "NC",
+      "citation": "N.C.G.S. § 105-129.87",
+      "qualifying_jobs": 14.08,
+      "basis": "net_new_headcount",
+      "annual_credit_usd": 10560,
+      "benefit_period_years": 5,
+      "lifetime_credit_usd": 52800
+    },
+    {
+      "credit_code": "CO_EZ",
+      "credit_name": "Colorado Enterprise Zone Job Credit",
+      "jurisdiction": "CO",
+      "citation": "C.R.S. § 39-30-105",
+      "qualifying_jobs": 6.33,
+      "basis": "net_new_headcount",
+      "annual_credit_usd": 3165,
+      "benefit_period_years": 3,
+      "lifetime_credit_usd": 9495
+    }
+  ],
+  "packs_considered": [
+    "CO_EZ",
+    "FL_QTI",
+    "GA_JTC",
+    "NC_JTEC",
+    "NY_EXCELSIOR",
+    "OH_JCTC",
+    "SC_JTC",
+    "TN_JTC",
+    "VA_MBJF",
+    "FED_WOTC",
+    "TX_NO_PACK"
+  ],
+  "excluded": [
+    "GA_JTC"
+  ],
+  "totals": {
+    "hit_count": 3,
+    "annual_credit_usd": 119325,
+    "lifetime_credit_usd": 167895
+  }
+}

@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+  <PropertyGroup>
+    <RootNamespace>TaxCredit.Worker</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\TaxCredit.Application\TaxCredit.Application.csproj" />
+    <ProjectReference Include="..\TaxCredit.Infrastructure.Persistence\TaxCredit.Infrastructure.Persistence.csproj" />
+    <ProjectReference Include="..\TaxCredit.ServiceDefaults\TaxCredit.ServiceDefaults.csproj" />
+  </ItemGroup>
+</Project>

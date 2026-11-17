@@ -1,0 +1,333 @@
+{
+  "improvements": [
+    {
+      "id": "IMP-routes_reads-1",
+      "kind": "defect_fix",
+      "route": "GET /api/v2/clients/{client_id}/units",
+      "case": "unknown.client-huge",
+      "categories": ["status", "body-kind", "type", "missing-field", "extra-field"],
+      "finding": "F-3",
+      "reason": "The shared storage identity binder deliberately refuses an out-of-Int64 client with JSON detail and 422 instead of allowing a SQL overflow and plain-text 500. No valid storage identity or calculated value is changed."
+    },
+    {
+      "id": "IMP-routes_reads-2",
+      "kind": "defect_fix",
+      "route": "GET /api/progress/{tax_year}",
+      "case": "get-api-progress-tax-year.query-within-negative",
+      "categories": ["status", "body-kind", "type", "missing-field", "extra-field"],
+      "finding": "F-4",
+      "reason": "A negative proximity band is invalid client input and receives the existing JSON detail family with 422 rather than Python's unhandled plain-text 500. Accepted cohort calculations are unchanged."
+    },
+    {
+      "id": "IMP-routes_reads-3",
+      "kind": "defect_fix",
+      "route": "GET /api/simulate/portfolio/{tax_year}",
+      "case": "unrecorded.simulate-portfolio-magnitude-over-bound",
+      "finding": "F-1",
+      "reason": "The unbounded CPU case was omitted from recordings. Finite simulation magnitude is operationally bounded at 10000 and larger or nonfinite input is refused with JSON detail and 422; no captured successful simulation figure is repriced."
+    },
+    {
+      "id": "IMP-routes_reads-4",
+      "kind": "defect_fix",
+      "route": "POST /api/onezero/employee/{employee_id}/review",
+      "case": "unrecorded.review-store-reopen",
+      "finding": "",
+      "reason": "Reviews use versioned durable lookup storage rather than a process-global dictionary. Reopening retains the same review and clearing closes its current version. The legacy unscoped employee namespace remains an explicitly documented integration limit."
+    },
+    {
+      "id": "IMP-routes_reads-5",
+      "kind": "defect_fix",
+      "route": "POST /api/ingestion/{tax_year}/exceptions/{exception_id}/resolve",
+      "case": "unrecorded.resolve-store-reopen",
+      "finding": "",
+      "reason": "Exception annotations hydrate the certified resolution behavior from durable client-bound lookup versions instead of a private process-global store. A multi-client source without a selected client is refused rather than silently annotating a different employer."
+    },
+    {
+      "id": "IMP-routes_reads-6",
+      "kind": "error_text",
+      "route": "GET /api/v2/clients/{client_id}/units/{unit_id}",
+      "path_prefix": "detail",
+      "categories": ["value", "type", "missing-field", "extra-field", "array-length"],
+      "finding": "",
+      "reason": "Handled failures retain the correct status and JSON detail family but use shared .NET validation wording and structural error metadata, not copies of Pydantic's English messages. Successful response fields and population numbers are not covered."
+    },
+    {
+      "id": "IMP-routes_reads-7",
+      "kind": "error_text",
+      "route": "POST /api/employee/drill",
+      "path_prefix": "detail",
+      "categories": ["value", "type", "missing-field", "extra-field", "array-length"],
+      "finding": "",
+      "reason": "Invalid JSON and token/scope refusals use the shared JSON detail error family and existing validators. Pydantic-specific prose and input-location formatting are not reimplemented; successful run identities or stored values are not waived."
+    },
+    {
+      "id": "IMP-routes_reads-8",
+      "kind": "framework_default",
+      "route": "GET /api/me",
+      "case": "cors.simple-with-token",
+      "path_prefix": "headers.access-control-allow-origin",
+      "categories": ["header"],
+      "finding": "F-13",
+      "reason": "The existing host applies its configured CORS origin allowlist instead of reflecting Python's wildcard header for an unapproved origin. This shared framework behavior is not replaced by feature-specific header emulation."
+    },
+    {
+      "id": "IMP-routes_reads-9",
+      "kind": "error_text",
+      "route": "GET /api/eligibility/{tax_year}",
+      "path_prefix": "detail",
+      "categories": ["value", "type", "missing-field", "extra-field", "array-length"],
+      "finding": "",
+      "reason": "Tier C retains JSON detail and the same error status, but uses shared validation prose and metadata rather than reproducing Pydantic error internals. No successful eligibility count or stored result is covered."
+    },
+    {
+      "id": "IMP-routes_reads-10",
+      "kind": "error_text",
+      "route": "GET /api/progress/{tax_year}",
+      "path_prefix": "detail",
+      "categories": ["value", "type", "missing-field", "extra-field", "array-length"],
+      "finding": "",
+      "reason": "Handled failures retain their status and JSON detail family. Shared .NET parsing and validation wording and error metadata are used; no successful progress denominator, headcount or forecast value is covered."
+    },
+    {
+      "id": "IMP-routes_reads-11",
+      "kind": "error_text",
+      "route": "GET /api/forecast/{tax_year}",
+      "path_prefix": "detail",
+      "categories": ["value", "type", "missing-field", "extra-field", "array-length"],
+      "finding": "",
+      "reason": "Handled errors keep their status and JSON detail family without copying Pydantic parsing messages or internal error metadata. Successful source-backed forecast figures and fiscal values are not covered."
+    },
+    {
+      "id": "IMP-routes_reads-12",
+      "kind": "error_text",
+      "route": "GET /api/alerts/monthly/{tax_year}",
+      "path_prefix": "detail",
+      "categories": ["value", "type", "missing-field", "extra-field", "array-length"],
+      "finding": "",
+      "reason": "Tier C errors retain the JSON detail family and status while shared parsing and validation supply their own wording and metadata. No accepted monthly alert or calculated value is covered."
+    },
+    {
+      "id": "IMP-routes_reads-13",
+      "kind": "error_text",
+      "route": "GET /api/triggers",
+      "path_prefix": "detail",
+      "categories": ["value", "type", "missing-field", "extra-field", "array-length"],
+      "finding": "",
+      "reason": "Client and scalar parsing refusals use the shared JSON detail error family without reproducing Pydantic internals. This entry does not cover status changes or successful trigger values."
+    },
+    {
+      "id": "IMP-routes_reads-14",
+      "kind": "error_text",
+      "route": "GET /api/performance/{tax_year}",
+      "path_prefix": "detail",
+      "categories": ["value", "type", "missing-field", "extra-field", "array-length"],
+      "finding": "",
+      "reason": "Error status and the JSON detail family are preserved while wording and validation metadata come from the host's shared validator, not Python framework emulation. Successful performance figures are not covered."
+    },
+    {
+      "id": "IMP-routes_reads-15",
+      "kind": "error_text",
+      "route": "GET /api/onezero/matrix/{tax_year}",
+      "path_prefix": "detail",
+      "categories": ["value", "type", "missing-field", "extra-field", "array-length"],
+      "finding": "",
+      "reason": "Handled matrix failures retain status and the JSON detail family but use shared validation messages and metadata. Stored matrix cells, verdicts, populations and run identities are never covered."
+    },
+    {
+      "id": "IMP-routes_reads-16",
+      "kind": "error_text",
+      "route": "GET /api/onezero/{tax_year}",
+      "path_prefix": "detail",
+      "categories": ["value", "type", "missing-field", "extra-field", "array-length"],
+      "finding": "",
+      "reason": "The host validates malformed scalar selections with its JSON detail error family and existing message vocabulary. The same statuses are required; successful legacy OneZero calculation values are not covered."
+    },
+    {
+      "id": "IMP-routes_reads-17",
+      "kind": "error_text",
+      "route": "GET /api/onezero/{tax_year}/employee/{employee_id}",
+      "path_prefix": "detail",
+      "categories": ["value", "type", "missing-field", "extra-field", "array-length"],
+      "finding": "",
+      "reason": "Malformed inputs and handled refusals use shared JSON detail messages and validation metadata rather than exact Python framework output. Successful employee calculations, review decisions and statuses are not covered."
+    },
+    {
+      "id": "IMP-routes_reads-18",
+      "kind": "error_text",
+      "route": "POST /api/onezero/employee/{employee_id}/review",
+      "path_prefix": "detail",
+      "categories": ["value", "type", "missing-field", "extra-field", "array-length"],
+      "finding": "",
+      "reason": "Invalid JSON and review fields retain the correct error status and JSON detail family while using the shared validator's prose and metadata. Successful review values and author attribution are not waived."
+    },
+    {
+      "id": "IMP-routes_reads-19",
+      "kind": "error_text",
+      "route": "GET /api/designations/{state}",
+      "path_prefix": "detail",
+      "categories": ["value", "type", "missing-field", "extra-field", "array-length"],
+      "finding": "",
+      "reason": "The existing host supplies its own parsing error messages and metadata in JSON detail; matching statuses remain mandatory. No successful designation, year label or statutory value is covered."
+    },
+    {
+      "id": "IMP-routes_reads-20",
+      "kind": "error_text",
+      "route": "GET /api/reconcile/{tax_year}",
+      "path_prefix": "detail",
+      "categories": ["value", "type", "missing-field", "extra-field", "array-length"],
+      "finding": "",
+      "reason": "Handled reconciliation errors retain their JSON detail family and status, but not Pydantic-specific English or validation metadata. No successful reconciliation figure or benchmark is covered."
+    },
+    {
+      "id": "IMP-routes_reads-21",
+      "kind": "error_text",
+      "route": "GET /api/qc/{tax_year}",
+      "path_prefix": "detail",
+      "categories": ["value", "type", "missing-field", "extra-field", "array-length"],
+      "finding": "",
+      "reason": "Parsing failures use shared JSON detail wording and metadata with the existing error statuses. Successful QC counts, exception identities and decisions are outside this entry."
+    },
+    {
+      "id": "IMP-routes_reads-22",
+      "kind": "error_text",
+      "route": "GET /api/onezero/retroactive/scan",
+      "path_prefix": "detail",
+      "categories": ["value", "type", "missing-field", "extra-field", "array-length"],
+      "finding": "",
+      "reason": "Malformed input errors keep JSON detail and their status while using shared validation prose and metadata. Retroactive years, tranches, credits and filing membership are not covered."
+    },
+    {
+      "id": "IMP-routes_reads-23",
+      "kind": "error_text",
+      "route": "GET /api/simulate/portfolio/{tax_year}",
+      "path_prefix": "detail",
+      "categories": ["value", "type", "missing-field", "extra-field", "array-length"],
+      "finding": "",
+      "reason": "Malformed simulation inputs and handled refusals retain JSON detail and their status while using shared .NET messages and validation metadata. Successful before/after figures are never waived."
+    },
+    {
+      "id": "IMP-routes_reads-24",
+      "kind": "error_text",
+      "route": "POST /api/simulate/unit",
+      "path_prefix": "detail",
+      "categories": ["value", "type", "missing-field", "extra-field", "array-length"],
+      "finding": "",
+      "reason": "Body parsing and bound errors keep the JSON detail family and status, without emulating Pydantic's English and error metadata. This does not cover successful baseline or simulated values."
+    },
+    {
+      "id": "IMP-routes_reads-25",
+      "kind": "error_text",
+      "route": "POST /api/simulate/employee",
+      "path_prefix": "detail",
+      "categories": ["value", "type", "missing-field", "extra-field", "array-length"],
+      "finding": "",
+      "reason": "Invalid employee stacks and malformed bodies use the shared JSON detail error family and existing statuses rather than Python framework-specific messages and metadata. No successful lever or calculation is covered."
+    },
+    {
+      "id": "IMP-routes_reads-26",
+      "kind": "error_text",
+      "route": "POST /api/simulate/onezero",
+      "path_prefix": "detail",
+      "categories": ["value", "type", "missing-field", "extra-field", "array-length"],
+      "finding": "",
+      "reason": "Invalid request bodies receive the same error status and JSON detail family using host validation wording and metadata. No successful simulated headcount, credit or year value is covered."
+    },
+    {
+      "id": "IMP-routes_reads-27",
+      "kind": "error_text",
+      "route": "GET /api/ingestion/{tax_year}",
+      "path_prefix": "detail",
+      "categories": ["value", "type", "missing-field", "extra-field", "array-length"],
+      "finding": "",
+      "reason": "Handled ingestion errors use the shared JSON detail family and validation vocabulary while keeping their status. No successful source count, canonical count or annotation value is covered."
+    },
+    {
+      "id": "IMP-routes_reads-28",
+      "kind": "error_text",
+      "route": "POST /api/ingestion/{tax_year}/exceptions/{exception_id}/resolve",
+      "path_prefix": "detail",
+      "categories": ["value", "type", "missing-field", "extra-field", "array-length"],
+      "finding": "",
+      "reason": "Invalid resolution fields or JSON retain their error status and JSON detail family but not exact Python validation wording and metadata. Successful resolution decisions and reviewer attribution are not waived."
+    },
+    {
+      "id": "IMP-routes_reads-29",
+      "kind": "error_text",
+      "route": "GET /api/ingestion/{tax_year}/rows",
+      "path_prefix": "detail",
+      "categories": ["value", "type", "missing-field", "extra-field", "array-length"],
+      "finding": "",
+      "reason": "Malformed source-browser selections use shared parsing messages and metadata in the JSON detail family, with matching statuses still required. Returned source rows, sorting and totals are not covered."
+    },
+    {
+      "id": "IMP-routes_reads-30",
+      "kind": "error_text",
+      "route": "GET /api/proximity/{tax_year}",
+      "path_prefix": "detail",
+      "categories": ["value", "type", "missing-field", "extra-field", "array-length"],
+      "finding": "",
+      "reason": "The same error statuses and JSON detail family are retained without copying Pydantic-specific wording and metadata. Successful cohort counts, gaps, rates and forecasts are not covered."
+    },
+    {
+      "id": "IMP-routes_reads-31",
+      "kind": "error_text",
+      "route": "GET /api/scope/client/{account_id}",
+      "path_prefix": "detail",
+      "categories": ["value", "type", "missing-field", "extra-field", "array-length"],
+      "finding": "",
+      "reason": "Unknown-client and malformed-selection errors use shared JSON detail messages and metadata with the same statuses. Successful source catalogue IDs, years, windows and row counts are not waived."
+    },
+    {
+      "id": "IMP-routes_reads-32",
+      "kind": "error_text",
+      "route": "GET /api/v2/clients/{client_id}/units",
+      "path_prefix": "detail",
+      "categories": ["value", "type", "missing-field", "extra-field", "array-length"],
+      "finding": "",
+      "reason": "Malformed selections retain the JSON detail error family and same statuses while using the shared host's validation prose and metadata. Successful Gold cells, totals, paging values and run identities are outside this entry."
+    },
+    {
+      "id": "IMP-routes_reads-33",
+      "kind": "error_text",
+      "route": "GET /api/v2/employees/{record_token}",
+      "path_prefix": "detail",
+      "categories": ["value", "type", "missing-field", "extra-field", "array-length"],
+      "finding": "",
+      "reason": "Handled token, client and year refusals keep the same status and JSON detail family without emulating Python message wording or error metadata. Successful accepted employee values are never waived."
+    },
+    {
+      "id": "IMP-routes_reads-34",
+      "kind": "error_text",
+      "route": "GET /api/me",
+      "path_prefix": "detail",
+      "categories": ["value", "type", "missing-field", "extra-field", "array-length"],
+      "finding": "",
+      "reason": "Authentication refusals retain their status, challenge and JSON detail family but do not disclose the Python JWT exception class in English messages. Successful verified identity and acting-user fields are not covered."
+    },
+    {
+      "id": "IMP-routes_reads-35",
+      "kind": "error_text",
+      "route": "GET /api/scope",
+      "case": "unavailable.scope",
+      "categories": ["value", "type", "missing-field", "extra-field", "array-length"],
+      "finding": "",
+      "reason": "An unconfigured source retains 503 and JSON detail. The shared source exception places dependency and remedy inside detail rather than Python's top-level diagnostic fields; no successful catalogue value is covered."
+    },
+    {
+      "id": "IMP-routes_reads-36",
+      "kind": "defect_fix",
+      "route": "GET /api/forecast/{tax_year}",
+      "case": "unavailable.forecast",
+      "finding": "",
+      "reason": "An unconfigured selected source is a dependency failure and receives 503 with JSON detail rather than pretending the selected client has no payroll and returning 404. Successful forecast figures are unchanged."
+    },
+    {
+      "id": "IMP-routes_reads-37",
+      "kind": "defect_fix",
+      "route": "GET /api/ingestion/{tax_year}",
+      "case": "unavailable.ingestion",
+      "finding": "",
+      "reason": "An unconfigured selected source is a dependency failure and receives 503 with JSON detail rather than a misleading no-payroll 404. This change does not invent an empty ingestion report or alter a successful count."
+    }
+  ]
+}

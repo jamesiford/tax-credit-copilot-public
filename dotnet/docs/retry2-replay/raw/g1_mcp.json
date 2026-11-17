@@ -1,0 +1,5439 @@
+{
+ "mode": "semantic",
+ "interpreter": {
+  "python": "external server",
+  "zlib": "n/a",
+  "oracle": null,
+  "allow_other_python": false
+ },
+ "scenarios": [
+  {
+   "scenario": "g1_mcp",
+   "exchanges": 103,
+   "failures": [
+    {
+     "scenario": "g1_mcp",
+     "case": "no-token",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "401",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "no-token",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "no-token",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.www-authenticate",
+     "expected": "Bearer",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "no-token",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "error",
+     "expected": "{\"code\":\"unauthenticated\",\"message\":\"no bearer token\"}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "no-token",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "garbage-token",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "401",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "garbage-token",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "garbage-token",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.www-authenticate",
+     "expected": "Bearer",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "garbage-token",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "error",
+     "expected": "{\"code\":\"unauthenticated\",\"message\":\"invalid token: DecodeError\"}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "garbage-token",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "initialize",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "initialize",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "initialize",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "initialize",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "1",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "initialize",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{\"tools\":{\"listChanged\":false}},\"serverInfo\":{\"name\":\"tcc-channel-gateway\",\"version\":\"0.1.0\"},\"instructions\":\"Every figure these tools return is the platform's own. Quote figures exactly as written.\"}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "initialize",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "initialize-old-version",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "initialize-old-version",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "initialize-old-version",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "initialize-old-version",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "2",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "initialize-old-version",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"protocolVersion\":\"2025-11-25\",\"capabilities\":{\"tools\":{\"listChanged\":false}},\"serverInfo\":{\"name\":\"tcc-channel-gateway\",\"version\":\"0.1.0\"},\"instructions\":\"Every figure these tools return is the platform's own. Quote figures exactly as written.\"}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "initialize-old-version",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "initialize-no-params",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "initialize-no-params",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "initialize-no-params",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "initialize-no-params",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "3",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "initialize-no-params",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"protocolVersion\":\"2025-11-25\",\"capabilities\":{\"tools\":{\"listChanged\":false}},\"serverInfo\":{\"name\":\"tcc-channel-gateway\",\"version\":\"0.1.0\"},\"instructions\":\"Every figure these tools return is the platform's own. Quote figures exactly as written.\"}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "initialize-no-params",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "initialized-notification",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "202",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "initialized-notification",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.content-type",
+     "expected": "<absent>",
+     "actual": "application/json"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "initialized-notification",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "initialized-notification",
+     "route": "POST /mcp",
+     "category": "body-kind",
+     "path": "body",
+     "expected": "empty",
+     "actual": "json"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "ping",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "ping",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "ping",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "ping",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "4",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "ping",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "ping",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-list",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-list",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-list",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-list",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "5",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-list",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"tools\":[{\"name\":\"book_rank\",\"title\":\"Book rank\",\"description\":\"WHOLE BOOK only: which clients to call across every client, ranked by a named reason, in the page's own order. Needs no client. Never use it for a question about one client (a client named, or \\\"them\\\" or \\\"this client\\\"): use that cli...(38231 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-list",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-list-no-session",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "400",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-list-no-session",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-list-no-session",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-list-no-session",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "5",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-list-no-session",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "error",
+     "expected": "{\"code\":-32600,\"message\":\"the Mcp-Session-Id header is required once initialised\"}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-list-no-session",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-list-unknown-session",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "404",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-list-unknown-session",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-list-unknown-session",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-list-unknown-session",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "5",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-list-unknown-session",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "error",
+     "expected": "{\"code\":-32600,\"message\":\"unknown session; initialise again\"}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-list-unknown-session",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-list-bad-protocol-version",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "400",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-list-bad-protocol-version",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-list-bad-protocol-version",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-list-bad-protocol-version",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-list-bad-protocol-version",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "error",
+     "expected": "{\"code\":-32600,\"message\":\"unsupported MCP-Protocol-Version: 1999-01-01\"}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-list-bad-protocol-version",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-list-bad-origin",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "403",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-list-bad-origin",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-list-bad-origin",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "error",
+     "expected": "{\"code\":\"origin_not_allowed\",\"message\":\"this Origin is not allowed\",\"retryable\":false}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-list-bad-origin",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "unknown-method",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "unknown-method",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "unknown-method",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "unknown-method",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "6",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "unknown-method",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "error",
+     "expected": "{\"code\":-32601,\"message\":\"method not found: no/such\"}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "unknown-method",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "null-id",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "400",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "null-id",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "null-id",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "null-id",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "null-id",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "error",
+     "expected": "{\"code\":-32600,\"message\":\"a request id is a string or an integer\"}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "null-id",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "bool-id",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "400",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "bool-id",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "bool-id",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "bool-id",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "bool-id",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "error",
+     "expected": "{\"code\":-32600,\"message\":\"a request id is a string or an integer\"}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "bool-id",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "not-jsonrpc",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "400",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "not-jsonrpc",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "not-jsonrpc",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "not-jsonrpc",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "not-jsonrpc",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "error",
+     "expected": "{\"code\":-32600,\"message\":\"expected one JSON-RPC 2.0 message\"}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "not-jsonrpc",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "batch-array",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "400",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "batch-array",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "batch-array",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "batch-array",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "batch-array",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "error",
+     "expected": "{\"code\":-32600,\"message\":\"expected one JSON-RPC 2.0 message\"}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "batch-array",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "not-json",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "400",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "not-json",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "not-json",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "not-json",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "not-json",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "error",
+     "expected": "{\"code\":-32700,\"message\":\"the body is not JSON\"}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "not-json",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "empty-body",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "400",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "empty-body",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "empty-body",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "empty-body",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "null",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "empty-body",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "error",
+     "expected": "{\"code\":-32700,\"message\":\"the body is not JSON\"}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "empty-body",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "client-response-ignored",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "202",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "client-response-ignored",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.content-type",
+     "expected": "<absent>",
+     "actual": "application/json"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "client-response-ignored",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "client-response-ignored",
+     "route": "POST /mcp",
+     "category": "body-kind",
+     "path": "body",
+     "expected": "empty",
+     "actual": "json"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-call-missing-name",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-call-missing-name",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-call-missing-name",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-call-missing-name",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "10",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-call-missing-name",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "error",
+     "expected": "{\"code\":-32602,\"message\":\"tools/call needs a tool name and an arguments object\"}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-call-missing-name",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-call-unknown-tool",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-call-unknown-tool",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-call-unknown-tool",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-call-unknown-tool",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "11",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-call-unknown-tool",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "error",
+     "expected": "{\"code\":-32602,\"message\":\"unknown tool: no_such_tool\"}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-call-unknown-tool",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-call-arguments-not-object",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-call-arguments-not-object",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-call-arguments-not-object",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-call-arguments-not-object",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "12",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-call-arguments-not-object",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "error",
+     "expected": "{\"code\":-32602,\"message\":\"tools/call needs a tool name and an arguments object\"}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "tools-call-arguments-not-object",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "get-405",
+     "route": "GET /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "405",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "get-405",
+     "route": "GET /mcp",
+     "category": "header",
+     "path": "headers.allow",
+     "expected": "POST, DELETE",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "get-405",
+     "route": "GET /mcp",
+     "category": "header",
+     "path": "headers.content-type",
+     "expected": "<absent>",
+     "actual": "application/json"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "get-405",
+     "route": "GET /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "get-405",
+     "route": "GET /mcp",
+     "category": "body-kind",
+     "path": "body",
+     "expected": "empty",
+     "actual": "json"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "get-no-token",
+     "route": "GET /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "405",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "get-no-token",
+     "route": "GET /mcp",
+     "category": "header",
+     "path": "headers.allow",
+     "expected": "POST, DELETE",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "get-no-token",
+     "route": "GET /mcp",
+     "category": "header",
+     "path": "headers.content-type",
+     "expected": "<absent>",
+     "actual": "application/json"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "get-no-token",
+     "route": "GET /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "get-no-token",
+     "route": "GET /mcp",
+     "category": "body-kind",
+     "path": "body",
+     "expected": "empty",
+     "actual": "json"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.book_rank.typical",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.book_rank.typical",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.book_rank.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.book_rank.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "100",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.book_rank.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"VERBATIM \u2014 quote figures exactly as written.\\n\\n1 of 1 clients have been assessed. Ranked by what inaction costs, in the order the page shows.\\n\\n| # | Client | Reason | Programme | Tax year | Identified | Jobs margin |\\n| --- | --- | --- | --- | --- | --- | --- |\\...(1961 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.book_rank.typical",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.book_rank.invalid",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.book_rank.invalid",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.book_rank.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.book_rank.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "101",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.book_rank.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (invalid_arguments): arguments: Additional properties are not allowed ('zz_unknown_argument' was unexpected)\"}],\"structuredContent\":{\"error\":{\"code\":\"invalid_arguments\",\"message\":\"arguments: Additional properties are not allowed ('zz_...(422 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.book_rank.invalid",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_resolve.typical",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_resolve.typical",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_resolve.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_resolve.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "102",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_resolve.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"VERBATIM \u2014 quote figures exactly as written.\\n\\nWhich client do you mean? (no client is selected)\\n\\n- Reference Dataset Client\\n\\nNot tax advice: these figures are computed from payroll by this software and must be reviewed by a qualified tax professional before a...(1100 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_resolve.typical",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_resolve.invalid",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_resolve.invalid",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_resolve.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_resolve.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "103",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_resolve.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (invalid_arguments): name_or_text: {'nested': 1} is not of type 'string'\"}],\"structuredContent\":{\"error\":{\"code\":\"invalid_arguments\",\"message\":\"name_or_text: {'nested': 1} is not of type 'string'\",\"retryable\":false},\"correlation_id\":\"...(350 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_resolve.invalid",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_situation.typical",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_situation.typical",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_situation.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_situation.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "104",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_situation.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"VERBATIM \u2014 quote figures exactly as written.\\n\\n### Reference Dataset Client\\n\\n2 recorded cells. Identified credit: $66,500.\\n\\n| Reason | Programme | Tax year | Identified | Jobs margin |\\n| --- | --- | --- | --- | --- |\\n| Identified | GA_JTC | 2025 | $66,500 | ...(2102 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_situation.typical",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_situation.invalid",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_situation.invalid",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_situation.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_situation.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "105",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_situation.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (invalid_arguments): client_id: 'abc' is not of type 'integer'\"}],\"structuredContent\":{\"error\":{\"code\":\"invalid_arguments\",\"message\":\"client_id: 'abc' is not of type 'integer'\",\"retryable\":false},\"correlation_id\":\"40000000000040008000...(330 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_situation.invalid",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_eligibility.typical",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_eligibility.typical",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_eligibility.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_eligibility.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "106",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_eligibility.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"VERBATIM \u2014 quote figures exactly as written.\\n\\n### Georgia Jobs Tax Credit \u00b7 TY2025\\n\\n| Measure | Value |\\n| --- | --- |\\n| Average headcount | 64.17 |\\n| Prior-year average headcount | 40.42 |\\n| Qualifying jobs | 21.75 |\\n| Annual credit | $76,125 |\\n| Lifetime...(2459 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_eligibility.typical",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_eligibility.invalid",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_eligibility.invalid",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_eligibility.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_eligibility.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "107",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_eligibility.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (invalid_arguments): client_id: 'abc' is not of type 'integer'\"}],\"structuredContent\":{\"error\":{\"code\":\"invalid_arguments\",\"message\":\"client_id: 'abc' is not of type 'integer'\",\"retryable\":false},\"correlation_id\":\"40000000000040008000...(330 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_eligibility.invalid",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_trend.typical",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_trend.typical",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_trend.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_trend.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "108",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_trend.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"VERBATIM \u2014 quote figures exactly as written.\\n\\n| Tax year | Average headcount | Eligible | Evaluated | Annual credit |  |\\n| --- | --- | --- | --- | --- | --- |\\n| 2024 | 40.00 | 49 | 81 | $0 | Base year |\\n| 2025 | 61.00 | 72 | 107 | $73,500 |  |\\n\\nEligible empl...(2291 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_trend.typical",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_trend.invalid",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_trend.invalid",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_trend.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_trend.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "109",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_trend.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (invalid_arguments): client_id: 'abc' is not of type 'integer'\"}],\"structuredContent\":{\"error\":{\"code\":\"invalid_arguments\",\"message\":\"client_id: 'abc' is not of type 'integer'\",\"retryable\":false},\"correlation_id\":\"40000000000040008000...(330 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_trend.invalid",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_at_risk.typical",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_at_risk.typical",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_at_risk.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_at_risk.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "110",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_at_risk.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"VERBATIM \u2014 quote figures exactly as written.\\n\\n46 of 77 counted employees sit within 5 weekly hours of a floor: 46 bind on hours and 0 on wages. Jobs at risk: 46.00.\\n\\nCushion is the SMALLER of the two floors' headroom, because eligibility needs both cleared \u2014 an...(5330 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_at_risk.typical",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_at_risk.invalid",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_at_risk.invalid",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_at_risk.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_at_risk.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "111",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_at_risk.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (invalid_arguments): client_id: 'abc' is not of type 'integer'\"}],\"structuredContent\":{\"error\":{\"code\":\"invalid_arguments\",\"message\":\"client_id: 'abc' is not of type 'integer'\",\"retryable\":false},\"correlation_id\":\"40000000000040008000...(330 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_at_risk.invalid",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_discovery.typical",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_discovery.typical",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_discovery.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_discovery.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "112",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_discovery.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"VERBATIM \u2014 quote figures exactly as written.\\n\\nProgrammes with a positive statutory credit, largest lifetime credit first.\\n\\n| Programme | Jurisdiction | Qualifying jobs | Annual credit | Lifetime credit |\\n| --- | --- | --- | --- | --- |\\n| Georgia Jobs Tax Cred...(3231 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_discovery.typical",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_discovery.invalid",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_discovery.invalid",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_discovery.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_discovery.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "113",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_discovery.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (invalid_arguments): client_id: 'abc' is not of type 'integer'\"}],\"structuredContent\":{\"error\":{\"code\":\"invalid_arguments\",\"message\":\"client_id: 'abc' is not of type 'integer'\",\"retryable\":false},\"correlation_id\":\"40000000000040008000...(330 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.client_discovery.invalid",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.simulate.typical",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.simulate.typical",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.simulate.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.simulate.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "114",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.simulate.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"VERBATIM \u2014 quote figures exactly as written.\\n\\n### GA_ATL_HQ \u00b7 TY2025\\n\\nAdded 1 full-time heads (cloned from E00064) at GA_ATL_HQ\\n\\n| Measure | Baseline | Projected | Change |\\n| --- | --- | --- | --- |\\n| Average headcount | 17.25 | 18.17 | 0.92 |\\n| Net new vs...(2771 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.simulate.typical",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.simulate.invalid",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.simulate.invalid",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.simulate.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.simulate.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "115",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.simulate.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (invalid_arguments): client_id: 'abc' is not of type 'integer'\"}],\"structuredContent\":{\"error\":{\"code\":\"invalid_arguments\",\"message\":\"client_id: 'abc' is not of type 'integer'\",\"retryable\":false},\"correlation_id\":\"40000000000040008000...(330 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.simulate.invalid",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.calc_walkthrough.typical",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.calc_walkthrough.typical",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.calc_walkthrough.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.calc_walkthrough.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "116",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.calc_walkthrough.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"VERBATIM \u2014 quote figures exactly as written.\\n\\n### Georgia Jobs Tax Credit \u00b7 TY2025\\n\\nCitation: OCGA \u00a7 48-7-40\\n\\n| Step | Inputs | Formula | Output | Citation |\\n| --- | --- | --- | --- | --- |\\n| Apply One/Zero Average Headcount to Georgia Jobs Tax Credit benef...(2847 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.calc_walkthrough.typical",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.calc_walkthrough.invalid",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.calc_walkthrough.invalid",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.calc_walkthrough.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.calc_walkthrough.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "117",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.calc_walkthrough.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (invalid_arguments): client_id: 'abc' is not of type 'integer'\"}],\"structuredContent\":{\"error\":{\"code\":\"invalid_arguments\",\"message\":\"client_id: 'abc' is not of type 'integer'\",\"retryable\":false},\"correlation_id\":\"40000000000040008000...(330 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.calc_walkthrough.invalid",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.employee_drill.typical",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.employee_drill.typical",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.employee_drill.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.employee_drill.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "118",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.employee_drill.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (invalid_arguments): record_token: 'x' is too short\"}],\"structuredContent\":{\"error\":{\"code\":\"invalid_arguments\",\"message\":\"record_token: 'x' is too short\",\"retryable\":false},\"correlation_id\":\"4000000000004000800000000000003f\"},\"isErro...(308 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.employee_drill.typical",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.employee_drill.invalid",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.employee_drill.invalid",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.employee_drill.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.employee_drill.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "119",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.employee_drill.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (invalid_arguments): client_id: 'abc' is not of type 'integer'; record_token: 'x' is too short\"}],\"structuredContent\":{\"error\":{\"code\":\"invalid_arguments\",\"message\":\"client_id: 'abc' is not of type 'integer'; record_token: 'x' is too ...(394 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.employee_drill.invalid",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.findings_list.typical",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.findings_list.typical",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.findings_list.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.findings_list.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "120",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.findings_list.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"VERBATIM \u2014 quote figures exactly as written.\\n\\n2 of 2 decisions are open, covering 2 underlying records.\\n\\n| Finding | Grain | Records | Status |\\n| --- | --- | --- | --- |\\n| Employee counted at two worksites in one month \u2014 clear-cut | Policy | 1 | Open |\\n| Emp...(3818 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.findings_list.typical",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.findings_list.invalid",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.findings_list.invalid",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.findings_list.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.findings_list.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "121",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.findings_list.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (invalid_arguments): client_id: 'abc' is not of type 'integer'\"}],\"structuredContent\":{\"error\":{\"code\":\"invalid_arguments\",\"message\":\"client_id: 'abc' is not of type 'integer'\",\"retryable\":false},\"correlation_id\":\"40000000000040008000...(330 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.findings_list.invalid",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_cell_history.typical",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_cell_history.typical",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_cell_history.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_cell_history.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "122",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_cell_history.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"VERBATIM \u2014 quote figures exactly as written.\\n\\n### GA_JTC \u00b7 TY2025\\n\\n| From | Status | Identified | Claimed | Decided by |\\n| --- | --- | --- | --- | --- |\\n| 2026-01-15 | assessed | $66,500 | $0 | tests |\\n\\nProvenance: rule pack ga_jtc.json.\\n\\nNot tax advice: ...(2851 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_cell_history.typical",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_cell_history.invalid",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_cell_history.invalid",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_cell_history.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_cell_history.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "123",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_cell_history.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (invalid_arguments): client_id: 'abc' is not of type 'integer'\"}],\"structuredContent\":{\"error\":{\"code\":\"invalid_arguments\",\"message\":\"client_id: 'abc' is not of type 'integer'\",\"retryable\":false},\"correlation_id\":\"40000000000040008000...(330 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_cell_history.invalid",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.data_catalog.typical",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.data_catalog.typical",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.data_catalog.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.data_catalog.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "124",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.data_catalog.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"VERBATIM \u2014 quote figures exactly as written.\\n\\n### Queryable data\\n\\n| Dataset | One row is | Source |\\n| --- | --- | --- |\\n| employee_period_fact | One row per employee per pay period, after the payroll was normalised. The only table that scales with payroll. | ...(8510 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.data_catalog.typical",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.data_catalog.invalid",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.data_catalog.invalid",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.data_catalog.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.data_catalog.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "125",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.data_catalog.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (invalid_arguments): arguments: Additional properties are not allowed ('zz_unknown_argument' was unexpected)\"}],\"structuredContent\":{\"error\":{\"code\":\"invalid_arguments\",\"message\":\"arguments: Additional properties are not allowed ('zz_...(422 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.data_catalog.invalid",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.data_query.typical",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.data_query.typical",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.data_query.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.data_query.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "126",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.data_query.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (empty_query): select at least one column or one measure\"}],\"structuredContent\":{\"error\":{\"code\":\"empty_query\",\"message\":\"select at least one column or one measure\",\"retryable\":false},\"correlation_id\":\"4000000000004000800000000000004f...(318 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.data_query.typical",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.data_query.invalid",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.data_query.invalid",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.data_query.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.data_query.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "127",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.data_query.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (invalid_arguments): dataset: {'nested': 1} is not of type 'string'; dataset: {'nested': 1} is not one of ['employee_period_fact', 'employee_eligibility', 'onezero_matrix', 'unit_month_summary', 'run_method_summary', 'run_manifest', '...(834 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.data_query.invalid",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.data_distinct_values.typical",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.data_distinct_values.typical",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.data_distinct_values.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.data_distinct_values.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "128",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.data_distinct_values.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (unknown_column): no such column in that dataset; read the catalog for the names\"}],\"structuredContent\":{\"error\":{\"code\":\"unknown_column\",\"message\":\"no such column in that dataset; read the catalog for the names\",\"retryable\":false,\"fi...(383 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.data_distinct_values.typical",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.data_distinct_values.invalid",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.data_distinct_values.invalid",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.data_distinct_values.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.data_distinct_values.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "129",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.data_distinct_values.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (invalid_arguments): client_id: 'abc' is not of type 'integer'\"}],\"structuredContent\":{\"error\":{\"code\":\"invalid_arguments\",\"message\":\"client_id: 'abc' is not of type 'integer'\",\"retryable\":false},\"correlation_id\":\"40000000000040008000...(330 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.data_distinct_values.invalid",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.verify_figures.typical",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.verify_figures.typical",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.verify_figures.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.verify_figures.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "130",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.verify_figures.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"VERBATIM \u2014 quote figures exactly as written.\\n\\n### Figure check\\n\\nEvery figure in the draft was found in this conversation's results (0 checked).\\n\\nNot tax advice: these figures are computed from payroll by this software and must be reviewed by a qualified tax p...(1065 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.verify_figures.typical",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.verify_figures.invalid",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.verify_figures.invalid",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.verify_figures.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.verify_figures.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "131",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.verify_figures.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (invalid_arguments): draft_text: {'nested': 1} is not of type 'string'\"}],\"structuredContent\":{\"error\":{\"code\":\"invalid_arguments\",\"message\":\"draft_text: {'nested': 1} is not of type 'string'\",\"retryable\":false},\"correlation_id\":\"4000...(346 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.verify_figures.invalid",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_status.typical",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_status.typical",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_status.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_status.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "132",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_status.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (not_calculated): No run batch has been started yet.\"}],\"structuredContent\":{\"error\":{\"code\":\"not_calculated\",\"message\":\"No run batch has been started yet.\",\"retryable\":false},\"correlation_id\":\"4000000000004000800000000000005b\"},\"isEr...(310 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_status.typical",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_status.invalid",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_status.invalid",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_status.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_status.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "133",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_status.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (invalid_arguments): arguments: Additional properties are not allowed ('zz_unknown_argument' was unexpected)\"}],\"structuredContent\":{\"error\":{\"code\":\"invalid_arguments\",\"message\":\"arguments: Additional properties are not allowed ('zz_...(422 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_status.invalid",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_list.typical",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_list.typical",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_list.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_list.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "134",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_list.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (not_calculated): No run batch has been started yet.\"}],\"structuredContent\":{\"error\":{\"code\":\"not_calculated\",\"message\":\"No run batch has been started yet.\",\"retryable\":false},\"correlation_id\":\"4000000000004000800000000000005f\"},\"isEr...(310 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_list.typical",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_list.invalid",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_list.invalid",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_list.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_list.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "135",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_list.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (invalid_arguments): arguments: Additional properties are not allowed ('zz_unknown_argument' was unexpected)\"}],\"structuredContent\":{\"error\":{\"code\":\"invalid_arguments\",\"message\":\"arguments: Additional properties are not allowed ('zz_...(422 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_list.invalid",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.program_catalog.typical",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.program_catalog.typical",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.program_catalog.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.program_catalog.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "136",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.program_catalog.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"VERBATIM \u2014 quote figures exactly as written.\\n\\n### Programs the platform knows\\n\\n10 programs are registered; 1 can be calculated for their authored years.\\n\\n| Program | State | Lifecycle | Authored years | Calculable | Clients |\\n| --- | --- | --- | --- | --- | ...(10063 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.program_catalog.typical",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.program_catalog.invalid",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.program_catalog.invalid",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.program_catalog.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.program_catalog.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "137",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.program_catalog.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (invalid_arguments): arguments: Additional properties are not allowed ('zz_unknown_argument' was unexpected)\"}],\"structuredContent\":{\"error\":{\"code\":\"invalid_arguments\",\"message\":\"arguments: Additional properties are not allowed ('zz_...(422 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.program_catalog.invalid",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_package_link.typical",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_package_link.typical",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_package_link.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_package_link.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "138",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_package_link.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (not_calculated): no claim package has been built for client 1001, tax year 2025; build it with claim_package_create first\"}],\"structuredContent\":{\"error\":{\"code\":\"not_calculated\",\"message\":\"no claim package has been built for client ...(450 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_package_link.typical",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_package_link.invalid",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_package_link.invalid",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_package_link.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_package_link.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "139",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_package_link.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (invalid_arguments): client_id: 'abc' is not of type 'integer'\"}],\"structuredContent\":{\"error\":{\"code\":\"invalid_arguments\",\"message\":\"client_id: 'abc' is not of type 'integer'\",\"retryable\":false},\"correlation_id\":\"40000000000040008000...(330 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_package_link.invalid",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_resolve_prepare.typical",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_resolve_prepare.typical",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_resolve_prepare.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_resolve_prepare.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "140",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_resolve_prepare.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (not_authorized): this user is not entitled to make changes\"}],\"structuredContent\":{\"error\":{\"code\":\"not_authorized\",\"message\":\"this user is not entitled to make changes\",\"retryable\":false},\"correlation_id\":\"40000000000040008000000000...(324 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_resolve_prepare.typical",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_resolve_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_resolve_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_resolve_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_resolve_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "141",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_resolve_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (invalid_arguments): client_id: 'abc' is not of type 'integer'\"}],\"structuredContent\":{\"error\":{\"code\":\"invalid_arguments\",\"message\":\"client_id: 'abc' is not of type 'integer'\",\"retryable\":false},\"correlation_id\":\"40000000000040008000...(330 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_resolve_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_resolve_commit.typical",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_resolve_commit.typical",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_resolve_commit.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_resolve_commit.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "142",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_resolve_commit.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (not_authorized): this user is not entitled to make changes\"}],\"structuredContent\":{\"error\":{\"code\":\"not_authorized\",\"message\":\"this user is not entitled to make changes\",\"retryable\":false},\"correlation_id\":\"40000000000040008000000000...(324 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_resolve_commit.typical",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_resolve_commit.invalid",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_resolve_commit.invalid",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_resolve_commit.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_resolve_commit.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "143",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_resolve_commit.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (not_authorized): this user is not entitled to make changes\"}],\"structuredContent\":{\"error\":{\"code\":\"not_authorized\",\"message\":\"this user is not entitled to make changes\",\"retryable\":false},\"correlation_id\":\"40000000000040008000000000...(324 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_resolve_commit.invalid",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_reopen_prepare.typical",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_reopen_prepare.typical",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_reopen_prepare.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_reopen_prepare.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "144",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_reopen_prepare.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (not_authorized): this user is not entitled to make changes\"}],\"structuredContent\":{\"error\":{\"code\":\"not_authorized\",\"message\":\"this user is not entitled to make changes\",\"retryable\":false},\"correlation_id\":\"40000000000040008000000000...(324 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_reopen_prepare.typical",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_reopen_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_reopen_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_reopen_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_reopen_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "145",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_reopen_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (invalid_arguments): client_id: 'abc' is not of type 'integer'\"}],\"structuredContent\":{\"error\":{\"code\":\"invalid_arguments\",\"message\":\"client_id: 'abc' is not of type 'integer'\",\"retryable\":false},\"correlation_id\":\"40000000000040008000...(330 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_reopen_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_reopen_commit.typical",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_reopen_commit.typical",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_reopen_commit.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_reopen_commit.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "146",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_reopen_commit.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (not_authorized): this user is not entitled to make changes\"}],\"structuredContent\":{\"error\":{\"code\":\"not_authorized\",\"message\":\"this user is not entitled to make changes\",\"retryable\":false},\"correlation_id\":\"40000000000040008000000000...(324 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_reopen_commit.typical",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_reopen_commit.invalid",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_reopen_commit.invalid",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_reopen_commit.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_reopen_commit.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "147",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_reopen_commit.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (not_authorized): this user is not entitled to make changes\"}],\"structuredContent\":{\"error\":{\"code\":\"not_authorized\",\"message\":\"this user is not entitled to make changes\",\"retryable\":false},\"correlation_id\":\"40000000000040008000000000...(324 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.finding_reopen_commit.invalid",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_transition_prepare.typical",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_transition_prepare.typical",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_transition_prepare.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_transition_prepare.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "148",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_transition_prepare.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (not_authorized): this user is not entitled to make changes\"}],\"structuredContent\":{\"error\":{\"code\":\"not_authorized\",\"message\":\"this user is not entitled to make changes\",\"retryable\":false},\"correlation_id\":\"40000000000040008000000000...(324 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_transition_prepare.typical",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_transition_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_transition_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_transition_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_transition_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "149",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_transition_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (invalid_arguments): client_id: 'abc' is not of type 'integer'\"}],\"structuredContent\":{\"error\":{\"code\":\"invalid_arguments\",\"message\":\"client_id: 'abc' is not of type 'integer'\",\"retryable\":false},\"correlation_id\":\"40000000000040008000...(330 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_transition_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_transition_commit.typical",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_transition_commit.typical",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_transition_commit.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_transition_commit.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "150",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_transition_commit.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (not_authorized): this user is not entitled to make changes\"}],\"structuredContent\":{\"error\":{\"code\":\"not_authorized\",\"message\":\"this user is not entitled to make changes\",\"retryable\":false},\"correlation_id\":\"40000000000040008000000000...(324 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_transition_commit.typical",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_transition_commit.invalid",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_transition_commit.invalid",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_transition_commit.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_transition_commit.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "151",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_transition_commit.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (not_authorized): this user is not entitled to make changes\"}],\"structuredContent\":{\"error\":{\"code\":\"not_authorized\",\"message\":\"this user is not entitled to make changes\",\"retryable\":false},\"correlation_id\":\"40000000000040008000000000...(324 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_transition_commit.invalid",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_record_prepare.typical",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_record_prepare.typical",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_record_prepare.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_record_prepare.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "152",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_record_prepare.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (not_authorized): this user is not entitled to make changes\"}],\"structuredContent\":{\"error\":{\"code\":\"not_authorized\",\"message\":\"this user is not entitled to make changes\",\"retryable\":false},\"correlation_id\":\"40000000000040008000000000...(324 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_record_prepare.typical",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_record_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_record_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_record_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_record_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "153",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_record_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (invalid_arguments): client_id: 'abc' is not of type 'integer'\"}],\"structuredContent\":{\"error\":{\"code\":\"invalid_arguments\",\"message\":\"client_id: 'abc' is not of type 'integer'\",\"retryable\":false},\"correlation_id\":\"40000000000040008000...(330 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_record_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_record_commit.typical",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_record_commit.typical",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_record_commit.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_record_commit.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "154",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_record_commit.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (not_authorized): this user is not entitled to make changes\"}],\"structuredContent\":{\"error\":{\"code\":\"not_authorized\",\"message\":\"this user is not entitled to make changes\",\"retryable\":false},\"correlation_id\":\"40000000000040008000000000...(324 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_record_commit.typical",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_record_commit.invalid",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_record_commit.invalid",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_record_commit.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_record_commit.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "155",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_record_commit.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (not_authorized): this user is not entitled to make changes\"}],\"structuredContent\":{\"error\":{\"code\":\"not_authorized\",\"message\":\"this user is not entitled to make changes\",\"retryable\":false},\"correlation_id\":\"40000000000040008000000000...(324 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_record_commit.invalid",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.engagement_set_prepare.typical",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.engagement_set_prepare.typical",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.engagement_set_prepare.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.engagement_set_prepare.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "156",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.engagement_set_prepare.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (not_authorized): this user is not entitled to make changes\"}],\"structuredContent\":{\"error\":{\"code\":\"not_authorized\",\"message\":\"this user is not entitled to make changes\",\"retryable\":false},\"correlation_id\":\"40000000000040008000000000...(324 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.engagement_set_prepare.typical",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.engagement_set_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.engagement_set_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.engagement_set_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.engagement_set_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "157",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.engagement_set_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (invalid_arguments): client_id: 'abc' is not of type 'integer'\"}],\"structuredContent\":{\"error\":{\"code\":\"invalid_arguments\",\"message\":\"client_id: 'abc' is not of type 'integer'\",\"retryable\":false},\"correlation_id\":\"40000000000040008000...(330 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.engagement_set_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.engagement_set_commit.typical",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.engagement_set_commit.typical",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.engagement_set_commit.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.engagement_set_commit.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "158",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.engagement_set_commit.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (not_authorized): this user is not entitled to make changes\"}],\"structuredContent\":{\"error\":{\"code\":\"not_authorized\",\"message\":\"this user is not entitled to make changes\",\"retryable\":false},\"correlation_id\":\"40000000000040008000000000...(324 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.engagement_set_commit.typical",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.engagement_set_commit.invalid",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.engagement_set_commit.invalid",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.engagement_set_commit.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.engagement_set_commit.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "159",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.engagement_set_commit.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (not_authorized): this user is not entitled to make changes\"}],\"structuredContent\":{\"error\":{\"code\":\"not_authorized\",\"message\":\"this user is not entitled to make changes\",\"retryable\":false},\"correlation_id\":\"40000000000040008000000000...(324 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.engagement_set_commit.invalid",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.base_year_set_prepare.typical",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.base_year_set_prepare.typical",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.base_year_set_prepare.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.base_year_set_prepare.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "160",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.base_year_set_prepare.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (not_authorized): this user is not entitled to make changes\"}],\"structuredContent\":{\"error\":{\"code\":\"not_authorized\",\"message\":\"this user is not entitled to make changes\",\"retryable\":false},\"correlation_id\":\"40000000000040008000000000...(324 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.base_year_set_prepare.typical",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.base_year_set_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.base_year_set_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.base_year_set_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.base_year_set_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "161",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.base_year_set_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (invalid_arguments): client_id: 'abc' is not of type 'integer'\"}],\"structuredContent\":{\"error\":{\"code\":\"invalid_arguments\",\"message\":\"client_id: 'abc' is not of type 'integer'\",\"retryable\":false},\"correlation_id\":\"40000000000040008000...(330 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.base_year_set_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.base_year_set_commit.typical",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.base_year_set_commit.typical",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.base_year_set_commit.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.base_year_set_commit.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "162",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.base_year_set_commit.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (not_authorized): this user is not entitled to make changes\"}],\"structuredContent\":{\"error\":{\"code\":\"not_authorized\",\"message\":\"this user is not entitled to make changes\",\"retryable\":false},\"correlation_id\":\"40000000000040008000000000...(324 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.base_year_set_commit.typical",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.base_year_set_commit.invalid",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.base_year_set_commit.invalid",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.base_year_set_commit.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.base_year_set_commit.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "163",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.base_year_set_commit.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (not_authorized): this user is not entitled to make changes\"}],\"structuredContent\":{\"error\":{\"code\":\"not_authorized\",\"message\":\"this user is not entitled to make changes\",\"retryable\":false},\"correlation_id\":\"40000000000040008000000000...(324 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.base_year_set_commit.invalid",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_package_create_prepare.typical",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_package_create_prepare.typical",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_package_create_prepare.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_package_create_prepare.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "164",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_package_create_prepare.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (not_authorized): this user is not entitled to make changes\"}],\"structuredContent\":{\"error\":{\"code\":\"not_authorized\",\"message\":\"this user is not entitled to make changes\",\"retryable\":false},\"correlation_id\":\"40000000000040008000000000...(324 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_package_create_prepare.typical",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_package_create_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_package_create_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_package_create_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_package_create_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "165",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_package_create_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (invalid_arguments): client_id: 'abc' is not of type 'integer'\"}],\"structuredContent\":{\"error\":{\"code\":\"invalid_arguments\",\"message\":\"client_id: 'abc' is not of type 'integer'\",\"retryable\":false},\"correlation_id\":\"40000000000040008000...(330 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_package_create_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_package_create_commit.typical",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_package_create_commit.typical",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_package_create_commit.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_package_create_commit.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "166",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_package_create_commit.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (not_authorized): this user is not entitled to make changes\"}],\"structuredContent\":{\"error\":{\"code\":\"not_authorized\",\"message\":\"this user is not entitled to make changes\",\"retryable\":false},\"correlation_id\":\"40000000000040008000000000...(324 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_package_create_commit.typical",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_package_create_commit.invalid",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_package_create_commit.invalid",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_package_create_commit.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_package_create_commit.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "167",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_package_create_commit.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (not_authorized): this user is not entitled to make changes\"}],\"structuredContent\":{\"error\":{\"code\":\"not_authorized\",\"message\":\"this user is not entitled to make changes\",\"retryable\":false},\"correlation_id\":\"40000000000040008000000000...(324 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.claim_package_create_commit.invalid",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_prepare.typical",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_prepare.typical",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_prepare.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_prepare.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "168",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_prepare.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (not_authorized): this user is not entitled to make changes\"}],\"structuredContent\":{\"error\":{\"code\":\"not_authorized\",\"message\":\"this user is not entitled to make changes\",\"retryable\":false},\"correlation_id\":\"40000000000040008000000000...(324 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_prepare.typical",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "169",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (invalid_arguments): scope: 'abc' is not of type 'object'\"}],\"structuredContent\":{\"error\":{\"code\":\"invalid_arguments\",\"message\":\"scope: 'abc' is not of type 'object'\",\"retryable\":false},\"correlation_id\":\"400000000000400080000000000000...(320 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_prepare.invalid",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_commit.typical",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_commit.typical",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_commit.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_commit.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "170",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_commit.typical",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (not_authorized): this user is not entitled to make changes\"}],\"structuredContent\":{\"error\":{\"code\":\"not_authorized\",\"message\":\"this user is not entitled to make changes\",\"retryable\":false},\"correlation_id\":\"40000000000040008000000000...(324 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_commit.typical",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_commit.invalid",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_commit.invalid",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_commit.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_commit.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "171",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_commit.invalid",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"content\":[{\"type\":\"text\",\"text\":\"The request did not go through (not_authorized): this user is not entitled to make changes\"}],\"structuredContent\":{\"error\":{\"code\":\"not_authorized\",\"message\":\"this user is not entitled to make changes\",\"retryable\":false},\"correlation_id\":\"40000000000040008000000000...(324 chars)",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "call.run_batch_commit.invalid",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "other-user-session",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "404",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "other-user-session",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "other-user-session",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "other-user-session",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "300",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "other-user-session",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "error",
+     "expected": "{\"code\":-32600,\"message\":\"unknown session; initialise again\"}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "other-user-session",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "delete-other-user",
+     "route": "DELETE /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "404",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "delete-other-user",
+     "route": "DELETE /mcp",
+     "category": "header",
+     "path": "headers.content-type",
+     "expected": "<absent>",
+     "actual": "application/json"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "delete-other-user",
+     "route": "DELETE /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "delete-other-user",
+     "route": "DELETE /mcp",
+     "category": "body-kind",
+     "path": "body",
+     "expected": "empty",
+     "actual": "json"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "delete",
+     "route": "DELETE /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "delete",
+     "route": "DELETE /mcp",
+     "category": "header",
+     "path": "headers.content-type",
+     "expected": "<absent>",
+     "actual": "application/json"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "delete",
+     "route": "DELETE /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "delete",
+     "route": "DELETE /mcp",
+     "category": "body-kind",
+     "path": "body",
+     "expected": "empty",
+     "actual": "json"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "after-delete",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "404",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "after-delete",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "after-delete",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "after-delete",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "301",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "after-delete",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "error",
+     "expected": "{\"code\":-32600,\"message\":\"unknown session; initialise again\"}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "after-delete",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "delete-again",
+     "route": "DELETE /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "404",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "delete-again",
+     "route": "DELETE /mcp",
+     "category": "header",
+     "path": "headers.content-type",
+     "expected": "<absent>",
+     "actual": "application/json"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "delete-again",
+     "route": "DELETE /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "delete-again",
+     "route": "DELETE /mcp",
+     "category": "body-kind",
+     "path": "body",
+     "expected": "empty",
+     "actual": "json"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "agent-initialize",
+     "route": "POST /mcp",
+     "category": "status",
+     "path": "status",
+     "expected": "200",
+     "actual": "501"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "agent-initialize",
+     "route": "POST /mcp",
+     "category": "header",
+     "path": "headers.vary",
+     "expected": "<absent>",
+     "actual": "Origin"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "agent-initialize",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "jsonrpc",
+     "expected": "2.0",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "agent-initialize",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "id",
+     "expected": "1",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "agent-initialize",
+     "route": "POST /mcp",
+     "category": "missing-field",
+     "path": "result",
+     "expected": "{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{\"tools\":{\"listChanged\":false}},\"serverInfo\":{\"name\":\"tcc-channel-gateway\",\"version\":\"0.1.0\"},\"instructions\":\"Every figure these tools return is the platform's own. Quote figures exactly as written.\"}",
+     "actual": "<absent>"
+    },
+    {
+     "scenario": "g1_mcp",
+     "case": "agent-initialize",
+     "route": "POST /mcp",
+     "category": "extra-field",
+     "path": "detail",
+     "expected": "<absent>",
+     "actual": "Operation not implemented: POST /mcp"
+    }
+   ],
+   "tolerated": []
+  }
+ ],
+ "exchanges": 103,
+ "failure_count": 602,
+ "tolerated_count": 0
+}

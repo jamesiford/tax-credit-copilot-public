@@ -1,0 +1,25 @@
+{
+  "improvements": [
+    {
+      "id": "IMP-orchestrator-1",
+      "kind": "defect_fix",
+      "route": "POST /responses",
+      "finding": "",
+      "reason": "After an uncertain commit, the source clears pending confirmation. The .NET workflow retains a recovery-only checkpoint and its original idempotency identity: unrelated reads can proceed, but confirmation and another prepare cannot accidentally repeat an unverified mutation. No calculated figure or recorded successful response changes."
+    },
+    {
+      "id": "IMP-orchestrator-2",
+      "kind": "framework_default",
+      "route": "POST /responses",
+      "finding": "",
+      "reason": "This hosted runtime deliberately requires AI_INJECTION_GUARD and AI_OUTPUT_POLICY to remain on, and AI_GATEWAY_TLS_VERIFY to remain true. Unsupported disabling settings fail startup explicitly rather than silently pretending to honor them. The source permits some diagnostic control overrides; enabling those overrides in .NET requires a separate owner decision."
+    },
+    {
+      "id": "IMP-orchestrator-3",
+      "kind": "defect_fix",
+      "route": "POST /responses",
+      "finding": "",
+      "reason": "Malformed boolean configuration is rejected with a value-free startup error instead of being silently interpreted as false. This prevents a spelling mistake from quietly disabling an intended control; supported boolean settings and all 39 deterministic records retain their behavior."
+    }
+  ]
+}

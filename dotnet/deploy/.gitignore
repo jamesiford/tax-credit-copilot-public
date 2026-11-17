@@ -1,0 +1,5 @@
+.artifacts/
+.staging/
+**/__pycache__/
+**/bin/
+**/obj/

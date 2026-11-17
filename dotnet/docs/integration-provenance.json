@@ -1,0 +1,77 @@
+{
+  "observed_utc": "2026-11-17T06:28:48.608969+00:00",
+  "product_revision": "006760b",
+  "product_and_contract_diff_empty": true,
+  "observer_source_sha256": "ca1aad9b9da7e80b06b355c6dc02a0efe8f846035b9e405155d86e8398376ce3",
+  "observer_commit": "a7efcac",
+  "release_binaries": {
+    "Api": {
+      "path": "dotnet\\artifacts\\bin\\TaxCredit.Api\\release\\TaxCredit.Api.dll",
+      "sha256": "b3cd365c7460c99c7025d8bb4cad2fd8a6c223b6f2aefae4cf49a6447e5b3de7"
+    },
+    "Gateway": {
+      "path": "dotnet\\artifacts\\bin\\TaxCredit.Gateway\\release\\TaxCredit.Gateway.dll",
+      "sha256": "0ba6785414d1e5c7ca12bd0bb722e3d17b3d70072e6973f365e067b9b47d81d1"
+    },
+    "Worker": {
+      "path": "dotnet\\artifacts\\bin\\TaxCredit.Worker\\release\\TaxCredit.Worker.dll",
+      "sha256": "a73c695b8a82a629f6a65fdac04b1df534f3c9251da33c077d681407d7115c92"
+    },
+    "Orchestrator": {
+      "path": "dotnet\\artifacts\\bin\\TaxCredit.Orchestrator\\release\\TaxCredit.Orchestrator.dll",
+      "sha256": "c88644ba70cc2b0b7fd309ffc4eb499732b7ff4b83e747d372be6073caef5adb"
+    },
+    "Shadow": {
+      "path": "dotnet\\artifacts\\bin\\TaxCredit.Shadow\\release\\TaxCredit.Shadow.dll",
+      "sha256": "9c88ed0b46f1f72f84d8014ae43d0b57aa9e2e98da3fbffb4a2dbddafd2a9672"
+    }
+  },
+  "sdk": "10.0.404",
+  "net10_installed_runtimes": [
+    [
+      "Microsoft.AspNetCore.App",
+      "10.0.15"
+    ],
+    [
+      "Microsoft.NETCore.App",
+      "10.0.15"
+    ]
+  ],
+  "oracle": {
+    "implementation": "CPython",
+    "version": "3.12.13",
+    "this_worktree_import": true
+  },
+  "topology": {
+    "baseline": "ordinary native API and independent standalone gateway, sequential, no API dependency for gateway",
+    "paired": "ordinary Python harness/ASGI and native API on loopback; separate state",
+    "cross_surface": "ordinary API plus independent in-process-composed gateway; separate state",
+    "workers": "No Worker during reset/replay; inherited finite Worker tests only in isolated test stores"
+  },
+  "providers": {
+    "observed": [
+      "synthetic CSV/seed",
+      "SQLite",
+      "local artifacts",
+      "scripted AI/transports"
+    ],
+    "unmeasured": [
+      "native Fabric source/Gold/ops",
+      "Blob",
+      "real exporter",
+      "live Foundry/Entra-bound ingress"
+    ]
+  },
+  "classification": "isolated synthetic hosts; current live admission only, no private payloads",
+  "approval_capacity": {
+    "approved": true,
+    "guard": "passed",
+    "capacity": "unavailable",
+    "oracle": "correct",
+    "reason": "configuration-missing",
+    "combined_ms": 1172.0
+  },
+  "native_grants": "unproved; permission/fingerprint/data stages not reached",
+  "private_reference_certified": false,
+  "deployments_or_traffic_changes": 0
+}

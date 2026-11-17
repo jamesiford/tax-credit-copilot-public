@@ -1,0 +1,138 @@
+name: Independent .NET validation
+on:
+  pull_request:
+    paths: ['dotnet/**', 'infra-dotnet/**', '.github/workflows/dotnet-*.yml', 'contract/**']
+  push:
+    branches: [dotnet/integration]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: dotnet-validation-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  DOTNET_NOLOGO: '1'
+  PYTHONDONTWRITEBYTECODE: '1'
+jobs:
+  managed:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.404
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Pinned build, formatting and existing fast suite
+        working-directory: dotnet
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if ((dotnet --version) -ne '10.0.404') { throw 'SDK selection drift.' }
+          dotnet restore TaxCredit.slnx --nologo -v:q
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          dotnet build TaxCredit.slnx --no-restore -warnaserror --nologo -v:q -m:1 -nr:false
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          dotnet format TaxCredit.slnx --verify-no-changes --no-restore -v:q
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          dotnet test TaxCredit.slnx --no-build --no-restore --filter 'Category!=heavy' --nologo -v:q -m:1 -nr:false
+          exit $LASTEXITCODE
+      - name: Deployment contract checks
+        shell: pwsh
+        run: |
+          python -m unittest discover -s dotnet/deploy/configuration -p 'test_*.py' -q
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          python -m unittest discover -s dotnet/deploy -p 'test_deployment.py' -q
+          exit $LASTEXITCODE
+      - name: Telemetry build, format and real collector receipts
+        working-directory: dotnet
+        shell: pwsh
+        run: |
+          dotnet build deploy/telemetry/Telemetry.slnx -c Release --nologo -v:q
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          dotnet format deploy/telemetry/Telemetry.slnx --verify-no-changes --no-restore -v:q
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          python deploy/telemetry/verify.py --collector
+          exit $LASTEXITCODE
+      - name: Locked publication and amd64 source images
+        shell: pwsh
+        run: |
+          python dotnet/deploy/publish.py --service all
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          python dotnet/deploy/build_images.py
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          python dotnet/deploy/container_smoke.py
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          python dotnet/deploy/smoke.py
+          exit $LASTEXITCODE
+      - name: Actual published API and gateway telemetry receipts
+        working-directory: dotnet
+        run: python deploy/telemetry/verify_published.py --collector
+      - name: Retain only sanitized deployment evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dotnet-deployment-aggregates
+          retention-days: 7
+          if-no-files-found: warn
+          path: |
+            dotnet/deploy/.artifacts/images.json
+            dotnet/deploy/.artifacts/container-smoke.json
+            dotnet/deploy/.artifacts/published-smoke.json
+  replay:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        host: [api, gateway]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.404
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install existing Python oracle requirements
+        run: python -m pip install -r backend/requirements.txt
+      - name: Build unchanged public replay consumers
+        working-directory: dotnet
+        run: dotnet build TaxCredit.slnx -warnaserror --nologo -v:q -m:1 -nr:false
+      - name: Run existing semantic replay and unmodified policy
+        env:
+          REPLAY_GROUP: ${{ matrix.host }}
+        shell: pwsh
+        run: |
+          python dotnet/deploy/ci_replay.py --group $env:REPLAY_GROUP
+          exit $LASTEXITCODE
+      - name: Retain aggregates, never raw replay/configuration/tokens
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dotnet-replay-${{ matrix.host }}
+          retention-days: 7
+          path: dotnet/deploy/.artifacts/ci-replay-*.json
+  terraform:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.17.1
+          terraform_wrapper: false
+      - uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: v0.65.0
+      - name: Guarded backend-free clean-copy validation and mocked tests
+        shell: pwsh
+        run: ./infra-dotnet/validate.ps1

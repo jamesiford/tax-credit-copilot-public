@@ -1,0 +1,69 @@
+<Project>
+  <!-- Central package management. Licences were checked in docs/adr/0003 and 0004. -->
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageVersion Include="xunit" Version="2.9.3" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.4" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="10.0.0" />
+    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.20.1" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.20.2" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.20.1" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.20.0" />
+    <PackageVersion Include="Aspire.Hosting.SqlServer" Version="13.6.5" />
+    <!-- JSON Schema (Draft 2020-12) for rule-pack validation. MIT, version 8.0.5: from 9.0 the binaries are under the json-everything Open Source Maintenance Fee EULA, which is not an acceptable licence here (docs/slice-domain-log.md DS8). -->
+    <PackageVersion Include="JsonSchema.Net" Version="8.0.5" />
+    <!-- BEGIN skeleton: only this session edits between the markers -->
+    <!-- ASP.NET Core in-process host: MIT (NuGet 10.0.0 licence metadata). -->
+    <PackageVersion Include="Microsoft.AspNetCore.TestHost" Version="10.0.0" />
+    <!-- END skeleton -->
+    <!-- BEGIN persistence: only this session edits between the markers -->
+    <PackageVersion Include="Microsoft.Data.SqlClient" Version="7.1.2" />
+    <PackageVersion Include="Microsoft.Data.Sqlite" Version="10.0.0" />
+    <PackageVersion Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.13" />
+    <!-- END persistence -->
+    <!-- BEGIN sources_auth_ai: only this session edits between the markers -->
+    <!-- Azure SDK and SqlClient are MIT; versions match stable installed packages, not previews. -->
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
+    <PackageVersion Include="Azure.Identity" Version="1.17.1" />
+    <PackageVersion Include="Azure.Storage.Blobs" Version="12.26.0" />
+  </ItemGroup>
+  <!-- Supply the approved local oracle to testhosts, not the shared machine environment. -->
+  <PropertyGroup Condition="$(MSBuildProjectName.EndsWith('.Tests')) and '$(TCC_PYTHON)' == '' and '$(VSTestCLIRunSettings)' == '' and '$(VSTestSetting)' == '' and '$(RunSettingsFilePath)' == '' and Exists('C:\Projects\py312-oracle\.venv\Scripts\python.exe')">
+    <VSTestCLIRunSettings>RunConfiguration.EnvironmentVariables.TCC_PYTHON=C:\Projects\py312-oracle\.venv\Scripts\python.exe</VSTestCLIRunSettings>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- END sources_auth_ai -->
+    <!-- BEGIN routes_reads: only this session edits between the markers -->
+    <!-- END routes_reads -->
+    <!-- BEGIN routes_claims: only this session edits between the markers -->
+    <!-- END routes_claims -->
+    <!-- BEGIN routes_drafts_runs: only this session edits between the markers -->
+    <!-- END routes_drafts_runs -->
+    <!-- BEGIN routes_ai_agents: only this session edits between the markers -->
+    <!-- END routes_ai_agents -->
+    <!-- BEGIN gateway: only this session edits between the markers -->
+    <!-- Official MCP SDK, Apache-2.0; stable net10.0 assets. -->
+    <PackageVersion Include="ModelContextProtocol" Version="1.0.0" />
+    <!-- END gateway -->
+    <!-- BEGIN orchestrator: only this session edits between the markers -->
+    <!-- Microsoft Agent Framework (stable) and Azure Responses hosting (preview): MIT. -->
+    <PackageVersion Include="Microsoft.Agents.AI" Version="1.28.0" />
+    <PackageVersion Include="Microsoft.Agents.AI.Workflows" Version="1.28.0" />
+    <PackageVersion Include="Azure.AI.AgentServer.Responses" Version="1.0.0-beta.9" />
+    <PackageVersion Include="Microsoft.Extensions.AI.OpenAI" Version="10.11.0" />
+    <!-- Reuse the shared declarations; the actual framework requires this serviced floor. -->
+    <PackageVersion Update="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.13" />
+    <PackageVersion Update="Microsoft.Extensions.DependencyInjection" Version="10.0.13" />
+    <!-- END orchestrator -->
+    <!-- BEGIN integration: only this session edits between the markers -->
+    <!-- MIT; reuse the stable parser version already exercised by the platform spike. -->
+    <PackageVersion Include="Microsoft.SqlServer.TransactSql.ScriptDom" Version="180.154.0" />
+    <!-- END integration -->
+  </ItemGroup>
+  <!-- Persistence gate repair: configure the approved oracle only when the runner has not supplied one. -->
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'TaxCredit.Parity.Tests' and '$(TCC_PYTHON)' == '' and '$(RunSettingsFilePath)' == ''">
+    <RunSettingsFilePath>$(MSBuildThisFileDirectory)tests\TaxCredit.Infrastructure.Persistence.Tests\Oracle.runsettings</RunSettingsFilePath>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,54 @@
+{
+  "receipt_payloads": 8,
+  "trace_spans": 19,
+  "metric_series_batches": 18,
+  "cross_service_parent_edges": 2,
+  "service_version_attributions": 4,
+  "shutdown_seconds": [
+    0.078,
+    0.089,
+    0.092
+  ],
+  "immediate_flush_shutdown_seconds": 0.097,
+  "immediate_flush_process_seconds": 0.677,
+  "collector_refused_shutdown_seconds": 1.096,
+  "disabled_or_invalid_configuration_checks": 6,
+  "custom_source_and_meter_with_hook": true,
+  "custom_source_and_meter_without_hook": false,
+  "privacy_allowlist": "passed",
+  "fixed_diagnostics_checked": true,
+  "duration_seconds": 9.762,
+  "additional_collector_failures": {
+    "http_503": {
+      "request_seconds": 0.005,
+      "shutdown_seconds": 0.089,
+      "exit_code": 0,
+      "fixed_diagnostic_once": true
+    },
+    "timeout": {
+      "request_seconds": 0.006,
+      "shutdown_seconds": 1.617,
+      "exit_code": 0,
+      "fixed_diagnostic_once": true
+    },
+    "partial_success": {
+      "request_seconds": 0.005,
+      "shutdown_seconds": 0.12,
+      "exit_code": 0,
+      "fixed_diagnostic_once": true
+    },
+    "malformed_response": {
+      "request_seconds": 0.004,
+      "shutdown_seconds": 0.091,
+      "exit_code": 0,
+      "fixed_diagnostic_once": true
+    }
+  },
+  "path": "local-test-receiver",
+  "sdk": "10.0.404",
+  "collector_image": null,
+  "runtime": "local-dotnet",
+  "linux_sigterm": false,
+  "scope": "synthetic deployment probe; actual ServiceDefaults compiled unchanged",
+  "hook_sha256": "a1106346d6c01be55b0b4f6b185cbecf0af300628cc54989ddb4711f3ef2864f"
+}

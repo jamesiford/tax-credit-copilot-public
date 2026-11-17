@@ -1,0 +1,127 @@
+{
+  "session": "routes_claims",
+  "branch": "dotnet/w2-routes_claims",
+  "head": "cffc895",
+  "summary": "BLOCKED: fixed owned-path restriction still prevents repairing the three shared framework failures.\nLatest supplied conductor replay: 78/316 adjusted passing cases (24.7%), seven waived; not accepted.\nThe newly rejected IMP-sources_auth_ai-2 belongs to the sources/auth/AI register, not this feature register.\nThe two shared tests were re-read and still require the implemented GET /api/rules to return 501.\nNo new product changes or redundant full gate runs were made in this retry; prior build/format passed.\nPrior local fast suite remains 717/720; all twelve raw replay reports and 12 passing feature tests retained.\nArtifact-ID and calculated-value mismatches remain failures, not waived or patched with extra ID draws.\nTask hard stops 1 and 3 require ending this repeated blocked attempt and retaining HALT.\nNo forbidden edits, live calls, remote changes or pushes; status/report-only update committed locally.\nThe head field identifies the preceding evidence commit; this status is committed afterward.",
+  "stages": {
+    "preflight": "done",
+    "stage-1-packages": "done",
+    "stage-2-claims-assessment-portfolio": "partial",
+    "stage-3-findings-rules-audit": "partial",
+    "stage-4-composed-acceptance": "partial"
+  },
+  "gates_claimed": {
+    "no_halt": false,
+    "commits_present": true,
+    "clean_tree": true,
+    "not_pushed": true,
+    "owned_paths": true,
+    "status_json": true,
+    "report_present": true,
+    "dotnet_build": true,
+    "dotnet_format": true,
+    "tests_fast": false,
+    "replay": false
+  },
+  "deviations": [
+    {
+      "id": "DEV-1",
+      "what": "Stopped rather than modifying Framework tests or suppressing the implemented GET /api/rules operation.",
+      "why": "DiscoveryTests and RegistryTests still assert 501 for that assigned operation. Their files are outside the allocated paths, triggering hard stop 1.",
+      "decision_needed": true
+    },
+    {
+      "id": "DEV-2",
+      "what": "Repeated package creation uses a distinct full UUID generation and returns 201.",
+      "why": "The deterministic first-12-character UUID prefix collides; immutable bytes must not be overwritten. Registered as an explicit F-5 improvement.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-3",
+      "what": "Complete relevant scenarios ran on a fresh ordinary host per scenario, using OS-assigned ports and isolated local state.",
+      "why": "The environment is shared, so OS-assigned ports and exclusively owned stores isolate evidence. The earlier reusable-reset defect is now separately reproduced, fixed and covered by a same-host regression.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-4",
+      "what": "No successful live rules application is claimed.",
+      "why": "Live retrieval is explicitly outside scope; captured 404/422/503 distinctions and NEEDS_KEY are implemented and tested.",
+      "decision_needed": false
+    }
+  ],
+  "findings": [
+    "F-5: repeated deterministic package generation can collide on a truncated UUID prefix; full generation identifiers avoid overwriting immutable bytes.",
+    "F-8: identical direct claim assertions return 409, while changed assertions and lifecycle transitions retain append-style history.",
+    "F-2: invalid portfolio engagement scope returns JSON detail with 422 rather than an unhandled 500.",
+    "Named F-14 reader assessment and verification exceptions are intentionally preserved because changing valid-request authorization outcomes requires owner review.",
+    "Raw replay includes incidental error wording, redirect/CORS headers, frozen-versus-real mtime and deterministic IDs affected by missing sibling operations.",
+    "Portfolio degraded rows/counters and oversized storage-bound inputs remain incomplete; they are not waived or reported as successful.",
+    "The shared singleton mediator captured scoped artifact-byte leases at its root, making reset fail after package publication. Ordinary feature registration now scopes the existing mediator; same-host reset and report generation pass.",
+    "The heavy P2 test previously set HttpClient.Timeout after its first request. Moving timeout configuration before requests and asserting reset success makes the complete test pass.",
+    "The claim-history test took 68 seconds under full-suite contention and is now heavy under the task policy; its conflict/history/isolation assertions are unchanged.",
+    "The formula-safety register entry was overly broad. It is now confined to the downloaded Provenance XML member and cannot cover package metadata artifact IDs; the integrity entry is confined to status.",
+    "The legacy replay wrapper groups by route shape as well as method, producing 397 owned cases instead of the conductor's 316. Exact-method local raw replay is 98/316; the external conductor now reports 78/316 adjusted. Neither passes.",
+    "The latest rejected waiver is IMP-sources_auth_ai-2 in dotnet/docs/improvements/sources_auth_ai.json. It broadly describes atomic byte publication and cannot legitimately waive a package artifact-ID mismatch. That register was inspected but not changed as a substitute for repairing the real mismatch.",
+    "Repeated gate retries have not resolved the shared-test ownership contradiction. Task hard stop 3 now independently requires stopping after three unsuccessful attempts on the same blocker; no additional redundant full gate run is claimed."
+  ],
+  "open_questions": [
+    "Which still-deferred operation should the two shared framework stub-replacement tests use after the rules route is implemented?",
+    "Should bare AddApplication/AddInfrastructure/AddTaxCreditRuntime construction invoke feature modules, or should the provider-selection test explicitly compose them?",
+    "What shared fixture book-name and deterministic identity-sequencing contract should integration preserve?",
+    "The feature scopes the mediator to release request adapters; should the shared AddApplication default also be corrected by its owner for hosts that do not load this feature?"
+  ],
+  "needs_human": [
+    {
+      "item": "Authorize the shared framework-test/composition work described in HALT-routes_claims.md.",
+      "why": "The full fast gate cannot pass while two forbidden-to-edit tests require the newly assigned rules route to remain a stub."
+    },
+    {
+      "item": "Resume outstanding semantic route work and replay to at least 98%.",
+      "why": "The latest exact-method local raw replay is 98/316 (31.01%); the latest supplied external conductor result is 78/316 adjusted (24.7%). There are real degraded-behavior and validation gaps as well as sibling and incidental differences; none is waived as accepted."
+    },
+    {
+      "item": "Narrow the cross-feature IMP-sources_auth_ai-2 waiver to its actual atomic-publication behavior.",
+      "why": "The conductor now rejects this other feature's broad entry for matching artifact_id. Fixing the register does not repair deterministic ID differences or make semantic acceptance pass."
+    },
+    {
+      "item": "Provision native tcc_ops.finding_audit through the operator path.",
+      "why": "Only local SQLite proof exists; this feature is not authorized to perform migrations or native service access."
+    },
+    {
+      "item": "Review M-01 captured-ingestion precedence.",
+      "why": "Captured wage_basis, measuring_date and pay-code overrides of year-resolved packs affect calculated figures and were preserved."
+    },
+    {
+      "item": "Review first-program credit pricing in multi-program states.",
+      "why": "Changing certified credit_math behavior would change figures; typed run-resolution refusals do not authorize a new credit_math refusal."
+    },
+    {
+      "item": "Review CAP-10 QC-drop behavior separately from annotations.",
+      "why": "The writer deliberately remains untouched; global application would change certified figures, not merely complete findings or ingestion read integration."
+    },
+    {
+      "item": "Native fiscal/SQL/Blob verification remains a separate approved activity.",
+      "why": "Strict leap shifts, zero-worksite differences, native AVG, publication transactions and deployed Blob permissions are not established by local feature tests."
+    }
+  ],
+  "reports": [
+    "dotnet/docs/ROUTES-CLAIMS-REPORT.md",
+    "dotnet/docs/HALT-routes_claims.md",
+    "dotnet/docs/routes_claims-log.md",
+    "dotnet/docs/improvements/routes_claims.json",
+    "dotnet/docs/replay-complete-1/board.json",
+    "dotnet/docs/openpyxl-assets-LICENSE.txt",
+    "dotnet/docs/revision-reset-before.json",
+    "dotnet/docs/revision-reset-after.json",
+    "dotnet/docs/revision-replay/board.json",
+    "dotnet/docs/revision-build-final.log",
+    "dotnet/docs/revision-format-final.log",
+    "dotnet/docs/revision-tests-feature-final.log",
+    "dotnet/docs/revision-tests-fast-final.log",
+    "dotnet/docs/retry2-summary.json",
+    "dotnet/docs/retry2-replay/board.json",
+    "dotnet/docs/retry2-build.log",
+    "dotnet/docs/retry2-format.log",
+    "dotnet/docs/retry2-tests-fast.log"
+  ]
+}

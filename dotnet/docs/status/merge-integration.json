@@ -1,0 +1,37 @@
+{
+  "session": "merge-integration",
+  "branch": "dotnet/integration",
+  "head": "2fc188c",
+  "summary": "Merged dotnet/w4-integration locally as 2fc188c.\nResolved the sole rename/rename conflict by retaining both identical W3 evidence files and their existing report links.\nPreserved all automatically merged W4 additions and configuration changes.\n.NET SDK 10.0.404 strict build passed with zero warnings/errors; format passed; all 1,559 fast tests passed.\nNo unresolved index entries or tracked text conflict markers remain; the compressed-golden binary match is unchanged in both parents.\nSource ancestry and clean worktree confirmed after the merge; this status is a subsequent documentation-only commit.\nNo live systems, push, remote changes or new behavioral deviations; inherited cutover limitations remain.",
+  "stages": {
+    "1": "done",
+    "2": "done"
+  },
+  "gates_claimed": {
+    "merge_completed": true,
+    "both_rename_intents_preserved": true,
+    "no_unmerged_entries": true,
+    "no_text_conflict_markers": true,
+    "build_warnaserror": true,
+    "format": true,
+    "fast_tests": true,
+    "source_branch_is_ancestor": true,
+    "clean_tree": true,
+    "owned_paths": true,
+    "commits_present": true,
+    "not_pushed": true,
+    "status_json": true,
+    "report_present": true
+  },
+  "deviations": [],
+  "findings": [
+    "The required unfiltered Git marker scan matches bytes in an unchanged compressed golden; tracked text is marker-free and the fixture blob is identical in both parents.",
+    "Run .NET commands from dotnet: its existing SDK pin selects 10.0.404, while the repository root selects 11.0.100."
+  ],
+  "open_questions": [],
+  "needs_human": [],
+  "reports": [
+    "dotnet/docs/merge-integration-log.md",
+    "dotnet/docs/status/merge-integration.json"
+  ]
+}

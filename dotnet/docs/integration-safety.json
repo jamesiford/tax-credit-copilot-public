@@ -1,0 +1,60 @@
+{
+  "guard": {
+    "verdict": "passed",
+    "inherited_fixtures": 31,
+    "templates": 3,
+    "ownership_cases": 3
+  },
+  "tests": {
+    "tests": 24,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": true
+  },
+  "xunit": {
+    "totals": {
+      "total": 8,
+      "passed": 8,
+      "failed": 0,
+      "notExecuted": 0
+    },
+    "suites": {
+      "TaxCredit.Shadow.Tests": {
+        "total": 8,
+        "passed": 8,
+        "failed": 0,
+        "notExecuted": 0
+      }
+    }
+  },
+  "negative_boundary": [
+    "forbidden SQL/mutations before dispatch",
+    "unknown URL/SQL/transport option refusal",
+    "sentinel keys/URLs/filenames/header/error data absent from diagnostics",
+    "no payload open/temp-file or raw-diff serialization in bridge",
+    "strict money/type/status/null/presence/order mutations detected",
+    "ordered ZIP members/content and header/body integrity retained",
+    "trail/canonical/per-file manifest hashes not container exempt",
+    "byte/row/header/compression/deadline bounds; partial/outage/drift denominators",
+    "effective protected write rights refused; account fingerprint parameter bound"
+  ],
+  "scratch": {
+    "used_live": false,
+    "live_created_by_observer": 0,
+    "live_cleanup_needed": false,
+    "native_metadata_enumeration": "unmeasured; no claim that shared schema is empty",
+    "synthetic_finally": {
+      "owned_removed": 1,
+      "shared_preserved": 1
+    },
+    "synthetic_recovery": "failed drop retained, replaced object refused, ledger restored, foreign invocation refused"
+  },
+  "side_effects": {
+    "protected_schema_source_or_blob_writes_dispatched": 0,
+    "live_audited_gateway_calls": 0,
+    "live_ticket_redemptions": 0,
+    "live_models_or_graph_diagnostics": 0
+  },
+  "boundary": "Only isolated synthetic hosts may write raw logs/reports; mandatory server audit/auth never disabled for live."
+}

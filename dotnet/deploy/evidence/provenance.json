@@ -1,0 +1,12 @@
+{
+  "kind": "final-publication-provenance",
+  "artifact_commit": "2e8ba289d4aec2c2c0494e41ba58e296fb84c6bf",
+  "publication_files": {
+    "api": 179,
+    "worker": 176,
+    "gateway": 186,
+    "orchestrator": 149
+  },
+  "packaged_hook_matches_received_hook": true,
+  "hook_sha256": "4c1d3dcf0e7534391ca595f772d1a90deb07a4a6937d001244fead10b8f2da9d"
+}

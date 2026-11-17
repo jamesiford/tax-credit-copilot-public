@@ -1,0 +1,105 @@
+{
+  "session": "routes_drafts_runs",
+  "branch": "dotnet/w2-routes_drafts_runs",
+  "head": "c5482d5",
+  "summary": "Corrected the latest ownership failure: all seven shared files are restored exactly to baseline b766691, and all final net changes are allocated. All 23 operations remain implemented, including the feature-scoped mediator fix. Fresh whole build and formatting pass. The complete fast suite is 712 passed and 8 failed, not the historical 721-test green state. Original shared probe collisions, provider composition and obsolete 501 assertions require edits explicitly rejected by the conductor. Runtime validation metadata is again inherited literal 17, not recorded Python 20 or observed SQL inventory 29. Fresh replay completed all 12 scenarios / 1769 exchanges: exact owned group 39/323 raw passes, 284 failures and 902 field differences, no unexpected owned 500. No adjusted 98% claim or fabricated IDs, counts, state or comparisons. Required hard-stop report restored. Nothing pushed.",
+  "stages": {
+    "stage_1_durable_http_worker": "done",
+    "stage_2_controls_client_base_year": "done",
+    "stage_3_drafts_catalogue_export": "done",
+    "stage_4_full_integration": "partial"
+  },
+  "gates_claimed": {
+    "no_halt": false,
+    "commits_present": true,
+    "clean_tree": true,
+    "not_pushed": true,
+    "owned_paths": true,
+    "status_json": true,
+    "report_present": true,
+    "dotnet_build": true,
+    "dotnet_format": true,
+    "tests_fast": false,
+    "replay": false
+  },
+  "deviations": [
+    {
+      "id": "DEV-1",
+      "what": "The earlier repair-scope extension assumption is withdrawn.",
+      "why": "The conductor explicitly rejected seven shared paths. Commit c5482d5 restores all seven exactly to baseline b766691. The associated new metadata test and improvement entry were withdrawn with that repair; all pre-existing tests remain unchanged.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-2",
+      "what": "The existing mediator remains request-scoped through the owned feature module.",
+      "why": "The request must resolve both policy and source adapters from current configuration. No alternate mediator or executor was introduced.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-3",
+      "what": "Stopped under the task's fixed hard-stop rules rather than claiming green integration.",
+      "why": "Fixing the shared fixtures requires rejected paths, and repeated replay attempts cannot reconcile mandatory durable state and incidental identity policy with the conductor's numeric guard. The HALT report records this conflict.",
+      "decision_needed": true
+    },
+    {
+      "id": "DEV-4",
+      "what": "The head field identifies the committed ownership correction.",
+      "why": "The final documentation child commit cannot contain its own hash. c5482d5 contains the exact shared-file restoration tested by this handoff.",
+      "decision_needed": false
+    }
+  ],
+  "findings": [
+    "Current ownership check: every net changed path versus baseline b766691 is inside the original allocation; the seven rejected shared files have zero net diff.",
+    "Current whole build: zero warnings/errors; whole formatter passes. Full fast suite: 720 total, 712 passed, 8 failed. Earlier 721-pass evidence is historical and depended on withdrawn shared repairs.",
+    "Six failures arise from duplicate draft-list and batch-detail probe routes, one from standalone provider validation omitting feature registrations, and one from an obsolete 501 assertion for implemented batch acceptance.",
+    "The inherited metadata count is 17. Previous direct observation found 29 SQL checks, versus recorded Python 20; no output-only replacement count is used.",
+    "The conductor's latest adjusted semantic result is 79/323 passing (24.5%), with 54 waived cases. This result is not replaced with the wrapper's broader denominator.",
+    "Fresh post-restoration replay completed 12 scenarios / 1769 exchanges: 39 raw passes, 284 failures, 902 field differences in 323 exact-template cases; zero unexpected owned 500s. The isolated API helper is stopped.",
+    "Five required post-run never_run counts and two numeric-looking UUID strings alone cap literal compatibility at 316/323 (97.83%), even if every other case were resolved.",
+    "F-18: successful durable manifests remain visible. Never-calculated clients remain 404. The task explicitly forbids manufacturing the historical disconnected-manifest result.",
+    "Preview still refuses arbitrary client payroll as expressly required; bundle member bytes and hashes remain covered by the CPython oracle.",
+    "The unowned ReadsCalc unit-list setup still yields capture-failed for rebase replay; the actual recorded unit's numeric rebase is covered by the historical passing heavy test."
+  ],
+  "open_questions": [
+    "How can the mandatory full fast suite be updated for implemented feature groups when the exact shared fixture paths needed to compose them are forbidden?",
+    "How should the conductor distinguish incidental identities and correct durable operational state from certified calculated figures?",
+    "Which authoritative shared owner will correct validation query metadata without removing checks or falsifying the reported count?"
+  ],
+  "needs_human": [
+    {
+      "item": "An authorized integrator must repair shared integration fixtures outside this session.",
+      "why": "The conductor rejected the four shared test files needed to remove duplicate probes, compose feature dependencies and assert real statuses. Production endpoints must not be hidden or changed to placeholder behavior to accommodate those fixtures."
+    },
+    {
+      "item": "Reconcile replay policy with mandatory durable manifests and incidental identities.",
+      "why": "Repeated complete runs remain below threshold. Required real post-run counts and numeric-looking UUID strings are rejected as changed figures. No broad numeric waiver or fabricated recording-specific state was introduced."
+    },
+    {
+      "item": "Repair authoritative validation metadata in its shared owner.",
+      "why": "The allowed feature folders cannot replace inherited literal 17 with actual SQL inventory without duplicating or disguising the shared validator. Recorded Python 20 also differs from observed inventory 29."
+    },
+    {
+      "item": "Complete unowned ReadsCalc setup and preserve per-scenario reset profiles.",
+      "why": "Rebase must receive a real recorded unit rather than capture-failed. P2 must be reset explicitly; the feature must not guess data sources from IDs."
+    },
+    {
+      "item": "Atomic override intent and recalculation acceptance remain a shared-port seam.",
+      "why": "Override save and queue acceptance are separate transactions; failure can leave saved intent without work and unchanged resave does not repair it."
+    },
+    {
+      "item": "Native provisioning and long-run lease sizing remain unmeasured.",
+      "why": "The inherited 600-second lease has entry renewal and precommit checks, not periodic heartbeat during synchronous compute. Expiry rollback is tested; live native deployment was not authorized."
+    },
+    {
+      "item": "Inherited year-resolved ingestion overrides and first-program credit math require owner decisions.",
+      "why": "Both are figure-sensitive Python-compatible behaviors. Neither was changed."
+    }
+  ],
+  "reports": [
+    "dotnet/docs/ROUTES-DRAFTS-RUNS-REPORT.md",
+    "dotnet/docs/routes_drafts_runs-log.md",
+    "dotnet/docs/improvements/routes_drafts_runs.json",
+    "dotnet/docs/replay-routes-drafts-runs.json",
+    "dotnet/docs/HALT-routes_drafts_runs.md"
+  ]
+}

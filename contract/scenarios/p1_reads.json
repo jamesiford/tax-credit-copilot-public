@@ -1,0 +1,7607 @@
+{
+ "name": "p1_reads",
+ "profile": "P1",
+ "variables": {
+  "exception_id": "t2:E00200:2025-02",
+  "draft_id": "00000000-0000-0000-0000-00000000dead",
+  "batch_id": "00000000-0000-0000-0000-00000000beef",
+  "artifact_id": "00000000-0000-0000-0000-00000000cafe"
+ },
+ "steps": [
+  {
+   "id": "boot.unit",
+   "note": "capture an employee token and id from the unit drill",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "limit",
+      2
+     ]
+    ]
+   },
+   "capture": {
+    "token": "body.employees.0.record_token",
+    "employee_id": "body.employees.0.employee_id"
+   }
+  },
+  {
+   "id": "boot.findings",
+   "note": "capture a finding id",
+   "request": {
+    "method": "GET",
+    "path": "/api/findings/1001/2025"
+   },
+   "capture": {
+    "finding_id": "body.findings.0.finding_id"
+   }
+  },
+  {
+   "id": "ok.api-ready",
+   "request": {
+    "method": "GET",
+    "path": "/api/ready"
+   }
+  },
+  {
+   "id": "ok.api-health",
+   "request": {
+    "method": "GET",
+    "path": "/api/health"
+   }
+  },
+  {
+   "id": "ok.api-me",
+   "request": {
+    "method": "GET",
+    "path": "/api/me"
+   }
+  },
+  {
+   "id": "ok.api-clients-client-id-artifacts-artifact-id",
+   "request": {
+    "method": "GET",
+    "path": "/api/clients/1001/artifacts/{{artifact_id}}"
+   }
+  },
+  {
+   "id": "ok.api-audit-channel",
+   "request": {
+    "method": "GET",
+    "path": "/api/audit/channel",
+    "query": [
+     [
+      "user_oid",
+      "00000000-0000-0000-0000-000000000001"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "ok.api-capabilities",
+   "request": {
+    "method": "GET",
+    "path": "/api/capabilities"
+   }
+  },
+  {
+   "id": "ok.api-claims-coverage-client-id",
+   "request": {
+    "method": "GET",
+    "path": "/api/claims/coverage/1001"
+   }
+  },
+  {
+   "id": "ok.api-claims-coverage",
+   "request": {
+    "method": "GET",
+    "path": "/api/claims/coverage"
+   }
+  },
+  {
+   "id": "ok.api-claims-cell-client-id-program-code-tax-year",
+   "request": {
+    "method": "GET",
+    "path": "/api/claims/cell/1001/GA_JTC/2025"
+   }
+  },
+  {
+   "id": "ok.api-claims-lifecycle",
+   "request": {
+    "method": "GET",
+    "path": "/api/claims/lifecycle"
+   }
+  },
+  {
+   "id": "ok.api-v2-portfolio",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio"
+   }
+  },
+  {
+   "id": "ok.api-v2-clients-client-id-situation",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/situation"
+   }
+  },
+  {
+   "id": "ok.api-eligibility-tax-year",
+   "request": {
+    "method": "GET",
+    "path": "/api/eligibility/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "ok.api-rules",
+   "request": {
+    "method": "GET",
+    "path": "/api/rules"
+   }
+  },
+  {
+   "id": "ok.api-progress-tax-year",
+   "request": {
+    "method": "GET",
+    "path": "/api/progress/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "ok.api-forecast-tax-year",
+   "request": {
+    "method": "GET",
+    "path": "/api/forecast/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "ok.api-alerts-monthly-tax-year",
+   "request": {
+    "method": "GET",
+    "path": "/api/alerts/monthly/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "ok.api-triggers",
+   "request": {
+    "method": "GET",
+    "path": "/api/triggers"
+   }
+  },
+  {
+   "id": "ok.api-performance-tax-year",
+   "request": {
+    "method": "GET",
+    "path": "/api/performance/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "ok.api-onezero-matrix-tax-year",
+   "request": {
+    "method": "GET",
+    "path": "/api/onezero/matrix/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "ok.api-onezero-tax-year",
+   "request": {
+    "method": "GET",
+    "path": "/api/onezero/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "ok.api-onezero-tax-year-employee-employee-id",
+   "request": {
+    "method": "GET",
+    "path": "/api/onezero/2025/employee/{{employee_id}}",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "ok.api-designations-state",
+   "request": {
+    "method": "GET",
+    "path": "/api/designations/GA",
+    "query": [
+     [
+      "tax_year",
+      2025
+     ]
+    ]
+   }
+  },
+  {
+   "id": "ok.api-reconcile-tax-year",
+   "request": {
+    "method": "GET",
+    "path": "/api/reconcile/2025"
+   }
+  },
+  {
+   "id": "ok.api-qc-tax-year",
+   "request": {
+    "method": "GET",
+    "path": "/api/qc/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "ok.api-onezero-retroactive-scan",
+   "request": {
+    "method": "GET",
+    "path": "/api/onezero/retroactive/scan"
+   }
+  },
+  {
+   "id": "ok.api-rules-ingested-state",
+   "request": {
+    "method": "GET",
+    "path": "/api/rules/ingested/GA"
+   }
+  },
+  {
+   "id": "ok.api-rules-ingested-state-refresh",
+   "request": {
+    "method": "GET",
+    "path": "/api/rules/ingested/GA/refresh"
+   }
+  },
+  {
+   "id": "ok.api-rules-ingested-state-proposals",
+   "request": {
+    "method": "GET",
+    "path": "/api/rules/ingested/GA/proposals"
+   }
+  },
+  {
+   "id": "ok.api-rules-ingested-state-changelog",
+   "request": {
+    "method": "GET",
+    "path": "/api/rules/ingested/GA/changelog"
+   }
+  },
+  {
+   "id": "ok.api-simulate-portfolio-tax-year",
+   "request": {
+    "method": "GET",
+    "path": "/api/simulate/portfolio/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "ok.api-ingestion-tax-year",
+   "request": {
+    "method": "GET",
+    "path": "/api/ingestion/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "ok.api-ingestion-tax-year-rows",
+   "request": {
+    "method": "GET",
+    "path": "/api/ingestion/2025/rows",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "limit",
+      3
+     ]
+    ]
+   }
+  },
+  {
+   "id": "ok.api-findings-client-id-tax-year",
+   "request": {
+    "method": "GET",
+    "path": "/api/findings/1001/2025"
+   }
+  },
+  {
+   "id": "ok.api-findings-client-id-finding-id-history",
+   "request": {
+    "method": "GET",
+    "path": "/api/findings/1001/{{finding_id}}/history"
+   }
+  },
+  {
+   "id": "ok.api-proximity-tax-year",
+   "request": {
+    "method": "GET",
+    "path": "/api/proximity/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "ok.api-v2-program-drafts",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts"
+   }
+  },
+  {
+   "id": "ok.api-v2-program-drafts-draft-id",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts/{{draft_id}}"
+   }
+  },
+  {
+   "id": "ok.api-v2-program-drafts-draft-id-export-manifest",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts/{{draft_id}}/export/manifest"
+   }
+  },
+  {
+   "id": "ok.api-v2-programs",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/programs"
+   }
+  },
+  {
+   "id": "ok.api-v2-programs-code",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/programs/GA_JTC"
+   }
+  },
+  {
+   "id": "ok.api-v2-run-batches",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches"
+   }
+  },
+  {
+   "id": "ok.api-v2-run-batches-batch-id",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches/{{batch_id}}"
+   }
+  },
+  {
+   "id": "ok.api-v2-run-batches-batch-id-items",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches/{{batch_id}}/items"
+   }
+  },
+  {
+   "id": "ok.api-scope",
+   "request": {
+    "method": "GET",
+    "path": "/api/scope"
+   }
+  },
+  {
+   "id": "ok.api-scope-client-account-id",
+   "request": {
+    "method": "GET",
+    "path": "/api/scope/client/1001"
+   }
+  },
+  {
+   "id": "ok.api-v2-clients-client-id-units",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "limit",
+      3
+     ]
+    ]
+   }
+  },
+  {
+   "id": "ok.api-v2-clients-client-id-units-unit-id-rebase",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ/rebase",
+    "query": [
+     [
+      "base_year",
+      2024
+     ]
+    ]
+   }
+  },
+  {
+   "id": "ok.api-v2-clients-client-id-units-unit-id",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "limit",
+      3
+     ]
+    ]
+   }
+  },
+  {
+   "id": "ok.api-v2-employees-record-token",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/employees/{{token}}",
+    "query": [
+     [
+      "client_id",
+      1001
+     ],
+     [
+      "year",
+      2025
+     ]
+    ]
+   }
+  },
+  {
+   "id": "ok.api-v2-clients-client-id-runs-latest",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/runs/latest"
+   }
+  },
+  {
+   "id": "ok.api-workspace",
+   "request": {
+    "method": "GET",
+    "path": "/api/workspace"
+   }
+  },
+  {
+   "id": "ok.api-workspace-onezero-method",
+   "request": {
+    "method": "GET",
+    "path": "/api/workspace/onezero/min_max"
+   }
+  },
+  {
+   "id": "ok.api-workspace-calculation-walk",
+   "request": {
+    "method": "GET",
+    "path": "/api/workspace/calculation-walk"
+   }
+  },
+  {
+   "id": "ok.api-workspace-assumptions",
+   "request": {
+    "method": "GET",
+    "path": "/api/workspace/assumptions"
+   }
+  },
+  {
+   "id": "ok.api-workspace-comparison",
+   "request": {
+    "method": "GET",
+    "path": "/api/workspace/comparison"
+   }
+  },
+  {
+   "id": "framework.openapi",
+   "request": {
+    "method": "GET",
+    "path": "/openapi.json"
+   }
+  },
+  {
+   "id": "framework.docs",
+   "request": {
+    "method": "GET",
+    "path": "/docs"
+   }
+  },
+  {
+   "id": "framework.redoc",
+   "request": {
+    "method": "GET",
+    "path": "/redoc"
+   }
+  },
+  {
+   "id": "framework.oauth2-redirect",
+   "request": {
+    "method": "GET",
+    "path": "/docs/oauth2-redirect"
+   }
+  },
+  {
+   "id": "404.unknown-path",
+   "request": {
+    "method": "GET",
+    "path": "/api/nope"
+   }
+  },
+  {
+   "id": "404.root",
+   "request": {
+    "method": "GET",
+    "path": "/"
+   }
+  },
+  {
+   "id": "404.api-root",
+   "request": {
+    "method": "GET",
+    "path": "/api"
+   }
+  },
+  {
+   "id": "404.unknown-path-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/nope",
+    "json": {}
+   }
+  },
+  {
+   "id": "405.health-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/health",
+    "json": {}
+   }
+  },
+  {
+   "id": "405.health-delete",
+   "request": {
+    "method": "DELETE",
+    "path": "/api/health"
+   }
+  },
+  {
+   "id": "405.health-put",
+   "request": {
+    "method": "PUT",
+    "path": "/api/health",
+    "json": {}
+   }
+  },
+  {
+   "id": "405.health-patch",
+   "request": {
+    "method": "PATCH",
+    "path": "/api/health",
+    "json": {}
+   }
+  },
+  {
+   "id": "trailing.health",
+   "request": {
+    "method": "GET",
+    "path": "/api/health/"
+   }
+  },
+  {
+   "id": "trailing.double-slash",
+   "request": {
+    "method": "GET",
+    "path": "//api/health"
+   }
+  },
+  {
+   "id": "case.path-uppercase",
+   "request": {
+    "method": "GET",
+    "path": "/API/health"
+   }
+  },
+  {
+   "id": "head.health",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/health"
+   }
+  },
+  {
+   "id": "options.health",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/health"
+   }
+  },
+  {
+   "id": "cors.preflight",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/claims",
+    "headers": {
+     "origin": "https://example.test",
+     "access-control-request-method": "POST",
+     "access-control-request-headers": "content-type,authorization"
+    }
+   }
+  },
+  {
+   "id": "cors.simple",
+   "request": {
+    "method": "GET",
+    "path": "/api/health",
+    "headers": {
+     "origin": "https://example.test"
+    }
+   }
+  },
+  {
+   "id": "cors.preflight-disallowed-method",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/claims",
+    "headers": {
+     "origin": "https://example.test",
+     "access-control-request-method": "DELETE"
+    }
+   }
+  },
+  {
+   "id": "get-api-ready.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/ready",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-ready.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/ready/"
+   }
+  },
+  {
+   "id": "get-api-ready.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/ready"
+   }
+  },
+  {
+   "id": "get-api-ready.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/ready"
+   }
+  },
+  {
+   "id": "get-api-ready.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/ready",
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-health.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/health",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-health.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/health/"
+   }
+  },
+  {
+   "id": "get-api-health.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/health"
+   }
+  },
+  {
+   "id": "get-api-health.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/health"
+   }
+  },
+  {
+   "id": "get-api-health.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/health",
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-me.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/me",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-me.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/me/"
+   }
+  },
+  {
+   "id": "get-api-me.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/me"
+   }
+  },
+  {
+   "id": "get-api-me.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/me"
+   }
+  },
+  {
+   "id": "get-api-me.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/me",
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-clients-client-id-artifacts-artifact-id.path-client_id-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/clients/abc/artifacts/{{artifact_id}}"
+   }
+  },
+  {
+   "id": "get-api-clients-client-id-artifacts-artifact-id.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/clients/1001/artifacts/{{artifact_id}}",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-clients-client-id-artifacts-artifact-id.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/clients/1001/artifacts/{{artifact_id}}/"
+   }
+  },
+  {
+   "id": "get-api-clients-client-id-artifacts-artifact-id.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/clients/1001/artifacts/{{artifact_id}}"
+   }
+  },
+  {
+   "id": "get-api-clients-client-id-artifacts-artifact-id.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/clients/1001/artifacts/{{artifact_id}}"
+   }
+  },
+  {
+   "id": "get-api-clients-client-id-artifacts-artifact-id.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/clients/1001/artifacts/{{artifact_id}}",
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-audit-channel.query-limit-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/audit/channel",
+    "query": [
+     [
+      "user_oid",
+      "00000000-0000-0000-0000-000000000001"
+     ],
+     [
+      "limit",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-audit-channel.query-limit-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/audit/channel",
+    "query": [
+     [
+      "user_oid",
+      "00000000-0000-0000-0000-000000000001"
+     ],
+     [
+      "limit",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-audit-channel.query-limit-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/audit/channel",
+    "query": [
+     [
+      "user_oid",
+      "00000000-0000-0000-0000-000000000001"
+     ],
+     [
+      "limit",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-audit-channel.query-limit-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/audit/channel",
+    "query": [
+     [
+      "user_oid",
+      "00000000-0000-0000-0000-000000000001"
+     ],
+     [
+      "limit",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-audit-channel.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/audit/channel",
+    "query": [
+     [
+      "user_oid",
+      "00000000-0000-0000-0000-000000000001"
+     ],
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-audit-channel.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/audit/channel/",
+    "query": [
+     [
+      "user_oid",
+      "00000000-0000-0000-0000-000000000001"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-audit-channel.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/audit/channel",
+    "query": [
+     [
+      "user_oid",
+      "00000000-0000-0000-0000-000000000001"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-audit-channel.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/audit/channel",
+    "query": [
+     [
+      "user_oid",
+      "00000000-0000-0000-0000-000000000001"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-audit-channel.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/audit/channel",
+    "query": [
+     [
+      "user_oid",
+      "00000000-0000-0000-0000-000000000001"
+     ]
+    ],
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-capabilities.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/capabilities",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-capabilities.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/capabilities/"
+   }
+  },
+  {
+   "id": "get-api-capabilities.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/capabilities"
+   }
+  },
+  {
+   "id": "get-api-capabilities.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/capabilities"
+   }
+  },
+  {
+   "id": "get-api-capabilities.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/capabilities",
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-claims-coverage-client-id.path-client_id-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/claims/coverage/abc"
+   }
+  },
+  {
+   "id": "get-api-claims-coverage-client-id.query-tax_year-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/claims/coverage/1001",
+    "query": [
+     [
+      "tax_year",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-claims-coverage-client-id.query-tax_year-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/claims/coverage/1001",
+    "query": [
+     [
+      "tax_year",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-claims-coverage-client-id.query-tax_year-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/claims/coverage/1001",
+    "query": [
+     [
+      "tax_year",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-claims-coverage-client-id.query-tax_year-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/claims/coverage/1001",
+    "query": [
+     [
+      "tax_year",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-claims-coverage-client-id.query-tax_years-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/claims/coverage/1001",
+    "query": [
+     [
+      "tax_years",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-claims-coverage-client-id.query-tax_years-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/claims/coverage/1001",
+    "query": [
+     [
+      "tax_years",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-claims-coverage-client-id.query-tax_years-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/claims/coverage/1001",
+    "query": [
+     [
+      "tax_years",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-claims-coverage-client-id.query-tax_years-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/claims/coverage/1001",
+    "query": [
+     [
+      "tax_years",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-claims-coverage-client-id.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/claims/coverage/1001",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-claims-coverage-client-id.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/claims/coverage/1001/"
+   }
+  },
+  {
+   "id": "get-api-claims-coverage-client-id.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/claims/coverage/1001"
+   }
+  },
+  {
+   "id": "get-api-claims-coverage-client-id.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/claims/coverage/1001"
+   }
+  },
+  {
+   "id": "get-api-claims-coverage-client-id.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/claims/coverage/1001",
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-claims-coverage.query-tax_year-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/claims/coverage",
+    "query": [
+     [
+      "tax_year",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-claims-coverage.query-tax_year-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/claims/coverage",
+    "query": [
+     [
+      "tax_year",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-claims-coverage.query-tax_year-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/claims/coverage",
+    "query": [
+     [
+      "tax_year",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-claims-coverage.query-tax_year-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/claims/coverage",
+    "query": [
+     [
+      "tax_year",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-claims-coverage.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/claims/coverage",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-claims-coverage.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/claims/coverage/"
+   }
+  },
+  {
+   "id": "get-api-claims-coverage.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/claims/coverage"
+   }
+  },
+  {
+   "id": "get-api-claims-coverage.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/claims/coverage"
+   }
+  },
+  {
+   "id": "get-api-claims-coverage.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/claims/coverage",
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-claims-cell-client-id-program-code-tax-year.path-client_id-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/claims/cell/abc/GA_JTC/2025"
+   }
+  },
+  {
+   "id": "get-api-claims-cell-client-id-program-code-tax-year.path-tax_year-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/claims/cell/1001/GA_JTC/abc"
+   }
+  },
+  {
+   "id": "get-api-claims-cell-client-id-program-code-tax-year.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/claims/cell/1001/GA_JTC/2025",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-claims-cell-client-id-program-code-tax-year.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/claims/cell/1001/GA_JTC/2025/"
+   }
+  },
+  {
+   "id": "get-api-claims-cell-client-id-program-code-tax-year.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/claims/cell/1001/GA_JTC/2025"
+   }
+  },
+  {
+   "id": "get-api-claims-cell-client-id-program-code-tax-year.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/claims/cell/1001/GA_JTC/2025"
+   }
+  },
+  {
+   "id": "get-api-claims-cell-client-id-program-code-tax-year.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/claims/cell/1001/GA_JTC/2025",
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-claims-lifecycle.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/claims/lifecycle",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-claims-lifecycle.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/claims/lifecycle/"
+   }
+  },
+  {
+   "id": "get-api-claims-lifecycle.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/claims/lifecycle"
+   }
+  },
+  {
+   "id": "get-api-claims-lifecycle.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/claims/lifecycle"
+   }
+  },
+  {
+   "id": "get-api-claims-lifecycle.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/claims/lifecycle",
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-v2-portfolio.query-year-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "year",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-portfolio.query-year-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "year",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-portfolio.query-year-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "year",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-portfolio.query-year-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "year",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-portfolio.query-limit-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "limit",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-portfolio.query-limit-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "limit",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-portfolio.query-limit-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "limit",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-portfolio.query-limit-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "limit",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-portfolio.query-offset-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "offset",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-portfolio.query-offset-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "offset",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-portfolio.query-offset-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "offset",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-portfolio.query-offset-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "offset",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-portfolio.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-portfolio.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/portfolio/"
+   }
+  },
+  {
+   "id": "get-api-v2-portfolio.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/v2/portfolio"
+   }
+  },
+  {
+   "id": "get-api-v2-portfolio.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/v2/portfolio"
+   }
+  },
+  {
+   "id": "get-api-v2-portfolio.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/portfolio",
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-situation.path-client_id-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/abc/situation"
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-situation.query-year-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/situation",
+    "query": [
+     [
+      "year",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-situation.query-year-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/situation",
+    "query": [
+     [
+      "year",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-situation.query-year-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/situation",
+    "query": [
+     [
+      "year",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-situation.query-year-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/situation",
+    "query": [
+     [
+      "year",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-situation.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/situation",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-situation.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/situation/"
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-situation.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/v2/clients/1001/situation"
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-situation.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/v2/clients/1001/situation"
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-situation.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/clients/1001/situation",
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-eligibility-tax-year.path-tax_year-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/eligibility/abc",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-eligibility-tax-year.query-limit-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/eligibility/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "limit",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-eligibility-tax-year.query-limit-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/eligibility/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "limit",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-eligibility-tax-year.query-limit-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/eligibility/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "limit",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-eligibility-tax-year.query-limit-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/eligibility/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "limit",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-eligibility-tax-year.query-offset-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/eligibility/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "offset",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-eligibility-tax-year.query-offset-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/eligibility/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "offset",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-eligibility-tax-year.query-offset-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/eligibility/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "offset",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-eligibility-tax-year.query-offset-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/eligibility/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "offset",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-eligibility-tax-year.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/eligibility/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-eligibility-tax-year.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/eligibility/2025/",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-eligibility-tax-year.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/eligibility/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-eligibility-tax-year.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/eligibility/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-eligibility-tax-year.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/eligibility/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ],
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-rules.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/rules",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-rules.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/rules/"
+   }
+  },
+  {
+   "id": "get-api-rules.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/rules"
+   }
+  },
+  {
+   "id": "get-api-rules.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/rules"
+   }
+  },
+  {
+   "id": "get-api-rules.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/rules",
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-progress-tax-year.path-tax_year-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/progress/abc",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-progress-tax-year.query-account_id-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/progress/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-progress-tax-year.query-account_id-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/progress/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-progress-tax-year.query-account_id-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/progress/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-progress-tax-year.query-account_id-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/progress/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-progress-tax-year.query-within-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/progress/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "within",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-progress-tax-year.query-within-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/progress/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "within",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-progress-tax-year.query-within-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/progress/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "within",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-progress-tax-year.query-within-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/progress/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "within",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-progress-tax-year.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/progress/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-progress-tax-year.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/progress/2025/",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-progress-tax-year.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/progress/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-progress-tax-year.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/progress/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-progress-tax-year.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/progress/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ],
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-forecast-tax-year.path-tax_year-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/forecast/abc",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-forecast-tax-year.query-account_id-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/forecast/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-forecast-tax-year.query-account_id-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/forecast/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-forecast-tax-year.query-account_id-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/forecast/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-forecast-tax-year.query-account_id-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/forecast/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-forecast-tax-year.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/forecast/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-forecast-tax-year.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/forecast/2025/",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-forecast-tax-year.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/forecast/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-forecast-tax-year.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/forecast/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-forecast-tax-year.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/forecast/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ],
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-alerts-monthly-tax-year.path-tax_year-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/alerts/monthly/abc",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-alerts-monthly-tax-year.query-account_id-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/alerts/monthly/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-alerts-monthly-tax-year.query-account_id-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/alerts/monthly/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-alerts-monthly-tax-year.query-account_id-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/alerts/monthly/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-alerts-monthly-tax-year.query-account_id-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/alerts/monthly/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-alerts-monthly-tax-year.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/alerts/monthly/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-alerts-monthly-tax-year.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/alerts/monthly/2025/",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-alerts-monthly-tax-year.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/alerts/monthly/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-alerts-monthly-tax-year.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/alerts/monthly/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-alerts-monthly-tax-year.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/alerts/monthly/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ],
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-triggers.query-account_id-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/triggers",
+    "query": [
+     [
+      "account_id",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-triggers.query-account_id-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/triggers",
+    "query": [
+     [
+      "account_id",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-triggers.query-account_id-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/triggers",
+    "query": [
+     [
+      "account_id",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-triggers.query-account_id-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/triggers",
+    "query": [
+     [
+      "account_id",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-triggers.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/triggers",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-triggers.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/triggers/"
+   }
+  },
+  {
+   "id": "get-api-triggers.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/triggers"
+   }
+  },
+  {
+   "id": "get-api-triggers.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/triggers"
+   }
+  },
+  {
+   "id": "get-api-triggers.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/triggers",
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-performance-tax-year.path-tax_year-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/performance/abc",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-performance-tax-year.query-account_id-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/performance/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-performance-tax-year.query-account_id-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/performance/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-performance-tax-year.query-account_id-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/performance/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-performance-tax-year.query-account_id-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/performance/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-performance-tax-year.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/performance/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-performance-tax-year.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/performance/2025/",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-performance-tax-year.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/performance/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-performance-tax-year.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/performance/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-performance-tax-year.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/performance/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ],
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-onezero-matrix-tax-year.path-tax_year-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/onezero/matrix/abc",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-onezero-matrix-tax-year.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/onezero/matrix/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-onezero-matrix-tax-year.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/onezero/matrix/2025/",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-onezero-matrix-tax-year.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/onezero/matrix/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-onezero-matrix-tax-year.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/onezero/matrix/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-onezero-matrix-tax-year.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/onezero/matrix/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ],
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-onezero-tax-year.path-tax_year-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/onezero/abc",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-onezero-tax-year.query-account_id-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/onezero/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-onezero-tax-year.query-account_id-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/onezero/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-onezero-tax-year.query-account_id-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/onezero/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-onezero-tax-year.query-account_id-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/onezero/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-onezero-tax-year.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/onezero/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-onezero-tax-year.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/onezero/2025/",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-onezero-tax-year.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/onezero/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-onezero-tax-year.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/onezero/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-onezero-tax-year.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/onezero/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ],
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-onezero-tax-year-employee-employee-id.path-tax_year-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/onezero/abc/employee/{{employee_id}}",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-onezero-tax-year-employee-employee-id.query-account_id-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/onezero/2025/employee/{{employee_id}}",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-onezero-tax-year-employee-employee-id.query-account_id-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/onezero/2025/employee/{{employee_id}}",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-onezero-tax-year-employee-employee-id.query-account_id-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/onezero/2025/employee/{{employee_id}}",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-onezero-tax-year-employee-employee-id.query-account_id-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/onezero/2025/employee/{{employee_id}}",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-onezero-tax-year-employee-employee-id.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/onezero/2025/employee/{{employee_id}}",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-onezero-tax-year-employee-employee-id.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/onezero/2025/employee/{{employee_id}}/",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-onezero-tax-year-employee-employee-id.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/onezero/2025/employee/{{employee_id}}",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-onezero-tax-year-employee-employee-id.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/onezero/2025/employee/{{employee_id}}",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-onezero-tax-year-employee-employee-id.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/onezero/2025/employee/{{employee_id}}",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ],
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-designations-state.query-tax_year-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/designations/GA",
+    "query": [
+     [
+      "tax_year",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-designations-state.query-tax_year-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/designations/GA",
+    "query": [
+     [
+      "tax_year",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-designations-state.query-tax_year-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/designations/GA",
+    "query": [
+     [
+      "tax_year",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-designations-state.query-tax_year-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/designations/GA",
+    "query": [
+     [
+      "tax_year",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-designations-state.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/designations/GA",
+    "query": [
+     [
+      "tax_year",
+      2025
+     ],
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-designations-state.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/designations/GA/",
+    "query": [
+     [
+      "tax_year",
+      2025
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-designations-state.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/designations/GA",
+    "query": [
+     [
+      "tax_year",
+      2025
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-designations-state.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/designations/GA",
+    "query": [
+     [
+      "tax_year",
+      2025
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-designations-state.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/designations/GA",
+    "query": [
+     [
+      "tax_year",
+      2025
+     ]
+    ],
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-reconcile-tax-year.path-tax_year-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/reconcile/abc"
+   }
+  },
+  {
+   "id": "get-api-reconcile-tax-year.query-account_id-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/reconcile/2025",
+    "query": [
+     [
+      "account_id",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-reconcile-tax-year.query-account_id-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/reconcile/2025",
+    "query": [
+     [
+      "account_id",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-reconcile-tax-year.query-account_id-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/reconcile/2025",
+    "query": [
+     [
+      "account_id",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-reconcile-tax-year.query-account_id-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/reconcile/2025",
+    "query": [
+     [
+      "account_id",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-reconcile-tax-year.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/reconcile/2025",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-reconcile-tax-year.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/reconcile/2025/"
+   }
+  },
+  {
+   "id": "get-api-reconcile-tax-year.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/reconcile/2025"
+   }
+  },
+  {
+   "id": "get-api-reconcile-tax-year.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/reconcile/2025"
+   }
+  },
+  {
+   "id": "get-api-reconcile-tax-year.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/reconcile/2025",
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-qc-tax-year.path-tax_year-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/qc/abc",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-qc-tax-year.query-min_wages-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/qc/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "min_wages",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-qc-tax-year.query-min_wages-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/qc/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "min_wages",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-qc-tax-year.query-min_wages-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/qc/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "min_wages",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-qc-tax-year.query-min_wages-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/qc/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "min_wages",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-qc-tax-year.query-min_hours-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/qc/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "min_hours",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-qc-tax-year.query-min_hours-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/qc/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "min_hours",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-qc-tax-year.query-min_hours-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/qc/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "min_hours",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-qc-tax-year.query-min_hours-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/qc/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "min_hours",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-qc-tax-year.query-account_id-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/qc/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-qc-tax-year.query-account_id-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/qc/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-qc-tax-year.query-account_id-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/qc/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-qc-tax-year.query-account_id-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/qc/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-qc-tax-year.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/qc/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-qc-tax-year.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/qc/2025/",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-qc-tax-year.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/qc/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-qc-tax-year.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/qc/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-qc-tax-year.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/qc/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ],
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-onezero-retroactive-scan.query-account_id-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/onezero/retroactive/scan",
+    "query": [
+     [
+      "account_id",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-onezero-retroactive-scan.query-account_id-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/onezero/retroactive/scan",
+    "query": [
+     [
+      "account_id",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-onezero-retroactive-scan.query-account_id-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/onezero/retroactive/scan",
+    "query": [
+     [
+      "account_id",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-onezero-retroactive-scan.query-account_id-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/onezero/retroactive/scan",
+    "query": [
+     [
+      "account_id",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-onezero-retroactive-scan.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/onezero/retroactive/scan",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-onezero-retroactive-scan.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/onezero/retroactive/scan/"
+   }
+  },
+  {
+   "id": "get-api-onezero-retroactive-scan.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/onezero/retroactive/scan"
+   }
+  },
+  {
+   "id": "get-api-onezero-retroactive-scan.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/onezero/retroactive/scan"
+   }
+  },
+  {
+   "id": "get-api-onezero-retroactive-scan.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/onezero/retroactive/scan",
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-rules-ingested-state.query-tax_year-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/rules/ingested/GA",
+    "query": [
+     [
+      "tax_year",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-rules-ingested-state.query-tax_year-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/rules/ingested/GA",
+    "query": [
+     [
+      "tax_year",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-rules-ingested-state.query-tax_year-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/rules/ingested/GA",
+    "query": [
+     [
+      "tax_year",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-rules-ingested-state.query-tax_year-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/rules/ingested/GA",
+    "query": [
+     [
+      "tax_year",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-rules-ingested-state.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/rules/ingested/GA",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-rules-ingested-state.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/rules/ingested/GA/"
+   }
+  },
+  {
+   "id": "get-api-rules-ingested-state.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/rules/ingested/GA"
+   }
+  },
+  {
+   "id": "get-api-rules-ingested-state.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/rules/ingested/GA"
+   }
+  },
+  {
+   "id": "get-api-rules-ingested-state.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/rules/ingested/GA",
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-rules-ingested-state-refresh.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/rules/ingested/GA/refresh",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-rules-ingested-state-refresh.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/rules/ingested/GA/refresh/"
+   }
+  },
+  {
+   "id": "get-api-rules-ingested-state-refresh.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/rules/ingested/GA/refresh"
+   }
+  },
+  {
+   "id": "get-api-rules-ingested-state-refresh.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/rules/ingested/GA/refresh"
+   }
+  },
+  {
+   "id": "get-api-rules-ingested-state-refresh.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/rules/ingested/GA/refresh",
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-rules-ingested-state-proposals.query-tax_year-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/rules/ingested/GA/proposals",
+    "query": [
+     [
+      "tax_year",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-rules-ingested-state-proposals.query-tax_year-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/rules/ingested/GA/proposals",
+    "query": [
+     [
+      "tax_year",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-rules-ingested-state-proposals.query-tax_year-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/rules/ingested/GA/proposals",
+    "query": [
+     [
+      "tax_year",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-rules-ingested-state-proposals.query-tax_year-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/rules/ingested/GA/proposals",
+    "query": [
+     [
+      "tax_year",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-rules-ingested-state-proposals.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/rules/ingested/GA/proposals",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-rules-ingested-state-proposals.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/rules/ingested/GA/proposals/"
+   }
+  },
+  {
+   "id": "get-api-rules-ingested-state-proposals.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/rules/ingested/GA/proposals"
+   }
+  },
+  {
+   "id": "get-api-rules-ingested-state-proposals.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/rules/ingested/GA/proposals"
+   }
+  },
+  {
+   "id": "get-api-rules-ingested-state-proposals.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/rules/ingested/GA/proposals",
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-rules-ingested-state-changelog.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/rules/ingested/GA/changelog",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-rules-ingested-state-changelog.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/rules/ingested/GA/changelog/"
+   }
+  },
+  {
+   "id": "get-api-rules-ingested-state-changelog.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/rules/ingested/GA/changelog"
+   }
+  },
+  {
+   "id": "get-api-rules-ingested-state-changelog.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/rules/ingested/GA/changelog"
+   }
+  },
+  {
+   "id": "get-api-rules-ingested-state-changelog.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/rules/ingested/GA/changelog",
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-simulate-portfolio-tax-year.path-tax_year-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/simulate/portfolio/abc",
+    "query": [
+     [
+      "state",
+      "GA"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-simulate-portfolio-tax-year.query-magnitude-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/simulate/portfolio/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "magnitude",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-simulate-portfolio-tax-year.query-magnitude-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/simulate/portfolio/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "magnitude",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-simulate-portfolio-tax-year.query-magnitude-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/simulate/portfolio/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "magnitude",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-simulate-portfolio-tax-year.query-limit-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/simulate/portfolio/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "limit",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-simulate-portfolio-tax-year.query-limit-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/simulate/portfolio/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "limit",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-simulate-portfolio-tax-year.query-limit-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/simulate/portfolio/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "limit",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-simulate-portfolio-tax-year.query-limit-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/simulate/portfolio/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "limit",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-simulate-portfolio-tax-year.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/simulate/portfolio/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-simulate-portfolio-tax-year.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/simulate/portfolio/2025/",
+    "query": [
+     [
+      "state",
+      "GA"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-simulate-portfolio-tax-year.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/simulate/portfolio/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-simulate-portfolio-tax-year.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/simulate/portfolio/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-simulate-portfolio-tax-year.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/simulate/portfolio/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ]
+    ],
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-ingestion-tax-year.path-tax_year-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/ingestion/abc",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-ingestion-tax-year.query-account_id-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/ingestion/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-ingestion-tax-year.query-account_id-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/ingestion/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-ingestion-tax-year.query-account_id-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/ingestion/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-ingestion-tax-year.query-account_id-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/ingestion/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-ingestion-tax-year.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/ingestion/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-ingestion-tax-year.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/ingestion/2025/",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-ingestion-tax-year.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/ingestion/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-ingestion-tax-year.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/ingestion/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-ingestion-tax-year.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/ingestion/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ],
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-ingestion-tax-year-rows.path-tax_year-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/ingestion/abc/rows",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "limit",
+      3
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-ingestion-tax-year-rows.query-limit-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/ingestion/2025/rows",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "limit",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-ingestion-tax-year-rows.query-limit-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/ingestion/2025/rows",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "limit",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-ingestion-tax-year-rows.query-limit-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/ingestion/2025/rows",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "limit",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-ingestion-tax-year-rows.query-limit-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/ingestion/2025/rows",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "limit",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-ingestion-tax-year-rows.query-offset-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/ingestion/2025/rows",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "limit",
+      3
+     ],
+     [
+      "offset",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-ingestion-tax-year-rows.query-offset-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/ingestion/2025/rows",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "limit",
+      3
+     ],
+     [
+      "offset",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-ingestion-tax-year-rows.query-offset-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/ingestion/2025/rows",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "limit",
+      3
+     ],
+     [
+      "offset",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-ingestion-tax-year-rows.query-offset-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/ingestion/2025/rows",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "limit",
+      3
+     ],
+     [
+      "offset",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-ingestion-tax-year-rows.query-account_id-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/ingestion/2025/rows",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "limit",
+      3
+     ],
+     [
+      "account_id",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-ingestion-tax-year-rows.query-account_id-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/ingestion/2025/rows",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "limit",
+      3
+     ],
+     [
+      "account_id",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-ingestion-tax-year-rows.query-account_id-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/ingestion/2025/rows",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "limit",
+      3
+     ],
+     [
+      "account_id",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-ingestion-tax-year-rows.query-account_id-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/ingestion/2025/rows",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "limit",
+      3
+     ],
+     [
+      "account_id",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-ingestion-tax-year-rows.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/ingestion/2025/rows",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "limit",
+      3
+     ],
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-ingestion-tax-year-rows.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/ingestion/2025/rows/",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "limit",
+      3
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-ingestion-tax-year-rows.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/ingestion/2025/rows",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "limit",
+      3
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-ingestion-tax-year-rows.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/ingestion/2025/rows",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "limit",
+      3
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-ingestion-tax-year-rows.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/ingestion/2025/rows",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "limit",
+      3
+     ]
+    ],
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-findings-client-id-tax-year.path-client_id-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/findings/abc/2025"
+   }
+  },
+  {
+   "id": "get-api-findings-client-id-tax-year.path-tax_year-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/findings/1001/abc"
+   }
+  },
+  {
+   "id": "get-api-findings-client-id-tax-year.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/findings/1001/2025",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-findings-client-id-tax-year.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/findings/1001/2025/"
+   }
+  },
+  {
+   "id": "get-api-findings-client-id-tax-year.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/findings/1001/2025"
+   }
+  },
+  {
+   "id": "get-api-findings-client-id-tax-year.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/findings/1001/2025"
+   }
+  },
+  {
+   "id": "get-api-findings-client-id-tax-year.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/findings/1001/2025",
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-findings-client-id-finding-id-history.path-client_id-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/findings/abc/{{finding_id}}/history"
+   }
+  },
+  {
+   "id": "get-api-findings-client-id-finding-id-history.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/findings/1001/{{finding_id}}/history",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-findings-client-id-finding-id-history.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/findings/1001/{{finding_id}}/history/"
+   }
+  },
+  {
+   "id": "get-api-findings-client-id-finding-id-history.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/findings/1001/{{finding_id}}/history"
+   }
+  },
+  {
+   "id": "get-api-findings-client-id-finding-id-history.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/findings/1001/{{finding_id}}/history"
+   }
+  },
+  {
+   "id": "get-api-findings-client-id-finding-id-history.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/findings/1001/{{finding_id}}/history",
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-proximity-tax-year.path-tax_year-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/proximity/abc",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-proximity-tax-year.query-within-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/proximity/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "within",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-proximity-tax-year.query-within-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/proximity/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "within",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-proximity-tax-year.query-within-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/proximity/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "within",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-proximity-tax-year.query-within-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/proximity/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "within",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-proximity-tax-year.query-limit-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/proximity/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "limit",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-proximity-tax-year.query-limit-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/proximity/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "limit",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-proximity-tax-year.query-limit-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/proximity/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "limit",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-proximity-tax-year.query-limit-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/proximity/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "limit",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-proximity-tax-year.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/proximity/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ],
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-proximity-tax-year.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/proximity/2025/",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-proximity-tax-year.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/proximity/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-proximity-tax-year.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/proximity/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-proximity-tax-year.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/proximity/2025",
+    "query": [
+     [
+      "state",
+      "GA"
+     ],
+     [
+      "account_id",
+      1001
+     ]
+    ],
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts.query-limit-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts",
+    "query": [
+     [
+      "limit",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts.query-limit-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts",
+    "query": [
+     [
+      "limit",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts.query-limit-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts",
+    "query": [
+     [
+      "limit",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts.query-limit-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts",
+    "query": [
+     [
+      "limit",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts.query-offset-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts",
+    "query": [
+     [
+      "offset",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts.query-offset-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts",
+    "query": [
+     [
+      "offset",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts.query-offset-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts",
+    "query": [
+     [
+      "offset",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts.query-offset-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts",
+    "query": [
+     [
+      "offset",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts/"
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/v2/program-drafts"
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/v2/program-drafts"
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts",
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts-draft-id.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts/{{draft_id}}",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts-draft-id.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts/{{draft_id}}/"
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts-draft-id.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/v2/program-drafts/{{draft_id}}"
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts-draft-id.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/v2/program-drafts/{{draft_id}}"
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts-draft-id.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}",
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts-draft-id-export-manifest.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts/{{draft_id}}/export/manifest",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts-draft-id-export-manifest.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/program-drafts/{{draft_id}}/export/manifest/"
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts-draft-id-export-manifest.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/v2/program-drafts/{{draft_id}}/export/manifest"
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts-draft-id-export-manifest.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/v2/program-drafts/{{draft_id}}/export/manifest"
+   }
+  },
+  {
+   "id": "get-api-v2-program-drafts-draft-id-export-manifest.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/program-drafts/{{draft_id}}/export/manifest",
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-v2-programs.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/programs",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-programs.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/programs/"
+   }
+  },
+  {
+   "id": "get-api-v2-programs.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/v2/programs"
+   }
+  },
+  {
+   "id": "get-api-v2-programs.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/v2/programs"
+   }
+  },
+  {
+   "id": "get-api-v2-programs.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/programs",
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-v2-programs-code.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/programs/GA_JTC",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-programs-code.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/programs/GA_JTC/"
+   }
+  },
+  {
+   "id": "get-api-v2-programs-code.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/v2/programs/GA_JTC"
+   }
+  },
+  {
+   "id": "get-api-v2-programs-code.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/v2/programs/GA_JTC"
+   }
+  },
+  {
+   "id": "get-api-v2-programs-code.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/programs/GA_JTC",
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-v2-run-batches.query-limit-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches",
+    "query": [
+     [
+      "limit",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-run-batches.query-limit-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches",
+    "query": [
+     [
+      "limit",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-run-batches.query-limit-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches",
+    "query": [
+     [
+      "limit",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-run-batches.query-limit-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches",
+    "query": [
+     [
+      "limit",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-run-batches.query-offset-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches",
+    "query": [
+     [
+      "offset",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-run-batches.query-offset-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches",
+    "query": [
+     [
+      "offset",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-run-batches.query-offset-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches",
+    "query": [
+     [
+      "offset",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-run-batches.query-offset-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches",
+    "query": [
+     [
+      "offset",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-run-batches.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-run-batches.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches/"
+   }
+  },
+  {
+   "id": "get-api-v2-run-batches.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/v2/run-batches"
+   }
+  },
+  {
+   "id": "get-api-v2-run-batches.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/v2/run-batches"
+   }
+  },
+  {
+   "id": "get-api-v2-run-batches.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches",
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-v2-run-batches-batch-id.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches/{{batch_id}}",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-run-batches-batch-id.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches/{{batch_id}}/"
+   }
+  },
+  {
+   "id": "get-api-v2-run-batches-batch-id.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/v2/run-batches/{{batch_id}}"
+   }
+  },
+  {
+   "id": "get-api-v2-run-batches-batch-id.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/v2/run-batches/{{batch_id}}"
+   }
+  },
+  {
+   "id": "get-api-v2-run-batches-batch-id.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches/{{batch_id}}",
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-v2-run-batches-batch-id-items.query-limit-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches/{{batch_id}}/items",
+    "query": [
+     [
+      "limit",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-run-batches-batch-id-items.query-limit-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches/{{batch_id}}/items",
+    "query": [
+     [
+      "limit",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-run-batches-batch-id-items.query-limit-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches/{{batch_id}}/items",
+    "query": [
+     [
+      "limit",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-run-batches-batch-id-items.query-limit-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches/{{batch_id}}/items",
+    "query": [
+     [
+      "limit",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-run-batches-batch-id-items.query-offset-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches/{{batch_id}}/items",
+    "query": [
+     [
+      "offset",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-run-batches-batch-id-items.query-offset-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches/{{batch_id}}/items",
+    "query": [
+     [
+      "offset",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-run-batches-batch-id-items.query-offset-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches/{{batch_id}}/items",
+    "query": [
+     [
+      "offset",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-run-batches-batch-id-items.query-offset-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches/{{batch_id}}/items",
+    "query": [
+     [
+      "offset",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-run-batches-batch-id-items.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches/{{batch_id}}/items",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-run-batches-batch-id-items.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/run-batches/{{batch_id}}/items/"
+   }
+  },
+  {
+   "id": "get-api-v2-run-batches-batch-id-items.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/v2/run-batches/{{batch_id}}/items"
+   }
+  },
+  {
+   "id": "get-api-v2-run-batches-batch-id-items.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/v2/run-batches/{{batch_id}}/items"
+   }
+  },
+  {
+   "id": "get-api-v2-run-batches-batch-id-items.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/run-batches/{{batch_id}}/items",
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-scope.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/scope",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-scope.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/scope/"
+   }
+  },
+  {
+   "id": "get-api-scope.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/scope"
+   }
+  },
+  {
+   "id": "get-api-scope.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/scope"
+   }
+  },
+  {
+   "id": "get-api-scope.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/scope",
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-scope-client-account-id.path-account_id-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/scope/client/abc"
+   }
+  },
+  {
+   "id": "get-api-scope-client-account-id.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/scope/client/1001",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-scope-client-account-id.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/scope/client/1001/"
+   }
+  },
+  {
+   "id": "get-api-scope-client-account-id.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/scope/client/1001"
+   }
+  },
+  {
+   "id": "get-api-scope-client-account-id.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/scope/client/1001"
+   }
+  },
+  {
+   "id": "get-api-scope-client-account-id.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/scope/client/1001",
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units.path-client_id-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/abc/units",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "limit",
+      3
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units.query-year-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units",
+    "query": [
+     [
+      "limit",
+      3
+     ],
+     [
+      "year",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units.query-year-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units",
+    "query": [
+     [
+      "limit",
+      3
+     ],
+     [
+      "year",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units.query-year-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units",
+    "query": [
+     [
+      "limit",
+      3
+     ],
+     [
+      "year",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units.query-year-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units",
+    "query": [
+     [
+      "limit",
+      3
+     ],
+     [
+      "year",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units.query-limit-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "limit",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units.query-limit-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "limit",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units.query-limit-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "limit",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units.query-limit-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "limit",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units.query-offset-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "limit",
+      3
+     ],
+     [
+      "offset",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units.query-offset-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "limit",
+      3
+     ],
+     [
+      "offset",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units.query-offset-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "limit",
+      3
+     ],
+     [
+      "offset",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units.query-offset-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "limit",
+      3
+     ],
+     [
+      "offset",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "limit",
+      3
+     ],
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units/",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "limit",
+      3
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/v2/clients/1001/units",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "limit",
+      3
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/v2/clients/1001/units",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "limit",
+      3
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/clients/1001/units",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "limit",
+      3
+     ]
+    ],
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units-unit-id-rebase.path-client_id-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/abc/units/GA_ATL_HQ/rebase",
+    "query": [
+     [
+      "base_year",
+      2024
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units-unit-id-rebase.query-base_year-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ/rebase",
+    "query": [
+     [
+      "base_year",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units-unit-id-rebase.query-base_year-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ/rebase",
+    "query": [
+     [
+      "base_year",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units-unit-id-rebase.query-base_year-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ/rebase",
+    "query": [
+     [
+      "base_year",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units-unit-id-rebase.query-base_year-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ/rebase",
+    "query": [
+     [
+      "base_year",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units-unit-id-rebase.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ/rebase",
+    "query": [
+     [
+      "base_year",
+      2024
+     ],
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units-unit-id-rebase.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ/rebase/",
+    "query": [
+     [
+      "base_year",
+      2024
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units-unit-id-rebase.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ/rebase",
+    "query": [
+     [
+      "base_year",
+      2024
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units-unit-id-rebase.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ/rebase",
+    "query": [
+     [
+      "base_year",
+      2024
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units-unit-id-rebase.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ/rebase",
+    "query": [
+     [
+      "base_year",
+      2024
+     ]
+    ],
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units-unit-id.path-client_id-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/abc/units/GA_ATL_HQ",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "limit",
+      3
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units-unit-id.query-year-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ",
+    "query": [
+     [
+      "limit",
+      3
+     ],
+     [
+      "year",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units-unit-id.query-year-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ",
+    "query": [
+     [
+      "limit",
+      3
+     ],
+     [
+      "year",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units-unit-id.query-year-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ",
+    "query": [
+     [
+      "limit",
+      3
+     ],
+     [
+      "year",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units-unit-id.query-year-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ",
+    "query": [
+     [
+      "limit",
+      3
+     ],
+     [
+      "year",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units-unit-id.query-month-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "limit",
+      3
+     ],
+     [
+      "month",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units-unit-id.query-month-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "limit",
+      3
+     ],
+     [
+      "month",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units-unit-id.query-month-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "limit",
+      3
+     ],
+     [
+      "month",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units-unit-id.query-month-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "limit",
+      3
+     ],
+     [
+      "month",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units-unit-id.query-near_min_hours-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "limit",
+      3
+     ],
+     [
+      "near_min_hours",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units-unit-id.query-near_min_hours-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "limit",
+      3
+     ],
+     [
+      "near_min_hours",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units-unit-id.query-near_min_hours-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "limit",
+      3
+     ],
+     [
+      "near_min_hours",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units-unit-id.query-near_min_hours-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "limit",
+      3
+     ],
+     [
+      "near_min_hours",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units-unit-id.query-limit-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "limit",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units-unit-id.query-limit-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "limit",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units-unit-id.query-limit-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "limit",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units-unit-id.query-limit-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "limit",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units-unit-id.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "limit",
+      3
+     ],
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units-unit-id.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ/",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "limit",
+      3
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units-unit-id.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "limit",
+      3
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units-unit-id.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "limit",
+      3
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-units-unit-id.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/clients/1001/units/GA_ATL_HQ",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "limit",
+      3
+     ]
+    ],
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-v2-employees-record-token.query-client_id-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/employees/{{token}}",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "client_id",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-employees-record-token.query-client_id-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/employees/{{token}}",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "client_id",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-employees-record-token.query-client_id-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/employees/{{token}}",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "client_id",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-employees-record-token.query-client_id-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/employees/{{token}}",
+    "query": [
+     [
+      "year",
+      2025
+     ],
+     [
+      "client_id",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-employees-record-token.query-year-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/employees/{{token}}",
+    "query": [
+     [
+      "client_id",
+      1001
+     ],
+     [
+      "year",
+      "abc"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-employees-record-token.query-year-negative",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/employees/{{token}}",
+    "query": [
+     [
+      "client_id",
+      1001
+     ],
+     [
+      "year",
+      "-1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-employees-record-token.query-year-zero",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/employees/{{token}}",
+    "query": [
+     [
+      "client_id",
+      1001
+     ],
+     [
+      "year",
+      "0"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-employees-record-token.query-year-huge",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/employees/{{token}}",
+    "query": [
+     [
+      "client_id",
+      1001
+     ],
+     [
+      "year",
+      "999999999"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-employees-record-token.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/employees/{{token}}",
+    "query": [
+     [
+      "client_id",
+      1001
+     ],
+     [
+      "year",
+      2025
+     ],
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-employees-record-token.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/employees/{{token}}/",
+    "query": [
+     [
+      "client_id",
+      1001
+     ],
+     [
+      "year",
+      2025
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-employees-record-token.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/v2/employees/{{token}}",
+    "query": [
+     [
+      "client_id",
+      1001
+     ],
+     [
+      "year",
+      2025
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-employees-record-token.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/v2/employees/{{token}}",
+    "query": [
+     [
+      "client_id",
+      1001
+     ],
+     [
+      "year",
+      2025
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-employees-record-token.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/employees/{{token}}",
+    "query": [
+     [
+      "client_id",
+      1001
+     ],
+     [
+      "year",
+      2025
+     ]
+    ],
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-runs-latest.path-client_id-abc",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/abc/runs/latest"
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-runs-latest.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/runs/latest",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-runs-latest.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/v2/clients/1001/runs/latest/"
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-runs-latest.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/v2/clients/1001/runs/latest"
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-runs-latest.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/v2/clients/1001/runs/latest"
+   }
+  },
+  {
+   "id": "get-api-v2-clients-client-id-runs-latest.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/v2/clients/1001/runs/latest",
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-workspace.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/workspace",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-workspace.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/workspace/"
+   }
+  },
+  {
+   "id": "get-api-workspace.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/workspace"
+   }
+  },
+  {
+   "id": "get-api-workspace.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/workspace"
+   }
+  },
+  {
+   "id": "get-api-workspace.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/workspace",
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-workspace-onezero-method.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/workspace/onezero/min_max",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-workspace-onezero-method.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/workspace/onezero/min_max/"
+   }
+  },
+  {
+   "id": "get-api-workspace-onezero-method.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/workspace/onezero/min_max"
+   }
+  },
+  {
+   "id": "get-api-workspace-onezero-method.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/workspace/onezero/min_max"
+   }
+  },
+  {
+   "id": "get-api-workspace-onezero-method.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/workspace/onezero/min_max",
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-workspace-calculation-walk.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/workspace/calculation-walk",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-workspace-calculation-walk.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/workspace/calculation-walk/"
+   }
+  },
+  {
+   "id": "get-api-workspace-calculation-walk.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/workspace/calculation-walk"
+   }
+  },
+  {
+   "id": "get-api-workspace-calculation-walk.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/workspace/calculation-walk"
+   }
+  },
+  {
+   "id": "get-api-workspace-calculation-walk.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/workspace/calculation-walk",
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-workspace-assumptions.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/workspace/assumptions",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-workspace-assumptions.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/workspace/assumptions/"
+   }
+  },
+  {
+   "id": "get-api-workspace-assumptions.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/workspace/assumptions"
+   }
+  },
+  {
+   "id": "get-api-workspace-assumptions.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/workspace/assumptions"
+   }
+  },
+  {
+   "id": "get-api-workspace-assumptions.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/workspace/assumptions",
+    "json": {}
+   }
+  },
+  {
+   "id": "get-api-workspace-comparison.unknown-query",
+   "request": {
+    "method": "GET",
+    "path": "/api/workspace/comparison",
+    "query": [
+     [
+      "zz_unknown",
+      "1"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "get-api-workspace-comparison.trailing-slash",
+   "request": {
+    "method": "GET",
+    "path": "/api/workspace/comparison/"
+   }
+  },
+  {
+   "id": "get-api-workspace-comparison.head",
+   "request": {
+    "method": "HEAD",
+    "path": "/api/workspace/comparison"
+   }
+  },
+  {
+   "id": "get-api-workspace-comparison.options",
+   "request": {
+    "method": "OPTIONS",
+    "path": "/api/workspace/comparison"
+   }
+  },
+  {
+   "id": "get-api-workspace-comparison.wrong-method-post",
+   "request": {
+    "method": "POST",
+    "path": "/api/workspace/comparison",
+    "json": {}
+   }
+  }
+ ]
+}

@@ -1,0 +1,92 @@
+{
+  "kind": "existing-semantic-policy",
+  "host": "api",
+  "groups": {
+    "_unassigned": {
+      "cases": 317,
+      "passed": 238,
+      "waived": 0,
+      "failed": 79,
+      "tolerated_fields": 6,
+      "pass_percent": 75.08,
+      "waived_percent": 0.0,
+      "waiver_share_at_most_25_percent": true
+    },
+    "ai": {
+      "cases": 27,
+      "passed": 27,
+      "waived": 3,
+      "tolerated_fields": 12,
+      "registered_fields": 75,
+      "pass_percent": 100.0,
+      "waived_percent": 11.11,
+      "required_percent": 90,
+      "threshold_met": true,
+      "waiver_share_at_most_25_percent": true
+    },
+    "claims_artifacts_rules": {
+      "cases": 316,
+      "passed": 295,
+      "waived": 70,
+      "registered_fields": 203,
+      "tolerated_fields": 212,
+      "failed": 21,
+      "pass_percent": 93.35,
+      "waived_percent": 22.15,
+      "required_percent": 90,
+      "threshold_met": true,
+      "waiver_share_at_most_25_percent": true
+    },
+    "drafts_runs": {
+      "cases": 323,
+      "passed": 313,
+      "waived": 68,
+      "registered_fields": 378,
+      "failed": 10,
+      "tolerated_fields": 403,
+      "pass_percent": 96.9,
+      "waived_percent": 21.05,
+      "required_percent": 90,
+      "threshold_met": true,
+      "waiver_share_at_most_25_percent": true
+    },
+    "framework": {
+      "cases": 17,
+      "passed": 17,
+      "waived": 9,
+      "registered_fields": 23,
+      "pass_percent": 100.0,
+      "waived_percent": 52.94,
+      "required_percent": 90,
+      "threshold_met": true,
+      "waiver_share_at_most_25_percent": false
+    },
+    "reads_calc": {
+      "cases": 414,
+      "passed": 406,
+      "waived": 26,
+      "tolerated_fields": 267,
+      "failed": 8,
+      "registered_fields": 41,
+      "pass_percent": 98.07,
+      "waived_percent": 6.28,
+      "required_percent": 95,
+      "threshold_met": true,
+      "waiver_share_at_most_25_percent": true
+    },
+    "workspace_sealed": {
+      "cases": 96,
+      "passed": 79,
+      "waived": 3,
+      "registered_fields": 9,
+      "tolerated_fields": 95,
+      "failed": 17,
+      "pass_percent": 82.29,
+      "waived_percent": 3.12,
+      "waiver_share_at_most_25_percent": true
+    }
+  },
+  "policy_pass": false,
+  "exchanges": 1514,
+  "raw_differing_fields": 2311
+}

@@ -1,0 +1,52 @@
+{
+  "improvements": [
+    {
+      "id": "IMP-routes_claims-1",
+      "kind": "defect_fix",
+      "route": "POST /api/clients/{client_id}/packages",
+      "case": "package.create-again",
+      "finding": "F-5",
+      "reason": "A repeat publishes a distinct immutable generation with 201 instead of reproducing the recorded 500. Full injected UUID entropy prevents deterministic-prefix collisions; failed storage never creates successful metadata."
+    },
+    {
+      "id": "IMP-routes_claims-2",
+      "kind": "defect_fix",
+      "route": "POST /api/claims",
+      "case": "claims.create-duplicate",
+      "finding": "F-8",
+      "reason": "An identical current assertion returns an explicit 409; later changed evidence and lifecycle transitions still append durable history."
+    },
+    {
+      "id": "IMP-routes_claims-3",
+      "kind": "defect_fix",
+      "route": "GET /api/v2/portfolio",
+      "case": "portfolio.scope",
+      "finding": "F-2",
+      "reason": "An unknown engagement scope is a caller error and returns JSON detail with 422, not an unhandled Python enum-conversion 500."
+    },
+    {
+      "id": "IMP-routes_claims-4",
+      "kind": "defect_fix",
+      "route": "GET /api/clients/{client_id}/artifacts/{artifact_id}",
+      "categories": ["zip-entry"],
+      "path_prefix": "body.zip_entries[xl/worksheets/sheet4.xml]",
+      "reason": "Formula-like authored text remains literal in the downloaded Provenance sheet. This entry describes only that sheet's XML member; it cannot cover package metadata, artifact IDs, money or other calculated values. The focused =1+1 integration test proves no formula elements."
+    },
+    {
+      "id": "IMP-routes_claims-5",
+      "kind": "wire_incidental",
+      "route": "POST /api/clients/{client_id}/packages",
+      "categories": ["header"],
+      "path_prefix": "headers.location",
+      "reason": "Successful creation exposes an API-relative download Location, as required by the task, without adding storage paths or credentials to the JSON contract."
+    },
+    {
+      "id": "IMP-routes_claims-6",
+      "kind": "defect_fix",
+      "route": "GET /api/clients/{client_id}/artifacts/{artifact_id}",
+      "categories": ["status"],
+      "path_prefix": "status",
+      "reason": "Registered bytes are checked against both stored size and SHA-256 before streaming. Corruption produces an audited missing outcome and safe 503 rather than serving bytes that contradict the metadata. This entry does not cover artifact IDs, workbook contents or calculated values."
+    }
+  ]
+}

@@ -1,0 +1,74 @@
+{
+  "session": "platform",
+  "branch": "dotnet/platform-risks",
+  "head": "79c0068",
+  "summary": "Conductor no_halt failure repaired: ScratchGuard now rejects ScriptDom BulkOpenRowset. All 20 forbidden cases and 11 allowed cases pass. Guarded demo Warehouse token connectivity and standalone cleanup succeeded, proving zero remaining scratch objects. HALT.md is removed. Head identifies the implementation commit before this status record; remaining platform experiments are not claimed complete.",
+  "stages": {
+    "preflight_guard": "done",
+    "conductor_gate_repair": "done",
+    "PS1": "partial: token connectivity and cleanup verified; default authentication, pooling and idle/retry tests not performed",
+    "PS2": "not_tested",
+    "PS3": "not_tested",
+    "PS4": "not_tested",
+    "PS5": "not_tested",
+    "PS6": "not_tested",
+    "PS7": "not_tested",
+    "PS8": "not_tested",
+    "PS9": "updated: measured scope and untested work recorded"
+  },
+  "gates_claimed": {
+    "no_halt": true,
+    "commits_present": true,
+    "clean_tree": true,
+    "not_pushed": true,
+    "owned_paths": true,
+    "report_present": true,
+    "expect_files": true
+  },
+  "checks": {
+    "build": {
+      "command": "dotnet build dotnet\\spikes\\platform\\Platform.slnx --nologo -v quiet",
+      "exit_code": 0,
+      "warnings": 0,
+      "errors": 0
+    },
+    "scratch_guard": {
+      "command": "dotnet run --no-build --project dotnet\\spikes\\platform\\Runner -- selftest",
+      "exit_code": 0,
+      "forbidden_cases_refused": 20,
+      "allowed_cases_passed": 11
+    },
+    "cleanup": {
+      "command": "dotnet run --no-build --project dotnet\\spikes\\platform\\Runner -- cleanup",
+      "exit_code": 0,
+      "scratch_tables_dropped": 0,
+      "scratch_schemas_dropped": 0,
+      "remaining_scratch_objects": 0,
+      "proven": true
+    },
+    "connectivity": {
+      "command": "dotnet run --no-build --project dotnet\\spikes\\platform\\Runner -- ps1",
+      "exit_code": 0,
+      "first_connection_and_probe_seconds": 3.9826646,
+      "token_acquisition_included": false,
+      "cleanup_proven": true
+    }
+  },
+  "deviations": [
+    "This follow-up repairs the reported conductor gate. PS1 is partial and PS2-PS8 remain untested; passing conductor gates is not completion of the original full platform spike."
+  ],
+  "findings": [
+    "ScriptDom represents OPENROWSET(BULK ...) as BulkOpenRowset, distinct from OpenRowsetTableReference.",
+    "The timing stopwatch now stops after SELECT 1 so persisted connection/probe timing excludes cleanup."
+  ],
+  "open_questions": [
+    "Warehouse write performance, Python baselines, read parity, version fingerprints, Delta/Linux library support and EF Core scope remain unmeasured.",
+    "Default authentication, pooled reconnects and idle/retry behavior remain unmeasured."
+  ],
+  "needs_human": [],
+  "reports": [
+    "dotnet/docs/PLATFORM-RISKS.md",
+    "dotnet/docs/platform-risks-log.md",
+    "dotnet/docs/platform-connectivity.json"
+  ]
+}

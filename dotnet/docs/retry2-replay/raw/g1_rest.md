@@ -1,0 +1,209 @@
+# Replay report (semantic)
+
+- server interpreter: external server (zlib n/a), oracle: None
+- scenarios: 1
+- exchanges compared: 142
+- failures: 857
+- tolerated (semantic mode only): 0
+
+## g1_rest: 142 exchanges, 857 failures, 0 tolerated
+- `GET /channel/health` / `health` **status** at `status`: expected `200` actual `501`
+- `GET /channel/health` / `health` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `GET /channel/health` / `health` **missing-field** at `status`: expected `ok` actual `<absent>`
+- `GET /channel/health` / `health` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /channel/health`
+- `GET /channel/ready` / `ready` **status** at `status`: expected `200` actual `501`
+- `GET /channel/ready` / `ready` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `GET /channel/ready` / `ready` **missing-field** at `ready`: expected `true` actual `<absent>`
+- `GET /channel/ready` / `ready` **missing-field** at `store`: expected `sqlite` actual `<absent>`
+- `GET /channel/ready` / `ready` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /channel/ready`
+- `GET /channel/v1/tools` / `tools.no-token` **status** at `status`: expected `401` actual `501`
+- `GET /channel/v1/tools` / `tools.no-token` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `GET /channel/v1/tools` / `tools.no-token` **header** at `headers.www-authenticate`: expected `Bearer` actual `<absent>`
+- `GET /channel/v1/tools` / `tools.no-token` **missing-field** at `error`: expected `{"code":"unauthenticated","message":"no bearer token","retryable":false}` actual `<absent>`
+- `GET /channel/v1/tools` / `tools.no-token` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /channel/v1/tools`
+- `GET /channel/v1/tools` / `tools.delegated` **status** at `status`: expected `200` actual `501`
+- `GET /channel/v1/tools` / `tools.delegated` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `GET /channel/v1/tools` / `tools.delegated` **missing-field** at `tools`: expected `[{"name":"book_rank","description":"WHOLE BOOK only: which clients to call across every client, ranked by a named reason, in the page's own order. Needs no client. Never use it for a question about one client (a client named, or \"them\" or \"this client\"): use that client's tools.","kind":"read","...(35326 chars)` actual `<absent>`
+- `GET /channel/v1/tools` / `tools.delegated` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /channel/v1/tools`
+- `GET /channel/v1/tools` / `tools.agent` **status** at `status`: expected `200` actual `501`
+- `GET /channel/v1/tools` / `tools.agent` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `GET /channel/v1/tools` / `tools.agent` **missing-field** at `tools`: expected `[{"name":"book_rank","description":"WHOLE BOOK only: which clients to call across every client, ranked by a named reason, in the page's own order. Needs no client. Never use it for a question about one client (a client named, or \"them\" or \"this client\"): use that client's tools.","kind":"read","...(35326 chars)` actual `<absent>`
+- `GET /channel/v1/tools` / `tools.agent` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /channel/v1/tools`
+- `GET /channel/v1/tools` / `tools.agent-no-acting-headers` **status** at `status`: expected `400` actual `501`
+- `GET /channel/v1/tools` / `tools.agent-no-acting-headers` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `GET /channel/v1/tools` / `tools.agent-no-acting-headers` **missing-field** at `error`: expected `{"code":"invalid_acting_user","message":"X-Acting-Tenant must be a GUID","retryable":false}` actual `<absent>`
+- `GET /channel/v1/tools` / `tools.agent-no-acting-headers` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /channel/v1/tools`
+- `GET /channel/v1/nope` / `unknown-route` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `GET /docs` / `docs-not-served` **status** at `status`: expected `404` actual `200`
+- `GET /docs` / `docs-not-served` **header** at `headers.content-type`: expected `application/json` actual `text/html; charset=utf-8`
+- `GET /docs` / `docs-not-served` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `GET /docs` / `docs-not-served` **body-kind** at `body`: expected `json` actual `text`
+- `GET /openapi.json` / `openapi-not-served` **status** at `status`: expected `404` actual `200`
+- `GET /openapi.json` / `openapi-not-served` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `GET /openapi.json` / `openapi-not-served` **missing-field** at `detail`: expected `Not Found` actual `<absent>`
+- `GET /openapi.json` / `openapi-not-served` **extra-field** at `openapi`: expected `<absent>` actual `3.1.0`
+- `GET /openapi.json` / `openapi-not-served` **extra-field** at `info`: expected `<absent>` actual `{"title":"Tax Credit Copilot API","version":"0.3.0"}`
+- `GET /openapi.json` / `openapi-not-served` **extra-field** at `paths`: expected `<absent>` actual `{"/api/ready":{"get":{"summary":"Ready","description":"True once startup has finished and the read paths are warm. [HOST-1]\n\n`/api/health` answers as soon as the process serves; this answers whether\nthe first real page will be fast. A warm-up that failed still counts as\nready: the warm-up is an ...(90309 chars)`
+- `GET /openapi.json` / `openapi-not-served` **extra-field** at `components`: expected `<absent>` actual `{"schemas":{"ActorBody":{"properties":{"actor":{"anyOf":[{"type":"string","maxLength":256},{"type":"null"}],"title":"Actor"}},"type":"object","title":"ActorBody","description":"A request with no fields of its own."},"ApplyRulesetRequest":{"properties":{"tax_year":{"type":"integer","title":"Tax Year"...(43486 chars)`
+- `POST /channel/v1/tools` / `tools.wrong-method` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `GET /channel/v1/tools` / `auth.user` **status** at `status`: expected `200` actual `501`
+- `GET /channel/v1/tools` / `auth.user` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `GET /channel/v1/tools` / `auth.user` **missing-field** at `tools`: expected `[{"name":"book_rank","description":"WHOLE BOOK only: which clients to call across every client, ranked by a named reason, in the page's own order. Needs no client. Never use it for a question about one client (a client named, or \"them\" or \"this client\"): use that client's tools.","kind":"read","...(35326 chars)` actual `<absent>`
+- `GET /channel/v1/tools` / `auth.user` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /channel/v1/tools`
+- `GET /channel/v1/tools` / `auth.writer_user` **status** at `status`: expected `200` actual `501`
+- `GET /channel/v1/tools` / `auth.writer_user` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `GET /channel/v1/tools` / `auth.writer_user` **missing-field** at `tools`: expected `[{"name":"book_rank","description":"WHOLE BOOK only: which clients to call across every client, ranked by a named reason, in the page's own order. Needs no client. Never use it for a question about one client (a client named, or \"them\" or \"this client\"): use that client's tools.","kind":"read","...(35326 chars)` actual `<absent>`
+- `GET /channel/v1/tools` / `auth.writer_user` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /channel/v1/tools`
+- `GET /channel/v1/tools` / `auth.agent` **status** at `status`: expected `200` actual `501`
+- `GET /channel/v1/tools` / `auth.agent` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `GET /channel/v1/tools` / `auth.agent` **missing-field** at `tools`: expected `[{"name":"book_rank","description":"WHOLE BOOK only: which clients to call across every client, ranked by a named reason, in the page's own order. Needs no client. Never use it for a question about one client (a client named, or \"them\" or \"this client\"): use that client's tools.","kind":"read","...(35326 chars)` actual `<absent>`
+- `GET /channel/v1/tools` / `auth.agent` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /channel/v1/tools`
+- `GET /channel/v1/tools` / `auth.agent_no_role` **status** at `status`: expected `403` actual `501`
+- `GET /channel/v1/tools` / `auth.agent_no_role` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `GET /channel/v1/tools` / `auth.agent_no_role` **missing-field** at `error`: expected `{"code":"caller_not_allowed","message":"the caller holds neither the 'Channel.Invoke' role nor an allowed app id","retryable":false}` actual `<absent>`
+- `GET /channel/v1/tools` / `auth.agent_no_role` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /channel/v1/tools`
+- `GET /channel/v1/tools` / `auth.agent_with_scope` **status** at `status`: expected `403` actual `501`
+- `GET /channel/v1/tools` / `auth.agent_with_scope` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `GET /channel/v1/tools` / `auth.agent_with_scope` **missing-field** at `error`: expected `{"code":"mixed_token","message":"an app-only token must not carry delegated scopes","retryable":false}` actual `<absent>`
+- `GET /channel/v1/tools` / `auth.agent_with_scope` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /channel/v1/tools`
+- `GET /channel/v1/tools` / `auth.expired` **status** at `status`: expected `401` actual `501`
+- `GET /channel/v1/tools` / `auth.expired` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `GET /channel/v1/tools` / `auth.expired` **header** at `headers.www-authenticate`: expected `Bearer` actual `<absent>`
+- `GET /channel/v1/tools` / `auth.expired` **missing-field** at `error`: expected `{"code":"unauthenticated","message":"invalid token: ExpiredSignatureError","retryable":false}` actual `<absent>`
+- `GET /channel/v1/tools` / `auth.expired` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /channel/v1/tools`
+- `GET /channel/v1/tools` / `auth.forged` **status** at `status`: expected `401` actual `501`
+- `GET /channel/v1/tools` / `auth.forged` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `GET /channel/v1/tools` / `auth.forged` **header** at `headers.www-authenticate`: expected `Bearer` actual `<absent>`
+- `GET /channel/v1/tools` / `auth.forged` **missing-field** at `error`: expected `{"code":"unauthenticated","message":"invalid token: InvalidSignatureError","retryable":false}` actual `<absent>`
+- `GET /channel/v1/tools` / `auth.forged` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /channel/v1/tools`
+- `GET /channel/v1/tools` / `auth.wrong_audience` **status** at `status`: expected `401` actual `501`
+- `GET /channel/v1/tools` / `auth.wrong_audience` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `GET /channel/v1/tools` / `auth.wrong_audience` **header** at `headers.www-authenticate`: expected `Bearer` actual `<absent>`
+- `GET /channel/v1/tools` / `auth.wrong_audience` **missing-field** at `error`: expected `{"code":"unauthenticated","message":"invalid token: InvalidAudienceError","retryable":false}` actual `<absent>`
+- `GET /channel/v1/tools` / `auth.wrong_audience` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /channel/v1/tools`
+- `GET /channel/v1/tools` / `auth.no_scope` **status** at `status`: expected `403` actual `501`
+- `GET /channel/v1/tools` / `auth.no_scope` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `GET /channel/v1/tools` / `auth.no_scope` **missing-field** at `error`: expected `{"code":"missing_scope","message":"the token lacks the 'Channel.Access' scope","retryable":false}` actual `<absent>`
+- `GET /channel/v1/tools` / `auth.no_scope` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /channel/v1/tools`
+- `GET /channel/v1/tools` / `auth.mixed` **status** at `status`: expected `403` actual `501`
+- `GET /channel/v1/tools` / `auth.mixed` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `GET /channel/v1/tools` / `auth.mixed` **missing-field** at `error`: expected `{"code":"mixed_token","message":"a delegated token must not carry an agent role","retryable":false}` actual `<absent>`
+- `GET /channel/v1/tools` / `auth.mixed` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /channel/v1/tools`
+- `GET /channel/v1/tools` / `auth.other_tenant_user` **status** at `status`: expected `403` actual `501`
+- `GET /channel/v1/tools` / `auth.other_tenant_user` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `GET /channel/v1/tools` / `auth.other_tenant_user` **missing-field** at `error`: expected `{"code":"tenant_mismatch","message":"the token is not from this tenant or names no user","retryable":false}` actual `<absent>`
+- `GET /channel/v1/tools` / `auth.other_tenant_user` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /channel/v1/tools`
+- `GET /channel/v1/tools` / `auth.no_oid` **status** at `status`: expected `403` actual `501`
+- `GET /channel/v1/tools` / `auth.no_oid` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `GET /channel/v1/tools` / `auth.no_oid` **missing-field** at `error`: expected `{"code":"tenant_mismatch","message":"the token is not from this tenant or names no user","retryable":false}` actual `<absent>`
+- `GET /channel/v1/tools` / `auth.no_oid` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /channel/v1/tools`
+- `GET /channel/v1/tools` / `acting.no-tenant` **status** at `status`: expected `400` actual `501`
+- `GET /channel/v1/tools` / `acting.no-tenant` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `GET /channel/v1/tools` / `acting.no-tenant` **missing-field** at `error`: expected `{"code":"invalid_acting_user","message":"X-Acting-Tenant must be a GUID","retryable":false}` actual `<absent>`
+- `GET /channel/v1/tools` / `acting.no-tenant` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /channel/v1/tools`
+- `GET /channel/v1/tools` / `acting.wrong-tenant` **status** at `status`: expected `403` actual `501`
+- `GET /channel/v1/tools` / `acting.wrong-tenant` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `GET /channel/v1/tools` / `acting.wrong-tenant` **missing-field** at `error`: expected `{"code":"tenant_mismatch","message":"the acting user is from another tenant","retryable":false}` actual `<absent>`
+- `GET /channel/v1/tools` / `acting.wrong-tenant` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /channel/v1/tools`
+- `GET /channel/v1/tools` / `acting.bad-channel` **status** at `status`: expected `400` actual `501`
+- `GET /channel/v1/tools` / `acting.bad-channel` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `GET /channel/v1/tools` / `acting.bad-channel` **missing-field** at `error`: expected `{"code":"invalid_acting_user","message":"X-Channel must be one of teams, m365-copilot","retryable":false}` actual `<absent>`
+- `GET /channel/v1/tools` / `acting.bad-channel` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /channel/v1/tools`
+- `GET /channel/v1/tools` / `acting.no-channel` **status** at `status`: expected `400` actual `501`
+- `GET /channel/v1/tools` / `acting.no-channel` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `GET /channel/v1/tools` / `acting.no-channel` **missing-field** at `error`: expected `{"code":"invalid_acting_user","message":"X-Channel must be one of teams, m365-copilot","retryable":false}` actual `<absent>`
+- `GET /channel/v1/tools` / `acting.no-channel` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /channel/v1/tools`
+- `GET /channel/v1/tools` / `acting.bad-oid` **status** at `status`: expected `400` actual `501`
+- `GET /channel/v1/tools` / `acting.bad-oid` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `GET /channel/v1/tools` / `acting.bad-oid` **missing-field** at `error`: expected `{"code":"invalid_acting_user","message":"X-Acting-User-Oid must be a GUID","retryable":false}` actual `<absent>`
+- `GET /channel/v1/tools` / `acting.bad-oid` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /channel/v1/tools`
+- `GET /channel/v1/tools` / `acting.no-name` **status** at `status`: expected `400` actual `501`
+- `GET /channel/v1/tools` / `acting.no-name` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `GET /channel/v1/tools` / `acting.no-name` **missing-field** at `error`: expected `{"code":"invalid_acting_user","message":"X-Acting-User-Name is required","retryable":false}` actual `<absent>`
+- `GET /channel/v1/tools` / `acting.no-name` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /channel/v1/tools`
+- `GET /channel/v1/tools` / `acting.no-conversation` **status** at `status`: expected `400` actual `501`
+- `GET /channel/v1/tools` / `acting.no-conversation` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `GET /channel/v1/tools` / `acting.no-conversation` **missing-field** at `error`: expected `{"code":"invalid_acting_user","message":"X-Conversation-Id is required","retryable":false}` actual `<absent>`
+- `GET /channel/v1/tools` / `acting.no-conversation` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /channel/v1/tools`
+- `GET /channel/v1/tools` / `acting.bad-correlation` **status** at `status`: expected `400` actual `501`
+- `GET /channel/v1/tools` / `acting.bad-correlation` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `GET /channel/v1/tools` / `acting.bad-correlation` **missing-field** at `error`: expected `{"code":"invalid_correlation_id","message":"X-Correlation-Id must be 1-64 letters, digits, . _ -","retryable":false}` actual `<absent>`
+- `GET /channel/v1/tools` / `acting.bad-correlation` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /channel/v1/tools`
+- `GET /channel/v1/tools` / `acting.long-name` **status** at `status`: expected `400` actual `501`
+- `GET /channel/v1/tools` / `acting.long-name` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `GET /channel/v1/tools` / `acting.long-name` **missing-field** at `error`: expected `{"code":"invalid_acting_user","message":"X-Acting-User-Name is longer than 256 characters","retryable":false}` actual `<absent>`
+- `GET /channel/v1/tools` / `acting.long-name` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /channel/v1/tools`
+- `GET /channel/v1/tools` / `acting.cowork-channel-asserted-by-agent` **status** at `status`: expected `400` actual `501`
+- `GET /channel/v1/tools` / `acting.cowork-channel-asserted-by-agent` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `GET /channel/v1/tools` / `acting.cowork-channel-asserted-by-agent` **missing-field** at `error`: expected `{"code":"invalid_acting_user","message":"X-Channel must be one of teams, m365-copilot","retryable":false}` actual `<absent>`
+- `GET /channel/v1/tools` / `acting.cowork-channel-asserted-by-agent` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: GET /channel/v1/tools`
+- `POST /channel/v1/tools/book_rank` / `tool.book_rank.typical` **status** at `status`: expected `200` actual `501`
+- `POST /channel/v1/tools/book_rank` / `tool.book_rank.typical` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /channel/v1/tools/book_rank` / `tool.book_rank.typical` **missing-field** at `blocks`: expected `[{"kind":"paragraph","rows":[],"text":"1 of 1 clients have been assessed. Ranked by what inaction costs, in the order the page shows."},{"kind":"table","rows":[["#","Client","Reason","Programme","Tax year","Identified","Jobs margin"],["1","Reference Dataset Client","Identified","GA_JTC","2025","$66,...(323 chars)` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `tool.book_rank.typical` **missing-field** at `disclaimer`: expected `Not tax advice: these figures are computed from payroll by this software and must be reviewed by a qualified tax professional before any filing or claim.` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `tool.book_rank.typical` **missing-field** at `facts`: expected `{"assessed_clients":1,"calculated":true,"claimed_is_unverified":false,"clients":[{"client_name":"Reference Dataset Client","credit_earned_on_trend_usd":null,"identified_usd":"66500","jobs_margin":19.0,"position":1,"program_code":"GA_JTC","provenance_verified":true,"reason":"Identified","tax_year":20...(655 chars)` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `tool.book_rank.typical` **missing-field** at `provenance`: expected `{"assumption_set_id":null,"rule_pack_version":null,"run_id":null,"source":"recorded claims; no run","trail_sha256":null}` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `tool.book_rank.typical` **missing-field** at `tool`: expected `book_rank` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `tool.book_rank.typical` **missing-field** at `warnings`: expected `[]` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `tool.book_rank.typical` **missing-field** at `correlation_id`: expected `c-book_rank` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `tool.book_rank.typical` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /channel/v1/tools/{tool}`
+- `POST /channel/v1/tools/book_rank` / `tool.book_rank.invalid` **status** at `status`: expected `422` actual `501`
+- `POST /channel/v1/tools/book_rank` / `tool.book_rank.invalid` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /channel/v1/tools/book_rank` / `tool.book_rank.invalid` **missing-field** at `error`: expected `{"code":"invalid_arguments","message":"arguments: Additional properties are not allowed ('zz_unknown_argument' was unexpected)","retryable":false}` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `tool.book_rank.invalid` **missing-field** at `correlation_id`: expected `i-book_rank` actual `<absent>`
+- `POST /channel/v1/tools/book_rank` / `tool.book_rank.invalid` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /channel/v1/tools/{tool}`
+- `POST /channel/v1/tools/client_resolve` / `tool.client_resolve.typical` **status** at `status`: expected `200` actual `501`
+- `POST /channel/v1/tools/client_resolve` / `tool.client_resolve.typical` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /channel/v1/tools/client_resolve` / `tool.client_resolve.typical` **missing-field** at `blocks`: expected `[{"kind":"paragraph","rows":[],"text":"Which client do you mean? (no client is selected)"},{"kind":"bullets","rows":[["Reference Dataset Client"]],"text":""}]` actual `<absent>`
+- `POST /channel/v1/tools/client_resolve` / `tool.client_resolve.typical` **missing-field** at `disclaimer`: expected `Not tax advice: these figures are computed from payroll by this software and must be reviewed by a qualified tax professional before any filing or claim.` actual `<absent>`
+- `POST /channel/v1/tools/client_resolve` / `tool.client_resolve.typical` **missing-field** at `facts`: expected `{"candidates":[{"client_id":1001,"name":"Reference Dataset Client"}],"clarify":true,"client_id":null,"client_name":null,"named":[],"reason":"no client is selected","resolved":false}` actual `<absent>`
+- `POST /channel/v1/tools/client_resolve` / `tool.client_resolve.typical` **missing-field** at `provenance`: expected `{"assumption_set_id":null,"rule_pack_version":null,"run_id":null,"source":"client book","trail_sha256":null}` actual `<absent>`
+- `POST /channel/v1/tools/client_resolve` / `tool.client_resolve.typical` **missing-field** at `tool`: expected `client_resolve` actual `<absent>`
+- `POST /channel/v1/tools/client_resolve` / `tool.client_resolve.typical` **missing-field** at `warnings`: expected `[]` actual `<absent>`
+- `POST /channel/v1/tools/client_resolve` / `tool.client_resolve.typical` **missing-field** at `correlation_id`: expected `c-client_resolve` actual `<absent>`
+- `POST /channel/v1/tools/client_resolve` / `tool.client_resolve.typical` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /channel/v1/tools/{tool}`
+- `POST /channel/v1/tools/client_resolve` / `tool.client_resolve.invalid` **status** at `status`: expected `422` actual `501`
+- `POST /channel/v1/tools/client_resolve` / `tool.client_resolve.invalid` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /channel/v1/tools/client_resolve` / `tool.client_resolve.invalid` **missing-field** at `error`: expected `{"code":"invalid_arguments","message":"name_or_text: {'nested': 1} is not of type 'string'","retryable":false}` actual `<absent>`
+- `POST /channel/v1/tools/client_resolve` / `tool.client_resolve.invalid` **missing-field** at `correlation_id`: expected `i-client_resolve` actual `<absent>`
+- `POST /channel/v1/tools/client_resolve` / `tool.client_resolve.invalid` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /channel/v1/tools/{tool}`
+- `POST /channel/v1/tools/client_situation` / `tool.client_situation.typical` **status** at `status`: expected `200` actual `501`
+- `POST /channel/v1/tools/client_situation` / `tool.client_situation.typical` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /channel/v1/tools/client_situation` / `tool.client_situation.typical` **missing-field** at `blocks`: expected `[{"kind":"heading","rows":[],"text":"Reference Dataset Client"},{"kind":"paragraph","rows":[],"text":"2 recorded cells. Identified credit: $66,500."},{"kind":"table","rows":[["Reason","Programme","Tax year","Identified","Jobs margin"],["Identified","GA_JTC","2025","$66,500","19"],["Nothing found","G...(337 chars)` actual `<absent>`
+- `POST /channel/v1/tools/client_situation` / `tool.client_situation.typical` **missing-field** at `disclaimer`: expected `Not tax advice: these figures are computed from payroll by this software and must be reviewed by a qualified tax professional before any filing or claim.` actual `<absent>`
+- `POST /channel/v1/tools/client_situation` / `tool.client_situation.typical` **missing-field** at `facts`: expected `{"assessed":true,"by_band":{"settled":[{"claimed_usd":"0","identified_usd":"0","jobs_margin":-2.0,"net_new_jobs":0.0,"opportunity_usd":"0","outcome":"base_year","program_code":"GA_JTC","provenance_verified":true,"tax_year":2024,"threshold_jobs":2.0}],"unclaimed_at_scale":[{"claimed_usd":"0","identif...(803 chars)` actual `<absent>`
+- `POST /channel/v1/tools/client_situation` / `tool.client_situation.typical` **missing-field** at `provenance`: expected `{"assumption_set_id":null,"rule_pack_version":null,"run_id":null,"source":"recorded claims; no run","trail_sha256":null}` actual `<absent>`
+- `POST /channel/v1/tools/client_situation` / `tool.client_situation.typical` **missing-field** at `tool`: expected `client_situation` actual `<absent>`
+- `POST /channel/v1/tools/client_situation` / `tool.client_situation.typical` **missing-field** at `warnings`: expected `[]` actual `<absent>`
+- `POST /channel/v1/tools/client_situation` / `tool.client_situation.typical` **missing-field** at `correlation_id`: expected `c-client_situation` actual `<absent>`
+- `POST /channel/v1/tools/client_situation` / `tool.client_situation.typical` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /channel/v1/tools/{tool}`
+- `POST /channel/v1/tools/client_situation` / `tool.client_situation.invalid` **status** at `status`: expected `422` actual `501`
+- `POST /channel/v1/tools/client_situation` / `tool.client_situation.invalid` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /channel/v1/tools/client_situation` / `tool.client_situation.invalid` **missing-field** at `error`: expected `{"code":"invalid_arguments","message":"client_id: 'abc' is not of type 'integer'","retryable":false}` actual `<absent>`
+- `POST /channel/v1/tools/client_situation` / `tool.client_situation.invalid` **missing-field** at `correlation_id`: expected `i-client_situation` actual `<absent>`
+- `POST /channel/v1/tools/client_situation` / `tool.client_situation.invalid` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /channel/v1/tools/{tool}`
+- `POST /channel/v1/tools/client_eligibility` / `tool.client_eligibility.typical` **status** at `status`: expected `200` actual `501`
+- `POST /channel/v1/tools/client_eligibility` / `tool.client_eligibility.typical` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /channel/v1/tools/client_eligibility` / `tool.client_eligibility.typical` **missing-field** at `blocks`: expected `[{"kind":"heading","rows":[],"text":"Georgia Jobs Tax Credit · TY2025"},{"kind":"table","rows":[["Measure","Value"],["Average headcount","64.17"],["Prior-year average headcount","40.42"],["Qualifying jobs","21.75"],["Annual credit","$76,125"],["Lifetime credit","$380,625"],["Benefit period (years)",...(382 chars)` actual `<absent>`
+- `POST /channel/v1/tools/client_eligibility` / `tool.client_eligibility.typical` **missing-field** at `disclaimer`: expected `Not tax advice: these figures are computed from payroll by this software and must be reviewed by a qualified tax professional before any filing or claim.` actual `<absent>`
+- `POST /channel/v1/tools/client_eligibility` / `tool.client_eligibility.typical` **missing-field** at `facts`: expected `{"credit":{"amount_per_job_usd":3500.0,"annual_credit_usd":76125,"average_headcount":64.17,"basis":"one_zero","benefit_period_years":5,"citation":"OCGA § 48-7-40","credit_code":"GA_JTC","credit_name":"Georgia Jobs Tax Credit","jurisdiction":"GA","lifetime_credit_usd":380625,"no_state_pack":false,"pr...(707 chars)` actual `<absent>`
+- `POST /channel/v1/tools/client_eligibility` / `tool.client_eligibility.typical` **missing-field** at `provenance`: expected `{"assumption_set_id":"GDS-STEP1-2026-08-25-v8 + GDS-ONEZERO-2026-08-24-v7","rule_pack_version":"rules/ga_jtc/2025.json","run_id":"40000000000040008000000000000001","source":"tcc_gold","trail_sha256":"5af1bb1724134722b6bb171b541c9417473c5c9245f91e742037aabe8367dbd7"}` actual `<absent>`
+- `POST /channel/v1/tools/client_eligibility` / `tool.client_eligibility.typical` **missing-field** at `tool`: expected `client_eligibility` actual `<absent>`
+- `POST /channel/v1/tools/client_eligibility` / `tool.client_eligibility.typical` **missing-field** at `warnings`: expected `[]` actual `<absent>`
+- `POST /channel/v1/tools/client_eligibility` / `tool.client_eligibility.typical` **missing-field** at `correlation_id`: expected `c-client_eligibility` actual `<absent>`
+- `POST /channel/v1/tools/client_eligibility` / `tool.client_eligibility.typical` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /channel/v1/tools/{tool}`
+- `POST /channel/v1/tools/client_eligibility` / `tool.client_eligibility.invalid` **status** at `status`: expected `422` actual `501`
+- `POST /channel/v1/tools/client_eligibility` / `tool.client_eligibility.invalid` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /channel/v1/tools/client_eligibility` / `tool.client_eligibility.invalid` **missing-field** at `error`: expected `{"code":"invalid_arguments","message":"client_id: 'abc' is not of type 'integer'","retryable":false}` actual `<absent>`
+- `POST /channel/v1/tools/client_eligibility` / `tool.client_eligibility.invalid` **missing-field** at `correlation_id`: expected `i-client_eligibility` actual `<absent>`
+- `POST /channel/v1/tools/client_eligibility` / `tool.client_eligibility.invalid` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /channel/v1/tools/{tool}`
+- `POST /channel/v1/tools/client_trend` / `tool.client_trend.typical` **status** at `status`: expected `200` actual `501`
+- `POST /channel/v1/tools/client_trend` / `tool.client_trend.typical` **header** at `headers.vary`: expected `<absent>` actual `Origin`
+- `POST /channel/v1/tools/client_trend` / `tool.client_trend.typical` **missing-field** at `blocks`: expected `[{"kind":"table","rows":[["Tax year","Average headcount","Eligible","Evaluated","Annual credit",""],["2024","40.00","49","81","$0","Base year"],["2025","61.00","72","107","$73,500",""]],"text":""},{"kind":"paragraph","rows":[],"text":"Eligible employees were found in every year since the base year."...(302 chars)` actual `<absent>`
+- `POST /channel/v1/tools/client_trend` / `tool.client_trend.typical` **missing-field** at `disclaimer`: expected `Not tax advice: these figures are computed from payroll by this software and must be reviewed by a qualified tax professional before any filing or claim.` actual `<absent>`
+- `POST /channel/v1/tools/client_trend` / `tool.client_trend.typical` **missing-field** at `facts`: expected `{"base_tax_year":2024,"calculated":true,"client_id":1001,"eligible_every_year_since_base":true,"method":"pay_period","note":"Years absent from this list were not reached by the run. They carry no figure, which is not the same as a zero. Where `eligible_every_year_since_base` is null there is no year...(793 chars)` actual `<absent>`
+- `POST /channel/v1/tools/client_trend` / `tool.client_trend.typical` **missing-field** at `provenance`: expected `{"assumption_set_id":"GDS-STEP1-2026-08-25-v8 + GDS-ONEZERO-2026-08-24-v7","rule_pack_version":"rules/ga_jtc/2025.json","run_id":"40000000000040008000000000000001","source":"tcc_gold","trail_sha256":null}` actual `<absent>`
+- `POST /channel/v1/tools/client_trend` / `tool.client_trend.typical` **missing-field** at `tool`: expected `client_trend` actual `<absent>`
+- `POST /channel/v1/tools/client_trend` / `tool.client_trend.typical` **missing-field** at `warnings`: expected `[]` actual `<absent>`
+- `POST /channel/v1/tools/client_trend` / `tool.client_trend.typical` **missing-field** at `correlation_id`: expected `c-client_trend` actual `<absent>`
+- `POST /channel/v1/tools/client_trend` / `tool.client_trend.typical` **extra-field** at `detail`: expected `<absent>` actual `Operation not implemented: POST /channel/v1/tools/{tool}`

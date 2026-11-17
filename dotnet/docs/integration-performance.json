@@ -1,0 +1,691 @@
+{
+  "classification": "isolated synthetic; no Fabric",
+  "product_revision": "006760b",
+  "python": "3.12.13",
+  "dotnet": "net10.0 Release",
+  "sdk": "10.0.404",
+  "topology": "independent ordinary Python ASGI and .NET API; isolated per-host state; no Worker",
+  "dataset": {
+    "profile": "P1",
+    "source_class": "committed synthetic; 9477 payroll rows",
+    "seed_manifest_sha256": "85aba29a8c49bd3b46c050d1065a711dd8e47377ce7bda862b9e437288b5b0eb"
+  },
+  "concurrency": 1,
+  "pairs_per_route": 6,
+  "warmup": "First post-readiness/setup read reported separately; next five warm reads retained.",
+  "timing_boundary": "combined client HTTP send through bounded body parsing; excludes startup/setup/comparison",
+  "token_connect_query_split": "unmeasured; no instrumentation supporting a reliable split",
+  "cold_limit": "First read is not a cold OS, DNS, engine, token or capacity benchmark.",
+  "network": "loopback, pooled warm HTTP, no live source/network; not a production speedup",
+  "host_load": "Shared workstation; no other owned tests/builds/replays active. Other users and OS effects uncontrolled.",
+  "slo": "not established; owner must agree acceptance/observation thresholds",
+  "results": {
+    "health": {
+      "route": "GET /api/health",
+      "planned_pairs": 6,
+      "observations": {
+        "python": [
+          {
+            "sample": 1,
+            "phase": "first-read",
+            "order": 1,
+            "http_success": true,
+            "ms": 98.289,
+            "outcome": "response"
+          },
+          {
+            "sample": 2,
+            "phase": "warm",
+            "order": 2,
+            "http_success": true,
+            "ms": 4.06,
+            "outcome": "response"
+          },
+          {
+            "sample": 3,
+            "phase": "warm",
+            "order": 1,
+            "http_success": true,
+            "ms": 3.419,
+            "outcome": "response"
+          },
+          {
+            "sample": 4,
+            "phase": "warm",
+            "order": 2,
+            "http_success": true,
+            "ms": 3.164,
+            "outcome": "response"
+          },
+          {
+            "sample": 5,
+            "phase": "warm",
+            "order": 1,
+            "http_success": true,
+            "ms": 3.208,
+            "outcome": "response"
+          },
+          {
+            "sample": 6,
+            "phase": "warm",
+            "order": 2,
+            "http_success": true,
+            "ms": 3.323,
+            "outcome": "response"
+          }
+        ],
+        "dotnet": [
+          {
+            "sample": 1,
+            "phase": "first-read",
+            "order": 2,
+            "http_success": true,
+            "ms": 10.695,
+            "outcome": "response"
+          },
+          {
+            "sample": 2,
+            "phase": "warm",
+            "order": 1,
+            "http_success": true,
+            "ms": 4.909,
+            "outcome": "response"
+          },
+          {
+            "sample": 3,
+            "phase": "warm",
+            "order": 2,
+            "http_success": true,
+            "ms": 2.481,
+            "outcome": "response"
+          },
+          {
+            "sample": 4,
+            "phase": "warm",
+            "order": 1,
+            "http_success": true,
+            "ms": 3.031,
+            "outcome": "response"
+          },
+          {
+            "sample": 5,
+            "phase": "warm",
+            "order": 2,
+            "http_success": true,
+            "ms": 2.153,
+            "outcome": "response"
+          },
+          {
+            "sample": 6,
+            "phase": "warm",
+            "order": 1,
+            "http_success": true,
+            "ms": 3.274,
+            "outcome": "response"
+          }
+        ]
+      },
+      "summaries": {
+        "python": {
+          "first_read": {
+            "sample": 1,
+            "phase": "first-read",
+            "order": 1,
+            "http_success": true,
+            "ms": 98.289,
+            "outcome": "response"
+          },
+          "warm": {
+            "attempted": 5,
+            "responses": 5,
+            "failures": 0,
+            "transport_failures": 0,
+            "http_failures": 0,
+            "median_scope": "all completed HTTP responses, including non-success",
+            "median_ms": 3.323,
+            "tail": "unmeasured: too few independent samples",
+            "p95_ms": null,
+            "p99_ms": null
+          }
+        },
+        "dotnet": {
+          "first_read": {
+            "sample": 1,
+            "phase": "first-read",
+            "order": 2,
+            "http_success": true,
+            "ms": 10.695,
+            "outcome": "response"
+          },
+          "warm": {
+            "attempted": 5,
+            "responses": 5,
+            "failures": 0,
+            "transport_failures": 0,
+            "http_failures": 0,
+            "median_scope": "all completed HTTP responses, including non-success",
+            "median_ms": 3.031,
+            "tail": "unmeasured: too few independent samples",
+            "p95_ms": null,
+            "p99_ms": null
+          }
+        }
+      },
+      "semantic_matches": 6,
+      "samples": [
+        {
+          "route": "GET /api/health",
+          "sample": 1,
+          "wire_equal": true,
+          "content_hash_equal": true,
+          "semantic_equal": true,
+          "failure_count": 0,
+          "categories": {},
+          "paths": [],
+          "semantic_tolerances": 0
+        },
+        {
+          "route": "GET /api/health",
+          "sample": 2,
+          "wire_equal": true,
+          "content_hash_equal": true,
+          "semantic_equal": true,
+          "failure_count": 0,
+          "categories": {},
+          "paths": [],
+          "semantic_tolerances": 0
+        },
+        {
+          "route": "GET /api/health",
+          "sample": 3,
+          "wire_equal": true,
+          "content_hash_equal": true,
+          "semantic_equal": true,
+          "failure_count": 0,
+          "categories": {},
+          "paths": [],
+          "semantic_tolerances": 0
+        },
+        {
+          "route": "GET /api/health",
+          "sample": 4,
+          "wire_equal": true,
+          "content_hash_equal": true,
+          "semantic_equal": true,
+          "failure_count": 0,
+          "categories": {},
+          "paths": [],
+          "semantic_tolerances": 0
+        },
+        {
+          "route": "GET /api/health",
+          "sample": 5,
+          "wire_equal": true,
+          "content_hash_equal": true,
+          "semantic_equal": true,
+          "failure_count": 0,
+          "categories": {},
+          "paths": [],
+          "semantic_tolerances": 0
+        },
+        {
+          "route": "GET /api/health",
+          "sample": 6,
+          "wire_equal": true,
+          "content_hash_equal": true,
+          "semantic_equal": true,
+          "failure_count": 0,
+          "categories": {},
+          "paths": [],
+          "semantic_tolerances": 0
+        }
+      ],
+      "warm_dotnet_minus_python_ms": -0.292
+    },
+    "eligibility": {
+      "route": "GET /api/eligibility/{tax_year}",
+      "planned_pairs": 6,
+      "observations": {
+        "python": [
+          {
+            "sample": 1,
+            "phase": "first-read",
+            "order": 1,
+            "http_success": true,
+            "ms": 24.727,
+            "outcome": "response"
+          },
+          {
+            "sample": 2,
+            "phase": "warm",
+            "order": 2,
+            "http_success": true,
+            "ms": 21.53,
+            "outcome": "response"
+          },
+          {
+            "sample": 3,
+            "phase": "warm",
+            "order": 1,
+            "http_success": true,
+            "ms": 19.957,
+            "outcome": "response"
+          },
+          {
+            "sample": 4,
+            "phase": "warm",
+            "order": 2,
+            "http_success": true,
+            "ms": 19.332,
+            "outcome": "response"
+          },
+          {
+            "sample": 5,
+            "phase": "warm",
+            "order": 1,
+            "http_success": true,
+            "ms": 16.814,
+            "outcome": "response"
+          },
+          {
+            "sample": 6,
+            "phase": "warm",
+            "order": 2,
+            "http_success": true,
+            "ms": 16.02,
+            "outcome": "response"
+          }
+        ],
+        "dotnet": [
+          {
+            "sample": 1,
+            "phase": "first-read",
+            "order": 2,
+            "http_success": true,
+            "ms": 342.709,
+            "outcome": "response"
+          },
+          {
+            "sample": 2,
+            "phase": "warm",
+            "order": 1,
+            "http_success": true,
+            "ms": 67.331,
+            "outcome": "response"
+          },
+          {
+            "sample": 3,
+            "phase": "warm",
+            "order": 2,
+            "http_success": true,
+            "ms": 68.532,
+            "outcome": "response"
+          },
+          {
+            "sample": 4,
+            "phase": "warm",
+            "order": 1,
+            "http_success": true,
+            "ms": 49.377,
+            "outcome": "response"
+          },
+          {
+            "sample": 5,
+            "phase": "warm",
+            "order": 2,
+            "http_success": true,
+            "ms": 49.061,
+            "outcome": "response"
+          },
+          {
+            "sample": 6,
+            "phase": "warm",
+            "order": 1,
+            "http_success": true,
+            "ms": 48.935,
+            "outcome": "response"
+          }
+        ]
+      },
+      "summaries": {
+        "python": {
+          "first_read": {
+            "sample": 1,
+            "phase": "first-read",
+            "order": 1,
+            "http_success": true,
+            "ms": 24.727,
+            "outcome": "response"
+          },
+          "warm": {
+            "attempted": 5,
+            "responses": 5,
+            "failures": 0,
+            "transport_failures": 0,
+            "http_failures": 0,
+            "median_scope": "all completed HTTP responses, including non-success",
+            "median_ms": 19.332,
+            "tail": "unmeasured: too few independent samples",
+            "p95_ms": null,
+            "p99_ms": null
+          }
+        },
+        "dotnet": {
+          "first_read": {
+            "sample": 1,
+            "phase": "first-read",
+            "order": 2,
+            "http_success": true,
+            "ms": 342.709,
+            "outcome": "response"
+          },
+          "warm": {
+            "attempted": 5,
+            "responses": 5,
+            "failures": 0,
+            "transport_failures": 0,
+            "http_failures": 0,
+            "median_scope": "all completed HTTP responses, including non-success",
+            "median_ms": 49.377,
+            "tail": "unmeasured: too few independent samples",
+            "p95_ms": null,
+            "p99_ms": null
+          }
+        }
+      },
+      "semantic_matches": 6,
+      "samples": [
+        {
+          "route": "GET /api/eligibility/{tax_year}",
+          "sample": 1,
+          "wire_equal": false,
+          "content_hash_equal": false,
+          "semantic_equal": true,
+          "failure_count": 0,
+          "categories": {},
+          "paths": [],
+          "semantic_tolerances": 32
+        },
+        {
+          "route": "GET /api/eligibility/{tax_year}",
+          "sample": 2,
+          "wire_equal": false,
+          "content_hash_equal": false,
+          "semantic_equal": true,
+          "failure_count": 0,
+          "categories": {},
+          "paths": [],
+          "semantic_tolerances": 32
+        },
+        {
+          "route": "GET /api/eligibility/{tax_year}",
+          "sample": 3,
+          "wire_equal": false,
+          "content_hash_equal": false,
+          "semantic_equal": true,
+          "failure_count": 0,
+          "categories": {},
+          "paths": [],
+          "semantic_tolerances": 32
+        },
+        {
+          "route": "GET /api/eligibility/{tax_year}",
+          "sample": 4,
+          "wire_equal": false,
+          "content_hash_equal": false,
+          "semantic_equal": true,
+          "failure_count": 0,
+          "categories": {},
+          "paths": [],
+          "semantic_tolerances": 32
+        },
+        {
+          "route": "GET /api/eligibility/{tax_year}",
+          "sample": 5,
+          "wire_equal": false,
+          "content_hash_equal": false,
+          "semantic_equal": true,
+          "failure_count": 0,
+          "categories": {},
+          "paths": [],
+          "semantic_tolerances": 32
+        },
+        {
+          "route": "GET /api/eligibility/{tax_year}",
+          "sample": 6,
+          "wire_equal": false,
+          "content_hash_equal": false,
+          "semantic_equal": true,
+          "failure_count": 0,
+          "categories": {},
+          "paths": [],
+          "semantic_tolerances": 32
+        }
+      ],
+      "warm_dotnet_minus_python_ms": 30.045
+    },
+    "drafts": {
+      "route": "GET /api/v2/program-drafts",
+      "planned_pairs": 6,
+      "observations": {
+        "python": [
+          {
+            "sample": 1,
+            "phase": "first-read",
+            "order": 1,
+            "http_success": true,
+            "ms": 57.935,
+            "outcome": "response"
+          },
+          {
+            "sample": 2,
+            "phase": "warm",
+            "order": 2,
+            "http_success": true,
+            "ms": 4.799,
+            "outcome": "response"
+          },
+          {
+            "sample": 3,
+            "phase": "warm",
+            "order": 1,
+            "http_success": true,
+            "ms": 3.284,
+            "outcome": "response"
+          },
+          {
+            "sample": 4,
+            "phase": "warm",
+            "order": 2,
+            "http_success": true,
+            "ms": 4.181,
+            "outcome": "response"
+          },
+          {
+            "sample": 5,
+            "phase": "warm",
+            "order": 1,
+            "http_success": true,
+            "ms": 3.43,
+            "outcome": "response"
+          },
+          {
+            "sample": 6,
+            "phase": "warm",
+            "order": 2,
+            "http_success": true,
+            "ms": 5.0,
+            "outcome": "response"
+          }
+        ],
+        "dotnet": [
+          {
+            "sample": 1,
+            "phase": "first-read",
+            "order": 2,
+            "http_success": true,
+            "ms": 51.593,
+            "outcome": "response"
+          },
+          {
+            "sample": 2,
+            "phase": "warm",
+            "order": 1,
+            "http_success": true,
+            "ms": 35.144,
+            "outcome": "response"
+          },
+          {
+            "sample": 3,
+            "phase": "warm",
+            "order": 2,
+            "http_success": true,
+            "ms": 40.577,
+            "outcome": "response"
+          },
+          {
+            "sample": 4,
+            "phase": "warm",
+            "order": 1,
+            "http_success": true,
+            "ms": 34.599,
+            "outcome": "response"
+          },
+          {
+            "sample": 5,
+            "phase": "warm",
+            "order": 2,
+            "http_success": true,
+            "ms": 49.243,
+            "outcome": "response"
+          },
+          {
+            "sample": 6,
+            "phase": "warm",
+            "order": 1,
+            "http_success": true,
+            "ms": 40.101,
+            "outcome": "response"
+          }
+        ]
+      },
+      "summaries": {
+        "python": {
+          "first_read": {
+            "sample": 1,
+            "phase": "first-read",
+            "order": 1,
+            "http_success": true,
+            "ms": 57.935,
+            "outcome": "response"
+          },
+          "warm": {
+            "attempted": 5,
+            "responses": 5,
+            "failures": 0,
+            "transport_failures": 0,
+            "http_failures": 0,
+            "median_scope": "all completed HTTP responses, including non-success",
+            "median_ms": 4.181,
+            "tail": "unmeasured: too few independent samples",
+            "p95_ms": null,
+            "p99_ms": null
+          }
+        },
+        "dotnet": {
+          "first_read": {
+            "sample": 1,
+            "phase": "first-read",
+            "order": 2,
+            "http_success": true,
+            "ms": 51.593,
+            "outcome": "response"
+          },
+          "warm": {
+            "attempted": 5,
+            "responses": 5,
+            "failures": 0,
+            "transport_failures": 0,
+            "http_failures": 0,
+            "median_scope": "all completed HTTP responses, including non-success",
+            "median_ms": 40.101,
+            "tail": "unmeasured: too few independent samples",
+            "p95_ms": null,
+            "p99_ms": null
+          }
+        }
+      },
+      "semantic_matches": 6,
+      "samples": [
+        {
+          "route": "GET /api/v2/program-drafts",
+          "sample": 1,
+          "wire_equal": true,
+          "content_hash_equal": true,
+          "semantic_equal": true,
+          "failure_count": 0,
+          "categories": {},
+          "paths": [],
+          "semantic_tolerances": 0
+        },
+        {
+          "route": "GET /api/v2/program-drafts",
+          "sample": 2,
+          "wire_equal": true,
+          "content_hash_equal": true,
+          "semantic_equal": true,
+          "failure_count": 0,
+          "categories": {},
+          "paths": [],
+          "semantic_tolerances": 0
+        },
+        {
+          "route": "GET /api/v2/program-drafts",
+          "sample": 3,
+          "wire_equal": true,
+          "content_hash_equal": true,
+          "semantic_equal": true,
+          "failure_count": 0,
+          "categories": {},
+          "paths": [],
+          "semantic_tolerances": 0
+        },
+        {
+          "route": "GET /api/v2/program-drafts",
+          "sample": 4,
+          "wire_equal": true,
+          "content_hash_equal": true,
+          "semantic_equal": true,
+          "failure_count": 0,
+          "categories": {},
+          "paths": [],
+          "semantic_tolerances": 0
+        },
+        {
+          "route": "GET /api/v2/program-drafts",
+          "sample": 5,
+          "wire_equal": true,
+          "content_hash_equal": true,
+          "semantic_equal": true,
+          "failure_count": 0,
+          "categories": {},
+          "paths": [],
+          "semantic_tolerances": 0
+        },
+        {
+          "route": "GET /api/v2/program-drafts",
+          "sample": 6,
+          "wire_equal": true,
+          "content_hash_equal": true,
+          "semantic_equal": true,
+          "failure_count": 0,
+          "categories": {},
+          "paths": [],
+          "semantic_tolerances": 0
+        }
+      ],
+      "warm_dotnet_minus_python_ms": 35.92
+    }
+  },
+  "live": "unmeasured: current capacity/access prerequisites unavailable"
+}

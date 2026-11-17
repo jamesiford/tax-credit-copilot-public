@@ -1,0 +1,9 @@
+.terraform/
+.validation/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.auto.tfvars
+*.auto.tfvars.json
+crash.log
+backend.config
