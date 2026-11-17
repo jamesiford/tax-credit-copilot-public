@@ -1,0 +1,39 @@
+{
+  "kind": "synthetic-publication-only",
+  "services": {
+    "api": {
+      "hashed_files": 179,
+      "liveness_status": 200,
+      "unavailable_readiness_status": 200,
+      "unavailable_readiness_body": false,
+      "unauthorized_status": 401,
+      "contract_controls_status": 404,
+      "ordinary_process_stopped": true
+    },
+    "worker": {
+      "hashed_files": 176,
+      "once_exit": 0,
+      "processed_observed": 0,
+      "http_listener": false,
+      "invalid_deployed_local_store_refused": true
+    },
+    "gateway": {
+      "hashed_files": 186,
+      "liveness_status": 200,
+      "static_readiness_false_positive_observed": true,
+      "unauthorized_status": 401,
+      "contract_controls_status": 404,
+      "ordinary_process_stopped": true
+    },
+    "orchestrator": {
+      "default_ingress_exit": 78,
+      "nonisolated_proof_exit": 78,
+      "ordinary_publication_hashes": 149,
+      "sdk_readiness_status": 200,
+      "network": "none",
+      "externally_usable": false,
+      "sigterm_exit": 0,
+      "stop_seconds": 0.531
+    }
+  }
+}

@@ -3,7 +3,7 @@
   "path": "local-linux-collector-to-receiver",
   "services": {
     "api": {
-      "published_dll_sha256": "3891d50138911a13dd5203f524671c2d03d62f90c398d7b8c8f957b9309572e1",
+      "published_dll_sha256": "a07fffec995a7ce886138316046594f1eef5508f6d8414ea5e8e52e901eb36e5",
       "health_status": 200,
       "protected_status": 401,
       "server_trace_receipts": 2,
@@ -12,7 +12,7 @@
       "actual_dependency_correlation": false
     },
     "gateway": {
-      "published_dll_sha256": "c1343c102ac4e7eb0190a85eed76c7d72d7ac01f0541f1feb7526e49bf24fbb6",
+      "published_dll_sha256": "e5524a679eaec3925392756e16e82971225ba5e19d68eb5d5679738dfe25b608",
       "health_status": 200,
       "protected_status": 401,
       "server_trace_receipts": 2,
@@ -24,5 +24,5 @@
   "privacy_allowlist": "passed",
   "actual_dependency_correlation": false,
   "shutdown_scope": "receipt proven before termination; no actual-host graceful-flush claim",
-  "hook_sha256": "a1106346d6c01be55b0b4f6b185cbecf0af300628cc54989ddb4711f3ef2864f"
+  "hook_sha256": "4c1d3dcf0e7534391ca595f772d1a90deb07a4a6937d001244fead10b8f2da9d"
 }

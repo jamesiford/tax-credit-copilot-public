@@ -79,6 +79,14 @@ empty because deployment introduced no intentional HTTP/calculation divergence.
 | CI templates | Explicit three template paths with **actionlint 1.7.7**: passed; private runner label declared, not waived. Heavy suite remains separately scheduled/manual |
 | Telemetry | Real local receiver/official collector receipts, synthetic service/version and dependency-parent checks, custom `TaxCredit.Ai` subscriptions only with hook, exit flush and collector-failure proofs; see dedicated tracked telemetry evidence and limitations below |
 
+Final artifact/source revision is **2e8ba28**. Rebuilt publications hash **179 /
+176 / 186 / 149** files respectively (API/Worker/gateway/orchestrator); all four
+packaged Hook DLL hashes equal the Hook actually used for final product-host
+receipt. Actual API/gateway zips each repeated identically (**180 / 187** entries).
+Final container SIGTERM times: API **0.500 s**, gateway **0.516 s**, Worker
+**0.344 s** (exit 143), Responses **0.453 s**. These measurements and image IDs
+are persisted under `dotnet/deploy/evidence`, not just ephemeral shell output.
+
 The build/format/fast command ran from `dotnet`, not the root's SDK 11.
 The full existing heavy suite was not claimed; templates schedule it.
 Terraform `VALIDATION.md` records exact clean-copy commands/provider schemas;
@@ -204,6 +212,8 @@ gateway tickets/ledgers and orchestrator confirmations/checkpoints/budgets;
 there is no result-recovery gateway endpoint. Knowledge retrieval remains off.
 Blob immutable bytes must be preserved; built-in Contributor is not WORM.
 Image/config rollback does not undo accepted writes or downgrade schema.
+The source count/max-modified marker is a weak data-version stand-in, not a
+transactional Delta snapshot; edits preserving those markers may be missed.
 
 ## Delivery index
 

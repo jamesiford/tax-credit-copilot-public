@@ -25,7 +25,7 @@ Service authentication never grants the acting person writer or client rights.
 | Existing tool | Guard/input and affected identity/state |
 |---|---|
 | `scripts/apply-migrations.py --target deployed [--dry-run]` | Fabric `FABRIC_WORKSPACE_ID`/`FABRIC_WAREHOUSE_ID` resolve the allowlisted item; `WAREHOUSE_SERVER`/`WAREHOUSE_DATABASE` must independently match. Other target names must be pinned in existing target metadata. Uses the operator's schema privileges, not app identity. **Even dry-run can resolve/contact the target.** |
-| Same tool `--bootstrap` | Destructive bootstrap only for an approved fresh target (`TCC_FABRIC_CREATED=true`, or approved pinned target; Azure SQL uses `TCC_SQL_CREATED`). An existing `tcc_ops.schema_migration` means pending forward migrations only. Never assert a "created" flag to bypass D22. |
+| Same tool `--bootstrap` | Destructive bootstrap only for an approved fresh target (`TCC_FABRIC_CREATED`, or approved pinned target; Azure SQL uses `TCC_SQL_CREATED`). An existing `tcc_ops.schema_migration` means pending forward migrations only. Never assert a "created" flag to bypass D22. |
 | `scripts/grant-warehouse-sql.py --target deployed --profile api --principal <approved-app-principal> [--dry-run]` | Operator supplies the explicit API **or .NET in-process gateway** principal. `api` grants SELECT/INSERT/UPDATE/DELETE on `tcc_gold`/`tcc_ops`, covering newly added tables; it does not grant Fabric workspace membership. Dry-run prints statements only and does **not** prove target resolution or access. |
 | Same tool `--profile gateway` | INSERT/SELECT on `channel_audit` only: **not a .NET gateway profile**. Do not select it for the in-process host. |
 | Same tool `--profile lakehouse --principal <approved-api-principal>` | Read-only object SELECT on the guarded lakehouse SQL endpoint using `LAKEHOUSE_SQL_*`/source schema and existing semantic-model table inventory. Requires source-table coverage review against the .NET embedded mapping. It explicitly refuses the configured `GATEWAY_IDENTITY_NAME`: an approved operator-tool enhancement/reviewed grant procedure is needed for the .NET gateway source role. **Do not unset/rename that guard input to bypass it.** |
@@ -159,6 +159,12 @@ durable work identity, reopened queue terminal state, manifest and publication
 under proper authority. A commit may already have succeeded. Never blind-retry
 with a new key. There is **no gateway result-recovery endpoint** to resolve an
 orchestrator's unknown outcome automatically.
+
+The SQL source's count/max-modified data-version stand-in is not a Delta
+snapshot or content hash of all consumed payroll. An edit that leaves those
+markers unchanged can escape detection. Preserve the run's source observation
+and verify native read consistency; do not turn marker equality into a stronger
+audit/reproducibility claim.
 
 Keep one gateway/orchestrator replica initially. Restart loses gateway fact
 ledgers, limits, sessions/download tickets and host-local key exclusions, plus

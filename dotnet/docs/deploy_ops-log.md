@@ -195,3 +195,26 @@ Subsequent implementation and measured gate results are appended below.
   leap-window and native money/AVG remain unchanged owner decisions. The
   SELECT 1 spike (3.983 s) is connectivity only. No live/cloud release gate is
   inferred from local build, Docker, telemetry or mock-provider success.
+
+## Final artifact refresh and retained evidence
+
+- Local implementation revision **2e8ba28** was used for the final four locked
+  publications and source image rebuilds, including updated Hook diagnostics.
+  OCI revision labels were inspected, not merely assumed from build arguments.
+- Final hashed file counts: API **179**, Worker **176**, gateway **186**,
+  orchestrator **149**. All four packaged Hook byte hashes match the final
+  actual API/gateway receiver/collector proof. Each actual host again delivered
+  two server spans and one metric series; dependency correlation remains false.
+- Final real containers passed exact configured liveness paths, protected/reset
+  checks, resources/read-only checks and kernel containment. API/gateway/
+  Responses SIGTERM exits **0**, at **0.500 / 0.516 / 0.453 s**; Worker **143**
+  at **0.344 s**, with emulated abnormal exit still explicitly unverified.
+- Actual API/gateway zips repeated identically (180 / 187 entries); SHA-256,
+  sizes, full source revision and inspection results are tracked as aggregates.
+- Seven allowlisted aggregate JSON files plus an explanatory index are retained
+  under deployment evidence. A redundant standalone Responses evidence filename
+  was initially requested during copying but is not produced by ordinary smoke;
+  that result is correctly retained inside `published-smoke.json`.
+- Exact temporary staging context and initial raw replay directory removed;
+  immutable local images/published artifacts remain for inspection. No wildcard
+  cleanup, shared process-name kill or Docker prune was used.
