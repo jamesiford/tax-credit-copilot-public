@@ -37,8 +37,10 @@ internal static class RuntimeSourceRegistration
             ? p.GetRequiredService<SeedAnalytics>().Transport : new SqlAnalyticsTransport(new AnalyticsConnectionFactory(
                 new AnalyticsConnectionOptions(settings.Get("SOURCE_SQL_SERVER") ?? "", settings.Get("SOURCE_SQL_DATABASE") ?? ""),
                 new EntraAnalyticsTokenProvider(p.GetRequiredService<DefaultAzureCredential>()), p.GetRequiredService<TimeProvider>())));
+        var limits = SourceLimits.From(settings);
+        services.AddSingleton(limits);
         services.AddScoped(p => new SourceScanner(p.GetRequiredService<IAnalyticsTransport>(), mapping,
-            settings.Get("SOURCE_SCHEMA") ?? "tcc_source"));
+            settings.Get("SOURCE_SCHEMA") ?? "tcc_source", limits.MaxAccountRows));
         services.AddScoped<PayrollProjector>();
         services.AddScoped<IFiscalRuleReader, SqlFiscalRuleReader>();
         services.AddScoped(p => new FiscalRuleAdapter(p.GetRequiredService<RuleLibrary>(),

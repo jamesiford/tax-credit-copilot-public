@@ -74,14 +74,14 @@ internal static class SourceTestData
 
     internal static (SqlClientSource Source, SourceScanner Scanner, RecordingTransport Transport) Source(
         Dictionary<string, IReadOnlyList<IReadOnlyDictionary<string, object?>>>? tables = null,
-        SourceMapping? mapping = null, long limit = 10000, FootprintGuard? guard = null)
+        SourceMapping? mapping = null, long limit = 10000, FootprintGuard? guard = null, SourceLimits? limits = null)
     {
         var active = mapping ?? SourceMapping.Load();
         var transport = new RecordingTransport(new MaterializedAnalyticsTransport(active, tables ?? MiniTables(active)));
         var scanner = new SourceScanner(transport, active, maximumRows: limit);
         var lookups = Lookups();
         return (new SqlClientSource(scanner, new PayrollProjector(active, lookups),
-            new FiscalRuleAdapter(Library(), new SqlFiscalRuleReader(scanner), lookups), guard), scanner, transport);
+            new FiscalRuleAdapter(Library(), new SqlFiscalRuleReader(scanner), lookups), guard, limits), scanner, transport);
     }
 
     internal static JsonDocument Oracle(string mode, object input)

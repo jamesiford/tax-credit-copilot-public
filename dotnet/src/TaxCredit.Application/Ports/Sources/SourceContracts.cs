@@ -159,9 +159,12 @@ public sealed class UnmappedPayCodes(long rows, int distinct)
 }
 
 /// <summary>Stops streaming at the configured row ceiling rather than after materializing the account.</summary>
-public sealed class SourceTooLarge(long limit)
-    : SourceFailureException("account_too_large", "source_sql", "Review the account row limit before retrying.")
+public sealed class SourceTooLarge(long limit, bool bytes = false)
+    : SourceFailureException("account_too_large", "source_sql", bytes
+        ? $"Keep the offline fixture under {SourceLimitSettings.Format(limit)} decompressed bytes."
+        : $"This client has more than {SourceLimitSettings.Format(limit)} payroll rows, the {SourceLimitSettings.MaxAccountRows} limit. "
+            + $"Raise {SourceLimitSettings.MaxAccountRows} if the host has the memory (minimum {SourceLimitSettings.Format(SourceLimitSettings.MinimumAccountRows)}), or narrow the read.")
 {
-    /// <summary>The refused ceiling.</summary>
+    /// <summary>The refused ceiling: rows, or decompressed bytes when <c>bytes</c> is set by the offline fixture loader.</summary>
     public long Limit { get; } = limit;
 }
