@@ -53,3 +53,23 @@
   command and owned-process cleanup. Used it for both focused scenarios.
 - Updated stale host composition documentation; no shared registration,
   dependency or test weakening was needed.
+
+## Shared decision metadata repair
+
+- HTTP claims, engagements and findings now default to `anonymous`, matching
+  their actual local caller, not the reserved `system` actor. Supplied local
+  attribution and authenticated-person precedence are preserved. Explicit
+  engine/package/practitioner defaults remain unchanged.
+- A new ordinary-host test proves all three decision surfaces and supplied
+  attribution, without loading a large seed or running an engine.
+- Finding history hydrates `superseded_at` as an instant before rendering:
+  storage-provider padding no longer leaks into the public timestamp.
+  Existing durable/tenant/reopen coverage now runs with zero and nonzero
+  microseconds and checks exact timestamp preservation after reopening storage.
+- Strict build and format pass; all 1,551 fast tests pass, zero failures/skips.
+  Both ordinary-host complete replays ran through the new unattended runner:
+  API 1,514 steps / 2,311 raw fields; gateway 255 / 523.
+  Evidence: `artifacts/w3-metadata-fast`, `artifacts/w3-metadata-replay`.
+- No new register entry: these restore recorded contract behavior rather than
+  introduce a deliberate difference. No stored timestamp, figure or
+  authenticated authorization outcome was changed.

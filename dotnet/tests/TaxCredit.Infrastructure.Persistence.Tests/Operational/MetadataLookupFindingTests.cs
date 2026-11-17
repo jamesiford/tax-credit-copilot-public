@@ -34,8 +34,10 @@ public sealed class MetadataLookupFindingTests
         Assert.Equal(2, session.Query(11, "SELECT override_id FROM tcc_ops.lookup_override WHERE {tenant}").Count);
     }
 
-    [Fact]
-    public void FindingResolutionAndReopenAreDurableAttributedAndTenantScoped()
+    [Theory]
+    [InlineData(0)]
+    [InlineData(123456)]
+    public void FindingResolutionAndReopenAreDurableAttributedAndTenantScoped(int microsecond)
     {
         using var store = new OperationalDatabase();
         var repository = new FindingRepository(store.Database);
@@ -56,11 +58,13 @@ public sealed class MetadataLookupFindingTests
         Assert.Single(repository.Live(11, 2023));
         Assert.Empty(repository.Live(11, 2024));
         Assert.Equal(2, repository.History(11, "local-id").Count);
-        Assert.True(repository.Reopen(11, "local-id", "reviewer", RunBatchRepositoryTests.At(2)));
+        var reopenedAt = RunBatchRepositoryTests.At(2) with { Microsecond = microsecond };
+        Assert.True(repository.Reopen(11, "local-id", "reviewer", reopenedAt));
         var restarted = new FindingRepository(store.Reopen());
         Assert.Empty(restarted.Live(11));
         Assert.Equal("drop", restarted.Live(22).Single().Resolution);
         Assert.Equal(2, restarted.History(11, "local-id").Count);
+        Assert.Equal(reopenedAt.IsoFormat(), restarted.History(11, "local-id")[^1].SupersededAt);
         Assert.Equal(["resolve", "resolve", "reopen"], restarted.Audit(11, "local-id").Select(row => row.Action).ToArray());
         Assert.Equal("reviewer", restarted.Audit(11, "local-id")[^1].Actor);
         Assert.False(restarted.Reopen(11, "local-id", "reviewer", Now));

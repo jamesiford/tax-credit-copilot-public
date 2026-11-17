@@ -8,6 +8,45 @@ namespace TaxCredit.Api.Tests.ClaimsArtifactsRules;
 public sealed class ClaimTests
 {
     [Fact]
+    public async Task Local_http_decisions_name_anonymous_callers_without_misattributing_system_work()
+    {
+        await using var host = await TestHost.Start();
+        var claim = await Json(await host.Client.PostAsJsonAsync("/api/claims", new
+        {
+            client_id = 5555,
+            program_code = "GA_JTC",
+            tax_year = 2023,
+            status = "assessed",
+            provenance = "client_asserted",
+        }));
+        Assert.Equal("anonymous", claim.GetProperty("decided_by").GetString());
+        var engagement = await Json(await host.Client.PutAsJsonAsync("/api/claims/engagement", new
+        {
+            client_id = 5555,
+            program_code = "GA_JTC",
+            scope = "in_scope",
+        }));
+        Assert.Equal("anonymous", engagement.GetProperty("set_by").GetString());
+        var finding = await Json(await host.Client.PostAsJsonAsync("/api/findings/synthetic-finding/resolve", new
+        {
+            client_id = 5555,
+            tax_year = 2023,
+            resolution = "accept",
+        }));
+        Assert.Equal("anonymous", finding.GetProperty("decided_by").GetString());
+        var named = await Json(await host.Client.PostAsJsonAsync("/api/claims", new
+        {
+            client_id = 5556,
+            program_code = "GA_JTC",
+            tax_year = 2023,
+            status = "assessed",
+            provenance = "client_asserted",
+            decided_by = "synthetic-reviewer",
+        }));
+        Assert.Equal("synthetic-reviewer", named.GetProperty("decided_by").GetString());
+    }
+
+    [Fact]
     [Trait("Category", "heavy")]
     public async Task Duplicate_assertion_is_a_conflict_but_transitions_append_and_reopening_is_isolated()
     {

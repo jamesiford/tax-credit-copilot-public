@@ -90,7 +90,7 @@ public sealed class FindingRepository(PersistenceDatabase database, IIdSource? i
             Note = r.Text("note"),
             DecidedBy = r.Required("decided_by"),
             DecidedAt = r.Required("decided_at"),
-            SupersededAt = r.Text("superseded_at"),
+            SupersededAt = r.Instant("superseded_at")?.IsoFormat(),
         };
     }
 

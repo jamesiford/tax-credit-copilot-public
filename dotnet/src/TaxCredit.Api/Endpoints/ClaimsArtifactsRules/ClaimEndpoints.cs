@@ -25,7 +25,7 @@ public sealed class ClaimEndpoints : IEndpointGroup
         endpoints.MapGet("/api/claims/lifecycle", (Delegate)((HttpContext c) => FeatureHttp.Send(c, () => new GetLifecycle())));
     }
 
-    internal static string Actor(HttpContext context, string field, string fallback = "system") =>
+    internal static string Actor(HttpContext context, string field, string fallback = "anonymous") =>
         FeatureHttp.Actor(context, FeatureValues.Text(FeatureHttp.Body(context), field), fallback);
 
     private static SetEngagement Engagement(HttpContext context)

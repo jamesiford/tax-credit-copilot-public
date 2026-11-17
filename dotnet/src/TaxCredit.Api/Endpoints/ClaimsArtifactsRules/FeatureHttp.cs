@@ -23,7 +23,7 @@ internal static class FeatureHttp
     internal static JsonElement Body(HttpContext context) => RequestValidator.Body(context)!.Value;
     internal static ApiPrincipal Principal(HttpContext context) =>
         context.RequestServices.GetRequiredService<IApiPrincipalAccessor>().Current ?? ApiPrincipal.Anonymous;
-    internal static string Actor(HttpContext context, string? supplied = null, string fallback = "system") =>
+    internal static string Actor(HttpContext context, string? supplied = null, string fallback = "anonymous") =>
         Principal(context).Attributed(supplied, fallback);
 
     internal static async Task<IResult> Send<T>(HttpContext context, Func<IRequest<T>> request, int status = 200)
