@@ -1,6 +1,7 @@
 using System.Data;
 using System.Data.Common;
 using System.Globalization;
+using TaxCredit.Application.Hosting;
 
 namespace TaxCredit.Infrastructure.Persistence.Sql;
 
@@ -106,9 +107,17 @@ public sealed class SqlSession : IDisposable
         }
     }
 
-    internal void Begin() => _transaction = _connection.BeginTransaction(IsolationLevel.Serializable);
+    internal void Begin()
+    {
+        using var span = RunSpans.Start("db.begin");
+        _transaction = _connection.BeginTransaction(IsolationLevel.Serializable);
+    }
 
-    internal void Commit() => _transaction!.Commit();
+    internal void Commit()
+    {
+        using var span = RunSpans.Start("db.commit");
+        _transaction!.Commit();
+    }
 
     internal void Rollback() => _transaction?.Rollback();
 
@@ -154,6 +163,15 @@ public sealed class SqlSession : IDisposable
             var tuple = "(" + string.Join(",", columns.Select(_ => "?")) + ")";
             var sql = "INSERT INTO " + name + " (" + string.Join(",", columns) + ") VALUES "
                 + string.Join(",", batch.Select(_ => tuple));
+            using var statement = RunSpans.Start("sql.insert-batch");
+            if (statement is not null)
+            {
+                statement.SetTag("table", table);
+                statement.SetTag("rows", batch.Length);
+                statement.SetTag("bytes", sql.Length);
+                statement.SetTag("parameters", batch.Length * columns.Count);
+            }
+
             count += Run(new BoundStatement(sql, batch.SelectMany(r => r).ToArray()));
         }
 
@@ -188,12 +206,14 @@ public sealed class SqlSession : IDisposable
 
     private int Run(BoundStatement statement)
     {
+        using var span = RunSpans.Start("sql.execute");
         using var command = Command(statement);
         return command.ExecuteNonQuery();
     }
 
     private List<IReadOnlyDictionary<string, object?>> Read(BoundStatement statement)
     {
+        using var span = RunSpans.Start("sql.query");
         using var command = Command(statement);
         using var reader = command.ExecuteReader();
         var rows = new List<IReadOnlyDictionary<string, object?>>();
