@@ -162,6 +162,10 @@ privacy/catalogue/identity boundaries; its policy pass is not native approval.
   queue/manifests remain the authoritative operator evidence. Direct
   orchestrator console logging and inherited gateway privacy gaps need
   application-owner review; a safe exporter does not sanitize those log paths.
+  Infrastructure exports **AllMetrics only**, not HTTP/console log categories;
+  Default/Microsoft/System/Console log levels are **None**, detailed errors and
+  failed-request tracing disabled. This excludes configured diagnostic payload
+  exports, not all possible direct console writes or platform retention.
 
 No application dependency was added or upgraded. Existing Agent Framework
 **1.28.0**, Responses **1.0.0-beta.9** / Core **beta.30** and DI **10.0.13**
