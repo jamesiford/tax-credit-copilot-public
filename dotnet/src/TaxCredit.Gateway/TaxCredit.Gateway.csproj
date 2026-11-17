@@ -1,6 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <RootNamespace>TaxCredit.Gateway</RootNamespace>
+    <!-- Microsoft.Data.SqlClient does not support invariant globalization; the shared default is on for deterministic tests. -->
+    <InvariantGlobalization>false</InvariantGlobalization>
     <!-- This JSON-only host must not inherit UI assets from the referenced API executable. -->
     <StaticWebAssetsEnabled>false</StaticWebAssetsEnabled>
   </PropertyGroup>

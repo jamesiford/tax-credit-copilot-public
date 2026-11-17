@@ -1,6 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk.Worker">
   <PropertyGroup>
     <RootNamespace>TaxCredit.Worker</RootNamespace>
+    <!-- Microsoft.Data.SqlClient does not support invariant globalization; the shared default is on for deterministic tests. -->
+    <InvariantGlobalization>false</InvariantGlobalization>
   </PropertyGroup>
   <ItemGroup>
   </ItemGroup>

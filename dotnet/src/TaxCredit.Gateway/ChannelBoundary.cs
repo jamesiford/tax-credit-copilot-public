@@ -9,7 +9,7 @@ internal sealed class ChannelBoundary(RequestDelegate next, ILogger<ChannelBound
 
     public async Task InvokeAsync(HttpContext context)
     {
-        if (!context.Request.Path.StartsWithSegments("/channel") && context.Request.Path != "/mcp")
+        if (!context.Request.Path.StartsWithSegments("/channel", StringComparison.Ordinal) && context.Request.Path != "/mcp")
         { await next(context).ConfigureAwait(false); return; }
         try
         {
