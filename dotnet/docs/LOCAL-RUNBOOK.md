@@ -56,6 +56,9 @@ You normally set none by hand. `backend\.env` is the single input; `dotnet\local
 | `PORTFOLIO_FOOTPRINT_MAX_ROWS` | 50000000 | The largest estimated payroll table `auto` will scan for the footprint. |
 | `PORTFOLIO_FOOTPRINT_TIMEOUT_SECONDS` | 20 | Statement timeout for the footprint query (the server cancels it). |
 | `PORTFOLIO_FOOTPRINT_CACHE_SECONDS` | 300 | How long the row estimate, and a timeout, are remembered. |
+| `SOURCE_MAX_ACCOUNT_ROWS` | 1000000 | Most payroll rows one client may have; a bigger client is refused with a 422 naming this setting. Whole number, minimum 1000; anything else stops the host at startup. Memory is about 3.5 KB per row at peak (see `docs/SCALE-S2-REPORT.md`), so 1,000,000 rows needs about 3.5 GB. |
+| `SOURCE_PORTFOLIO_MAX_ACCOUNTS` | 25 | Most clients a portfolio-wide payroll load (entity portfolio simulation) will read; a bigger book is refused before any payroll is read. Whole number, minimum 1. |
+| `SOURCE_PORTFOLIO_MAX_ROWS` | 5000000 | Running payroll-row total a portfolio-wide load may not pass; checked per client from the SQL scope aggregate before that client's payroll is read. Whole number, minimum 1000. |
 | `RUN_BATCH_MAX_ITEMS` | 5000 | Largest batch a request may queue. |
 | `RUN_BATCH_CONFIRM_ABOVE` | 25 | A batch larger than this needs the typed confirmation count. |
 | `RUN_STALE_WORKER_SECONDS` | 60 | After this long with queued work and no live Worker lease, the Runs page shows "queued runs in this batch are not progressing". |
@@ -163,7 +166,7 @@ What is in place (`TaxCredit.Infrastructure.Sources`):
 - Only columns the engine needs are selected.
 - Dimension tables (location, address, employment, ...) are read by key in batches of 900, not scanned.
 - Scope (years, states, dates) and the source fingerprint are computed by SQL aggregates, not by loading rows.
-- Rows stream and the read stops at a size cap instead of after loading.
+- Rows stream and the read stops at a size cap (`SOURCE_MAX_ACCOUNT_ROWS`) instead of after loading.
 - The portfolio footprint is **bounded and guarded** (stage S1, `docs/SCALE-S1-REPORT.md`): it is read only for the clients on the page or in the batch, in `IN (...)` batches of 900 bound parameters, behind a row-estimate guard and a statement timeout. When it is refused the portfolio page still answers, with a `degraded` entry.
 
 What is **not** in place, and matters at scale:
@@ -171,13 +174,14 @@ What is **not** in place, and matters at scale:
 | Gap | Effect with billions of rows | Python had |
 |---|---|---|
 | Portfolio footprint: a refused, timed-out or switched-off read leaves the map and state filters empty (portfolio) or refuses the batch that needs it (planner). `auto` estimates rows from the SQL catalogue only; there is no Delta-log estimate, and no pre-aggregated summary yet. | Where clients operate is unknown above `PORTFOLIO_FOOTPRINT_MAX_ROWS` unless the mode is `on`. | Same settings, plus a Delta-log estimate and a one-hour decision cache |
-| Per-client row cap is fixed at 1,000,000 (`SourceTooLarge`). | A client over 1M rows is refused. Candle Bottle is 384k. | `SOURCE_MAX_ACCOUNT_ROWS`, default 50M, configurable |
+| Per-client row cap is a setting (`SOURCE_MAX_ACCOUNT_ROWS`, default 1,000,000) but the default is deliberately not Python's 50M: at about 3.5 KB of peak memory per row a 50M-row client would need about 170 GB in one process (`docs/SCALE-S2-REPORT.md`). | A client over the cap is refused with a 422 whose remedy names the setting and the limit. Candle Bottle is 384k (about 1.4 GB). | `SOURCE_MAX_ACCOUNT_ROWS`, default 50M |
 | No per-account dataset cache or version check; every run re-reads the client. | Repeat runs for one client pay the full read each time. | `SOURCE_CACHE_*`, `SOURCE_VERSION_CHECK_SECONDS` |
 | No Silver (account-partitioned) table path. | The `account_id` filter only prunes well if the Payroll table is partitioned or clustered by `account_id`. | `SOURCE_SILVER` |
-| `LoadPortfolioPayPeriods` loads every account's payroll into memory (used by entity simulation). | Not usable at this scale. | n/a |
+| `LoadPortfolioPayPeriods` (entity portfolio simulation) still holds every account's projected rows at once, but is now bounded: it refuses before reading when the book has more than `SOURCE_PORTFOLIO_MAX_ACCOUNTS` (25) clients or the running row total passes `SOURCE_PORTFOLIO_MAX_ROWS` (5,000,000). | A larger book gets a 422 `portfolio_too_large` telling the caller to select fewer clients. The default row bound is still about 13 GB of projected rows, so lower it on a smaller host. | n/a |
 
-Recommended next steps, in order: (1) serve the footprint from a small pre-aggregated summary table; (2) make the row cap a setting;
-(3) partition or cluster the Payroll Delta table by `account_id`; (4) cache per-client datasets with a version check.
+Recommended next steps, in order: (1) serve the footprint from a small pre-aggregated summary table; (2) cut the per-row projection cost
+(the engine's dictionary row is 2.6 KB of the 3.5 KB, `docs/SCALE-S2-REPORT.md`); (3) partition or cluster the Payroll Delta table by `account_id`;
+(4) cache per-client datasets with a version check.
 
 ## 8. Troubleshooting
 

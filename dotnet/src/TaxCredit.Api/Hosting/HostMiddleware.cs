@@ -84,7 +84,7 @@ public sealed class HostMiddleware(RequestDelegate next, ILogger<HostMiddleware>
             object body = exception is SourceFootprintUnavailable footprint
                 ? new { code = exception.Code, dependency = exception.Dependency, remedy = exception.Remedy, reason = footprint.Reason, impact = footprint.Impact }
                 : new { code = exception.Code, dependency = exception.Dependency, remedy = exception.Remedy };
-            await Error(context, exception is SourceTooLarge ? 422 : 503, body).ConfigureAwait(false);
+            await Error(context, exception is SourceTooLarge or SourcePortfolioTooLarge ? 422 : 503, body).ConfigureAwait(false);
         }
         catch (ArtifactByteException exception) when (!context.Response.HasStarted)
         {

@@ -45,7 +45,7 @@ public sealed class MaterializedAnalyticsTransport : IAnalyticsTransport
             while (reader.ReadLine() is { } line)
             {
                 consumed += System.Text.Encoding.UTF8.GetByteCount(line) + 1;
-                if (consumed > maximumDecompressedBytes) { throw new SourceTooLarge(maximumDecompressedBytes); }
+                if (consumed > maximumDecompressedBytes) { throw new SourceTooLarge(maximumDecompressedBytes, bytes: true); }
                 using var doc = JsonDocument.Parse(line);
                 rows.Add(doc.RootElement.EnumerateObject().ToDictionary(p => p.Name, p => JsonValue(p.Value), StringComparer.Ordinal));
             }

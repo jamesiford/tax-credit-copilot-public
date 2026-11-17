@@ -11,7 +11,7 @@ namespace TaxCredit.Infrastructure.Sources;
 
 /// <summary>SQL-served logical lakehouse payroll and its catalogue share the certified Domain port.</summary>
 public sealed class SqlClientSource(SourceScanner scanner, PayrollProjector projector, FiscalRuleAdapter fiscal,
-    FootprintGuard? guard = null)
+    FootprintGuard? guard = null, SourceLimits? limits = null)
     : IClientPayrollSource, ISourceReader, ISourceCatalogue
 {
     /// <inheritdoc />
@@ -27,11 +27,21 @@ public sealed class SqlClientSource(SourceScanner scanner, PayrollProjector proj
     public IReadOnlyList<PayRow> LoadPayPeriods(long? accountId) =>
         accountId is { } id ? LoadProjection(id)?.Rows ?? [] : [];
     /// <inheritdoc />
+    /// <remarks>
+    /// Refuses with <see cref="SourcePortfolioTooLarge"/> before holding more than the configured number of clients or
+    /// rows. Each account's size is read from the cheap scope aggregate before its payroll is, never after.
+    /// </remarks>
     public IReadOnlyDictionary<long, IReadOnlyList<PayRow>> LoadPortfolioPayPeriods()
     {
+        var bound = limits ?? SourceLimits.Default;
+        var accounts = ListAccounts();
+        if (accounts.Count > bound.PortfolioMaxAccounts) { throw SourcePortfolioTooLarge.ForAccounts(accounts.Count, bound.PortfolioMaxAccounts); }
         var result = new Dictionary<long, IReadOnlyList<PayRow>>();
-        foreach (var account in ListAccounts())
+        long running = 0;
+        foreach (var account in accounts)
         {
+            running += PayrollScope(account.AccountId).TotalRows;
+            if (running > bound.PortfolioMaxRows) { throw SourcePortfolioTooLarge.ForRows(running, bound.PortfolioMaxRows); }
             var rows = LoadPayPeriods(account.AccountId);
             if (rows.Count > 0) { result.Add(account.AccountId, rows); }
         }
