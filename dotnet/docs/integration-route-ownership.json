@@ -1,0 +1,777 @@
+{
+  "source": "route-groups.json",
+  "inventory_operations": 110,
+  "operations": [
+    {
+      "operation": "GET /openapi.json",
+      "producer": "framework",
+      "lifecycle": "accepted stored read/source/statute; writes remain coupled",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "HEAD /openapi.json",
+      "producer": "framework",
+      "lifecycle": "accepted stored read/source/statute; writes remain coupled",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /docs",
+      "producer": "framework",
+      "lifecycle": "accepted stored read/source/statute; writes remain coupled",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "HEAD /docs",
+      "producer": "framework",
+      "lifecycle": "accepted stored read/source/statute; writes remain coupled",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /docs/oauth2-redirect",
+      "producer": "framework",
+      "lifecycle": "accepted stored read/source/statute; writes remain coupled",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "HEAD /docs/oauth2-redirect",
+      "producer": "framework",
+      "lifecycle": "accepted stored read/source/statute; writes remain coupled",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /redoc",
+      "producer": "framework",
+      "lifecycle": "accepted stored read/source/statute; writes remain coupled",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "HEAD /redoc",
+      "producer": "framework",
+      "lifecycle": "accepted stored read/source/statute; writes remain coupled",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/ready",
+      "producer": "framework",
+      "lifecycle": "accepted stored read/source/statute; writes remain coupled",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/health",
+      "producer": "framework",
+      "lifecycle": "accepted stored read/source/statute; writes remain coupled",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/me",
+      "producer": "reads_calc",
+      "lifecycle": "accepted stored read/source/statute; writes remain coupled",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/eligibility/{tax_year}",
+      "producer": "reads_calc",
+      "lifecycle": "accepted stored read/source/statute; writes remain coupled",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/progress/{tax_year}",
+      "producer": "reads_calc",
+      "lifecycle": "accepted stored read/source/statute; writes remain coupled",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/forecast/{tax_year}",
+      "producer": "reads_calc",
+      "lifecycle": "accepted stored read/source/statute; writes remain coupled",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/alerts/monthly/{tax_year}",
+      "producer": "reads_calc",
+      "lifecycle": "accepted stored read/source/statute; writes remain coupled",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/triggers",
+      "producer": "reads_calc",
+      "lifecycle": "accepted stored read/source/statute; writes remain coupled",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/performance/{tax_year}",
+      "producer": "reads_calc",
+      "lifecycle": "accepted stored read/source/statute; writes remain coupled",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/onezero/matrix/{tax_year}",
+      "producer": "reads_calc",
+      "lifecycle": "accepted stored read/source/statute; writes remain coupled",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/onezero/{tax_year}",
+      "producer": "reads_calc",
+      "lifecycle": "accepted stored read/source/statute; writes remain coupled",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/onezero/{tax_year}/employee/{employee_id}",
+      "producer": "reads_calc",
+      "lifecycle": "accepted stored read/source/statute; writes remain coupled",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "POST /api/onezero/employee/{employee_id}/review",
+      "producer": "reads_calc",
+      "lifecycle": "accepted stored read/source/statute; writes remain coupled",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/designations/{state}",
+      "producer": "reads_calc",
+      "lifecycle": "accepted stored read/source/statute; writes remain coupled",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/reconcile/{tax_year}",
+      "producer": "reads_calc",
+      "lifecycle": "accepted stored read/source/statute; writes remain coupled",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/qc/{tax_year}",
+      "producer": "reads_calc",
+      "lifecycle": "accepted stored read/source/statute; writes remain coupled",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/onezero/retroactive/scan",
+      "producer": "reads_calc",
+      "lifecycle": "accepted stored read/source/statute; writes remain coupled",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/simulate/portfolio/{tax_year}",
+      "producer": "reads_calc",
+      "lifecycle": "accepted stored read/source/statute; writes remain coupled",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "POST /api/simulate/unit",
+      "producer": "reads_calc",
+      "lifecycle": "accepted stored read/source/statute; writes remain coupled",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "POST /api/simulate/employee",
+      "producer": "reads_calc",
+      "lifecycle": "accepted stored read/source/statute; writes remain coupled",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "POST /api/simulate/onezero",
+      "producer": "reads_calc",
+      "lifecycle": "accepted stored read/source/statute; writes remain coupled",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/ingestion/{tax_year}",
+      "producer": "reads_calc",
+      "lifecycle": "accepted stored read/source/statute; writes remain coupled",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "POST /api/ingestion/{tax_year}/exceptions/{exception_id}/resolve",
+      "producer": "reads_calc",
+      "lifecycle": "accepted stored read/source/statute; writes remain coupled",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/ingestion/{tax_year}/rows",
+      "producer": "reads_calc",
+      "lifecycle": "accepted stored read/source/statute; writes remain coupled",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/proximity/{tax_year}",
+      "producer": "reads_calc",
+      "lifecycle": "accepted stored read/source/statute; writes remain coupled",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/scope",
+      "producer": "reads_calc",
+      "lifecycle": "accepted stored read/source/statute; writes remain coupled",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/scope/client/{account_id}",
+      "producer": "reads_calc",
+      "lifecycle": "accepted stored read/source/statute; writes remain coupled",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/v2/clients/{client_id}/units",
+      "producer": "reads_calc",
+      "lifecycle": "accepted stored read/source/statute; writes remain coupled",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/v2/clients/{client_id}/units/{unit_id}",
+      "producer": "reads_calc",
+      "lifecycle": "accepted stored read/source/statute; writes remain coupled",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/v2/employees/{record_token}",
+      "producer": "reads_calc",
+      "lifecycle": "accepted stored read/source/statute; writes remain coupled",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "POST /api/employee/drill",
+      "producer": "reads_calc",
+      "lifecycle": "accepted stored read/source/statute; writes remain coupled",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "POST /api/clients/{client_id}/packages",
+      "producer": "claims_artifacts_rules",
+      "lifecycle": "package-generation/metadata/download/audit lifecycle",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/clients/{client_id}/artifacts/{artifact_id}",
+      "producer": "claims_artifacts_rules",
+      "lifecycle": "package-generation/metadata/download/audit lifecycle",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/audit/channel",
+      "producer": "claims_artifacts_rules",
+      "lifecycle": "claims/rules/findings plus accepted run destination",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/claims/coverage/{client_id}",
+      "producer": "claims_artifacts_rules",
+      "lifecycle": "claims/rules/findings plus accepted run destination",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/claims/coverage",
+      "producer": "claims_artifacts_rules",
+      "lifecycle": "claims/rules/findings plus accepted run destination",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/claims/cell/{client_id}/{program_code}/{tax_year}",
+      "producer": "claims_artifacts_rules",
+      "lifecycle": "claims/rules/findings plus accepted run destination",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "POST /api/claims",
+      "producer": "claims_artifacts_rules",
+      "lifecycle": "claims/rules/findings plus accepted run destination",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "POST /api/claims/cell/{client_id}/{program_code}/{tax_year}/transition",
+      "producer": "claims_artifacts_rules",
+      "lifecycle": "claims/rules/findings plus accepted run destination",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "PUT /api/claims/engagement",
+      "producer": "claims_artifacts_rules",
+      "lifecycle": "claims/rules/findings plus accepted run destination",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "POST /api/claims/assess",
+      "producer": "claims_artifacts_rules",
+      "lifecycle": "claims/rules/findings plus accepted run destination",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/claims/lifecycle",
+      "producer": "claims_artifacts_rules",
+      "lifecycle": "claims/rules/findings plus accepted run destination",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/v2/portfolio",
+      "producer": "claims_artifacts_rules",
+      "lifecycle": "claims/rules/findings plus accepted run destination",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/v2/clients/{client_id}/situation",
+      "producer": "claims_artifacts_rules",
+      "lifecycle": "claims/rules/findings plus accepted run destination",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/rules",
+      "producer": "claims_artifacts_rules",
+      "lifecycle": "claims/rules/findings plus accepted run destination",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "POST /api/rules/{code}/verify",
+      "producer": "claims_artifacts_rules",
+      "lifecycle": "claims/rules/findings plus accepted run destination",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/rules/ingested/{state}",
+      "producer": "claims_artifacts_rules",
+      "lifecycle": "claims/rules/findings plus accepted run destination",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/rules/ingested/{state}/refresh",
+      "producer": "claims_artifacts_rules",
+      "lifecycle": "claims/rules/findings plus accepted run destination",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/rules/ingested/{state}/proposals",
+      "producer": "claims_artifacts_rules",
+      "lifecycle": "claims/rules/findings plus accepted run destination",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "POST /api/rules/ingested/{state}/apply",
+      "producer": "claims_artifacts_rules",
+      "lifecycle": "claims/rules/findings plus accepted run destination",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/rules/ingested/{state}/changelog",
+      "producer": "claims_artifacts_rules",
+      "lifecycle": "claims/rules/findings plus accepted run destination",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/findings/{client_id}/{tax_year}",
+      "producer": "claims_artifacts_rules",
+      "lifecycle": "claims/rules/findings plus accepted run destination",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "POST /api/findings/{finding_id}/resolve",
+      "producer": "claims_artifacts_rules",
+      "lifecycle": "claims/rules/findings plus accepted run destination",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "POST /api/findings/{finding_id}/reopen",
+      "producer": "claims_artifacts_rules",
+      "lifecycle": "claims/rules/findings plus accepted run destination",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/findings/{client_id}/{finding_id}/history",
+      "producer": "claims_artifacts_rules",
+      "lifecycle": "claims/rules/findings plus accepted run destination",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/v2/program-drafts",
+      "producer": "drafts_runs",
+      "lifecycle": "draft-version/review/export lifecycle",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "POST /api/v2/program-drafts",
+      "producer": "drafts_runs",
+      "lifecycle": "draft-version/review/export lifecycle",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/v2/program-drafts/{draft_id}",
+      "producer": "drafts_runs",
+      "lifecycle": "draft-version/review/export lifecycle",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "PUT /api/v2/program-drafts/{draft_id}/documents",
+      "producer": "drafts_runs",
+      "lifecycle": "draft-version/review/export lifecycle",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "POST /api/v2/program-drafts/{draft_id}/validate",
+      "producer": "drafts_runs",
+      "lifecycle": "draft-version/review/export lifecycle",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "POST /api/v2/program-drafts/{draft_id}/request-review",
+      "producer": "drafts_runs",
+      "lifecycle": "draft-version/review/export lifecycle",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "POST /api/v2/program-drafts/{draft_id}/review",
+      "producer": "drafts_runs",
+      "lifecycle": "draft-version/review/export lifecycle",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "POST /api/v2/program-drafts/{draft_id}/preview",
+      "producer": "drafts_runs",
+      "lifecycle": "draft-version/review/export lifecycle",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "POST /api/v2/program-drafts/{draft_id}/withdraw",
+      "producer": "drafts_runs",
+      "lifecycle": "draft-version/review/export lifecycle",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "POST /api/v2/program-drafts/{draft_id}/export",
+      "producer": "drafts_runs",
+      "lifecycle": "draft-version/review/export lifecycle",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/v2/program-drafts/{draft_id}/export/manifest",
+      "producer": "drafts_runs",
+      "lifecycle": "draft-version/review/export lifecycle",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/v2/programs",
+      "producer": "drafts_runs",
+      "lifecycle": "program/run/override/queue/Worker/Gold/manifest authority",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/v2/programs/{code}",
+      "producer": "drafts_runs",
+      "lifecycle": "program/run/override/queue/Worker/Gold/manifest authority",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "POST /api/v2/run-batches",
+      "producer": "drafts_runs",
+      "lifecycle": "program/run/override/queue/Worker/Gold/manifest authority",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/v2/run-batches",
+      "producer": "drafts_runs",
+      "lifecycle": "program/run/override/queue/Worker/Gold/manifest authority",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/v2/run-batches/{batch_id}",
+      "producer": "drafts_runs",
+      "lifecycle": "program/run/override/queue/Worker/Gold/manifest authority",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/v2/run-batches/{batch_id}/items",
+      "producer": "drafts_runs",
+      "lifecycle": "program/run/override/queue/Worker/Gold/manifest authority",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "POST /api/v2/run-batches/{batch_id}/cancel",
+      "producer": "drafts_runs",
+      "lifecycle": "program/run/override/queue/Worker/Gold/manifest authority",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "POST /api/v2/run-batches/{batch_id}/retry-failed",
+      "producer": "drafts_runs",
+      "lifecycle": "program/run/override/queue/Worker/Gold/manifest authority",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "POST /api/v2/clients/{client_id}/units/{unit_id}/base-year",
+      "producer": "drafts_runs",
+      "lifecycle": "program/run/override/queue/Worker/Gold/manifest authority",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/v2/clients/{client_id}/units/{unit_id}/rebase",
+      "producer": "drafts_runs",
+      "lifecycle": "program/run/override/queue/Worker/Gold/manifest authority",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "POST /api/v2/clients/{client_id}/runs",
+      "producer": "drafts_runs",
+      "lifecycle": "program/run/override/queue/Worker/Gold/manifest authority",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/v2/clients/{client_id}/runs/latest",
+      "producer": "drafts_runs",
+      "lifecycle": "program/run/override/queue/Worker/Gold/manifest authority",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/capabilities",
+      "producer": "ai",
+      "lifecycle": "canonical producer/narration/conversation authority",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "POST /api/capabilities/{tool}",
+      "producer": "ai",
+      "lifecycle": "canonical producer/narration/conversation authority",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "POST /api/chat",
+      "producer": "ai",
+      "lifecycle": "canonical producer/narration/conversation authority",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "POST /api/summary",
+      "producer": "ai",
+      "lifecycle": "canonical producer/narration/conversation authority",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/workspace",
+      "producer": "workspace_sealed",
+      "lifecycle": "all eleven unavailable; reference owner",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "POST /api/workspace/refresh",
+      "producer": "workspace_sealed",
+      "lifecycle": "all eleven unavailable; reference owner",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "POST /api/workspace/source/search",
+      "producer": "workspace_sealed",
+      "lifecycle": "all eleven unavailable; reference owner",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "POST /api/workspace/eligibility/search",
+      "producer": "workspace_sealed",
+      "lifecycle": "all eleven unavailable; reference owner",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "POST /api/workspace/employee",
+      "producer": "workspace_sealed",
+      "lifecycle": "all eleven unavailable; reference owner",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/workspace/onezero/{method}",
+      "producer": "workspace_sealed",
+      "lifecycle": "all eleven unavailable; reference owner",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "POST /api/workspace/onezero/contributors",
+      "producer": "workspace_sealed",
+      "lifecycle": "all eleven unavailable; reference owner",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/workspace/calculation-walk",
+      "producer": "workspace_sealed",
+      "lifecycle": "all eleven unavailable; reference owner",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/workspace/assumptions",
+      "producer": "workspace_sealed",
+      "lifecycle": "all eleven unavailable; reference owner",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /api/workspace/comparison",
+      "producer": "workspace_sealed",
+      "lifecycle": "all eleven unavailable; reference owner",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "POST /api/workspace/comparison/stage",
+      "producer": "workspace_sealed",
+      "lifecycle": "all eleven unavailable; reference owner",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "API"
+    },
+    {
+      "operation": "GET /channel/health",
+      "producer": "gateway",
+      "lifecycle": "gateway/canonical producer/audit/session/ticket authority",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "standalone gateway"
+    },
+    {
+      "operation": "GET /channel/ready",
+      "producer": "gateway",
+      "lifecycle": "gateway/canonical producer/audit/session/ticket authority",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "standalone gateway"
+    },
+    {
+      "operation": "GET /channel/v1/tools",
+      "producer": "gateway",
+      "lifecycle": "gateway/canonical producer/audit/session/ticket authority",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "standalone gateway"
+    },
+    {
+      "operation": "POST /channel/v1/tools/{tool}",
+      "producer": "gateway",
+      "lifecycle": "gateway/canonical producer/audit/session/ticket authority",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "standalone gateway"
+    },
+    {
+      "operation": "POST /channel/v1/audit/narration",
+      "producer": "gateway",
+      "lifecycle": "gateway/canonical producer/audit/session/ticket authority",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "standalone gateway"
+    },
+    {
+      "operation": "GET /channel/v1/downloads/{ticket}",
+      "producer": "gateway",
+      "lifecycle": "gateway/canonical producer/audit/session/ticket authority",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "standalone gateway"
+    },
+    {
+      "operation": "POST /mcp",
+      "producer": "gateway",
+      "lifecycle": "gateway/canonical producer/audit/session/ticket authority",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "standalone gateway"
+    },
+    {
+      "operation": "GET /mcp",
+      "producer": "gateway",
+      "lifecycle": "gateway/canonical producer/audit/session/ticket authority",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "standalone gateway"
+    },
+    {
+      "operation": "DELETE /mcp",
+      "producer": "gateway",
+      "lifecycle": "gateway/canonical producer/audit/session/ticket authority",
+      "authority": "retain-existing-no-traffic-change",
+      "future_host": "standalone gateway"
+    }
+  ],
+  "additional_hosted_surface": "POST /responses: orchestrator; retain existing"
+}

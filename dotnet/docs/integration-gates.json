@@ -1,0 +1,185 @@
+{
+  "commands": {
+    "format": {
+      "passed": true,
+      "ms": 51609.0
+    },
+    "release_build": {
+      "passed": true,
+      "ms": 3109.0
+    },
+    "shadow_build": {
+      "passed": true,
+      "ms": 1438.0
+    },
+    "shadow_format": {
+      "passed": true,
+      "ms": 4578.0
+    },
+    "shadow_tests": {
+      "passed": true,
+      "ms": 2469.0
+    }
+  },
+  "full_fast": {
+    "totals": {
+      "total": 1559,
+      "passed": 1559,
+      "failed": 0,
+      "notExecuted": 0
+    },
+    "suites": {
+      "TaxCredit.Api.Tests": {
+        "total": 370,
+        "passed": 370,
+        "failed": 0,
+        "notExecuted": 0
+      },
+      "TaxCredit.Architecture.Tests": {
+        "total": 16,
+        "passed": 16,
+        "failed": 0,
+        "notExecuted": 0
+      },
+      "TaxCredit.Domain.Tests": {
+        "total": 18,
+        "passed": 18,
+        "failed": 0,
+        "notExecuted": 0
+      },
+      "TaxCredit.Gateway.Tests": {
+        "total": 103,
+        "passed": 103,
+        "failed": 0,
+        "notExecuted": 0
+      },
+      "TaxCredit.Infrastructure.Ai.Tests": {
+        "total": 167,
+        "passed": 167,
+        "failed": 0,
+        "notExecuted": 0
+      },
+      "TaxCredit.Infrastructure.Auth.Tests": {
+        "total": 147,
+        "passed": 147,
+        "failed": 0,
+        "notExecuted": 0
+      },
+      "TaxCredit.Infrastructure.Persistence.Tests": {
+        "total": 130,
+        "passed": 130,
+        "failed": 0,
+        "notExecuted": 0
+      },
+      "TaxCredit.Infrastructure.Sources.Tests": {
+        "total": 108,
+        "passed": 108,
+        "failed": 0,
+        "notExecuted": 0
+      },
+      "TaxCredit.Orchestrator.Tests": {
+        "total": 431,
+        "passed": 431,
+        "failed": 0,
+        "notExecuted": 0
+      },
+      "TaxCredit.Parity.Tests": {
+        "total": 61,
+        "passed": 61,
+        "failed": 0,
+        "notExecuted": 0
+      },
+      "TaxCredit.Shadow.Tests": {
+        "total": 8,
+        "passed": 8,
+        "failed": 0,
+        "notExecuted": 0
+      }
+    }
+  },
+  "full_heavy_initial": {
+    "totals": {
+      "total": 141,
+      "passed": 138,
+      "failed": 3,
+      "notExecuted": 0
+    },
+    "suites": {
+      "TaxCredit.Api.Tests": {
+        "total": 38,
+        "passed": 35,
+        "failed": 3,
+        "notExecuted": 0
+      },
+      "TaxCredit.Infrastructure.Persistence.Tests": {
+        "total": 11,
+        "passed": 11,
+        "failed": 0,
+        "notExecuted": 0
+      },
+      "TaxCredit.Infrastructure.Sources.Tests": {
+        "total": 1,
+        "passed": 1,
+        "failed": 0,
+        "notExecuted": 0
+      },
+      "TaxCredit.Parity.Tests": {
+        "total": 91,
+        "passed": 91,
+        "failed": 0,
+        "notExecuted": 0
+      }
+    }
+  },
+  "heavy_prerequisite_repair": {
+    "totals": {
+      "total": 3,
+      "passed": 3,
+      "failed": 0,
+      "notExecuted": 0
+    },
+    "suites": {
+      "TaxCredit.Api.Tests": {
+        "total": 3,
+        "passed": 3,
+        "failed": 0,
+        "notExecuted": 0
+      }
+    }
+  },
+  "final_shadow": {
+    "totals": {
+      "total": 8,
+      "passed": 8,
+      "failed": 0,
+      "notExecuted": 0
+    },
+    "suites": {
+      "TaxCredit.Shadow.Tests": {
+        "total": 8,
+        "passed": 8,
+        "failed": 0,
+        "notExecuted": 0
+      }
+    }
+  },
+  "distinct_heavy_passed": 141,
+  "remaining_heavy_failed": 0,
+  "heavy_monolithic_initial_pass": false,
+  "heavy_setup": "Three tests launch fixed Debug API/Worker DLLs; build those prerequisites, then targeted rerun. No product/test edits.",
+  "python_boundary": {
+    "tests": 24,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": true
+  },
+  "guard": {
+    "verdict": "passed",
+    "inherited_fixtures": 31,
+    "templates": 3,
+    "ownership_cases": 3
+  },
+  "scope": "Full fast before final observer extensions; final Shadow rerun covers current code/Python. Product source unchanged.",
+  "verdict": "passed-with-disclosed-initial-heavy-setup-failures"
+}

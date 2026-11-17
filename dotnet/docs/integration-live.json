@@ -1,0 +1,141 @@
+{
+  "mode": "live",
+  "admission": {
+    "approved": true,
+    "guard": "passed",
+    "capacity": "unavailable",
+    "oracle": "correct",
+    "reason": "configuration-missing",
+    "combined_ms": 1172.0
+  },
+  "groups": {
+    "framework": {
+      "planned": 2,
+      "eligible": 0,
+      "attempted": 0,
+      "paired": 0,
+      "completed": 0,
+      "inconclusive": 0,
+      "hash_matches": 0,
+      "semantic_matches": 0,
+      "failed": 0,
+      "unmeasured_reasons": [
+        "current-capacity-not-admitted",
+        "runtime-endpoints-identities-or-readonly-credentials-missing",
+        "ingress-employer-rights-or-destination-proof-missing"
+      ]
+    },
+    "reads_calc": {
+      "planned": 2,
+      "eligible": 0,
+      "attempted": 0,
+      "paired": 0,
+      "completed": 0,
+      "inconclusive": 0,
+      "hash_matches": 0,
+      "semantic_matches": 0,
+      "failed": 0,
+      "unmeasured_reasons": [
+        "current-capacity-not-admitted",
+        "runtime-endpoints-identities-or-readonly-credentials-missing",
+        "ingress-employer-rights-or-destination-proof-missing"
+      ]
+    },
+    "drafts_runs": {
+      "planned": 2,
+      "eligible": 0,
+      "attempted": 0,
+      "paired": 0,
+      "completed": 0,
+      "inconclusive": 0,
+      "hash_matches": 0,
+      "semantic_matches": 0,
+      "failed": 0,
+      "unmeasured_reasons": [
+        "current-capacity-not-admitted",
+        "runtime-endpoints-identities-or-readonly-credentials-missing",
+        "ingress-employer-rights-or-destination-proof-missing",
+        "synthetic-only-excluded"
+      ]
+    },
+    "claims_artifacts_rules": {
+      "planned": 2,
+      "eligible": 0,
+      "attempted": 0,
+      "paired": 0,
+      "completed": 0,
+      "inconclusive": 0,
+      "hash_matches": 0,
+      "semantic_matches": 0,
+      "failed": 0,
+      "unmeasured_reasons": [
+        "current-capacity-not-admitted",
+        "runtime-endpoints-identities-or-readonly-credentials-missing",
+        "ingress-employer-rights-or-destination-proof-missing",
+        "artifact-access-audit-excluded",
+        "synthetic-only-excluded",
+        "unbounded-claim-scan-excluded"
+      ]
+    },
+    "gateway": {
+      "planned": 2,
+      "eligible": 0,
+      "attempted": 0,
+      "paired": 0,
+      "completed": 0,
+      "inconclusive": 0,
+      "hash_matches": 0,
+      "semantic_matches": 0,
+      "failed": 0,
+      "unmeasured_reasons": [
+        "current-capacity-not-admitted",
+        "runtime-endpoints-identities-or-readonly-credentials-missing",
+        "ingress-employer-rights-or-destination-proof-missing",
+        "mandatory-audit-excluded"
+      ]
+    },
+    "ai": {
+      "planned": 2,
+      "eligible": 0,
+      "attempted": 0,
+      "paired": 0,
+      "completed": 0,
+      "inconclusive": 0,
+      "hash_matches": 0,
+      "semantic_matches": 0,
+      "failed": 0,
+      "unmeasured_reasons": [
+        "current-capacity-not-admitted",
+        "runtime-endpoints-identities-or-readonly-credentials-missing",
+        "ingress-employer-rights-or-destination-proof-missing",
+        "narration-or-remote-excluded",
+        "synthetic-only-excluded"
+      ]
+    },
+    "workspace_sealed": {
+      "planned": 2,
+      "eligible": 0,
+      "attempted": 0,
+      "paired": 0,
+      "completed": 0,
+      "inconclusive": 0,
+      "hash_matches": 0,
+      "semantic_matches": 0,
+      "failed": 0,
+      "unmeasured_reasons": [
+        "current-capacity-not-admitted",
+        "runtime-endpoints-identities-or-readonly-credentials-missing",
+        "ingress-employer-rights-or-destination-proof-missing",
+        "sealed-unavailable-excluded"
+      ]
+    }
+  },
+  "scratch": {
+    "used": false,
+    "created": 0,
+    "cleanup": "not-needed-no-live-scratch"
+  },
+  "protected_writes_dispatched": 0,
+  "classification": "Current live approval/admission; data comparisons unmeasured unless admitted per group",
+  "observed_utc": "2026-11-17T06:11:02.393628+00:00"
+}

@@ -1,0 +1,133 @@
+{
+  "session": "integration",
+  "branch": "dotnet/w4-integration",
+  "head": "cb10457",
+  "summary": "NOT READY FOR CUTOVER. Bounded, privacy-safe shadow harness and complete evidence/runbook delivered.\nRelease build/format and 1,559 fast tests pass; 141 distinct heavy cases pass across a disclosed 138/3 initial run and three repaired-prerequisite reruns.\nFinal owned boundary: eight xUnit, 24 Python, 31 inherited SQL fixtures, three templates and three ownership cases pass.\nFresh API: 1,514 steps/2,311 raw fields; independent gateway: 255 HTTP/523 raw fields, adjusted 236/255.\nExact current policy retains 637 unresolved fields; framework is sub-40 cap-exempt, not repaired.\nSeven canonical cross-surface comparisons match; 18 paired synthetic read samples retain first/warm timings and no observed HTTP/transport failures.\nLive approval exists, but capacity/access is unproved due missing Warehouse configuration: zero live data attempts.\nNo protected writes, scratch, deployment, traffic switch, product/contract changes or push. No new product waivers.",
+  "stages": {
+    "I1": "done",
+    "I2": "done",
+    "I3": "partial",
+    "I4": "done",
+    "I5": "done",
+    "I6": "done"
+  },
+  "gates_claimed": {
+    "no_halt": true,
+    "commits_present": true,
+    "clean_tree": true,
+    "not_pushed": true,
+    "owned_paths": true,
+    "status_json": true,
+    "report_present": true,
+    "stages_done": true,
+    "release_build": true,
+    "format": true,
+    "fast_tests": true,
+    "distinct_heavy_cases_have_passing_evidence": true,
+    "dual_host_replay_completed_with_disclosed_differences": true
+  },
+  "deviations": [
+    {
+      "id": "DEV-1",
+      "what": "Live coverage is explicitly unmeasured; I3 is partial.",
+      "why": "Current approval is insufficient without capacity/configuration, safe runtime endpoints/read-only credentials and proven ingress/employer/right/destination binding. No activation or provisioning is authorized.",
+      "decision_needed": true
+    },
+    {
+      "id": "DEV-2",
+      "what": "Historical framework-cap halt is not a current scoring blocker.",
+      "why": "Current cap_min_exchanges=40 exempts 17 framework exchanges; nine waived passes/52.94% and all raw differences remain visible.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-3",
+      "what": "Drafts score 312/323 under exact current patterns, not the old helper's 313/323.",
+      "why": "p2_run_batches:unknown-client detail.detail is not a globally free current path. It remains unresolved; no regex or source register was broadened.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-4",
+      "what": "Heavy evidence is 141 distinct passing cases across disclosed runs, not an initially green monolithic run.",
+      "why": "Three inherited executable tests require hard-coded Debug host DLLs absent after Release-only build. Building those prerequisites and rerunning exactly the failures passes all three without product/test edits.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-5",
+      "what": "Shadow-owned launch/build setup replaces neither product behavior nor contract setup.",
+      "why": "Direct Release DLL launch avoids the old launcher's root SDK selection. Explicit owned-project build prevents a stale out-of-solution executable. Public fixture commit metadata is preserved; initial setup attempts are retained separately.",
+      "decision_needed": false
+    },
+    {
+      "id": "DEV-6",
+      "what": "Native eligibility and draft reads were slower in the small local HTTP sample.",
+      "why": "Shared-workstation, synthetic SQLite observations are not production regressions or live Fabric speedups; no SLO or acceptance threshold exists.",
+      "decision_needed": true
+    }
+  ],
+  "findings": [
+    "M-01 overrides year-resolved wage_basis/measuring_date/pay codes despite ADR-005. Preserve figures until statutory/domain reconciliation.",
+    "First-program multi-program pricing, zero-worksite SQL/projector, leap/context, QC-drop, legacy fiscal/year/benefit and historical override-order seams remain inherited figure-sensitive decisions.",
+    "F-14's four named valid-request reader exceptions remain owner-sensitive; general writer policy is not permission to change them.",
+    "Standalone gateway remains 19 cases/49 fields short: two MCP person-lane refusals/16, two missing-dataset catalogues/17, fifteen real allocation-drift cases/16.",
+    "Native monetary AVG/decimal string scale, metadata, schema/grants and supplemental operational tables are not proved by SQLite or typed payload tests.",
+    "Unknown-client nested error wording is outside exact current global paths. Recorded list metadata semantics supersede obsolete page-independent demands.",
+    "Gateway read tools audit, links mint tickets and downloads can consume/audit. None is a live read-only mirror.",
+    "Override save/queue acceptance is non-atomic; synchronous compute has a 600-second lease without periodic renewal.",
+    "Gateway key exclusion is host-local; orchestrator checkpoints/budgets are in-memory and production resultLookup/recovery endpoint is absent.",
+    "Private 10,236/539/656 is not certified; all eleven sealed operations stay unavailable. Synthetic 81/51/49 is distinct."
+  ],
+  "open_questions": [
+    "The named owners must accept or repair the source-linked producer residuals before a traffic slice.",
+    "Approved live runtime inputs, actual native rights/type/schema evidence, trusted ingress and employer binding remain unavailable.",
+    "Production SLO, workload, evidence freshness window, observation period and rollback thresholds are unset.",
+    "Fleet idempotency, restart/replica checkpoint retention and uncertain-write recovery require an explicit operational design."
+  ],
+  "needs_human": [
+    {"item":"DEC-M01 - statutory/domain owner","why":"Reconcile ingestion overrides versus ADR-005; no figure change without owner approval."},
+    {"item":"DEC-MULTI-PROGRAM - statutory/domain owner","why":"Decide contextual first-program pricing while preserving the current valid figures."},
+    {"item":"DEC-ZERO-WORKSITE - source/calculation owners","why":"Resolve SQL COALESCE versus falsy projector fallback and quantify the figure impact."},
+    {"item":"DEC-LEAP - application/domain/statutory owners","why":"Design a context-carrying inward fiscal port before changing strict leap-shift/calendar fallback behavior."},
+    {"item":"DEC-NATIVE-MONEY - persistence/client-contract owners","why":"Prove native AVG/datetime/DECIMAL metadata and agree exact decimal-string scale; no float or scale waiver."},
+    {"item":"DEC-QC-DROP - calculation/QC owners","why":"Decide and reconcile whether persisted QC-drop annotations affect actual run computation."},
+    {"item":"DEC-LEGACY-FISCAL - ReadsCalc/statutory owners","why":"Reconcile legacy fiscal/tax-year/scalar-benefit paths without unilateral changes."},
+    {"item":"DEC-OVERRIDE-ORDER - persistence/operations owners","why":"A new sequence cannot recover historical equal-time intent; ambiguous history needs explicit reconciliation."},
+    {"item":"DEC-F14 - authorization/business owners","why":"Decide the four named valid-request reader entitlement exceptions explicitly."},
+    {"item":"DEC-GATEWAY-LANE - privacy/authorization/gateway owners","why":"Reconcile two MCP person-derived fact refusals; privacy rationale is not a missing-fact waiver."},
+    {"item":"DEC-GATEWAY-DATASETS - source/governed-query/gateway owners","why":"Bind payroll/location/pay_code and verify the complete eleven-dataset catalogue/query contract."},
+    {"item":"DEC-ALLOCATION - application/persistence/gateway owners","why":"Resolve genuine post-preview identity-allocation history without dummy draws or response rewrites."},
+    {"item":"DEC-STORAGE-BOUNDS - claims/rules/persistence owners","why":"Choose a compatible contract for long valid program/rule text that currently exceeds storage limits; never truncate or waive a 500."},
+    {"item":"DEC-READ-RESIDUALS - producer owners","why":"Repair exact current status/stored-program/base-year/run-ID/scale residuals. Conductor policy review is needed if nested detail.detail wording is intended free."},
+    {"item":"DEC-NATIVE-SCHEMA - database/deployment/persistence owners","why":"Apply reviewed Python forward migrations/grants, including supplemental audit/sequence/work/source tables, and prove native behavior."},
+    {"item":"DEC-OVERRIDE-QUEUE - drafts/runs/persistence owners","why":"Agree atomicity or explicit repair for saved override intent with failed queue acceptance; an unchanged resave is not repair."},
+    {"item":"DEC-LEASE - calculation/queue/operations owners","why":"Prove long native work and recovery under the non-heartbeating 600-second synchronous-compute lease."},
+    {"item":"DEC-FINGERPRINT - source/audit owners","why":"Accept count/max limitations or supply a stronger version source; it is not snapshot/sync-lag/freshness proof."},
+    {"item":"DEC-EXPORTER - observability/deployment owners","why":"Prove safe real exporter receipt/redaction; instrumentation registration or unmerged assets are insufficient."},
+    {"item":"DEC-INGRESS - identity/security/deployment owners","why":"Prove trusted header stripping/replacement, direct-origin isolation, audience/acting-person validity and employer binding."},
+    {"item":"DEC-GATEWAY-IDEMPOTENCY - gateway/persistence owners","why":"Agree durable fleet key exclusion/retention or a reviewed single-authority constraint."},
+    {"item":"DEC-CHECKPOINTS - orchestrator/operations owners","why":"Agree restart/replica affinity and retention for process-local checkpoints, confirmations and budgets."},
+    {"item":"DEC-RESULT-RECOVERY - gateway/orchestrator/operations owners","why":"Design recovery for unknown acknowledgements; there is no production resultLookup/recovery endpoint and blind retry is unsafe."},
+    {"item":"DEC-ONE-WRITER - API/queue/persistence/change owners","why":"Approve one writer/Worker authority and one accepted Gold/manifest destination, including in-flight lease drain/reconciliation."},
+    {"item":"DEC-ARTIFACTS - artifact/gateway/operations owners","why":"Keep package generations, metadata, bytes, access audit and expiring/single-use tickets coherent through transition/rollback."},
+    {"item":"DEC-SEALED - reference-data/statutory owners","why":"Obtain separately approved private-extract reconciliation before certifying 10,236/539/656 or moving any sealed operation."},
+    {"item":"DEC-LIVE - environment/identity/database operators","why":"Supply runtime-only safe approved inputs and fresh current admission; no activation, deployment or new grants in shadow."},
+    {"item":"DEC-PERFORMANCE - service/capacity/business owners","why":"Agree workload, freshness/observation windows and median/tail/failure acceptance criteria before any slice."}
+  ],
+  "reports": [
+    "dotnet/docs/FINAL-REPORT.md",
+    "dotnet/docs/CUTOVER-RUNBOOK.md",
+    "dotnet/docs/SHADOW-DEVIATIONS.json",
+    "dotnet/docs/SHADOW-DEVIATIONS.md",
+    "dotnet/docs/integration-provenance.json",
+    "dotnet/docs/integration-gates.json",
+    "dotnet/docs/integration-replay.json",
+    "dotnet/docs/integration-live.json",
+    "dotnet/docs/integration-performance.json",
+    "dotnet/docs/integration-cross-surface.json",
+    "dotnet/docs/integration-safety.json",
+    "dotnet/docs/integration-route-ownership.json",
+    "dotnet/docs/integration-log.md",
+    "dotnet/docs/improvements/integration.json",
+    "dotnet/docs/status/integration.json",
+    "dotnet/spikes/shadow/README.md"
+  ]
+}
