@@ -1,11 +1,41 @@
-# Shared API and Worker composition
+# API, gateway and Worker composition
 
 The ordinary .NET 10 API and Worker share real W1 adapters through
 `TaxCredit.ServiceDefaults.Hosting.AddTaxCreditRuntime`. Framework probes,
-documentation, contract controls and the missing-reference workspace are real;
-business and gateway handlers remain deferred JSON **501** operations.
-The API retains all **110 captured method/template pairs**. Composition is not
-a claim that the next wave's business features are implemented.
+documentation, contract controls and the missing-reference workspace share
+that composition with implemented business feature groups. The standalone
+gateway reuses application services in-process; it requires no API listener.
+The API retains all **110 captured method/template pairs**, including the
+gateway placeholders; channel clients use the gateway executable instead.
+
+## W3 standalone gateway and repeatable dual-host replay
+
+`TaxCredit.Gateway` references the API composition library, Application and
+ServiceDefaults. `GatewayHost.Build` calls `AddSkeletonHost` before provider
+construction and `UseSkeletonHost` afterwards. It maps only channel/MCP,
+download, process-health and opt-in contract-control endpoints; it does not
+map portal endpoints, `/docs` or `/openapi.json`. The API and Worker do not
+reference the gateway. No loopback HTTP client or separate API is needed by
+gateway tools. The orchestrator is a separate Responses host that calls the
+gateway REST surface with verified acting-person assertions.
+
+Build first, then run both contract replays unattended from the worktree root:
+
+```powershell
+dotnet build .\dotnet\TaxCredit.slnx -warnaserror
+& C:\Projects\py312-oracle\.venv\Scripts\python.exe .\dotnet\docs\run_wave_replays.py --out .\dotnet\artifacts\w3-replay
+```
+
+The runner starts each ordinary executable with `dotnet run --no-build
+--no-launch-profile`, the conductor's `TCC_CONTRACT_DIR` marker, an isolated
+SQLite database/artifact directory and a free loopback port. It verifies
+CPython 3.12 and health, invokes the unchanged public `contract.replay` from
+`backend` with root `PYTHONPATH`, semantic mode and the reset URL, and always
+stops its own child host. Scenario setup/reset/mint/drain is automatic.
+Nine API scenarios run against the API; the three `g1_` scenarios run against
+the gateway. `--scenario g1_rest` selects a complete individual scenario.
+Reports distinguish raw differences from policy scoring: runner exit success
+means both replays completed, not that every field matched.
 
 ## Ownership and registration
 
@@ -30,7 +60,7 @@ The group ownership is:
 | drafts_runs | DraftsRuns | Drafts/programs/batches and trend run/base-year/rebase routes |
 | ai | Ai | Chat, summary and capabilities |
 | workspace_sealed | WorkspaceSealed | All eleven captured workspace routes |
-| gateway | Gateway | Channel and MCP; deferred |
+| gateway | Separate `TaxCredit.Gateway` executable | Channel, MCP and downloads |
 
 Folders are relative to `src/TaxCredit.Api/Endpoints/`,
 `src/TaxCredit.Application/Features/` and `tests/TaxCredit.Api.Tests/`.
@@ -59,7 +89,7 @@ tests; update captured inventory through its owner, not within this session.
 
 Endpoint groups import Application, not infrastructure. Outward adapter wiring
 lives in ServiceDefaults; inward execution lives in Application Hosting/Ports.
-Neither executable references the other. Domain and the W1 Sources/Auth/AI
+The API and Worker do not reference one another. Domain and the W1 Sources/Auth/AI
 implementations are unchanged. `AddSkeletonHost` / `MapSkeletonHost` retain
 their compatibility names but now use the real composition.
 
@@ -177,8 +207,9 @@ Ordinary launches and direct DLL/deployed execution gain no hook default.
 
 Reset accepts a body profile, a `?profile=` query, or the startup
 `TCC_CONTRACT_PROFILE`, with P1 as the default. P1/P2/G1/G1L are supported.
-The replay sends `{}` to reset, so the wrapper supplies each scenario's profile
-through the reset URL. `RuntimeContractWork` loads real Gold/operational/source
+The public replay sends the scenario's declared profile to reset and applies
+its authentication/writer/rate-limit setup before minting.
+`RuntimeContractWork` loads real Gold/operational/source
 seeds, restores caches and snapshots, and drains the shared durable executor.
 G1/G1L use P1, matching the harness; P2 selects staged materialized analytics
 using the existing SQL source projector/fiscal adapters. P1 selects CSV.
@@ -189,7 +220,8 @@ hermetic host, real sources otherwise. Minting uses a startup-generated,
 in-memory RSA key, validated cryptographically by the real RS256 validator
 through a hook-only key bridge. No token, key or token-lookup digest is retained.
 Seed loading consumes no UUID calls, so reset resumes the independent UUID
-counter after the seed high-water mark (P1: three; P2: twenty-six) while restarting
+counter after the seed and four real startup trace allocations (P1: seven;
+P2: thirty) while restarting
 the independent secret counter. Normal hosts use real time/randomness.
 
 Framework health/readiness dispatch Application queries. Startup and control

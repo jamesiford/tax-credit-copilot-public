@@ -28,15 +28,19 @@ internal sealed partial class CapabilityData(IGoldDataQueryPort query, IGoldRead
         {
             spec = spec with { Method = null };
         }
+        if (spec.Select.Count == 0 && spec.Measures.Count == 0)
+        {
+            throw new CapabilityException(422, "empty_query", "Select at least one column or measure.");
+        }
+        if (tool == "data_distinct_values")
+        {
+            return Distinct(args, spec, dataset, writer, cancellationToken);
+        }
         var raw = IsEmployeeResult(dataset, spec);
         if (raw && !writer && !(principal.IsAgent && principal.ActingFor?.IsFirstParty == true))
         {
             throw new CapabilityException(403, "employee_level_not_allowed",
                 "Employee-level rows are available only in an entitled first-party channel or to a writer. Ask for an aggregate instead.");
-        }
-        if (tool == "data_distinct_values")
-        {
-            return Distinct(args, spec, dataset, writer, cancellationToken);
         }
         var enforceGroups = dataset.EmployeeLevel && spec.Measures.Count != 0 && !writer;
         var running = enforceGroups ? WithGroupSize(spec, dataset) : spec;
@@ -137,10 +141,15 @@ internal sealed partial class CapabilityData(IGoldDataQueryPort query, IGoldRead
     private CapabilityResult Distinct(JsonObject args, GoldQuerySpec spec, GoldQueryDataset dataset, bool writer, CancellationToken cancellationToken)
     {
         var column = args["column"]!.GetValue<string>();
-        var category = dataset.Columns.FirstOrDefault(entry => entry.Name == column);
-        if (category is null || category.Sensitivity != "public_aggregate" || category.Role is not ("dimension" or "flag"))
+        var category = dataset.Columns.FirstOrDefault(entry => entry.Name == column)
+            ?? throw ColumnRefusal("unknown_column", "No such column in that dataset; read the catalogue for its names.");
+        if (category.Sensitivity == "blocked")
         {
-            throw new CapabilityException(422, "column_not_listable", "Only public category columns may be listed.");
+            throw ColumnRefusal("blocked_column", "That column can never be listed.");
+        }
+        if (category.Sensitivity != "public_aggregate" || category.Role is not ("dimension" or "flag"))
+        {
+            throw ColumnRefusal("column_not_listable", "Only public category columns may be listed.");
         }
         if (dataset.EmployeeLevel && !writer)
         {
@@ -176,6 +185,9 @@ internal sealed partial class CapabilityData(IGoldDataQueryPort query, IGoldRead
                 JsonSerializer.SerializeToNode(gold.LatestRun(spec.ClientId)), Source(spec.Dataset)),
         };
     }
+
+    private static CapabilityException ColumnRefusal(string code, string message) =>
+        new(422, code, message, extra: new JsonObject { ["field"] = "column" });
 
     private static string Source(string dataset) => $"Source: warehouse {(dataset == "run_manifest" ? "tcc_ops" : "tcc_gold")}.{dataset}";
 }

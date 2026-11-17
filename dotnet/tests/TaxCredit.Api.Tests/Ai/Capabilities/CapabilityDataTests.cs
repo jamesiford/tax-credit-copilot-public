@@ -7,6 +7,25 @@ namespace TaxCredit.Api.Tests.Ai.Capabilities;
 
 public sealed class CapabilityDataTests
 {
+    [Theory]
+    [InlineData("data_query", """{"dataset":"employee_eligibility","client_id":42}""", "empty_query", null)]
+    [InlineData("data_distinct_values", """{"dataset":"employee_eligibility","client_id":42,"column":"unknown"}""", "unknown_column", "column")]
+    [InlineData("data_distinct_values", """{"dataset":"employee_eligibility","client_id":42,"column":"employee_id"}""", "blocked_column", "column")]
+    [InlineData("data_distinct_values", """{"dataset":"employee_eligibility","client_id":42,"column":"record_token"}""", "column_not_listable", "column")]
+    public async Task Invalid_questions_are_classified_before_person_lane_checks_without_querying(
+        string tool, string arguments, string code, string? field)
+    {
+        using var harness = new CapabilityHarness();
+        using var scope = harness.Principals.Push(new ApiPrincipal(Oid: "service", PrincipalType: "agent",
+            ActingFor: new ActingUser("reader", Channel: "cowork")));
+        var error = await Assert.ThrowsAsync<CapabilityException>(() =>
+            harness.Service.InvokeAsync(tool, JsonNode.Parse(arguments)!.AsObject()));
+        Assert.Equal(422, error.StatusCode);
+        Assert.Equal(code, error.Code);
+        Assert.Equal(field, error.Body()["error"]!["field"]?.GetValue<string>());
+        Assert.Empty(harness.Queries);
+    }
+
     [Fact]
     public async Task Numeric_filters_reach_the_warehouse_as_provider_supported_exact_scalars()
     {
