@@ -25,8 +25,18 @@ public interface ISourceReader
     bool IsConfigured { get; }
     /// <summary>Source accounts, not claims or generated identities.</summary>
     IReadOnlyList<SourceAccount> ListAccounts();
-    /// <summary>States per held client, never attributed dollars.</summary>
+    /// <summary>States per held client in the book, never attributed dollars; never an untenanted scan.</summary>
     IReadOnlyDictionary<long, IReadOnlyList<string>> Footprint();
+    /// <summary>
+    /// States for only the named clients. The default narrows <see cref="Footprint()"/>; a source that can read less
+    /// (SQL, in batches of bounded size) overrides it so a page or a batch never pays for the whole book.
+    /// </summary>
+    IReadOnlyDictionary<long, IReadOnlyList<string>> Footprint(IReadOnlyCollection<long> accountIds)
+    {
+        ArgumentNullException.ThrowIfNull(accountIds);
+        var wanted = accountIds.ToHashSet();
+        return Footprint().Where(p => wanted.Contains(p.Key)).ToDictionary(p => p.Key, p => p.Value);
+    }
 }
 
 /// <summary>Read-side aggregates over the same projected population.</summary>
@@ -87,6 +97,26 @@ public sealed class UnsupportedNonfinitePayroll()
 /// <summary>Only classified transport failures permit opt-in fiscal fallback.</summary>
 public sealed class SourceUnavailable(string dependency = "source_sql")
     : SourceFailureException("source_unavailable", dependency, "Restore the source connection or configure an approved offline fiscal fallback.");
+
+/// <summary>A statement exceeded its own timeout and was cancelled on the server; this is not an outage, so it never enables fiscal fallback.</summary>
+public sealed class SourceTimedOut(int seconds)
+    : SourceFailureException("source_timeout", "source_sql", "Raise the statement timeout or narrow the read.")
+{
+    /// <summary>The timeout that elapsed.</summary>
+    public int Seconds { get; } = seconds;
+}
+
+/// <summary>The payroll footprint was refused, switched off or timed out; the rest of the source still answers.</summary>
+public sealed class SourceFootprintUnavailable(string code, string reason, string remedy)
+    : SourceFailureException(code, "source_sql", remedy)
+{
+    /// <summary>What the page cannot say while this holds; the same wording is shown to the person reading it.</summary>
+    public const string ImpactText = "where each client operates is unknown, so the footprint map and the state filters are empty";
+    /// <summary>Why the footprint was not read.</summary>
+    public string Reason { get; } = reason;
+    /// <summary>The consequence for the reader.</summary>
+    public string Impact { get; } = ImpactText;
+}
 
 /// <summary>No connection can be attempted, distinct from unknown account and empty payroll.</summary>
 public sealed class SourceNotConfigured()

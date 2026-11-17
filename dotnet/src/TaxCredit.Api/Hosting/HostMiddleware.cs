@@ -81,8 +81,10 @@ public sealed class HostMiddleware(RequestDelegate next, ILogger<HostMiddleware>
         }
         catch (SourceFailureException exception) when (!context.Response.HasStarted)
         {
-            await Error(context, exception is SourceTooLarge ? 422 : 503,
-                new { code = exception.Code, dependency = exception.Dependency, remedy = exception.Remedy }).ConfigureAwait(false);
+            object body = exception is SourceFootprintUnavailable footprint
+                ? new { code = exception.Code, dependency = exception.Dependency, remedy = exception.Remedy, reason = footprint.Reason, impact = footprint.Impact }
+                : new { code = exception.Code, dependency = exception.Dependency, remedy = exception.Remedy };
+            await Error(context, exception is SourceTooLarge ? 422 : 503, body).ConfigureAwait(false);
         }
         catch (ArtifactByteException exception) when (!context.Response.HasStarted)
         {

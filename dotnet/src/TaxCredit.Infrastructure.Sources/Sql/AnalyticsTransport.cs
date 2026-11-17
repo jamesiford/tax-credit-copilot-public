@@ -8,7 +8,7 @@ namespace TaxCredit.Infrastructure.Sources.Sql;
 /// <summary>A planned read contains explicit SQL plus its logical projection for hermetic fixture execution.</summary>
 public sealed record AnalyticsQuery(string Sql, IReadOnlyList<object?> Parameters, string Table,
     IReadOnlyDictionary<string, string> Columns, string? FilterField = null,
-    IReadOnlyList<object?>? FilterValues = null, string Kind = "scan")
+    IReadOnlyList<object?>? FilterValues = null, string Kind = "scan", int? TimeoutSeconds = null)
 {
     /// <summary>Never print bound values, SQL, or physical names in diagnostics.</summary>
     public override string ToString() => "AnalyticsQuery(" + Kind + ")";
@@ -138,7 +138,7 @@ public sealed class SqlAnalyticsTransport(AnalyticsConnectionFactory factory) : 
         using var lease = Acquire(cancellationToken);
         using var command = lease.Connection.CreateCommand();
         command.CommandText = query.Sql;
-        command.CommandTimeout = factory.CommandTimeoutSeconds;
+        command.CommandTimeout = query.TimeoutSeconds is > 0 and var own ? own : factory.CommandTimeoutSeconds;
         for (var i = 0; i < query.Parameters.Count; i++)
         {
             var value = query.Parameters[i];
@@ -146,9 +146,9 @@ public sealed class SqlAnalyticsTransport(AnalyticsConnectionFactory factory) : 
             parameter.Value = value ?? DBNull.Value;
         }
         using var registration = cancellationToken.Register(command.Cancel);
-        using var reader = Execute(command, cancellationToken);
+        using var reader = Execute(command, query, cancellationToken);
         var names = query.Columns.Keys.ToArray();
-        while (Next(reader, cancellationToken))
+        while (Next(reader, query, cancellationToken))
         {
             yield return Materialize(reader, names, cancellationToken);
         }
@@ -190,17 +190,17 @@ public sealed class SqlAnalyticsTransport(AnalyticsConnectionFactory factory) : 
         catch { connection.Dispose(); throw; }
     }
 
-    private static SqlDataReader Execute(SqlCommand command, CancellationToken cancellationToken)
+    private static SqlDataReader Execute(SqlCommand command, AnalyticsQuery query, CancellationToken cancellationToken)
     {
         try { return command.ExecuteReader(CommandBehavior.SequentialAccess); }
-        catch (SqlException error) { cancellationToken.ThrowIfCancellationRequested(); throw SqlFailure(error.Number); }
+        catch (SqlException error) { cancellationToken.ThrowIfCancellationRequested(); throw SqlFailure(error.Number, query); }
     }
 
-    private static bool Next(DbDataReader reader, CancellationToken cancellationToken)
+    private static bool Next(DbDataReader reader, AnalyticsQuery query, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         try { return reader.Read(); }
-        catch (SqlException error) { cancellationToken.ThrowIfCancellationRequested(); throw SqlFailure(error.Number); }
+        catch (SqlException error) { cancellationToken.ThrowIfCancellationRequested(); throw SqlFailure(error.Number, query); }
     }
 
     private static Dictionary<string, object?> Materialize(DbDataReader reader, string[] names, CancellationToken cancellationToken)
@@ -213,6 +213,10 @@ public sealed class SqlAnalyticsTransport(AnalyticsConnectionFactory factory) : 
         }
         catch (SqlException error) { cancellationToken.ThrowIfCancellationRequested(); throw SqlFailure(error.Number); }
     }
+
+    /// <summary>A timeout (-2) on a statement that set its own limit is a typed cancellation, not an outage; other queries keep today's mapping.</summary>
+    internal static SourceFailureException SqlFailure(int number, AnalyticsQuery query) =>
+        number == -2 && query.TimeoutSeconds is > 0 and var seconds ? new SourceTimedOut(seconds) : SqlFailure(number);
 
     internal static SourceFailureException SqlFailure(int number) => number switch
     {

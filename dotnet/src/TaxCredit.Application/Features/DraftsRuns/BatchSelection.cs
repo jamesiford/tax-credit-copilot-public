@@ -16,6 +16,9 @@ public sealed class BatchSelection(IClaimRepository claims, RuleLibrary rules)
         foreach (var client in clients) { _ = Read(client); }
     }
 
+    /// <summary>Whether the filter has a state criterion, the only part of a filter that needs the payroll footprint.</summary>
+    internal static bool NeedsStates(PyDict filter) => Text(filter, "state") is { Length: > 0 };
+
     internal bool Matches(long client, PyDict filter, IReadOnlyList<string> states)
     {
         if (Text(filter, "state") is { Length: > 0 } state && !states.Contains(state, StringComparer.OrdinalIgnoreCase)) { return false; }

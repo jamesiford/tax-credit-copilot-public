@@ -25,7 +25,6 @@ internal sealed class GetPortfolioHandler(IClaimRepository repository, ISourceRe
         var grouped = all.Where(c => request.Year is null || c.TaxYear == request.Year).GroupBy(c => c.ClientId).OrderBy(g => g.Key).ToArray();
         var accounts = source.ListAccounts();
         var byId = accounts.ToDictionary(a => a.AccountId);
-        var footprint = source.Footprint();
         var priceable = rules.LoadRegistry().Active().Where(e => e.State is not null && rules.AuthoredYears(e.PackFile).Count > 0)
             .Select(e => e.State!).ToHashSet(StringComparer.Ordinal);
         var descending = request.Order.Equals("desc", StringComparison.OrdinalIgnoreCase);
@@ -52,14 +51,11 @@ internal sealed class GetPortfolioHandler(IClaimRepository repository, ISourceRe
             }
         }
         var rows = PortfolioOrdering.Sort(ranked, request.Sort, descending).Concat(unassessed).ToArray();
-        foreach (var row in rows)
-        {
-            var states = footprint.GetValueOrDefault((long)row["client_id"]!) ?? [];
-            row.Add("states", states).Add("priceable_states", states.Where(priceable.Contains).ToArray());
-        }
+        var page = rows.Skip(request.Offset).Take(request.Limit).ToArray();
+        var degraded = AttachStates(page, priceable);
         return ValueTask.FromResult<object>(new
         {
-            items = rows.Skip(request.Offset).Take(request.Limit).ToArray(),
+            items = page,
             total = rows.Length,
             limit = request.Limit,
             offset = request.Offset,
@@ -74,10 +70,34 @@ internal sealed class GetPortfolioHandler(IClaimRepository repository, ISourceRe
             total_clients = accounts.Count == 0 ? rows.Length : accounts.Count,
             assessed_clients = grouped.Length,
             unavailable_clients = 0,
-            degraded = Array.Empty<object>(),
+            degraded,
             unassessed_clients = unassessed.Count,
             _note = "One row per client, with the most actionable matching cell surfaced. Ranking is by the jobs gap when possible, because a cell worth $0 can still be the one to call. Clients never assessed are included with null money \u2014 not zero \u2014 and sort after the ranked rows.",
         });
+    }
+
+    /// <summary>
+    /// States are read for the rows on the page only, so a page of ten asks the source for ten clients however large the
+    /// book is. A footprint the source will not read leaves the states empty and says so, rather than failing the page.
+    /// </summary>
+    private object[] AttachStates(PyDict[] page, HashSet<string> priceable)
+    {
+        IReadOnlyDictionary<long, IReadOnlyList<string>> footprint = new Dictionary<long, IReadOnlyList<string>>();
+        object[] degraded = [];
+        if (page.Length > 0)
+        {
+            try { footprint = source.Footprint(page.Select(row => (long)row["client_id"]!).Distinct().ToArray()); }
+            catch (SourceFootprintUnavailable unavailable)
+            {
+                degraded = [new PyDict().Add("dependency", unavailable.Dependency).Add("impact", unavailable.Impact).Add("remedy", unavailable.Remedy)];
+            }
+        }
+        foreach (var row in page)
+        {
+            var states = footprint.GetValueOrDefault((long)row["client_id"]!) ?? [];
+            row.Add("states", states).Add("priceable_states", states.Where(priceable.Contains).ToArray());
+        }
+        return degraded;
     }
 
     private Dictionary<string, EngagementScope?> Scopes(long id) => repository.Engagements(id)

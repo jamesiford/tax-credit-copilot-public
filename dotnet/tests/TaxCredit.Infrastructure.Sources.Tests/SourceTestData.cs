@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Text.Json;
+using TaxCredit.Application.Ports.Sources;
 using TaxCredit.Domain.Programs;
 using TaxCredit.Infrastructure.Rules;
 using TaxCredit.Infrastructure.Sources.Fiscal;
@@ -73,14 +74,14 @@ internal static class SourceTestData
 
     internal static (SqlClientSource Source, SourceScanner Scanner, RecordingTransport Transport) Source(
         Dictionary<string, IReadOnlyList<IReadOnlyDictionary<string, object?>>>? tables = null,
-        SourceMapping? mapping = null, long limit = 10000)
+        SourceMapping? mapping = null, long limit = 10000, FootprintGuard? guard = null)
     {
         var active = mapping ?? SourceMapping.Load();
         var transport = new RecordingTransport(new MaterializedAnalyticsTransport(active, tables ?? MiniTables(active)));
         var scanner = new SourceScanner(transport, active, maximumRows: limit);
         var lookups = Lookups();
         return (new SqlClientSource(scanner, new PayrollProjector(active, lookups),
-            new FiscalRuleAdapter(Library(), new SqlFiscalRuleReader(scanner), lookups)), scanner, transport);
+            new FiscalRuleAdapter(Library(), new SqlFiscalRuleReader(scanner), lookups), guard), scanner, transport);
     }
 
     internal static JsonDocument Oracle(string mode, object input)
@@ -120,6 +121,10 @@ internal sealed class RecordingTransport(IAnalyticsTransport inner) : IAnalytics
     internal int RowsSent { get; private set; }
     internal int DisposedStreams { get; private set; }
     internal Exception? Failure { get; set; }
+    /// <summary>What the catalogue estimate query answers; null means the endpoint has no estimate.</summary>
+    internal long? Estimate { get; set; }
+    /// <summary>Statement kinds the server cancels at their own timeout.</summary>
+    internal HashSet<string> TimeOut { get; } = [];
     public bool IsConfigured { get; set; } = true;
     public IReadOnlyList<string> Columns(string schema, string physicalTable, CancellationToken cancellationToken = default)
     {
@@ -131,6 +136,12 @@ internal sealed class RecordingTransport(IAnalyticsTransport inner) : IAnalytics
     {
         Queries.Add(query);
         if (Failure is not null) { throw Failure; }
+        if (TimeOut.Contains(query.Kind)) { throw new SourceTimedOut(query.TimeoutSeconds ?? 0); }
+        if (query.Kind == "estimate")
+        {
+            if (Estimate is { } rows) { yield return new Dictionary<string, object?> { ["rows"] = rows }; }
+            yield break;
+        }
         try
         {
             foreach (var row in inner.Read(query, cancellationToken)) { RowsSent++; yield return row; }

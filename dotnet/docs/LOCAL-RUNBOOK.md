@@ -52,6 +52,10 @@ You normally set none by hand. `backend\.env` is the single input; `dotnet\local
 | `OPERATIONAL_DB` | `dotnet\artifacts\local\operations.db` | Path of the SQLite store. |
 | `ARTIFACT_LOCAL_ROOT` | `dotnet\artifacts\local\bytes` | Where artifact bytes go. |
 | `TCC_REPOSITORY_ROOT`, `RULES_DIR` | discovered | Repository root and rule-pack folder. |
+| `PORTFOLIO_FOOTPRINT_MODE` | `auto` | `auto` asks the SQL catalogue for a payroll row estimate and refuses the footprint above the limit; `on` always runs it under the timeout; `off` never runs it. |
+| `PORTFOLIO_FOOTPRINT_MAX_ROWS` | 50000000 | The largest estimated payroll table `auto` will scan for the footprint. |
+| `PORTFOLIO_FOOTPRINT_TIMEOUT_SECONDS` | 20 | Statement timeout for the footprint query (the server cancels it). |
+| `PORTFOLIO_FOOTPRINT_CACHE_SECONDS` | 300 | How long the row estimate, and a timeout, are remembered. |
 | `RUN_BATCH_MAX_ITEMS` | 5000 | Largest batch a request may queue. |
 | `RUN_BATCH_CONFIRM_ABOVE` | 25 | A batch larger than this needs the typed confirmation count. |
 | `RUN_STALE_WORKER_SECONDS` | 60 | After this long with queued work and no live Worker lease, the Runs page shows "queued runs in this batch are not progressing". |
@@ -160,18 +164,19 @@ What is in place (`TaxCredit.Infrastructure.Sources`):
 - Dimension tables (location, address, employment, ...) are read by key in batches of 900, not scanned.
 - Scope (years, states, dates) and the source fingerprint are computed by SQL aggregates, not by loading rows.
 - Rows stream and the read stops at a size cap instead of after loading.
+- The portfolio footprint is **bounded and guarded** (stage S1, `docs/SCALE-S1-REPORT.md`): it is read only for the clients on the page or in the batch, in `IN (...)` batches of 900 bound parameters, behind a row-estimate guard and a statement timeout. When it is refused the portfolio page still answers, with a `degraded` entry.
 
 What is **not** in place, and matters at scale:
 
 | Gap | Effect with billions of rows | Python had |
 |---|---|---|
-| Portfolio footprint (`SourceQueries.Footprint`) is one `GROUP BY` over **all** payroll with three joins, run on every portfolio load and every batch preview, with no cache or timeout guard beyond the 120 s command timeout. | The page that lists clients scans the whole table. This is the main risk. | `PORTFOLIO_FOOTPRINT_*` guard and a cache |
+| Portfolio footprint: a refused, timed-out or switched-off read leaves the map and state filters empty (portfolio) or refuses the batch that needs it (planner). `auto` estimates rows from the SQL catalogue only; there is no Delta-log estimate, and no pre-aggregated summary yet. | Where clients operate is unknown above `PORTFOLIO_FOOTPRINT_MAX_ROWS` unless the mode is `on`. | Same settings, plus a Delta-log estimate and a one-hour decision cache |
 | Per-client row cap is fixed at 1,000,000 (`SourceTooLarge`). | A client over 1M rows is refused. Candle Bottle is 384k. | `SOURCE_MAX_ACCOUNT_ROWS`, default 50M, configurable |
 | No per-account dataset cache or version check; every run re-reads the client. | Repeat runs for one client pay the full read each time. | `SOURCE_CACHE_*`, `SOURCE_VERSION_CHECK_SECONDS` |
 | No Silver (account-partitioned) table path. | The `account_id` filter only prunes well if the Payroll table is partitioned or clustered by `account_id`. | `SOURCE_SILVER` |
 | `LoadPortfolioPayPeriods` loads every account's payroll into memory (used by entity simulation). | Not usable at this scale. | n/a |
 
-Recommended next steps, in order: (1) bound the footprint to the account list or serve it from a small summary table refreshed per load; (2) make the row cap a setting;
+Recommended next steps, in order: (1) serve the footprint from a small pre-aggregated summary table; (2) make the row cap a setting;
 (3) partition or cluster the Payroll Delta table by `account_id`; (4) cache per-client datasets with a version check.
 
 ## 8. Troubleshooting

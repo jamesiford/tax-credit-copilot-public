@@ -70,6 +70,7 @@ public sealed class MaterializedAnalyticsTransport : IAnalyticsTransport
     public IEnumerable<IReadOnlyDictionary<string, object?>> Read(AnalyticsQuery query, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(query);
+        if (query.Kind == "estimate") { return []; }
         if (query.Kind is "scope" or "footprint") { return ScopeRows(query, cancellationToken); }
         if (query.Kind == "fingerprint") { return FingerprintRows(query, cancellationToken); }
         return ScanRows(query, cancellationToken);
@@ -133,8 +134,9 @@ public sealed class MaterializedAnalyticsTransport : IAnalyticsTransport
         }
         if (query.Kind == "footprint")
         {
-            return observations.Select(r => (r.Account, r.State)).Distinct().Select(r => Dict(
-                ("account_id", r.Account), ("work_state", r.State)));
+            var tenants = query.FilterValues?.Select(v => Convert.ToInt64(v, CultureInfo.InvariantCulture)).ToHashSet();
+            return observations.Where(r => tenants is null || tenants.Contains(r.Account)).Select(r => (r.Account, r.State)).Distinct()
+                .Select(r => Dict(("account_id", r.Account), ("work_state", r.State)));
         }
         return observations.GroupBy(r => (r.Year, r.State, r.Paid)).Select(g => Dict(
             ("tax_year", g.Key.Year), ("work_state", g.Key.State), ("pay_date", g.Key.Paid), ("rows_in", (long)g.Count())));
