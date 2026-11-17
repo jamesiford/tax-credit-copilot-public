@@ -229,7 +229,7 @@ The existing REST contract needs no new shared orchestrator type.
   uses real application composition with hermetic seeded adapters. Neither
   is claimed to prove deployed grants, native concurrency or live bytes.
 
-## Final gates and replay evidence
+## Original delivery gates and replay evidence
 
 SDK **10.0.404**, CPython oracle **3.12.13**, target **net10.0**.
 The oracle imports this checkout. The inherited strict build and 978 fast
@@ -339,3 +339,55 @@ W3's replay threshold is **board only**: completion claims execution and
 transparent attribution, not an all-green parity board. The actual hosts
 used for replay and hooks-off proof were stopped. No remote was changed
 and nothing was pushed.
+
+## Conductor build-gate correction: 16 November 2026
+
+The conductor launched from the repository root, selecting **SDK 11.0.100**,
+not the **10.0.404** selected from `dotnet`. Reproducing its strict solution
+build failed in `Microsoft.NET.Sdk.StaticWebAssets.JSModules.targets(233,3)`:
+the referenced API executable contributed the Blazor hot-reload module
+`_framework/Microsoft.NET.Sdk.BlazorWeb.HotReload#[.{fingerprint}]!.lib.module.js`
+without a matching gateway static-asset endpoint.
+
+Fix commit **`3b3fae2`** sets **`StaticWebAssetsEnabled=false`** in
+`TaxCredit.Gateway.csproj`. This host exposes JSON/MCP/download endpoints,
+not UI/static assets. Disabling that unused build pipeline is scoped to the
+gateway; it neither suppresses a compiler warning nor changes API behavior,
+SDK selection, net10.0, dependencies, tests or replay policy.
+
+Fresh gate results:
+
+| Check | Result |
+|---|---|
+| Root SDK 11 `dotnet build .\dotnet\TaxCredit.slnx -warnaserror` | Pass, zero warnings/errors |
+| Pinned SDK 10 build from `dotnet` | Pass, zero warnings/errors |
+| Root SDK 11 whole-solution build with `--no-incremental` after SDK 10 | Pass, zero warnings/errors |
+| Root `dotnet format .\dotnet\TaxCredit.slnx --verify-no-changes --no-restore -v:q` | Pass |
+| Root whole-solution `dotnet test` with `--no-build --no-restore --filter 'Category!=heavy' -m:1 -nr:false` | 1,114 passed, zero failed/skipped |
+| Ordinary root-launched gateway replay | 255 exchanges, 528 raw failing fields, unchanged |
+| Ordinary root-launched API regression replay | 1,514 exchanges, 2,325 raw failing fields, unchanged |
+
+An initial run of parallel test projects alongside format verification hit
+the inherited AI resilience test
+`RetryAfterIsHonoredAndHealthyStreamsUseGapNotDuration`: its healthy-stream
+timeout is 100 ms. The full suite passed with projects serialized; no test
+or timeout was modified, excluded or retried selectively.
+Passing TRX evidence is `artifacts\gateway-build-fix-fast-serial`; the initial
+run remains separately available at `artifacts\gateway-build-fix-fast`.
+
+Both replay hosts used the real root `dotnet run --no-build --project ...`
+launch, no launch profile, the conductor's contract marker, separate local
+stores and the existing public replay setup. Health probes returned 200.
+The **complete ordered failure lists**, not only totals, match the original
+delivery for all three gateway and nine API scenarios. Fresh raw reports are
+`artifacts\gateway-build-fix-replay\raw\g1.json` and
+`artifacts\gateway-build-fix-api-replay\raw\api.json`.
+The separate fresh gateway policy diagnostic is
+`artifacts\gateway-build-fix-replay\policy-board.json`: **233/255**,
+11 fully waived cases, 56 unresolved fields in 22 cases and no numerical
+waiver. Existing exact unresolved attributions above remain valid.
+
+The public raw comparator still exits 1 on those disclosed differences;
+W3's replay requirement remains **board only**, not full parity. Both proof
+hosts were stopped. No live services, SDK 11-only features, new dependencies
+or changes outside the assigned ownership were needed.

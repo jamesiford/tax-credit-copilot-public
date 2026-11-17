@@ -1,8 +1,8 @@
 {
   "session": "gateway",
   "branch": "dotnet/w3-gateway",
-  "head": "a8002e6",
-  "summary": "Delivered the ordinary in-process .NET 10 channel gateway with official MCP SDK 1.0.0, all production capability bridges, eight real prepare/commit pairs, trusted person/conversation ledger, checked composition, safe narration audit and owner-authorized single-use downloads.\nStrict build and format pass; 1,114 fast tests and four diagnostic tests pass.\nAll 255 gateway and 1,514 API replay exchanges ran on ordinary executables.\nGateway raw: 528 fields and 0/255 cases because every exchange differs at Vary; separate policy diagnostic: 233/255, 11 fully waived cases, 56 unresolved fields in 22 cases, no numerical waiver.\nAPI: 2,325 raw fields, identical ordered differences across two post-change executions; no new external-conductor parity claim.\nAll stages implemented; infrastructure, privacy-policy and cross-replica limitations remain explicit. Head identifies the tested implementation commit; the following documentation commit records this status. Local commits only, clean tree, no live systems.",
+  "head": "3b3fae2",
+  "summary": "Delivered the ordinary in-process .NET 10 gateway with official MCP SDK 1.0.0, production capability bridges, trusted execution, numeric integrity and person-bound downloads.\nFixed the conductor's SDK 11 build failure by disabling static-web-asset processing only for the JSON-only gateway; no target, SDK pin, route or comparison changed.\nStrict whole-solution builds pass with SDK 10.0.404 and root-selected SDK 11.0.100, including a nonincremental SDK 11 build after switching SDKs; root format verification passes.\nAll 1,114 fast tests pass with projects serialized. An initial parallel run hit an inherited 100 ms AI timeout test; no tests were modified or excluded.\nReran all 255 gateway and 1,514 API exchanges against ordinary root-launched executables; every ordered failure list exactly matches the original delivery.\nGateway: 528 raw fields; policy diagnostic 233/255, 11 fully waived cases, 56 unresolved fields in 22 cases, no numerical waiver. API: 2,325 raw fields. Replay is board-only, not full parity.\nAll stages remain done and existing limitations remain explicit. Head identifies the tested fix commit; the following documentation commit records this status. Local commits only, proof hosts stopped, no live systems.",
   "stages": {
     "G1": "done",
     "G2": "done",
@@ -59,7 +59,9 @@
     "The channel must not inherit the portal's optional local writer mode or anonymous contract-reset mode; entitlement applies to previews and commits.",
     "Verified write-envelope failures previously bypassed application audit. REST and recognizable MCP pre-dispatch write refusals now have one safe refusal audit.",
     "Unknown download ticket 502 invalid_arguments and replayed ticket 410 confirmation_replayed are intentional F-19/F-20 behavior, not normalized to other statuses.",
-    "All raw gateway cases include Vary differences. Raw failure counts and separately applied policy counts are distinct evidence, not interchangeable passing-test totals."
+    "All raw gateway cases include Vary differences. Raw failure counts and separately applied policy counts are distinct evidence, not interchangeable passing-test totals.",
+    "Building from the repository root selects SDK 11.0.100 instead of dotnet/global.json's SDK 10.0.404. SDK 11 processes the referenced API's Blazor hot-reload module without a matching gateway asset endpoint. The JSON-only gateway now sets StaticWebAssetsEnabled=false; both SDK builds pass without changing the net10.0 target.",
+    "Running all test projects concurrently with format verification triggered the inherited ResilienceTests.RetryAfterIsHonoredAndHealthyStreamsUseGapNotDuration 100 ms timeout. The complete unchanged fast suite passed with -m:1; no timing thresholds or test filters were weakened."
   ],
   "open_questions": [],
   "needs_human": [

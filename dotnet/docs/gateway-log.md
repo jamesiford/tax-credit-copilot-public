@@ -93,3 +93,34 @@
 - All proof processes were stopped. Only assigned paths changed; no remote
   operation or push was performed. Final status identifies the tested code
   commit; the following documentation commit records its report and status.
+
+## Conductor build-gate correction (16 November 2026)
+
+- Reproduced the exact root-selected SDK 11.0.100 failure with
+  `dotnet build .\dotnet\TaxCredit.slnx -warnaserror`: the API project reference
+  supplied `_framework/Microsoft.NET.Sdk.BlazorWeb.HotReload#[.{fingerprint}]!.lib.module.js`
+  without a matching gateway static-asset endpoint.
+- Set `StaticWebAssetsEnabled=false` only in the JSON-only gateway project.
+  It serves no UI/static assets; API composition, executable launch targets,
+  net10.0, SDK pins and all endpoint contracts remain unchanged.
+- Root SDK 11 strict build passes, then the pinned SDK 10.0.404 strict build
+  passes, then a root SDK 11 nonincremental whole-solution build passes.
+  Each reports zero warnings/errors. Root whole-solution format verification
+  also passes.
+- The initial parallel fast-test/format run hit the inherited AI resilience
+  test's 100 ms healthy-stream timeout. The complete unchanged fast suite
+  passed with projects serialized (`-m:1 -nr:false`): **1,114 passed,
+  zero failed/skipped**. Evidence: `artifacts\gateway-build-fix-fast-serial`.
+  No tests, filters or timing thresholds changed.
+- Reran the actual root/no-profile/no-build gateway and API executables with
+  the conductor marker and isolated hermetic stores. Both health probes
+  returned 200. All **255 gateway** and **1,514 API** exchanges executed.
+  All twelve scenarios' complete ordered failure lists exactly match the
+  original delivery: **528 gateway** and **2,325 API** raw fields.
+- Gateway policy diagnostic remains **233/255**, 11 fully waived cases and
+  56 unresolved fields in 22 cases; no numerical waiver. The board-only replay
+  gate is exercised, not represented as full parity. Evidence:
+  `artifacts\gateway-build-fix-replay` and
+  `artifacts\gateway-build-fix-api-replay`.
+- Both proof hosts were stopped. Fix commit: `3b3fae2`; the status/report commit
+  follows it. No live systems, remote operations or out-of-scope edits.
