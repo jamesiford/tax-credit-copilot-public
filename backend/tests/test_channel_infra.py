@@ -117,14 +117,14 @@ def test_deploy_yml_stays_dispatch_only_and_deploys_the_channel_only_when_it_exi
 
 def test_the_azd_environment_maps_the_scalar_channel_variables_with_safe_defaults():
     mapping = json.loads(read("infra", "main.tfvars.json"))
-    assert mapping["enable_m365_channel"] == "${TCC_ENABLE_M365_CHANNEL=false}"
-    assert mapping["channel_writer_source"] == "${TCC_CHANNEL_WRITER_SOURCE=allowlist}"
+    assert mapping["enable_m365_channel"] == "${M365_CHANNEL_ENABLED=false}"
+    assert mapping["channel_writer_source"] == "${CHANNEL_WRITER_SOURCE=allowlist}"
     assert {"channel_gateway_audience", "channel_writer_group_id"} <= set(mapping)
 
 
 def test_display_name_resolution_is_one_off_by_default_azd_value_and_one_conditional_setting():
-    """CH-15a: TCC_CHANNEL_RESOLVE_DISPLAY_NAMES -> channel_resolve_display_names -> CHANNEL_RESOLVE_DISPLAY_NAMES, only when true."""
-    assert json.loads(read("infra", "main.tfvars.json"))["channel_resolve_display_names"] == "${TCC_CHANNEL_RESOLVE_DISPLAY_NAMES=false}"
+    """CH-15a: CHANNEL_RESOLVE_DISPLAY_NAMES -> channel_resolve_display_names -> CHANNEL_RESOLVE_DISPLAY_NAMES, only when true."""
+    assert json.loads(read("infra", "main.tfvars.json"))["channel_resolve_display_names"] == "${CHANNEL_RESOLVE_DISPLAY_NAMES=false}"
     module = read("infra", "modules", "channel", "main.tf")
     assert 'var.resolve_display_names ? { CHANNEL_RESOLVE_DISPLAY_NAMES = "true" } : {}' in module
     assert module.count("CHANNEL_RESOLVE_DISPLAY_NAMES") == 2  # the description and the one conditional setting

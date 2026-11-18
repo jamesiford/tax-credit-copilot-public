@@ -5,7 +5,7 @@ namespace TaxCredit.Parity.Tests;
 /// <summary>
 /// The pinned oracle interpreter. The product runs on CPython 3.12, and later releases differ in ways that change bits
 /// (<c>sum()</c> of an int after a float, the Unicode database), so the tests refuse any other interpreter. There is
-/// deliberately no default path: <c>TCC_PYTHON</c> must name the interpreter explicitly.
+/// deliberately no default path: <c>ORACLE_PYTHON</c> must name the interpreter explicitly.
 /// </summary>
 internal static class OracleInterpreter
 {
@@ -14,14 +14,14 @@ internal static class OracleInterpreter
         "The parity oracle is CPython 3.12 (the interpreter the product runs on). Create the oracle environment with:\n" +
         "    uv python install 3.12\n" +
         "    uv venv --python 3.12 C:\\Projects\\py312-oracle\\.venv\n" +
-        "then set TCC_PYTHON to C:\\Projects\\py312-oracle\\.venv\\Scripts\\python.exe.";
+        "then set ORACLE_PYTHON to C:\\Projects\\py312-oracle\\.venv\\Scripts\\python.exe.";
 
-    /// <summary>True when <c>TCC_ALLOW_OTHER_PYTHON=1</c>: an exploratory cross-check on another interpreter, never certification.</summary>
-    internal static bool AllowOther { get; } = Environment.GetEnvironmentVariable("TCC_ALLOW_OTHER_PYTHON") == "1";
+    /// <summary>True when <c>ORACLE_ALLOW_OTHER_PYTHON=1</c>: an exploratory cross-check on another interpreter, never certification.</summary>
+    internal static bool AllowOther { get; } = Environment.GetEnvironmentVariable("ORACLE_ALLOW_OTHER_PYTHON") == "1";
 
     private static readonly Lazy<(string Exe, string Version)> Resolved = new(Resolve);
 
-    /// <summary>The verified oracle interpreter path; throws unless <c>TCC_PYTHON</c> names CPython 3.12.</summary>
+    /// <summary>The verified oracle interpreter path; throws unless <c>ORACLE_PYTHON</c> names CPython 3.12.</summary>
     public static string Exe => Resolved.Value.Exe;
 
     /// <summary>The verified interpreter's version string, e.g. <c>3.12.13</c>.</summary>
@@ -29,10 +29,10 @@ internal static class OracleInterpreter
 
     private static (string Exe, string Version) Resolve()
     {
-        var exe = Environment.GetEnvironmentVariable("TCC_PYTHON");
+        var exe = Environment.GetEnvironmentVariable("ORACLE_PYTHON");
         if (string.IsNullOrWhiteSpace(exe))
         {
-            throw new InvalidOperationException("TCC_PYTHON is not set. " + HowToCreate);
+            throw new InvalidOperationException("ORACLE_PYTHON is not set. " + HowToCreate);
         }
 
         var info = new ProcessStartInfo(exe, "--version") { RedirectStandardOutput = true, RedirectStandardError = true, UseShellExecute = false };
@@ -43,7 +43,7 @@ internal static class OracleInterpreter
         var version = text.StartsWith(prefix, StringComparison.Ordinal) ? text[prefix.Length..] : text;
         if (!IsCPython312(version) && !AllowOther)
         {
-            throw new InvalidOperationException($"TCC_PYTHON ({exe}) is Python {version}, not 3.12. " + HowToCreate + " For a documented cross-check only, set TCC_ALLOW_OTHER_PYTHON=1.");
+            throw new InvalidOperationException($"ORACLE_PYTHON ({exe}) is Python {version}, not 3.12. " + HowToCreate + " For a documented cross-check only, set ORACLE_ALLOW_OTHER_PYTHON=1.");
         }
 
         if (!IsCPython312(version))

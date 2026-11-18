@@ -27,7 +27,7 @@ public static class HostComposition
         builder.Services.AddSingleton<RequestValidator>();
         builder.Services.AddScoped<IApiAccess, RuntimeAccess>();
         builder.Services.AddSingleton<ContractRequestGate>();
-        if (builder.Configuration["TCC_CONTRACT_HOOKS"] == "1")
+        if (builder.Configuration["CONTRACT_HOOKS"] == "1")
         {
             builder.Services.AddSingleton<ContractTokenMinter>();
             builder.Services.TryAddSingleton<ITokenMinter>(s => s.GetRequiredService<ContractTokenMinter>());
@@ -56,7 +56,7 @@ public static class HostComposition
     {
         ArgumentNullException.ThrowIfNull(app);
         app.Services.GetRequiredService<RuntimeStatus>().Settle();
-        if (app.Configuration["TCC_CONTRACT_HOOKS"] == "1")
+        if (app.Configuration["CONTRACT_HOOKS"] == "1")
         {
             // Force key creation at startup, not on the first request.
             _ = app.Services.GetRequiredService<ContractTokenMinter>();

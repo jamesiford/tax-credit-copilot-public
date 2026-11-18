@@ -42,6 +42,7 @@ from config_sections import (
     WebIqSettings, parse_data_source, parse_identity, parse_observability, parse_portfolio, parse_runtime, parse_schema_name,
     parse_source_schema, parse_stores, parse_warehouse, parse_webiq,
 )
+from config_aliases import warn_deprecated, with_aliases
 from config_limits import LimitSettings, parse_limits
 from config_platform import PlatformSettings, parse_platform
 from config_programs import ProgramSettings, parse_programs
@@ -125,7 +126,8 @@ class Settings:
 def load_settings(environ: Mapping[str, str] | None = None) -> Settings:
     """Settings from `environ`, or from the process environment when none is given."""
     source = os.environ if environ is None else environ
-    return Settings(MappingProxyType(dict(source)))
+    warn_deprecated(source)
+    return Settings(MappingProxyType(with_aliases(source)))
 
 
 _override: Settings | None = None

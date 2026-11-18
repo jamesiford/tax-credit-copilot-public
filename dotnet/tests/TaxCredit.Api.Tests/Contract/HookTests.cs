@@ -91,7 +91,7 @@ public sealed class HookTests
         await using var host = await TestHost.Start(hooks: false);
         foreach (var operation in new[] { "drain", "env", "mint", "reset" })
         {
-            using var response = await host.Client.PostAsJsonAsync("/__contract__/" + operation, new { set = new { TCC_CONTRACT_HOOKS = "1" } });
+            using var response = await host.Client.PostAsJsonAsync("/__contract__/" + operation, new { set = new { CONTRACT_HOOKS = "1" } });
             Assert.Equal(404, (int)response.StatusCode);
         }
     }

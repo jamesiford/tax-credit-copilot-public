@@ -33,6 +33,12 @@ TESTS_ROOT = Path(__file__).resolve().parent
 if str(TESTS_ROOT) not in sys.path:
     sys.path.insert(0, str(TESTS_ROOT))
 
+# A developer's shell may still carry the pre-rename `TCC_*` test switches; honour them
+# for one release (the alias table lives in `config_aliases.py`).
+from config_aliases import apply_to_process  # noqa: E402
+
+apply_to_process(os.environ)
+
 # Pin the suite to the deterministic local CSV FIXTURE regardless of what
 # `backend/.env` sets (a dev may have DATA_SOURCE=lakehouse for live work). This
 # is the only place `csv` is selected: it is not a data source the product can
@@ -68,7 +74,7 @@ os.environ["DATA_CLASSIFICATION"] = "synthetic"
 os.environ["ENVIRONMENT"] = "local"
 os.environ["AUTH_MODE"] = "none"
 
-# The opt-in live-Fabric tests (TCC_FABRIC_TESTS=1) still need somewhere to
+# The opt-in live-Fabric tests (TEST_FABRIC=1) still need somewhere to
 # connect. Only then, take just the connection settings from `.env`, never DATA_SOURCE —
 # which is why this cannot just be `load_dotenv()`. Without the opt-in the suite sees no Fabric at all, as in CI: a
 # configured workspace would send tests of an empty or unconfigured source to the live warehouse. The WAREHOUSE_ pair is the
@@ -78,7 +84,7 @@ for _name in (
     "FABRIC_WORKSPACE", "FABRIC_LAKEHOUSE", "FABRIC_EMPLOYEES_TABLE",
     "WAREHOUSE_SERVER", "WAREHOUSE_DATABASE",
 ):
-    if os.getenv("TCC_FABRIC_TESTS") == "1" and not os.getenv(_name):
+    if os.getenv("TEST_FABRIC") == "1" and not os.getenv(_name):
         _env = BACKEND_ROOT / ".env"
         if _env.exists():
             for _line in _env.read_text(encoding="utf-8").splitlines():

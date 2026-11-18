@@ -9,9 +9,9 @@ public sealed class RuntimePaths
     public RuntimePaths(IRuntimeConfiguration settings)
     {
         ArgumentNullException.ThrowIfNull(settings);
-        Repository = settings.Get("TCC_REPOSITORY_ROOT") ?? Discover();
+        Repository = settings.Get("REPOSITORY_ROOT") ?? Discover();
         Rules = settings.Get("RULES_DIR") ?? Path.Combine(Repository, "backend", "rules");
-        Seeds = settings.Get("TCC_SEED_ROOT") ?? Path.Combine(Repository, "contract", "seed");
+        Seeds = settings.Get("SEED_ROOT") ?? Path.Combine(Repository, "contract", "seed");
         Csv = settings.Get("PAYROLL_PATH") ?? Path.Combine(Repository, "backend", "data", "payroll_pay_periods.csv");
         var state = Path.Combine(Repository, "dotnet", "artifacts", "local");
         Database = settings.Get("OPERATIONAL_DB") ?? Path.Combine(state, "operations.db");
@@ -45,6 +45,6 @@ public sealed class RuntimePaths
             }
         }
 
-        throw new InvalidOperationException("Set TCC_REPOSITORY_ROOT to the product resources and schema root.");
+        throw new InvalidOperationException("Set REPOSITORY_ROOT to the product resources and schema root.");
     }
 }

@@ -22,7 +22,7 @@ internal static class FamilyFuzzRunner
         int.TryParse(Environment.GetEnvironmentVariable(name), NumberStyles.Integer, CultureInfo.InvariantCulture, out var v) ? v : fallback;
 
     public static ulong Seed() =>
-        ulong.TryParse(Environment.GetEnvironmentVariable("TCC_FUZZ_SEED"), NumberStyles.Integer, CultureInfo.InvariantCulture, out var s) ? s : DefaultSeed;
+        ulong.TryParse(Environment.GetEnvironmentVariable("FUZZ_SEED"), NumberStyles.Integer, CultureInfo.InvariantCulture, out var s) ? s : DefaultSeed;
 
     public static FuzzOutcome Run(FuzzFamily family, int total, ulong seed, int batchSize, int parallel)
     {

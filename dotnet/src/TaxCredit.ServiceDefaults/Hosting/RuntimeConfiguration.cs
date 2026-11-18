@@ -14,7 +14,7 @@ public sealed class RuntimeConfiguration(IConfiguration original) : IRuntimeConf
     {
         lock (_lock)
         {
-            if (name == "TCC_CONTRACT_HOOKS") { return original[name]; }
+            if (name == "CONTRACT_HOOKS") { return original[name]; }
             return _overlay.TryGetValue(name, out var value) ? value : original[name] ?? Default(name);
         }
     }
@@ -25,7 +25,7 @@ public sealed class RuntimeConfiguration(IConfiguration original) : IRuntimeConf
         "AUTH_MODE" => (original["ENVIRONMENT"] ?? "local") == "local" ? "none" : "entra",
         "DATA_SOURCE" => "csv",
         "DATA_CLASSIFICATION" => "synthetic",
-        "TCC_PERSISTENCE_PROVIDER" => "sqlite",
+        "PERSISTENCE_PROVIDER" => "sqlite",
         "ARTIFACT_STORE" => "local",
         "CHANNEL_ENFORCE_WRITER_FOR_USERS" => "false",
         "RATE_LIMIT_PER_MINUTE" => "60",
@@ -39,8 +39,8 @@ public sealed class RuntimeConfiguration(IConfiguration original) : IRuntimeConf
     {
         ArgumentNullException.ThrowIfNull(set);
         ArgumentNullException.ThrowIfNull(unset);
-        if (set.Keys.Concat(unset).Any(k => k is "TCC_CONTRACT_HOOKS" or "ENVIRONMENT" or "TCC_PERSISTENCE_PROVIDER"
-            or "OPERATIONAL_DB" or "TCC_REPOSITORY_ROOT" or "TCC_SEED_ROOT" or "RULES_DIR" or "ARTIFACT_STORE" or "ARTIFACT_LOCAL_ROOT"))
+        if (set.Keys.Concat(unset).Any(k => k is "CONTRACT_HOOKS" or "ENVIRONMENT" or "PERSISTENCE_PROVIDER"
+            or "OPERATIONAL_DB" or "REPOSITORY_ROOT" or "SEED_ROOT" or "RULES_DIR" or "ARTIFACT_STORE" or "ARTIFACT_LOCAL_ROOT"))
         {
             throw new ArgumentException("Startup-only settings cannot be changed through the environment hook.", nameof(set));
         }

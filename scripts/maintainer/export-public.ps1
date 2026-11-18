@@ -19,7 +19,7 @@
       - scripts/audit-export.py --enforce
       - gitleaks dir . (the raw exported directory; there is no git history
         yet for `gitleaks git` to walk)
-      - the backend suite WITHOUT TCC_REQUIRE_PARITY: the private parity
+      - the backend suite WITHOUT TEST_REQUIRE_PARITY: the private parity
         fixtures were never tracked, so test_engine_parity_reference.py must
         skip cleanly (not error) and test_engine_parity_synthetic.py (its
         fixture IS committed) must pass for real
@@ -118,10 +118,10 @@ if ($SkipChecks) {
         # package-lock.json this archive just exported - a fresh npm install
         # from that identical lockfile would resolve to the same tree, so the
         # junction only saves the time, not the guarantee.
-        Invoke-Checked "backend pytest (no TCC_REQUIRE_PARITY)" {
+        Invoke-Checked "backend pytest (no TEST_REQUIRE_PARITY)" {
             Push-Location (Join-Path $Destination 'backend')
             try {
-                Remove-Item Env:\TCC_REQUIRE_PARITY -ErrorAction SilentlyContinue
+                Remove-Item Env:\TEST_REQUIRE_PARITY -ErrorAction SilentlyContinue
                 & "$repoRoot\.venv\Scripts\python.exe" -m pytest tests -q -p no:cacheprovider
             } finally {
                 Pop-Location

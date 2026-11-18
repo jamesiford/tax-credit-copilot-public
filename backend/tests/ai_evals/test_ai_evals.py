@@ -2,7 +2,7 @@
 
 `ai_eval` is on by default: the offline evals are deterministic and fast, and a
 regression in routing, the numeric guard or scope refusal should fail the build.
-`TCC_AI_EVALS_LIVE=1` adds the live evals (needs configured providers); they are
+`TEST_AI_EVALS_LIVE=1` adds the live evals (needs configured providers); they are
 opt-in for the same reason the live-Fabric tests are — CI has no model.
 
 Run them with a table instead: `python scripts/ai-eval.py [--live]`.
@@ -45,7 +45,7 @@ def test_the_scorer_fails_when_the_subject_regresses():
     assert always_eligibility.score < 0.5 and always_eligibility.failures
 
 
-@pytest.mark.skipif(os.environ.get("TCC_AI_EVALS_LIVE") != "1", reason="set TCC_AI_EVALS_LIVE=1 to run the evals against live providers")
+@pytest.mark.skipif(os.environ.get("TEST_AI_EVALS_LIVE") != "1", reason="set TEST_AI_EVALS_LIVE=1 to run the evals against live providers")
 def test_the_live_evals_meet_their_thresholds():
     results = asyncio.run(harness.run_live())
     assert all(harness.verdicts(results, "live").values()), "\n" + _report(results)

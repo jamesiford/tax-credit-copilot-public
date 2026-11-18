@@ -19,7 +19,7 @@ public static class RuntimeRegistration
         ArgumentNullException.ThrowIfNull(configuration);
         var settings = new RuntimeConfiguration(configuration);
         var paths = new RuntimePaths(settings);
-        var hooks = configuration["TCC_CONTRACT_HOOKS"] == "1";
+        var hooks = configuration["CONTRACT_HOOKS"] == "1";
         Validate(settings, hooks);
         services.AddSingleton(settings);
         services.AddSingleton<IRuntimeConfiguration>(settings);
@@ -30,7 +30,7 @@ public static class RuntimeRegistration
         services.AddSingleton<ISecretSource>(s => s.GetRequiredService<RuntimeSources>());
         services.AddSingleton<TimeProvider>(s => s.GetRequiredService<RuntimeSources>());
         services.TryAddSingleton(new DefaultAzureCredential());
-        var provider = settings.Get("TCC_PERSISTENCE_PROVIDER");
+        var provider = settings.Get("PERSISTENCE_PROVIDER");
         PersistenceDatabase database;
         if (provider == "sqlite")
         {
@@ -46,7 +46,7 @@ public static class RuntimeRegistration
         }
         else
         {
-            throw new InvalidOperationException("Unknown TCC_PERSISTENCE_PROVIDER.");
+            throw new InvalidOperationException("Unknown PERSISTENCE_PROVIDER.");
         }
 
         services.AddPersistence(database, paths.Repository, paths.Seeds, retention: GoldRetention.FromSettings(settings.Get));
@@ -95,7 +95,7 @@ public static class RuntimeRegistration
     private static void Validate(RuntimeConfiguration settings, bool hooks)
     {
         if (settings.Get("ENVIRONMENT") != "local"
-            && (hooks || settings.Get("TCC_PERSISTENCE_PROVIDER") != "warehouse" || settings.Get("DATA_SOURCE") != "lakehouse"
+            && (hooks || settings.Get("PERSISTENCE_PROVIDER") != "warehouse" || settings.Get("DATA_SOURCE") != "lakehouse"
                 || settings.Get("ARTIFACT_STORE") != "blob"))
         {
             throw new InvalidOperationException("Deployed hosts require Warehouse, lakehouse SQL and Blob; replay controls are local-only.");

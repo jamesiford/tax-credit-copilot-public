@@ -1,7 +1,7 @@
 """The channel stores' contracts: audit, agent actions, writers, confirmations. [CH-03]
 
 One suite over every adapter: SQLite always, the Warehouse with
-`TCC_FABRIC_TESTS=1`. What it pins is what the rest of the system relies on —
+`TEST_FABRIC=1`. What it pins is what the rest of the system relies on —
 that the trail is append-only, that a crash leaves a visible `pending`, that a
 confirmation can be consumed exactly once, and that a removal is a stamp.
 """

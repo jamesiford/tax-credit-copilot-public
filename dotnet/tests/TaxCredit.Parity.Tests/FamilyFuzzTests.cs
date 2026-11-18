@@ -4,8 +4,8 @@ namespace TaxCredit.Parity.Tests;
 
 /// <summary>
 /// Gate G3 for the ported families: differential fuzzing of proximity, gold projection, base year, simulation/forecast and credit math against the
-/// CPython 3.12 oracle (<c>parity/engine_cli.py</c>, <c>fuzz_ops.py</c>). Each family runs <c>TCC_FUZZ_N</c> seeded scenarios (default 20,000; seed
-/// <c>TCC_FUZZ_SEED</c>, always logged) in batches of <c>TCC_FUZZ_BATCH</c> (default 250), each batch in a fresh Python process. A divergence is
+/// CPython 3.12 oracle (<c>parity/engine_cli.py</c>, <c>fuzz_ops.py</c>). Each family runs <c>FUZZ_N</c> seeded scenarios (default 20,000; seed
+/// <c>FUZZ_SEED</c>, always logged) in batches of <c>FUZZ_BATCH</c> (default 250), each batch in a fresh Python process. A divergence is
 /// minimised (ddmin over rows, inputs and fields), saved under <c>parity/goldens/regressions</c>, replayed by
 /// <see cref="Saved_family_regressions_still_agree_with_the_python_engine"/> thereafter, and fails the test.
 /// </summary>
@@ -39,10 +39,10 @@ public sealed class FamilyFuzzTests(ITestOutputHelper output)
 
     private void Run(FuzzFamily family)
     {
-        var total = FamilyFuzzRunner.EnvInt("TCC_FUZZ_N", 20000);
+        var total = FamilyFuzzRunner.EnvInt("FUZZ_N", 20000);
         var seed = FamilyFuzzRunner.Seed();
-        var batch = Math.Max(1, FamilyFuzzRunner.EnvInt("TCC_FUZZ_BATCH", 250));
-        var parallel = Math.Max(1, FamilyFuzzRunner.EnvInt("TCC_FUZZ_PARALLEL", 6));
+        var batch = Math.Max(1, FamilyFuzzRunner.EnvInt("FUZZ_BATCH", 250));
+        var parallel = Math.Max(1, FamilyFuzzRunner.EnvInt("FUZZ_PARALLEL", 6));
         output.WriteLine($"fuzz[{family.Name}]: N={total} seed={seed} batch={batch} parallel={parallel} python={PythonSession.PythonExe} ({OracleInterpreter.Version})");
         var outcome = FamilyFuzzRunner.Run(family, total, seed, batch, parallel);
         output.WriteLine($"fuzz[{family.Name}]: {outcome.Total} scenarios in {outcome.Elapsed.TotalSeconds:F0}s, python raised on {outcome.PythonErrors} (compared by exception type and message)");

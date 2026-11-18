@@ -93,7 +93,7 @@ and [ENV-VARS.md](ENV-VARS.md).
 
 | Flag | Default | What it switches | Notes |
 | --- | --- | --- | --- |
-| `enable_m365_channel` (azd `TCC_ENABLE_M365_CHANNEL`) | `false` | Creates the channel gateway: a third App Service on the existing plan, its identity, a telemetry role, a diagnostic setting | Public profile only; refused for `enterprise`; needs `auth_mode = entra` and an API client id. With it off the Terraform plan gains no resource (`channel.tftest.hcl`: `off_creates_nothing_and_says_so`) |
+| `enable_m365_channel` (azd `M365_CHANNEL_ENABLED`) | `false` | Creates the channel gateway: a third App Service on the existing plan, its identity, a telemetry role, a diagnostic setting | Public profile only; refused for `enterprise`; needs `auth_mode = entra` and an API client id. With it off the Terraform plan gains no resource (`channel.tftest.hcl`: `off_creates_nothing_and_says_so`) |
 | `enable_mock_ai_gateway` | `false` | A mock OpenAI-compatible gateway App Service on the same plan, for a proof of concept | Refused for `enterprise`; deploying the script into it is a separate manual step |
 | `DATA_QUERY_SOURCE_ENABLED` (`data_query_source_enabled`) | `false` | The raw-payroll (lakehouse source) datasets of the governed data query. The Gold and ops datasets are not behind it | Needs read-only grants on the lakehouse endpoint, added by postprovision only when this is `true` |
 | `KNOWLEDGE_ENABLED` (+ `KNOWLEDGE_PROVIDER`) | `false` | The knowledge tier: cited reference text through a port, never a figure | Read by the orchestrator only; not set by Terraform or any profile (a test fails if one sets it). Only a fake source is built; the Foundry IQ adapter is designed, not built ([ADR-010](ADR-010-knowledge-tier.md)) |
@@ -105,7 +105,7 @@ and [ENV-VARS.md](ENV-VARS.md).
 | `CHANNEL_WRITER_SOURCE` | `allowlist` | Who may make changes through the channel: `allowlist`, `entra_group` or `either` | Writers are people, never service principals |
 | `DATA_MIN_GROUP_SIZE` | `5` (a value below 2 is read as 2) | The smallest group an aggregate over employee-level data may show; smaller groups are left out and counted | A privacy floor, so not mapped in Terraform; a writer is exempt |
 | `AI_PROVIDER_CHAIN` | empty (the application default, `foundry`) | Which model providers narrate. Exactly `foundry` is served by the framework's own client; a chain that names `gateway` keeps the custom chain | The model never produces a figure under any chain |
-| `foundry_public_network_access` (`TCC_FOUNDRY_PUBLIC_NETWORK_ACCESS`) | `false` | The demo network posture of the Foundry account | Refused for `enterprise` and for customer data; default is private, byte for byte |
+| `foundry_public_network_access` (`FOUNDRY_PUBLIC_NETWORK_ACCESS`) | `false` | The demo network posture of the Foundry account | Refused for `enterprise` and for customer data; default is private, byte for byte |
 
 ## 5. What is unchanged against `main`
 
@@ -132,8 +132,8 @@ What **does** differ for a default deployment, so nothing is a surprise:
 - **Two additive Warehouse migrations** that `apply-migrations.py` applies on provision whether or not the channel is on: three tables
   (`tcc_ops.channel_audit`, `channel_user`, `channel_confirmation`) and two nullable columns on `program_engagement`. The reference DDL
   (`tcc-schema.fabric.sql`) is unchanged. **Unverified on a fresh Warehouse:** read from the script and the migration files, not run in this session.
-- **A `postdeploy` hook** (`scripts/deploy-channel.ps1`) that exits at once unless `TCC_ENABLE_M365_CHANNEL` is `true`.
-- **The synthetic source load now runs only when Terraform created the Lakehouse** (`TCC_FABRIC_CREATED=true`). It overwrites every table
+- **A `postdeploy` hook** (`scripts/deploy-channel.ps1`) that exits at once unless `M365_CHANNEL_ENABLED` is `true`.
+- **The synthetic source load now runs only when Terraform created the Lakehouse** (`FABRIC_CREATED=true`). It overwrites every table
   it writes, so this is a narrowing of what `azd up` does to a Lakehouse the operator brought.
 - Newer pinned SDKs in `backend/requirements.txt` (the agent framework, the Foundry SDK, `jsonschema`).
 

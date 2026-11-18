@@ -21,18 +21,18 @@ public sealed record BulkLoadPolicy(bool Enabled, int MinimumRows, int TimeoutSe
     /// <summary>The default for SQL Server-family destinations.</summary>
     public static BulkLoadPolicy Default { get; } = new(true, 1000, 3600);
 
-    /// <summary>Reads <c>TCC_BULK_LOAD</c> (<c>on</c> or <c>off</c>), <c>TCC_BULK_LOAD_MIN_ROWS</c> and <c>TCC_BULK_TIMEOUT_SECONDS</c>.</summary>
+    /// <summary>Reads <c>BULK_LOAD</c> (<c>on</c> or <c>off</c>), <c>BULK_LOAD_MIN_ROWS</c> and <c>BULK_TIMEOUT_SECONDS</c>.</summary>
     public static BulkLoadPolicy FromSettings(Func<string, string?> setting)
     {
         ArgumentNullException.ThrowIfNull(setting);
-        var enabled = setting("TCC_BULK_LOAD")?.Trim().ToLowerInvariant() switch
+        var enabled = setting("BULK_LOAD")?.Trim().ToLowerInvariant() switch
         {
             null or "" or "on" or "true" or "1" => true,
             "off" or "false" or "0" => false,
-            _ => throw new InvalidOperationException("Invalid setting TCC_BULK_LOAD: use on or off."),
+            _ => throw new InvalidOperationException("Invalid setting BULK_LOAD: use on or off."),
         };
-        return new BulkLoadPolicy(enabled, Number(setting, "TCC_BULK_LOAD_MIN_ROWS", Default.MinimumRows, 1),
-            Number(setting, "TCC_BULK_TIMEOUT_SECONDS", Default.TimeoutSeconds, 1));
+        return new BulkLoadPolicy(enabled, Number(setting, "BULK_LOAD_MIN_ROWS", Default.MinimumRows, 1),
+            Number(setting, "BULK_TIMEOUT_SECONDS", Default.TimeoutSeconds, 1));
     }
 
     private static int Number(Func<string, string?> setting, string key, int fallback, int minimum)

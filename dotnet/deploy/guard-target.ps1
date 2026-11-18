@@ -4,7 +4,7 @@ if ($Service -eq 'worker') { throw 'Worker App Service topology unavailable: no 
 if ($Service -eq 'infrastructure') {
     throw 'Provisioning is manual and separately approved. Configure the independent .NET backend and run the operator plan; this manifest never provisions automatically.'
 }
-if ($env:TCC_DOTNET_ACTIVATE -ne '1') { throw 'Explicit .NET application activation is required.' }
+if ($env:DEPLOY_DOTNET_ACTIVATE -ne '1') { throw 'Explicit .NET application activation is required.' }
 foreach ($key in @('DOTNET_ENVIRONMENT_NAME', 'DOTNET_RESOURCE_GROUP_NAME', 'DOTNET_TARGET_SUBSCRIPTION', 'GIT_COMMIT')) {
     if ([string]::IsNullOrWhiteSpace([Environment]::GetEnvironmentVariable($key))) { throw "Required setting: $key" }
 }

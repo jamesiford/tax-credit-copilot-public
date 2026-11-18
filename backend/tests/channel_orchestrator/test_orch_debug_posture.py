@@ -55,5 +55,5 @@ def test_the_cleanup_page_exists_and_names_the_switch_and_its_command():
     page = (ROOT / "docs" / "m365-channel" / "DEMO-CLEANUP.md").read_text(encoding="utf-8")
     assert "azd env set CHANNEL_DEBUG_WHOAMI false" in page
     assert "channel_debug_whoami = false" in page
-    for topic in ("foundry_allow_any_ip", "channel_allowed_caller_app_ids", "enable_mock_ai_gateway", "TCC_CHANNEL_WRITER_SOURCE allowlist"):
+    for topic in ("foundry_allow_any_ip", "channel_allowed_caller_app_ids", "enable_mock_ai_gateway", "CHANNEL_WRITER_SOURCE allowlist"):
         assert topic in page, topic

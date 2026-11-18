@@ -43,7 +43,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-$secretVariable = 'TCC_GATEWAY_SECRET'
+$secretVariable = 'AI_GATEWAY_SECRET'
 
 function ConvertTo-BicepLiteral([object]$Value) {
     if ($Value -is [bool]) { return $Value.ToString().ToLowerInvariant() }

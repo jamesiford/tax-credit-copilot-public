@@ -6,13 +6,13 @@ using TaxCredit.Infrastructure.Persistence.Sql;
 namespace TaxCredit.Infrastructure.Persistence.Tests.Sql;
 
 /// <summary>
-/// A throwaway database on a SQL Server-family instance named by <c>TCC_SQLSERVER_TEST</c> (a connection string without a catalog, for example
+/// A throwaway database on a SQL Server-family instance named by <c>TEST_SQLSERVER</c> (a connection string without a catalog, for example
 /// <c>Server=(localdb)\MSSQLLocalDB;Integrated Security=true;TrustServerCertificate=true</c>). It carries the deployed bootstrap DDL and forward
 /// migrations, so it exercises the same statements and the same bulk protocol as the Warehouse and Azure SQL. Unset means "no target here".
 /// </summary>
 internal sealed class SqlServerTarget : IDisposable
 {
-    internal const string Setting = "TCC_SQLSERVER_TEST";
+    internal const string Setting = "TEST_SQLSERVER";
     private readonly string _server;
     private readonly string _name = "tcc_s5_" + Guid.NewGuid().ToString("N")[..12];
 

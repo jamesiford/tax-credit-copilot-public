@@ -6,7 +6,7 @@ internal sealed partial record Settings(Uri Endpoint, string Service, string Ver
 {
     internal static Settings? Read()
     {
-        var enabled = Environment.GetEnvironmentVariable("TCC_TELEMETRY_ENABLED");
+        var enabled = Environment.GetEnvironmentVariable("TELEMETRY_ENABLED");
         if (enabled is null or "0")
         {
             return null;
@@ -17,8 +17,8 @@ internal sealed partial record Settings(Uri Endpoint, string Service, string Ver
             return null;
         }
         var service = Environment.GetEnvironmentVariable("OTEL_SERVICE_NAME");
-        var version = Environment.GetEnvironmentVariable("TCC_TELEMETRY_VERSION");
-        var address = Environment.GetEnvironmentVariable("TCC_TELEMETRY_ENDPOINT");
+        var version = Environment.GetEnvironmentVariable("TELEMETRY_VERSION");
+        var address = Environment.GetEnvironmentVariable("TELEMETRY_ENDPOINT");
         if (service is not ("taxcredit-api" or "taxcredit-gateway" or "taxcredit-worker" or "taxcredit-orchestrator")
             || version is null || !VersionPattern().IsMatch(version)
             || !Uri.TryCreate(address, UriKind.Absolute, out var endpoint)

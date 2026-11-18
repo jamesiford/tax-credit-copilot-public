@@ -20,6 +20,6 @@ class HermeticTests(unittest.TestCase):
         self.assertNotIn("WAREHOUSE_SQL_ENDPOINT", result)
         self.assertEqual("", result["FOUNDRY_PROJECT_ENDPOINT"])
         self.assertEqual("csv", result["DATA_SOURCE"])
-        self.assertEqual("sqlite", result["TCC_PERSISTENCE_PROVIDER"])
+        self.assertEqual("sqlite", result["PERSISTENCE_PROVIDER"])
         self.assertTrue(Path(result["TEMP"]).is_relative_to(output))
         self.assertNotIn("private-looking-sentinel", repr(result))

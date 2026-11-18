@@ -10,7 +10,7 @@ would find out with real client data instead of here.
     10,236 employees  ·  539 Min-Max eligible  ·  656 Pay Period eligible
 
 Skipped when the confidential reference extract is absent. Set
-`TCC_REQUIRE_PARITY=1` to make that an error instead — see
+`TEST_REQUIRE_PARITY=1` to make that an error instead — see
 `tests/test_engine_parity_reference.py`.
 """
 from __future__ import annotations
@@ -40,10 +40,10 @@ _SOURCE_DIR = _BACKEND_ROOT / "data" / "payroll"
 _SOURCE_FILES = ("One.csv", "Two.csv", "Three.csv", "Four.csv")
 _FIXTURES_PRESENT = all((_SOURCE_DIR / n).exists() for n in _SOURCE_FILES)
 
-if os.environ.get("TCC_REQUIRE_PARITY", "").strip().lower() in {"1", "true", "yes"}:
+if os.environ.get("TEST_REQUIRE_PARITY", "").strip().lower() in {"1", "true", "yes"}:
     if not _FIXTURES_PRESENT:
         raise RuntimeError(
-            "TCC_REQUIRE_PARITY is set but the reference extract is missing "
+            "TEST_REQUIRE_PARITY is set but the reference extract is missing "
             f"from {_SOURCE_DIR}; the source-schema round-trip gate cannot run."
         )
 

@@ -60,7 +60,7 @@ Failure signatures are in [RUNBOOK](../architecture/RUNBOOK.md). Two PoC-specifi
 * Teams audit rows say `(name not provided)` and a write is attributed to a GUID: display-name resolution is off or has no role.
   It is an admin action and two settings. An administrator who can grant application permissions runs
   `pwsh scripts/assign-channel-roles.ps1 -ApiApplicationId <id> -GatewayApplicationId <id> -GatewayIdentityPrincipalId <oid> -GrantUserReadBasic`
-  (idempotent; Graph `User.ReadBasic.All`, nothing broader), then `azd env set TCC_CHANNEL_RESOLVE_DISPLAY_NAMES true` and `azd provision`
+  (idempotent; Graph `User.ReadBasic.All`, nothing broader), then `azd env set CHANNEL_RESOLVE_DISPLAY_NAMES true` and `azd provision`
   (or `CHANNEL_RESOLVE_DISPLAY_NAMES=true` on the gateway app). A lookup that fails never stops a request: the placeholder stays, and
   the gateway logs a warning with the object id only. A refused role is retried at most once a minute (CH-15e) and a failed lookup is not
   repeated for five minutes.
@@ -101,12 +101,12 @@ The ordered checklist, with every command, is [DEMO-CLEANUP](DEMO-CLEANUP.md): d
 firewall, allowed caller app ids, the mock model gateway and the group writer source.
 
 The PoC runs the Foundry data plane public to one operator address
-(`TCC_FOUNDRY_PUBLIC_NETWORK_ACCESS=true`, `TCC_FOUNDRY_ALLOWED_IP_RANGES=<operator>/32`) and the
+(`FOUNDRY_PUBLIC_NETWORK_ACCESS=true`, `FOUNDRY_ALLOWED_IP_RANGES=<operator>/32`) and the
 gateway public (callers are authenticated by token). To close the Foundry side:
 
 ```pwsh
-azd env set TCC_FOUNDRY_PUBLIC_NETWORK_ACCESS false
-azd env set TCC_FOUNDRY_ALLOWED_IP_RANGES ""
+azd env set FOUNDRY_PUBLIC_NETWORK_ACCESS false
+azd env set FOUNDRY_ALLOWED_IP_RANGES ""
 azd provision --no-prompt
 ```
 

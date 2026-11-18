@@ -32,11 +32,11 @@ tests reject it. Every golden records the interpreter in its meta line, and the 
 ## Running the gates
 
 ```pwsh
-$env:TCC_PYTHON = 'C:\Projects\py312-oracle\.venv\Scripts\python.exe'   # required; there is no default
+$env:ORACLE_PYTHON = 'C:\Projects\py312-oracle\.venv\Scripts\python.exe'   # required; there is no default
 cd dotnet
 dotnet test TaxCredit.slnx                                              # G1, G2, version-sensitive facts, G3 at N=20,000
-$env:TCC_FUZZ_N=500000; $env:TCC_FUZZ_SEED=7; dotnet test tests\TaxCredit.Parity.Tests --filter Random_scenarios
-$env:TCC_RUN_MUTATION_TESTS=1; dotnet test tests\TaxCredit.Parity.Tests --filter MutationSelfTests
+$env:FUZZ_N=500000; $env:FUZZ_SEED=7; dotnet test tests\TaxCredit.Parity.Tests --filter Random_scenarios
+$env:MUTATION_RUN=1; dotnet test tests\TaxCredit.Parity.Tests --filter MutationSelfTests
 ```
 
 Regenerate everything after an engine change (3.12 only), then commit the new goldens:

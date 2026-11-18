@@ -60,7 +60,7 @@ try {
         Write-Host 'DATA_CLASSIFICATION is not synthetic; skipping the illustrative seed.' -ForegroundColor Yellow
         exit 0
     }
-    $env:TCC_ALLOW_SEED = '1'
+    $env:ALLOW_SEED = '1'
     $env:CLAIM_STORE = 'warehouse'
     $env:FINDING_STORE = 'warehouse'
 

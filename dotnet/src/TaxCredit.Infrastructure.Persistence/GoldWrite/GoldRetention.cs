@@ -20,11 +20,11 @@ public sealed record GoldRetention(int? KeepSuperseded, int MaximumRunsPerPass =
     /// <summary>The conservative default: the current run plus the two before it.</summary>
     public static GoldRetention Default { get; } = new(2);
 
-    /// <summary>Reads <c>TCC_RETAIN_SUPERSEDED_RUNS</c>: a whole number of superseded runs to keep (at least 1), or <c>all</c> to prune nothing.</summary>
+    /// <summary>Reads <c>RETAIN_SUPERSEDED_RUNS</c>: a whole number of superseded runs to keep (at least 1), or <c>all</c> to prune nothing.</summary>
     public static GoldRetention FromSettings(Func<string, string?> setting)
     {
         ArgumentNullException.ThrowIfNull(setting);
-        var text = setting("TCC_RETAIN_SUPERSEDED_RUNS")?.Trim().ToLowerInvariant();
+        var text = setting("RETAIN_SUPERSEDED_RUNS")?.Trim().ToLowerInvariant();
         if (string.IsNullOrEmpty(text))
         {
             return Default;
@@ -38,7 +38,7 @@ public sealed record GoldRetention(int? KeepSuperseded, int MaximumRunsPerPass =
         // At least one: a reader that resolved the current run an instant before a newer publish supersedes it must still find its rows.
         return int.TryParse(text, NumberStyles.None, CultureInfo.InvariantCulture, out var keep) && keep >= 1
             ? new GoldRetention(keep)
-            : throw new InvalidOperationException("Invalid setting TCC_RETAIN_SUPERSEDED_RUNS: a whole number of runs (at least 1), or all.");
+            : throw new InvalidOperationException("Invalid setting RETAIN_SUPERSEDED_RUNS: a whole number of runs (at least 1), or all.");
     }
 
     // Deleted in this order. employee_eligibility goes last because it is the marker: a run that still has eligibility rows still has

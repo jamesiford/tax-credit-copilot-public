@@ -60,7 +60,7 @@ Prerequisites: .NET SDK 10 (`global.json`) and the **CPython 3.12 oracle environ
 ```pwsh
 uv python install 3.12
 uv venv --python 3.12 C:\Projects\py312-oracle\.venv
-$env:TCC_PYTHON = 'C:\Projects\py312-oracle\.venv\Scripts\python.exe'   # required, no default
+$env:ORACLE_PYTHON = 'C:\Projects\py312-oracle\.venv\Scripts\python.exe'   # required, no default
 ```
 
 ```pwsh
@@ -70,7 +70,7 @@ dotnet format TaxCredit.slnx --verify-no-changes
 dotnet test TaxCredit.slnx                       # goldens, 20,000-scenario fuzz, architecture rules, unit tests
 ```
 
-`TCC_PYTHON` has no default. The tests run `python --version` once and fail unless it is 3.12; the goldens' meta lines
+`ORACLE_PYTHON` has no default. The tests run `python --version` once and fail unless it is 3.12; the goldens' meta lines
 are asserted to say 3.12 as well. Details and every gate command: [`../parity/README.md`](../parity/README.md).
 
 ### Parity harness
@@ -84,9 +84,9 @@ are asserted to say 3.12 as well. Details and every gate command: [`../parity/RE
 | `python parity/engine_cli.py` | JSON Lines engine, used by the fuzzer |
 | `python parity/bench_python.py` | Python side of the micro-benchmark |
 
-Environment knobs for the .NET tests: `TCC_FUZZ_N` (default 20000), `TCC_FUZZ_SEED`, `TCC_FUZZ_PARALLEL` (4),
-`TCC_PYTHON`, `TCC_RUN_MUTATION_TESTS=1` (builds four mutated copies and requires the harness to fail on each),
-`TCC_RUN_BENCH=1` (use `-c Release`).
+Environment knobs for the .NET tests: `FUZZ_N` (default 20000), `FUZZ_SEED`, `FUZZ_PARALLEL` (4),
+`ORACLE_PYTHON`, `MUTATION_RUN=1` (builds four mutated copies and requires the harness to fail on each),
+`BENCH_RUN=1` (use `-c Release`).
 
 A fuzz mismatch is minimised (rows are shrunk while it still fails), saved under `parity/goldens/regressions/`, and
 replayed by `Saved_regression_goldens_still_agree_with_the_python_engine`.
@@ -101,8 +101,8 @@ differ. See [ADR 0001](docs/adr/0001-solution-layout-and-dependency-rules.md) an
 
 Every ported family has a Python exporter (`parity/export_<family>.py [--check]`) that runs the production functions and writes
 `parity/goldens/<family>.jsonl.gz`, a C# replay test comparing bit for bit, and mutation self-tests in
-`MutationSelfTests`. Extra gates: per-family differential fuzz (`FamilyFuzzTests`, N = 20,000 per family, `TCC_FUZZ_N` /
-`TCC_FUZZ_SEED`), and the capstone (`export_gold_payload.py` against `ClientCalculationParityTests`: every row of the seven
+`MutationSelfTests`. Extra gates: per-family differential fuzz (`FamilyFuzzTests`, N = 20,000 per family, `FUZZ_N` /
+`FUZZ_SEED`), and the capstone (`export_gold_payload.py` against `ClientCalculationParityTests`: every row of the seven
 `tcc_gold` tables). Regenerate the port map with `python parity/port_map.py`. Mutation subsets:
-`TCC_RUN_MUTATION_TESTS=1 TCC_MUTATION_FILTER=<text> TCC_MUTATION_TEST_FILTER=<xunit filter>` (a full pass is slow).
+`MUTATION_RUN=1 MUTATION_FILTER=<text> MUTATION_TEST_FILTER=<xunit filter>` (a full pass is slow).
 Rule files are read from `backend/rules` through `RulePackOptions` and are never copied.

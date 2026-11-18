@@ -24,11 +24,11 @@ def run(root: Path, scenario: str, output: Path, oracle: str) -> dict:
     work.mkdir(parents=True, exist_ok=False)
     env = {
         **os.environ,
-        "TCC_CONTRACT_HOOKS": "1",
+        "CONTRACT_HOOKS": "1",
         "ENVIRONMENT": "local",
         "AUTH_MODE": "none",
         "DATA_SOURCE": "csv",
-        "TCC_REPOSITORY_ROOT": str(root),
+        "REPOSITORY_ROOT": str(root),
         "OPERATIONAL_DB": str(work / "operations.db"),
         "ARTIFACT_LOCAL_ROOT": str(work / "bytes"),
         "Logging__LogLevel__Default": "Warning",

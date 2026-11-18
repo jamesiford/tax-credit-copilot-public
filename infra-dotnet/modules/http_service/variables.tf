@@ -68,22 +68,22 @@ variable "app_settings" {
   validation {
     condition = try(
       var.app_settings.ENVIRONMENT == "azure" &&
-      var.app_settings.TCC_PERSISTENCE_PROVIDER == "warehouse" &&
+      var.app_settings.PERSISTENCE_PROVIDER == "warehouse" &&
       var.app_settings.DATA_SOURCE == "lakehouse" &&
       var.app_settings.ARTIFACT_STORE == "blob" &&
       var.app_settings.AUTH_MODE == "entra" &&
-      var.app_settings.TCC_CONTRACT_HOOKS == "0" &&
+      var.app_settings.CONTRACT_HOOKS == "0" &&
       var.app_settings.CHANNEL_ENFORCE_WRITER_FOR_USERS == "true", false
     )
     error_message = "HTTP services require deployed Warehouse/SQL/Blob, Entra, acting-person writer enforcement and disabled replay controls."
   }
   validation {
     condition = length(setsubtract(toset(keys(var.app_settings)), toset([
-      "ENVIRONMENT", "DATA_CLASSIFICATION", "DATA_SOURCE", "TCC_PERSISTENCE_PROVIDER",
+      "ENVIRONMENT", "DATA_CLASSIFICATION", "DATA_SOURCE", "PERSISTENCE_PROVIDER",
       "FABRIC_SQL_SERVER", "FABRIC_SQL_DATABASE", "SOURCE_SQL_SERVER", "SOURCE_SQL_DATABASE", "SOURCE_SCHEMA",
-      "ARTIFACT_STORE", "ARTIFACT_BLOB_ACCOUNT_URL", "TCC_REPOSITORY_ROOT", "AUTH_MODE", "AUTH_TENANT_ID",
+      "ARTIFACT_STORE", "ARTIFACT_BLOB_ACCOUNT_URL", "REPOSITORY_ROOT", "AUTH_MODE", "AUTH_TENANT_ID",
       "API_AUDIENCE", "CLIENT_ALLOWLIST", "CHANNEL_ENFORCE_WRITER_FOR_USERS", "CHANNEL_WRITER_SOURCE",
-      "CHANNEL_WRITER_GROUP_ID", "TCC_CONTRACT_HOOKS", "GIT_COMMIT", "PAY_CODE_POLICY", "FISCAL_RULES_POLICY",
+      "CHANNEL_WRITER_GROUP_ID", "CONTRACT_HOOKS", "GIT_COMMIT", "PAY_CODE_POLICY", "FISCAL_RULES_POLICY",
       "TENANT_ID", "GATEWAY_AUDIENCE", "CHANNEL_DEBUG_WHOAMI", "CHANNEL_ALLOWED_CALLER_APP_IDS",
       "CHANNEL_CALLER_CHANNELS", "CHANNEL_RATE_LIMIT_PER_MINUTE"
     ]))) == 0

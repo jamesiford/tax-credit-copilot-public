@@ -28,7 +28,7 @@ def _find_backend() -> Path | None:
         _HERE.parents[1] / "backend",                       # in the repo
         Path(r"C:\Projects\GitHub\tax-credit-copilot\backend"),
     ]
-    env = os.getenv("TCC_BACKEND")
+    env = os.getenv("BACKEND_DIR") or os.getenv("TCC_BACKEND")  # TCC_BACKEND is deprecated, one release
     if env:
         candidates.insert(0, Path(env))
     for candidate in candidates:
@@ -42,8 +42,8 @@ if _BACKEND is None:
     print(
         "Cannot find the tax-credit-copilot backend.\n\n"
         "This script compares the portable rules against the production engine,\n"
-        "so it needs the repo. Set TCC_BACKEND to the backend directory:\n\n"
-        "    set TCC_BACKEND=C:\\path\\to\\tax-credit-copilot\\backend\n\n"
+        "so it needs the repo. Set BACKEND_DIR to the backend directory:\n\n"
+        "    set BACKEND_DIR=C:\\path\\to\\tax-credit-copilot\\backend\n\n"
         "flex_rules.py itself has no such dependency — run `python flex_rules.py`\n"
         "for the self-check, which needs nothing but the standard library."
     )

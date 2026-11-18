@@ -48,9 +48,9 @@ def shim(tmp_path):
 
 def run(shim, *args, **env):
     environment = {**os.environ, "PATH": f"{shim.dir}{os.pathsep}{os.environ['PATH']}",
-                   "CHANNEL_APP_NAME": "", "AZURE_RESOURCE_GROUP": "", "TCC_ENABLE_M365_CHANNEL": "",
+                   "CHANNEL_APP_NAME": "", "AZURE_RESOURCE_GROUP": "", "M365_CHANNEL_ENABLED": "",
                    # These tests are about packaging and the deploy call; the health wait has its own file (CH-14).
-                   "TCC_CHANNEL_HEALTH_CHECK": "off", **env}
+                   "CHANNEL_HEALTH_CHECK": "off", **env}
     return subprocess.run(
         [PWSH, "-NoProfile", "-NonInteractive", "-File", str(SCRIPT), *args],
         capture_output=True, text=True, env=environment, timeout=180,
@@ -63,18 +63,18 @@ def az_calls(shim) -> list[str]:
 
 @pytest.mark.parametrize("flag", ["", "false", "False", "0", "yes"])
 def test_with_the_toggle_off_it_exits_zero_calls_nothing_and_is_not_alarming(shim, flag):
-    done = run(shim, TCC_ENABLE_M365_CHANNEL=flag)
+    done = run(shim, M365_CHANNEL_ENABLED=flag)
     assert done.returncode == 0 and done.stderr == ""
     assert "not enabled" in done.stdout and "error" not in done.stdout.lower()
     assert az_calls(shim) == []
 
 
 def test_off_needs_no_terraform_output_at_all(shim):
-    assert run(shim, TCC_ENABLE_M365_CHANNEL="false", CHANNEL_APP_NAME="null").returncode == 0
+    assert run(shim, M365_CHANNEL_ENABLED="false", CHANNEL_APP_NAME="null").returncode == 0
 
 
 def test_on_packages_backend_and_deploys_it_to_the_named_app(shim):
-    done = run(shim, TCC_ENABLE_M365_CHANNEL="true", CHANNEL_APP_NAME=APP, AZURE_RESOURCE_GROUP=GROUP)
+    done = run(shim, M365_CHANNEL_ENABLED="true", CHANNEL_APP_NAME=APP, AZURE_RESOURCE_GROUP=GROUP)
     assert done.returncode == 0, done.stdout + done.stderr
     [call] = az_calls(shim)
     assert call.startswith("webapp deploy") and f"-g {GROUP}" in call and f"-n {APP}" in call
@@ -87,13 +87,13 @@ def test_on_packages_backend_and_deploys_it_to_the_named_app(shim):
 
 def test_on_is_idempotent_it_deploys_the_same_package_again(shim):
     for _ in range(2):
-        assert run(shim, TCC_ENABLE_M365_CHANNEL="true", CHANNEL_APP_NAME=APP, AZURE_RESOURCE_GROUP=GROUP).returncode == 0
+        assert run(shim, M365_CHANNEL_ENABLED="true", CHANNEL_APP_NAME=APP, AZURE_RESOURCE_GROUP=GROUP).returncode == 0
     first, second = az_calls(shim)
     assert first.split("--src-path")[0] == second.split("--src-path")[0]
 
 
 def test_whatif_prints_the_plan_and_changes_nothing(shim):
-    done = run(shim, "-WhatIf", TCC_ENABLE_M365_CHANNEL="true", CHANNEL_APP_NAME=APP, AZURE_RESOURCE_GROUP=GROUP)
+    done = run(shim, "-WhatIf", M365_CHANNEL_ENABLED="true", CHANNEL_APP_NAME=APP, AZURE_RESOURCE_GROUP=GROUP)
     assert done.returncode == 0
     assert APP in done.stdout + done.stderr and "channel gateway" in done.stdout + done.stderr
     assert az_calls(shim) == [] and not shim.zip.exists()
@@ -101,7 +101,7 @@ def test_whatif_prints_the_plan_and_changes_nothing(shim):
 
 @pytest.mark.parametrize("missing", ["CHANNEL_APP_NAME", "AZURE_RESOURCE_GROUP"])
 def test_on_without_a_terraform_output_fails_naming_it(shim, missing):
-    env = {"TCC_ENABLE_M365_CHANNEL": "true", "CHANNEL_APP_NAME": APP, "AZURE_RESOURCE_GROUP": GROUP, missing: "null"}
+    env = {"M365_CHANNEL_ENABLED": "true", "CHANNEL_APP_NAME": APP, "AZURE_RESOURCE_GROUP": GROUP, missing: "null"}
     done = run(shim, **env)
     assert done.returncode != 0 and missing in done.stderr + done.stdout
     assert az_calls(shim) == []
@@ -114,7 +114,7 @@ def test_a_failing_deploy_fails_the_hook_and_leaves_no_temp_zip(shim, tmp_path):
         (shim.dir / "az.cmd").write_text("@echo off\r\nexit /b 3\r\n", encoding="ascii")
     else:
         (shim.dir / "az").write_text("#!/bin/sh\nexit 3\n", encoding="ascii")
-    done = run(shim, TCC_ENABLE_M365_CHANNEL="true", CHANNEL_APP_NAME=APP, AZURE_RESOURCE_GROUP=GROUP, TMP=str(marker), TMPDIR=str(marker))
+    done = run(shim, M365_CHANNEL_ENABLED="true", CHANNEL_APP_NAME=APP, AZURE_RESOURCE_GROUP=GROUP, TMP=str(marker), TMPDIR=str(marker))
     assert done.returncode != 0 and "az webapp deploy failed" in done.stderr + done.stdout
     assert list(marker.glob("tcc-channel-*.zip")) == []
 

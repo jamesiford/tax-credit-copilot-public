@@ -36,9 +36,9 @@ def run_host(root: Path, output: Path, host: str, selected: list[str]) -> None:
     local.mkdir(parents=True, exist_ok=True)
     oracle = os.environ.get("CONTRACT_PYTHON", r"C:\Projects\py312-oracle\.venv\Scripts\python.exe")
     environment = {**os.environ, "PYTHONPATH": str(root), "CONTRACT_PYTHON": oracle,
-                   "PYTHONUTF8": "1", "TCC_CONTRACT_DIR": str(root / "contract"),
+                   "PYTHONUTF8": "1", "CONTRACT_DIR": str(root / "contract"),
                    "ENVIRONMENT": "local", "DATA_SOURCE": "csv",
-                   "TCC_PERSISTENCE_PROVIDER": "sqlite", "ARTIFACT_STORE": "local",
+                   "PERSISTENCE_PROVIDER": "sqlite", "ARTIFACT_STORE": "local",
                    "FOUNDRY_PROJECT_ENDPOINT": "", "APPLICATIONINSIGHTS_CONNECTION_STRING": "",
                    "OPERATIONAL_DB": str(local / "operations.db"),
                    "ARTIFACT_LOCAL_ROOT": str(local / "bytes")}

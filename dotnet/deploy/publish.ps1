@@ -3,7 +3,7 @@ param(
     [string] $Service = 'all',
     [string] $Output,
     [string] $Runtime,
-    [string] $Python = $(if ($env:TCC_DEPLOY_PYTHON) { $env:TCC_DEPLOY_PYTHON } else { 'python' })
+    [string] $Python = $(if ($env:DEPLOY_PYTHON) { $env:DEPLOY_PYTHON } else { 'python' })
 )
 $ErrorActionPreference = 'Stop'
 $arguments = @((Join-Path $PSScriptRoot 'publish.py'), '--service', $Service)

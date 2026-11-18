@@ -2,7 +2,7 @@ name: tax-credit-copilot
 metadata:
   template: tax-credit-copilot@2.0.0
 
-# Terraform (TF-4). The profile comes from `azd env set TCC_PROFILE
+# Terraform (TF-4). The profile comes from `azd env set DEPLOY_PROFILE
 # public|enterprise`; infra/main.tfvars.json maps azd environment values into
 # Terraform variables. Every azd command here runs with --no-prompt.
 infra:
@@ -33,7 +33,7 @@ hooks:
   # azd cannot make a service conditional (it resolves each service by its
   # azd-service-name tag, and with the channel off there is no such app), so the
   # gateway is deployed here and is NOT a `channel` service. With
-  # TCC_ENABLE_M365_CHANNEL not `true` the script exits 0 at once.
+  # M365_CHANNEL_ENABLED not `true` the script exits 0 at once.
   postdeploy:
     windows:
       shell: pwsh

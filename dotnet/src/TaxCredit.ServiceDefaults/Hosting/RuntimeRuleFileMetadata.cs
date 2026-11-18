@@ -14,7 +14,7 @@ internal sealed class RuntimeRuleFileMetadata(IRulePackSource source, RuntimeCon
         {
             throw new FileNotFoundException("Known rule file is missing.");
         }
-        return settings.Get("TCC_CONTRACT_HOOKS") == "1"
+        return settings.Get("CONTRACT_HOOKS") == "1"
             ? clock.UtcNow.AddDays(-30).AddSeconds(Crc32(fileName) % (20 * 86400))
             : new DateTimeOffset(File.GetLastWriteTimeUtc(Path.Combine(source.RulesDirectory, fileName)));
     }

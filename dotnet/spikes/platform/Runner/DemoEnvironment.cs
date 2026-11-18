@@ -12,8 +12,8 @@ internal sealed class DemoEnvironment
 
     internal DemoEnvironment()
     {
-        if (Environment.GetEnvironmentVariable("TCC_PLATFORM_SPIKE_APPROVED") != "yes")
-            throw new GuardRefusal("TCC_PLATFORM_SPIKE_APPROVED must be yes.");
+        if (Environment.GetEnvironmentVariable("SPIKE_PLATFORM_APPROVED") != "yes")
+            throw new GuardRefusal("SPIKE_PLATFORM_APPROVED must be yes.");
         foreach (var line in File.ReadLines(FilePath))
         {
             var text = line.Trim();

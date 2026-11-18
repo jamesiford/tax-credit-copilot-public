@@ -48,8 +48,8 @@ def launch(service, endpoint, work):
     env = parent_smoke.environment(service, package, work)
     env.update({
         "DOTNET_STARTUP_HOOKS": str(s.ARTIFACTS / "publish" / "hook" / "TaxCredit.Deployment.Telemetry.dll"),
-        "TCC_TELEMETRY_ENABLED": "1", "OTEL_SERVICE_NAME": "taxcredit-" + service,
-        "TCC_TELEMETRY_VERSION": s.VERSION, "TCC_TELEMETRY_ENDPOINT": endpoint,
+        "TELEMETRY_ENABLED": "1", "OTEL_SERVICE_NAME": "taxcredit-" + service,
+        "TELEMETRY_VERSION": s.VERSION, "TELEMETRY_ENDPOINT": endpoint,
     })
     address = f"http://127.0.0.1:{s.port()}"
     process = subprocess.Popen(

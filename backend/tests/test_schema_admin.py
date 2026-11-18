@@ -391,14 +391,14 @@ def test_schema_names_default_to_v2_and_refuse_anything_but_an_identifier(monkey
     import config
 
     assert (config.DEFAULT_GOLD_SCHEMA, config.DEFAULT_OPS_SCHEMA) == ("tcc_gold", "tcc_ops")
-    monkeypatch.delenv("TCC_TEST_SCHEMA", raising=False)
-    assert config.schema_name("TCC_TEST_SCHEMA", "tcc_gold") == "tcc_gold"
-    monkeypatch.setenv("TCC_TEST_SCHEMA", "  custom_gold ")
-    assert config.schema_name("TCC_TEST_SCHEMA", "tcc_gold") == "custom_gold"
+    monkeypatch.delenv("TEST_SCHEMA", raising=False)
+    assert config.schema_name("TEST_SCHEMA", "tcc_gold") == "tcc_gold"
+    monkeypatch.setenv("TEST_SCHEMA", "  custom_gold ")
+    assert config.schema_name("TEST_SCHEMA", "tcc_gold") == "custom_gold"
     for bad in ("tcc_gold; DROP TABLE x", "a.b", "1abc", "[x]"):
-        monkeypatch.setenv("TCC_TEST_SCHEMA", bad)
+        monkeypatch.setenv("TEST_SCHEMA", bad)
         with pytest.raises(ValueError):
-            config.schema_name("TCC_TEST_SCHEMA", "tcc_gold")
+            config.schema_name("TEST_SCHEMA", "tcc_gold")
 
 
 def test_the_adapters_read_the_configured_schema_names():

@@ -30,8 +30,8 @@
     <PackageVersion Include="Azure.Storage.Blobs" Version="12.26.0" />
   </ItemGroup>
   <!-- Supply the approved local oracle to testhosts, not the shared machine environment. -->
-  <PropertyGroup Condition="$(MSBuildProjectName.EndsWith('.Tests')) and '$(TCC_PYTHON)' == '' and '$(VSTestCLIRunSettings)' == '' and '$(VSTestSetting)' == '' and '$(RunSettingsFilePath)' == '' and Exists('C:\Projects\py312-oracle\.venv\Scripts\python.exe')">
-    <VSTestCLIRunSettings>RunConfiguration.EnvironmentVariables.TCC_PYTHON=C:\Projects\py312-oracle\.venv\Scripts\python.exe</VSTestCLIRunSettings>
+  <PropertyGroup Condition="$(MSBuildProjectName.EndsWith('.Tests')) and '$(ORACLE_PYTHON)' == '' and '$(VSTestCLIRunSettings)' == '' and '$(VSTestSetting)' == '' and '$(RunSettingsFilePath)' == '' and Exists('C:\Projects\py312-oracle\.venv\Scripts\python.exe')">
+    <VSTestCLIRunSettings>RunConfiguration.EnvironmentVariables.ORACLE_PYTHON=C:\Projects\py312-oracle\.venv\Scripts\python.exe</VSTestCLIRunSettings>
   </PropertyGroup>
   <ItemGroup>
     <!-- END sources_auth_ai -->
@@ -63,7 +63,7 @@
     <!-- END integration -->
   </ItemGroup>
   <!-- Persistence gate repair: configure the approved oracle only when the runner has not supplied one. -->
-  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'TaxCredit.Parity.Tests' and '$(TCC_PYTHON)' == '' and '$(RunSettingsFilePath)' == ''">
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'TaxCredit.Parity.Tests' and '$(ORACLE_PYTHON)' == '' and '$(RunSettingsFilePath)' == ''">
     <RunSettingsFilePath>$(MSBuildThisFileDirectory)tests\TaxCredit.Infrastructure.Persistence.Tests\Oracle.runsettings</RunSettingsFilePath>
   </PropertyGroup>
 </Project>

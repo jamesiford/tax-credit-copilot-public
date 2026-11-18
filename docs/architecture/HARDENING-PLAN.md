@@ -38,8 +38,8 @@ plane**: not the operator's `azd ai agent` deploy, not `scripts/publish-m365.ps1
 
 | Input | azd value | Default | Meaning |
 | --- | --- | --- | --- |
-| `foundry_public_network_access` | `TCC_FOUNDRY_PUBLIC_NETWORK_ACCESS` | `false` | `true` sets `publicNetworkAccess = "Enabled"`. With no ranges `networkAcls.defaultAction = "Allow"`; with ranges it is `Deny` plus an `ipRules` entry per range. `disableLocalAuth` stays `true`; the private endpoint, DNS and the API's private path are unchanged |
-| `foundry_allowed_ip_ranges` | `TCC_FOUNDRY_ALLOWED_IP_RANGES` | empty | IPv4 CIDRs allowed through the account firewall: a list, or a comma-separated string (what azd passes). A `/32` is sent as a bare address; `/31` is not supported by the firewall |
+| `foundry_public_network_access` | `FOUNDRY_PUBLIC_NETWORK_ACCESS` | `false` | `true` sets `publicNetworkAccess = "Enabled"`. With no ranges `networkAcls.defaultAction = "Allow"`; with ranges it is `Deny` plus an `ipRules` entry per range. `disableLocalAuth` stays `true`; the private endpoint, DNS and the API's private path are unchanged |
+| `foundry_allowed_ip_ranges` | `FOUNDRY_ALLOWED_IP_RANGES` | empty | IPv4 CIDRs allowed through the account firewall: a list, or a comma-separated string (what azd passes). A `/32` is sent as a bare address; `/31` is not supported by the firewall |
 | `foundry_allow_any_ip` | (overlay only) | `false` | Permits `0.0.0.0/0` (any `/0`) in the list. A second, deliberate switch: an open range defeats the point of listing ranges |
 
 Guards (all tested in `infra/tests/foundry_network*.tftest.hcl`): refused with the enterprise profile;

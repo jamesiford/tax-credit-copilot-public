@@ -18,7 +18,7 @@ def start_collector(receiver):
         "docker", "run", "--detach", "--rm", "--log-driver", "none",
         "--publish", f"127.0.0.1:{collector_port}:4318",
         "--mount", f"type=bind,source={s.ROOT / 'collector.yaml'},target=/etc/otelcol/config.yaml,readonly",
-        "--env", f"TCC_RECEIPT_ENDPOINT=http://host.docker.internal:{receiver.server_port}",
+        "--env", f"TELEMETRY_RECEIPT_ENDPOINT=http://host.docker.internal:{receiver.server_port}",
     ]
     for service_port in s.SERVICE_PORTS.values():
         command.extend(["--publish", f"127.0.0.1:{service_port}:{service_port}"])

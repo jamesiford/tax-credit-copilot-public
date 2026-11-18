@@ -12,10 +12,10 @@ using Xunit.Abstractions;
 namespace TaxCredit.Infrastructure.Persistence.Tests.GoldWrite;
 
 /// <summary>
-/// Opt-in (<c>TCC_RUN_BENCH=1</c>): persists synthetic Gold payloads of <c>TCC_BENCH_SIZES</c> (default 100000,400000,1000000)
+/// Opt-in (<c>BENCH_RUN=1</c>): persists synthetic Gold payloads of <c>BENCH_SIZES</c> (default 100000,400000,1000000)
 /// <c>employee_period_fact</c> rows through <see cref="GoldWriter.WriteRun" /> and reports seconds, rows/s and statement count per table.
-/// Targets: SQLite always; SQL Server when <c>TCC_SQLSERVER_TEST</c> names an instance (statements, then bulk); the live Warehouse
-/// only when <c>TCC_LIVE_PROFILE=yes</c> and <c>az account show</c> succeeds, on a throwaway client that is deleted afterwards.
+/// Targets: SQLite always; SQL Server when <c>TEST_SQLSERVER</c> names an instance (statements, then bulk); the live Warehouse
+/// only when <c>TEST_LIVE_PROFILE=yes</c> and <c>az account show</c> succeeds, on a throwaway client that is deleted afterwards.
 /// </summary>
 public sealed class PersistBench(ITestOutputHelper output)
 {
@@ -25,12 +25,12 @@ public sealed class PersistBench(ITestOutputHelper output)
     [Trait("Category", "bench")]
     public void Gold_payloads_are_timed_per_table_and_target()
     {
-        if (Environment.GetEnvironmentVariable("TCC_RUN_BENCH") != "1") { return; }
-        var sizes = (Environment.GetEnvironmentVariable("TCC_BENCH_SIZES") ?? "100000,400000,1000000")
+        if (Environment.GetEnvironmentVariable("BENCH_RUN") != "1") { return; }
+        var sizes = (Environment.GetEnvironmentVariable("BENCH_SIZES") ?? "100000,400000,1000000")
             .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Select(int.Parse).ToArray();
         var directory = Path.Combine(PersistenceFixture.Root, "dotnet", "artifacts", "bench");
         Directory.CreateDirectory(directory);
-        var file = Path.Combine(directory, "persist-" + (Environment.GetEnvironmentVariable("TCC_BENCH_LABEL") ?? "run") + ".txt");
+        var file = Path.Combine(directory, "persist-" + (Environment.GetEnvironmentVariable("BENCH_LABEL") ?? "run") + ".txt");
         File.Delete(file);
         var targets = new List<string> { "sqlite" };
         if (SqlServerTarget.Configured)
@@ -225,7 +225,7 @@ internal static class LiveWarehouse
         "tcc_gold.run_method_summary", "tcc_gold.unit_year_master", "tcc_gold.unit_credit_installment", "tcc_ops.run_manifest",
     ];
 
-    internal static bool Available => Environment.GetEnvironmentVariable("TCC_LIVE_PROFILE") == "yes" && Server is not null && AzLoggedIn();
+    internal static bool Available => Environment.GetEnvironmentVariable("TEST_LIVE_PROFILE") == "yes" && Server is not null && AzLoggedIn();
 
     private static (string Server, string Database)? Settings { get; } = Read();
 
@@ -287,7 +287,7 @@ internal static class LiveWarehouse
 
     private static (string, string)? Read()
     {
-        string? server = Environment.GetEnvironmentVariable("TCC_LIVE_SQL_SERVER"), database = Environment.GetEnvironmentVariable("TCC_LIVE_SQL_DATABASE");
+        string? server = Environment.GetEnvironmentVariable("TEST_LIVE_SQL_SERVER"), database = Environment.GetEnvironmentVariable("TEST_LIVE_SQL_DATABASE");
         if (server is not null && database is not null)
         {
             return (server, database);
@@ -295,7 +295,7 @@ internal static class LiveWarehouse
 
         var candidates = new[]
         {
-            Environment.GetEnvironmentVariable("TCC_ENV_FILE"),
+            Environment.GetEnvironmentVariable("TEST_ENV_FILE"),
             Path.Combine(PersistenceFixture.Root, "backend", ".env"),
             Path.Combine(PersistenceFixture.Root, "..", "tax-credit-copilot-public", "backend", ".env"),
         };

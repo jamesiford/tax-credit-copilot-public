@@ -35,7 +35,7 @@ def test_the_dry_run_names_the_command_fetches_no_secret_and_prints_none(tmp_pat
     out = result.stdout
     assert "az deployment group create --resource-group rg-test --name tcc-model-connection --parameters" in out
     assert "param connectionName = 'corp-gw'" in out and "param models = ['m1', 'm2']" in out
-    assert "param apiKey = readEnvironmentVariable('TCC_GATEWAY_SECRET')" in out
+    assert "param apiKey = readEnvironmentVariable('AI_GATEWAY_SECRET')" in out
     assert "Key Vault kv-test/gw-key" in out and "az keyvault" not in out
 
 

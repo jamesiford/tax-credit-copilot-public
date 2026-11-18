@@ -25,14 +25,14 @@ def environment(output: Path) -> dict:
     temporary = output / "tmp"
     temporary.mkdir(parents=True, exist_ok=True)
     env.update({"PYTHONPATH": str(ROOT), "PYTHONUTF8": "1", "PYTHONDONTWRITEBYTECODE": "1",
-                "CONTRACT_PYTHON": str(ORACLE), "TCC_PYTHON": str(ORACLE),
+                "CONTRACT_PYTHON": str(ORACLE), "ORACLE_PYTHON": str(ORACLE),
                 "ENVIRONMENT": "local", "DATA_CLASSIFICATION": "synthetic", "DATA_SOURCE": "csv",
-                "TCC_PERSISTENCE_PROVIDER": "sqlite", "ARTIFACT_STORE": "local", "AUTH_MODE": "none",
-                "TCC_CONTRACT_HOOKS": "1", "TCC_CONTRACT_DIR": str(ROOT / "contract"),
-                "TCC_REPOSITORY_ROOT": str(ROOT), "TCC_SEED_ROOT": str(ROOT / "contract" / "seed"),
+                "PERSISTENCE_PROVIDER": "sqlite", "ARTIFACT_STORE": "local", "AUTH_MODE": "none",
+                "CONTRACT_HOOKS": "1", "CONTRACT_DIR": str(ROOT / "contract"),
+                "REPOSITORY_ROOT": str(ROOT), "SEED_ROOT": str(ROOT / "contract" / "seed"),
                 "OPERATIONAL_DB": str(output / "operations.db"), "ARTIFACT_LOCAL_ROOT": str(output / "bytes"),
                 "FOUNDRY_PROJECT_ENDPOINT": "", "APPLICATIONINSIGHTS_CONNECTION_STRING": "",
-                "OTEL_SDK_DISABLED": "true", "TCC_WARM_ON_START": "0", "RUN_WORKER_INLINE": "0"})
+                "OTEL_SDK_DISABLED": "true", "WARM_ON_START": "0", "RUN_WORKER_INLINE": "0"})
     env.update({key: str(temporary) for key in ("TEMP", "TMP", "TMPDIR")})
     return env
 

@@ -8,7 +8,7 @@ Two modes share the datasets:
 - OFFLINE (the default, runs in CI): the deterministic parts — keyword routing,
   the numeric guard over recorded good and bad replies, and per-capability scope
   refusal. No model, no network, exact.
-- LIVE (`TCC_AI_EVALS_LIVE=1`): the same questions put to the configured
+- LIVE (`TEST_AI_EVALS_LIVE=1`): the same questions put to the configured
   providers — the router's JSON plan, and real narrations checked by the numeric
   guard — scored against the looser `live` thresholds, because a model varies.
 

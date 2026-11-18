@@ -28,7 +28,7 @@ public sealed class SkeletonHostStatus(IRuntimeConfiguration configuration, ICon
     {
         get
         {
-            var hermetic = startup["TCC_CONTRACT_HOOKS"] == "1";
+            var hermetic = startup["CONTRACT_HOOKS"] == "1";
             return new Dictionary<string, object?>(StringComparer.Ordinal)
             {
                 ["ready"] = hermetic,

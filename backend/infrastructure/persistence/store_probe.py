@@ -29,7 +29,7 @@ _AZURE_REMEDIES = {
     "config": "Set WAREHOUSE_SERVER (the server FQDN) and WAREHOUSE_DATABASE, with WAREHOUSE_PLATFORM=azure_sql.",
     "bootstrap": (
         "Run `python scripts/apply-migrations.py --target deployed --bootstrap` "
-        "(TCC_SQL_CREATED=true on a database Terraform just created)."
+        "(SQL_CREATED=true on a database Terraform just created)."
     ),
     "migrate": "Run `python scripts/apply-migrations.py --target deployed`.",
     "grants": (

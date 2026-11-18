@@ -91,7 +91,7 @@ There are no pre/postprovision hooks and no automatic schema/grant/seed scripts.
 Both apps are Linux **.NET 10 code deployments**, not containers, with
 `dotnet TaxCredit.Api.dll` / `dotnet TaxCredit.Gateway.dll`. Packages must place
 the DLL at the zip root and authored resources under `resources`; runtime uses
-`TCC_REPOSITORY_ROOT=/home/site/wwwroot/resources`. `RuntimePaths` expects
+`REPOSITORY_ROOT=/home/site/wwwroot/resources`. `RuntimePaths` expects
 `backend/rules` and `docs/data/schema`; staging must include the verified runtime
 resources described by `dotnet\deploy` (including consumed public wage/preview
 samples). Terraform does not assemble or certify the package.
@@ -102,14 +102,14 @@ samples). Terraform does not assemble or certify the package.
 inventory. `settings.tf` emits their real names:
 
 - Warehouse -> `FABRIC_SQL_SERVER`/`FABRIC_SQL_DATABASE`,
-  `TCC_PERSISTENCE_PROVIDER=warehouse`; no individual Python store selectors.
+  `PERSISTENCE_PROVIDER=warehouse`; no individual Python store selectors.
 - Source -> `SOURCE_SQL_SERVER`/`SOURCE_SQL_DATABASE`/`SOURCE_SCHEMA`,
   `DATA_SOURCE=lakehouse`; no OneLake/Delta/mapping-override controls.
 - Bytes -> `ARTIFACT_STORE=blob`, `ARTIFACT_BLOB_ACCOUNT_URL`; identity selected
   by per-service `AZURE_CLIENT_ID`. SQL clients enforce encryption/certificate
   validation in source code; there is no invented TLS environment switch.
 - `ENVIRONMENT=azure`, explicit classification/Entra/client allowlist, person
-  writer enforcement, strict pay-code/fiscal policies, `TCC_CONTRACT_HOOKS=0`.
+  writer enforcement, strict pay-code/fiscal policies, `CONTRACT_HOOKS=0`.
 - Gateway additionally gets its own tenant/audience, explicit caller/channel
   binding, rate 60/minute and `CHANNEL_DEBUG_WHOAMI=false`. It makes business
   calls **in-process**, so no `API_BASE_URL` is emitted.

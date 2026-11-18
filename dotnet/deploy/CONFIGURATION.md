@@ -58,7 +58,7 @@ auth, rule, source and artifact graph.
 | `ENVIRONMENT` | Explicit non-`local`. Unset defaults **local** in `RuntimeConfiguration`; empty is nonlocal in runtime validation. |
 | `DATA_CLASSIFICATION` | Explicit `synthetic` or `customer`. Runtime defaults synthetic and does not validate the enum; deployment lint closes that gap. |
 | `AUTH_MODE` | Explicit `entra`. Gateway forcibly sets it. `ALLOW_ANONYMOUS_SYNTHETIC` is **not wired** by `RuntimeTrustRegistration`; no deployed anonymous demo exemption. |
-| `TCC_PERSISTENCE_PROVIDER` | Exact `warehouse`; unset defaults sqlite. One destination for every Gold/ops repository, not one database per legacy store selector. |
+| `PERSISTENCE_PROVIDER` | Exact `warehouse`; unset defaults sqlite. One destination for every Gold/ops repository, not one database per legacy store selector. |
 | `FABRIC_SQL_SERVER`, `FABRIC_SQL_DATABASE` | Required Warehouse host/database. Explicit translation from Python `WAREHOUSE_SERVER` / `WAREHOUSE_DATABASE`; old names are **not aliases**. |
 | `DATA_SOURCE` | Exact `lakehouse` deployed, meaning SQL analytics. Unset defaults **csv**; empty/unknown rejected, unlike Python. `flex` is accepted only outside deployed validation. |
 | `SOURCE_SQL_SERVER`, `SOURCE_SQL_DATABASE` | Lakehouse SQL analytics endpoint and database. Resolve explicitly from verified endpoint metadata; translate `LAKEHOUSE_SQL_*` manually. No Warehouse-host or item-name fallback. |
@@ -73,8 +73,8 @@ auth, rule, source and artifact graph.
 | `CHANNEL_ENFORCE_WRITER_FOR_USERS` | Explicit `true` deployed; actual shared parser accepts `true/1/yes`, `false/0/no` and blank, **not `on/off`**. Gateway always enforces the acting-person writer check. |
 | `AZURE_CLIENT_ID` | Attached per-service user-assigned managed identity client id. Azure SDK consumes it; selecting an ID does not attach or grant the identity. |
 | `GIT_COMMIT` | Immutable build revision. Unset becomes `working-tree`; no git discovery subprocess. Empty is retained by runtime and rejected by deployment lint. |
-| `TCC_CONTRACT_HOOKS` | Off (`0` recommended). **Only exact `1` activates** token mint/reset/environment/drain controls; deployed runtime rejects enabled hooks. Ordinary `dotnet DLL` never invokes the project replay-launch MSBuild target. |
-| `TCC_REPOSITORY_ROOT` | Explicit staged product root: `/app/resources` in Linux images; `/home/site/wwwroot/resources` for App Service packages. **`TCC_RESOURCE_ROOT` does not exist.** |
+| `CONTRACT_HOOKS` | Off (`0` recommended). **Only exact `1` activates** token mint/reset/environment/drain controls; deployed runtime rejects enabled hooks. Ordinary `dotnet DLL` never invokes the project replay-launch MSBuild target. |
+| `REPOSITORY_ROOT` | Explicit staged product root: `/app/resources` in Linux images; `/home/site/wwwroot/resources` for App Service packages. **`RESOURCE_ROOT` does not exist.** |
 
 `AZURE_TENANT_ID` / `AZURE_TOKEN_CREDENTIALS` are SDK-chain inputs, not replacements
 for API trust. Existing SDK `DefaultAzureCredential` owns their behavior. A separate
@@ -113,7 +113,7 @@ prerequisites, not configuration fixes.
 ## Resources: preserve paths and Linux case
 
 API, Worker and gateway packages must retain this **allowlisted** resource tree,
-read-only, rooted at `TCC_REPOSITORY_ROOT`. The `resources` directory belongs under
+read-only, rooted at `REPOSITORY_ROOT`. The `resources` directory belongs under
 the published package root (`/app/resources` in the image,
 `/home/site/wwwroot/resources` on App Service), not an external checkout.
 Parent deployment tooling stages locked-restore inputs without changing
@@ -130,7 +130,7 @@ application projects or central package files:
 
 If `RULES_DIR` is overridden, previews seek `data/payroll_pay_periods.csv` beside
 that rules directory's parent. Null-coalescing paths preserve **empty strings**;
-do not set resource path variables to empty. `TCC_SEED_ROOT` may point at an absent
+do not set resource path variables to empty. `SEED_ROOT` may point at an absent
 `contract/seed` in production: seeds load only through local contract controls.
 No private extract, `backend/data/payroll/`, `.env`, SQLite database, token cache,
 generated log, contract seed directory or blanket `backend` copy belongs in production.
@@ -159,7 +159,7 @@ polls. There is an initial heartbeat but **no periodic extension during synchron
 calculation**. Python lease/concurrency/heartbeat/poll/backoff flags do nothing.
 `RUN_WORKER_STALE_SECONDS` translates to actual `RUN_STALE_WORKER_SECONDS`
 (default **60**, health reporting only, not Python's 300). `--once` or exact
-`TCC_WORKER_ONCE=1` drains finitely; ordinary daemon deployment keeps it off.
+`WORKER_ONCE=1` drains finitely; ordinary daemon deployment keeps it off.
 
 ## Orchestrator model and trust contract
 
@@ -225,8 +225,8 @@ environment switches. Do not claim those switches suppress its messages.
 The separate optional deployment-owned startup hook is now locally measured;
 see [`telemetry/README.md`](telemetry/README.md) for its exact integration,
 receipt, collector-failure, privacy and shutdown evidence. Its explicit settings
-are `DOTNET_STARTUP_HOOKS`, `TCC_TELEMETRY_ENABLED`, `OTEL_SERVICE_NAME`,
-`TCC_TELEMETRY_VERSION` and `TCC_TELEMETRY_ENDPOINT`. The hook subscribes
+are `DOTNET_STARTUP_HOOKS`, `TELEMETRY_ENABLED`, `OTEL_SERVICE_NAME`,
+`TELEMETRY_VERSION` and `TELEMETRY_ENDPOINT`. The hook subscribes
 allowlisted sources/meters, including custom AI signals when emitted, and exports
 a newly constructed minimal OTLP/HTTP JSON envelope. This does **not** change
 ServiceDefaults, install an application exporter, or make an unavailable model

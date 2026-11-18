@@ -86,7 +86,7 @@ def refusal_reason() -> str | None:
     if not synthetic_environment():
         return "DATA_CLASSIFICATION is not 'synthetic'; the seed invents claims and must never touch customer data"
     if not runtime.allow_seed:
-        return "TCC_ALLOW_SEED=1 is not set; seeding is an explicit act, never a side effect"
+        return "ALLOW_SEED=1 is not set; seeding is an explicit act, never a side effect"
     return None
 
 

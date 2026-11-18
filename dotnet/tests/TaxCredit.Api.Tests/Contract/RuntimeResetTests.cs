@@ -67,9 +67,9 @@ public sealed class RuntimeResetTests
         Assert.Equal("csv", (await csv.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("source").GetString());
         using var invalid = await host.Client.PostAsJsonAsync("/__contract__/env", new
         {
-            set = new Dictionary<string, string> { ["TCC_CONTRACT_HOOKS"] = "0" },
+            set = new Dictionary<string, string> { ["CONTRACT_HOOKS"] = "0" },
         });
         Assert.Equal(422, (int)invalid.StatusCode);
-        Assert.Equal("1", host.App.Services.GetRequiredService<IRuntimeConfiguration>().Get("TCC_CONTRACT_HOOKS"));
+        Assert.Equal("1", host.App.Services.GetRequiredService<IRuntimeConfiguration>().Get("CONTRACT_HOOKS"));
     }
 }

@@ -6,13 +6,13 @@
     Runs after every `azd provision` / `azd up`, reading Terraform outputs from
     the azd environment:
 
-      1. apply-migrations    `--bootstrap` ONLY when TCC_FABRIC_CREATED=true,
+      1. apply-migrations    `--bootstrap` ONLY when FABRIC_CREATED=true,
                              i.e. Terraform created this Warehouse. The script
                              still refuses the bootstrap if the Warehouse
                              already has tcc_ops.schema_migration, so a re-run
                              applies nothing.
       2. load-synthetic      public profile only, and only when Terraform created
-                             this Lakehouse (TCC_FABRIC_CREATED=true): the synthetic
+                             this Lakehouse (FABRIC_CREATED=true): the synthetic
                              source dataset into the new Lakehouse
                              (data.source.load_fabric). `--synthetic-only` OVERWRITES
                              every table it writes, so it never runs against a
@@ -21,7 +21,7 @@
                              the channel is enabled (GATEWAY_IDENTITY_NAME is set), also
                              INSERT/SELECT on tcc_ops.channel_audit to the gateway
                              identity, at object level only. When the governed data query's
-                             lakehouse source is on (TCC_DATA_QUERY_SOURCE_ENABLED=true), also
+                             lakehouse source is on (DATA_QUERY_SOURCE_ENABLED=true), also
                              READ-ONLY SELECT on the source payroll tables, on the lakehouse
                              SQL analytics endpoint, to the API identity (never the gateway).
       4. seed-operational-store  idempotent.
@@ -55,8 +55,8 @@ function Invoke-Step([string]$Title, [scriptblock]$Body) {
 # Azure SQL Database. `$created` is whether THIS apply created that store, the one case the destructive
 # bootstrap may run; `$createdLakehouse` is about the Lakehouse the synthetic source is loaded into.
 $azureSql = ($env:WAREHOUSE_PLATFORM -eq 'azure_sql')
-$createdLakehouse = ($env:TCC_FABRIC_CREATED -eq 'true')
-$created = if ($azureSql) { $env:TCC_SQL_CREATED -eq 'true' } else { $createdLakehouse }
+$createdLakehouse = ($env:FABRIC_CREATED -eq 'true')
+$created = if ($azureSql) { $env:SQL_CREATED -eq 'true' } else { $createdLakehouse }
 Invoke-Step 'apply-migrations' {
     if ($created) {
         & $python (Join-Path $PSScriptRoot 'apply-migrations.py') --target deployed --bootstrap
@@ -65,7 +65,7 @@ Invoke-Step 'apply-migrations' {
     }
 }
 
-if ($env:TCC_PROFILE -eq 'public' -and $createdLakehouse) {
+if ($env:DEPLOY_PROFILE -eq 'public' -and $createdLakehouse) {
     Invoke-Step 'load-synthetic' {
         Push-Location (Join-Path $repoRoot 'backend')
         try {
@@ -103,9 +103,9 @@ if (-not [string]::IsNullOrWhiteSpace($env:GATEWAY_IDENTITY_NAME) -and $env:GATE
 # The governed data query's lakehouse source reads the payroll tables through the lakehouse
 # SQL analytics endpoint. The API identity gets object-level SELECT on exactly the tables
 # the semantic model names; no write, no schema grant, and never the gateway identity.
-# Off unless the azd value TCC_DATA_QUERY_SOURCE_ENABLED is true (the same value Terraform
+# Off unless the azd value DATA_QUERY_SOURCE_ENABLED is true (the same value Terraform
 # maps to DATA_QUERY_SOURCE_ENABLED). GRANT is idempotent.
-if ($env:TCC_DATA_QUERY_SOURCE_ENABLED -eq 'true') {
+if ($env:DATA_QUERY_SOURCE_ENABLED -eq 'true') {
     Invoke-Step 'grant-warehouse-sql (lakehouse endpoint, read-only)' {
         & $python (Join-Path $PSScriptRoot 'grant-warehouse-sql.py') --target deployed --profile lakehouse
     }

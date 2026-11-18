@@ -22,7 +22,7 @@ run "azure_sql_is_off_by_default" {
   command = apply
 
   assert {
-    condition     = output.WAREHOUSE_PLATFORM == "fabric" && output.SQL_SERVER_FQDN == "" && output.TCC_SQL_CREATED == "false"
+    condition     = output.WAREHOUSE_PLATFORM == "fabric" && output.SQL_SERVER_FQDN == "" && output.SQL_CREATED == "false"
     error_message = "the default platform is Fabric and creates no Azure SQL server"
   }
 
@@ -42,7 +42,7 @@ run "azure_sql_feeds_the_warehouse_settings" {
   }
 
   assert {
-    condition     = output.WAREHOUSE_PLATFORM == "azure_sql" && output.TCC_SQL_CREATED == "true"
+    condition     = output.WAREHOUSE_PLATFORM == "azure_sql" && output.SQL_CREATED == "true"
     error_message = "the platform output says azure_sql and that this deployment created the database"
   }
 

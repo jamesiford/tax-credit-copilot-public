@@ -132,7 +132,7 @@ public sealed class VersionSensitiveTests
     }
 }
 
-/// <summary>Fails the run, with the instructions, unless <c>TCC_PYTHON</c> is CPython 3.12.</summary>
+/// <summary>Fails the run, with the instructions, unless <c>ORACLE_PYTHON</c> is CPython 3.12.</summary>
 public sealed class OracleInterpreterTests
 {
     [Fact]

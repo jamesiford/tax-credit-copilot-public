@@ -77,15 +77,15 @@ see [RUNBOOK.md §8](RUNBOOK.md#8-deployment-configuration-refused-at-startup).
 | `ALLOW_ANONYMOUS_SYNTHETIC` | `backend/application/auth_policy.py` | `1`/`true`/`yes`/`on` lets a deployed process run `AUTH_MODE=none`, and only with `DATA_CLASSIFICATION=synthetic` (the public profile's demo). Never honoured for `customer` [RM-03] | TF api: `1`, only when `auth_mode = "none"` | — | new in RM-03 | Enforced |
 | `GIT_COMMIT` | `backend/application/commands/run_client_calculation.py`, `backend/tools/reference_runner.py` | Commit stamped on every run (`run_manifest.code_commit`). Unset: `git rev-parse HEAD`, else `working-tree` | TF api: variable `git_commit` from azd `GIT_COMMIT`; `deploy.yml` sets `TF_VAR_git_commit` to the workflow commit | — | Same: param `gitCommit` from azd `GIT_COMMIT` | No (runs record `working-tree`) |
 | `LOG_LEVEL` | `backend/main.py` | Python root log level. Default `INFO` | not set | — | not set | No |
-| `TCC_STRANDED_RUN_MINUTES` | `backend/infrastructure/persistence/fabric_warehouse.py` | Minutes a run may stay `running` before the startup reaper marks it failed. Default `60` | not set | — | not set | No |
+| `STRANDED_RUN_MINUTES` | `backend/infrastructure/persistence/fabric_warehouse.py` | Minutes a run may stay `running` before the startup reaper marks it failed. Default `60` | not set | — | not set | No |
 
 ## 2. Payroll source (Fabric Lakehouse over OneLake)
 
 | Variable | Read by | Purpose / default | Deployed value | TF output | v1 Bicep | Required (deployed) |
 |---|---|---|---|---|---|---|
 | `DATA_SOURCE` | `backend/tools/fabric_source.py` (`resolve_data_source`, the one resolver), `backend/tools/reference_workspace.py`, `backend/application/warmup.py` | `lakehouse` (default; a blank or unset value too), `fabric` (flattened slice) or `csv` (test fixture, not deployable, only when set explicitly). `flex` is a deprecated alias for `lakehouse`; unknown values resolve to `lakehouse`. With the lakehouse selected and no `FABRIC_WORKSPACE` / `FABRIC_LAKEHOUSE` the API answers `503` naming them (`SourceNotConfigured`) | TF api: `lakehouse` | — | v1: param `dataSource` (azd `DATA_SOURCE`, default `flex`) | Functional |
-| `FABRIC_WORKSPACE` | `backend/data/source/from_fabric.py`, `backend/tools/fabric_source.py`, `backend/data/source/load_fabric.py`, `backend/data/source/to_delta.py` | Workspace name or id in OneLake paths. No default | TF api: `module.fabric.workspace_name` (created workspace, or azd `TCC_FABRIC_WORKSPACE_NAME`) | `FABRIC_WORKSPACE` | Setting from param `fabricWorkspace` (azd `FABRIC_WORKSPACE`); not an output | Functional (every payroll read) |
-| `FABRIC_LAKEHOUSE` | as above, plus `backend/infrastructure/persistence/source_sql.py` | Lakehouse name. No default | TF api: `module.fabric.lakehouse_name` (created, or azd `TCC_FABRIC_LAKEHOUSE_NAME`) | `FABRIC_LAKEHOUSE` | Setting from param `fabricLakehouse` (azd `FABRIC_LAKEHOUSE`); not an output | Functional |
+| `FABRIC_WORKSPACE` | `backend/data/source/from_fabric.py`, `backend/tools/fabric_source.py`, `backend/data/source/load_fabric.py`, `backend/data/source/to_delta.py` | Workspace name or id in OneLake paths. No default | TF api: `module.fabric.workspace_name` (created workspace, or azd `FABRIC_WORKSPACE_NAME`) | `FABRIC_WORKSPACE` | Setting from param `fabricWorkspace` (azd `FABRIC_WORKSPACE`); not an output | Functional (every payroll read) |
+| `FABRIC_LAKEHOUSE` | as above, plus `backend/infrastructure/persistence/source_sql.py` | Lakehouse name. No default | TF api: `module.fabric.lakehouse_name` (created, or azd `FABRIC_LAKEHOUSE_NAME`) | `FABRIC_LAKEHOUSE` | Setting from param `fabricLakehouse` (azd `FABRIC_LAKEHOUSE`); not an output | Functional |
 | `SOURCE_SCHEMA` | `backend/config.py`, `backend/data/source/onelake.py`, `backend/data/source/from_fabric.py`, `backend/data/source/to_delta.py`, `backend/infrastructure/persistence/source_sql.py`, `scripts/postprovision.ps1` | Lakehouse schema holding source payroll. Default `tcc_source` when unset; a customer overlay can select an existing schema such as `flex`. **Set but empty** means a lakehouse that is not schema-enabled (`Tables/<table>`, and `[lakehouse]..[table]` in SQL) | TF api: variable `source_schema` from azd `SOURCE_SCHEMA` | `SOURCE_SCHEMA` | new in v2 | Functional (every source-table read) |
 | `ONELAKE_ENDPOINT` | `backend/data/source/onelake.py` | Full URL of the workspace-specific private-link **blob** host, `https://<workspaceid-no-dashes>.z<xy>.blob.fabric.microsoft.com`; passed as the `azure_endpoint` storage option. Default unset: the public OneLake host. Never derived from a workspace name | not set | — | new | No |
 | `ONELAKE_PATH_STYLE` | `backend/data/source/onelake.py` | `name` (default) addresses `<workspace-name>` and `<lakehouse>.Lakehouse`; `guid` addresses the workspace id and the lakehouse item id (then `FABRIC_WORKSPACE` and `FABRIC_LAKEHOUSE` hold ids) | not set | — | new | No |
@@ -109,28 +109,28 @@ see [RUNBOOK.md §8](RUNBOOK.md#8-deployment-configuration-refused-at-startup).
 | `FIXTURE_ACCOUNT_ID` *(local)* | `backend/infrastructure/payroll/pay_period_source.py` | The one account a single-tenant fixture source (`DATA_SOURCE=csv` or `fabric`) holds. **No default**; the lakehouse never reads it. Replaces `FLEX_ACCOUNT_ID` (whose default `1001` named a specific client) | not set | — | removed in v2 | No |
 | `REFERENCE_ACCOUNT_ID` | `backend/tools/reference_identity.py` | The account the certified reference run is about. **Unset by default**: without it `GET /api/workspace` answers 200 with `available: false` and the other sealed reference views answer 503 `reference_dataset`; nothing else is affected, and the portal opens on the real book | not set | — | — | No |
 | `REFERENCE_ACCOUNT_NAME` | `backend/tools/reference_identity.py` | Display name of that account. Default `Reference Dataset Client` | not set | — | — | No |
-| `TCC_ALLOW_SEED` | `backend/data/seed_claims.py` | `1` lets the illustrative seed run, and only with `DATA_CLASSIFICATION=synthetic`; the seed also checks each target account's name. Set by `seed-operational-store.ps1` only for a synthetic environment | not set | — | — | No |
+| `ALLOW_SEED` | `backend/data/seed_claims.py` | `1` lets the illustrative seed run, and only with `DATA_CLASSIFICATION=synthetic`; the seed also checks each target account's name. Set by `seed-operational-store.ps1` only for a synthetic environment | not set | — | — | No |
 | `REFERENCE_ACCESS_OUTPUT_PATH` *(local)* | `backend/tools/reference_workspace.py` | Path to the partner's Access output for the sealed comparison | not set | — | not set | No |
 
 ## 3. Fabric Warehouse (`tcc_gold`, `tcc_ops`)
 
 | Variable | Read by | Purpose / default | Deployed value | TF output | v1 Bicep | Required (deployed) |
 |---|---|---|---|---|---|---|
-| `WAREHOUSE_SERVER` | `backend/infrastructure/persistence/fabric_warehouse.py`, `scripts/sql_common.py`, `scripts/seed-operational-store.ps1`, `scripts/postprovision.ps1` | Warehouse SQL endpoint host. No default | TF api: `module.fabric.warehouse_server` (created Warehouse's connection string, or azd `TCC_WAREHOUSE_SERVER`) | `WAREHOUSE_SERVER` | Setting from param `warehouseServer` (azd `WAREHOUSE_SERVER`); not an output | Functional (every Gold read and every `warehouse` store) |
-| `WAREHOUSE_DATABASE` | same as above | Warehouse database (item display name). No default | TF api: `module.fabric.warehouse_database` (created, or azd `TCC_WAREHOUSE_DATABASE`) | `WAREHOUSE_DATABASE` | Setting from param `warehouseDatabase`; not an output | Functional |
+| `WAREHOUSE_SERVER` | `backend/infrastructure/persistence/fabric_warehouse.py`, `scripts/sql_common.py`, `scripts/seed-operational-store.ps1`, `scripts/postprovision.ps1` | Warehouse SQL endpoint host. No default | TF api: `module.fabric.warehouse_server` (created Warehouse's connection string, or azd `EXISTING_WAREHOUSE_SERVER`) | `WAREHOUSE_SERVER` | Setting from param `warehouseServer` (azd `WAREHOUSE_SERVER`); not an output | Functional (every Gold read and every `warehouse` store) |
+| `WAREHOUSE_DATABASE` | same as above | Warehouse database (item display name). No default | TF api: `module.fabric.warehouse_database` (created, or azd `EXISTING_WAREHOUSE_DATABASE`) | `WAREHOUSE_DATABASE` | Setting from param `warehouseDatabase`; not an output | Functional |
 | `WAREHOUSE_ODBC_DRIVER` | `backend/infrastructure/persistence/fabric_warehouse.py` | ODBC driver name. Default `ODBC Driver 18 for SQL Server` | not set | — | not set | No |
 | `WAREHOUSE_CONNECT_TIMEOUT` | `backend/infrastructure/persistence/fabric_warehouse.py` | Connect timeout, seconds. Default `90` | not set | — | not set | No |
 | `WAREHOUSE_PLATFORM` | `backend/config_platform.py`, `scripts/sql_common.py`, `backend/infrastructure/persistence/store_probe.py` | Where `tcc_ops` / `tcc_gold` live: `fabric` (default, the Fabric Warehouse) or `azure_sql` (an Azure SQL Database). `azure_sql` makes the migration and grant tooling check the target against a server and database allow-list instead of resolving a Fabric item, and names Azure SQL remedies in readiness messages. The store settings keep the value `warehouse` | TF api: `WAREHOUSE_PLATFORM=azure_sql`, only when `warehouse_platform = "azure_sql"` | output `WAREHOUSE_PLATFORM` | not set | No (needed on Azure SQL) |
 | `WAREHOUSE_POOL_MAX_IDLE` | `backend/infrastructure/persistence/pool_policy.py` | Idle Warehouse connections kept. Unset: 4 (the value measured on Fabric) | not set | — | not set | No |
 | `WAREHOUSE_POOL_MAX_AGE_SECONDS` | same | How long an idle Warehouse connection is trusted. Unset: 45 (measured on Fabric; not yet measured on Azure SQL, so raise it only after a live check) | not set | — | not set | No |
-| `DATA_QUERY_TIMEOUT_SECONDS` | `backend/bootstrap/data_wiring.py` | Governed data-query statement time limit, seconds (clamped 1-120). Default `20`. A query past it is a typed `query_timeout`, never a partial result [CH-16c] | TF api: variable `data_query_timeout_seconds` (azd `TCC_DATA_QUERY_TIMEOUT_SECONDS`), only when set | — | not set | No |
-| `DATA_QUERY_MAX_ROWS` | same | Server row cap for a data query (1-500); can only lower a specification's own limit. Default `500` | TF api: `data_query_max_rows` (azd `TCC_DATA_QUERY_MAX_ROWS`), only when set | — | not set | No |
-| `DATA_QUERY_RATE_PER_MINUTE` | same | Data queries per person per minute (token bucket, 1-600), refused beyond it. Per process. Default `30` | TF api: `data_query_rate_per_minute` (azd `TCC_DATA_QUERY_RATE_PER_MINUTE`), only when set | — | not set | No |
-| `DATA_QUERY_MAX_CONCURRENCY` | same | Data queries in flight at once across all people (1-16); the next is refused as `query_busy`. Default `4` | TF api: `data_query_max_concurrency` (azd `TCC_DATA_QUERY_MAX_CONCURRENCY`), only when set | — | not set | No |
+| `DATA_QUERY_TIMEOUT_SECONDS` | `backend/bootstrap/data_wiring.py` | Governed data-query statement time limit, seconds (clamped 1-120). Default `20`. A query past it is a typed `query_timeout`, never a partial result [CH-16c] | TF api: variable `data_query_timeout_seconds` (azd `DATA_QUERY_TIMEOUT_SECONDS`), only when set | — | not set | No |
+| `DATA_QUERY_MAX_ROWS` | same | Server row cap for a data query (1-500); can only lower a specification's own limit. Default `500` | TF api: `data_query_max_rows` (azd `DATA_QUERY_MAX_ROWS`), only when set | — | not set | No |
+| `DATA_QUERY_RATE_PER_MINUTE` | same | Data queries per person per minute (token bucket, 1-600), refused beyond it. Per process. Default `30` | TF api: `data_query_rate_per_minute` (azd `DATA_QUERY_RATE_PER_MINUTE`), only when set | — | not set | No |
+| `DATA_QUERY_MAX_CONCURRENCY` | same | Data queries in flight at once across all people (1-16); the next is refused as `query_busy`. Default `4` | TF api: `data_query_max_concurrency` (azd `DATA_QUERY_MAX_CONCURRENCY`), only when set | — | not set | No |
 | `DATA_MIN_GROUP_SIZE` | same | The smallest group of people an aggregate over employee-level data may show (**K**); smaller groups are left out and counted. Default `5`; a value below `2` is read as `2`, never as off; a writer is exempt. A privacy floor, so **not** mapped in Terraform: the code default is the deployed value | none (set by hand to raise it) | — | not set | No |
-| `DATA_QUERY_SOURCE_ENABLED` | same | Switches ON the lakehouse source (raw payroll) datasets. Default `false`; the Gold and ops datasets are not behind it. Needs the lakehouse endpoint grants (`scripts/grant-warehouse-sql.py --profile lakehouse`, run by postprovision on the same azd value) | TF api: `data_query_source_enabled` (azd `TCC_DATA_QUERY_SOURCE_ENABLED`, default `false`), emitted only when true | — | not set | No |
-| `LAKEHOUSE_SQL_SERVER` | `backend/infrastructure/persistence/lakehouse_sql_connection.py`, `scripts/sql_common.py` | Lakehouse SQL analytics endpoint host. Defaults to `WAREHOUSE_SERVER` (one host per Fabric workspace); the grant script refuses a host that is not the guarded workspace's | TF api: `lakehouse_sql_server` (azd `TCC_LAKEHOUSE_SQL_SERVER`), only when set | — | not set | No (needs `DATA_QUERY_SOURCE_ENABLED`) |
-| `LAKEHOUSE_SQL_DATABASE` | same | The lakehouse's endpoint database. Defaults to `FABRIC_LAKEHOUSE` | TF api: `lakehouse_sql_database` (azd `TCC_LAKEHOUSE_SQL_DATABASE`), only when set | — | not set | No (needs `DATA_QUERY_SOURCE_ENABLED`) |
+| `DATA_QUERY_SOURCE_ENABLED` | same | Switches ON the lakehouse source (raw payroll) datasets. Default `false`; the Gold and ops datasets are not behind it. Needs the lakehouse endpoint grants (`scripts/grant-warehouse-sql.py --profile lakehouse`, run by postprovision on the same azd value) | TF api: `data_query_source_enabled` (azd `DATA_QUERY_SOURCE_ENABLED`, default `false`), emitted only when true | — | not set | No |
+| `LAKEHOUSE_SQL_SERVER` | `backend/infrastructure/persistence/lakehouse_sql_connection.py`, `scripts/sql_common.py` | Lakehouse SQL analytics endpoint host. Defaults to `WAREHOUSE_SERVER` (one host per Fabric workspace); the grant script refuses a host that is not the guarded workspace's | TF api: `lakehouse_sql_server` (azd `LAKEHOUSE_SQL_SERVER`), only when set | — | not set | No (needs `DATA_QUERY_SOURCE_ENABLED`) |
+| `LAKEHOUSE_SQL_DATABASE` | same | The lakehouse's endpoint database. Defaults to `FABRIC_LAKEHOUSE` | TF api: `lakehouse_sql_database` (azd `LAKEHOUSE_SQL_DATABASE`), only when set | — | not set | No (needs `DATA_QUERY_SOURCE_ENABLED`) |
 | `DATA_QUERY_SQLITE_DIR` | `backend/bootstrap/data_wiring.py` | Local runs only: a folder of `<schema>.db` files the SQLite data-query adapter attaches | not set | — | not set | No |
 | `GOLD_SCHEMA` | `backend/config.py` (also every SQL script through it) | Read schema. Default `tcc_gold`. A non-identifier is refused at import | not set | — | not set (v1 schemas were `flex_*`) | No. If set, set it identically for the API and the scripts |
 | `OPS_SCHEMA` | `backend/config.py` | Operational schema. Default `tcc_ops`. Same rule | not set | — | not set | No. Same rule |
@@ -201,9 +201,9 @@ pack under version control; pointing these elsewhere moves where the files are r
 
 | Variable | Read by | Purpose / default | Deployed value | TF output | v1 Bicep | Required (deployed) |
 |---|---|---|---|---|---|---|
-| `AUTH_TENANT_ID` | `backend/application/deployment.py` (`auth_tenant_id`, used by the token validator in `backend/bootstrap/auth_wiring.py`) | Tenant whose tokens the API accepts. Falls back to `AZURE_TENANT_ID` | TF api, only when `AUTH_MODE=entra`: azd `TCC_TENANT_ID`, else the deploying principal's tenant | — | new in v2 | Enforced when `AUTH_MODE=entra` |
+| `AUTH_TENANT_ID` | `backend/application/deployment.py` (`auth_tenant_id`, used by the token validator in `backend/bootstrap/auth_wiring.py`) | Tenant whose tokens the API accepts. Falls back to `AZURE_TENANT_ID` | TF api, only when `AUTH_MODE=entra`: azd `TENANT_ID`, else the deploying principal's tenant | — | new in v2 | Enforced when `AUTH_MODE=entra` |
 | `AZURE_TENANT_ID` | `backend/application/deployment.py` | Fallback for `AUTH_TENANT_ID` only | not set on the apps | — | not set | No |
-| `API_AUDIENCE` | `backend/application/deployment.py`, `backend/bootstrap/auth_wiring.py` | Audience the API validates | TF api, only when `entra`: azd `TCC_API_AUDIENCE`, else `api://<TCC_API_CLIENT_ID>` | — | new in v2 | Enforced when `AUTH_MODE=entra` |
+| `API_AUDIENCE` | `backend/application/deployment.py`, `backend/bootstrap/auth_wiring.py` | Audience the API validates | TF api, only when `entra`: azd `API_AUDIENCE`, else `api://<API_CLIENT_ID>` | — | new in v2 | Enforced when `AUTH_MODE=entra` |
 | `OVERRIDE_USE_MI_FIC_ASSERTION_CLIENTID` | App Service Easy Auth (platform), web app | Web identity's client id; Easy Auth uses a managed-identity federated credential instead of a client secret | TF platform (web), only when Easy Auth is on (enterprise) | — | new in v2 | Functional when Easy Auth is on |
 
 ## 7. Identity and telemetry
@@ -250,9 +250,9 @@ pack under version control; pointing these elsewhere moves where the files are r
 |---|---|---|---|---|---|---|
 | `WEB_CONCURRENCY` | `backend/startup.sh` | Gunicorn workers. Default `2` | TF api: variable `api_worker_count` (default `2`) | — | new in v2 | No |
 | `PORT` | `backend/startup.sh` | Bind port. Default `8000` | App Service platform | — | n/a (container) | Set by platform |
-| `TCC_WARM_ON_START` | `backend/application/warmup.py` | `0`/`false`/`no` disables the startup warm-up and Warehouse keepalive. Default `1`; skipped unless `DATA_SOURCE=lakehouse` | not set | — | not set | No |
-| `TCC_WARM_CLIENTS` | `backend/application/warmup.py` | How many clients warm-up pre-reads: the first N the source lists, never a fixed id. Default `3`; `0` warms none | not set | — | not set | No |
-| `TCC_KEEPALIVE_SECONDS` | `backend/application/warmup.py` | Warehouse pool keepalive interval. Default `30`, minimum `5` | not set | — | not set | No |
+| `WARM_ON_START` | `backend/application/warmup.py` | `0`/`false`/`no` disables the startup warm-up and Warehouse keepalive. Default `1`; skipped unless `DATA_SOURCE=lakehouse` | not set | — | not set | No |
+| `WARM_CLIENTS` | `backend/application/warmup.py` | How many clients warm-up pre-reads: the first N the source lists, never a fixed id. Default `3`; `0` warms none | not set | — | not set | No |
+| `KEEPALIVE_SECONDS` | `backend/application/warmup.py` | Warehouse pool keepalive interval. Default `30`, minimum `5` | not set | — | not set | No |
 | `CAPABILITY_TIMEOUT_SECONDS` | `backend/application/capabilities/invoke.py` | How long one `POST /api/capabilities/{tool}` call may run before the caller gets a structured `504 timeout`. Default `25`; a bad value raises. The gateway's own `CHANNEL_REQUEST_TIMEOUT_SECONDS` (default 30) sits just above it | not set | — | new | No |
 | `SCM_DO_BUILD_DURING_DEPLOYMENT` | App Service build (platform) | Build on deploy | TF platform: `true`, both apps | — | n/a (container images) | Platform |
 | `WEBSITES_CONTAINER_START_TIME_LIMIT` | App Service (platform) | Start-up time limit, seconds | TF platform: `1800`, API | — | n/a | Platform |
@@ -280,7 +280,7 @@ refused. Nothing below is a secret.
 | `CHANNEL_REQUEST_TIMEOUT_SECONDS` | `backend/channel/config.py` | How long the gateway waits for the API, `1`–`600`. Default `30`, above the API's own `CAPABILITY_TIMEOUT_SECONDS` | not set | — | No |
 | `CHANNEL_DEBUG_WHOAMI` | `backend/channel/config.py` | `true` offers the `channel_ping` diagnostic (who the platform believes is calling, by which rule, whether the API answers). Never returns a token. Default off; logs a WARNING at startup when on ([DEMO-CLEANUP](../m365-channel/DEMO-CLEANUP.md)) | not set | — | No |
 | `CHANNEL_MCP_ALLOWED_ORIGINS` | `backend/channel/config.py`, `backend/channel/mcp.py` | Comma-separated `scheme://host[:port]` origins a browser-originated request to `/mcp` may carry (no path, no wildcard; a malformed entry stops the start). The MCP specification requires Origin validation (DNS rebinding); a real MCP client is not a browser and sends none, so the default, empty, admits **no** request that carries an `Origin` (`403 origin_not_allowed`, checked before the token is read). Add an origin only if the Cowork client is found to send one (RM-14, D-136, unverified against the real client) | not set | — | No |
-| `CHANNEL_RESOLVE_DISPLAY_NAMES` | `backend/channel/config.py` | `true` makes the gateway look up the display name and UPN of a Teams or Copilot Chat user (an object id and the placeholder `(name not provided)` from the orchestrator) in Microsoft Graph (`GET /users/{oid}?$select=displayName,userPrincipalName`, 2 s timeout, 24 h cache, 5 min negative cache, fail-soft), so audit rows and the author of a write name a person. Needs the Graph application role `User.ReadBasic.All` on the gateway identity (admin action: `scripts/assign-channel-roles.ps1 -GrantUserReadBasic`). A Cowork caller already carries its name and never reaches Graph. Default off, so tests and local runs never reach Graph | TF channel: variable `channel_resolve_display_names` (azd `TCC_CHANNEL_RESOLVE_DISPLAY_NAMES`) | — | No |
+| `CHANNEL_RESOLVE_DISPLAY_NAMES` | `backend/channel/config.py` | `true` makes the gateway look up the display name and UPN of a Teams or Copilot Chat user (an object id and the placeholder `(name not provided)` from the orchestrator) in Microsoft Graph (`GET /users/{oid}?$select=displayName,userPrincipalName`, 2 s timeout, 24 h cache, 5 min negative cache, fail-soft), so audit rows and the author of a write name a person. Needs the Graph application role `User.ReadBasic.All` on the gateway identity (admin action: `scripts/assign-channel-roles.ps1 -GrantUserReadBasic`). A Cowork caller already carries its name and never reaches Graph. Default off, so tests and local runs never reach Graph | TF channel: variable `channel_resolve_display_names` (azd `CHANNEL_RESOLVE_DISPLAY_NAMES`) | — | No |
 | `WEB_CONCURRENCY` | `backend/startup-channel.sh` | Gunicorn workers. Default **`1`**: the fact ledger (`verify_figures`) and the rate limiter are per process | not set | — | No |
 | `ENVIRONMENT`, `DATA_CLASSIFICATION` | `backend/application/deployment.py` | As for the API (a non-`local` environment switches the durable-store checks on) | TF channel: `azure`, from the profile | — | Enforced |
 | `WAREHOUSE_SERVER`, `WAREHOUSE_DATABASE`, `FABRIC_WORKSPACE` | `backend/infrastructure/persistence/` | The Warehouse the audit trail is written to (the gateway holds `INSERT`/`SELECT` on `tcc_ops.channel_audit` only) | TF channel: the API's values | — | Enforced |
@@ -346,28 +346,28 @@ outputs it needs into `$GITHUB_ENV` after `terraform apply`.
 |---|---|---|---|
 | `WAREHOUSE_SERVER`, `WAREHOUSE_DATABASE` | `scripts/sql_common.py`, `scripts/seed-operational-store.ps1`, `scripts/postprovision.ps1` | Connect, and check the resolved target | TF outputs |
 | `FABRIC_WORKSPACE_ID`, `FABRIC_WAREHOUSE_ID` | `scripts/sql_common.py`, `scripts/postprovision.ps1` | Target `deployed`: the guard resolves these through the Fabric API before any SQL runs | TF outputs (new in v2) |
-| `TCC_FABRIC_CREATED` | `scripts/sql_common.py`, `scripts/postprovision.ps1`, `deploy.yml` | `true` only when this apply created the Warehouse; the only case the destructive bootstrap may run (D22) | TF output (new in v2) |
+| `FABRIC_CREATED` | `scripts/sql_common.py`, `scripts/postprovision.ps1`, `deploy.yml` | `true` only when this apply created the Warehouse; the only case the destructive bootstrap may run (D22) | TF output (new in v2) |
 | `SQL_SERVER_FQDN`, `SQL_DATABASE_NAME` | `scripts/sql_common.py` | Target `deployed` on `WAREHOUSE_PLATFORM=azure_sql`: the server and database Terraform created. The guard compares `WAREHOUSE_SERVER` / `WAREHOUSE_DATABASE` to them before any SQL runs | TF outputs (empty on Fabric) |
-| `TCC_SQL_CREATED` | `scripts/sql_common.py`, `scripts/postprovision.ps1` | `true` only when this apply created the Azure SQL database: the one case the destructive bootstrap may run | TF output |
+| `SQL_CREATED` | `scripts/sql_common.py`, `scripts/postprovision.ps1` | `true` only when this apply created the Azure SQL database: the one case the destructive bootstrap may run | TF output |
 | `API_IDENTITY_NAME` | `scripts/grant-warehouse-sql.py` | Principal for the T-SQL grants | TF output (new in v2) |
-| `TCC_DATA_QUERY_SOURCE_ENABLED` | `scripts/postprovision.ps1` | `true` adds the read-only lakehouse-endpoint grant step (`grant-warehouse-sql.py --profile lakehouse`, API identity only) | azd value, the same one Terraform maps to `DATA_QUERY_SOURCE_ENABLED` |
-| `TCC_PROFILE` | `scripts/postprovision.ps1` | `public` runs the synthetic load | azd input, echoed as TF output |
+| `DATA_QUERY_SOURCE_ENABLED` | `scripts/postprovision.ps1` | `true` adds the read-only lakehouse-endpoint grant step (`grant-warehouse-sql.py --profile lakehouse`, API identity only) | azd value, the same one Terraform maps to `DATA_QUERY_SOURCE_ENABLED` |
+| `DEPLOY_PROFILE` | `scripts/postprovision.ps1` | `public` runs the synthetic load | azd input, echoed as TF output |
 | `SOURCE_SCHEMA`, `FABRIC_WORKSPACE`, `FABRIC_LAKEHOUSE` | `scripts/postprovision.ps1`, `backend/data/source/load_fabric.py` | Synthetic load target | TF outputs |
 | `GOLD_SCHEMA`, `OPS_SCHEMA` | every SQL script via `backend/config.py` | Schema names | unset (defaults) |
 | `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID` | `deploy.yml` | OIDC login; mapped to `ARM_*` and `FABRIC_CLIENT_ID` / `FABRIC_TENANT_ID` (with `ARM_USE_OIDC`, `FABRIC_USE_OIDC`) | GitHub repository or environment variables ([OIDC-SETUP.md](OIDC-SETUP.md)) |
 | `AZURE_ENV_NAME`, `AZURE_LOCATION`, `AZURE_RESOURCE_GROUP` | `deploy.yml` | `TF_VAR_environment_name`, `TF_VAR_location`, `TF_VAR_resource_group_name`; target assertion | GitHub variables |
 | `TF_BACKEND_RESOURCE_GROUP`, `TF_BACKEND_STORAGE_ACCOUNT`, `TF_BACKEND_CONTAINER` | `deploy.yml` | Remote state; the run fails without them (D23) | GitHub variables |
 | `TF_VARS_JSON` | `deploy.yml` | Enterprise BYO inputs, written to `deploy.auto.tfvars.json` | GitHub variable (no secrets) |
-| `TCC_REPO_ROOT` *(local)* | `backend/tools/verify_reference_independent.py` | Repo root override | unset |
+| `REPOSITORY_ROOT` *(local)* | `backend/tools/verify_reference_independent.py` | Repo root override | unset |
 
 ## 13. Tests only
 
 | Variable | Read by | Purpose |
 |---|---|---|
-| `TCC_REQUIRE_PARITY` | `backend/tests/test_engine_parity_reference.py`, `backend/tests/test_flex_roundtrip.py` | `1` turns a missing-fixture skip of the parity gate into a collection error |
-| `TCC_FABRIC_TESTS` | live-Fabric tests under `backend/tests/` | `1` opts in to tests that read the Lakehouse and Warehouse |
-| `TCC_SQL_TESTS` | `backend/tests/contracts/conftest.py` | `1` runs the operational-store contract suite against the Warehouse the `WAREHOUSE_*` settings name, Fabric or Azure SQL (`TCC_FABRIC_TESTS=1` still works). Rows are written under a client_id block of its own and deleted afterwards |
-| `TCC_AZURE_TESTS` | `backend/tests/contracts/conftest.py` | `1` (with `ARTIFACT_BLOB_ACCOUNT_URL`) runs the artifact store contract against Blob |
+| `TEST_REQUIRE_PARITY` | `backend/tests/test_engine_parity_reference.py`, `backend/tests/test_flex_roundtrip.py` | `1` turns a missing-fixture skip of the parity gate into a collection error |
+| `TEST_FABRIC` | live-Fabric tests under `backend/tests/` | `1` opts in to tests that read the Lakehouse and Warehouse |
+| `TEST_SQL` | `backend/tests/contracts/conftest.py` | `1` runs the operational-store contract suite against the Warehouse the `WAREHOUSE_*` settings name, Fabric or Azure SQL (`TEST_FABRIC=1` still works). Rows are written under a client_id block of its own and deleted afterwards |
+| `TEST_AZURE` | `backend/tests/contracts/conftest.py` | `1` (with `ARTIFACT_BLOB_ACCOUNT_URL`) runs the artifact store contract against Blob |
 | `DATA_SOURCE` | `backend/tests/conftest.py` | Pinned to `csv` for the whole suite; never taken from `.env` |
 | `FABRIC_WORKSPACE`, `FABRIC_LAKEHOUSE`, `FABRIC_EMPLOYEES_TABLE`, `WAREHOUSE_SERVER`, `WAREHOUSE_DATABASE` | `backend/tests/conftest.py` | Copied from `backend/.env` when unset, for the opt-in live tests |
 
@@ -380,41 +380,41 @@ into the settings above. Full guidance is in [DEPLOYMENT-HANDOVER.md](DEPLOYMENT
 
 | azd value | Terraform variable | Default | Profile | Becomes |
 |---|---|---|---|---|
-| `TCC_PROFILE` | `profile` | `public` | both | Every profile default in `infra/locals.tf`; output `TCC_PROFILE` |
-| `TCC_ENABLE_M365_CHANNEL` | `enable_m365_channel` | `false` | public | The channel gateway app, its identity, telemetry role and diagnostic setting; outputs `CHANNEL_APP_NAME`, `CHANNEL_BASE_URL`, `GATEWAY_IDENTITY_NAME`. Needs `auth_mode = "entra"` and `api_client_id` |
-| `TCC_CHANNEL_GATEWAY_AUDIENCE` | `channel_gateway_audience` | none | public (required with the toggle) | `GATEWAY_AUDIENCE` |
-| `TCC_CHANNEL_WRITER_SOURCE` | `channel_writer_source` | `allowlist` | public | `CHANNEL_WRITER_SOURCE` |
-| `TCC_CHANNEL_WRITER_GROUP_ID` | `channel_writer_group_id` | none | public (required unless `allowlist`) | `CHANNEL_WRITER_GROUP_ID` |
-| `TCC_CHANNEL_RESOLVE_DISPLAY_NAMES` | `channel_resolve_display_names` | `false` | public | `CHANNEL_RESOLVE_DISPLAY_NAMES` (only when true; needs Graph `User.ReadBasic.All` on the gateway identity) |
-| `TCC_DATA_QUERY_SOURCE_ENABLED` | `data_query_source_enabled` | `false` | both | `DATA_QUERY_SOURCE_ENABLED` on the API (only when true). postprovision also reads this value and, when `true`, grants the API identity read-only `SELECT` on the source payroll tables through the lakehouse endpoint |
-| `TCC_DATA_QUERY_TIMEOUT_SECONDS`, `TCC_DATA_QUERY_MAX_ROWS`, `TCC_DATA_QUERY_RATE_PER_MINUTE`, `TCC_DATA_QUERY_MAX_CONCURRENCY` | `data_query_timeout_seconds`, `data_query_max_rows`, `data_query_rate_per_minute`, `data_query_max_concurrency` | unset | both | `DATA_QUERY_TIMEOUT_SECONDS` (1-120), `DATA_QUERY_MAX_ROWS` (1-500), `DATA_QUERY_RATE_PER_MINUTE` (1-600), `DATA_QUERY_MAX_CONCURRENCY` (1-16), each only when set; an out-of-range value fails the plan |
-| `TCC_LAKEHOUSE_SQL_SERVER`, `TCC_LAKEHOUSE_SQL_DATABASE` | `lakehouse_sql_server`, `lakehouse_sql_database` | unset | both | `LAKEHOUSE_SQL_SERVER`, `LAKEHOUSE_SQL_DATABASE`, only when set; the application falls back to the Warehouse host and the lakehouse name |
+| `DEPLOY_PROFILE` | `profile` | `public` | both | Every profile default in `infra/locals.tf`; output `DEPLOY_PROFILE` |
+| `M365_CHANNEL_ENABLED` | `enable_m365_channel` | `false` | public | The channel gateway app, its identity, telemetry role and diagnostic setting; outputs `CHANNEL_APP_NAME`, `CHANNEL_BASE_URL`, `GATEWAY_IDENTITY_NAME`. Needs `auth_mode = "entra"` and `api_client_id` |
+| `CHANNEL_GATEWAY_AUDIENCE` | `channel_gateway_audience` | none | public (required with the toggle) | `GATEWAY_AUDIENCE` |
+| `CHANNEL_WRITER_SOURCE` | `channel_writer_source` | `allowlist` | public | `CHANNEL_WRITER_SOURCE` |
+| `CHANNEL_WRITER_GROUP_ID` | `channel_writer_group_id` | none | public (required unless `allowlist`) | `CHANNEL_WRITER_GROUP_ID` |
+| `CHANNEL_RESOLVE_DISPLAY_NAMES` | `channel_resolve_display_names` | `false` | public | `CHANNEL_RESOLVE_DISPLAY_NAMES` (only when true; needs Graph `User.ReadBasic.All` on the gateway identity) |
+| `DATA_QUERY_SOURCE_ENABLED` | `data_query_source_enabled` | `false` | both | `DATA_QUERY_SOURCE_ENABLED` on the API (only when true). postprovision also reads this value and, when `true`, grants the API identity read-only `SELECT` on the source payroll tables through the lakehouse endpoint |
+| `DATA_QUERY_TIMEOUT_SECONDS`, `DATA_QUERY_MAX_ROWS`, `DATA_QUERY_RATE_PER_MINUTE`, `DATA_QUERY_MAX_CONCURRENCY` | `data_query_timeout_seconds`, `data_query_max_rows`, `data_query_rate_per_minute`, `data_query_max_concurrency` | unset | both | `DATA_QUERY_TIMEOUT_SECONDS` (1-120), `DATA_QUERY_MAX_ROWS` (1-500), `DATA_QUERY_RATE_PER_MINUTE` (1-600), `DATA_QUERY_MAX_CONCURRENCY` (1-16), each only when set; an out-of-range value fails the plan |
+| `LAKEHOUSE_SQL_SERVER`, `LAKEHOUSE_SQL_DATABASE` | `lakehouse_sql_server`, `lakehouse_sql_database` | unset | both | `LAKEHOUSE_SQL_SERVER`, `LAKEHOUSE_SQL_DATABASE`, only when set; the application falls back to the Warehouse host and the lakehouse name |
 | `AZURE_ENV_NAME` | `environment_name` | written by azd | both | Resource names, `azd-env-name` tag |
 | `AZURE_LOCATION` | `location` | none | both | Region; output `AZURE_LOCATION` |
 | `AZURE_RESOURCE_GROUP` | `resource_group_name` | `rg-<env>` | both | Output `AZURE_RESOURCE_GROUP` |
 | `AZURE_SUBSCRIPTION_ID` | `subscription_id` | written by azd | both | Provider subscription |
-| `TCC_TENANT_ID` | `tenant_id` | deploying principal's tenant | enterprise | `AUTH_TENANT_ID`, Easy Auth issuer |
+| `TENANT_ID` | `tenant_id` | deploying principal's tenant | enterprise | `AUTH_TENANT_ID`, Easy Auth issuer |
 | `GIT_COMMIT` | `git_commit` | empty | both | `GIT_COMMIT` |
 | `FABRIC_CAPACITY_ADMIN` | `fabric_capacity_admin` | none | public (`create_fabric`) | Capacity administrator; required when Fabric is created |
-| `TCC_WEB_CLIENT_ID` | `web_client_id` | none | enterprise (required) | Easy Auth client id |
-| `TCC_API_CLIENT_ID` | `api_client_id` | none | enterprise (required) | `API_AUDIENCE` when `TCC_API_AUDIENCE` is empty |
-| `TCC_API_AUDIENCE` | `api_audience` | `api://<api client id>` | enterprise | `API_AUDIENCE` |
-| `TCC_APP_SUBNET_ID` | `app_integration_subnet_id` | none | enterprise (required) | VNet integration subnet |
-| `TCC_PRIVATE_ENDPOINT_SUBNET_ID` | `private_endpoint_subnet_id` | none | enterprise (required) | Private endpoint subnet |
-| `TCC_FABRIC_WORKSPACE_ID` | `fabric_workspace_id` | none | enterprise (required) | Output `FABRIC_WORKSPACE_ID` |
-| `TCC_FABRIC_WORKSPACE_NAME` | `fabric_workspace_name` | created workspace | enterprise | `FABRIC_WORKSPACE` |
-| `TCC_FABRIC_LAKEHOUSE_NAME` | `fabric_lakehouse_name` | created Lakehouse | enterprise | `FABRIC_LAKEHOUSE` |
-| `TCC_FABRIC_WAREHOUSE_ID` | `fabric_warehouse_id` | none | enterprise (required) | Output `FABRIC_WAREHOUSE_ID` |
-| `TCC_WAREHOUSE_SERVER` | `warehouse_server` | created Warehouse | enterprise (required) | `WAREHOUSE_SERVER` |
-| `TCC_WAREHOUSE_DATABASE` | `warehouse_database` | created Warehouse | enterprise (required) | `WAREHOUSE_DATABASE` |
-| `TCC_WAREHOUSE_PLATFORM` | `warehouse_platform` | `fabric` | both | `WAREHOUSE_PLATFORM` (only when `azure_sql`); `azure_sql` creates the Azure SQL module and points `WAREHOUSE_SERVER` / `WAREHOUSE_DATABASE` at it |
-| `TCC_SQL_ADMIN_GROUP_OBJECT_ID`, `TCC_SQL_ADMIN_GROUP_NAME` | `azure_sql_admin_group_object_id`, `azure_sql_admin_group_name` | none | both (required for `azure_sql`) | The Entra group that administers the server and creates database users. Terraform-only inputs without an azd value: `azure_sql_database_name`, `azure_sql_sku`, `azure_sql_max_size_gb`, `azure_sql_public_network_access`, `azure_sql_firewall_rules` |
+| `WEB_CLIENT_ID` | `web_client_id` | none | enterprise (required) | Easy Auth client id |
+| `API_CLIENT_ID` | `api_client_id` | none | enterprise (required) | `API_AUDIENCE` when `API_AUDIENCE` is empty |
+| `API_AUDIENCE` | `api_audience` | `api://<api client id>` | enterprise | `API_AUDIENCE` |
+| `APP_SUBNET_ID` | `app_integration_subnet_id` | none | enterprise (required) | VNet integration subnet |
+| `PRIVATE_ENDPOINT_SUBNET_ID` | `private_endpoint_subnet_id` | none | enterprise (required) | Private endpoint subnet |
+| `EXISTING_FABRIC_WORKSPACE_ID` | `fabric_workspace_id` | none | enterprise (required) | Output `FABRIC_WORKSPACE_ID` |
+| `FABRIC_WORKSPACE_NAME` | `fabric_workspace_name` | created workspace | enterprise | `FABRIC_WORKSPACE` |
+| `FABRIC_LAKEHOUSE_NAME` | `fabric_lakehouse_name` | created Lakehouse | enterprise | `FABRIC_LAKEHOUSE` |
+| `EXISTING_FABRIC_WAREHOUSE_ID` | `fabric_warehouse_id` | none | enterprise (required) | Output `FABRIC_WAREHOUSE_ID` |
+| `EXISTING_WAREHOUSE_SERVER` | `warehouse_server` | created Warehouse | enterprise (required) | `WAREHOUSE_SERVER` |
+| `EXISTING_WAREHOUSE_DATABASE` | `warehouse_database` | created Warehouse | enterprise (required) | `WAREHOUSE_DATABASE` |
+| `WAREHOUSE_PLATFORM` | `warehouse_platform` | `fabric` | both | `WAREHOUSE_PLATFORM` (only when `azure_sql`); `azure_sql` creates the Azure SQL module and points `WAREHOUSE_SERVER` / `WAREHOUSE_DATABASE` at it |
+| `SQL_ADMIN_GROUP_OBJECT_ID`, `SQL_ADMIN_GROUP_NAME` | `azure_sql_admin_group_object_id`, `azure_sql_admin_group_name` | none | both (required for `azure_sql`) | The Entra group that administers the server and creates database users. Terraform-only inputs without an azd value: `azure_sql_database_name`, `azure_sql_sku`, `azure_sql_max_size_gb`, `azure_sql_public_network_access`, `azure_sql_firewall_rules` |
 | `SOURCE_SCHEMA` | `source_schema` | `flex` | both | `SOURCE_SCHEMA` |
 | `FOUNDRY_MODEL` | `foundry_model` | `gpt-4.1-mini` | both | `FOUNDRY_MODEL`, deployment name |
 | `FOUNDRY_MODEL_VERSION` | `foundry_model_version` | `2025-04-14` | both | Model version (not an app setting) |
-| `TCC_APP_SERVICE_SKU` | `app_service_sku` | `P1v3` | both | Plan SKU (not an app setting) |
-| `TCC_FOUNDRY_PUBLIC_NETWORK_ACCESS` | `foundry_public_network_access` | `false` | public | **Demo only.** Not an app setting: it changes two properties of the Foundry account (`publicNetworkAccess`, `networkAcls`). `true` enables the account's public endpoint (Entra-only, local auth off, private endpoint kept). Refused with the enterprise profile and customer data. Output `network_posture` |
-| `TCC_FOUNDRY_ALLOWED_IP_RANGES` | `foundry_allowed_ip_ranges` | empty | public | **Demo only.** Comma-separated IPv4 CIDRs allowed through the account firewall when the toggle is on; empty allows any address |
+| `APP_SERVICE_SKU` | `app_service_sku` | `P1v3` | both | Plan SKU (not an app setting) |
+| `FOUNDRY_PUBLIC_NETWORK_ACCESS` | `foundry_public_network_access` | `false` | public | **Demo only.** Not an app setting: it changes two properties of the Foundry account (`publicNetworkAccess`, `networkAcls`). `true` enables the account's public endpoint (Entra-only, local auth off, private endpoint kept). Refused with the enterprise profile and customer data. Output `network_posture` |
+| `FOUNDRY_ALLOWED_IP_RANGES` | `foundry_allowed_ip_ranges` | empty | public | **Demo only.** Comma-separated IPv4 CIDRs allowed through the account firewall when the toggle is on; empty allows any address |
 
 Terraform variables with no azd mapping, settable only through a tfvars
 overlay (`*.auto.tfvars`, `infra/profiles/*.tfvars`, or `TF_VARS_JSON` in
@@ -452,8 +452,8 @@ above.
 | `AZURE_CONTAINER_REGISTRY_NAME` | — | removed in v2 |
 | `AZURE_CONTAINER_APPS_ENVIRONMENT_NAME` | — | removed in v2: App Service plan |
 | `COSMOS_ENDPOINT`, `COSMOS_ACCOUNT_NAME`, `COSMOS_DATABASE` | — | removed in A05 |
-| — | `TCC_PROFILE`, `AUTH_MODE`, `DATA_CLASSIFICATION` | new: resolved profile |
+| — | `DEPLOY_PROFILE`, `AUTH_MODE`, `DATA_CLASSIFICATION` | new: resolved profile |
 | — | `API_IDENTITY_NAME`, `API_IDENTITY_CLIENT_ID`, `API_IDENTITY_PRINCIPAL_ID` | new: the API's own identity (v1 had one shared identity) |
 | — | `ARTIFACT_BLOB_ACCOUNT_URL` | new |
-| — | `FABRIC_WORKSPACE_ID`, `FABRIC_WORKSPACE`, `FABRIC_LAKEHOUSE`, `FABRIC_WAREHOUSE_ID`, `WAREHOUSE_SERVER`, `WAREHOUSE_DATABASE`, `SOURCE_SCHEMA`, `TCC_FABRIC_CREATED` | new: Fabric is in Terraform (created or brought) |
+| — | `FABRIC_WORKSPACE_ID`, `FABRIC_WORKSPACE`, `FABRIC_LAKEHOUSE`, `FABRIC_WAREHOUSE_ID`, `WAREHOUSE_SERVER`, `WAREHOUSE_DATABASE`, `SOURCE_SCHEMA`, `FABRIC_CREATED` | new: Fabric is in Terraform (created or brought) |
 | — | `api_role_assignments`, `web_role_assignments`, `easy_auth_enabled` | new, lower case: for review, not used by hooks |

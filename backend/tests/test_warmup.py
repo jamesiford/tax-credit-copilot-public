@@ -21,13 +21,13 @@ def test_warming_is_skipped_when_the_cost_is_a_local_file(monkeypatch):
 def test_warming_can_be_turned_off(monkeypatch):
     monkeypatch.setenv("DATA_SOURCE", "lakehouse")
     for value in ("0", "false", "no"):
-        monkeypatch.setenv("TCC_WARM_ON_START", value)
+        monkeypatch.setenv("WARM_ON_START", value)
         assert should_warm() is False
 
 
 def test_warming_is_on_by_default_against_the_lakehouse(monkeypatch):
     monkeypatch.setenv("DATA_SOURCE", "lakehouse")
-    monkeypatch.delenv("TCC_WARM_ON_START", raising=False)
+    monkeypatch.delenv("WARM_ON_START", raising=False)
     assert should_warm() is True
 
 

@@ -23,6 +23,8 @@ PINNED_TARGETS = REPO / "docs" / "platform-v2" / "live-targets.json"
 if str(BACKEND) not in sys.path:
     sys.path.insert(0, str(BACKEND))
 
+from config_aliases import env_value  # noqa: E402  (one-release fallback for the renamed azd outputs)
+
 # Exit codes the callers (and AGENTS.md) rely on.
 EXIT_OK = 0
 EXIT_FAILED = 1
@@ -66,7 +68,7 @@ def allowed_target(name: str):
 
     `deployed` is the Warehouse this environment's Terraform outputs name
     (FABRIC_WORKSPACE_ID / FABRIC_WAREHOUSE_ID). It may be bootstrapped only
-    when TCC_FABRIC_CREATED=true, i.e. Terraform created it in this apply.
+    when FABRIC_CREATED=true, i.e. Terraform created it in this apply.
     Any other name must be pinned in docs/platform-v2/live-targets.json.
     """
     from infrastructure.persistence.schema_admin import AllowedTarget, TargetMismatch, load_pinned_targets
@@ -80,7 +82,7 @@ def allowed_target(name: str):
             name="deployed",
             workspace_id=workspace,
             item_id=item,
-            bootstrap_approved=os.getenv("TCC_FABRIC_CREATED", "").strip().lower() == "true",
+            bootstrap_approved=os.getenv("FABRIC_CREATED", "").strip().lower() == "true",
         )
     pinned = load_pinned_targets(PINNED_TARGETS)
     if name not in pinned:
@@ -115,7 +117,7 @@ def allowed_sql_target(name: str):
     `deployed` is the server and database this environment's Terraform outputs name (SQL_SERVER_FQDN /
     SQL_DATABASE_NAME) — deliberately NOT the WAREHOUSE_* values the connection will use, so the check
     compares two independent statements of the same fact. It may be bootstrapped only when
-    TCC_SQL_CREATED=true, i.e. Terraform created the database in this apply. Any other name must be pinned
+    SQL_CREATED=true, i.e. Terraform created the database in this apply. Any other name must be pinned
     in docs/platform-v2/live-targets.json with `"platform": "azure_sql"`.
     """
     from infrastructure.persistence.schema_admin import TargetMismatch
@@ -130,7 +132,7 @@ def allowed_sql_target(name: str):
             name="deployed",
             server=server,
             database=database,
-            bootstrap_approved=os.getenv("TCC_SQL_CREATED", "").strip().lower() == "true",
+            bootstrap_approved=os.getenv("SQL_CREATED", "").strip().lower() == "true",
         )
     pinned = load_pinned_sql_targets(PINNED_TARGETS)
     if name not in pinned:

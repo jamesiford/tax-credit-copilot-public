@@ -98,13 +98,13 @@ public sealed class PackValidationParityTests
         var semanticReports = PackValidationHarness.Records("doc").Count(r => r.ContainsKey("report"));
         var text = PackValidationDeviationReport.Build(run.Comparisons, semanticIssues, semanticReports, (string)meta["jsonschema"]!);
         Assert.StartsWith("8.0.5", System.Reflection.CustomAttributeExtensions.GetCustomAttribute<System.Reflection.AssemblyInformationalVersionAttribute>(typeof(Json.Schema.JsonSchema).Assembly)?.InformationalVersion ?? string.Empty, StringComparison.Ordinal);
-        if (Environment.GetEnvironmentVariable("TCC_UPDATE_DEVIATIONS") == "1")
+        if (Environment.GetEnvironmentVariable("TEST_UPDATE_DEVIATIONS") == "1")
         {
             File.WriteAllText(PackValidationDeviationReport.Path, text);
         }
 
         var onDisk = File.Exists(PackValidationDeviationReport.Path) ? File.ReadAllText(PackValidationDeviationReport.Path).Replace("\r\n", "\n", StringComparison.Ordinal) : string.Empty;
-        Assert.True(onDisk == text, "docs/pack-validation-deviations.md is not what the measurement produces; run this test with TCC_UPDATE_DEVIATIONS=1 and review the diff.");
+        Assert.True(onDisk == text, "docs/pack-validation-deviations.md is not what the measurement produces; run this test with TEST_UPDATE_DEVIATIONS=1 and review the diff.");
     }
 
     [Fact]

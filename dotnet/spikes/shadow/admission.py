@@ -39,13 +39,13 @@ def oracle_preflight() -> bool:
 
 def capacity_admission(check: Path) -> dict:
     started = time.monotonic()
-    approved = os.environ.get("TCC_SHADOW_APPROVED") == "yes"
+    approved = os.environ.get("SPIKE_SHADOW_APPROVED") == "yes"
     guard = guard_preflight()
     result = {"approved": approved, "guard": guard["verdict"], "capacity": "not-attempted",
               "oracle": "correct" if oracle_preflight() else "refused"}
     if not approved or guard["verdict"] != "passed" or result["oracle"] != "correct":
         return result
-    environment = {**os.environ, "TCC_REPO": str(ROOT), "PYTHONPATH": str(ROOT / "backend"),
+    environment = {**os.environ, "SPIKE_REPO": str(ROOT), "PYTHONPATH": str(ROOT / "backend"),
                    "PYTHONDONTWRITEBYTECODE": "1"}
     try:
         probe = subprocess.run([str(ORACLE), str(check)], cwd=ROOT / "backend", env=environment,

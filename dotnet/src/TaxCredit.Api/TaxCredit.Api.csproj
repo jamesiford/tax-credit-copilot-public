@@ -6,9 +6,9 @@
   </PropertyGroup>
   <!-- The conductor marks its hermetic launch with the inventory directory, not the hook flag. -->
   <Target Name="ConfigureContractReplayLaunch" BeforeTargets="ComputeRunArguments"
-          Condition="'$(TCC_CONTRACT_DIR)' != '' and '$(TCC_CONTRACT_HOOKS)' == '' and Exists('$(TCC_CONTRACT_DIR)\inventory\routes.json')">
+          Condition="'$(CONTRACT_DIR)' != '' and '$(CONTRACT_HOOKS)' == '' and Exists('$(CONTRACT_DIR)\inventory\routes.json')">
     <PropertyGroup>
-      <RunArguments>$(RunArguments) --TCC_CONTRACT_HOOKS=1</RunArguments>
+      <RunArguments>$(RunArguments) --CONTRACT_HOOKS=1</RunArguments>
     </PropertyGroup>
   </Target>
   <ItemGroup>

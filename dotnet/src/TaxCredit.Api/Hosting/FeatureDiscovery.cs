@@ -19,7 +19,7 @@ public sealed class FeatureDiscovery
     {
         ArgumentNullException.ThrowIfNull(configuration);
         var assemblies = new[] { typeof(IEndpointGroup).Assembly, typeof(Application.DependencyInjection).Assembly }
-            .Concat((configuration["TCC_FEATURE_ASSEMBLIES"] ?? "").Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+            .Concat((configuration["FEATURE_ASSEMBLIES"] ?? "").Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
                 .Select(name => Path.IsPathFullyQualified(name)
                     ? AssemblyLoadContext.Default.LoadFromAssemblyPath(name) : Assembly.Load(name)));
         Types = assemblies.Distinct().OrderBy(a => a.FullName, StringComparer.Ordinal)

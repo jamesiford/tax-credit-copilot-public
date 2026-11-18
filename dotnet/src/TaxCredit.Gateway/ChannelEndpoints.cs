@@ -14,7 +14,7 @@ internal static class ChannelEndpoints
     {
         app.MapGet("/channel/health", () => Results.Json(new { status = "ok" }));
         app.MapGet("/channel/ready", (IRuntimeConfiguration settings) => Results.Json(new
-        { ready = true, store = settings.Get("CHANNEL_STORE") ?? settings.Get("TCC_PERSISTENCE_PROVIDER") ?? "sqlite" }));
+        { ready = true, store = settings.Get("CHANNEL_STORE") ?? settings.Get("PERSISTENCE_PROVIDER") ?? "sqlite" }));
         app.MapGet("/channel/v1/tools", async (HttpContext http, ChannelAuthenticator auth, ChannelCatalog catalog) =>
         {
             _ = await auth.AuthenticateAsync(http.Request).ConfigureAwait(false);

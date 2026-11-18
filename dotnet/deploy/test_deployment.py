@@ -105,7 +105,7 @@ class DeploymentTests(unittest.TestCase):
 
     def test_native_target_assertions_accept_only_matching_dotnet_metadata(self):
         script = r"""
-$env:TCC_DOTNET_ACTIVATE = '1'
+$env:DEPLOY_DOTNET_ACTIVATE = '1'
 $env:DOTNET_ENVIRONMENT_NAME = 'proof'
 $env:DOTNET_RESOURCE_GROUP_NAME = 'rg-tcc-dotnet-proof'
 $env:DOTNET_TARGET_SUBSCRIPTION = '00000000-0000-0000-0000-000000000001'

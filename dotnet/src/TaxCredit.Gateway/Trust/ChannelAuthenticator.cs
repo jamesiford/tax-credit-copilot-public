@@ -68,7 +68,7 @@ internal sealed class ChannelAuthenticator(IRuntimeConfiguration settings, ISign
         _ = Strings(claims, "roles");
         var tenant = Tenant;
         var audience = settings.Get("GATEWAY_AUDIENCE") ??
-            (settings.Get("TCC_CONTRACT_HOOKS") == "1" ? "api://contract-gateway" : null);
+            (settings.Get("CONTRACT_HOOKS") == "1" ? "api://contract-gateway" : null);
         var bare = audience?.Replace("api://", "", StringComparison.Ordinal);
         var audiences = Strings(claims, "aud");
         var now = clock.UtcNow.ToUnixTimeSeconds();
@@ -120,7 +120,7 @@ internal sealed class ChannelAuthenticator(IRuntimeConfiguration settings, ISign
     }
 
     private string Tenant => (settings.Get("TENANT_ID") ?? settings.Get("AUTH_TENANT_ID") ??
-        (settings.Get("TCC_CONTRACT_HOOKS") == "1" ? "00000000-0000-0000-0000-0000000000aa" : "")).ToLowerInvariant();
+        (settings.Get("CONTRACT_HOOKS") == "1" ? "00000000-0000-0000-0000-0000000000aa" : "")).ToLowerInvariant();
     internal static string? Header(HttpRequest request, string name) =>
         string.IsNullOrWhiteSpace(request.Headers[name]) ? null : request.Headers[name].ToString().Trim();
     private static string GuidField(string? value) => Guid.TryParseExact(value, "D", out var id) ? id.ToString() :

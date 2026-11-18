@@ -36,7 +36,7 @@ internal static class RuntimeSourceRegistration
             services.RemoveAll(type);
         }
         services.AddScoped(p => Lookups(p, settings, paths));
-        services.AddScoped<IAnalyticsTransport>(p => settings.Get("TCC_CONTRACT_HOOKS") == "1"
+        services.AddScoped<IAnalyticsTransport>(p => settings.Get("CONTRACT_HOOKS") == "1"
             ? p.GetRequiredService<SeedAnalytics>().Transport : new SqlAnalyticsTransport(new AnalyticsConnectionFactory(
                 new AnalyticsConnectionOptions(settings.Get("SOURCE_SQL_SERVER") ?? "", settings.Get("SOURCE_SQL_DATABASE") ?? ""),
                 new EntraAnalyticsTokenProvider(p.GetRequiredService<DefaultAzureCredential>()), p.GetRequiredService<TimeProvider>())));

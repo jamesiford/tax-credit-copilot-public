@@ -1,7 +1,7 @@
 """Deployment values for the plugin: where they come from and what makes one a placeholder. [CH-10]
 
 Values come from a JSON file (`--config`), and an environment variable of the same
-name (`TCC_COWORK_<KEY>`) overrides the file, so a pipeline can inject one value
+name (`COWORK_<KEY>`) overrides the file, so a pipeline can inject one value
 without editing a file that lives in a gitignored overlay.
 
 The app id is a UUID v5 of a seed, not a random UUID: a Cowork package id must stay
@@ -13,12 +13,14 @@ from __future__ import annotations
 import json
 import os
 import re
+import sys
 import uuid
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-ENV_PREFIX = "TCC_COWORK_"
+ENV_PREFIX = "COWORK_"
+LEGACY_ENV_PREFIX = "TCC_COWORK_"  # deprecated, honoured for one release; the new name wins
 DEFAULT_SEED = "tcc-channel.cowork-plugin"
 SEED_NAMESPACE = uuid.UUID("6ba7b811-9dad-11d1-80b4-00c04fd430c8")  # RFC 4122 URL namespace
 SUPPORTED_MANIFEST_VERSIONS = ("1.28", "1.29")
@@ -89,6 +91,10 @@ def load_settings(config: Path | None = None, environ: dict[str, str] | None = N
             merged[key] = str(value)
     for key in (*REQUIRED, *DEFAULTS):
         override = environ.get(ENV_PREFIX + key.upper())
+        legacy = LEGACY_ENV_PREFIX + key.upper()
+        if not override and environ.get(legacy):
+            override = environ[legacy]
+            print(f"Deprecated environment variable {legacy} is in use; set {ENV_PREFIX + key.upper()} instead.", file=sys.stderr)
         if override:
             merged[key] = override
     missing = [key for key in REQUIRED if not merged.get(key, "").strip()]

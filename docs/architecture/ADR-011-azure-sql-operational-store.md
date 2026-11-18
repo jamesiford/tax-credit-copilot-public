@@ -30,7 +30,7 @@ Support Azure SQL Database as the store for `tcc_ops` and `tcc_gold`, selected b
 - **Schema and migration tooling is platform-aware.** For `azure_sql` the target guard compares the configured server
   FQDN and database to an allow-list instead of resolving a Fabric item (`schema_platform.py`,
   `scripts/sql_common.py`). The destructive bootstrap keeps its rules: it runs at most once, only where
-  `tcc_ops.schema_migration` does not exist, and only on a target approved for it (`TCC_SQL_CREATED=true` when Terraform
+  `tcc_ops.schema_migration` does not exist, and only on a target approved for it (`SQL_CREATED=true` when Terraform
   just created the database, or a pinned target with `bootstrap_approved`). A mismatch raises before any statement runs.
 - **The Fabric T-SQL subset is valid SQL Server except `NOT ENFORCED`.** The bootstrap uses the generated SQL Server
   DDL; every numbered migration is applied with `NOT ENFORCED` removed at apply time, so a migration added later is
@@ -85,7 +85,7 @@ schema loaded by `apply-migrations.py` (never by hand).
 
 No live Azure SQL run has been made. The checks to make, in order: acquire a token and connect; run `grant-sql.py`
 as the Entra admin; run `apply-migrations.py --bootstrap`, then again (0 pending); run
-`scripts/check-operational-store.py`; run the contract suite with `TCC_SQL_TESTS=1` against a test database (its rows
+`scripts/check-operational-store.py`; run the contract suite with `TEST_SQL=1` against a test database (its rows
 use a client_id block of their own and are deleted afterwards); run a realistic Gold load and measure insert throughput
 (the 2,100-parameter ceiling is shared with SQL Server); review `warehouse_data_query.py` and the semantic model's SQL
 against Azure SQL; measure idle-connection lifetime before changing the pool defaults.

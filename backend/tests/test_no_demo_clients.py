@@ -99,7 +99,7 @@ def test_a_fixture_source_with_no_declared_account_has_no_clients(monkeypatch):
     ([11, 12, 13, 14, 15], "3", [11, 12, 13]), ([21], "3", [21]), ([], "3", []), ([31, 32], "0", []),
 ])
 def test_warm_up_takes_a_bounded_prefix_of_what_the_source_lists(monkeypatch, listed, warm, expected):
-    monkeypatch.setenv("TCC_WARM_CLIENTS", warm)
+    monkeypatch.setenv("WARM_CLIENTS", warm)
     assert warmup._warm_account_ids([{"AccountId": i} for i in listed]) == expected
 
 

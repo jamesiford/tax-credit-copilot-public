@@ -8,7 +8,7 @@ Until this existed, the sealed views read four local CSVs while every other
 view read the source schema, so one client resolved from two sources on one
 screen.
 
-Reaches live Fabric. Set `TCC_FABRIC_TESTS=1` to run it; it skips otherwise, so
+Reaches live Fabric. Set `TEST_FABRIC=1` to run it; it skips otherwise, so
 CI never needs a lakehouse.
 """
 from __future__ import annotations
@@ -26,8 +26,8 @@ from tools.reference_source import CertifiedFiguresMismatch, LakehousePayrollAda
 from tools.reference_workspace import ReferenceWorkspaceService, _observed_figures
 
 pytestmark = pytest.mark.skipif(
-    os.environ.get("TCC_FABRIC_TESTS", "").strip().lower() not in {"1", "true", "yes"},
-    reason="set TCC_FABRIC_TESTS=1 to run tests that reach live Fabric",
+    os.environ.get("TEST_FABRIC", "").strip().lower() not in {"1", "true", "yes"},
+    reason="set TEST_FABRIC=1 to run tests that reach live Fabric",
 )
 
 

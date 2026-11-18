@@ -22,7 +22,7 @@ class Container:
         env = environment(service, Path("/app"), Path("/tmp/tcc"))
         env = {key: value for key, value in env.items()
                if key.upper() not in {"PATH", "SYSTEMROOT", "WINDIR", "TEMP", "TMP", "COMSPEC", "DOTNET_ROOT"}}
-        env.update({"TCC_REPOSITORY_ROOT": "/app/resources", "OPERATIONAL_DB": "/tmp/tcc/ops.db",
+        env.update({"REPOSITORY_ROOT": "/app/resources", "OPERATIONAL_DB": "/tmp/tcc/ops.db",
                     "ARTIFACT_LOCAL_ROOT": "/tmp/tcc/bytes", "PAYROLL_PATH": "/tmp/tcc/absent.csv"})
         env.update(extra or {})
         args = ["create", "--platform", "linux/amd64", "--network", network, "--ulimit", "core=0",
@@ -98,7 +98,7 @@ def orchestrator(published: Path | None = None) -> dict:
     finally:
         denied.cleanup()
     # Even explicitly synthetic flags cannot bypass actual kernel containment.
-    bridged = Container("orchestrator", {"TCC_ORCHESTRATOR_LOCAL_PROOF": "1"}, network="bridge")
+    bridged = Container("orchestrator", {"ORCHESTRATOR_LOCAL_PROOF": "1"}, network="bridge")
     try:
         finite(bridged, 78)
         results["nonisolated_proof_exit"] = 78
@@ -106,7 +106,7 @@ def orchestrator(published: Path | None = None) -> dict:
         bridged.cleanup()
     if published:
         results["ordinary_publication_hashes"] = verify_resources(published, False)
-    proof = Container("orchestrator", {"TCC_ORCHESTRATOR_LOCAL_PROOF": "1"}, published=published)
+    proof = Container("orchestrator", {"ORCHESTRATOR_LOCAL_PROOF": "1"}, published=published)
     try:
         proof.start()
         proof.wait("/readiness")

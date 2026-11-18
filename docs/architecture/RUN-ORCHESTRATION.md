@@ -152,7 +152,7 @@ off the plan is unchanged (a Terraform test proves it). `RUN_WORKER_APP_NAME` is
 The build only validates and tests the module (`terraform validate`, `terraform test`); it never applies it. Deploying is yours:
 
 ```powershell
-azd env set TCC_ENABLE_RUN_WORKER true      # then add enable_run_worker to infra/main.tfvars.json's mapping, or set TF_VAR_enable_run_worker=true
+azd env set ENABLE_RUN_WORKER true      # then add enable_run_worker to infra/main.tfvars.json's mapping, or set TF_VAR_enable_run_worker=true
 azd provision
 python scripts/package-app.py backend worker.zip
 az webapp deploy -g <resource group> -n <RUN_WORKER_APP_NAME output> --src-path worker.zip --type zip

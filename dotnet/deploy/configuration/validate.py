@@ -11,10 +11,10 @@ from contract import SERVICES, inventory
 from model_checks import validate_models
 
 SHARED_REQUIRED = ("ENVIRONMENT", "DATA_CLASSIFICATION", "AUTH_MODE",
-                   "TCC_PERSISTENCE_PROVIDER", "FABRIC_SQL_SERVER", "FABRIC_SQL_DATABASE",
+                   "PERSISTENCE_PROVIDER", "FABRIC_SQL_SERVER", "FABRIC_SQL_DATABASE",
                    "SOURCE_SQL_SERVER", "SOURCE_SQL_DATABASE", "DATA_SOURCE", "ARTIFACT_STORE",
                    "ARTIFACT_BLOB_ACCOUNT_URL", "AUTH_TENANT_ID", "API_AUDIENCE",
-                   "TCC_REPOSITORY_ROOT", "AZURE_CLIENT_ID", "GIT_COMMIT",
+                   "REPOSITORY_ROOT", "AZURE_CLIENT_ID", "GIT_COMMIT",
                    "CHANNEL_WRITER_SOURCE", "CHANNEL_ENFORCE_WRITER_FOR_USERS")
 
 
@@ -60,11 +60,11 @@ def validate_names(settings, service):
 
 
 def validate_emission(settings, errors):
-    for name in ("TCC_CONTRACT_HOOKS", "TCC_WORKER_ONCE"):
+    for name in ("CONTRACT_HOOKS", "WORKER_ONCE"):
         if name in settings and settings[name] not in ("", "0"):
             errors.add(name)
-    if settings.get("TCC_FEATURE_ASSEMBLIES", ""):
-        errors.add("TCC_FEATURE_ASSEMBLIES")
+    if settings.get("FEATURE_ASSEMBLIES", ""):
+        errors.add("FEATURE_ASSEMBLIES")
     for name in ("OPERATIONAL_DB", "ARTIFACT_LOCAL_ROOT", "PAYROLL_PATH"):
         if name in settings:
             errors.add(name)
@@ -94,7 +94,7 @@ def validate_runtime(settings, errors, deployed):
         required(settings, SHARED_REQUIRED, errors)
         if settings.get("ENVIRONMENT") in ("", "local", None):
             errors.add("ENVIRONMENT")
-        for name, value in (("TCC_PERSISTENCE_PROVIDER", "warehouse"),
+        for name, value in (("PERSISTENCE_PROVIDER", "warehouse"),
                             ("DATA_SOURCE", "lakehouse"), ("ARTIFACT_STORE", "blob"),
                             ("AUTH_MODE", "entra")):
             if settings.get(name) != value:
@@ -132,7 +132,7 @@ def validate_runtime_paths(settings, errors, deployed):
     schema = settings.get("SOURCE_SCHEMA", "tcc_source").strip()
     if schema and not re.fullmatch(r"[A-Za-z0-9_][A-Za-z0-9_-]{0,127}", schema):
         errors.add("SOURCE_SCHEMA")
-    for name in ("TCC_REPOSITORY_ROOT", "RULES_DIR", "TCC_SEED_ROOT", "GIT_COMMIT"):
+    for name in ("REPOSITORY_ROOT", "RULES_DIR", "SEED_ROOT", "GIT_COMMIT"):
         if name in settings and not settings[name].strip():
             errors.add(name)
     if "PROGRAM_DRAFT_REQUIRE_SECOND_REVIEWER" in settings:

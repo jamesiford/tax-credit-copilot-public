@@ -31,7 +31,7 @@ public sealed class DiscoveryTests
         var (replaced, remaining) = await DeferredOperations.Pair();
         await using var host = await TestHost.Start(configuration: new Dictionary<string, string?>
         {
-            ["TCC_FEATURE_ASSEMBLIES"] = typeof(DiscoveryFeature).Assembly.FullName,
+            ["FEATURE_ASSEMBLIES"] = typeof(DiscoveryFeature).Assembly.FullName,
             ["DISCOVERY_VALUE"] = "module-service",
             ["DISCOVERY_PATH"] = replaced.Path,
         });

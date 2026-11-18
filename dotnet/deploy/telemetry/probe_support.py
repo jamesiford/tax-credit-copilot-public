@@ -132,17 +132,17 @@ class DockerProbe:
 def host_settings(endpoint, service, dependency, enabled, version, host_port):
     settings = {
         "DOTNET_STARTUP_HOOKS": str(ARTIFACTS / "publish" / "hook" / "TaxCredit.Deployment.Telemetry.dll"),
-        "TCC_TELEMETRY_ENABLED": enabled,
+        "TELEMETRY_ENABLED": enabled,
         "OTEL_SERVICE_NAME": service,
-        "TCC_TELEMETRY_VERSION": version,
-        "TCC_TELEMETRY_ENDPOINT": endpoint,
+        "TELEMETRY_VERSION": version,
+        "TELEMETRY_ENDPOINT": endpoint,
         "ASPNETCORE_URLS": f"http://127.0.0.1:{host_port}",
         "Logging__LogLevel__Default": "None",
         "OTEL_RESOURCE_ATTRIBUTES": "person.id=" + POISON + ",url.full=" + POISON,
     }
     if LINUX_CONTAINER:
         settings["DOTNET_STARTUP_HOOKS"] = "/telemetry/hook/TaxCredit.Deployment.Telemetry.dll"
-        settings["TCC_TELEMETRY_ENDPOINT"] = endpoint.replace(HOST_ENDPOINT, "http://127.0.0.1:4318/")
+        settings["TELEMETRY_ENDPOINT"] = endpoint.replace(HOST_ENDPOINT, "http://127.0.0.1:4318/")
         settings["ASPNETCORE_URLS"] = f"http://0.0.0.0:{host_port}"
     if dependency:
         settings["PROBE_DEPENDENCY"] = dependency

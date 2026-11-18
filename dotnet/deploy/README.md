@@ -24,7 +24,7 @@ $python = 'C:\Projects\py312-oracle\.venv\Scripts\python.exe'
 Scripts anchor paths to this tree, select SDK **10.0.404** from the staged
 `global.json`, and publish framework-dependent **net10.0**. CPython **3.12**
 is required by the publication CLI. `publish.ps1` provides the equivalent
-PowerShell entry; `TCC_DEPLOY_PYTHON` selects its interpreter without putting an
+PowerShell entry; `DEPLOY_PYTHON` selects its interpreter without putting an
 operator-specific path in the azd manifest. Product projects, central packages
 and Python deployment assets are never edited.
 

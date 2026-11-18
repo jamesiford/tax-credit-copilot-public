@@ -9,18 +9,18 @@
     deployment. The gateway is therefore deployed from a `postdeploy` hook (and
     from deploy.yml) by this script instead.
 
-    With TCC_ENABLE_M365_CHANNEL not `true` this exits 0 at once and says so in one
+    With M365_CHANNEL_ENABLED not `true` this exits 0 at once and says so in one
     quiet line. With it on, it builds the same package the `api` service uses
     (scripts/package-app.py over backend/, which carries `channel/` and
     `startup-channel.sh`) and zip-deploys it to the app Terraform named in the
     CHANNEL_APP_NAME output. Re-running deploys the same code again: idempotent.
 
     Inputs come from the azd environment (azd exports it to hooks):
-      TCC_ENABLE_M365_CHANNEL  `true` to deploy
+      M365_CHANNEL_ENABLED  `true` to deploy
       CHANNEL_APP_NAME         the gateway app (Terraform output)
       AZURE_RESOURCE_GROUP     its resource group (Terraform output)
       CHANNEL_BASE_URL         its https address (Terraform output); the default hostname when unset
-      TCC_CHANNEL_HEALTH_CHECK `off` to skip the health wait below (a workstation that cannot reach it)
+      CHANNEL_HEALTH_CHECK `off` to skip the health wait below (a workstation that cannot reach it)
 
     `az webapp deploy` has been seen to report that the site did not start within ten minutes for a gateway that was
     serving and ready minutes earlier (its first build is slow). So the deploy's own verdict is not the verdict: after
@@ -44,7 +44,7 @@ $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot
 
 function Test-ChannelEnabled {
-    return ([Environment]::GetEnvironmentVariable('TCC_ENABLE_M365_CHANNEL') -eq 'true')
+    return ([Environment]::GetEnvironmentVariable('M365_CHANNEL_ENABLED') -eq 'true')
 }
 
 function Get-RequiredSetting([string]$Name) {
@@ -98,7 +98,7 @@ function Wait-ChannelHealthy([string]$BaseUrl) {
 
 function Invoke-ChannelDeploy {
     if (-not (Test-ChannelEnabled)) {
-        Write-Host 'channel gateway: not enabled (TCC_ENABLE_M365_CHANNEL is not true); nothing to deploy.'
+        Write-Host 'channel gateway: not enabled (M365_CHANNEL_ENABLED is not true); nothing to deploy.'
         return
     }
     $appName = Get-RequiredSetting 'CHANNEL_APP_NAME'
@@ -112,7 +112,7 @@ function Invoke-ChannelDeploy {
         New-ChannelPackage $package
         Write-Host "==> deploying to $appName" -ForegroundColor Cyan
         $deployExit = Publish-ChannelPackage $resourceGroup $appName $package
-        if ([Environment]::GetEnvironmentVariable('TCC_CHANNEL_HEALTH_CHECK') -eq 'off') {
+        if ([Environment]::GetEnvironmentVariable('CHANNEL_HEALTH_CHECK') -eq 'off') {
             if ($deployExit -ne 0) { throw "az webapp deploy failed with exit code $deployExit" }
             Write-Host 'channel gateway deployed (health check skipped).' -ForegroundColor Green
             return

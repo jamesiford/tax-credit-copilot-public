@@ -161,7 +161,7 @@ re-reconciliation with the partner, or a bug. It is never a test that needs
 updating.
 
 ```pwsh
-cd backend ; $env:TCC_REQUIRE_PARITY=1 ; pytest tests/ -q
+cd backend ; $env:TEST_REQUIRE_PARITY=1 ; pytest tests/ -q
 python backend/tools/verify_reference_independent.py
 ```
 
@@ -171,4 +171,4 @@ worth more than either one passing its own tests.
 
 With `DATA_SOURCE=flex` the same figures are recomputed from the Fabric
 lakehouse, and a source that fails to reproduce them is refused rather than
-served. `TCC_FABRIC_TESTS=1 pytest tests/test_reference_workspace_flex.py`.
+served. `TEST_FABRIC=1 pytest tests/test_reference_workspace_flex.py`.

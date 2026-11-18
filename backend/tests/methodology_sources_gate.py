@@ -6,7 +6,7 @@ workbook and a historical wages PDF) that
 B05 removed that directory from the repository for good — unlike the private
 payroll extract (`backend/data/payroll/`, gitignored but re-stageable for a
 private reconciliation run), there is no workflow in which these two files
-come back. So this is a plain, permanent skip, not a `TCC_REQUIRE_PARITY`
+come back. So this is a plain, permanent skip, not a `TEST_REQUIRE_PARITY`
 condition: nothing should ever expect them to be present again.
 
 Import `pytestmark` from this module into any test module that calls

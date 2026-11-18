@@ -27,7 +27,7 @@ dotnet build .\dotnet\TaxCredit.slnx -warnaserror
 ```
 
 The runner starts each ordinary executable with `dotnet run --no-build
---no-launch-profile`, the conductor's `TCC_CONTRACT_DIR` marker, an isolated
+--no-launch-profile`, the conductor's `CONTRACT_DIR` marker, an isolated
 SQLite database/artifact directory and a free loopback port. It verifies
 CPython 3.12 and health, invokes the unchanged public `contract.replay` from
 `backend` with root `PYTHONPATH`, semantic mode and the reset URL, and always
@@ -69,7 +69,7 @@ and the framework-independent control ports in Application `Ports/Contract/`.
 No speculative business handlers or empty infrastructure adapters were added.
 
 Before `Build`, `FeatureDiscovery` scans the API and Application assemblies plus
-the semicolon-separated `TCC_FEATURE_ASSEMBLIES` setting (assembly names or
+the semicolon-separated `FEATURE_ASSEMBLIES` setting (assembly names or
 absolute assembly paths). Assemblies/types are ordinally sorted and deduplicated.
 Public, concrete, parameterless `IFeatureModule` implementations configure
 services once; the same discovered types supply endpoint groups after `Build`.
@@ -191,22 +191,22 @@ is an inventory snapshot, **not a claim that stubbed business handlers work**.
 
 ## Hermetic controls and adapter seams
 
-Only startup `TCC_CONTRACT_HOOKS=1` maps `/__contract__/drain`, `/env`, `/mint`
+Only startup `CONTRACT_HOOKS=1` maps `/__contract__/drain`, `/env`, `/mint`
 and `/reset`; otherwise these paths are 404. `/env` cannot enable hooks.
 Environment overrides are host-local, never process-global mutations.
 One hermetic gate serializes control and product requests.
 
-The conductor's actual launcher sets `TCC_CONTRACT_DIR`, but omits the hook
+The conductor's actual launcher sets `CONTRACT_DIR`, but omits the hook
 flag and disables launch profiles. The API project therefore bridges that
 explicit inventory-directory marker to the startup argument
-`--TCC_CONTRACT_HOOKS=1` in `ComputeRunArguments`. This applies only to
+`--CONTRACT_HOOKS=1` in `ComputeRunArguments`. This applies only to
 `dotnet run`, requires `inventory/routes.json` in the supplied directory, and
-never overrides an explicitly set `TCC_CONTRACT_HOOKS` (including `0`).
+never overrides an explicitly set `CONTRACT_HOOKS` (including `0`).
 Ordinary launches and direct DLL/deployed execution gain no hook default.
 `Contract/test_contract_launch.py` verifies all three launch conditions.
 
 Reset accepts a body profile, a `?profile=` query, or the startup
-`TCC_CONTRACT_PROFILE`, with P1 as the default. P1/P2/G1/G1L are supported.
+`CONTRACT_PROFILE`, with P1 as the default. P1/P2/G1/G1L are supported.
 The public replay sends the scenario's declared profile to reset and applies
 its authentication/writer/rate-limit setup before minting.
 `RuntimeContractWork` loads real Gold/operational/source
@@ -242,11 +242,11 @@ cannot change through `/env`. Invalid consumer configuration is rolled back.
 | Settings | Local default / requirement |
 | --- | --- |
 | `ENVIRONMENT`, `AUTH_MODE` | `local`, `none`; nonlocal defaults to `entra` |
-| `TCC_PERSISTENCE_PROVIDER`, `OPERATIONAL_DB` | `sqlite`, `dotnet\artifacts\local\operations.db` |
+| `PERSISTENCE_PROVIDER`, `OPERATIONAL_DB` | `sqlite`, `dotnet\artifacts\local\operations.db` |
 | Native operational provider | Explicit `sqlserver` or `warehouse`; require `FABRIC_SQL_SERVER`, `FABRIC_SQL_DATABASE` |
 | `DATA_SOURCE`, `DATA_CLASSIFICATION` | `csv`, `synthetic`; SQL uses `lakehouse` (`flex` alias) |
 | SQL source | `SOURCE_SQL_SERVER`, `SOURCE_SQL_DATABASE`, `SOURCE_SCHEMA` (default `tcc_source`) |
-| Resources | `TCC_REPOSITORY_ROOT` or upward discovery from cwd/executable; `RULES_DIR`, `TCC_SEED_ROOT`, `PAYROLL_PATH` override paths |
+| Resources | `REPOSITORY_ROOT` or upward discovery from cwd/executable; `RULES_DIR`, `SEED_ROOT`, `PAYROLL_PATH` override paths |
 | Default resources | Existing `backend\rules`, `contract\seed`, `backend\data\payroll_pay_periods.csv`; wage adapter reads committed `backend\data\payroll.csv` |
 | Source policies | `FISCAL_RULES_POLICY=assume`, optional `PAY_CODE_POLICY`; strict behavior stays in W1 adapters |
 | `ARTIFACT_STORE`, `ARTIFACT_LOCAL_ROOT` | Explicit effective `local`, `dotnet\artifacts\local\bytes`; `blob` requires `ARTIFACT_BLOB_ACCOUNT_URL` |
@@ -271,7 +271,7 @@ In another terminal, use the same explicit database/source/resource settings:
 ```powershell
 Set-Location C:\Projects\GitHub\tcc-dotnet-w1b-composition\dotnet
 dotnet run --project src\TaxCredit.Worker --no-launch-profile
-# Finite bounded pass (also TCC_WORKER_ONCE=1):
+# Finite bounded pass (also WORKER_ONCE=1):
 dotnet run --project src\TaxCredit.Worker --no-launch-profile -- --once
 ```
 
@@ -323,7 +323,7 @@ do not run a separate poller during replay. It is not a distributed reset lock.
 
 ## Local replay and evidence
 
-Use the ordinary API command with `TCC_CONTRACT_DIR` pointing at this worktree's
+Use the ordinary API command with `CONTRACT_DIR` pointing at this worktree's
 `contract` directory and the hook flag absent to exercise the conductor bridge.
 Then run from the worktree root:
 

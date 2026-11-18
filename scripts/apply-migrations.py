@@ -2,7 +2,7 @@
 
 WAREHOUSE_PLATFORM=azure_sql checks the server and database against the allow-list instead of resolving a Fabric
 item, uses the generated SQL Server bootstrap, and applies each migration with NOT ENFORCED removed. Approval for the
-bootstrap there is TCC_SQL_CREATED=true (or a pinned target with bootstrap_approved).
+bootstrap there is SQL_CREATED=true (or a pinned target with bootstrap_approved).
 
     python scripts/apply-migrations.py --target deployed
     python scripts/apply-migrations.py --target deployed --bootstrap      # postprovision, create_fabric only
@@ -10,7 +10,7 @@ bootstrap there is TCC_SQL_CREATED=true (or a pinned target with bootstrap_appro
 
 Without `<ops>.schema_migration` the Warehouse has never been bootstrapped, and
 this REFUSES unless `--bootstrap` is given AND the target is approved for it (a
-pinned target with bootstrap_approved, or `deployed` with TCC_FABRIC_CREATED=true).
+pinned target with bootstrap_approved, or `deployed` with FABRIC_CREATED=true).
 The bootstrap is DDL v2.0, which is destructive; it records version 0000.
 
 With the table present, `--bootstrap` is ignored (logged) — the bootstrap never
@@ -73,7 +73,7 @@ def main(argv: list[str] | None = None) -> int:
             if not allowed.bootstrap_approved:
                 print(
                     f"REFUSED: target '{allowed.name}' is not approved for the destructive bootstrap "
-                    "(pinned bootstrap_approved, or deployed with TCC_FABRIC_CREATED=true / TCC_SQL_CREATED=true).",
+                    "(pinned bootstrap_approved, or deployed with FABRIC_CREATED=true / SQL_CREATED=true).",
                     file=sys.stderr,
                 )
                 return common.EXIT_FAILED

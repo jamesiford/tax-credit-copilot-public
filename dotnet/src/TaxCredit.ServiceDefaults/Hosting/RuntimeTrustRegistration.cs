@@ -57,7 +57,7 @@ internal static class RuntimeTrustRegistration
         services.AddScoped<TaxCredit.Application.Pipeline.IAuthorizer, RuntimeAuthorizer>();
         services.AddSingleton<RuntimeLimits>();
         services.AddSingleton<IApiRateLimiter>(p => p.GetRequiredService<RuntimeLimits>());
-        if (settings.Get("TCC_CONTRACT_HOOKS") == "1")
+        if (settings.Get("CONTRACT_HOOKS") == "1")
         {
             services.AddSingleton<ISigningKeyProvider, ContractKeys>();
         }
@@ -65,7 +65,7 @@ internal static class RuntimeTrustRegistration
 
     private static AuthConfiguration Configuration(RuntimeConfiguration settings)
     {
-        var fixture = settings.Get("TCC_CONTRACT_HOOKS") == "1";
+        var fixture = settings.Get("CONTRACT_HOOKS") == "1";
         var config = new AuthConfiguration
         {
             Mode = settings.Get("AUTH_MODE") ?? "entra",
@@ -88,7 +88,7 @@ internal static class RuntimeTrustRegistration
             return new AllowListClientAuthorizer(map.ToDictionary(p => p.Key, p => (IEnumerable<long>)p.Value, StringComparer.Ordinal));
         }
 
-        if (settings.Get("TCC_CONTRACT_HOOKS") == "1") { return SyntheticPolicy.Clients(); }
+        if (settings.Get("CONTRACT_HOOKS") == "1") { return SyntheticPolicy.Clients(); }
         return new LocalOrDeny(settings.Get("ENVIRONMENT") == "local" && settings.Get("AUTH_MODE") == "none");
     }
 

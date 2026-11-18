@@ -8,7 +8,7 @@ The guard failure reported by the conductor is repaired. All 20 negative and
 have succeeded. See `dotnet\docs\PLATFORM-RISKS.md` for the measured scope.
 
 ```powershell
-$env:TCC_PLATFORM_SPIKE_APPROVED = 'yes'
+$env:SPIKE_PLATFORM_APPROVED = 'yes'
 dotnet build dotnet\spikes\platform\Platform.slnx
 dotnet run --project dotnet\spikes\platform\Runner -- selftest
 dotnet run --project dotnet\spikes\platform\Runner -- ps1

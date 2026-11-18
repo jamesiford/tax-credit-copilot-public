@@ -156,8 +156,8 @@ jobs:
         run: |
           terraform output -json > "$RUNNER_TEMP/outputs.json"
           for key in API_APP_NAME WEB_APP_NAME AZURE_RESOURCE_GROUP WAREHOUSE_SERVER WAREHOUSE_DATABASE \
-                     FABRIC_WORKSPACE_ID FABRIC_WAREHOUSE_ID TCC_FABRIC_CREATED API_IDENTITY_NAME \
-                     FABRIC_WORKSPACE FABRIC_LAKEHOUSE SOURCE_SCHEMA TCC_PROFILE \
+                     FABRIC_WORKSPACE_ID FABRIC_WAREHOUSE_ID FABRIC_CREATED API_IDENTITY_NAME \
+                     FABRIC_WORKSPACE FABRIC_LAKEHOUSE SOURCE_SCHEMA DEPLOY_PROFILE \
                      CHANNEL_APP_NAME GATEWAY_IDENTITY_NAME; do
             echo "$key=$(jq -r ".${key}.value" "$RUNNER_TEMP/outputs.json")" >> "$GITHUB_ENV"
           done
@@ -177,7 +177,7 @@ jobs:
 
       - name: Apply schema migrations (bootstrap only on a Warehouse this run created)
         run: |
-          if [ "$TCC_FABRIC_CREATED" = "true" ]; then
+          if [ "$FABRIC_CREATED" = "true" ]; then
             python scripts/apply-migrations.py --target deployed --bootstrap
           else
             python scripts/apply-migrations.py --target deployed
@@ -210,7 +210,7 @@ jobs:
       - name: Zip deploy the channel gateway (only when the channel is enabled)
         if: env.CHANNEL_APP_NAME != '' && env.CHANNEL_APP_NAME != 'null'
         env:
-          TCC_ENABLE_M365_CHANNEL: 'true'
+          M365_CHANNEL_ENABLED: 'true'
         run: pwsh scripts/deploy-channel.ps1
 
       - name: Smoke test through the web app (public profile)

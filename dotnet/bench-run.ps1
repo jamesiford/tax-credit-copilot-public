@@ -3,7 +3,7 @@
   Prints a per-stage timing table for one queued client calculation at 100k, 400k and 1M payroll rows, with no live lakehouse.
 
 .DESCRIPTION
-  Runs the opt-in benchmark in TaxCredit.Api.Tests (TCC_RUN_BENCH=1): a synthetic client in the real source shape behind a fake analytics
+  Runs the opt-in benchmark in TaxCredit.Api.Tests (BENCH_RUN=1): a synthetic client in the real source shape behind a fake analytics
   transport, the real worker executor, SQLite operational store. Spans come from TaxCredit.Run (RunSpans); times are exclusive, so the rows add up.
   Also writes dotnet\artifacts\bench\bench-<label>.txt and, with -DumpGold, a dump of every stored Gold row per size.
 
@@ -20,10 +20,10 @@ param(
 
 $ErrorActionPreference = 'Stop'
 Set-Location $PSScriptRoot
-$env:TCC_RUN_BENCH = '1'
-$env:TCC_BENCH_SIZES = ($Sizes -join ',')
-$env:TCC_BENCH_LABEL = $Label
-if ($DumpGold) { New-Item -ItemType Directory -Force $DumpGold | Out-Null; $env:TCC_BENCH_DUMP = (Resolve-Path $DumpGold).Path }
+$env:BENCH_RUN = '1'
+$env:BENCH_SIZES = ($Sizes -join ',')
+$env:BENCH_LABEL = $Label
+if ($DumpGold) { New-Item -ItemType Directory -Force $DumpGold | Out-Null; $env:BENCH_DUMP = (Resolve-Path $DumpGold).Path }
 $testArgs = @('test', 'tests\TaxCredit.Api.Tests', '--filter', 'Category=bench', '--nologo')
 if ($NoBuild) { $testArgs += '--no-build' }
 & dotnet @testArgs | Out-Null

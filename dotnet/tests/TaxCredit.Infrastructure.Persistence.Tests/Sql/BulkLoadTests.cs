@@ -81,12 +81,12 @@ public sealed class BulkLoadTests
     public void The_policy_reads_its_settings_and_refuses_nonsense()
     {
         Assert.Equal(BulkLoadPolicy.Default, BulkLoadPolicy.FromSettings(_ => null));
-        var off = BulkLoadPolicy.FromSettings(key => key == "TCC_BULK_LOAD" ? "off" : null);
+        var off = BulkLoadPolicy.FromSettings(key => key == "BULK_LOAD" ? "off" : null);
         Assert.False(off.Enabled);
-        var tuned = BulkLoadPolicy.FromSettings(key => key switch { "TCC_BULK_LOAD_MIN_ROWS" => "250", "TCC_BULK_TIMEOUT_SECONDS" => "90", _ => null });
+        var tuned = BulkLoadPolicy.FromSettings(key => key switch { "BULK_LOAD_MIN_ROWS" => "250", "BULK_TIMEOUT_SECONDS" => "90", _ => null });
         Assert.Equal(new BulkLoadPolicy(true, 250, 90), tuned);
-        Assert.Throws<InvalidOperationException>(() => BulkLoadPolicy.FromSettings(key => key == "TCC_BULK_LOAD" ? "maybe" : null));
-        Assert.Throws<InvalidOperationException>(() => BulkLoadPolicy.FromSettings(key => key == "TCC_BULK_TIMEOUT_SECONDS" ? "0" : null));
+        Assert.Throws<InvalidOperationException>(() => BulkLoadPolicy.FromSettings(key => key == "BULK_LOAD" ? "maybe" : null));
+        Assert.Throws<InvalidOperationException>(() => BulkLoadPolicy.FromSettings(key => key == "BULK_TIMEOUT_SECONDS" ? "0" : null));
         Assert.False(new SqliteDialect().Bulk.Enabled);
     }
 

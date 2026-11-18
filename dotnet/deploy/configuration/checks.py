@@ -84,7 +84,7 @@ def headers(text):
 
 
 def resources(settings, errors):
-    root = Path(settings.get("TCC_REPOSITORY_ROOT", ""))
+    root = Path(settings.get("REPOSITORY_ROOT", ""))
     rules = Path(settings.get("RULES_DIR", root / "backend" / "rules"))
     expected = [
         root / "docs" / "data" / "schema" / "tcc-schema.sqlserver.sql",
@@ -94,10 +94,10 @@ def resources(settings, errors):
     ]
     try:
         if not all(path.is_file() for path in expected):
-            errors.add("TCC_REPOSITORY_ROOT")
+            errors.add("REPOSITORY_ROOT")
         if not list((root / "docs" / "data" / "schema" / "migrations").glob("*.sql")):
-            errors.add("TCC_REPOSITORY_ROOT")
+            errors.add("REPOSITORY_ROOT")
         if not (rules / "lookups").is_dir() or not (rules / "methodology").is_dir():
             errors.add("RULES_DIR")
     except OSError:
-        errors.add("TCC_REPOSITORY_ROOT")
+        errors.add("REPOSITORY_ROOT")

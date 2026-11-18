@@ -7,7 +7,7 @@ using Xunit.Abstractions;
 
 namespace TaxCredit.Infrastructure.Persistence.Tests.Sql;
 
-/// <summary>Opt-in (<c>TCC_RUN_BENCH=1</c>): where does SQLite spend a Gold insert, in the CHECK functions, the index or the statement itself?</summary>
+/// <summary>Opt-in (<c>BENCH_RUN=1</c>): where does SQLite spend a Gold insert, in the CHECK functions, the index or the statement itself?</summary>
 public sealed class InsertCostProbe(ITestOutputHelper output)
 {
     private const int Rows = 20_000;
@@ -16,7 +16,7 @@ public sealed class InsertCostProbe(ITestOutputHelper output)
     [Trait("Category", "bench")]
     public void Gold_insert_cost_by_constraint()
     {
-        if (Environment.GetEnvironmentVariable("TCC_RUN_BENCH") != "1") { return; }
+        if (Environment.GetEnvironmentVariable("BENCH_RUN") != "1") { return; }
         using var fixture = new PersistenceFixture();
         var schema = PersistenceSchema.Read(PersistenceFixture.Root)["tcc_gold.employee_period_fact"];
         var columns = GoldColumns.All["employee_period_fact"];

@@ -83,7 +83,7 @@ The certified figures (10,236 employees, 539 Min-Max, 656 Pay Period) are comput
 code that does not read the lakehouse (`tools/reference_source.py`), so a read-mode switch cannot move them and they cannot
 prove the SQL path. The proof for adoption is the **per-client** read, which reads the lakehouse:
 
-1. Load the reference client into the lakehouse and run, with `TCC_FABRIC_TESTS=1`, the per-client agreement tests
+1. Load the reference client into the lakehouse and run, with `TEST_FABRIC=1`, the per-client agreement tests
    (`test_the_per_client_read_agrees_with_the_certified_figures` and the engine parity suites) once with
    `SOURCE_READ_MODE=onelake` and once with `sql`. Every figure must be identical.
 2. For every account, compare the two modes' datasets (the spike script's parity check, pointed at the real lake).
@@ -136,4 +136,4 @@ both modes. Until then keep `onelake`, and keep the spike off.
 3. Partition pruning on the tenant column: the statement's plan and the files touched for one account of a very large table.
 4. The endpoint's collation and its effect on the keyed `IN` lists and on string ids.
 5. Metadata sync lag after a load, and a way to read the version.
-6. The per-client re-certification (above), with `TCC_FABRIC_TESTS=1`, in both modes.
+6. The per-client re-certification (above), with `TEST_FABRIC=1`, in both modes.

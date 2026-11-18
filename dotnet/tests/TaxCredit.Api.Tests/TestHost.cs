@@ -21,7 +21,7 @@ internal sealed class TestHost(WebApplication app, HttpClient client, string own
         builder.Logging.ClearProviders();
         builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
         {
-            ["TCC_CONTRACT_HOOKS"] = hooks ? "1" : "0",
+            ["CONTRACT_HOOKS"] = hooks ? "1" : "0",
             ["AUTH_MODE"] = "none",
             ["ENVIRONMENT"] = "local",
             ["DATA_SOURCE"] = "csv",
