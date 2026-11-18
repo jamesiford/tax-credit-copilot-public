@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tax-credit-copilot/data-map.schema.json",
+  "title": "Tax Credit Copilot data map",
+  "description": "Maps the stable LOGICAL database, schema, table and column names the application speaks to the ACTUAL names in the customer's Lakehouse (payroll source) and Warehouse (operational store). Keys are logical and never change; only the physical values do. The file is complete: every entry the application uses must be present. Keys starting with an underscore are notes and are ignored.",
+  "type": "object",
+  "required": ["version", "lakehouse", "warehouse"],
+  "additionalProperties": false,
+  "patternProperties": { "^_": {} },
+  "properties": {
+    "version": { "const": 1 },
+    "lakehouse": {
+      "type": "object",
+      "required": ["database", "schema", "case_insensitive_columns", "naming", "transforms", "tables"],
+      "additionalProperties": false,
+      "patternProperties": { "^_": {} },
+      "properties": {
+        "database": { "$ref": "#/$defs/database" },
+        "schema": { "$ref": "#/$defs/identifier" },
+        "case_insensitive_columns": { "type": "boolean" },
+        "naming": {
+          "type": "object",
+          "required": ["table_prefix", "table_case"],
+          "additionalProperties": false,
+          "patternProperties": { "^_": {} },
+          "properties": {
+            "table_prefix": { "type": "string", "pattern": "^[A-Za-z0-9_\\-]{0,64}$" },
+            "table_case": { "enum": ["as_is", "lower", "upper"] }
+          }
+        },
+        "transforms": {
+          "type": "object",
+          "additionalProperties": false,
+          "patternProperties": { "^_": {} },
+          "properties": {
+            "worksite_location": { "type": "string" },
+            "null_pay_date": { "type": "string" }
+          },
+          "required": ["worksite_location", "null_pay_date"]
+        },
+        "tables": {
+          "type": "object",
+          "additionalProperties": false,
+          "patternProperties": { "^_": {}, "^[A-Za-z][A-Za-z0-9]*$": { "$ref": "#/$defs/lakehouseTable" } }
+        }
+      }
+    },
+    "warehouse": {
+      "type": "object",
+      "required": ["database", "schemas", "tables"],
+      "additionalProperties": false,
+      "patternProperties": { "^_": {} },
+      "properties": {
+        "database": { "$ref": "#/$defs/database" },
+        "schemas": {
+          "type": "object",
+          "required": ["gold", "ops"],
+          "additionalProperties": false,
+          "patternProperties": { "^_": {} },
+          "properties": {
+            "gold": { "$ref": "#/$defs/identifier" },
+            "ops": { "$ref": "#/$defs/identifier" }
+          }
+        },
+        "tables": {
+          "type": "object",
+          "additionalProperties": false,
+          "patternProperties": { "^_": {}, "^(gold|ops)\\.[a-z][a-z0-9_]*$": { "$ref": "#/$defs/warehouseTable" } }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "identifier": { "type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_\\-]{0,127}$" },
+    "database": {
+      "type": "object",
+      "required": ["logical", "name"],
+      "additionalProperties": false,
+      "patternProperties": { "^_": {} },
+      "properties": {
+        "logical": { "type": "string" },
+        "name": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/identifier" }] }
+      }
+    },
+    "lakehouseTable": {
+      "type": "object",
+      "required": ["table", "dataset_attr", "columns"],
+      "additionalProperties": false,
+      "patternProperties": { "^_": {} },
+      "properties": {
+        "table": { "$ref": "#/$defs/identifier" },
+        "dataset_attr": { "type": "string" },
+        "tenant_field": { "type": "string" },
+        "partition_by": { "type": "array", "items": { "type": "string" } },
+        "optional_reason": { "type": "string" },
+        "columns": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": false,
+          "patternProperties": { "^_": {}, "^[a-z][a-z0-9_]*$": { "$ref": "#/$defs/lakehouseColumn" } }
+        }
+      }
+    },
+    "lakehouseColumn": {
+      "type": "object",
+      "required": ["column", "type", "required", "engine"],
+      "additionalProperties": false,
+      "patternProperties": { "^_": {} },
+      "properties": {
+        "column": { "$ref": "#/$defs/identifier" },
+        "type": { "enum": ["int64", "int32", "string", "bool", "double", "date32", "timestamp[us]", "decimal128(18, 2)"] },
+        "required": { "type": "boolean" },
+        "engine": { "type": "boolean" }
+      }
+    },
+    "warehouseTable": {
+      "type": "object",
+      "required": ["schema", "table", "columns"],
+      "additionalProperties": false,
+      "patternProperties": { "^_": {} },
+      "properties": {
+        "schema": { "enum": ["gold", "ops"] },
+        "table": { "$ref": "#/$defs/identifier" },
+        "columns": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": false,
+          "patternProperties": { "^_": {}, "^[a-z][a-z0-9_]*$": { "$ref": "#/$defs/warehouseColumn" } }
+        }
+      }
+    },
+    "warehouseColumn": {
+      "type": "object",
+      "required": ["column", "type"],
+      "additionalProperties": false,
+      "patternProperties": { "^_": {} },
+      "properties": {
+        "column": { "$ref": "#/$defs/identifier" },
+        "type": { "type": "string", "description": "Read-only information: what the column holds. The loader ignores it." }
+      }
+    }
+  }
+}
