@@ -51,10 +51,10 @@ TaxCredit.Api.dll` entry point, set the following Linux environment:
 
 ```sh
 DOTNET_STARTUP_HOOKS=/opt/tcc-telemetry/TaxCredit.Deployment.Telemetry.dll
-TCC_TELEMETRY_ENABLED=1
+TELEMETRY_ENABLED=1
 OTEL_SERVICE_NAME=taxcredit-api
-TCC_TELEMETRY_VERSION=1.2.3
-TCC_TELEMETRY_ENDPOINT=http://127.0.0.1:4318/
+TELEMETRY_VERSION=1.2.3
+TELEMETRY_ENDPOINT=http://127.0.0.1:4318/
 Logging__LogLevel__Default=None
 ```
 
@@ -75,13 +75,13 @@ An unset enable flag or explicit `0` disables export without a warning. A malfor
 flag or invalid enabled configuration disables export without stopping the
 application, but emits `TCC_TELEMETRY_INVALID_CONFIGURATION` to stderr once per
 process. No setting names or values are included.
-Disabling `TCC_TELEMETRY_ENABLED` is the rollback; no host edits are necessary.
+Disabling `TELEMETRY_ENABLED` is the rollback; no host edits are necessary.
 NativeAOT, trimming and single-file deployment have not been qualified.
 Republish/repackage the hook with parent package/image manifests after a hook
 change; do not replace bytes behind an old artifact checksum.
 
 `collector.yaml` is a **local receipt fixture**, not a cloud backend: set
-`TCC_RECEIPT_ENDPOINT` to the local test receiver. It exposes no logs pipeline,
+`TELEMETRY_RECEIPT_ENDPOINT` to the local test receiver. It exposes no logs pipeline,
 uses bounded memory, batches, and disables backend retries/queues. In tests its
 port is published on host loopback only. Production requires operator-owned
 collector TLS/network/backend configuration and independent collector health.

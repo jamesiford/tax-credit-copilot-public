@@ -86,7 +86,7 @@ internal static class SourceTestData
 
     internal static JsonDocument Oracle(string mode, object input)
     {
-        var python = Environment.GetEnvironmentVariable("TCC_PYTHON") ?? throw new InvalidOperationException("TCC_PYTHON must select CPython 3.12.");
+        var python = Environment.GetEnvironmentVariable("ORACLE_PYTHON") ?? throw new InvalidOperationException("ORACLE_PYTHON must select CPython 3.12.");
         var start = new ProcessStartInfo(python)
         {
             WorkingDirectory = Root,

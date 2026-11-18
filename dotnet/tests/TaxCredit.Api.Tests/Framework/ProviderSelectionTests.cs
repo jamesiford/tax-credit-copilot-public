@@ -24,11 +24,11 @@ public sealed class ProviderSelectionTests
     {
         var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
         {
-            ["TCC_REPOSITORY_ROOT"] = Corpus.Root,
+            ["REPOSITORY_ROOT"] = Corpus.Root,
             ["ENVIRONMENT"] = "local",
             ["AUTH_MODE"] = "entra",
-            ["TCC_CONTRACT_HOOKS"] = "0",
-            ["TCC_PERSISTENCE_PROVIDER"] = "warehouse",
+            ["CONTRACT_HOOKS"] = "0",
+            ["PERSISTENCE_PROVIDER"] = "warehouse",
             ["FABRIC_SQL_SERVER"] = "synthetic.invalid",
             ["FABRIC_SQL_DATABASE"] = "synthetic",
             ["SOURCE_SQL_SERVER"] = "synthetic.invalid",

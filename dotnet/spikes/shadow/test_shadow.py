@@ -132,13 +132,13 @@ class BoundaryTests(unittest.TestCase):
                 origin(url)
 
     def test_admission_denies_before_any_connection_and_sanitises_subprocess_errors(self):
-        with patch.dict(os.environ, {"TCC_SHADOW_APPROVED": ""}), \
+        with patch.dict(os.environ, {"SPIKE_SHADOW_APPROVED": ""}), \
                 patch("admission.guard_preflight", return_value={"verdict": "passed"}), \
                 patch("admission.oracle_preflight", return_value=True), \
                 patch("admission.subprocess.run") as run:
             self.assertEqual("not-attempted", capacity_admission(Path(SENTINEL))["capacity"])
             run.assert_not_called()
-        with patch.dict(os.environ, {"TCC_SHADOW_APPROVED": "yes"}), \
+        with patch.dict(os.environ, {"SPIKE_SHADOW_APPROVED": "yes"}), \
                 patch("admission.guard_preflight", return_value={"verdict": "passed"}), \
                 patch("admission.oracle_preflight", return_value=True), \
                 patch("admission.subprocess.run", return_value=subprocess.CompletedProcess(

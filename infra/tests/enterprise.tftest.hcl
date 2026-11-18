@@ -50,7 +50,7 @@ run "enterprise_profile" {
   }
 
   assert {
-    condition     = output.TCC_FABRIC_CREATED == "false" && output.FABRIC_WAREHOUSE_ID == var.fabric_warehouse_id
+    condition     = output.FABRIC_CREATED == "false" && output.FABRIC_WAREHOUSE_ID == var.fabric_warehouse_id
     error_message = "enterprise brings its own Fabric and must never be bootstrapped"
   }
 

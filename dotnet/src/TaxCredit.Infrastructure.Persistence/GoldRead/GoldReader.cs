@@ -65,13 +65,13 @@ public sealed partial class GoldReader : IGoldReadPort
         return One(clientId, Page("SELECT run_id, client_id, program_code, tax_year, fiscal_year_begin, fiscal_year_end, " +
             "step1_assumption_set_id, onezero_assumption_set_id, rule_pack_version, code_commit, calculation_id, " +
             "run_started_at, run_completed_at, run_status, superseded_by_run_id, triggered_by " +
-            "FROM tcc_ops.run_manifest WHERE {tenant} AND run_status = 'success'" + narrow +
+            "FROM {ops.run_manifest} WHERE {tenant} AND run_status = 'success'" + narrow +
             " AND superseded_by_run_id IS NULL AND run_completed_at IS NOT NULL ORDER BY run_started_at DESC", 1), values.ToArray());
     }
 
     /// <inheritdoc />
     public IReadOnlyDictionary<string, object?>? RunInFlight(long clientId) =>
-        One(clientId, Page("SELECT run_id, run_started_at, triggered_by, tax_year FROM tcc_ops.run_manifest " +
+        One(clientId, Page("SELECT run_id, run_started_at, triggered_by, tax_year FROM {ops.run_manifest} " +
             "WHERE {tenant} AND run_completed_at IS NULL AND run_status = 'running' " +
             "AND run_started_at >= ? ORDER BY run_started_at DESC", 1),
             (_clock.GetUtcNow() - _strandedAfter).UtcDateTime);
@@ -87,7 +87,7 @@ public sealed partial class GoldReader : IGoldReadPort
         public int Keepalive()
         {
             using var session = database.Open();
-            session.Query(0, "SELECT COUNT(*) AS total FROM tcc_ops.run_manifest WHERE {tenant} AND 1 = 0");
+            session.Query(0, "SELECT COUNT(*) AS total FROM {ops.run_manifest} WHERE {tenant} AND 1 = 0");
             return 1;
         }
         public int Prewarm(int count = 1)
@@ -100,7 +100,7 @@ public sealed partial class GoldReader : IGoldReadPort
                 {
                     var session = database.Open();
                     sessions.Add(session);
-                    session.Query(0, "SELECT COUNT(*) AS total FROM tcc_ops.run_manifest WHERE {tenant} AND 1 = 0");
+                    session.Query(0, "SELECT COUNT(*) AS total FROM {ops.run_manifest} WHERE {tenant} AND 1 = 0");
                 }
                 return sessions.Count;
             }

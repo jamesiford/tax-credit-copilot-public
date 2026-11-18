@@ -96,11 +96,11 @@ class ConfigurationTests(unittest.TestCase):
             self.assertEqual([name], validate(data, "api"))
 
     def test_deployed_local_stores_and_replay_features_are_refused(self):
-        for name, value in (("TCC_PERSISTENCE_PROVIDER", "sqlite"),
-                            ("TCC_PERSISTENCE_PROVIDER", "memory"), ("DATA_SOURCE", "csv"),
+        for name, value in (("PERSISTENCE_PROVIDER", "sqlite"),
+                            ("PERSISTENCE_PROVIDER", "memory"), ("DATA_SOURCE", "csv"),
                             ("ARTIFACT_STORE", "local"), ("AUTH_MODE", "none"),
-                            ("TCC_CONTRACT_HOOKS", "1"), ("ALLOW_ANONYMOUS_SYNTHETIC", "1"),
-                            ("TCC_FEATURE_ASSEMBLIES", "untrusted"),
+                            ("CONTRACT_HOOKS", "1"), ("ALLOW_ANONYMOUS_SYNTHETIC", "1"),
+                            ("FEATURE_ASSEMBLIES", "untrusted"),
                             ("CLAIM_STORE", "memory"), ("OPERATIONAL_DB", "local.db")):
             data = example("api")
             data[name] = value
@@ -169,8 +169,8 @@ class ModelAndPrivacyTests(unittest.TestCase):
 
     def test_missing_resource_package_has_only_setting_name_diagnostic(self):
         data = example("api")
-        data["TCC_REPOSITORY_ROOT"] = str(HERE / "absent-resources")
-        self.assertIn("TCC_REPOSITORY_ROOT", validate(data, "api", check_resources=True))
+        data["REPOSITORY_ROOT"] = str(HERE / "absent-resources")
+        self.assertIn("REPOSITORY_ROOT", validate(data, "api", check_resources=True))
 
     def test_platform_and_logging_controls_are_not_arbitrary_strings(self):
         for name, value in (("SCM_DO_BUILD_DURING_DEPLOYMENT", "sometimes"),
@@ -195,11 +195,11 @@ class ModelAndPrivacyTests(unittest.TestCase):
     def test_selected_actual_consumer_expressions_are_verified(self):
         folder = ROOT / "dotnet" / "src" / "TaxCredit.ServiceDefaults" / "Hosting"
         source = (folder / "RuntimeSourceRegistration.cs").read_text(encoding="utf-8")
-        self.assertIn('SourceMapping.Load()', source)
-        self.assertIn('settings.Get("SOURCE_SCHEMA") ?? "tcc_source"', source)
+        self.assertIn('SourceMapping.Load(dataMap)', source)
+        self.assertIn('settings.Get("SOURCE_SCHEMA") ?? dataMap.SourceSchema', source)
         paths = (folder / "RuntimePaths.cs").read_text(encoding="utf-8")
-        self.assertIn('settings.Get("TCC_REPOSITORY_ROOT") ?? Discover()', paths)
-        self.assertNotIn("TCC_RESOURCE_ROOT", paths)
+        self.assertIn('settings.Get("REPOSITORY_ROOT") ?? Discover()', paths)
+        self.assertNotIn("RESOURCE_ROOT", paths)
         scanner = (ROOT / "dotnet" / "src" / "TaxCredit.Infrastructure.Sources" /
                    "Sql" / "SourceScanner.cs").read_text(encoding="utf-8")
         self.assertIn('Schema.Length == 0 ? "dbo" : Schema', scanner)

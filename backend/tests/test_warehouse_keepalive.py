@@ -108,7 +108,7 @@ def test_the_keepalive_never_exceeds_the_pool_bound(pool):
 
 def test_the_keepalive_does_not_run_without_the_warm_switch(monkeypatch):
     """Tests and CI have no warehouse; a background task opening one is flake."""
-    monkeypatch.setenv("TCC_WARM_ON_START", "0")
+    monkeypatch.setenv("WARM_ON_START", "0")
 
     assert touch_warehouse() == 0
 

@@ -1,5 +1,6 @@
 using TaxCredit.Application.Ports;
 using TaxCredit.Application.Ports.Contract;
+using TaxCredit.ServiceDefaults.Hosting;
 
 namespace TaxCredit.Api.Hosting;
 
@@ -11,7 +12,7 @@ public sealed class SkeletonAccess(IRuntimeConfiguration configuration, IConfigu
     {
         ArgumentNullException.ThrowIfNull(request);
         var mode = configuration.Get("AUTH_MODE");
-        if (mode != "entra" && startup["TCC_CONTRACT_HOOKS"] == "1"
+        if (mode != "entra" && startup.Setting("CONTRACT_HOOKS") == "1"
             || mode == "none" && configuration.Get("ENVIRONMENT") == "local")
         {
             return ValueTask.FromResult(new ApiAccessDecision(true));

@@ -36,8 +36,8 @@ public sealed class OperationalResetTests
         {
             foreach (var table in OperationalSchema.TableNames)
             {
-                var seedName = table[8..] + ".jsonl.gz";
-                var expected = table == "tcc_ops.write_sequence" ? 1 : restored.TableCounts.GetValueOrDefault("operational/" + seedName)
+                var seedName = table[4..] + ".jsonl.gz";
+                var expected = table == "ops.write_sequence" ? 1 : restored.TableCounts.GetValueOrDefault("operational/" + seedName)
                     + restored.TableCounts.GetValueOrDefault("ops/" + seedName);
                 Assert.Equal(expected, Count(after, table));
             }

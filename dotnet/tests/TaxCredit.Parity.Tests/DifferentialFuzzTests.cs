@@ -5,8 +5,8 @@ using Xunit.Abstractions;
 namespace TaxCredit.Parity.Tests;
 
 /// <summary>
-/// Gate G3: differential fuzzing. C# generates N seeded random scenarios (default 20,000; <c>TCC_FUZZ_N</c>,
-/// <c>TCC_FUZZ_SEED</c>), the Python production engine answers each through <c>parity/engine_cli.py</c>, and the C# engine
+/// Gate G3: differential fuzzing. C# generates N seeded random scenarios (default 20,000; <c>FUZZ_N</c>,
+/// <c>FUZZ_SEED</c>), the Python production engine answers each through <c>parity/engine_cli.py</c>, and the C# engine
 /// must agree bit for bit. A mismatch is minimised (ddmin over the rows), saved as a regression golden under
 /// <c>parity/goldens/regressions</c>, and fails the test.
 /// </summary>
@@ -22,9 +22,9 @@ public sealed class DifferentialFuzzTests(ITestOutputHelper output)
     [Trait("Category", "heavy")]
     public void Random_scenarios_agree_with_the_python_engine()
     {
-        var total = EnvInt("TCC_FUZZ_N", 20000);
-        var seed = ulong.TryParse(Environment.GetEnvironmentVariable("TCC_FUZZ_SEED"), NumberStyles.Integer, CultureInfo.InvariantCulture, out var s) ? s : DefaultSeed;
-        var parallel = Math.Max(1, EnvInt("TCC_FUZZ_PARALLEL", 4));
+        var total = EnvInt("FUZZ_N", 20000);
+        var seed = ulong.TryParse(Environment.GetEnvironmentVariable("FUZZ_SEED"), NumberStyles.Integer, CultureInfo.InvariantCulture, out var s) ? s : DefaultSeed;
+        var parallel = Math.Max(1, EnvInt("FUZZ_PARALLEL", 4));
         output.WriteLine($"fuzz: N={total} seed={seed} batch={BatchSize} parallel={parallel} python={PythonSession.PythonExe} ({OracleInterpreter.Version})");
 
         var batches = Enumerable.Range(0, (total + BatchSize - 1) / BatchSize).ToList();

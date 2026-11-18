@@ -37,8 +37,8 @@ sys.stdout.reconfigure(encoding="utf-8")
 D = decimal.Decimal
 
 # Resolve from this file's location so the script is portable across checkouts.
-# `TCC_REPO_ROOT` overrides for CI runners that stage the fixtures elsewhere.
-REPO = Path(os.environ.get("TCC_REPO_ROOT", Path(__file__).resolve().parent.parent.parent))
+# `REPOSITORY_ROOT` (deprecated alias `TCC_REPO_ROOT`) overrides for CI runners that stage the fixtures elsewhere.
+REPO = Path(os.environ.get("REPOSITORY_ROOT") or os.environ.get("TCC_REPO_ROOT") or Path(__file__).resolve().parent.parent.parent)
 SRC = REPO / "backend" / "data" / "payroll"
 OUT = REPO / "backend" / "data" / "reference_output"
 STEP1_CFG = REPO / "backend" / "rules" / "methodology" / "reference-dataset-assumptions.v8.json"

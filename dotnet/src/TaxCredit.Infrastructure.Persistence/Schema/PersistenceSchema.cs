@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Numerics;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
+using TaxCredit.Domain.DataMap;
 using TaxCredit.Domain.Numerics;
 using TaxCredit.Infrastructure.Persistence.Sql;
 
@@ -83,13 +84,18 @@ public static partial class PersistenceSchema
             var sql = Comments().Replace(File.ReadAllText(file), string.Empty);
             foreach (Match table in Tables().Matches(sql))
             {
-                result.Add(table.Groups[1].Value, Columns().Matches(table.Groups[2].Value).Select(match => Column(match)).ToArray());
+                if (Logical(table.Groups[1].Value) is { } key)
+                {
+                    result.Add(key, Columns().Matches(table.Groups[2].Value).Select(match => Column(match)).ToArray());
+                }
             }
 
             foreach (Match alter in AddColumns().Matches(sql))
             {
-                var name = alter.Groups[1].Value;
-                result[name] = [.. result[name], Column(alter, 2)];
+                if (Logical(alter.Groups[1].Value) is { } name)
+                {
+                    result[name] = [.. result[name], Column(alter, 2)];
+                }
             }
         }
 
@@ -123,11 +129,11 @@ public static partial class PersistenceSchema
             foreach (var table in EmployeeTables)
             {
                 session.ExecuteExempt(SqlExemption.Schema, "CREATE INDEX IF NOT EXISTS ix_" + table
-                    + "_run ON " + session.Dialect.Name("tcc_gold." + table) + " (client_id,run_id,tax_year)");
+                    + "_run ON " + session.Dialect.Name("gold." + table) + " (client_id,run_id,tax_year)");
             }
 
-            session.ExecuteExempt(SqlExemption.Schema, "CREATE UNIQUE INDEX IF NOT EXISTS ix_run_identity ON tcc_ops.run_manifest(run_id)");
-            session.ExecuteExempt(SqlExemption.Schema, "CREATE UNIQUE INDEX IF NOT EXISTS ix_claim_identity ON tcc_ops.program_claim(claim_id)");
+            session.ExecuteExempt(SqlExemption.Schema, "CREATE UNIQUE INDEX IF NOT EXISTS ix_run_identity ON {ops.run_manifest}(run_id)");
+            session.ExecuteExempt(SqlExemption.Schema, "CREATE UNIQUE INDEX IF NOT EXISTS ix_claim_identity ON {ops.program_claim}(claim_id)");
             RecordMigrations(session, repositoryRoot);
             return 0;
         });
@@ -165,7 +171,7 @@ public static partial class PersistenceSchema
             var name = Path.GetFileNameWithoutExtension(file);
             var version = name == "tcc-schema.sqlserver" ? "0000" : name[..4];
             var hash = Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(file)));
-            var existing = session.QueryExempt(SqlExemption.Schema, "SELECT sha256 FROM tcc_ops.schema_migration WHERE version=?", version);
+            var existing = session.QueryExempt(SqlExemption.Schema, "SELECT sha256 FROM {ops.schema_migration} WHERE version=?", version);
             if (existing.Count > 0)
             {
                 if ((string)existing[0]["sha256"]! != hash)
@@ -177,7 +183,7 @@ public static partial class PersistenceSchema
             }
 
             session.ExecuteExempt(SqlExemption.Schema,
-                "INSERT INTO tcc_ops.schema_migration (version,name,sha256,applied_at,applied_by) VALUES (?,?,?,?,?)",
+                "INSERT INTO {ops.schema_migration} (version,name,sha256,applied_at,applied_by) VALUES (?,?,?,?,?)",
                 version, name, hash, DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture), "persistence-local");
         }
     }
@@ -216,12 +222,19 @@ public static partial class PersistenceSchema
     [GeneratedRegex(@"/\*[\s\S]*?\*/|--[^\r\n]*")]
     private static partial Regex Comments();
 
-    [GeneratedRegex(@"CREATE\s+TABLE\s+(tcc_(?:gold|ops)\.\w+)\s*\(([\s\S]*?)\)\s*;", RegexOptions.IgnoreCase)]
+    [GeneratedRegex(@"CREATE\s+TABLE\s+(\w+\.\w+)\s*\(([\s\S]*?)\)\s*;", RegexOptions.IgnoreCase)]
     private static partial Regex Tables();
 
     [GeneratedRegex(@"(\w+)\s+(BIGINT|INT|BIT|FLOAT|DECIMAL|VARCHAR|CHAR|DATETIME2|DATE)(?:\((\d+)(?:,(\d+))?\))?\s+(NOT\s+NULL|NULL)", RegexOptions.IgnoreCase)]
     private static partial Regex Columns();
 
-    [GeneratedRegex(@"ALTER\s+TABLE\s+(tcc_(?:gold|ops)\.\w+)\s+ADD\s+(\w+)\s+(BIGINT|INT|BIT|FLOAT|DECIMAL|VARCHAR|CHAR|DATETIME2|DATE)(?:\((\d+)(?:,(\d+))?\))?\s+(NOT\s+NULL|NULL)", RegexOptions.IgnoreCase)]
+    [GeneratedRegex(@"ALTER\s+TABLE\s+(\w+\.\w+)\s+ADD\s+(\w+)\s+(BIGINT|INT|BIT|FLOAT|DECIMAL|VARCHAR|CHAR|DATETIME2|DATE)(?:\((\d+)(?:,(\d+))?\))?\s+(NOT\s+NULL|NULL)", RegexOptions.IgnoreCase)]
     private static partial Regex AddColumns();
+
+    /// <summary>The checked-in DDL spells the shipped actual names; the schema is keyed by logical key.</summary>
+    private static string? Logical(string shippedQualified)
+    {
+        var shipped = DataMap.Default;
+        return shipped.Tables.Values.FirstOrDefault(t => shipped.Schema(t.Schema) + "." + t.Physical == shippedQualified)?.Key;
+    }
 }

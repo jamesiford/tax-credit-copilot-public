@@ -14,13 +14,13 @@ public sealed class SourceScanner
     private readonly long _maximumRows;
 
     /// <summary>Each scanner has its own mapping/schema cache; no cross-configuration static state.</summary>
-    public SourceScanner(IAnalyticsTransport transport, SourceMapping mapping, string? schema = "tcc_source",
+    public SourceScanner(IAnalyticsTransport transport, SourceMapping mapping, string? schema = null,
         long maximumRows = 1_000_000)
     {
         ArgumentNullException.ThrowIfNull(transport);
         ArgumentNullException.ThrowIfNull(mapping);
         ArgumentOutOfRangeException.ThrowIfLessThan(maximumRows, 1);
-        Schema = schema is null ? "tcc_source" : schema.Trim();
+        Schema = schema is null ? Domain.DataMap.PhysicalNames.Active.Map.SourceSchema : schema.Trim();
         if (Schema.Length > 0) { SourceMapping.ValidateIdentifier(Schema); }
         _transport = transport;
         Mapping = mapping;

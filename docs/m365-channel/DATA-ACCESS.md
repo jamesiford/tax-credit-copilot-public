@@ -184,7 +184,7 @@ on both lists.
   API's Warehouse grant is shared with the engine's writes. A separate read-only identity for data queries would add
   defence in depth and is not built.
 - **Lakehouse source datasets are off until switched on**: `DATA_QUERY_SOURCE_ENABLED=true` (azd
-  `TCC_DATA_QUERY_SOURCE_ENABLED`) and the read grant below. A disabled source is `data_source_disabled`, an
+  `DATA_QUERY_SOURCE_ENABLED`) and the read grant below. A disabled source is `data_source_disabled`, an
   unconfigured one `data_source_unavailable`; there is never a fallback to another store. Gold and ops datasets are
   not behind this flag.
 - **Settings are all optional**, non-secret and API-only. The gateway never touches data directly.
@@ -213,7 +213,7 @@ source datasets add exactly this, and nothing else:
   explicit `SELECT` makes the read independent of that role, so it survives a later narrowing of the workspace role
   to Viewer; whether the role alone already suffices is confirmed on the live redeploy.
 - **Idempotent.** `GRANT` repeats harmlessly. postprovision runs it after the schema grants, **only when
-  `TCC_DATA_QUERY_SOURCE_ENABLED=true`**, through the target guard: the Warehouse is resolved and checked as for
+  `DATA_QUERY_SOURCE_ENABLED=true`**, through the target guard: the Warehouse is resolved and checked as for
   every SQL step, and the lakehouse endpoint must be on the **same host** (one host per Fabric workspace) or the
   script refuses (exit 3).
 - **Who runs it.** Whoever runs `azd up` (it needs workspace Admin or Member, like every grant here). By hand:

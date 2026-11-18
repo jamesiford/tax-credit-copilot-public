@@ -17,10 +17,9 @@ from dotenv import load_dotenv  # noqa: E402
 load_dotenv(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".env"))
 
 from infrastructure.persistence.fabric_warehouse import (  # noqa: E402
-    GOLD_SCHEMA,
-    OPS_SCHEMA,
     FabricWarehouseConnection,
 )
+from config import names
 
 
 def rows(cur, sql):
@@ -35,7 +34,7 @@ with FabricWarehouseConnection().scope() as conn:
     print("-- live run per client")
     live = rows(cur, f"""
         SELECT client_id, run_id, tax_year, run_status
-        FROM {OPS_SCHEMA}.run_manifest
+        FROM {names.ops.run_manifest}
         WHERE run_status = 'success' AND superseded_by_run_id IS NULL
               AND run_completed_at IS NOT NULL
     """)
@@ -48,10 +47,10 @@ with FabricWarehouseConnection().scope() as conn:
                MAX(y.client_id) AS client_id,
                COUNT(DISTINCT y.tax_year) AS year_count,
                COUNT(*) AS year_rows
-        FROM {GOLD_SCHEMA}.unit_year_master y GROUP BY y.run_id
+        FROM {names.gold.unit_year_master} y GROUP BY y.run_id
     """):
         cur.execute(
-            f"SELECT COUNT(*), COUNT(DISTINCT tax_year) FROM {GOLD_SCHEMA}.unit_month_summary "
+            f"SELECT COUNT(*), COUNT(DISTINCT tax_year) FROM {names.gold.unit_month_summary} "
             f"WHERE run_id = ?", [r["run_id"]],
         )
         month_rows, month_years = cur.fetchone()
@@ -63,12 +62,12 @@ with FabricWarehouseConnection().scope() as conn:
     print("\n-- CURRENT year rows (is_current=1) vs live-run month rows, per client")
     for r in live:
         cur.execute(
-            f"SELECT COUNT(*) FROM {GOLD_SCHEMA}.unit_year_master "
+            f"SELECT COUNT(*) FROM {names.gold.unit_year_master} "
             f"WHERE client_id = ? AND is_current = 1", [r["client_id"]],
         )
         year_current = cur.fetchone()[0]
         cur.execute(
-            f"SELECT COUNT(*) FROM {GOLD_SCHEMA}.unit_month_summary WHERE run_id = ?",
+            f"SELECT COUNT(*) FROM {names.gold.unit_month_summary} WHERE run_id = ?",
             [r["run_id"]],
         )
         month_live = cur.fetchone()[0]
@@ -80,7 +79,7 @@ with FabricWarehouseConnection().scope() as conn:
     for r in rows(cur, f"""
         SELECT client_id, COUNT(DISTINCT tax_year) AS years,
                MIN(tax_year) AS first_year, MAX(tax_year) AS last_year, COUNT(*) AS rows_
-        FROM {GOLD_SCHEMA}.unit_year_master WHERE is_current = 1
+        FROM {names.gold.unit_year_master} WHERE is_current = 1
         GROUP BY client_id ORDER BY client_id
     """):
         print("   ", r)

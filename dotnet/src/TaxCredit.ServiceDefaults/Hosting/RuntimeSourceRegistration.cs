@@ -20,9 +20,9 @@ namespace TaxCredit.ServiceDefaults.Hosting;
 
 internal static class RuntimeSourceRegistration
 {
-    internal static void AddRuntimeSources(this IServiceCollection services, RuntimeConfiguration settings, RuntimePaths paths)
+    internal static void AddRuntimeSources(this IServiceCollection services, RuntimeConfiguration settings, RuntimePaths paths, Domain.DataMap.DataMap dataMap)
     {
-        var mapping = SourceMapping.Load();
+        var mapping = SourceMapping.Load(dataMap);
         services.AddSingleton(mapping);
         services.AddSingleton<SeedAnalytics>();
         services.AddScoped<ISourceLookupReader, PersistenceLookups>();
@@ -36,14 +36,14 @@ internal static class RuntimeSourceRegistration
             services.RemoveAll(type);
         }
         services.AddScoped(p => Lookups(p, settings, paths));
-        services.AddScoped<IAnalyticsTransport>(p => settings.Get("TCC_CONTRACT_HOOKS") == "1"
+        services.AddScoped<IAnalyticsTransport>(p => settings.Get("CONTRACT_HOOKS") == "1"
             ? p.GetRequiredService<SeedAnalytics>().Transport : new SqlAnalyticsTransport(new AnalyticsConnectionFactory(
-                new AnalyticsConnectionOptions(settings.Get("SOURCE_SQL_SERVER") ?? "", settings.Get("SOURCE_SQL_DATABASE") ?? ""),
+                new AnalyticsConnectionOptions(settings.Get("SOURCE_SQL_SERVER") ?? "", settings.Get("SOURCE_SQL_DATABASE") ?? dataMap.SourceDatabase ?? ""),
                 new EntraAnalyticsTokenProvider(p.GetRequiredService<DefaultAzureCredential>()), p.GetRequiredService<TimeProvider>())));
         var limits = SourceLimits.From(settings);
         services.AddSingleton(limits);
         services.AddScoped(p => new SourceScanner(p.GetRequiredService<IAnalyticsTransport>(), mapping,
-            settings.Get("SOURCE_SCHEMA") ?? "tcc_source", limits.MaxAccountRows));
+            settings.Get("SOURCE_SCHEMA") ?? dataMap.SourceSchema, limits.MaxAccountRows));
         services.AddScoped<PayrollProjector>();
         services.AddScoped<IFiscalRuleReader, SqlFiscalRuleReader>();
         services.AddScoped(p => new FiscalRuleAdapter(p.GetRequiredService<RuleLibrary>(),

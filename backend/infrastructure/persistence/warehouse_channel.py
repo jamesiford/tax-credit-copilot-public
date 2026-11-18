@@ -20,7 +20,7 @@ from datetime import datetime
 from typing import Any
 
 from domain.channel import AgentActionAudit, ChannelAuditEvent
-from infrastructure.persistence.fabric_warehouse import OPS_SCHEMA, FabricWarehouseConnection
+from infrastructure.persistence.fabric_warehouse import names, FabricWarehouseConnection
 from infrastructure.persistence.sqlite_channel import (
     ACTION_COLUMNS, EVENT_COLUMNS, action_from_row, action_values, event_from_row, event_values,
 )
@@ -33,8 +33,8 @@ _AUDIT_BY_CORRELATION = tenant_exempt("channel audit by correlation id: one turn
 _ACTION_UNSCOPED = tenant_exempt("agent action that names no client has no tenant to bind")
 _ACTION_RECENT = tenant_exempt("agent action trail read: the narrator's activity spans clients by design")
 
-_AUDIT = f"{OPS_SCHEMA}.channel_audit"
-_ACTIONS = f"{OPS_SCHEMA}.agent_action_audit"
+_AUDIT = f"{names.ops.channel_audit}"
+_ACTIONS = f"{names.ops.agent_action_audit}"
 
 
 def _db(value: Any) -> Any:

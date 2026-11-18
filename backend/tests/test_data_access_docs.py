@@ -46,8 +46,8 @@ def test_each_variable_has_an_azd_value_and_the_source_flag_defaults_to_false():
     mapping = json.loads(read("infra", "main.tfvars.json"))
     for variable in DATA_SETTINGS.values():
         assert variable in mapping, f"{variable} has no azd value in main.tfvars.json"
-        assert re.fullmatch(r"\$\{TCC_[A-Z_]+(=[a-z]+)?\}", mapping[variable])
-    assert mapping["data_query_source_enabled"] == "${TCC_DATA_QUERY_SOURCE_ENABLED=false}"
+        assert re.fullmatch(r"\$\{[A-Z_]+(=[a-z]+)?\}", mapping[variable])
+    assert mapping["data_query_source_enabled"] == "${DATA_QUERY_SOURCE_ENABLED=false}"
 
 
 def test_the_flag_is_emitted_only_when_true_so_a_default_plan_is_unchanged():
@@ -66,7 +66,7 @@ def test_env_vars_documents_every_setting_and_its_azd_value():
     for setting, variable in DATA_SETTINGS.items():
         assert f"`{setting}`" in text, f"ENV-VARS.md does not list {setting}"
         assert f"`{variable}`" in text, f"ENV-VARS.md does not name the Terraform variable {variable}"
-    assert "TCC_DATA_QUERY_SOURCE_ENABLED" in text
+    assert "DATA_QUERY_SOURCE_ENABLED" in text
 
 
 def test_the_data_access_page_is_indexed_and_covers_what_the_work_package_promised():

@@ -21,10 +21,10 @@ public sealed class RunPublication(PersistenceDatabase database, IRunBatchReposi
         return database.Transact(session =>
         {
             Own(item, owner, now);
-            var rows = session.Query(item.ClientId, "SELECT run_id FROM tcc_ops.run_work_identity WHERE {tenant} AND item_id = ?", item.ItemId);
+            var rows = session.Query(item.ClientId, "SELECT run_id FROM {ops.run_work_identity} WHERE {tenant} AND item_id = ?", item.ItemId);
             if (rows.Count > 0) { return (string)rows.Single()["run_id"]!; }
             var runId = newId();
-            session.Insert(item.ClientId, "tcc_ops.run_work_identity", ["client_id", "item_id", "run_id"], [[item.ClientId, item.ItemId, runId]]);
+            session.Insert(item.ClientId, "ops.run_work_identity", ["client_id", "item_id", "run_id"], [[item.ClientId, item.ItemId, runId]]);
             return runId;
         });
     }
@@ -62,7 +62,7 @@ public sealed class RunPublication(PersistenceDatabase database, IRunBatchReposi
                 Own(item, owner, now());
                 if (result.RunId is { } resultId && Accepted(item.ClientId, resultId) is { } manifest)
                 {
-                    session.Execute(item.ClientId, "UPDATE tcc_ops.run_batch_item SET program_code = ? WHERE {tenant} AND item_id = ? AND lease_owner = ?",
+                    session.Execute(item.ClientId, "UPDATE {ops.run_batch_item} SET program_code = ? WHERE {tenant} AND item_id = ? AND lease_owner = ?",
                         manifest.ProgramCode, item.ItemId, owner);
                 }
                 if (!queue.Finish(item.ClientId, item.ItemId, owner, now(), result, item.BatchId)) { throw new RunLeaseLost(); }
@@ -104,7 +104,7 @@ public sealed class RunPublication(PersistenceDatabase database, IRunBatchReposi
             Own(item, owner, now());
             if (result.RunId is { } resultId && Accepted(item.ClientId, resultId) is { } manifest)
             {
-                session.Execute(item.ClientId, "UPDATE tcc_ops.run_batch_item SET program_code = ? WHERE {tenant} AND item_id = ? AND lease_owner = ?",
+                session.Execute(item.ClientId, "UPDATE {ops.run_batch_item} SET program_code = ? WHERE {tenant} AND item_id = ? AND lease_owner = ?",
                     manifest.ProgramCode, item.ItemId, owner);
             }
 

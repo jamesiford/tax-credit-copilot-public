@@ -71,7 +71,7 @@ move in the same commit. New code reads the role.
 `modern`) through `brand.config.js` and applied by `applyTheme()` in `main.jsx`
 before the first render. A choice stored under `localStorage['tcc-theme']`
 outranks the build default (the style guide's toggle, and the dev tools, use
-it). Run the gates under either theme with `TCC_THEME=classic`.
+it). Run the gates under either theme with `UI_THEME=classic`.
 
 ## Re-skinning for a customer
 
@@ -314,7 +314,7 @@ visible-row gate is held at the pre-revamp 7 / 13 / 17 rows at that size.
 ```pwsh
 python frontend/tools/check_all.py            # the whole table
 python frontend/tools/check_all.py --quick    # no unit tests, build or sweep
-$env:TCC_THEME='classic'; python frontend/tools/measure_ui.py   # one tool, one theme
+$env:UI_THEME='classic'; python frontend/tools/measure_ui.py   # one tool, one theme
 python frontend/tools/check_perf.py           # needs `npx vite preview --port 4173` after a build
 python frontend/tools/shoot_pages.py after modern   # Visual QA pack, gitignored
 python frontend/tools/compare.py before after-modern --diff 2   # contact sheet

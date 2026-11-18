@@ -4,7 +4,7 @@ from __future__ import annotations
 from typing import Any, Unpack
 
 from application.gold_read_port import EligibilityOptions
-from infrastructure.persistence.fabric_warehouse import GOLD_SCHEMA
+from config import names
 from infrastructure.persistence.gold_reader.columns import _rows, month_ends_of
 from infrastructure.persistence.gold_reader.reader_base import ReaderBase
 from infrastructure.persistence.gold_reader.stmt_drill import _stmt_drill_periods, _stmt_drill_segments, _stmt_drill_verdicts
@@ -113,7 +113,7 @@ class EmployeeReads(ReaderBase):
             cursor = connection.cursor()
             try:
                 cursor.execute(
-                    f"SELECT * FROM {GOLD_SCHEMA}.employee_eligibility "
+                    f"SELECT * FROM {names.gold.employee_eligibility} "
                     f"WHERE record_token = ? AND client_id = ? AND tax_year = ? "
                     f"AND run_id = ? ORDER BY method",
                     [record_token, client_id, tax_year, run_id],
@@ -132,7 +132,7 @@ class EmployeeReads(ReaderBase):
             try:
                 cursor.execute(
                     f"SELECT worksite_id, entity_fein, first_pps, last_ppe, weight, {months} "
-                    f"FROM {GOLD_SCHEMA}.onezero_matrix "
+                    f"FROM {names.gold.onezero_matrix} "
                     f"WHERE record_token = ? AND client_id = ? AND tax_year = ? "
                     f"AND run_id = ? AND method = ? ORDER BY worksite_id",
                     [record_token, client_id, tax_year, run_id, method],

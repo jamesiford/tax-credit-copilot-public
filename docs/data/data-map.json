@@ -1,0 +1,2919 @@
+{
+  "version": 1,
+  "_doc": "Keys starting with an underscore are ignored by the loader and may be used for notes.",
+  "lakehouse": {
+    "database": {
+      "logical": "source",
+      "name": null
+    },
+    "schema": "tcc_source",
+    "case_insensitive_columns": true,
+    "naming": {
+      "table_prefix": "",
+      "table_case": "as_is"
+    },
+    "transforms": {
+      "worksite_location": "worksite_then_location",
+      "null_pay_date": "period_end"
+    },
+    "tables": {
+      "Account": {
+        "table": "Account",
+        "dataset_attr": "account",
+        "tenant_field": "account_id",
+        "columns": {
+          "account_id": {
+            "column": "AccountId",
+            "type": "int64",
+            "required": true,
+            "engine": true
+          },
+          "account_eid": {
+            "column": "AccountEid",
+            "type": "int64",
+            "required": false,
+            "engine": false
+          },
+          "name": {
+            "column": "Name",
+            "type": "string",
+            "required": true,
+            "engine": true
+          },
+          "billing_state": {
+            "column": "BillingState",
+            "type": "string",
+            "required": false,
+            "engine": true
+          },
+          "billing_city": {
+            "column": "BillingCity",
+            "type": "string",
+            "required": false,
+            "engine": false
+          },
+          "billing_postal_code": {
+            "column": "BillingPostalCode",
+            "type": "string",
+            "required": false,
+            "engine": false
+          },
+          "industry_type_id": {
+            "column": "IndustryTypeId",
+            "type": "int64",
+            "required": false,
+            "engine": true
+          },
+          "account_status_id": {
+            "column": "AccountStatusId",
+            "type": "int64",
+            "required": false,
+            "engine": false
+          },
+          "account_type_id": {
+            "column": "AccountTypeId",
+            "type": "int64",
+            "required": false,
+            "engine": false
+          },
+          "actual_number_of_employees": {
+            "column": "ActualNumberOfEmployees",
+            "type": "int64",
+            "required": false,
+            "engine": true
+          },
+          "external_name": {
+            "column": "ExternalName",
+            "type": "string",
+            "required": false,
+            "engine": false
+          },
+          "create_date": {
+            "column": "CreateDate",
+            "type": "timestamp[us]",
+            "required": false,
+            "engine": false
+          }
+        }
+      },
+      "StateCountyZip": {
+        "table": "StateCountyZip",
+        "dataset_attr": "state_county_zips",
+        "columns": {
+          "state_county_zip_id": {
+            "column": "StateCountyZipId",
+            "type": "int64",
+            "required": true,
+            "engine": true
+          },
+          "state_abbr": {
+            "column": "StateAbbr",
+            "type": "string",
+            "required": true,
+            "engine": true
+          },
+          "state_name": {
+            "column": "StateName",
+            "type": "string",
+            "required": false,
+            "engine": false
+          },
+          "county_name": {
+            "column": "CountyName",
+            "type": "string",
+            "required": true,
+            "engine": true
+          },
+          "zip_code": {
+            "column": "ZipCode",
+            "type": "string",
+            "required": false,
+            "engine": false
+          }
+        }
+      },
+      "Address": {
+        "table": "Address",
+        "dataset_attr": "addresses",
+        "columns": {
+          "address_id": {
+            "column": "AddressId",
+            "type": "int64",
+            "required": true,
+            "engine": true
+          },
+          "street_address_1": {
+            "column": "StreetAddress1",
+            "type": "string",
+            "required": false,
+            "engine": false
+          },
+          "city_name": {
+            "column": "CityName",
+            "type": "string",
+            "required": false,
+            "engine": true
+          },
+          "state_county_zip_id": {
+            "column": "StateCountyZipId",
+            "type": "int64",
+            "required": true,
+            "engine": true
+          },
+          "zip_code_original": {
+            "column": "ZipCodeOriginal",
+            "type": "string",
+            "required": false,
+            "engine": false
+          },
+          "state_original": {
+            "column": "StateOriginal",
+            "type": "string",
+            "required": false,
+            "engine": true
+          },
+          "latitude": {
+            "column": "Latitude",
+            "type": "double",
+            "required": false,
+            "engine": false
+          },
+          "longitude": {
+            "column": "Longitude",
+            "type": "double",
+            "required": false,
+            "engine": false
+          }
+        }
+      },
+      "EntityFiscalYearRules": {
+        "table": "EntityFiscalYearRules",
+        "dataset_attr": "fiscal_year_rules",
+        "optional_reason": "Client fiscal windows fall back to a calendar year, flagged as assumed.",
+        "columns": {
+          "fiscal_year_rules_id": {
+            "column": "FiscalYearRulesId",
+            "type": "int64",
+            "required": false,
+            "engine": true
+          },
+          "name": {
+            "column": "Name",
+            "type": "string",
+            "required": false,
+            "engine": true
+          },
+          "fiscal_year_begin": {
+            "column": "FiscalYearBegin",
+            "type": "date32",
+            "required": false,
+            "engine": true
+          },
+          "fiscal_year_end": {
+            "column": "FiscalYearEnd",
+            "type": "date32",
+            "required": false,
+            "engine": true
+          },
+          "rule_expression": {
+            "column": "RuleExpression",
+            "type": "string",
+            "required": false,
+            "engine": true
+          },
+          "inferred": {
+            "column": "Inferred",
+            "type": "bool",
+            "required": false,
+            "engine": true
+          }
+        }
+      },
+      "Entity": {
+        "table": "Entity",
+        "dataset_attr": "entities",
+        "tenant_field": "account_id",
+        "columns": {
+          "entity_id": {
+            "column": "EntityId",
+            "type": "int64",
+            "required": true,
+            "engine": true
+          },
+          "account_id": {
+            "column": "AccountId",
+            "type": "int64",
+            "required": true,
+            "engine": true
+          },
+          "name": {
+            "column": "Name",
+            "type": "string",
+            "required": false,
+            "engine": false
+          },
+          "federal_tax_id": {
+            "column": "FederalTaxId",
+            "type": "string",
+            "required": true,
+            "engine": true
+          },
+          "state_tax_id": {
+            "column": "StateTaxId",
+            "type": "string",
+            "required": false,
+            "engine": false
+          },
+          "parent_entity_id": {
+            "column": "ParentEntityId",
+            "type": "int64",
+            "required": false,
+            "engine": false
+          },
+          "entity_business_type_id": {
+            "column": "EntityBusinessTypeId",
+            "type": "int64",
+            "required": false,
+            "engine": false
+          },
+          "fiscal_year_rules_id": {
+            "column": "FiscalYearRulesId",
+            "type": "int64",
+            "required": false,
+            "engine": true
+          },
+          "inception_date": {
+            "column": "InceptionDate",
+            "type": "date32",
+            "required": false,
+            "engine": false
+          },
+          "dissolution_date": {
+            "column": "DissolutionDate",
+            "type": "date32",
+            "required": false,
+            "engine": false
+          }
+        }
+      },
+      "Location": {
+        "table": "Location",
+        "dataset_attr": "locations",
+        "tenant_field": "account_id",
+        "columns": {
+          "location_id": {
+            "column": "LocationId",
+            "type": "int64",
+            "required": true,
+            "engine": true
+          },
+          "account_id": {
+            "column": "AccountId",
+            "type": "int64",
+            "required": true,
+            "engine": true
+          },
+          "entity_id": {
+            "column": "EntityId",
+            "type": "int64",
+            "required": false,
+            "engine": true
+          },
+          "location_name": {
+            "column": "LocationName",
+            "type": "string",
+            "required": false,
+            "engine": true
+          },
+          "address_id": {
+            "column": "AddressId",
+            "type": "int64",
+            "required": true,
+            "engine": true
+          },
+          "client_location_id": {
+            "column": "ClientLocationId",
+            "type": "string",
+            "required": true,
+            "engine": true
+          },
+          "dba": {
+            "column": "Dba",
+            "type": "string",
+            "required": false,
+            "engine": true
+          },
+          "open_date": {
+            "column": "OpenDate",
+            "type": "date32",
+            "required": false,
+            "engine": true
+          },
+          "close_date": {
+            "column": "CloseDate",
+            "type": "date32",
+            "required": false,
+            "engine": true
+          },
+          "location_status_id": {
+            "column": "LocationStatusId",
+            "type": "int64",
+            "required": false,
+            "engine": true
+          },
+          "screening_status_id": {
+            "column": "ScreeningStatusId",
+            "type": "int64",
+            "required": false,
+            "engine": false
+          }
+        }
+      },
+      "PayFrequency": {
+        "table": "PayFrequency",
+        "dataset_attr": "pay_frequencies",
+        "optional_reason": "Pay-frequency labels are unavailable; the headcount does not use them.",
+        "columns": {
+          "pay_frequency_id": {
+            "column": "PayFrequencyId",
+            "type": "int64",
+            "required": false,
+            "engine": true
+          },
+          "name": {
+            "column": "Name",
+            "type": "string",
+            "required": false,
+            "engine": true
+          },
+          "inferred": {
+            "column": "Inferred",
+            "type": "bool",
+            "required": false,
+            "engine": true
+          }
+        }
+      },
+      "PayCode": {
+        "table": "PayCode",
+        "dataset_attr": "pay_codes",
+        "tenant_field": "account_id",
+        "columns": {
+          "pay_code_id": {
+            "column": "PayCodeId",
+            "type": "int64",
+            "required": true,
+            "engine": true
+          },
+          "account_id": {
+            "column": "AccountId",
+            "type": "int64",
+            "required": true,
+            "engine": true
+          },
+          "pay_code": {
+            "column": "PayCode",
+            "type": "string",
+            "required": true,
+            "engine": true
+          },
+          "description": {
+            "column": "Description",
+            "type": "string",
+            "required": false,
+            "engine": false
+          },
+          "is_aca": {
+            "column": "IsAca",
+            "type": "bool",
+            "required": false,
+            "engine": false
+          },
+          "is_futa": {
+            "column": "IsFuta",
+            "type": "bool",
+            "required": false,
+            "engine": false
+          },
+          "pay_code_category_id": {
+            "column": "PayCodeCategoryId",
+            "type": "int64",
+            "required": false,
+            "engine": true
+          }
+        }
+      },
+      "Employment": {
+        "table": "Employment",
+        "dataset_attr": "employments",
+        "optional_reason": "Job titles are unavailable; they are display-only.",
+        "columns": {
+          "employment_id": {
+            "column": "EmploymentId",
+            "type": "int64",
+            "required": false,
+            "engine": false
+          },
+          "employee_id": {
+            "column": "EmployeeId",
+            "type": "int64",
+            "required": false,
+            "engine": true
+          },
+          "hire_location_id": {
+            "column": "HireLocationId",
+            "type": "int64",
+            "required": false,
+            "engine": false
+          },
+          "current_location_id": {
+            "column": "CurrentLocationId",
+            "type": "int64",
+            "required": false,
+            "engine": false
+          },
+          "status": {
+            "column": "Status",
+            "type": "string",
+            "required": false,
+            "engine": false
+          },
+          "job_title": {
+            "column": "JobTitle",
+            "type": "string",
+            "required": false,
+            "engine": true
+          },
+          "hire_date": {
+            "column": "HireDate",
+            "type": "date32",
+            "required": false,
+            "engine": false
+          },
+          "start_date": {
+            "column": "StartDate",
+            "type": "date32",
+            "required": false,
+            "engine": false
+          },
+          "termination_date": {
+            "column": "TerminationDate",
+            "type": "date32",
+            "required": false,
+            "engine": false
+          },
+          "termination_reason": {
+            "column": "TerminationReason",
+            "type": "string",
+            "required": false,
+            "engine": false
+          },
+          "employment_type": {
+            "column": "EmploymentType",
+            "type": "string",
+            "required": false,
+            "engine": false
+          },
+          "wage_type": {
+            "column": "WageType",
+            "type": "string",
+            "required": false,
+            "engine": false
+          },
+          "employment_status": {
+            "column": "EmploymentStatus",
+            "type": "string",
+            "required": false,
+            "engine": false
+          },
+          "department_number": {
+            "column": "DepartmentNumber",
+            "type": "string",
+            "required": false,
+            "engine": false
+          },
+          "department_name": {
+            "column": "DepartmentName",
+            "type": "string",
+            "required": false,
+            "engine": false
+          }
+        }
+      },
+      "Payroll": {
+        "table": "Payroll",
+        "dataset_attr": "payroll",
+        "tenant_field": "account_id",
+        "partition_by": [
+          "account_id"
+        ],
+        "columns": {
+          "payroll_id": {
+            "column": "PayrollId",
+            "type": "int64",
+            "required": false,
+            "engine": true
+          },
+          "account_id": {
+            "column": "AccountId",
+            "type": "int64",
+            "required": true,
+            "engine": true
+          },
+          "employee_id": {
+            "column": "EmployeeId",
+            "type": "int64",
+            "required": true,
+            "engine": true
+          },
+          "entity_id": {
+            "column": "EntityId",
+            "type": "int64",
+            "required": true,
+            "engine": true
+          },
+          "location_id": {
+            "column": "LocationId",
+            "type": "int64",
+            "required": true,
+            "engine": true
+          },
+          "pay_frequency_id": {
+            "column": "PayFrequencyId",
+            "type": "int64",
+            "required": false,
+            "engine": true
+          },
+          "pay_period_start": {
+            "column": "PayPeriodStart",
+            "type": "date32",
+            "required": true,
+            "engine": true
+          },
+          "pay_period_end": {
+            "column": "PayPeriodEnd",
+            "type": "date32",
+            "required": true,
+            "engine": true
+          },
+          "pay_date": {
+            "column": "PayDate",
+            "type": "date32",
+            "required": true,
+            "engine": true
+          },
+          "hours": {
+            "column": "Hours",
+            "type": "decimal128(18, 2)",
+            "required": true,
+            "engine": true
+          },
+          "wages": {
+            "column": "Wages",
+            "type": "decimal128(18, 2)",
+            "required": true,
+            "engine": true
+          },
+          "client_employee_id": {
+            "column": "ClientEmployeeId",
+            "type": "string",
+            "required": false,
+            "engine": false
+          },
+          "hourly_rate": {
+            "column": "HourlyRate",
+            "type": "decimal128(18, 2)",
+            "required": false,
+            "engine": false
+          },
+          "is_full_time": {
+            "column": "IsFullTime",
+            "type": "bool",
+            "required": false,
+            "engine": false
+          },
+          "is_salaried": {
+            "column": "IsSalaried",
+            "type": "bool",
+            "required": false,
+            "engine": false
+          },
+          "pay_code_id": {
+            "column": "PayCodeId",
+            "type": "int64",
+            "required": true,
+            "engine": true
+          },
+          "worksite_location_id": {
+            "column": "WorksiteLocationId",
+            "type": "int64",
+            "required": false,
+            "engine": true
+          },
+          "inload_payroll_id": {
+            "column": "InloadPayrollId",
+            "type": "int64",
+            "required": false,
+            "engine": false
+          },
+          "create_date": {
+            "column": "CreateDate",
+            "type": "timestamp[us]",
+            "required": false,
+            "engine": false
+          },
+          "modify_date": {
+            "column": "ModifyDate",
+            "type": "timestamp[us]",
+            "required": false,
+            "engine": false
+          },
+          "created_by": {
+            "column": "CreatedBy",
+            "type": "int64",
+            "required": false,
+            "engine": false
+          },
+          "modified_by": {
+            "column": "ModifiedBy",
+            "type": "int64",
+            "required": false,
+            "engine": false
+          }
+        }
+      }
+    }
+  },
+  "warehouse": {
+    "database": {
+      "logical": "warehouse",
+      "name": null
+    },
+    "schemas": {
+      "gold": "tcc_gold",
+      "ops": "tcc_ops"
+    },
+    "tables": {
+      "ops.run_manifest": {
+        "schema": "ops",
+        "table": "run_manifest",
+        "columns": {
+          "run_id": {
+            "column": "run_id",
+            "type": "VARCHAR(64)"
+          },
+          "client_id": {
+            "column": "client_id",
+            "type": "BIGINT"
+          },
+          "entity_id": {
+            "column": "entity_id",
+            "type": "BIGINT"
+          },
+          "program_code": {
+            "column": "program_code",
+            "type": "VARCHAR(32)"
+          },
+          "tax_year": {
+            "column": "tax_year",
+            "type": "INT"
+          },
+          "fiscal_year_begin": {
+            "column": "fiscal_year_begin",
+            "type": "DATE"
+          },
+          "fiscal_year_end": {
+            "column": "fiscal_year_end",
+            "type": "DATE"
+          },
+          "source_snapshot_id": {
+            "column": "source_snapshot_id",
+            "type": "VARCHAR(64)"
+          },
+          "step1_assumption_set_id": {
+            "column": "step1_assumption_set_id",
+            "type": "VARCHAR(64)"
+          },
+          "step1_assumption_sha256": {
+            "column": "step1_assumption_sha256",
+            "type": "CHAR(64)"
+          },
+          "onezero_assumption_set_id": {
+            "column": "onezero_assumption_set_id",
+            "type": "VARCHAR(64)"
+          },
+          "onezero_assumption_sha256": {
+            "column": "onezero_assumption_sha256",
+            "type": "CHAR(64)"
+          },
+          "rule_pack_version": {
+            "column": "rule_pack_version",
+            "type": "VARCHAR(64)"
+          },
+          "code_commit": {
+            "column": "code_commit",
+            "type": "CHAR(40)"
+          },
+          "calculation_id": {
+            "column": "calculation_id",
+            "type": "CHAR(64)"
+          },
+          "run_started_at": {
+            "column": "run_started_at",
+            "type": "DATETIME2(3)"
+          },
+          "run_completed_at": {
+            "column": "run_completed_at",
+            "type": "DATETIME2(3)"
+          },
+          "run_status": {
+            "column": "run_status",
+            "type": "VARCHAR(16)"
+          },
+          "superseded_by_run_id": {
+            "column": "superseded_by_run_id",
+            "type": "VARCHAR(64)"
+          },
+          "triggered_by": {
+            "column": "triggered_by",
+            "type": "VARCHAR(256)"
+          }
+        }
+      },
+      "ops.source_snapshot": {
+        "schema": "ops",
+        "table": "source_snapshot",
+        "columns": {
+          "snapshot_id": {
+            "column": "snapshot_id",
+            "type": "VARCHAR(64)"
+          },
+          "client_id": {
+            "column": "client_id",
+            "type": "BIGINT"
+          },
+          "extracted_at": {
+            "column": "extracted_at",
+            "type": "DATETIME2(3)"
+          },
+          "extraction_query_version": {
+            "column": "extraction_query_version",
+            "type": "VARCHAR(64)"
+          },
+          "row_count": {
+            "column": "row_count",
+            "type": "BIGINT"
+          },
+          "manifest_sha256": {
+            "column": "manifest_sha256",
+            "type": "CHAR(64)"
+          },
+          "source_max_modify_date": {
+            "column": "source_max_modify_date",
+            "type": "DATETIME2(3)"
+          },
+          "source_inload_batch_ids": {
+            "column": "source_inload_batch_ids",
+            "type": "VARCHAR(4000)"
+          }
+        }
+      },
+      "ops.source_file_manifest": {
+        "schema": "ops",
+        "table": "source_file_manifest",
+        "columns": {
+          "snapshot_id": {
+            "column": "snapshot_id",
+            "type": "VARCHAR(64)"
+          },
+          "ordinal": {
+            "column": "ordinal",
+            "type": "INT"
+          },
+          "file_name": {
+            "column": "file_name",
+            "type": "VARCHAR(512)"
+          },
+          "sha256": {
+            "column": "sha256",
+            "type": "CHAR(64)"
+          },
+          "byte_size": {
+            "column": "byte_size",
+            "type": "BIGINT"
+          },
+          "row_count": {
+            "column": "row_count",
+            "type": "BIGINT"
+          },
+          "column_list": {
+            "column": "column_list",
+            "type": "VARCHAR(8000)"
+          }
+        }
+      },
+      "gold.employee_period_fact": {
+        "schema": "gold",
+        "table": "employee_period_fact",
+        "columns": {
+          "client_id": {
+            "column": "client_id",
+            "type": "BIGINT"
+          },
+          "tax_year": {
+            "column": "tax_year",
+            "type": "INT"
+          },
+          "run_id": {
+            "column": "run_id",
+            "type": "VARCHAR(64)"
+          },
+          "employee_id": {
+            "column": "employee_id",
+            "type": "VARCHAR(64)"
+          },
+          "record_token": {
+            "column": "record_token",
+            "type": "CHAR(24)"
+          },
+          "worksite_id": {
+            "column": "worksite_id",
+            "type": "VARCHAR(64)"
+          },
+          "entity_fein": {
+            "column": "entity_fein",
+            "type": "VARCHAR(16)"
+          },
+          "job_title": {
+            "column": "job_title",
+            "type": "VARCHAR(128)"
+          },
+          "pay_period_start": {
+            "column": "pay_period_start",
+            "type": "DATE"
+          },
+          "pay_period_end": {
+            "column": "pay_period_end",
+            "type": "DATE"
+          },
+          "pay_date": {
+            "column": "pay_date",
+            "type": "DATE"
+          },
+          "period_days": {
+            "column": "period_days",
+            "type": "INT"
+          },
+          "pay_frequency_code": {
+            "column": "pay_frequency_code",
+            "type": "VARCHAR(16)"
+          },
+          "hours": {
+            "column": "hours",
+            "type": "DECIMAL(18,2)"
+          },
+          "wages": {
+            "column": "wages",
+            "type": "DECIMAL(18,2)"
+          },
+          "pay_code": {
+            "column": "pay_code",
+            "type": "VARCHAR(64)"
+          },
+          "included": {
+            "column": "included",
+            "type": "BIT"
+          },
+          "selection_decision": {
+            "column": "selection_decision",
+            "type": "VARCHAR(32)"
+          },
+          "qc_flag": {
+            "column": "qc_flag",
+            "type": "VARCHAR(32)"
+          }
+        }
+      },
+      "gold.employee_eligibility": {
+        "schema": "gold",
+        "table": "employee_eligibility",
+        "columns": {
+          "client_id": {
+            "column": "client_id",
+            "type": "BIGINT"
+          },
+          "tax_year": {
+            "column": "tax_year",
+            "type": "INT"
+          },
+          "method": {
+            "column": "method",
+            "type": "VARCHAR(16)"
+          },
+          "run_id": {
+            "column": "run_id",
+            "type": "VARCHAR(64)"
+          },
+          "employee_id": {
+            "column": "employee_id",
+            "type": "VARCHAR(64)"
+          },
+          "record_token": {
+            "column": "record_token",
+            "type": "CHAR(24)"
+          },
+          "total_hours": {
+            "column": "total_hours",
+            "type": "DECIMAL(18,2)"
+          },
+          "total_wages": {
+            "column": "total_wages",
+            "type": "DECIMAL(18,2)"
+          },
+          "first_start": {
+            "column": "first_start",
+            "type": "DATE"
+          },
+          "last_end": {
+            "column": "last_end",
+            "type": "DATE"
+          },
+          "days": {
+            "column": "days",
+            "type": "INT"
+          },
+          "weeks_worked": {
+            "column": "weeks_worked",
+            "type": "DECIMAL(10,2)"
+          },
+          "avg_weekly_hours": {
+            "column": "avg_weekly_hours",
+            "type": "DECIMAL(10,2)"
+          },
+          "avg_weekly_wages": {
+            "column": "avg_weekly_wages",
+            "type": "DECIMAL(10,2)"
+          },
+          "eligible": {
+            "column": "eligible",
+            "type": "BIT"
+          },
+          "weight": {
+            "column": "weight",
+            "type": "DECIMAL(3,2)"
+          }
+        }
+      },
+      "gold.onezero_matrix": {
+        "schema": "gold",
+        "table": "onezero_matrix",
+        "columns": {
+          "client_id": {
+            "column": "client_id",
+            "type": "BIGINT"
+          },
+          "tax_year": {
+            "column": "tax_year",
+            "type": "INT"
+          },
+          "method": {
+            "column": "method",
+            "type": "VARCHAR(16)"
+          },
+          "run_id": {
+            "column": "run_id",
+            "type": "VARCHAR(64)"
+          },
+          "employee_id": {
+            "column": "employee_id",
+            "type": "VARCHAR(64)"
+          },
+          "record_token": {
+            "column": "record_token",
+            "type": "CHAR(24)"
+          },
+          "worksite_id": {
+            "column": "worksite_id",
+            "type": "VARCHAR(64)"
+          },
+          "entity_fein": {
+            "column": "entity_fein",
+            "type": "VARCHAR(16)"
+          },
+          "first_pps": {
+            "column": "first_pps",
+            "type": "DATE"
+          },
+          "last_ppe": {
+            "column": "last_ppe",
+            "type": "DATE"
+          },
+          "weight": {
+            "column": "weight",
+            "type": "DECIMAL(3,2)"
+          },
+          "month_01": {
+            "column": "month_01",
+            "type": "DECIMAL(3,2)"
+          },
+          "month_02": {
+            "column": "month_02",
+            "type": "DECIMAL(3,2)"
+          },
+          "month_03": {
+            "column": "month_03",
+            "type": "DECIMAL(3,2)"
+          },
+          "month_04": {
+            "column": "month_04",
+            "type": "DECIMAL(3,2)"
+          },
+          "month_05": {
+            "column": "month_05",
+            "type": "DECIMAL(3,2)"
+          },
+          "month_06": {
+            "column": "month_06",
+            "type": "DECIMAL(3,2)"
+          },
+          "month_07": {
+            "column": "month_07",
+            "type": "DECIMAL(3,2)"
+          },
+          "month_08": {
+            "column": "month_08",
+            "type": "DECIMAL(3,2)"
+          },
+          "month_09": {
+            "column": "month_09",
+            "type": "DECIMAL(3,2)"
+          },
+          "month_10": {
+            "column": "month_10",
+            "type": "DECIMAL(3,2)"
+          },
+          "month_11": {
+            "column": "month_11",
+            "type": "DECIMAL(3,2)"
+          },
+          "month_12": {
+            "column": "month_12",
+            "type": "DECIMAL(3,2)"
+          }
+        }
+      },
+      "gold.unit_month_summary": {
+        "schema": "gold",
+        "table": "unit_month_summary",
+        "columns": {
+          "client_id": {
+            "column": "client_id",
+            "type": "BIGINT"
+          },
+          "tax_year": {
+            "column": "tax_year",
+            "type": "INT"
+          },
+          "method": {
+            "column": "method",
+            "type": "VARCHAR(16)"
+          },
+          "run_id": {
+            "column": "run_id",
+            "type": "VARCHAR(64)"
+          },
+          "worksite_id": {
+            "column": "worksite_id",
+            "type": "VARCHAR(64)"
+          },
+          "month_01": {
+            "column": "month_01",
+            "type": "DECIMAL(10,2)"
+          },
+          "month_02": {
+            "column": "month_02",
+            "type": "DECIMAL(10,2)"
+          },
+          "month_03": {
+            "column": "month_03",
+            "type": "DECIMAL(10,2)"
+          },
+          "month_04": {
+            "column": "month_04",
+            "type": "DECIMAL(10,2)"
+          },
+          "month_05": {
+            "column": "month_05",
+            "type": "DECIMAL(10,2)"
+          },
+          "month_06": {
+            "column": "month_06",
+            "type": "DECIMAL(10,2)"
+          },
+          "month_07": {
+            "column": "month_07",
+            "type": "DECIMAL(10,2)"
+          },
+          "month_08": {
+            "column": "month_08",
+            "type": "DECIMAL(10,2)"
+          },
+          "month_09": {
+            "column": "month_09",
+            "type": "DECIMAL(10,2)"
+          },
+          "month_10": {
+            "column": "month_10",
+            "type": "DECIMAL(10,2)"
+          },
+          "month_11": {
+            "column": "month_11",
+            "type": "DECIMAL(10,2)"
+          },
+          "month_12": {
+            "column": "month_12",
+            "type": "DECIMAL(10,2)"
+          },
+          "total": {
+            "column": "total",
+            "type": "DECIMAL(12,2)"
+          },
+          "average_headcount": {
+            "column": "average_headcount",
+            "type": "DECIMAL(10,2)"
+          },
+          "months_with_headcount": {
+            "column": "months_with_headcount",
+            "type": "INT"
+          },
+          "unreachable_months": {
+            "column": "unreachable_months",
+            "type": "VARCHAR(64)"
+          }
+        }
+      },
+      "gold.run_method_summary": {
+        "schema": "gold",
+        "table": "run_method_summary",
+        "columns": {
+          "client_id": {
+            "column": "client_id",
+            "type": "BIGINT"
+          },
+          "tax_year": {
+            "column": "tax_year",
+            "type": "INT"
+          },
+          "method": {
+            "column": "method",
+            "type": "VARCHAR(16)"
+          },
+          "run_id": {
+            "column": "run_id",
+            "type": "VARCHAR(64)"
+          },
+          "program_code": {
+            "column": "program_code",
+            "type": "VARCHAR(32)"
+          },
+          "annual_average": {
+            "column": "annual_average",
+            "type": "DECIMAL(12,2)"
+          },
+          "eligible_employees": {
+            "column": "eligible_employees",
+            "type": "INT"
+          },
+          "employees_evaluated": {
+            "column": "employees_evaluated",
+            "type": "INT"
+          },
+          "matrix_rows": {
+            "column": "matrix_rows",
+            "type": "INT"
+          },
+          "unit_fein_rows": {
+            "column": "unit_fein_rows",
+            "type": "INT"
+          },
+          "contested_months": {
+            "column": "contested_months",
+            "type": "INT"
+          },
+          "month_ends": {
+            "column": "month_ends",
+            "type": "VARCHAR(256)"
+          },
+          "appended_at": {
+            "column": "appended_at",
+            "type": "DATETIME2(6)"
+          }
+        }
+      },
+      "gold.unit_year_master": {
+        "schema": "gold",
+        "table": "unit_year_master",
+        "columns": {
+          "client_id": {
+            "column": "client_id",
+            "type": "BIGINT"
+          },
+          "worksite_id": {
+            "column": "worksite_id",
+            "type": "VARCHAR(64)"
+          },
+          "entity_fein": {
+            "column": "entity_fein",
+            "type": "VARCHAR(16)"
+          },
+          "program_code": {
+            "column": "program_code",
+            "type": "VARCHAR(32)"
+          },
+          "method": {
+            "column": "method",
+            "type": "VARCHAR(16)"
+          },
+          "tax_year": {
+            "column": "tax_year",
+            "type": "INT"
+          },
+          "average_headcount": {
+            "column": "average_headcount",
+            "type": "DECIMAL(10,2)"
+          },
+          "is_base_year": {
+            "column": "is_base_year",
+            "type": "BIT"
+          },
+          "base_average_headcount": {
+            "column": "base_average_headcount",
+            "type": "DECIMAL(10,2)"
+          },
+          "base_year_source": {
+            "column": "base_year_source",
+            "type": "VARCHAR(16)"
+          },
+          "net_new_vs_base": {
+            "column": "net_new_vs_base",
+            "type": "DECIMAL(10,2)"
+          },
+          "months_reachable": {
+            "column": "months_reachable",
+            "type": "INT"
+          },
+          "year_complete": {
+            "column": "year_complete",
+            "type": "BIT"
+          },
+          "declined": {
+            "column": "declined",
+            "type": "BIT"
+          },
+          "decline_reason": {
+            "column": "decline_reason",
+            "type": "VARCHAR(512)"
+          },
+          "threshold": {
+            "column": "threshold",
+            "type": "DECIMAL(10,2)"
+          },
+          "threshold_source": {
+            "column": "threshold_source",
+            "type": "VARCHAR(16)"
+          },
+          "qualified": {
+            "column": "qualified",
+            "type": "BIT"
+          },
+          "status": {
+            "column": "status",
+            "type": "VARCHAR(16)"
+          },
+          "tier": {
+            "column": "tier",
+            "type": "VARCHAR(32)"
+          },
+          "designation": {
+            "column": "designation",
+            "type": "VARCHAR(64)"
+          },
+          "tier_source": {
+            "column": "tier_source",
+            "type": "VARCHAR(16)"
+          },
+          "eligible_jobs": {
+            "column": "eligible_jobs",
+            "type": "DECIMAL(10,2)"
+          },
+          "new_jobs_created": {
+            "column": "new_jobs_created",
+            "type": "DECIMAL(10,2)"
+          },
+          "high_water_mark": {
+            "column": "high_water_mark",
+            "type": "DECIMAL(10,2)"
+          },
+          "backfilled": {
+            "column": "backfilled",
+            "type": "BIT"
+          },
+          "per_job_usd": {
+            "column": "per_job_usd",
+            "type": "DECIMAL(19,4)"
+          },
+          "tranche_years": {
+            "column": "tranche_years",
+            "type": "INT"
+          },
+          "annual_credit_usd": {
+            "column": "annual_credit_usd",
+            "type": "DECIMAL(19,4)"
+          },
+          "base_year_overridden": {
+            "column": "base_year_overridden",
+            "type": "BIT"
+          },
+          "high_water_mark_overridden": {
+            "column": "high_water_mark_overridden",
+            "type": "BIT"
+          },
+          "run_id": {
+            "column": "run_id",
+            "type": "VARCHAR(64)"
+          },
+          "is_current": {
+            "column": "is_current",
+            "type": "BIT"
+          },
+          "appended_at": {
+            "column": "appended_at",
+            "type": "DATETIME2(3)"
+          }
+        }
+      },
+      "gold.unit_credit_installment": {
+        "schema": "gold",
+        "table": "unit_credit_installment",
+        "columns": {
+          "client_id": {
+            "column": "client_id",
+            "type": "BIGINT"
+          },
+          "worksite_id": {
+            "column": "worksite_id",
+            "type": "VARCHAR(64)"
+          },
+          "program_code": {
+            "column": "program_code",
+            "type": "VARCHAR(32)"
+          },
+          "method": {
+            "column": "method",
+            "type": "VARCHAR(16)"
+          },
+          "creation_year": {
+            "column": "creation_year",
+            "type": "INT"
+          },
+          "tax_year": {
+            "column": "tax_year",
+            "type": "INT"
+          },
+          "tranche_jobs": {
+            "column": "tranche_jobs",
+            "type": "DECIMAL(10,2)"
+          },
+          "jobs_maintained": {
+            "column": "jobs_maintained",
+            "type": "DECIMAL(10,2)"
+          },
+          "per_job_usd": {
+            "column": "per_job_usd",
+            "type": "DECIMAL(19,4)"
+          },
+          "claimable_usd": {
+            "column": "claimable_usd",
+            "type": "DECIMAL(19,4)"
+          },
+          "projected": {
+            "column": "projected",
+            "type": "BIT"
+          },
+          "run_id": {
+            "column": "run_id",
+            "type": "VARCHAR(64)"
+          },
+          "is_current": {
+            "column": "is_current",
+            "type": "BIT"
+          },
+          "appended_at": {
+            "column": "appended_at",
+            "type": "DATETIME2(3)"
+          }
+        }
+      },
+      "ops.excluded_record": {
+        "schema": "ops",
+        "table": "excluded_record",
+        "columns": {
+          "exclusion_id": {
+            "column": "exclusion_id",
+            "type": "VARCHAR(64)"
+          },
+          "run_id": {
+            "column": "run_id",
+            "type": "VARCHAR(64)"
+          },
+          "client_id": {
+            "column": "client_id",
+            "type": "BIGINT"
+          },
+          "employee_id": {
+            "column": "employee_id",
+            "type": "VARCHAR(64)"
+          },
+          "pay_period_start": {
+            "column": "pay_period_start",
+            "type": "DATE"
+          },
+          "pay_period_end": {
+            "column": "pay_period_end",
+            "type": "DATE"
+          },
+          "period_days": {
+            "column": "period_days",
+            "type": "INT"
+          },
+          "hours": {
+            "column": "hours",
+            "type": "DECIMAL(18,2)"
+          },
+          "wages": {
+            "column": "wages",
+            "type": "DECIMAL(18,2)"
+          },
+          "exclusion_rule": {
+            "column": "exclusion_rule",
+            "type": "VARCHAR(64)"
+          },
+          "numerator_treatment": {
+            "column": "numerator_treatment",
+            "type": "VARCHAR(16)"
+          },
+          "source_refs": {
+            "column": "source_refs",
+            "type": "VARCHAR(4000)"
+          },
+          "is_reinstated": {
+            "column": "is_reinstated",
+            "type": "BIT"
+          },
+          "reinstated_by": {
+            "column": "reinstated_by",
+            "type": "VARCHAR(256)"
+          },
+          "reinstated_at": {
+            "column": "reinstated_at",
+            "type": "DATETIME2(3)"
+          },
+          "reinstatement_note": {
+            "column": "reinstatement_note",
+            "type": "VARCHAR(2000)"
+          }
+        }
+      },
+      "ops.manual_override": {
+        "schema": "ops",
+        "table": "manual_override",
+        "columns": {
+          "override_id": {
+            "column": "override_id",
+            "type": "VARCHAR(64)"
+          },
+          "run_id": {
+            "column": "run_id",
+            "type": "VARCHAR(64)"
+          },
+          "client_id": {
+            "column": "client_id",
+            "type": "BIGINT"
+          },
+          "scope": {
+            "column": "scope",
+            "type": "VARCHAR(16)"
+          },
+          "target_key": {
+            "column": "target_key",
+            "type": "VARCHAR(256)"
+          },
+          "field_changed": {
+            "column": "field_changed",
+            "type": "VARCHAR(128)"
+          },
+          "value_before": {
+            "column": "value_before",
+            "type": "VARCHAR(512)"
+          },
+          "value_after": {
+            "column": "value_after",
+            "type": "VARCHAR(512)"
+          },
+          "reason_code": {
+            "column": "reason_code",
+            "type": "VARCHAR(64)"
+          },
+          "justification_text": {
+            "column": "justification_text",
+            "type": "VARCHAR(2000)"
+          },
+          "created_by": {
+            "column": "created_by",
+            "type": "VARCHAR(256)"
+          },
+          "created_at": {
+            "column": "created_at",
+            "type": "DATETIME2(3)"
+          },
+          "approved_by": {
+            "column": "approved_by",
+            "type": "VARCHAR(256)"
+          },
+          "approved_at": {
+            "column": "approved_at",
+            "type": "DATETIME2(3)"
+          },
+          "write_order": {
+            "column": "write_order",
+            "type": "BIGINT"
+          }
+        }
+      },
+      "ops.exception_report_item": {
+        "schema": "ops",
+        "table": "exception_report_item",
+        "columns": {
+          "item_id": {
+            "column": "item_id",
+            "type": "VARCHAR(64)"
+          },
+          "run_id": {
+            "column": "run_id",
+            "type": "VARCHAR(64)"
+          },
+          "client_id": {
+            "column": "client_id",
+            "type": "BIGINT"
+          },
+          "severity": {
+            "column": "severity",
+            "type": "VARCHAR(16)"
+          },
+          "rule_code": {
+            "column": "rule_code",
+            "type": "VARCHAR(64)"
+          },
+          "entity_type": {
+            "column": "entity_type",
+            "type": "VARCHAR(32)"
+          },
+          "entity_key": {
+            "column": "entity_key",
+            "type": "VARCHAR(256)"
+          },
+          "message": {
+            "column": "message",
+            "type": "VARCHAR(2000)"
+          },
+          "disposition": {
+            "column": "disposition",
+            "type": "VARCHAR(16)"
+          },
+          "dispositioned_by": {
+            "column": "dispositioned_by",
+            "type": "VARCHAR(256)"
+          },
+          "dispositioned_at": {
+            "column": "dispositioned_at",
+            "type": "DATETIME2(3)"
+          }
+        }
+      },
+      "ops.assumption_set_version": {
+        "schema": "ops",
+        "table": "assumption_set_version",
+        "columns": {
+          "assumption_set_id": {
+            "column": "assumption_set_id",
+            "type": "VARCHAR(64)"
+          },
+          "schema_version": {
+            "column": "schema_version",
+            "type": "VARCHAR(16)"
+          },
+          "status": {
+            "column": "status",
+            "type": "VARCHAR(16)"
+          },
+          "supersedes": {
+            "column": "supersedes",
+            "type": "VARCHAR(64)"
+          },
+          "content_json": {
+            "column": "content_json",
+            "type": "VARCHAR(8000)"
+          },
+          "sha256": {
+            "column": "sha256",
+            "type": "CHAR(64)"
+          },
+          "authored_by": {
+            "column": "authored_by",
+            "type": "VARCHAR(256)"
+          },
+          "approved_by": {
+            "column": "approved_by",
+            "type": "VARCHAR(256)"
+          },
+          "approved_at": {
+            "column": "approved_at",
+            "type": "DATETIME2(3)"
+          },
+          "effective_from": {
+            "column": "effective_from",
+            "type": "DATE"
+          },
+          "effective_to": {
+            "column": "effective_to",
+            "type": "DATE"
+          }
+        }
+      },
+      "ops.rule_pack_version": {
+        "schema": "ops",
+        "table": "rule_pack_version",
+        "columns": {
+          "rule_pack_version": {
+            "column": "rule_pack_version",
+            "type": "VARCHAR(64)"
+          },
+          "program_code": {
+            "column": "program_code",
+            "type": "VARCHAR(32)"
+          },
+          "tax_year": {
+            "column": "tax_year",
+            "type": "INT"
+          },
+          "content_json": {
+            "column": "content_json",
+            "type": "VARCHAR(8000)"
+          },
+          "sha256": {
+            "column": "sha256",
+            "type": "CHAR(64)"
+          },
+          "citation": {
+            "column": "citation",
+            "type": "VARCHAR(512)"
+          },
+          "source_url": {
+            "column": "source_url",
+            "type": "VARCHAR(1024)"
+          },
+          "authored_by": {
+            "column": "authored_by",
+            "type": "VARCHAR(256)"
+          },
+          "approved_by": {
+            "column": "approved_by",
+            "type": "VARCHAR(256)"
+          },
+          "approved_at": {
+            "column": "approved_at",
+            "type": "DATETIME2(3)"
+          },
+          "effective_from": {
+            "column": "effective_from",
+            "type": "DATE"
+          },
+          "effective_to": {
+            "column": "effective_to",
+            "type": "DATE"
+          }
+        }
+      },
+      "ops.rule_change_audit": {
+        "schema": "ops",
+        "table": "rule_change_audit",
+        "columns": {
+          "change_id": {
+            "column": "change_id",
+            "type": "VARCHAR(64)"
+          },
+          "assumption_set_id_before": {
+            "column": "assumption_set_id_before",
+            "type": "VARCHAR(64)"
+          },
+          "assumption_set_id_after": {
+            "column": "assumption_set_id_after",
+            "type": "VARCHAR(64)"
+          },
+          "assumption_code": {
+            "column": "assumption_code",
+            "type": "VARCHAR(32)"
+          },
+          "field_path": {
+            "column": "field_path",
+            "type": "VARCHAR(256)"
+          },
+          "value_before": {
+            "column": "value_before",
+            "type": "VARCHAR(512)"
+          },
+          "value_after": {
+            "column": "value_after",
+            "type": "VARCHAR(512)"
+          },
+          "rationale": {
+            "column": "rationale",
+            "type": "VARCHAR(2000)"
+          },
+          "source_citation": {
+            "column": "source_citation",
+            "type": "VARCHAR(512)"
+          },
+          "changed_by": {
+            "column": "changed_by",
+            "type": "VARCHAR(256)"
+          },
+          "changed_at": {
+            "column": "changed_at",
+            "type": "DATETIME2(3)"
+          },
+          "runs_invalidated": {
+            "column": "runs_invalidated",
+            "type": "VARCHAR(8000)"
+          }
+        }
+      },
+      "ops.agent_action_audit": {
+        "schema": "ops",
+        "table": "agent_action_audit",
+        "columns": {
+          "action_id": {
+            "column": "action_id",
+            "type": "VARCHAR(64)"
+          },
+          "run_id": {
+            "column": "run_id",
+            "type": "VARCHAR(64)"
+          },
+          "client_id": {
+            "column": "client_id",
+            "type": "BIGINT"
+          },
+          "agent_name": {
+            "column": "agent_name",
+            "type": "VARCHAR(128)"
+          },
+          "agent_version": {
+            "column": "agent_version",
+            "type": "VARCHAR(32)"
+          },
+          "model_deployment": {
+            "column": "model_deployment",
+            "type": "VARCHAR(128)"
+          },
+          "prompt_hash": {
+            "column": "prompt_hash",
+            "type": "CHAR(64)"
+          },
+          "tool_calls": {
+            "column": "tool_calls",
+            "type": "VARCHAR(8000)"
+          },
+          "input_summary": {
+            "column": "input_summary",
+            "type": "VARCHAR(2000)"
+          },
+          "output_summary": {
+            "column": "output_summary",
+            "type": "VARCHAR(2000)"
+          },
+          "user_upn": {
+            "column": "user_upn",
+            "type": "VARCHAR(256)"
+          },
+          "occurred_at": {
+            "column": "occurred_at",
+            "type": "DATETIME2(3)"
+          },
+          "is_deterministic_path": {
+            "column": "is_deterministic_path",
+            "type": "BIT"
+          }
+        }
+      },
+      "ops.program_claim": {
+        "schema": "ops",
+        "table": "program_claim",
+        "columns": {
+          "claim_id": {
+            "column": "claim_id",
+            "type": "VARCHAR(64)"
+          },
+          "client_id": {
+            "column": "client_id",
+            "type": "BIGINT"
+          },
+          "entity_id": {
+            "column": "entity_id",
+            "type": "BIGINT"
+          },
+          "program_code": {
+            "column": "program_code",
+            "type": "VARCHAR(32)"
+          },
+          "tax_year": {
+            "column": "tax_year",
+            "type": "INT"
+          },
+          "status": {
+            "column": "status",
+            "type": "VARCHAR(24)"
+          },
+          "provenance": {
+            "column": "provenance",
+            "type": "VARCHAR(32)"
+          },
+          "identified_usd": {
+            "column": "identified_usd",
+            "type": "DECIMAL(19,4)"
+          },
+          "claimed_usd": {
+            "column": "claimed_usd",
+            "type": "DECIMAL(19,4)"
+          },
+          "certified_usd": {
+            "column": "certified_usd",
+            "type": "DECIMAL(19,4)"
+          },
+          "average_headcount": {
+            "column": "average_headcount",
+            "type": "FLOAT"
+          },
+          "base_average_headcount": {
+            "column": "base_average_headcount",
+            "type": "FLOAT"
+          },
+          "threshold_jobs": {
+            "column": "threshold_jobs",
+            "type": "FLOAT"
+          },
+          "is_base_year": {
+            "column": "is_base_year",
+            "type": "BIT"
+          },
+          "identified_run_id": {
+            "column": "identified_run_id",
+            "type": "VARCHAR(64)"
+          },
+          "assumption_set_id": {
+            "column": "assumption_set_id",
+            "type": "VARCHAR(64)"
+          },
+          "rule_pack_version": {
+            "column": "rule_pack_version",
+            "type": "VARCHAR(64)"
+          },
+          "filed_on": {
+            "column": "filed_on",
+            "type": "DATE"
+          },
+          "filing_reference": {
+            "column": "filing_reference",
+            "type": "VARCHAR(128)"
+          },
+          "decided_by": {
+            "column": "decided_by",
+            "type": "VARCHAR(256)"
+          },
+          "decided_at": {
+            "column": "decided_at",
+            "type": "DATETIME2(3)"
+          },
+          "decline_reason": {
+            "column": "decline_reason",
+            "type": "VARCHAR(1024)"
+          },
+          "effective_from": {
+            "column": "effective_from",
+            "type": "DATE"
+          },
+          "effective_to": {
+            "column": "effective_to",
+            "type": "DATE"
+          }
+        }
+      },
+      "ops.program_engagement": {
+        "schema": "ops",
+        "table": "program_engagement",
+        "columns": {
+          "client_id": {
+            "column": "client_id",
+            "type": "BIGINT"
+          },
+          "program_code": {
+            "column": "program_code",
+            "type": "VARCHAR(32)"
+          },
+          "scope": {
+            "column": "scope",
+            "type": "VARCHAR(24)"
+          },
+          "effective_from": {
+            "column": "effective_from",
+            "type": "DATE"
+          },
+          "effective_to": {
+            "column": "effective_to",
+            "type": "DATE"
+          },
+          "note": {
+            "column": "note",
+            "type": "VARCHAR(1024)"
+          },
+          "set_by": {
+            "column": "set_by",
+            "type": "VARCHAR(256)"
+          },
+          "set_at": {
+            "column": "set_at",
+            "type": "DATETIME2(3)"
+          }
+        }
+      },
+      "ops.agent_finding_resolution": {
+        "schema": "ops",
+        "table": "agent_finding_resolution",
+        "columns": {
+          "finding_id": {
+            "column": "finding_id",
+            "type": "VARCHAR(128)"
+          },
+          "client_id": {
+            "column": "client_id",
+            "type": "BIGINT"
+          },
+          "tax_year": {
+            "column": "tax_year",
+            "type": "INT"
+          },
+          "resolution": {
+            "column": "resolution",
+            "type": "VARCHAR(16)"
+          },
+          "detail": {
+            "column": "detail",
+            "type": "VARCHAR(1024)"
+          },
+          "note": {
+            "column": "note",
+            "type": "VARCHAR(4000)"
+          },
+          "decided_by": {
+            "column": "decided_by",
+            "type": "VARCHAR(256)"
+          },
+          "decided_at": {
+            "column": "decided_at",
+            "type": "DATETIME2(3)"
+          },
+          "superseded_at": {
+            "column": "superseded_at",
+            "type": "DATETIME2(3)"
+          }
+        }
+      },
+      "ops.artifact": {
+        "schema": "ops",
+        "table": "artifact",
+        "columns": {
+          "artifact_id": {
+            "column": "artifact_id",
+            "type": "VARCHAR(64)"
+          },
+          "kind": {
+            "column": "kind",
+            "type": "VARCHAR(24)"
+          },
+          "client_id": {
+            "column": "client_id",
+            "type": "BIGINT"
+          },
+          "program_code": {
+            "column": "program_code",
+            "type": "VARCHAR(32)"
+          },
+          "tax_year": {
+            "column": "tax_year",
+            "type": "INT"
+          },
+          "run_id": {
+            "column": "run_id",
+            "type": "VARCHAR(64)"
+          },
+          "rule_pack_version": {
+            "column": "rule_pack_version",
+            "type": "VARCHAR(64)"
+          },
+          "container_name": {
+            "column": "container_name",
+            "type": "VARCHAR(63)"
+          },
+          "blob_path": {
+            "column": "blob_path",
+            "type": "VARCHAR(1024)"
+          },
+          "file_name": {
+            "column": "file_name",
+            "type": "VARCHAR(256)"
+          },
+          "content_type": {
+            "column": "content_type",
+            "type": "VARCHAR(128)"
+          },
+          "size_bytes": {
+            "column": "size_bytes",
+            "type": "BIGINT"
+          },
+          "sha256": {
+            "column": "sha256",
+            "type": "CHAR(64)"
+          },
+          "created_by": {
+            "column": "created_by",
+            "type": "VARCHAR(256)"
+          },
+          "created_at": {
+            "column": "created_at",
+            "type": "DATETIME2(3)"
+          },
+          "retain_until": {
+            "column": "retain_until",
+            "type": "DATE"
+          },
+          "superseded_at": {
+            "column": "superseded_at",
+            "type": "DATETIME2(3)"
+          }
+        }
+      },
+      "ops.artifact_access": {
+        "schema": "ops",
+        "table": "artifact_access",
+        "columns": {
+          "access_id": {
+            "column": "access_id",
+            "type": "VARCHAR(64)"
+          },
+          "artifact_id": {
+            "column": "artifact_id",
+            "type": "VARCHAR(64)"
+          },
+          "client_id": {
+            "column": "client_id",
+            "type": "BIGINT"
+          },
+          "user_upn": {
+            "column": "user_upn",
+            "type": "VARCHAR(256)"
+          },
+          "user_oid": {
+            "column": "user_oid",
+            "type": "VARCHAR(64)"
+          },
+          "accessed_at": {
+            "column": "accessed_at",
+            "type": "DATETIME2(3)"
+          },
+          "outcome": {
+            "column": "outcome",
+            "type": "VARCHAR(16)"
+          }
+        }
+      },
+      "ops.schema_migration": {
+        "schema": "ops",
+        "table": "schema_migration",
+        "columns": {
+          "version": {
+            "column": "version",
+            "type": "VARCHAR(16)"
+          },
+          "name": {
+            "column": "name",
+            "type": "VARCHAR(128)"
+          },
+          "sha256": {
+            "column": "sha256",
+            "type": "CHAR(64)"
+          },
+          "applied_at": {
+            "column": "applied_at",
+            "type": "DATETIME2(3)"
+          },
+          "applied_by": {
+            "column": "applied_by",
+            "type": "VARCHAR(256)"
+          }
+        }
+      },
+      "ops.client_config": {
+        "schema": "ops",
+        "table": "client_config",
+        "columns": {
+          "client_id": {
+            "column": "client_id",
+            "type": "BIGINT"
+          },
+          "entity_id": {
+            "column": "entity_id",
+            "type": "BIGINT"
+          },
+          "fiscal_year_begin_rule": {
+            "column": "fiscal_year_begin_rule",
+            "type": "VARCHAR(256)"
+          },
+          "fiscal_year_end_rule": {
+            "column": "fiscal_year_end_rule",
+            "type": "VARCHAR(256)"
+          },
+          "fiscal_year_rules_id": {
+            "column": "fiscal_year_rules_id",
+            "type": "BIGINT"
+          },
+          "is_staffing_client": {
+            "column": "is_staffing_client",
+            "type": "BIT"
+          },
+          "programs_enrolled": {
+            "column": "programs_enrolled",
+            "type": "VARCHAR(1024)"
+          },
+          "effective_from": {
+            "column": "effective_from",
+            "type": "DATE"
+          },
+          "effective_to": {
+            "column": "effective_to",
+            "type": "DATE"
+          }
+        }
+      },
+      "ops.channel_audit": {
+        "schema": "ops",
+        "table": "channel_audit",
+        "columns": {
+          "audit_id": {
+            "column": "audit_id",
+            "type": "VARCHAR(64)"
+          },
+          "event_seq": {
+            "column": "event_seq",
+            "type": "INT"
+          },
+          "phase": {
+            "column": "phase",
+            "type": "VARCHAR(8)"
+          },
+          "correlation_id": {
+            "column": "correlation_id",
+            "type": "VARCHAR(64)"
+          },
+          "occurred_at": {
+            "column": "occurred_at",
+            "type": "DATETIME2(3)"
+          },
+          "elapsed_ms": {
+            "column": "elapsed_ms",
+            "type": "INT"
+          },
+          "channel": {
+            "column": "channel",
+            "type": "VARCHAR(24)"
+          },
+          "user_oid": {
+            "column": "user_oid",
+            "type": "VARCHAR(64)"
+          },
+          "tenant_id": {
+            "column": "tenant_id",
+            "type": "VARCHAR(64)"
+          },
+          "user_display_name": {
+            "column": "user_display_name",
+            "type": "VARCHAR(256)"
+          },
+          "user_upn": {
+            "column": "user_upn",
+            "type": "VARCHAR(256)"
+          },
+          "identity_assurance": {
+            "column": "identity_assurance",
+            "type": "VARCHAR(24)"
+          },
+          "conversation_id": {
+            "column": "conversation_id",
+            "type": "VARCHAR(128)"
+          },
+          "tool_name": {
+            "column": "tool_name",
+            "type": "VARCHAR(64)"
+          },
+          "action_kind": {
+            "column": "action_kind",
+            "type": "VARCHAR(16)"
+          },
+          "client_id": {
+            "column": "client_id",
+            "type": "BIGINT"
+          },
+          "tax_year": {
+            "column": "tax_year",
+            "type": "INT"
+          },
+          "request_summary": {
+            "column": "request_summary",
+            "type": "VARCHAR(2000)"
+          },
+          "request_sha256": {
+            "column": "request_sha256",
+            "type": "CHAR(64)"
+          },
+          "confirmation_ref": {
+            "column": "confirmation_ref",
+            "type": "VARCHAR(64)"
+          },
+          "outcome": {
+            "column": "outcome",
+            "type": "VARCHAR(24)"
+          },
+          "error": {
+            "column": "error",
+            "type": "VARCHAR(2000)"
+          },
+          "run_id": {
+            "column": "run_id",
+            "type": "VARCHAR(64)"
+          },
+          "trail_sha256": {
+            "column": "trail_sha256",
+            "type": "CHAR(64)"
+          },
+          "numeric_guard": {
+            "column": "numeric_guard",
+            "type": "VARCHAR(8)"
+          },
+          "is_deterministic_path": {
+            "column": "is_deterministic_path",
+            "type": "BIT"
+          }
+        }
+      },
+      "ops.channel_user": {
+        "schema": "ops",
+        "table": "channel_user",
+        "columns": {
+          "user_oid": {
+            "column": "user_oid",
+            "type": "VARCHAR(64)"
+          },
+          "display_name": {
+            "column": "display_name",
+            "type": "VARCHAR(256)"
+          },
+          "role": {
+            "column": "role",
+            "type": "VARCHAR(16)"
+          },
+          "added_by": {
+            "column": "added_by",
+            "type": "VARCHAR(256)"
+          },
+          "added_at": {
+            "column": "added_at",
+            "type": "DATETIME2(3)"
+          },
+          "removed_at": {
+            "column": "removed_at",
+            "type": "DATETIME2(3)"
+          }
+        }
+      },
+      "ops.channel_confirmation": {
+        "schema": "ops",
+        "table": "channel_confirmation",
+        "columns": {
+          "confirmation_id": {
+            "column": "confirmation_id",
+            "type": "VARCHAR(64)"
+          },
+          "token_sha256": {
+            "column": "token_sha256",
+            "type": "CHAR(64)"
+          },
+          "user_oid": {
+            "column": "user_oid",
+            "type": "VARCHAR(64)"
+          },
+          "tool_name": {
+            "column": "tool_name",
+            "type": "VARCHAR(64)"
+          },
+          "args_sha256": {
+            "column": "args_sha256",
+            "type": "CHAR(64)"
+          },
+          "idempotency_key": {
+            "column": "idempotency_key",
+            "type": "VARCHAR(128)"
+          },
+          "created_at": {
+            "column": "created_at",
+            "type": "DATETIME2(3)"
+          },
+          "expires_at": {
+            "column": "expires_at",
+            "type": "DATETIME2(3)"
+          },
+          "consumed_at": {
+            "column": "consumed_at",
+            "type": "DATETIME2(3)"
+          },
+          "outcome": {
+            "column": "outcome",
+            "type": "VARCHAR(16)"
+          },
+          "result_json": {
+            "column": "result_json",
+            "type": "VARCHAR(8000)"
+          }
+        }
+      },
+      "ops.lookup_override": {
+        "schema": "ops",
+        "table": "lookup_override",
+        "columns": {
+          "override_id": {
+            "column": "override_id",
+            "type": "VARCHAR(36)"
+          },
+          "lookup_name": {
+            "column": "lookup_name",
+            "type": "VARCHAR(64)"
+          },
+          "client_id": {
+            "column": "client_id",
+            "type": "BIGINT"
+          },
+          "key_kind": {
+            "column": "key_kind",
+            "type": "VARCHAR(16)"
+          },
+          "key_value": {
+            "column": "key_value",
+            "type": "VARCHAR(256)"
+          },
+          "value_json": {
+            "column": "value_json",
+            "type": "VARCHAR(2000)"
+          },
+          "effective_from": {
+            "column": "effective_from",
+            "type": "DATE"
+          },
+          "effective_to": {
+            "column": "effective_to",
+            "type": "DATE"
+          },
+          "authored_by": {
+            "column": "authored_by",
+            "type": "VARCHAR(256)"
+          },
+          "authored_on": {
+            "column": "authored_on",
+            "type": "DATETIME2(3)"
+          },
+          "basis": {
+            "column": "basis",
+            "type": "VARCHAR(1000)"
+          },
+          "inferred": {
+            "column": "inferred",
+            "type": "BIT"
+          },
+          "superseded_at": {
+            "column": "superseded_at",
+            "type": "DATETIME2(3)"
+          }
+        }
+      },
+      "ops.lookup_audit": {
+        "schema": "ops",
+        "table": "lookup_audit",
+        "columns": {
+          "audit_id": {
+            "column": "audit_id",
+            "type": "VARCHAR(36)"
+          },
+          "lookup_name": {
+            "column": "lookup_name",
+            "type": "VARCHAR(64)"
+          },
+          "client_id": {
+            "column": "client_id",
+            "type": "BIGINT"
+          },
+          "action": {
+            "column": "action",
+            "type": "VARCHAR(16)"
+          },
+          "key_kind": {
+            "column": "key_kind",
+            "type": "VARCHAR(16)"
+          },
+          "key_value": {
+            "column": "key_value",
+            "type": "VARCHAR(256)"
+          },
+          "value_json": {
+            "column": "value_json",
+            "type": "VARCHAR(2000)"
+          },
+          "actor": {
+            "column": "actor",
+            "type": "VARCHAR(256)"
+          },
+          "at": {
+            "column": "at",
+            "type": "DATETIME2(3)"
+          },
+          "basis": {
+            "column": "basis",
+            "type": "VARCHAR(1000)"
+          }
+        }
+      },
+      "ops.run_batch": {
+        "schema": "ops",
+        "table": "run_batch",
+        "columns": {
+          "batch_id": {
+            "column": "batch_id",
+            "type": "VARCHAR(36)"
+          },
+          "kind": {
+            "column": "kind",
+            "type": "VARCHAR(24)"
+          },
+          "scope_kind": {
+            "column": "scope_kind",
+            "type": "VARCHAR(8)"
+          },
+          "scope_spec": {
+            "column": "scope_spec",
+            "type": "VARCHAR(4000)"
+          },
+          "program_code": {
+            "column": "program_code",
+            "type": "VARCHAR(64)"
+          },
+          "tax_years": {
+            "column": "tax_years",
+            "type": "VARCHAR(200)"
+          },
+          "force_run": {
+            "column": "force_run",
+            "type": "BIT"
+          },
+          "include_code_commit": {
+            "column": "include_code_commit",
+            "type": "BIT"
+          },
+          "refresh_once": {
+            "column": "refresh_once",
+            "type": "BIT"
+          },
+          "status": {
+            "column": "status",
+            "type": "VARCHAR(16)"
+          },
+          "cancel_requested": {
+            "column": "cancel_requested",
+            "type": "BIT"
+          },
+          "items_total": {
+            "column": "items_total",
+            "type": "INT"
+          },
+          "items_queued": {
+            "column": "items_queued",
+            "type": "INT"
+          },
+          "items_running": {
+            "column": "items_running",
+            "type": "INT"
+          },
+          "items_succeeded": {
+            "column": "items_succeeded",
+            "type": "INT"
+          },
+          "items_skipped": {
+            "column": "items_skipped",
+            "type": "INT"
+          },
+          "items_failed": {
+            "column": "items_failed",
+            "type": "INT"
+          },
+          "items_cancelled": {
+            "column": "items_cancelled",
+            "type": "INT"
+          },
+          "requested_by": {
+            "column": "requested_by",
+            "type": "VARCHAR(256)"
+          },
+          "requested_at": {
+            "column": "requested_at",
+            "type": "DATETIME2(3)"
+          },
+          "started_at": {
+            "column": "started_at",
+            "type": "DATETIME2(3)"
+          },
+          "finished_at": {
+            "column": "finished_at",
+            "type": "DATETIME2(3)"
+          },
+          "idempotency_key": {
+            "column": "idempotency_key",
+            "type": "VARCHAR(128)"
+          },
+          "dry_run_summary": {
+            "column": "dry_run_summary",
+            "type": "VARCHAR(4000)"
+          }
+        }
+      },
+      "ops.run_batch_item": {
+        "schema": "ops",
+        "table": "run_batch_item",
+        "columns": {
+          "item_id": {
+            "column": "item_id",
+            "type": "VARCHAR(36)"
+          },
+          "batch_id": {
+            "column": "batch_id",
+            "type": "VARCHAR(36)"
+          },
+          "seq": {
+            "column": "seq",
+            "type": "INT"
+          },
+          "client_id": {
+            "column": "client_id",
+            "type": "BIGINT"
+          },
+          "program_code": {
+            "column": "program_code",
+            "type": "VARCHAR(64)"
+          },
+          "tax_year": {
+            "column": "tax_year",
+            "type": "INT"
+          },
+          "status": {
+            "column": "status",
+            "type": "VARCHAR(24)"
+          },
+          "attempts": {
+            "column": "attempts",
+            "type": "INT"
+          },
+          "lease_owner": {
+            "column": "lease_owner",
+            "type": "VARCHAR(128)"
+          },
+          "lease_expires_at": {
+            "column": "lease_expires_at",
+            "type": "DATETIME2(3)"
+          },
+          "heartbeat_at": {
+            "column": "heartbeat_at",
+            "type": "DATETIME2(3)"
+          },
+          "not_before": {
+            "column": "not_before",
+            "type": "DATETIME2(3)"
+          },
+          "run_id": {
+            "column": "run_id",
+            "type": "VARCHAR(36)"
+          },
+          "skip_reason": {
+            "column": "skip_reason",
+            "type": "VARCHAR(500)"
+          },
+          "error_dependency": {
+            "column": "error_dependency",
+            "type": "VARCHAR(64)"
+          },
+          "error_message": {
+            "column": "error_message",
+            "type": "VARCHAR(1000)"
+          },
+          "started_at": {
+            "column": "started_at",
+            "type": "DATETIME2(3)"
+          },
+          "finished_at": {
+            "column": "finished_at",
+            "type": "DATETIME2(3)"
+          }
+        }
+      },
+      "ops.program_draft": {
+        "schema": "ops",
+        "table": "program_draft",
+        "columns": {
+          "draft_id": {
+            "column": "draft_id",
+            "type": "VARCHAR(36)"
+          },
+          "proposed_code": {
+            "column": "proposed_code",
+            "type": "VARCHAR(64)"
+          },
+          "name": {
+            "column": "name",
+            "type": "VARCHAR(200)"
+          },
+          "jurisdiction_level": {
+            "column": "jurisdiction_level",
+            "type": "VARCHAR(16)"
+          },
+          "state": {
+            "column": "state",
+            "type": "VARCHAR(8)"
+          },
+          "status": {
+            "column": "status",
+            "type": "VARCHAR(24)"
+          },
+          "version": {
+            "column": "version",
+            "type": "INT"
+          },
+          "created_by": {
+            "column": "created_by",
+            "type": "VARCHAR(256)"
+          },
+          "created_at": {
+            "column": "created_at",
+            "type": "DATETIME2(3)"
+          },
+          "updated_by": {
+            "column": "updated_by",
+            "type": "VARCHAR(256)"
+          },
+          "updated_at": {
+            "column": "updated_at",
+            "type": "DATETIME2(3)"
+          },
+          "validation_json": {
+            "column": "validation_json",
+            "type": "VARCHAR(8000)"
+          },
+          "review_requested_by": {
+            "column": "review_requested_by",
+            "type": "VARCHAR(256)"
+          },
+          "reviewer": {
+            "column": "reviewer",
+            "type": "VARCHAR(256)"
+          },
+          "decision": {
+            "column": "decision",
+            "type": "VARCHAR(24)"
+          },
+          "decision_comment": {
+            "column": "decision_comment",
+            "type": "VARCHAR(2000)"
+          },
+          "decided_at": {
+            "column": "decided_at",
+            "type": "DATETIME2(3)"
+          },
+          "approved_sha256": {
+            "column": "approved_sha256",
+            "type": "VARCHAR(64)"
+          },
+          "exported_at": {
+            "column": "exported_at",
+            "type": "DATETIME2(3)"
+          },
+          "export_sha256": {
+            "column": "export_sha256",
+            "type": "VARCHAR(64)"
+          }
+        }
+      },
+      "ops.program_draft_document": {
+        "schema": "ops",
+        "table": "program_draft_document",
+        "columns": {
+          "draft_id": {
+            "column": "draft_id",
+            "type": "VARCHAR(36)"
+          },
+          "doc_key": {
+            "column": "doc_key",
+            "type": "VARCHAR(16)"
+          },
+          "content_json": {
+            "column": "content_json",
+            "type": "VARCHAR(8000)"
+          },
+          "content_sha256": {
+            "column": "content_sha256",
+            "type": "VARCHAR(64)"
+          }
+        }
+      },
+      "ops.program_draft_event": {
+        "schema": "ops",
+        "table": "program_draft_event",
+        "columns": {
+          "draft_id": {
+            "column": "draft_id",
+            "type": "VARCHAR(36)"
+          },
+          "seq": {
+            "column": "seq",
+            "type": "INT"
+          },
+          "event_type": {
+            "column": "event_type",
+            "type": "VARCHAR(32)"
+          },
+          "actor": {
+            "column": "actor",
+            "type": "VARCHAR(256)"
+          },
+          "at": {
+            "column": "at",
+            "type": "DATETIME2(3)"
+          },
+          "from_status": {
+            "column": "from_status",
+            "type": "VARCHAR(24)"
+          },
+          "to_status": {
+            "column": "to_status",
+            "type": "VARCHAR(24)"
+          },
+          "detail_json": {
+            "column": "detail_json",
+            "type": "VARCHAR(4000)"
+          }
+        }
+      },
+      "ops.write_sequence": {
+        "schema": "ops",
+        "table": "write_sequence",
+        "columns": {
+          "sequence_name": {
+            "column": "sequence_name",
+            "type": "VARCHAR(64)"
+          },
+          "last_value": {
+            "column": "last_value",
+            "type": "BIGINT"
+          }
+        }
+      },
+      "ops.run_work_identity": {
+        "schema": "ops",
+        "table": "run_work_identity",
+        "columns": {
+          "client_id": {
+            "column": "client_id",
+            "type": "BIGINT"
+          },
+          "item_id": {
+            "column": "item_id",
+            "type": "VARCHAR(64)"
+          },
+          "run_id": {
+            "column": "run_id",
+            "type": "VARCHAR(64)"
+          }
+        }
+      },
+      "ops.run_source_observation": {
+        "schema": "ops",
+        "table": "run_source_observation",
+        "columns": {
+          "client_id": {
+            "column": "client_id",
+            "type": "BIGINT"
+          },
+          "run_id": {
+            "column": "run_id",
+            "type": "VARCHAR(64)"
+          },
+          "observation_json": {
+            "column": "observation_json",
+            "type": "VARCHAR(8000)"
+          }
+        }
+      },
+      "ops.finding_audit": {
+        "schema": "ops",
+        "table": "finding_audit",
+        "columns": {
+          "audit_id": {
+            "column": "audit_id",
+            "type": "VARCHAR(64)"
+          },
+          "client_id": {
+            "column": "client_id",
+            "type": "BIGINT"
+          },
+          "finding_id": {
+            "column": "finding_id",
+            "type": "VARCHAR(128)"
+          },
+          "action": {
+            "column": "action",
+            "type": "VARCHAR(16)"
+          },
+          "actor": {
+            "column": "actor",
+            "type": "VARCHAR(256)"
+          },
+          "at": {
+            "column": "at",
+            "type": "VARCHAR(40)"
+          }
+        }
+      }
+    }
+  }
+}

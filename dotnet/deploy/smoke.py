@@ -24,8 +24,8 @@ def environment(service: str, package: Path, work: Path) -> dict[str, str]:
     result = {key: value for key, value in os.environ.items() if key.upper() in allowed}
     result.update({
         "ENVIRONMENT": "local", "DATA_CLASSIFICATION": "synthetic",
-        "TCC_REPOSITORY_ROOT": str(package / "resources"), "TCC_CONTRACT_HOOKS": "0",
-        "TCC_PERSISTENCE_PROVIDER": "sqlite", "OPERATIONAL_DB": str(work / "ops.db"),
+        "REPOSITORY_ROOT": str(package / "resources"), "CONTRACT_HOOKS": "0",
+        "PERSISTENCE_PROVIDER": "sqlite", "OPERATIONAL_DB": str(work / "ops.db"),
         "ARTIFACT_STORE": "local", "ARTIFACT_LOCAL_ROOT": str(work / "bytes"),
         "DATA_SOURCE": "csv", "PAYROLL_PATH": str(work / "absent-synthetic.csv"),
         "AUTH_MODE": "entra", "AUTH_TENANT_ID": SYNTHETIC_TENANT,

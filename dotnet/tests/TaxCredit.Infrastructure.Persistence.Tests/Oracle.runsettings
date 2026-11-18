@@ -2,8 +2,8 @@
 <RunSettings>
   <RunConfiguration>
     <EnvironmentVariables>
-      <TCC_PYTHON>C:\Projects\py312-oracle\.venv\Scripts\python.exe</TCC_PYTHON>
-      <TCC_ALLOW_OTHER_PYTHON>0</TCC_ALLOW_OTHER_PYTHON>
+      <ORACLE_PYTHON>C:\Projects\py312-oracle\.venv\Scripts\python.exe</ORACLE_PYTHON>
+      <ORACLE_ALLOW_OTHER_PYTHON>0</ORACLE_ALLOW_OTHER_PYTHON>
     </EnvironmentVariables>
   </RunConfiguration>
 </RunSettings>

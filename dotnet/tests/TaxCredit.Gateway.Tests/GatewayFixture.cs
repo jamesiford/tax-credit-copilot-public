@@ -29,7 +29,7 @@ public sealed class GatewayFixture : IAsyncLifetime
         Directory.CreateDirectory(_directory);
         _app = GatewayHost.Build(
         [
-            "--urls=http://127.0.0.1:0", "--TCC_CONTRACT_HOOKS=1",
+            "--urls=http://127.0.0.1:0", "--CONTRACT_HOOKS=1",
             "--OPERATIONAL_DB=" + Path.Combine(_directory, "operations.db"),
             "--ARTIFACT_LOCAL_ROOT=" + Path.Combine(_directory, "bytes"),
         ], builder => builder.Logging.ClearProviders(), _configure);

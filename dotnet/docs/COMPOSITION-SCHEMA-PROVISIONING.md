@@ -1,5 +1,7 @@
 # Composition schema provisioning
 
+> **Names:** `tcc_ops`, `tcc_gold` and the table names below are the shipped defaults. The hosts resolve them through the data map (`DATA_MAP_FILE`, [`docs/DATA-MAP.md`](../../docs/DATA-MAP.md)). To provision under your own names, render the DDL with `backend/data_map_render.py` (it is the identity under the shipped map) and apply `0100_dotnet_operational_objects.sql` rendered the same way; the migration hashes recorded in `schema_migration` are of the shipped text and stay valid. Warehouse column names cannot be renamed yet.
+
 ## Scope and proof boundary
 
 The existing Python migration/grant tools are unchanged. This document is the
@@ -73,5 +75,5 @@ Those are operator validation prerequisites, not gates claimed by this session.
 
 - **No new table, staging table, schema change or storage account.** The bulk load (`SqlBulkCopy`) writes straight into the existing `tcc_gold` tables on the connection and inside the transaction the publish already uses.
 - **Permissions.** The bulk protocol needs the same `INSERT` right on `tcc_gold.*` the statement path needed (Warehouse: the workspace role plus the existing T-SQL grants); nothing extra was needed on the live Warehouse used for the measurements.
-- **Retention** (`TCC_RETAIN_SUPERSEDED_RUNS`, default 2) additionally uses `DELETE` on `tcc_gold.employee_period_fact`, `tcc_gold.onezero_matrix` and `tcc_gold.employee_eligibility`. Where the identity has no `DELETE`, a pass fails, is logged and skipped and nothing else is affected; set the setting to `all` to switch it off.
+- **Retention** (`RETAIN_SUPERSEDED_RUNS`, default 2) additionally uses `DELETE` on `tcc_gold.employee_period_fact`, `tcc_gold.onezero_matrix` and `tcc_gold.employee_eligibility`. Where the identity has no `DELETE`, a pass fails, is logged and skipped and nothing else is affected; set the setting to `all` to switch it off.
 - `RUN_LEASE_SECONDS` and `RUN_LEASE_RENEW_SECONDS` need nothing from the database beyond the `UPDATE` on `tcc_ops.run_batch_item` the queue already uses.

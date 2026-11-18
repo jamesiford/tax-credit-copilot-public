@@ -23,8 +23,8 @@ def main() -> int:
     with tempfile.TemporaryDirectory(prefix="claims-reset-probe-", dir=root / "dotnet" / "artifacts") as directory:
         work = Path(directory)
         env = {
-            **os.environ, "TCC_CONTRACT_HOOKS": "1", "ENVIRONMENT": "local",
-            "AUTH_MODE": "none", "DATA_SOURCE": "csv", "TCC_REPOSITORY_ROOT": str(root),
+            **os.environ, "CONTRACT_HOOKS": "1", "ENVIRONMENT": "local",
+            "AUTH_MODE": "none", "DATA_SOURCE": "csv", "REPOSITORY_ROOT": str(root),
             "OPERATIONAL_DB": str(work / "operations.db"), "ARTIFACT_LOCAL_ROOT": str(work / "bytes"),
             "FOUNDRY_PROJECT_ENDPOINT": "", "APPLICATIONINSIGHTS_CONNECTION_STRING": "",
             "Logging__LogLevel__Default": "Warning",

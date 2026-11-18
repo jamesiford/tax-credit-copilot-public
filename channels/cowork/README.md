@@ -48,7 +48,7 @@ python -m playwright install chromium              # only where Cairo is not ava
 | `app_id_seed` | Seed for the app id, a UUID v5. Same seed, same id, for every version: an update installs over the old one. Change it only to get a second, separate plugin. `app_id` overrides it with an explicit id. |
 | `version`, `manifest_version`, `accent_color` | Package version (`1.0.0`), manifest `1.29` (default) or `1.28`, and `#RRGGBB` (the default matches the icon tile). |
 
-Every key can also come from an environment variable `TCC_COWORK_<KEY>`, which wins over the file.
+Every key can also come from an environment variable `COWORK_<KEY>`, which wins over the file.
 
 The build is reproducible: sorted entries, fixed timestamps and permissions, LF line endings, and
 the icons read as bytes from `dist/branding/`. Two builds of the same inputs and the same rendered

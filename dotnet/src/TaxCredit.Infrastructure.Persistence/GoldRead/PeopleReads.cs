@@ -27,7 +27,7 @@ public sealed partial class GoldReader
         var inFlight = RunInFlight(clientId);
         var unit = Unit(clientId, worksiteId, taxYear, method, options.ProgramCode);
         var (where, parameters) = UnitWhere(method, taxYear, options.ProgramCode);
-        var count = One(clientId, "SELECT COUNT(*) AS count_rows FROM tcc_gold.unit_year_master WHERE " + where, parameters)!;
+        var count = One(clientId, "SELECT COUNT(*) AS count_rows FROM {gold.unit_year_master} WHERE " + where, parameters)!;
         var held = GoldValues.Int(count, "count_rows") > 0;
         if (run is null || !held)
         {
@@ -76,13 +76,13 @@ public sealed partial class GoldReader
 
     /// <inheritdoc />
     public IReadOnlyList<IReadOnlyDictionary<string, object?>> Employee(string recordToken, long clientId, int taxYear, string runId) =>
-        Many(clientId, "SELECT * FROM tcc_gold.employee_eligibility WHERE {tenant} AND record_token = ? " +
+        Many(clientId, "SELECT * FROM {gold.employee_eligibility} WHERE {tenant} AND record_token = ? " +
             "AND tax_year = ? AND run_id = ? ORDER BY method", recordToken, taxYear, runId);
 
     /// <inheritdoc />
     public IReadOnlyList<IReadOnlyDictionary<string, object?>> EmployeeUnits(string recordToken, long clientId, int taxYear, string runId, string method) =>
         Many(clientId, "SELECT worksite_id, entity_fein, first_pps, last_ppe, weight, " +
-            string.Join(", ", GoldValues.Months) + " FROM tcc_gold.onezero_matrix WHERE {tenant} AND record_token = ? " +
+            string.Join(", ", GoldValues.Months) + " FROM {gold.onezero_matrix} WHERE {tenant} AND record_token = ? " +
             "AND tax_year = ? AND run_id = ? AND method = ? ORDER BY worksite_id", recordToken, taxYear, runId, method);
 
     /// <inheritdoc />
@@ -96,13 +96,13 @@ public sealed partial class GoldReader
         }
         object?[] values = [taxYear, run["run_id"], recordToken];
         var verdicts = Many(clientId, "SELECT method, employee_id, weeks_worked, total_hours, total_wages, avg_weekly_hours, " +
-            "avg_weekly_wages, eligible, weight, days, first_start, last_end FROM tcc_gold.employee_eligibility " +
+            "avg_weekly_wages, eligible, weight, days, first_start, last_end FROM {gold.employee_eligibility} " +
             "WHERE {tenant} AND tax_year = ? AND run_id = ? AND record_token = ?", values);
         var segments = Many(clientId, "SELECT method, worksite_id, entity_fein, first_pps, last_ppe, weight, " +
-            string.Join(", ", GoldValues.Months) + " FROM tcc_gold.onezero_matrix " +
+            string.Join(", ", GoldValues.Months) + " FROM {gold.onezero_matrix} " +
             "WHERE {tenant} AND tax_year = ? AND run_id = ? AND record_token = ? ORDER BY method, worksite_id, first_pps", values);
         var periods = Many(clientId, "SELECT worksite_id, entity_fein, job_title, pay_period_start, pay_period_end, pay_date, " +
-            "pay_frequency_code, hours, wages, pay_code, selection_decision FROM tcc_gold.employee_period_fact " +
+            "pay_frequency_code, hours, wages, pay_code, selection_decision FROM {gold.employee_period_fact} " +
             "WHERE {tenant} AND tax_year = ? AND run_id = ? AND record_token = ? ORDER BY pay_period_end", values);
         return new Dictionary<string, object?>
         {

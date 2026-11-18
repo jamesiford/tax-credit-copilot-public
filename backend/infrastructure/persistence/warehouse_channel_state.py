@@ -15,7 +15,7 @@ from __future__ import annotations
 from datetime import datetime
 
 from domain.channel import Confirmation, WriterGrant, utcnow
-from infrastructure.persistence.fabric_warehouse import OPS_SCHEMA, FabricWarehouseConnection
+from infrastructure.persistence.fabric_warehouse import names, FabricWarehouseConnection
 from infrastructure.persistence.sqlite_channel_state import (
     CONFIRMATION_COLUMNS, GRANT_COLUMNS, confirmation_from_row, confirmation_values,
     grant_from_row, grant_values,
@@ -27,8 +27,8 @@ from infrastructure.persistence.warehouse_claims import from_db_instant, to_db_i
 _WRITERS = tenant_exempt("channel_user allow-list is not per client")
 _CONFIRMATIONS = tenant_exempt("channel_confirmation tokens are not per client")
 
-_USERS = f"{OPS_SCHEMA}.channel_user"
-_CONFIRM = f"{OPS_SCHEMA}.channel_confirmation"
+_USERS = f"{names.ops.channel_user}"
+_CONFIRM = f"{names.ops.channel_confirmation}"
 
 
 def _db(value):

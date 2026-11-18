@@ -69,7 +69,7 @@ internal sealed class SetBaseYearHandler(IGoldReadPort gold, IManualOverrideRepo
         };
         queue.Create(batch, [new RunBatchItem { ItemId = ids.NewId().ToString("N"), BatchId = batchId, Seq = 0,
             ClientId = request.ClientId, ProgramCode = program, TaxYear = taxYear }]);
-        if (configuration.Get("TCC_CONTRACT_HOOKS") == "1")
+        if (configuration.Get("CONTRACT_HOOKS") == "1")
         {
             gate.Defer(async token => { _ = await executor.Drain(token).ConfigureAwait(false); });
         }

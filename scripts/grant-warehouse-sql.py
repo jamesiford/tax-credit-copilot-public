@@ -18,7 +18,7 @@ Three profiles:
   on each source table the governed data query reads (the semantic model's `lakehouse`
   datasets), at object level. No schema grant, no INSERT/UPDATE/DELETE, no db_owner. It never
   accepts the gateway identity: the gateway never touches data directly. postprovision runs it
-  only when TCC_DATA_QUERY_SOURCE_ENABLED=true.
+  only when DATA_QUERY_SOURCE_ENABLED=true.
 
 Exit codes: 0 ok · 1 a grant failed · 2 usage (or a lakehouse endpoint not configured) · 3 target guard refused.
 """

@@ -19,7 +19,7 @@ internal static class ClaimRows
         "client_id", "program_code", "scope", "effective_from", "effective_to", "note", "set_by", "set_at",
     ];
 
-    internal static string Select => "SELECT " + string.Join(", ", Columns) + " FROM tcc_ops.program_claim";
+    internal static string Select => "SELECT " + string.Join(", ", Columns) + " FROM {ops.program_claim}";
 
     internal static object?[] Values(SqlSession session, ProgramClaim claim) =>
     [

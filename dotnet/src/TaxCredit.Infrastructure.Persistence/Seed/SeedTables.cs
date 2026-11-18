@@ -30,7 +30,7 @@ internal static class SeedTables
                 ? ["claim_id", "client_id", "entity_id", "program_code", "tax_year", "status", "provenance", "identified_usd", "claimed_usd", "certified_usd",
                     "average_headcount", "base_average_headcount", "threshold_jobs", "is_base_year", "identified_run_id", "assumption_set_id", "rule_pack_version",
                     "filed_on", "filing_reference", "decided_by", "decided_at", "decline_reason", "effective_from", "effective_to"]
-                : schema["tcc_ops." + table].Select(c => c.Name).ToArray();
+                : schema["ops." + table].Select(c => c.Name).ToArray();
             result.Add("operational/" + table + ".jsonl.gz", columns);
         }
 

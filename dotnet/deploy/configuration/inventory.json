@@ -58,7 +58,7 @@
       "classification": "unchanged",
       "consumers": {"api": "SD/RuntimeSourceRegistration.cs; Infrastructure.Sources/Sql/SourceScanner.cs", "worker": "SD/RuntimeSourceRegistration.cs; Infrastructure.Sources/Sql/SourceScanner.cs", "gateway": "SD/RuntimeSourceRegistration.cs; Infrastructure.Sources/Sql/SourceScanner.cs"},
       "required": "Optional; explicitly select actual SQL schema",
-      "unset": "tcc_source via ??; not the old azd flex default",
+      "unset": "The data map's lakehouse.schema (tcc_source in the shipped map)",
       "empty": "Trimmed empty: [dbo].[table], metadata dbo; HasBlankSchemaWarning=true; never tcc_source",
       "source": "Reviewed source SQL schema; empty requires operator confirmation"
     },
@@ -70,6 +70,16 @@
       "unset": "Sealed loopback views may name missing settings", "empty": "Same as unset",
       "source": "Optional Fabric item metadata only; resolve real SQL endpoint separately",
       "note": "No OneLake consumer. FABRIC_LAKEHOUSE may be translated manually to SOURCE_SQL_DATABASE only after verifying SQL database metadata."
+    },
+    {
+      "names": ["DATA_MAP_FILE"],
+      "classification": "new",
+      "consumers": {"api": "SD/RuntimeRegistration.cs; Domain/DataMap/DataMapLoader.cs", "worker": "SD/RuntimeRegistration.cs; Domain/DataMap/DataMapLoader.cs", "gateway": "SD/RuntimeRegistration.cs; Domain/DataMap/DataMapLoader.cs"},
+      "required": "Optional; path to a COMPLETE data map file (docs/data/data-map.json is the example)",
+      "unset": "The embedded shipped map; readiness reports data_map.source=embedded",
+      "empty": "Same as unset",
+      "source": "Operator-supplied file, read once at start-up; an incomplete or invalid file stops the host naming the key",
+      "note": "The .NET host does not read SOURCE_MAPPING_FILE (the Python backend keeps it as a deprecated alias); use DATA_MAP_FILE. A complete map, not a patch. DATA_MAP_FILE wins over nothing else: SOURCE_SQL_DATABASE, FABRIC_SQL_DATABASE and SOURCE_SCHEMA still take precedence over the map's names."
     },
     {
       "names": ["SOURCE_TABLE_PREFIX", "SOURCE_TABLE_CASE", "SOURCE_TABLE_MAP", "SOURCE_MAPPING_FILE", "SOURCE_SCHEMA_VALIDATION", "WORKSITE_LOCATION_SOURCE", "NULL_PAY_DATE_POLICY", "SOURCE_CACHE_MB", "SOURCE_CACHE_ACCOUNTS", "SOURCE_MAX_ACCOUNT_ROWS", "SOURCE_VERSION_CHECK_SECONDS", "SOURCE_SILVER", "SOURCE_READ_MODE", "SOURCE_FALLBACK", "PORTFOLIO_FOOTPRINT_MODE", "PORTFOLIO_FOOTPRINT_MAX_ROWS", "PORTFOLIO_FOOTPRINT_TIMEOUT_SECONDS", "ONELAKE_ENDPOINT", "ONELAKE_PATH_STYLE"],
@@ -91,7 +101,7 @@
     {
       "names": ["CLAIM_STORE", "FINDING_STORE", "RUN_MANIFEST_STORE", "OVERRIDE_STORE", "ARTIFACT_REPOSITORY", "LOOKUP_STORE"],
       "classification": "translated",
-      "target": "TCC_PERSISTENCE_PROVIDER",
+      "target": "PERSISTENCE_PROVIDER",
       "consumers": {"api": "SD/RuntimeRegistration.cs; Infrastructure.Persistence/PersistenceRegistration.cs (target only)", "worker": "SD/RuntimeRegistration.cs; Infrastructure.Persistence/PersistenceRegistration.cs (target only)", "gateway": "SD/RuntimeRegistration.cs; Infrastructure.Persistence/PersistenceRegistration.cs (target only)"},
       "required": "One target warehouse for ALL Gold/ops repositories; independent legacy selectors do not exist",
       "unset": "Legacy ignored; target defaults sqlite", "empty": "Legacy ignored; target empty rejected",
@@ -99,10 +109,10 @@
     },
     {
       "names": ["CHANNEL_STORE"],
-      "classification": "translated", "target": "TCC_PERSISTENCE_PROVIDER",
+      "classification": "translated", "target": "PERSISTENCE_PROVIDER",
       "consumers": {"gateway": "GW/ChannelEndpoints.cs readiness LABEL only; persistence uses SD/RuntimeRegistration.cs"},
       "required": "Do not emit; cannot select persistence independently",
-      "unset": "Gateway label falls back to TCC_PERSISTENCE_PROVIDER", "empty": "Empty label only, no store change",
+      "unset": "Gateway label falls back to PERSISTENCE_PROVIDER", "empty": "Empty label only, no store change",
       "source": "Use shared warehouse provider, not this legacy label",
       "note": "API/Worker ignore it; channel readiness is declarative, not a dependency probe."
     },
@@ -160,7 +170,7 @@
       "classification": "unchanged",
       "consumers": {"api": "SD/RuntimePaths.cs", "worker": "SD/RuntimePaths.cs", "gateway": "SD/RuntimePaths.cs"},
       "required": "Optional override; deployment contract nonblank if set",
-      "unset": "<TCC_REPOSITORY_ROOT>/backend/rules", "empty": "Preserved as empty path, not fallback; reject",
+      "unset": "<REPOSITORY_ROOT>/backend/rules", "empty": "Preserved as empty path, not fallback; reject",
       "source": "Read-only authored resource staging path"
     },
     {
@@ -302,7 +312,7 @@
       "note": "Reserved platform input for hosted orchestrator is not evidence that .NET emits telemetry."
     },
     {
-      "names": ["ALLOW_ANONYMOUS_SYNTHETIC", "LOG_LEVEL", "TCC_STRANDED_RUN_MINUTES", "WAREHOUSE_ODBC_DRIVER", "WAREHOUSE_CONNECT_TIMEOUT", "WAREHOUSE_POOL_MAX_IDLE", "WAREHOUSE_POOL_MAX_AGE_SECONDS", "DATA_QUERY_TIMEOUT_SECONDS", "DATA_QUERY_MAX_ROWS", "DATA_QUERY_RATE_PER_MINUTE", "DATA_QUERY_MAX_CONCURRENCY", "DATA_MIN_GROUP_SIZE", "DATA_QUERY_SOURCE_ENABLED", "DATA_QUERY_SQLITE_DIR", "GOLD_SCHEMA", "OPS_SCHEMA", "RUN_BATCH_MAX_ITEMS", "RUN_BATCH_CONFIRM_ABOVE", "RUN_WORKER_CONCURRENCY", "RUN_ITEM_MAX_ATTEMPTS", "RUN_WORKER_INLINE", "RUN_LEASE_SECONDS", "RUN_HEARTBEAT_SECONDS", "RUN_WORKER_POLL_SECONDS", "RUN_BACKOFF_BASE_SECONDS", "PROGRAM_REGISTRY_FILE", "PROGRAM_PREVIEW_ALLOW_CUSTOMER_DATA", "PROGRAM_EXPORT_ALLOW_LOCAL_WRITE", "OUTPUTS_RETENTION_DAYS", "TELEMETRY_ENABLED", "APPLICATIONINSIGHTS_AUTHENTICATION_STRING", "AI_FOUNDRY_CONNECTION_NAME", "AI_AGENT_VERSION_PINS", "CAPABILITY_TIMEOUT_SECONDS", "CHANNEL_RESOLVE_DISPLAY_NAMES", "TCC_WARM_ON_START", "TCC_WARM_CLIENTS", "TCC_KEEPALIVE_SECONDS"],
+      "names": ["ALLOW_ANONYMOUS_SYNTHETIC", "LOG_LEVEL", "STRANDED_RUN_MINUTES", "WAREHOUSE_ODBC_DRIVER", "WAREHOUSE_CONNECT_TIMEOUT", "WAREHOUSE_POOL_MAX_IDLE", "WAREHOUSE_POOL_MAX_AGE_SECONDS", "DATA_QUERY_TIMEOUT_SECONDS", "DATA_QUERY_MAX_ROWS", "DATA_QUERY_RATE_PER_MINUTE", "DATA_QUERY_MAX_CONCURRENCY", "DATA_MIN_GROUP_SIZE", "DATA_QUERY_SOURCE_ENABLED", "DATA_QUERY_SQLITE_DIR", "GOLD_SCHEMA", "OPS_SCHEMA", "RUN_BATCH_MAX_ITEMS", "RUN_BATCH_CONFIRM_ABOVE", "RUN_WORKER_CONCURRENCY", "RUN_ITEM_MAX_ATTEMPTS", "RUN_WORKER_INLINE", "RUN_LEASE_SECONDS", "RUN_HEARTBEAT_SECONDS", "RUN_WORKER_POLL_SECONDS", "RUN_BACKOFF_BASE_SECONDS", "PROGRAM_REGISTRY_FILE", "PROGRAM_PREVIEW_ALLOW_CUSTOMER_DATA", "PROGRAM_EXPORT_ALLOW_LOCAL_WRITE", "OUTPUTS_RETENTION_DAYS", "TELEMETRY_ENABLED", "APPLICATIONINSIGHTS_AUTHENTICATION_STRING", "AI_FOUNDRY_CONNECTION_NAME", "AI_AGENT_VERSION_PINS", "CAPABILITY_TIMEOUT_SECONDS", "CHANNEL_RESOLVE_DISPLAY_NAMES", "WARM_ON_START", "WARM_CLIENTS", "KEEPALIVE_SECONDS"],
       "classification": "unsupported", "consumers": {},
       "required": "Do not advertise as functioning .NET configuration",
       "unset": "Absent environment consumer; hardcoded or separately typed policy may exist", "empty": "Absent consumer",
@@ -359,7 +369,7 @@
       "source": "Existing Python deployment workflow metadata; .NET templates own independent state and explicit mapping"
     },
     {
-      "names": ["WAREHOUSE_PLATFORM", "FABRIC_WORKSPACE_ID", "FABRIC_WAREHOUSE_ID", "TCC_FABRIC_CREATED", "SQL_SERVER_FQDN", "SQL_DATABASE_NAME", "TCC_SQL_CREATED", "API_IDENTITY_NAME", "API_IDENTITY_CLIENT_ID", "API_IDENTITY_PRINCIPAL_ID", "TCC_DATA_QUERY_SOURCE_ENABLED", "TCC_PROFILE", "AZURE_SUBSCRIPTION_ID", "AZURE_ENV_NAME", "AZURE_LOCATION", "AZURE_RESOURCE_GROUP", "TF_BACKEND_RESOURCE_GROUP", "TF_BACKEND_STORAGE_ACCOUNT", "TF_BACKEND_CONTAINER", "TF_VARS_JSON", "ARM_USE_OIDC", "FABRIC_CLIENT_ID", "FABRIC_TENANT_ID", "FABRIC_USE_OIDC", "GITHUB_ENV", "TCC_ENABLE_M365_CHANNEL", "TCC_CHANNEL_GATEWAY_AUDIENCE", "TCC_CHANNEL_WRITER_SOURCE", "TCC_CHANNEL_WRITER_GROUP_ID", "TCC_CHANNEL_RESOLVE_DISPLAY_NAMES", "TCC_DATA_QUERY_TIMEOUT_SECONDS", "TCC_DATA_QUERY_MAX_ROWS", "TCC_DATA_QUERY_RATE_PER_MINUTE", "TCC_DATA_QUERY_MAX_CONCURRENCY", "TCC_LAKEHOUSE_SQL_SERVER", "TCC_LAKEHOUSE_SQL_DATABASE", "TCC_TENANT_ID", "FABRIC_CAPACITY_ADMIN", "TCC_WEB_CLIENT_ID", "TCC_API_CLIENT_ID", "TCC_API_AUDIENCE", "TCC_APP_SUBNET_ID", "TCC_PRIVATE_ENDPOINT_SUBNET_ID", "TCC_FABRIC_WORKSPACE_ID", "TCC_FABRIC_WORKSPACE_NAME", "TCC_FABRIC_LAKEHOUSE_NAME", "TCC_FABRIC_WAREHOUSE_ID", "TCC_WAREHOUSE_SERVER", "TCC_WAREHOUSE_DATABASE", "TCC_WAREHOUSE_PLATFORM", "TCC_SQL_ADMIN_GROUP_OBJECT_ID", "TCC_SQL_ADMIN_GROUP_NAME", "FOUNDRY_MODEL_VERSION", "TCC_APP_SERVICE_SKU", "TCC_FOUNDRY_PUBLIC_NETWORK_ACCESS", "TCC_FOUNDRY_ALLOWED_IP_RANGES", "FOUNDRY_MODEL_SKU", "TCC_ALLOW_SEED"],
+      "names": ["WAREHOUSE_PLATFORM", "FABRIC_WORKSPACE_ID", "FABRIC_WAREHOUSE_ID", "FABRIC_CREATED", "SQL_SERVER_FQDN", "SQL_DATABASE_NAME", "SQL_CREATED", "API_IDENTITY_NAME", "API_IDENTITY_CLIENT_ID", "API_IDENTITY_PRINCIPAL_ID", "DEPLOY_PROFILE", "AZURE_SUBSCRIPTION_ID", "AZURE_ENV_NAME", "AZURE_LOCATION", "AZURE_RESOURCE_GROUP", "TF_BACKEND_RESOURCE_GROUP", "TF_BACKEND_STORAGE_ACCOUNT", "TF_BACKEND_CONTAINER", "TF_VARS_JSON", "ARM_USE_OIDC", "FABRIC_CLIENT_ID", "FABRIC_TENANT_ID", "FABRIC_USE_OIDC", "GITHUB_ENV", "M365_CHANNEL_ENABLED", "FABRIC_CAPACITY_ADMIN", "WEB_CLIENT_ID", "API_CLIENT_ID", "APP_SUBNET_ID", "PRIVATE_ENDPOINT_SUBNET_ID", "EXISTING_FABRIC_WORKSPACE_ID", "FABRIC_WORKSPACE_NAME", "FABRIC_LAKEHOUSE_NAME", "EXISTING_FABRIC_WAREHOUSE_ID", "EXISTING_WAREHOUSE_SERVER", "EXISTING_WAREHOUSE_DATABASE", "SQL_ADMIN_GROUP_OBJECT_ID", "SQL_ADMIN_GROUP_NAME", "FOUNDRY_MODEL_VERSION", "APP_SERVICE_SKU", "FOUNDRY_PUBLIC_NETWORK_ACCESS", "FOUNDRY_ALLOWED_IP_RANGES", "FOUNDRY_MODEL_SKU", "ALLOW_SEED"],
       "classification": "Python-ops-only", "consumers": {},
       "required": "Not .NET runtime inputs; retain guarded existing Python/operator/azd/CI semantics separately",
       "unset": "No .NET runtime default", "empty": "No .NET runtime effect",
@@ -367,7 +377,7 @@
       "note": "Translate deliberately into reviewed .NET target names where needed; never run destructive bootstrap on existing Warehouse. WAREHOUSE_PLATFORM is operator metadata, not a .NET driver switch."
     },
     {
-      "names": ["API_BASE_URL", "API_BACKEND_URL", "API_BACKEND_HOST", "VITE_API_BASE", "WEB_CONCURRENCY", "PYTHONNOUSERSITE", "FIXTURE_ACCOUNT_ID", "FLEX_ACCOUNT_ID", "FABRIC_EMPLOYEES_TABLE", "REFERENCE_ACCOUNT_ID", "REFERENCE_ACCOUNT_NAME", "REFERENCE_ACCESS_OUTPUT_PATH", "WEBIQ_API_KEY", "WEBIQ_BEARER_TOKEN", "WEBIQ_BASE_URL", "COSMOS_ENDPOINT", "COSMOS_DATABASE", "COSMOS_ACCOUNT_NAME", "TCC_REPO_ROOT", "TCC_REQUIRE_PARITY", "TCC_FABRIC_TESTS", "TCC_SQL_TESTS", "TCC_AZURE_TESTS", "CONTAINER_APPS_LOCATION", "SERVICE_API_IMAGE_NAME", "SERVICE_WEB_IMAGE_NAME", "AZURE_PRINCIPAL_ID", "API_APP_NAME", "WEB_APP_NAME", "WEB_BASE_URL", "CHANNEL_APP_NAME", "CHANNEL_BASE_URL", "GATEWAY_IDENTITY_NAME", "AZURE_CONTAINER_REGISTRY_ENDPOINT", "AZURE_CONTAINER_REGISTRY_NAME", "AZURE_CONTAINER_APPS_ENVIRONMENT_NAME"],
+      "names": ["API_BASE_URL", "API_BACKEND_URL", "API_BACKEND_HOST", "VITE_API_BASE", "WEB_CONCURRENCY", "PYTHONNOUSERSITE", "FIXTURE_ACCOUNT_ID", "FLEX_ACCOUNT_ID", "FABRIC_EMPLOYEES_TABLE", "REFERENCE_ACCOUNT_ID", "REFERENCE_ACCOUNT_NAME", "REFERENCE_ACCESS_OUTPUT_PATH", "WEBIQ_API_KEY", "WEBIQ_BEARER_TOKEN", "WEBIQ_BASE_URL", "COSMOS_ENDPOINT", "COSMOS_DATABASE", "COSMOS_ACCOUNT_NAME", "TEST_REQUIRE_PARITY", "TEST_FABRIC", "TEST_SQL", "TEST_AZURE", "CONTAINER_APPS_LOCATION", "SERVICE_API_IMAGE_NAME", "SERVICE_WEB_IMAGE_NAME", "AZURE_PRINCIPAL_ID", "API_APP_NAME", "WEB_APP_NAME", "WEB_BASE_URL", "CHANNEL_APP_NAME", "CHANNEL_BASE_URL", "GATEWAY_IDENTITY_NAME", "AZURE_CONTAINER_REGISTRY_ENDPOINT", "AZURE_CONTAINER_REGISTRY_NAME", "AZURE_CONTAINER_APPS_ENVIRONMENT_NAME"],
       "classification": "irrelevant", "consumers": {},
       "required": "None for these four .NET executables",
       "unset": "No .NET runtime default", "empty": "No .NET runtime effect",
@@ -375,18 +385,18 @@
       "note": "Gateway calls application services in-process: API_BASE_URL is not its backend. FIXTURE_ACCOUNT_ID is not wired; local CSV is hardcoded account 1001."
     },
     {
-      "names": ["TCC_PERSISTENCE_PROVIDER", "FABRIC_SQL_SERVER", "FABRIC_SQL_DATABASE", "SOURCE_SQL_SERVER", "SOURCE_SQL_DATABASE", "TCC_REPOSITORY_ROOT", "TCC_SEED_ROOT", "PAYROLL_PATH", "TCC_CONTRACT_HOOKS", "TCC_WORKER_ONCE", "TCC_CONTRACT_PROFILE", "CLIENT_ALLOWLIST", "RUN_STALE_WORKER_SECONDS", "CORS_ORIGINS", "TCC_FEATURE_ASSEMBLIES", "ASPNETCORE_URLS"],
+      "names": ["PERSISTENCE_PROVIDER", "FABRIC_SQL_SERVER", "FABRIC_SQL_DATABASE", "SOURCE_SQL_SERVER", "SOURCE_SQL_DATABASE", "REPOSITORY_ROOT", "SEED_ROOT", "PAYROLL_PATH", "CONTRACT_HOOKS", "WORKER_ONCE", "CONTRACT_PROFILE", "CLIENT_ALLOWLIST", "RUN_STALE_WORKER_SECONDS", "CORS_ORIGINS", "FEATURE_ASSEMBLIES", "ASPNETCORE_URLS"],
       "classification": "unchanged",
       "unsupported_consumers": {"orchestrator": ["ASPNETCORE_URLS"]},
       "consumer_names": {
-        "api": ["TCC_PERSISTENCE_PROVIDER", "FABRIC_SQL_SERVER", "FABRIC_SQL_DATABASE", "SOURCE_SQL_SERVER", "SOURCE_SQL_DATABASE", "TCC_REPOSITORY_ROOT", "TCC_SEED_ROOT", "PAYROLL_PATH", "TCC_CONTRACT_HOOKS", "TCC_CONTRACT_PROFILE", "CLIENT_ALLOWLIST", "RUN_STALE_WORKER_SECONDS", "CORS_ORIGINS", "TCC_FEATURE_ASSEMBLIES", "ASPNETCORE_URLS"],
-        "worker": ["TCC_PERSISTENCE_PROVIDER", "FABRIC_SQL_SERVER", "FABRIC_SQL_DATABASE", "SOURCE_SQL_SERVER", "SOURCE_SQL_DATABASE", "TCC_REPOSITORY_ROOT", "TCC_SEED_ROOT", "PAYROLL_PATH", "TCC_CONTRACT_HOOKS", "CLIENT_ALLOWLIST", "TCC_WORKER_ONCE"],
-        "gateway": ["TCC_PERSISTENCE_PROVIDER", "FABRIC_SQL_SERVER", "FABRIC_SQL_DATABASE", "SOURCE_SQL_SERVER", "SOURCE_SQL_DATABASE", "TCC_REPOSITORY_ROOT", "TCC_SEED_ROOT", "PAYROLL_PATH", "TCC_CONTRACT_HOOKS", "TCC_CONTRACT_PROFILE", "CLIENT_ALLOWLIST", "RUN_STALE_WORKER_SECONDS", "CORS_ORIGINS", "TCC_FEATURE_ASSEMBLIES", "ASPNETCORE_URLS"],
+        "api": ["PERSISTENCE_PROVIDER", "FABRIC_SQL_SERVER", "FABRIC_SQL_DATABASE", "SOURCE_SQL_SERVER", "SOURCE_SQL_DATABASE", "REPOSITORY_ROOT", "SEED_ROOT", "PAYROLL_PATH", "CONTRACT_HOOKS", "CONTRACT_PROFILE", "CLIENT_ALLOWLIST", "RUN_STALE_WORKER_SECONDS", "CORS_ORIGINS", "FEATURE_ASSEMBLIES", "ASPNETCORE_URLS"],
+        "worker": ["PERSISTENCE_PROVIDER", "FABRIC_SQL_SERVER", "FABRIC_SQL_DATABASE", "SOURCE_SQL_SERVER", "SOURCE_SQL_DATABASE", "REPOSITORY_ROOT", "SEED_ROOT", "PAYROLL_PATH", "CONTRACT_HOOKS", "CLIENT_ALLOWLIST", "WORKER_ONCE"],
+        "gateway": ["PERSISTENCE_PROVIDER", "FABRIC_SQL_SERVER", "FABRIC_SQL_DATABASE", "SOURCE_SQL_SERVER", "SOURCE_SQL_DATABASE", "REPOSITORY_ROOT", "SEED_ROOT", "PAYROLL_PATH", "CONTRACT_HOOKS", "CONTRACT_PROFILE", "CLIENT_ALLOWLIST", "RUN_STALE_WORKER_SECONDS", "CORS_ORIGINS", "FEATURE_ASSEMBLIES", "ASPNETCORE_URLS"],
         "orchestrator": ["ASPNETCORE_URLS"]
       },
-      "consumers": {"api": "SD/RuntimeRegistration.cs; RuntimePaths.cs; RuntimeTrustRegistration.cs; Api/Hosting/HostComposition.cs; FeatureDiscovery.cs", "worker": "SD shared runtime; Worker/Program.cs for TCC_WORKER_ONCE; no HTTP/CORS/feature assembly consumers", "gateway": "SD shared runtime; GW/GatewayHost.cs; Api/Hosting/HostComposition.cs", "orchestrator": "OR/ResponsesHosting.cs attempts UseUrls; measured preview AgentHost SDK ListenAnyIP overrides it and binds http://[::]:8088 even with loopback CLI/env; ineffective address control"},
-      "required_by_name": {"TCC_PERSISTENCE_PROVIDER": "Deployed exact warehouse", "FABRIC_SQL_SERVER": "Warehouse host required", "FABRIC_SQL_DATABASE": "Warehouse database required", "SOURCE_SQL_SERVER": "Lakehouse SQL host required functionally", "SOURCE_SQL_DATABASE": "Lakehouse SQL database required functionally", "TCC_REPOSITORY_ROOT": "Published resource root required; NOT TCC_RESOURCE_ROOT", "TCC_SEED_ROOT": "No production seed directory needed hooks off", "PAYROLL_PATH": "CSV-only; do not emit deployed", "TCC_CONTRACT_HOOKS": "Deployed disabled; only exact 1 activates", "TCC_WORKER_ONCE": "Worker-only exact 1 or --once; deployment must be off", "TCC_CONTRACT_PROFILE": "Hook-only local seed profile", "CLIENT_ALLOWLIST": "Signed client access requires nonempty object mapping effective OID to client-id arrays", "RUN_STALE_WORKER_SECONDS": "Health report threshold only", "CORS_ORIGINS": "Explicit approved portal origins; not authentication", "TCC_FEATURE_ASSEMBLIES": "Trusted startup-only code loading; deployment contract forbids", "ASPNETCORE_URLS": "API/gateway explicit bind; orchestrator override unsupported: preview SDK ListenAnyIP on 8088 wins, never a confinement control"},
-      "defaults": {"TCC_PERSISTENCE_PROVIDER": "sqlite", "FABRIC_SQL_SERVER": "none", "FABRIC_SQL_DATABASE": "none", "SOURCE_SQL_SERVER": "empty/unconfigured", "SOURCE_SQL_DATABASE": "empty/unconfigured", "TCC_REPOSITORY_ROOT": "upward discovery requires backend/rules and docs/data/schema", "TCC_SEED_ROOT": "<root>/contract/seed", "PAYROLL_PATH": "<root>/backend/data/payroll_pay_periods.csv; CSV-only", "TCC_CONTRACT_HOOKS": "disabled", "TCC_WORKER_ONCE": "disabled", "TCC_CONTRACT_PROFILE": "P1 when hooks on", "CLIENT_ALLOWLIST": "deny all signed client access", "RUN_STALE_WORKER_SECONDS": "60", "CORS_ORIGINS": "http://localhost:5173", "TCC_FEATURE_ASSEMBLIES": "none", "ASPNETCORE_URLS": "API/gateway host default; orchestrator SDK http://[::]:8088 even with attempted override"},
+      "consumers": {"api": "SD/RuntimeRegistration.cs; RuntimePaths.cs; RuntimeTrustRegistration.cs; Api/Hosting/HostComposition.cs; FeatureDiscovery.cs", "worker": "SD shared runtime; Worker/Program.cs for WORKER_ONCE; no HTTP/CORS/feature assembly consumers", "gateway": "SD shared runtime; GW/GatewayHost.cs; Api/Hosting/HostComposition.cs", "orchestrator": "OR/ResponsesHosting.cs attempts UseUrls; measured preview AgentHost SDK ListenAnyIP overrides it and binds http://[::]:8088 even with loopback CLI/env; ineffective address control"},
+      "required_by_name": {"PERSISTENCE_PROVIDER": "Deployed exact warehouse", "FABRIC_SQL_SERVER": "Warehouse host required", "FABRIC_SQL_DATABASE": "Warehouse database required", "SOURCE_SQL_SERVER": "Lakehouse SQL host required functionally", "SOURCE_SQL_DATABASE": "Lakehouse SQL database required functionally", "REPOSITORY_ROOT": "Published resource root required; NOT RESOURCE_ROOT", "SEED_ROOT": "No production seed directory needed hooks off", "PAYROLL_PATH": "CSV-only; do not emit deployed", "CONTRACT_HOOKS": "Deployed disabled; only exact 1 activates", "WORKER_ONCE": "Worker-only exact 1 or --once; deployment must be off", "CONTRACT_PROFILE": "Hook-only local seed profile", "CLIENT_ALLOWLIST": "Signed client access requires nonempty object mapping effective OID to client-id arrays", "RUN_STALE_WORKER_SECONDS": "Health report threshold only", "CORS_ORIGINS": "Explicit approved portal origins; not authentication", "FEATURE_ASSEMBLIES": "Trusted startup-only code loading; deployment contract forbids", "ASPNETCORE_URLS": "API/gateway explicit bind; orchestrator override unsupported: preview SDK ListenAnyIP on 8088 wins, never a confinement control"},
+      "defaults": {"PERSISTENCE_PROVIDER": "sqlite", "FABRIC_SQL_SERVER": "none", "FABRIC_SQL_DATABASE": "none", "SOURCE_SQL_SERVER": "empty/unconfigured", "SOURCE_SQL_DATABASE": "empty/unconfigured", "REPOSITORY_ROOT": "upward discovery requires backend/rules and docs/data/schema", "SEED_ROOT": "<root>/contract/seed", "PAYROLL_PATH": "<root>/backend/data/payroll_pay_periods.csv; CSV-only", "CONTRACT_HOOKS": "disabled", "WORKER_ONCE": "disabled", "CONTRACT_PROFILE": "P1 when hooks on", "CLIENT_ALLOWLIST": "deny all signed client access", "RUN_STALE_WORKER_SECONDS": "60", "CORS_ORIGINS": "http://localhost:5173", "FEATURE_ASSEMBLIES": "none", "ASPNETCORE_URLS": "API/gateway host default; orchestrator SDK http://[::]:8088 even with attempted override"},
       "unset": "See defaults", "empty": "Provider/required paths rejected by deployment contract; hooks/once off; allowlist deny; sources unconfigured; stale falls back60; CORS empty allowed; assemblies empty none",
       "source": "Reviewed .NET runtime metadata, resource package paths and caller/client entitlement policy; never secret or fixture/customer data"
     }

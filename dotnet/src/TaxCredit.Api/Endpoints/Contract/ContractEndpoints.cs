@@ -13,7 +13,7 @@ public sealed class ContractEndpoints(IConfiguration configuration) : IEndpointG
     public void Map(IEndpointRouteBuilder endpoints)
     {
         ArgumentNullException.ThrowIfNull(endpoints);
-        if (configuration["TCC_CONTRACT_HOOKS"] != "1")
+        if (configuration.Setting("CONTRACT_HOOKS") != "1")
         {
             return;
         }
@@ -82,7 +82,7 @@ public sealed class ContractEndpoints(IConfiguration configuration) : IEndpointG
         }
 
         var profile = spec.Value.TryGetProperty("profile", out var value) ? value.GetString()
-            : context.Request.Query["profile"].FirstOrDefault() ?? configuration.Get("TCC_CONTRACT_PROFILE") ?? "P1";
+            : context.Request.Query["profile"].FirstOrDefault() ?? configuration.Get("CONTRACT_PROFILE") ?? "P1";
         if (profile is not ("P1" or "P2" or "G1" or "G1L"))
         {
             return ApiErrors.Detail(422, "Unknown contract profile.");

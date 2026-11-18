@@ -14,7 +14,7 @@ processors:
     timeout: 1s
 exporters:
   otlphttp/receipt:
-    endpoint: ${env:TCC_RECEIPT_ENDPOINT}
+    endpoint: ${env:TELEMETRY_RECEIPT_ENDPOINT}
     encoding: json
     compression: none
     retry_on_failure:

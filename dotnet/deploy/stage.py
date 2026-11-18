@@ -12,8 +12,8 @@ DEPLOY = Path(__file__).resolve().parent
 ROOT = DEPLOY.parent.parent
 SERVICES = {"api": "Api", "worker": "Worker", "gateway": "Gateway", "orchestrator": "Orchestrator"}
 RESOURCE_PREFIXES = ("backend/rules/", "backend/data/rules_ingested/", "docs/data/schema/")
-RESOURCE_FILES = {"backend/data/payroll.csv", "backend/data/payroll_pay_periods.csv"}
-BUILD_FILES = {"backend/data/source/mapping/default.json"}
+RESOURCE_FILES = {"backend/data/payroll.csv", "backend/data/payroll_pay_periods.csv", "docs/data/data-map.json"}
+BUILD_FILES = {"backend/data/source/mapping/default.json", "docs/data/data-map.json"}
 
 
 def tracked_files() -> list[str]:

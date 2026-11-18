@@ -61,7 +61,7 @@ Every app setting comes from Terraform and none is a secret.
 
 ## The two profiles
 
-`TCC_PROFILE` (`azd env set TCC_PROFILE public|enterprise`) selects the
+`DEPLOY_PROFILE` (`azd env set DEPLOY_PROFILE public|enterprise`) selects the
 profile. `infra/locals.tf` holds the matrix; each value can be overridden by
 its own Terraform variable.
 
@@ -192,7 +192,7 @@ azd auth login
 azd env new <env-name> --no-prompt
 azd env set AZURE_LOCATION <region>
 azd env set AZURE_RESOURCE_GROUP <resource-group>
-azd env set TCC_PROFILE public                     # or enterprise
+azd env set DEPLOY_PROFILE public                     # or enterprise
 azd env set GIT_COMMIT (git rev-parse HEAD)        # stamps every run with the commit
 ```
 
@@ -215,35 +215,35 @@ variable.
 
 | azd value | Terraform variable | Profile | Purpose / failure mode when unset |
 |---|---|---|---|
-| `TCC_PROFILE` | `profile` | both | `public` (default) or `enterprise`. Selects every profile default |
+| `DEPLOY_PROFILE` | `profile` | both | `public` (default) or `enterprise`. Selects every profile default |
 | `AZURE_LOCATION` | `location` | both | Region for every resource |
 | `AZURE_RESOURCE_GROUP` | `resource_group_name` | both | Group Terraform creates; empty uses `rg-<env>` |
 | `FABRIC_CAPACITY_ADMIN` | `fabric_capacity_admin` | public | UPN made admin of the F2 capacity. Required when Fabric is created; the plan fails without it |
 | `SOURCE_SCHEMA` | `source_schema` | both | Lakehouse schema holding source payroll (default `flex`) |
 | `GIT_COMMIT` | `git_commit` | both | Recorded on every run manifest. Unset, runs record `working-tree` |
 | `FOUNDRY_MODEL`, `FOUNDRY_MODEL_VERSION` | `foundry_model`, `foundry_model_version` | both | Model the narrating agents use (default `gpt-4.1-mini` / `2025-04-14`). Check regional availability and quota |
-| `TCC_APP_SERVICE_SKU` | `app_service_sku` | both | Plan SKU shared by both apps (default `P1v3`) |
-| `TCC_FOUNDRY_PUBLIC_NETWORK_ACCESS` | `foundry_public_network_access` | public | **DEMO ONLY.** `false` (default) keeps the Foundry data plane private, exactly as before. `true` enables its public endpoint (Entra-only, local auth off; the private endpoint and DNS stay) so an operator's workstation can run `azd ai agent`, `scripts/publish-m365.ps1` and smoke tests. Refused with the enterprise profile and with `data_classification = customer`. The plan prints a warning and the output `network_posture` reads `demo-public-foundry`. Set it back to `false` after the demo. See [HARDENING-PLAN](HARDENING-PLAN.md) |
-| `TCC_FOUNDRY_ALLOWED_IP_RANGES` | `foundry_allowed_ip_ranges` | public | **DEMO ONLY.** With the toggle above, the IPv4 CIDR ranges allowed through the account firewall, comma-separated (for example `203.0.113.0/24,198.51.100.7/32`). Empty allows any address (still Entra-only). Ranges without the toggle, a malformed range, a `/31`, or `0.0.0.0/0` without `foundry_allow_any_ip` make the plan fail |
-| `TCC_ENABLE_M365_CHANNEL` | `enable_m365_channel` | public | `false` (default) creates nothing. `true` adds the Microsoft 365 channel gateway: a third App Service on the same plan, in the same subnet, with its own identity ([component spec §4.7a](INFRASTRUCTURE-COMPONENT-SPEC.md)). It needs the API to validate tokens, so set `auth_mode = "entra"` and `api_client_id` in an overlay too; the plan fails with that message otherwise. The enterprise profile refuses it. With it off, a default `azd up` / `azd deploy` is exactly what it was: the gateway is not an azd service. With it on, the `postdeploy` hook runs `scripts/deploy-channel.ps1` (needs `TCC_ENABLE_M365_CHANNEL=true` in the azd environment as well as the Terraform variable) |
-| `TCC_CHANNEL_GATEWAY_AUDIENCE` | `channel_gateway_audience` | public | The gateway's app registration (`api://<id>` or the bare id). Required with the toggle |
-| `TCC_CHANNEL_WRITER_SOURCE` | `channel_writer_source` | public | Who may make changes through the channel: `allowlist` (default), `entra_group` or `either`. A group source needs Graph `GroupMember.Read.All` on the gateway identity |
-| `TCC_CHANNEL_WRITER_GROUP_ID` | `channel_writer_group_id` | public | The Entra group for `entra_group` / `either`. Required for those |
-| `TCC_CHANNEL_RESOLVE_DISPLAY_NAMES` | `channel_resolve_display_names` | public | `true` resolves a Teams user's name and UPN from Graph (default `false`). Needs `User.ReadBasic.All` on the gateway identity first (`assign-channel-roles.ps1 -GrantUserReadBasic`, an admin action) |
-| `TCC_DATA_QUERY_SOURCE_ENABLED` | `data_query_source_enabled` | both | `false` (default) leaves the agent's governed data query on the Gold and ops datasets only. `true` also switches on the lakehouse source (raw payroll) datasets (`DATA_QUERY_SOURCE_ENABLED`, API only) **and** makes postprovision grant the API identity read-only `SELECT` on `Payroll`, `Location` and `PayCode` through the lakehouse SQL analytics endpoint (`grant-warehouse-sql.py --profile lakehouse`; never the gateway identity). See [DATA-ACCESS](../m365-channel/DATA-ACCESS.md) |
-| `TCC_DATA_QUERY_TIMEOUT_SECONDS`, `TCC_DATA_QUERY_MAX_ROWS`, `TCC_DATA_QUERY_RATE_PER_MINUTE`, `TCC_DATA_QUERY_MAX_CONCURRENCY` | `data_query_timeout_seconds`, `data_query_max_rows`, `data_query_rate_per_minute`, `data_query_max_concurrency` | both | Optional limits of the data query (defaults 20 s, 500 rows, 30 a minute per person, 4 at once). Empty keeps the default; a value outside 1-120, 1-500, 1-600, 1-16 respectively fails the plan |
-| `TCC_LAKEHOUSE_SQL_SERVER`, `TCC_LAKEHOUSE_SQL_DATABASE` | `lakehouse_sql_server`, `lakehouse_sql_database` | both | Optional: the lakehouse SQL analytics endpoint host and database. Empty uses the Warehouse host and the lakehouse name, which is right for one Fabric workspace |
-| `TCC_TENANT_ID` | `tenant_id` | enterprise | Entra tenant for Easy Auth and token validation; empty uses the deployer's tenant |
-| `TCC_WEB_CLIENT_ID` | `web_client_id` | enterprise | Web app registration (Easy Auth). Required: the plan fails without it |
-| `TCC_API_CLIENT_ID` | `api_client_id` | enterprise | API app registration (`user_impersonation`, role `TCC.User`). Required |
-| `TCC_API_AUDIENCE` | `api_audience` | enterprise | Audience the API validates; empty uses `api://<api client id>` |
-| `TCC_APP_SUBNET_ID` | `app_integration_subnet_id` | enterprise | BYO integration subnet. Required |
-| `TCC_PRIVATE_ENDPOINT_SUBNET_ID` | `private_endpoint_subnet_id` | enterprise | BYO private-endpoint subnet. Required |
-| `TCC_FABRIC_WORKSPACE_ID`, `TCC_FABRIC_WORKSPACE_NAME` | `fabric_workspace_id`, `fabric_workspace_name` | enterprise | Existing workspace. Id required |
-| `TCC_FABRIC_LAKEHOUSE_NAME` | `fabric_lakehouse_name` | enterprise | Lakehouse holding the source schema |
-| `TCC_FABRIC_WAREHOUSE_ID`, `TCC_WAREHOUSE_SERVER`, `TCC_WAREHOUSE_DATABASE` | `fabric_warehouse_id`, `warehouse_server`, `warehouse_database` | enterprise | Existing Warehouse for `tcc_gold` / `tcc_ops`. Required; never bootstrapped (D22) |
-| `TCC_WAREHOUSE_PLATFORM` | `warehouse_platform` | both | `fabric` (default) or `azure_sql`. `azure_sql` creates an Entra-only Azure SQL server and database (`infra/modules/azure_sql`) and points `WAREHOUSE_SERVER` / `WAREHOUSE_DATABASE` at it; the payroll lakehouse stays in Fabric. Not applied or run live yet: see [ADR-011](ADR-011-azure-sql-operational-store.md) |
-| `TCC_SQL_ADMIN_GROUP_OBJECT_ID`, `TCC_SQL_ADMIN_GROUP_NAME` | `azure_sql_admin_group_object_id`, `azure_sql_admin_group_name` | both | Required when `TCC_WAREHOUSE_PLATFORM=azure_sql`: the Entra group that administers the server. `postprovision` runs `grant-sql.py`, which needs a member of that group |
+| `APP_SERVICE_SKU` | `app_service_sku` | both | Plan SKU shared by both apps (default `P1v3`) |
+| `FOUNDRY_PUBLIC_NETWORK_ACCESS` | `foundry_public_network_access` | public | **DEMO ONLY.** `false` (default) keeps the Foundry data plane private, exactly as before. `true` enables its public endpoint (Entra-only, local auth off; the private endpoint and DNS stay) so an operator's workstation can run `azd ai agent`, `scripts/publish-m365.ps1` and smoke tests. Refused with the enterprise profile and with `data_classification = customer`. The plan prints a warning and the output `network_posture` reads `demo-public-foundry`. Set it back to `false` after the demo. See [HARDENING-PLAN](HARDENING-PLAN.md) |
+| `FOUNDRY_ALLOWED_IP_RANGES` | `foundry_allowed_ip_ranges` | public | **DEMO ONLY.** With the toggle above, the IPv4 CIDR ranges allowed through the account firewall, comma-separated (for example `203.0.113.0/24,198.51.100.7/32`). Empty allows any address (still Entra-only). Ranges without the toggle, a malformed range, a `/31`, or `0.0.0.0/0` without `foundry_allow_any_ip` make the plan fail |
+| `M365_CHANNEL_ENABLED` | `enable_m365_channel` | public | `false` (default) creates nothing. `true` adds the Microsoft 365 channel gateway: a third App Service on the same plan, in the same subnet, with its own identity ([component spec §4.7a](INFRASTRUCTURE-COMPONENT-SPEC.md)). It needs the API to validate tokens, so set `auth_mode = "entra"` and `api_client_id` in an overlay too; the plan fails with that message otherwise. The enterprise profile refuses it. With it off, a default `azd up` / `azd deploy` is exactly what it was: the gateway is not an azd service. With it on, the `postdeploy` hook runs `scripts/deploy-channel.ps1` (needs `M365_CHANNEL_ENABLED=true` in the azd environment as well as the Terraform variable) |
+| `CHANNEL_GATEWAY_AUDIENCE` | `channel_gateway_audience` | public | The gateway's app registration (`api://<id>` or the bare id). Required with the toggle |
+| `CHANNEL_WRITER_SOURCE` | `channel_writer_source` | public | Who may make changes through the channel: `allowlist` (default), `entra_group` or `either`. A group source needs Graph `GroupMember.Read.All` on the gateway identity |
+| `CHANNEL_WRITER_GROUP_ID` | `channel_writer_group_id` | public | The Entra group for `entra_group` / `either`. Required for those |
+| `CHANNEL_RESOLVE_DISPLAY_NAMES` | `channel_resolve_display_names` | public | `true` resolves a Teams user's name and UPN from Graph (default `false`). Needs `User.ReadBasic.All` on the gateway identity first (`assign-channel-roles.ps1 -GrantUserReadBasic`, an admin action) |
+| `DATA_QUERY_SOURCE_ENABLED` | `data_query_source_enabled` | both | `false` (default) leaves the agent's governed data query on the Gold and ops datasets only. `true` also switches on the lakehouse source (raw payroll) datasets (`DATA_QUERY_SOURCE_ENABLED`, API only) **and** makes postprovision grant the API identity read-only `SELECT` on `Payroll`, `Location` and `PayCode` through the lakehouse SQL analytics endpoint (`grant-warehouse-sql.py --profile lakehouse`; never the gateway identity). See [DATA-ACCESS](../m365-channel/DATA-ACCESS.md) |
+| `DATA_QUERY_TIMEOUT_SECONDS`, `DATA_QUERY_MAX_ROWS`, `DATA_QUERY_RATE_PER_MINUTE`, `DATA_QUERY_MAX_CONCURRENCY` | `data_query_timeout_seconds`, `data_query_max_rows`, `data_query_rate_per_minute`, `data_query_max_concurrency` | both | Optional limits of the data query (defaults 20 s, 500 rows, 30 a minute per person, 4 at once). Empty keeps the default; a value outside 1-120, 1-500, 1-600, 1-16 respectively fails the plan |
+| `LAKEHOUSE_SQL_SERVER`, `LAKEHOUSE_SQL_DATABASE` | `lakehouse_sql_server`, `lakehouse_sql_database` | both | Optional: the lakehouse SQL analytics endpoint host and database. Empty uses the Warehouse host and the lakehouse name, which is right for one Fabric workspace |
+| `TENANT_ID` | `tenant_id` | enterprise | Entra tenant for Easy Auth and token validation; empty uses the deployer's tenant |
+| `WEB_CLIENT_ID` | `web_client_id` | enterprise | Web app registration (Easy Auth). Required: the plan fails without it |
+| `API_CLIENT_ID` | `api_client_id` | enterprise | API app registration (`user_impersonation`, role `TCC.User`). Required |
+| `API_AUDIENCE` | `api_audience` | enterprise | Audience the API validates; empty uses `api://<api client id>` |
+| `APP_SUBNET_ID` | `app_integration_subnet_id` | enterprise | BYO integration subnet. Required |
+| `PRIVATE_ENDPOINT_SUBNET_ID` | `private_endpoint_subnet_id` | enterprise | BYO private-endpoint subnet. Required |
+| `EXISTING_FABRIC_WORKSPACE_ID`, `FABRIC_WORKSPACE_NAME` | `fabric_workspace_id`, `fabric_workspace_name` | enterprise | Existing workspace. Id required |
+| `FABRIC_LAKEHOUSE_NAME` | `fabric_lakehouse_name` | enterprise | Lakehouse holding the source schema |
+| `EXISTING_FABRIC_WAREHOUSE_ID`, `EXISTING_WAREHOUSE_SERVER`, `EXISTING_WAREHOUSE_DATABASE` | `fabric_warehouse_id`, `warehouse_server`, `warehouse_database` | enterprise | Existing Warehouse for `tcc_gold` / `tcc_ops`. Required; never bootstrapped (D22) |
+| `WAREHOUSE_PLATFORM` | `warehouse_platform` | both | `fabric` (default) or `azure_sql`. `azure_sql` creates an Entra-only Azure SQL server and database (`infra/modules/azure_sql`) and points `WAREHOUSE_SERVER` / `WAREHOUSE_DATABASE` at it; the payroll lakehouse stays in Fabric. Not applied or run live yet: see [ADR-011](ADR-011-azure-sql-operational-store.md) |
+| `SQL_ADMIN_GROUP_OBJECT_ID`, `SQL_ADMIN_GROUP_NAME` | `azure_sql_admin_group_object_id`, `azure_sql_admin_group_name` | both | Required when `WAREHOUSE_PLATFORM=azure_sql`: the Entra group that administers the server. `postprovision` runs `grant-sql.py`, which needs a member of that group |
 
 `AZURE_ENV_NAME` and `AZURE_SUBSCRIPTION_ID` are written by azd.
 `backend/tests/test_deployment_docs_contract.py` fails the build if a value
@@ -268,7 +268,7 @@ azd up --no-prompt
 `azd up` runs, in order:
 
 1. **Provision.** `terraform apply` with the values above. Outputs (app names,
-   URLs, Warehouse endpoint, Fabric ids, `TCC_FABRIC_CREATED`,
+   URLs, Warehouse endpoint, Fabric ids, `FABRIC_CREATED`,
    `API_IDENTITY_NAME`, …) are written back into the azd environment.
 2. **Post-provision** (`scripts/postprovision.ps1`). It first checks that
    `WAREHOUSE_SERVER`, `WAREHOUSE_DATABASE`, `FABRIC_WORKSPACE_ID` and
@@ -276,7 +276,7 @@ azd up --no-prompt
    guard resolves through the Fabric API and checks against those values
    before executing anything.
    1. `apply-migrations.py`: `--bootstrap` (DDL v2.0) only when
-      `TCC_FABRIC_CREATED=true`, i.e. Terraform just created this Warehouse.
+      `FABRIC_CREATED=true`, i.e. Terraform just created this Warehouse.
       Otherwise it applies pending migrations only. A re-run applies nothing.
    2. Synthetic load (public profile only):
       `python -m data.source.load_fabric --synthetic-only` into the new Lakehouse.

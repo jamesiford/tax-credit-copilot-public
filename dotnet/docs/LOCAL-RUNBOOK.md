@@ -1,5 +1,7 @@
 # Local runbook: configure, run and calculate (.NET host)
 
+> **Names:** the `tcc_gold`, `tcc_ops` and `tcc_source` schema names and table names in this runbook are the shipped defaults. They come from the data map (`DATA_MAP_FILE`, [`docs/DATA-MAP.md`](../../docs/DATA-MAP.md)); with a customer map the same objects have the customer's names.
+
 How to set the environment, deploy the agents, run the backend and frontend, and generate calculations for clients.
 Everything here was checked against the code in this repository on 2026-11-17 unless a line says **unverified**.
 
@@ -41,7 +43,7 @@ You normally set none by hand. `backend\.env` is the single input; `dotnet\local
 |---|---|---|
 | `ENVIRONMENT` | `local` | Marks a developer run; lets `AUTH_MODE=none` through. |
 | `DATA_SOURCE` | `lakehouse` (`csv` offline) | Which payroll source the host uses. |
-| `TCC_PERSISTENCE_PROVIDER` | `sqlite` (or `warehouse`) | Where claims, findings, runs and batches live. API and Worker must match. |
+| `PERSISTENCE_PROVIDER` | `sqlite` (or `warehouse`) | Where claims, findings, runs and batches live. API and Worker must match. |
 | `ARTIFACT_STORE` | `local` | Claim-package bytes on local disk (`dotnet\artifacts\local\bytes`). |
 | `AZURE_TOKEN_CREDENTIALS` | `AzureCliCredential` | Forces the `az login` identity instead of Visual Studio / VS Code sign-ins. |
 
@@ -51,7 +53,7 @@ You normally set none by hand. `backend\.env` is the single input; `dotnet\local
 |---|---|---|
 | `OPERATIONAL_DB` | `dotnet\artifacts\local\operations.db` | Path of the SQLite store. |
 | `ARTIFACT_LOCAL_ROOT` | `dotnet\artifacts\local\bytes` | Where artifact bytes go. |
-| `TCC_REPOSITORY_ROOT`, `RULES_DIR` | discovered | Repository root and rule-pack folder. |
+| `REPOSITORY_ROOT`, `RULES_DIR` | discovered | Repository root and rule-pack folder. |
 | `PORTFOLIO_FOOTPRINT_MODE` | `auto` | `auto` asks the SQL catalogue for a payroll row estimate and refuses the footprint above the limit; `on` always runs it under the timeout; `off` never runs it. |
 | `PORTFOLIO_FOOTPRINT_MAX_ROWS` | 50000000 | The largest estimated payroll table `auto` will scan for the footprint. |
 | `PORTFOLIO_FOOTPRINT_TIMEOUT_SECONDS` | 20 | Statement timeout for the footprint query (the server cancels it). |
@@ -63,10 +65,10 @@ You normally set none by hand. `backend\.env` is the single input; `dotnet\local
 | `SOURCE_CACHE_MB` | 512 | Estimated memory the cache may hold (an estimate of the row dictionaries, not a measurement). Whole number, minimum 16. Least recently used clients are dropped to fit. |
 | `SOURCE_CACHE_ACCOUNTS` | 64 | Most clients the cache may hold. Whole number, minimum 1. |
 | `SOURCE_VERSION_CHECK_SECONDS` | 300 | How long a matching source marker is trusted. Inside it a page read asks the source nothing; after it the next read takes the cheap marker again and reloads only if it changed. This is the **staleness window** for page reads. Whole number, minimum 1. Calculation runs ignore it. |
-| `TCC_BULK_LOAD` | `on` | SQL Server-family stores only (Warehouse, Azure SQL): large inserts use `SqlBulkCopy` inside the publish transaction. `off` is the kill switch and restores multi-row INSERT statements (about 500 rows/s on the Warehouse). |
-| `TCC_BULK_LOAD_MIN_ROWS` | 1000 | Inserts smaller than this keep using statements. |
-| `TCC_BULK_TIMEOUT_SECONDS` | 3600 | Timeout of one table's bulk load. |
-| `TCC_RETAIN_SUPERSEDED_RUNS` | 2 | How many superseded runs per client-program keep their employee-grain Gold rows (`employee_period_fact`, `onezero_matrix`, `employee_eligibility`); older ones are pruned after the publish commits. Whole number, minimum 1; `all` prunes nothing. Manifests and unit-level tables are never pruned. |
+| `BULK_LOAD` | `on` | SQL Server-family stores only (Warehouse, Azure SQL): large inserts use `SqlBulkCopy` inside the publish transaction. `off` is the kill switch and restores multi-row INSERT statements (about 500 rows/s on the Warehouse). |
+| `BULK_LOAD_MIN_ROWS` | 1000 | Inserts smaller than this keep using statements. |
+| `BULK_TIMEOUT_SECONDS` | 3600 | Timeout of one table's bulk load. |
+| `RETAIN_SUPERSEDED_RUNS` | 2 | How many superseded runs per client-program keep their employee-grain Gold rows (`employee_period_fact`, `onezero_matrix`, `employee_eligibility`); older ones are pruned after the publish commits. Whole number, minimum 1; `all` prunes nothing. Manifests and unit-level tables are never pruned. |
 | `RUN_LEASE_SECONDS` | 600 | Queue lease of an item; a worker that goes silent for this long loses it. |
 | `RUN_LEASE_RENEW_SECONDS` | a third of the lease | How often a running item renews its lease while it calculates and writes. Must be shorter than the lease. |
 | `RUN_BATCH_MAX_ITEMS` | 5000 | Largest batch a request may queue. |
@@ -84,7 +86,7 @@ You normally set none by hand. `backend\.env` is the single input; `dotnet\local
 
 ### 2e. Frontend
 
-Vite reads `frontend\.env.local` (copy `frontend\.env.example`). `VITE_API_BASE` bypasses the dev proxy; `TCC_API_TARGET` (shell variable) points the proxy elsewhere; `VITE_BRAND_*` set the brand; the theme switch is `modern` (default) or `classic`.
+Vite reads `frontend\.env.local` (copy `frontend\.env.example`). `VITE_API_BASE` bypasses the dev proxy; `API_TARGET` (shell variable) points the proxy elsewhere; `VITE_BRAND_*` set the brand; the theme switch is `modern` (default) or `classic`.
 
 ## 3. Run the backend
 
@@ -211,7 +213,7 @@ Recommended next steps, in order: (1) serve the footprint from a small pre-aggre
 
 Measured on the live Fabric Warehouse with `SqlBulkCopy` (one connection, inside the publish transaction), synthetic client, `employee_period_fact` rows: 100,000 rows 37 s, 400,000 rows 58 s, 1,000,000 rows 99 s in total
 (the `employee_period_fact` table itself 7.7 s, 28 s and 63 s). The multi-row INSERT path it replaces took more than 35 minutes for a 384,418-row client. A running item now renews its queue lease on a timer, so a write that
-outlasts the lease no longer loses it. If a Warehouse ever rejects the bulk protocol, set `TCC_BULK_LOAD=off`.
+outlasts the lease no longer loses it. If a Warehouse ever rejects the bulk protocol, set `BULK_LOAD=off`.
 
 ### The per-client projection cache (`SOURCE_CACHE_MODE`, off by default)
 

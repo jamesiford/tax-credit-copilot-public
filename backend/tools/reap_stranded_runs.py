@@ -15,10 +15,10 @@ from dotenv import load_dotenv  # noqa: E402
 load_dotenv(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".env"))
 
 from infrastructure.persistence.fabric_warehouse import (  # noqa: E402
-    OPS_SCHEMA,
     STRANDED_RUN_MINUTES,
     FabricWarehouseConnection,
 )
+from config import names
 from infrastructure.persistence.warehouse_gold import GoldWriter  # noqa: E402
 
 
@@ -27,7 +27,7 @@ def _show(title: str) -> None:
         cur = conn.cursor()
         cur.execute(
             f"SELECT client_id, run_id, tax_year, run_status, run_started_at, run_completed_at "
-            f"FROM {OPS_SCHEMA}.run_manifest WHERE run_status IN ('running', 'failed') "
+            f"FROM {names.ops.run_manifest} WHERE run_status IN ('running', 'failed') "
             f"ORDER BY run_started_at"
         )
         print(f"\n-- {title}")

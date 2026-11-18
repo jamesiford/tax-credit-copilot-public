@@ -7,7 +7,7 @@ Branch `scale/s4-profile`. Method, harness and raw numbers: `scale-s4-log.md`, `
 
 - One queued `Calculate` item, the real `RunWorkExecutor` > `RunPublication` > `PersistedClientCalculation` > Domain `ClientCalculation`, SQLite
   operational store, a synthetic client (three tax years of bi-weekly payroll, 100 locations, staff hired across the years) served by a fake
-  `IAnalyticsTransport` in the real source shape. **No live lakehouse was used**: `TCC_LIVE_PROFILE` is not set. Live attribution below is derived.
+  `IAnalyticsTransport` in the real source shape. **No live lakehouse was used**: `TEST_LIVE_PROFILE` is not set. Live attribution below is derived.
 - Times are **exclusive** (a span's own time minus its children), so the stage rows add up to the item's wall clock. "Engine + gold projection +
   replay" is `run.calculation` minus its instrumented children; nothing was added inside the Domain, so it cannot be split further here.
 - The workstation was shared with other sessions' builds and tests. Wall times move by up to 2x between identical runs (the 400k "before" ran
@@ -56,7 +56,7 @@ fact table, about 0.18 ms per row before the fix) gives **about 70 s of inserts*
 the first** (the 28 s before `run_started_at` holds read number one, from resolve), which together make up the 108 s. The 79 s inside the run holds source
 reads two and three (`ResolveClientRun`, then `ReplayUnitSeries`) and the engine. Source reads are then roughly 100 s of the 215 s and SQLite inserts
 roughly 70 s: about four fifths of the item is two application-side causes. The guess in the brief (persistence into SQLite) was right and incomplete.
-This is a derivation from the harness, **not a live measurement**; a live run with the same spans (`TCC_LIVE_PROFILE=yes`, `az login`) is the way to confirm
+This is a derivation from the harness, **not a live measurement**; a live run with the same spans (`TEST_LIVE_PROFILE=yes`, `az login`) is the way to confirm
 the split.
 ## The six checks, with numbers
 

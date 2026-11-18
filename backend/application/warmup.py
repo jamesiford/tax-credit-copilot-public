@@ -132,7 +132,7 @@ def warm_read_paths(*, warm_workspace=None) -> dict[str, Any]:
 
     # 4. The landing grid. It reads Gold, so the cost to move off the request is
     #    the warehouse connection and its token, not an engine replay.
-    #    Bounded and data-driven: the first TCC_WARM_CLIENTS accounts the source lists, never a fixed id.
+    #    Bounded and data-driven: the first WARM_CLIENTS accounts the source lists, never a fixed id.
     for account_id in _warm_account_ids(accounts):
         _timed(report, f"trend[{account_id}]", lambda a=account_id: get_gold_reader().latest_run(a))
 

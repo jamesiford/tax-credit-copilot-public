@@ -22,7 +22,7 @@ HOW_TO_CREATE = (
     "{found}. Create the oracle environment with:\n"
     "    uv python install 3.12\n"
     "    uv venv --python 3.12 C:\\Projects\\py312-oracle\\.venv\n"
-    "then run this script with C:\\Projects\\py312-oracle\\.venv\\Scripts\\python.exe (set TCC_PYTHON to it for the .NET tests). "
+    "then run this script with C:\\Projects\\py312-oracle\\.venv\\Scripts\\python.exe (set ORACLE_PYTHON to it for the .NET tests). "
     "For exploratory use only, pass " + FLAG + " (the output is stamped and the .NET tests reject it)."
 )
 

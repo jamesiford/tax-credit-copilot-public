@@ -18,11 +18,11 @@ variables {
   log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-external/providers/Microsoft.OperationalInsights/workspaces/log"
   app_settings = {
     ENVIRONMENT                      = "azure"
-    TCC_PERSISTENCE_PROVIDER         = "warehouse"
+    PERSISTENCE_PROVIDER             = "warehouse"
     DATA_SOURCE                      = "lakehouse"
     ARTIFACT_STORE                   = "blob"
     AUTH_MODE                        = "entra"
-    TCC_CONTRACT_HOOKS               = "0"
+    CONTRACT_HOOKS                   = "0"
     CHANNEL_ENFORCE_WRITER_FOR_USERS = "true"
   }
 }
@@ -123,11 +123,11 @@ run "deployed_local_store_cannot_be_substituted" {
   variables {
     app_settings = {
       ENVIRONMENT                      = "azure"
-      TCC_PERSISTENCE_PROVIDER         = "sqlite"
+      PERSISTENCE_PROVIDER             = "sqlite"
       DATA_SOURCE                      = "csv"
       ARTIFACT_STORE                   = "local"
       AUTH_MODE                        = "none"
-      TCC_CONTRACT_HOOKS               = "1"
+      CONTRACT_HOOKS                   = "1"
       CHANNEL_ENFORCE_WRITER_FOR_USERS = "false"
     }
   }
@@ -142,11 +142,11 @@ run "unsupported_runtime_flags_are_rejected" {
   variables {
     app_settings = {
       ENVIRONMENT                      = "azure"
-      TCC_PERSISTENCE_PROVIDER         = "warehouse"
+      PERSISTENCE_PROVIDER             = "warehouse"
       DATA_SOURCE                      = "lakehouse"
       ARTIFACT_STORE                   = "blob"
       AUTH_MODE                        = "entra"
-      TCC_CONTRACT_HOOKS               = "0"
+      CONTRACT_HOOKS                   = "0"
       CHANNEL_ENFORCE_WRITER_FOR_USERS = "true"
       RUN_LEASE_SECONDS                = "600"
     }

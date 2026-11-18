@@ -151,9 +151,9 @@ Skip this unless `WAREHOUSE_PLATFORM=azure_sql`. See [ADR-011](ADR-011-azure-sql
    ```
 7. **Load the schema with the migration tool, never by hand:**
    ```powershell
-   $env:TCC_SQL_CREATED = "true"      # only on a database nothing has been loaded into
+   $env:SQL_CREATED = "true"      # only on a database nothing has been loaded into
    python scripts/apply-migrations.py --target deployed --bootstrap
-   Remove-Item Env:TCC_SQL_CREATED
+   Remove-Item Env:SQL_CREATED
    python scripts/apply-migrations.py --target deployed          # must report 0 pending
    ```
 8. **Check:** `python scripts/check-operational-store.py` prints `ok`, or the first problem and its remedy.

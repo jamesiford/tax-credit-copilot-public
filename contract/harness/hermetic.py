@@ -28,7 +28,7 @@ PINNED = {
     "DATA_CLASSIFICATION": "synthetic",
     "ENVIRONMENT": "local",
     "AUTH_MODE": "none",
-    "TCC_WARM_ON_START": "0",
+    "WARM_ON_START": "0",
     "PYTHONUTF8": "1",
     "GIT_COMMIT": "0000000000000000000000000000000000c0ffee",
     "LOG_LEVEL": "WARNING",

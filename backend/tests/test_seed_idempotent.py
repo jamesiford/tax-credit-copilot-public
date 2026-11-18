@@ -23,7 +23,7 @@ from infrastructure.persistence.sqlite_claims import SqliteClaimRepository
 @pytest.fixture(autouse=True)
 def seeding_allowed(monkeypatch):
     monkeypatch.setenv("DATA_CLASSIFICATION", "synthetic")
-    monkeypatch.setenv("TCC_ALLOW_SEED", "1")
+    monkeypatch.setenv("ALLOW_SEED", "1")
 
 
 def seed_book():
@@ -87,7 +87,7 @@ def test_the_seed_refuses_in_a_customer_classified_environment(repo, monkeypatch
 def test_the_seed_refuses_without_the_explicit_flag(repo, monkeypatch):
     from data import seed_claims
 
-    monkeypatch.delenv("TCC_ALLOW_SEED")
+    monkeypatch.delenv("ALLOW_SEED")
     assert seed_claims.main(book=seed_book) == 2
     assert _row_count(repo) == (0, 0)
 

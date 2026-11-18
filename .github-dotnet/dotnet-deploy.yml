@@ -23,7 +23,7 @@ jobs:
     environment: dotnet-preproduction
     runs-on: [self-hosted, linux, tcc-dotnet-vnet]
     env:
-      TCC_DOTNET_ACTIVATE: '1'
+      DEPLOY_DOTNET_ACTIVATE: '1'
       DOTNET_ENVIRONMENT_NAME: ${{ vars.DOTNET_ENVIRONMENT_NAME }}
       DOTNET_RESOURCE_GROUP_NAME: ${{ vars.DOTNET_RESOURCE_GROUP_NAME }}
       DOTNET_TARGET_SUBSCRIPTION: ${{ vars.DOTNET_AZURE_SUBSCRIPTION_ID }}

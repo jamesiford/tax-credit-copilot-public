@@ -1,13 +1,20 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
+using TaxCredit.Domain.DataMap;
 
 namespace TaxCredit.Infrastructure.Persistence.Sql;
 
 /// <summary>Provider details remain outside application contracts.</summary>
 public interface ISqlDialect
 {
-    /// <summary>Quotes a trusted, qualified table name.</summary>
+    /// <summary>The logical-to-actual name resolver this dialect applies; the embedded shipped map unless a data map file is supplied.</summary>
+    PhysicalNames Names => PhysicalNames.Default;
+
+    /// <summary>Quotes a trusted table name: a logical key (<c>ops.run_manifest</c>) resolves through the data map.</summary>
     string Name(string qualifiedName);
+
+    /// <summary>Replaces logical table tokens (<c>{ops.run_manifest}</c>) in trusted adapter SQL with actual names.</summary>
+    string Resolve(string sql);
 
     /// <summary>Pages an ordered SELECT, including SELECT DISTINCT.</summary>
     string Page(string sql, int limit, long offset);
@@ -31,19 +38,33 @@ public sealed class SqlServerDialect : ISqlDialect
     /// <summary>Selects how large inserts are sent; a null policy means <see cref="BulkLoadPolicy.Default" />.</summary>
     public SqlServerDialect(BulkLoadPolicy? bulk) : this(bulk, new SqlBulkCopyWriter()) { }
 
-    internal SqlServerDialect(BulkLoadPolicy? bulk, IBulkWriter writer)
+    /// <summary>Applies the supplied names (a data map file) instead of the shipped map.</summary>
+    public SqlServerDialect(BulkLoadPolicy? bulk, PhysicalNames names) : this(bulk, new SqlBulkCopyWriter(), names) { }
+
+    internal SqlServerDialect(BulkLoadPolicy? bulk, IBulkWriter writer, PhysicalNames? names = null)
     {
         Bulk = bulk ?? BulkLoadPolicy.Default;
         Writer = writer;
+        Names = names ?? PhysicalNames.Default;
     }
 
     /// <inheritdoc />
     public BulkLoadPolicy Bulk { get; }
 
+    /// <inheritdoc />
+    public PhysicalNames Names { get; }
+
     internal IBulkWriter Writer { get; }
 
     /// <inheritdoc />
-    public string Name(string qualifiedName) => SqlNames.Qualified(qualifiedName, false);
+    public string Name(string qualifiedName)
+    {
+        qualifiedName = SqlNames.Key(qualifiedName);
+        return Names.Map.Tables.ContainsKey(qualifiedName) ? Names.Bracketed(qualifiedName) : SqlNames.Qualified(qualifiedName, false);
+    }
+
+    /// <inheritdoc />
+    public string Resolve(string sql) => Names.Resolve(sql);
 
     /// <inheritdoc />
     public string Page(string sql, int limit, long offset)
@@ -56,17 +77,33 @@ public sealed class SqlServerDialect : ISqlDialect
     public string Like(string value) => SqlNames.Like(value).Replace("[", "\\[", StringComparison.Ordinal);
 
     /// <inheritdoc />
-    public string Translate(string sql) => sql;
+    public string Translate(string sql) => Resolve(sql);
 }
 
 /// <summary>SQLite executes the same repository statements without credentials.</summary>
-public sealed partial class SqliteDialect : ISqlDialect
+public sealed class SqliteDialect : ISqlDialect
 {
+    /// <summary>Uses the shipped map's names.</summary>
+    public SqliteDialect() : this(PhysicalNames.Default) { }
+
+    /// <summary>Applies the supplied names (a data map file) instead of the shipped map.</summary>
+    public SqliteDialect(PhysicalNames names) => Names = names;
+
     /// <inheritdoc />
     public BulkLoadPolicy Bulk => BulkLoadPolicy.Off;
 
     /// <inheritdoc />
-    public string Name(string qualifiedName) => SqlNames.Qualified(qualifiedName, true);
+    public PhysicalNames Names { get; }
+
+    /// <inheritdoc />
+    public string Name(string qualifiedName)
+    {
+        qualifiedName = SqlNames.Key(qualifiedName);
+        return Names.Map.Tables.ContainsKey(qualifiedName) ? "\"" + Names.Flat(qualifiedName) + "\"" : SqlNames.Qualified(qualifiedName, true);
+    }
+
+    /// <inheritdoc />
+    public string Resolve(string sql) => Names.ResolveFlat(sql);
 
     /// <inheritdoc />
     public string Page(string sql, int limit, long offset)
@@ -81,21 +118,22 @@ public sealed partial class SqliteDialect : ISqlDialect
     /// <inheritdoc />
     public string Translate(string sql)
     {
+        sql = Resolve(sql);
         var mask = SqlLex.Mask(sql);
-        foreach (Match match in Tables().Matches(mask).Cast<Match>().Reverse())
+        foreach (Match match in Names.QualifiedPattern.Matches(mask).Cast<Match>().Reverse())
         {
-            sql = sql.Remove(match.Index, match.Length).Insert(match.Index, Name(match.Value));
+            sql = sql.Remove(match.Index, match.Length).Insert(match.Index, SqlNames.Qualified(match.Value, true));
         }
 
         return sql;
     }
-
-    [GeneratedRegex(@"\b(?:tcc_gold|tcc_ops|tcc_source)\.[A-Za-z_][A-Za-z0-9_]*\b")]
-    private static partial Regex Tables();
 }
 
 internal static class SqlNames
 {
+    /// <summary>A table argument may be a logical key (<c>ops.x</c>) or a <c>{ops.x}</c> token; both name the same table.</summary>
+    internal static string Key(string name) => name.Length > 2 && name[0] == '{' && name[^1] == '}' ? name[1..^1] : name;
+
     internal static string Qualified(string name, bool sqlite)
     {
         var parts = name.Split('.');

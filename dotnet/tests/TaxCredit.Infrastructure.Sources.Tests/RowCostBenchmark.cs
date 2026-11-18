@@ -11,10 +11,10 @@ using Xunit.Abstractions;
 
 namespace TaxCredit.Infrastructure.Sources.Tests;
 
-/// <summary>Skipped unless <c>TCC_RUN_BENCH=1</c>, so ordinary runs stay fast.</summary>
+/// <summary>Skipped unless <c>BENCH_RUN=1</c>, so ordinary runs stay fast.</summary>
 internal sealed class BenchFactAttribute : FactAttribute
 {
-    internal const string Switch = "TCC_RUN_BENCH";
+    internal const string Switch = "BENCH_RUN";
 
     public BenchFactAttribute()
     {
@@ -24,7 +24,7 @@ internal sealed class BenchFactAttribute : FactAttribute
 
 /// <summary>
 /// What one payroll row costs in memory, in the real source shape. Each size is its own test so a fresh test host measures
-/// it: run <c>TCC_RUN_BENCH=1 dotnet test --filter "FullyQualifiedName~RowCostBenchmark.Rows_100k"</c> (and 400k, 1M), one per process.
+/// it: run <c>BENCH_RUN=1 dotnet test --filter "FullyQualifiedName~RowCostBenchmark.Rows_100k"</c> (and 400k, 1M), one per process.
 /// </summary>
 public sealed class RowCostBenchmark(ITestOutputHelper output)
 {
@@ -69,7 +69,7 @@ public sealed class RowCostBenchmark(ITestOutputHelper output)
         output.WriteLine("| rows | scan B/row | projection B/row | retained B/row after dataset dropped | scan heap MiB | projected heap MiB | "
             + "peak WS after scan MiB | peak WS MiB | WS before MiB | scan s | project s |");
         output.WriteLine(line + (compact ? " compact row" : ""));
-        if (Environment.GetEnvironmentVariable("TCC_BENCH_OUT") is { Length: > 0 } path) { File.AppendAllText(path, line + (compact ? " compact row" : "") + Environment.NewLine); }
+        if (Environment.GetEnvironmentVariable("BENCH_OUT") is { Length: > 0 } path) { File.AppendAllText(path, line + (compact ? " compact row" : "") + Environment.NewLine); }
     }
 
     // Each phase runs in its own frame: an unoptimized test method would otherwise keep every temporary alive and hide what the GC can free.

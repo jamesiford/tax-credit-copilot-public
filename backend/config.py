@@ -37,11 +37,13 @@ from dataclasses import dataclass
 from functools import cached_property
 from types import MappingProxyType
 
+import data_map
 from config_sections import (
     DataSourceSettings, IdentitySettings, ObservabilitySettings, PortfolioSettings, RuntimeSettings, StoresSettings, WarehouseSettings,
     WebIqSettings, parse_data_source, parse_identity, parse_observability, parse_portfolio, parse_runtime, parse_schema_name,
     parse_source_schema, parse_stores, parse_warehouse, parse_webiq,
 )
+from config_aliases import warn_deprecated, with_aliases
 from config_limits import LimitSettings, parse_limits
 from config_platform import PlatformSettings, parse_platform
 from config_programs import ProgramSettings, parse_programs
@@ -125,7 +127,8 @@ class Settings:
 def load_settings(environ: Mapping[str, str] | None = None) -> Settings:
     """Settings from `environ`, or from the process environment when none is given."""
     source = os.environ if environ is None else environ
-    return Settings(MappingProxyType(dict(source)))
+    warn_deprecated(source)
+    return Settings(MappingProxyType(with_aliases(source)))
 
 
 _override: Settings | None = None
@@ -173,14 +176,16 @@ def resolve_environ(env: Mapping[str, str] | None = None) -> Mapping[str, str]:
 
 # --- Warehouse schema names (Platform v2, D11) ------------------------------
 #
-# The two schemas the application owns. They are configuration so a customer
-# can host them under their own names; the defaults are what DDL v2.0 creates.
-# They are interpolated into SQL text (a schema cannot be a bound parameter),
-# so anything that is not a plain identifier is refused at import rather than
+# The schemas the application owns come from the data map (`DATA_MAP_FILE`, or the
+# shipped default `docs/data/data-map.json`). `GOLD_SCHEMA`, `OPS_SCHEMA` and
+# `SOURCE_SCHEMA` still override a schema name (deprecated: name it in the map).
+# They are interpolated into SQL text (a schema cannot be a bound parameter), so
+# anything that is not a plain identifier is refused at import rather than
 # reaching a statement.
 
-DEFAULT_GOLD_SCHEMA = "tcc_gold"
-DEFAULT_OPS_SCHEMA = "tcc_ops"
+_SHIPPED = data_map.default_map()
+DEFAULT_GOLD_SCHEMA = _SHIPPED.gold_schema
+DEFAULT_OPS_SCHEMA = _SHIPPED.ops_schema
 
 
 def schema_name(env_var: str, default: str) -> str:
@@ -188,17 +193,23 @@ def schema_name(env_var: str, default: str) -> str:
     return parse_schema_name(get_settings().environ, env_var, default)
 
 
+_MAP = data_map.load(get_settings().environ.get("DATA_MAP_FILE"))
+
 #: The read schema: every figure a screen shows.
-GOLD_SCHEMA = schema_name("GOLD_SCHEMA", DEFAULT_GOLD_SCHEMA)
+GOLD_SCHEMA = schema_name("GOLD_SCHEMA", _MAP.gold_schema)
 
 #: Operational and provenance tables: runs, overrides, claims, findings, artifacts.
-OPS_SCHEMA = schema_name("OPS_SCHEMA", DEFAULT_OPS_SCHEMA)
+OPS_SCHEMA = schema_name("OPS_SCHEMA", _MAP.ops_schema)
 
 #: The source schema: the customer's payroll tables in the Fabric Lakehouse
-#: (`data/source/`, `DATA_SOURCE=lakehouse`). This one is a parameter rather
-#: than a fixed name on purpose (D14) — a customer's own Fabric lakehouse may
-#: already use a schema name of its own (an overlay sets `SOURCE_SCHEMA`
-#: accordingly), and the public default stands in for one that does not.
-DEFAULT_SOURCE_SCHEMA = "tcc_source"
+#: (`data/source/`, `DATA_SOURCE=lakehouse`). A customer's own Fabric lakehouse may
+#: already use a schema name of its own: set it in the data map's `lakehouse.schema`.
+DEFAULT_SOURCE_SCHEMA = _SHIPPED.source_schema
 
-SOURCE_SCHEMA = parse_source_schema(get_settings().environ, DEFAULT_SOURCE_SCHEMA)
+SOURCE_SCHEMA = parse_source_schema(get_settings().environ, _MAP.source_schema)
+
+#: The process's data map (overrides applied) and the logical-name accessors over it:
+#: `names.ops.run_manifest`, `names.gold.unit_year_master`.
+DATA_MAP = data_map.build(get_settings().environ.get("DATA_MAP_FILE"),
+                          {"gold_schema": GOLD_SCHEMA, "ops_schema": OPS_SCHEMA, "source_schema": SOURCE_SCHEMA})
+names = data_map.Names(DATA_MAP)

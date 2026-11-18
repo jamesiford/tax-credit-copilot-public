@@ -6,7 +6,7 @@ internal sealed partial record Settings(Uri Endpoint, string Service, string Ver
 {
     internal static Settings? Read()
     {
-        var enabled = Environment.GetEnvironmentVariable("TCC_TELEMETRY_ENABLED");
+        var enabled = Variable("TELEMETRY_ENABLED");
         if (enabled is null or "0")
         {
             return null;
@@ -17,8 +17,8 @@ internal sealed partial record Settings(Uri Endpoint, string Service, string Ver
             return null;
         }
         var service = Environment.GetEnvironmentVariable("OTEL_SERVICE_NAME");
-        var version = Environment.GetEnvironmentVariable("TCC_TELEMETRY_VERSION");
-        var address = Environment.GetEnvironmentVariable("TCC_TELEMETRY_ENDPOINT");
+        var version = Variable("TELEMETRY_VERSION");
+        var address = Variable("TELEMETRY_ENDPOINT");
         if (service is not ("taxcredit-api" or "taxcredit-gateway" or "taxcredit-worker" or "taxcredit-orchestrator")
             || version is null || !VersionPattern().IsMatch(version)
             || !Uri.TryCreate(address, UriKind.Absolute, out var endpoint)
@@ -36,6 +36,19 @@ internal sealed partial record Settings(Uri Endpoint, string Service, string Ver
             return null;
         }
         return new(endpoint, service, version);
+    }
+
+    // The deprecated TCC_ spellings are honoured for one release: the new name wins, and only the name is reported.
+    private static string? Variable(string name)
+    {
+        var current = Environment.GetEnvironmentVariable(name);
+        if (current is not null) { return current; }
+        var legacy = Environment.GetEnvironmentVariable("TCC_" + name);
+        if (legacy is not null)
+        {
+            Console.Error.WriteLine($"Deprecated environment variable TCC_{name} is in use; set {name} instead.");
+        }
+        return legacy;
     }
 
     [GeneratedRegex(@"\A(?:[0-9a-f]{7,40}|[0-9]{1,4}\.[0-9]{1,4}\.[0-9]{1,4})\z", RegexOptions.CultureInvariant)]

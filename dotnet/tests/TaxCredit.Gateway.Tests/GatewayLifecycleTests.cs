@@ -40,7 +40,7 @@ public sealed class GatewayLifecycleTests
             Directory.CreateDirectory(directory);
             await using var app = GatewayHost.Build(
             [
-                "--urls=http://127.0.0.1:0", "--TCC_CONTRACT_HOOKS=0", "--ENVIRONMENT=local", "--AUTH_MODE=none",
+                "--urls=http://127.0.0.1:0", "--CONTRACT_HOOKS=0", "--ENVIRONMENT=local", "--AUTH_MODE=none",
                 "--AUTH_TENANT_ID=" + GatewayFixture.Tenant, "--GATEWAY_AUDIENCE=api://synthetic-channel", "--API_AUDIENCE=api://synthetic-api",
                 "--OPERATIONAL_DB=" + Path.Combine(directory, "operations.db"), "--ARTIFACT_LOCAL_ROOT=" + Path.Combine(directory, "bytes"),
             ], builder => builder.Logging.ClearProviders());

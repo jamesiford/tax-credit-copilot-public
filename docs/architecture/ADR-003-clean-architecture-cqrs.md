@@ -188,7 +188,7 @@ Migration protocol, and it is not negotiable:
 
 1. Move one module. Do not modify it in the same commit.
 2. Run `pytest tests/test_engine_parity_reference.py` with
-   `TCC_REQUIRE_PARITY=1`.
+   `TEST_REQUIRE_PARITY=1`.
 3. Run `python -m tools.verify_reference_independent` — the independent
    re-derivation, 17/17.
 4. Commit.

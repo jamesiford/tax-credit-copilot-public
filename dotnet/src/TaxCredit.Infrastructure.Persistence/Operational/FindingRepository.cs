@@ -13,7 +13,7 @@ public sealed class FindingRepository(PersistenceDatabase database, IIdSource? i
     [
         "finding_id", "client_id", "tax_year", "resolution", "detail", "note", "decided_by", "decided_at", "superseded_at",
     ];
-    private static string Select => "SELECT " + string.Join(", ", Columns) + " FROM tcc_ops.agent_finding_resolution";
+    private static string Select => "SELECT " + string.Join(", ", Columns) + " FROM {ops.agent_finding_resolution}";
 
     /// <inheritdoc />
     public IReadOnlyList<FindingResolution> Live(long clientId, long? taxYear = null)
@@ -42,9 +42,9 @@ public sealed class FindingRepository(PersistenceDatabase database, IIdSource? i
 
         return database.Transact(session =>
         {
-            session.Execute(resolution.ClientId, "UPDATE tcc_ops.agent_finding_resolution SET superseded_at = ? "
+            session.Execute(resolution.ClientId, "UPDATE {ops.agent_finding_resolution} SET superseded_at = ? "
                 + "WHERE {tenant} AND finding_id = ? AND superseded_at IS NULL", OpsRow.Timestamp(session, resolution.DecidedAt), resolution.FindingId);
-            session.Insert(resolution.ClientId, "tcc_ops.agent_finding_resolution", Columns,
+            session.Insert(resolution.ClientId, "ops.agent_finding_resolution", Columns,
                 [new object?[] { resolution.FindingId, resolution.ClientId, resolution.TaxYear, resolution.Resolution, OpsRow.Json(resolution.Detail),
                     resolution.Note, resolution.DecidedBy, OpsRow.Timestamp(session, resolution.DecidedAt), null }]);
             AppendAudit(session, resolution.ClientId, resolution.FindingId, "resolve", resolution.DecidedBy, resolution.DecidedAt);
@@ -55,7 +55,7 @@ public sealed class FindingRepository(PersistenceDatabase database, IIdSource? i
     /// <inheritdoc />
     public bool Reopen(long clientId, string findingId, string decidedBy, PyDateTime at) => database.Transact(session =>
     {
-        var changed = session.Execute(clientId, "UPDATE tcc_ops.agent_finding_resolution SET superseded_at = ? "
+        var changed = session.Execute(clientId, "UPDATE {ops.agent_finding_resolution} SET superseded_at = ? "
             + "WHERE {tenant} AND finding_id = ? AND superseded_at IS NULL", OpsRow.Clock(session, at), findingId);
         if (changed != 0)
         {
@@ -69,7 +69,7 @@ public sealed class FindingRepository(PersistenceDatabase database, IIdSource? i
     public IReadOnlyList<FindingAudit> Audit(long clientId, string findingId)
     {
         using var session = database.Open();
-        return session.Query(clientId, "SELECT finding_id, client_id, action, actor, at FROM tcc_ops.finding_audit "
+        return session.Query(clientId, "SELECT finding_id, client_id, action, actor, at FROM {ops.finding_audit} "
             + "WHERE {tenant} AND finding_id = ? ORDER BY at, audit_id", findingId).Select(values =>
             {
                 var r = new OpsRow(values);
@@ -95,6 +95,6 @@ public sealed class FindingRepository(PersistenceDatabase database, IIdSource? i
     }
 
     private void AppendAudit(SqlSession session, long clientId, string findingId, string action, string actor, string at) =>
-        session.Insert(clientId, "tcc_ops.finding_audit", ["audit_id", "client_id", "finding_id", "action", "actor", "at"],
+        session.Insert(clientId, "ops.finding_audit", ["audit_id", "client_id", "finding_id", "action", "actor", "at"],
             [new object?[] { (ids?.NewId() ?? Guid.NewGuid()).ToString(), clientId, findingId, action, actor, at }]);
 }

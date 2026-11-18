@@ -135,7 +135,7 @@ mass edit here would be unreviewable.
 
 `check_contrast.py` fails the build for the modern theme. The classic theme is
 the previous look, preserved as it was (its muted greys predate the gate); its
-offenders are printed but do not fail. `TCC_STRICT_CLASSIC=1` makes them fail.
+offenders are printed but do not fail. `STRICT_CLASSIC=1` makes them fail.
 
 ## D10. The app cannot boot on a clone without private inputs
 

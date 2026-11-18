@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Runtime.Loader;
 using TaxCredit.Api.Endpoints;
+using TaxCredit.ServiceDefaults.Hosting;
 
 namespace TaxCredit.Api.Hosting;
 
@@ -19,7 +20,7 @@ public sealed class FeatureDiscovery
     {
         ArgumentNullException.ThrowIfNull(configuration);
         var assemblies = new[] { typeof(IEndpointGroup).Assembly, typeof(Application.DependencyInjection).Assembly }
-            .Concat((configuration["TCC_FEATURE_ASSEMBLIES"] ?? "").Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+            .Concat((configuration.Setting("FEATURE_ASSEMBLIES") ?? "").Split(';', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
                 .Select(name => Path.IsPathFullyQualified(name)
                     ? AssemblyLoadContext.Default.LoadFromAssemblyPath(name) : Assembly.Load(name)));
         Types = assemblies.Distinct().OrderBy(a => a.FullName, StringComparer.Ordinal)

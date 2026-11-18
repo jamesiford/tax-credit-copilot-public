@@ -55,6 +55,6 @@ public sealed class PagingTests
 
     internal static readonly Dictionary<string, string?> Configuration = new(StringComparer.Ordinal)
     {
-        ["TCC_FEATURE_ASSEMBLIES"] = typeof(DiscoveryFeature).Assembly.FullName,
+        ["FEATURE_ASSEMBLIES"] = typeof(DiscoveryFeature).Assembly.FullName,
     };
 }

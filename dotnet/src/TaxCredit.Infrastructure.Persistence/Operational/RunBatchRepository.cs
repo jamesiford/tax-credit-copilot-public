@@ -37,7 +37,7 @@ public sealed partial class RunBatchRepository(PersistenceDatabase database) : I
             foreach (var chunk in items.Chunk(1000))
             {
                 var placeholders = string.Join(", ", chunk.Select(_ => "?"));
-                if (session.QueryExempt(SqlExemption.Worker, "SELECT item_id FROM tcc_ops.run_batch_item WHERE item_id IN (" + placeholders + ")",
+                if (session.QueryExempt(SqlExemption.Worker, "SELECT item_id FROM {ops.run_batch_item} WHERE item_id IN (" + placeholders + ")",
                     chunk.Select(item => (object?)item.ItemId).ToArray()).Count != 0)
                 {
                     throw new InvalidOperationException("A queue item identity is already recorded.");

@@ -5,13 +5,13 @@ namespace TaxCredit.Domain.Pipeline;
 
 /// <summary>
 /// Everything one run hands the Gold writer (the dictionary <c>handle_run_client_calculation</c> passes to <c>write_run</c>): the run's identity, the manifest
-/// row and the seven <c>tcc_gold</c> projections, rows in the order the run produced them.
+/// row and the seven <c>gold</c> projections, rows in the order the run produced them.
 /// </summary>
 /// <param name="ClientId">The client.</param>
 /// <param name="ProgramCode">The program.</param>
 /// <param name="RunId">The run.</param>
 /// <param name="RunCompletedAt">The completion stamp the writer records once every row is down.</param>
-/// <param name="ManifestColumns">The <c>tcc_ops.run_manifest</c> columns, in DDL order.</param>
+/// <param name="ManifestColumns">The <c>ops.run_manifest</c> columns, in DDL order.</param>
 /// <param name="ManifestRow">The manifest's values, aligned with <paramref name="ManifestColumns"/> (<c>string</c>, <c>long</c>, <see cref="DateOnly"/>, <see cref="PyDateTime"/> or <c>null</c>).</param>
 /// <param name="EmployeePeriodFact">One row per pay period consumed, requested year first.</param>
 /// <param name="EmployeeEligibility">Per employee, year and method.</param>

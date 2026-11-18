@@ -22,7 +22,7 @@ BRIEF = "Brief.\n\nJSON:\n" + json.dumps({"identified_usd": "31000.00"})
 def _offline(monkeypatch, **env):
     for name in ("FOUNDRY_PROJECT_ENDPOINT", "APPLICATIONINSIGHTS_CONNECTION_STRING"):
         monkeypatch.setenv(name, "")
-    monkeypatch.setenv("TCC_WARM_ON_START", "0")
+    monkeypatch.setenv("WARM_ON_START", "0")
     for name, value in env.items():
         monkeypatch.setenv(name, value)
 

@@ -148,13 +148,13 @@ class WebIqSettings:
 
 
 def parse_runtime(environ: Mapping[str, str]) -> RuntimeSettings:
-    warm = environ.get("TCC_WARM_ON_START", "1").strip().lower() not in ("0", "false", "no")
+    warm = environ.get("WARM_ON_START", "1").strip().lower() not in ("0", "false", "no")
     return RuntimeSettings(
         git_commit=environ.get("GIT_COMMIT"), log_level=environ.get("LOG_LEVEL", "INFO"),
-        warm_on_start=warm, keepalive_seconds=_tuned_int(environ, "TCC_KEEPALIVE_SECONDS", DEFAULT_KEEPALIVE_SECONDS, 5),
-        warm_clients=_tuned_int(environ, "TCC_WARM_CLIENTS", DEFAULT_WARM_CLIENTS, 0),
+        warm_on_start=warm, keepalive_seconds=_tuned_int(environ, "KEEPALIVE_SECONDS", DEFAULT_KEEPALIVE_SECONDS, 5),
+        warm_clients=_tuned_int(environ, "WARM_CLIENTS", DEFAULT_WARM_CLIENTS, 0),
         data_classification=(environ.get("DATA_CLASSIFICATION") or "").strip().lower() or None,
-        allow_seed=environ.get("TCC_ALLOW_SEED", "").strip().lower() in ("1", "true", "yes"),
+        allow_seed=environ.get("ALLOW_SEED", "").strip().lower() in ("1", "true", "yes"),
     )
 
 
@@ -227,7 +227,7 @@ def parse_warehouse(environ: Mapping[str, str]) -> WarehouseSettings:
         connect_timeout=int(environ.get("WAREHOUSE_CONNECT_TIMEOUT", DEFAULT_CONNECT_TIMEOUT_SECONDS)),
         lakehouse_sql_server=environ.get("LAKEHOUSE_SQL_SERVER") or "",
         lakehouse_sql_database=environ.get("LAKEHOUSE_SQL_DATABASE") or "",
-        stranded_run_minutes=int(environ.get("TCC_STRANDED_RUN_MINUTES", DEFAULT_STRANDED_RUN_MINUTES)),
+        stranded_run_minutes=int(environ.get("STRANDED_RUN_MINUTES", DEFAULT_STRANDED_RUN_MINUTES)),
     )
 
 

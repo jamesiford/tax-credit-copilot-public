@@ -12,7 +12,7 @@ def _offline(monkeypatch):
     """Start the app without reaching Foundry or App Insights from a local .env."""
     for name in ("FOUNDRY_PROJECT_ENDPOINT", "APPLICATIONINSIGHTS_CONNECTION_STRING"):
         monkeypatch.setenv(name, "")
-    monkeypatch.setenv("TCC_WARM_ON_START", "0")
+    monkeypatch.setenv("WARM_ON_START", "0")
 
 
 def test_ready_is_false_before_startup_and_true_after(monkeypatch):

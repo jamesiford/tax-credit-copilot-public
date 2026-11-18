@@ -2,7 +2,7 @@ name: tax-credit-copilot
 metadata:
   template: tax-credit-copilot@2.0.0
 
-# Terraform (TF-4). The profile comes from `azd env set TCC_PROFILE
+# Terraform (TF-4). The profile comes from `azd env set DEPLOY_PROFILE
 # public|enterprise`; infra/main.tfvars.json maps azd environment values into
 # Terraform variables. Every azd command here runs with --no-prompt.
 infra:
@@ -10,6 +10,19 @@ infra:
   path: infra
 
 hooks:
+  # Before every provision: an azd environment that still holds a pre-rename TCC_
+  # value gets the new name written beside it (one release, scripts/legacy-env.ps1),
+  # because infra/main.tfvars.json reads only the new names.
+  preprovision:
+    windows:
+      shell: pwsh
+      run: ./scripts/legacy-env.ps1 -AzdEnv
+      continueOnError: false
+    posix:
+      shell: sh
+      run: pwsh ./scripts/legacy-env.ps1 -AzdEnv
+      continueOnError: false
+
   # After every provision, in order (D22):
   #   1. apply-migrations  - bootstraps DDL v2.0 ONLY on a Warehouse this
   #                          deployment just created; otherwise applies pending
@@ -33,7 +46,7 @@ hooks:
   # azd cannot make a service conditional (it resolves each service by its
   # azd-service-name tag, and with the channel off there is no such app), so the
   # gateway is deployed here and is NOT a `channel` service. With
-  # TCC_ENABLE_M365_CHANNEL not `true` the script exits 0 at once.
+  # M365_CHANNEL_ENABLED not `true` the script exits 0 at once.
   postdeploy:
     windows:
       shell: pwsh

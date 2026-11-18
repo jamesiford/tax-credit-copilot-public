@@ -25,11 +25,11 @@ rules in `backend/tests/test_architecture.py`.
 1. Fork the repository and create a branch for your change.
 2. Run the standard gate before opening a pull request:
    ```pwsh
-   cd backend ; $env:TCC_REQUIRE_PARITY=1 ; pytest tests/ -q
+   cd backend ; $env:TEST_REQUIRE_PARITY=1 ; pytest tests/ -q
    cd frontend ; npm test ; npm run build
    python backend/tools/verify_reference_independent.py
    ```
-   `TCC_REQUIRE_PARITY=1` only turns a missing private fixture into a loud
+   `TEST_REQUIRE_PARITY=1` only turns a missing private fixture into a loud
    error rather than a silent skip; `backend/tests/test_engine_parity_synthetic.py`
    runs either way, against the committed synthetic dataset.
 3. Open a pull request describing what changed and why. Reference the

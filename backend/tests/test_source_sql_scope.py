@@ -5,7 +5,7 @@ DISTINCTs. It now asks the warehouse. That is only safe if both paths select the
 same row population and resolve state the same way, so this crosses the boundary
 rather than testing either side alone.
 
-The live half is opt-in (`TCC_FABRIC_TESTS=1`) because CI has no lakehouse. The
+The live half is opt-in (`TEST_FABRIC=1`) because CI has no lakehouse. The
 offline half runs everywhere and pins the fallback's shape.
 """
 from __future__ import annotations
@@ -20,8 +20,8 @@ from infrastructure.persistence.source_sql import (
     payroll_scope_from_rows,
 )
 
-LIVE = os.getenv("TCC_FABRIC_TESTS") == "1"
-live_only = pytest.mark.skipif(not LIVE, reason="needs a Fabric lakehouse; set TCC_FABRIC_TESTS=1")
+LIVE = os.getenv("TEST_FABRIC") == "1"
+live_only = pytest.mark.skipif(not LIVE, reason="needs a Fabric lakehouse; set TEST_FABRIC=1")
 
 REFERENCE_ACCOUNT = 1001
 
@@ -82,7 +82,7 @@ def test_the_sql_and_the_row_projection_agree(monkeypatch):
     from infrastructure.payroll.pay_period_source import load_pay_periods
 
     reader = SourceSqlReader()
-    assert reader.is_configured(), "TCC_FABRIC_TESTS=1 but no lakehouse is configured"
+    assert reader.is_configured(), "TEST_FABRIC=1 but no lakehouse is configured"
 
     from_sql = reader.payroll_scope(REFERENCE_ACCOUNT)
     from_rows = payroll_scope_from_rows(load_pay_periods(REFERENCE_ACCOUNT))

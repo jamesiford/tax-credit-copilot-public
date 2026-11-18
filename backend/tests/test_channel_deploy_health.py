@@ -47,8 +47,8 @@ function Get-HealthStatus([string]$Url) {{ $script:urls += $Url; $c = $script:co
 try {{ Invoke-ChannelDeploy; $ok = 'ok' }} catch {{ $ok = 'failed: ' + $_.Exception.Message }}
 "result=$ok"; "probes=$($script:probes)"; "sleeps=$($script:sleeps)"; "urls=$($script:urls -join ',')"
 """
-    env = {**os.environ, "PATH": f"{az}{os.pathsep}{os.environ['PATH']}", "AZ_EXIT": str(deploy_exit), "TCC_ENABLE_M365_CHANNEL": "true",
-           "CHANNEL_APP_NAME": APP, "AZURE_RESOURCE_GROUP": "rg-test", "CHANNEL_BASE_URL": base_url, "TCC_CHANNEL_HEALTH_CHECK": check}
+    env = {**os.environ, "PATH": f"{az}{os.pathsep}{os.environ['PATH']}", "AZ_EXIT": str(deploy_exit), "M365_CHANNEL_ENABLED": "true",
+           "CHANNEL_APP_NAME": APP, "AZURE_RESOURCE_GROUP": "rg-test", "CHANNEL_BASE_URL": base_url, "CHANNEL_HEALTH_CHECK": check}
     done = subprocess.run([PWSH, "-NoProfile", "-NonInteractive", "-Command", program], capture_output=True, text=True, env=env, timeout=240)
     lines = dict(line.split("=", 1) for line in done.stdout.splitlines() if line.startswith(("result=", "probes=", "sleeps=", "urls=")))
     return lines, done.stdout + done.stderr

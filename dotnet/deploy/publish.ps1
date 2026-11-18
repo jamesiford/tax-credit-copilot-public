@@ -3,8 +3,10 @@ param(
     [string] $Service = 'all',
     [string] $Output,
     [string] $Runtime,
-    [string] $Python = $(if ($env:TCC_DEPLOY_PYTHON) { $env:TCC_DEPLOY_PYTHON } else { 'python' })
+    [string] $Python = $(if ($env:DEPLOY_PYTHON) { $env:DEPLOY_PYTHON } else { 'python' })
 )
+# One-release fallback for the pre-rename TCC_ names (scripts/legacy-env.ps1).
+. "$PSScriptRoot/../../scripts/legacy-env.ps1"
 $ErrorActionPreference = 'Stop'
 $arguments = @((Join-Path $PSScriptRoot 'publish.py'), '--service', $Service)
 if ($Output) { $arguments += @('--output', $Output) }

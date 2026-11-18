@@ -42,8 +42,10 @@ param(
     [string]$DeploymentName = 'tcc-model-connection'
 )
 
+# One-release fallback for the pre-rename TCC_ names (scripts/legacy-env.ps1).
+. "$PSScriptRoot/legacy-env.ps1"
 $ErrorActionPreference = 'Stop'
-$secretVariable = 'TCC_GATEWAY_SECRET'
+$secretVariable = 'AI_GATEWAY_SECRET'
 
 function ConvertTo-BicepLiteral([object]$Value) {
     if ($Value -is [bool]) { return $Value.ToString().ToLowerInvariant() }

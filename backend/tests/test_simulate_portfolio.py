@@ -104,16 +104,16 @@ def _live_or_skip(monkeypatch):
     nothing to sweep. These tests opt in to live Fabric under the same flag as
     `test_fabric_source_selection.py`, so a default run stays offline and fast.
 
-        $env:TCC_FABRIC_TESTS=1 ; pytest tests/test_simulate_portfolio.py
+        $env:TEST_FABRIC=1 ; pytest tests/test_simulate_portfolio.py
 
     The source switch MUST go through `monkeypatch`. Assigning `os.environ`
     directly leaves the whole process on `lakehouse` for every test that follows,
     and the sealed `/api/workspace/*` tests then read live Fabric instead of
     the certified CSV fixture and fail on figures that are not theirs. That is
-    invisible offline, because this branch only runs under TCC_FABRIC_TESTS=1.
+    invisible offline, because this branch only runs under TEST_FABRIC=1.
     """
-    if os.getenv("TCC_FABRIC_TESTS") != "1":
-        pytest.skip("set TCC_FABRIC_TESTS=1 to run the sweep against live Fabric")
+    if os.getenv("TEST_FABRIC") != "1":
+        pytest.skip("set TEST_FABRIC=1 to run the sweep against live Fabric")
 
     monkeypatch.setenv("DATA_SOURCE", "lakehouse")
     from application.queries.simulate_portfolio import handle_simulate_portfolio

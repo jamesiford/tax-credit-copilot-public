@@ -36,8 +36,8 @@ def _lakehouse_or_skip():
     a missing lakehouse — so the skip message says so, rather than leaving the
     next person to rediscover it.
     """
-    if os.getenv("TCC_FABRIC_TESTS") != "1":
-        pytest.skip("set TCC_FABRIC_TESTS=1 to run tests that reach live Fabric")
+    if os.getenv("TEST_FABRIC") != "1":
+        pytest.skip("set TEST_FABRIC=1 to run tests that reach live Fabric")
     try:
         from data.source.from_fabric import FabricLakehouseReader
 
@@ -121,8 +121,8 @@ def test_the_flattened_source_is_a_different_shape():
     The flattened table has no account column at all, which is the root reason it
     cannot serve portfolio scope — not merely that it holds fewer rows.
     """
-    if os.getenv("TCC_FABRIC_TESTS") != "1":
-        pytest.skip("set TCC_FABRIC_TESTS=1 to run tests that reach live Fabric")
+    if os.getenv("TEST_FABRIC") != "1":
+        pytest.skip("set TEST_FABRIC=1 to run tests that reach live Fabric")
     from tools.fabric_source import FabricEmployeesAdapter
 
     try:

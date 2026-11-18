@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using TaxCredit.Application.Hosting;
 using TaxCredit.Application.Ports.Contract;
+using TaxCredit.Domain.DataMap;
 using TaxCredit.Infrastructure.Persistence;
 using TaxCredit.Infrastructure.Persistence.Sql;
 
@@ -18,8 +19,14 @@ public static class RuntimeRegistration
         ArgumentNullException.ThrowIfNull(services);
         ArgumentNullException.ThrowIfNull(configuration);
         var settings = new RuntimeConfiguration(configuration);
+        LegacySettingAliases.Report(configuration, Console.Error.WriteLine);
+        var dataMap = DataMapLoader.Load(settings.Get("DATA_MAP_FILE"));
+        var names = new PhysicalNames(dataMap);
+        PhysicalNames.Use(names);
+        services.AddSingleton(dataMap);
+        services.AddSingleton(names);
         var paths = new RuntimePaths(settings);
-        var hooks = configuration["TCC_CONTRACT_HOOKS"] == "1";
+        var hooks = configuration.Setting("CONTRACT_HOOKS") == "1";
         Validate(settings, hooks);
         services.AddSingleton(settings);
         services.AddSingleton<IRuntimeConfiguration>(settings);
@@ -30,27 +37,28 @@ public static class RuntimeRegistration
         services.AddSingleton<ISecretSource>(s => s.GetRequiredService<RuntimeSources>());
         services.AddSingleton<TimeProvider>(s => s.GetRequiredService<RuntimeSources>());
         services.TryAddSingleton(new DefaultAzureCredential());
-        var provider = settings.Get("TCC_PERSISTENCE_PROVIDER");
+        var provider = settings.Get("PERSISTENCE_PROVIDER");
         PersistenceDatabase database;
         if (provider == "sqlite")
         {
             Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(paths.Database))!);
-            database = PersistenceDatabase.Sqlite(paths.Database);
+            database = PersistenceDatabase.Sqlite(paths.Database, names: names);
         }
         else if (provider is "sqlserver" or "warehouse")
         {
             var connections = new EntraSqlConnections(Required(settings, "FABRIC_SQL_SERVER"),
-                Required(settings, "FABRIC_SQL_DATABASE"), new CredentialSqlTokens(new DefaultAzureCredential()));
-            database = connections.Database(bulk: BulkLoadPolicy.FromSettings(settings.Get));
+                settings.Get("FABRIC_SQL_DATABASE") is { Length: > 0 } warehouse ? warehouse
+                    : dataMap.WarehouseDatabase ?? Required(settings, "FABRIC_SQL_DATABASE"), new CredentialSqlTokens(new DefaultAzureCredential()));
+            database = connections.Database(bulk: BulkLoadPolicy.FromSettings(settings.Get), names: names);
             services.AddSingleton(connections);
         }
         else
         {
-            throw new InvalidOperationException("Unknown TCC_PERSISTENCE_PROVIDER.");
+            throw new InvalidOperationException("Unknown PERSISTENCE_PROVIDER.");
         }
 
         services.AddPersistence(database, paths.Repository, paths.Seeds, retention: GoldRetention.FromSettings(settings.Get));
-        services.AddRuntimeSources(settings, paths);
+        services.AddRuntimeSources(settings, paths, dataMap);
         services.AddRuntimeCalculation(settings, paths);
         services.AddRuntimeTrust(settings);
         services.AddRuntimeAi(settings);
@@ -95,7 +103,7 @@ public static class RuntimeRegistration
     private static void Validate(RuntimeConfiguration settings, bool hooks)
     {
         if (settings.Get("ENVIRONMENT") != "local"
-            && (hooks || settings.Get("TCC_PERSISTENCE_PROVIDER") != "warehouse" || settings.Get("DATA_SOURCE") != "lakehouse"
+            && (hooks || settings.Get("PERSISTENCE_PROVIDER") != "warehouse" || settings.Get("DATA_SOURCE") != "lakehouse"
                 || settings.Get("ARTIFACT_STORE") != "blob"))
         {
             throw new InvalidOperationException("Deployed hosts require Warehouse, lakehouse SQL and Blob; replay controls are local-only.");

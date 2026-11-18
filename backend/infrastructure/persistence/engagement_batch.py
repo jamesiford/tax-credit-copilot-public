@@ -39,14 +39,14 @@ def _sqlite(repo: Any, wanted: list[int]) -> dict[int, list[ProgramEngagement]]:
 
 
 def _warehouse(repo: Any, wanted: list[int]) -> dict[int, list[ProgramEngagement]]:
-    from infrastructure.persistence.fabric_warehouse import OPS_SCHEMA
+    from config import names
     from infrastructure.persistence.tenant_sql import tenant_exempt
     from infrastructure.persistence.warehouse_claims import _ENGAGEMENT_COLUMNS, from_db_instant, rows_as_dicts
 
     out: dict[int, list[ProgramEngagement]] = {i: [] for i in wanted}
     for start in range(0, len(wanted), _CHUNK):
         chunk = wanted[start:start + _CHUNK]
-        sql = (f"SELECT {', '.join(_ENGAGEMENT_COLUMNS)} FROM {OPS_SCHEMA}.program_engagement "
+        sql = (f"SELECT {', '.join(_ENGAGEMENT_COLUMNS)} FROM {names.ops.program_engagement} "
                f"WHERE client_id IN ({','.join('?' * len(chunk))}) AND effective_to IS NULL ORDER BY client_id, program_code")
         with repo._connection.connect() as connection:
             cursor = connection.cursor()

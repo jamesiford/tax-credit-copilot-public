@@ -133,7 +133,7 @@ public sealed class GoldWriterTests
             {
                 foreach (var (column, cell) in expected[i].Columns.Zip(expected[i].Cells))
                 {
-                    var value = schema["tcc_gold." + name].First(c => c.Name == column).ConvertValue(cell);
+                    var value = schema["gold." + name].First(c => c.Name == column).ConvertValue(cell);
                     var stored = value switch
                     {
                         DateOnly date => date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),

@@ -268,8 +268,8 @@ public sealed class ProjectionCacheSourceTests
     [Fact]
     public void The_estimate_is_within_a_factor_of_two_of_the_retained_heap_for_projected_rows()
     {
-        // A heap measurement is only meaningful in a quiet process: other tests allocate concurrently. Run it with TCC_RUN_BENCH=1 on its own.
-        if (Environment.GetEnvironmentVariable("TCC_RUN_BENCH") != "1") { return; }
+        // A heap measurement is only meaningful in a quiet process: other tests allocate concurrently. Run it with BENCH_RUN=1 on its own.
+        if (Environment.GetEnvironmentVariable("BENCH_RUN") != "1") { return; }
         var before = GC.GetTotalMemory(forceFullCollection: true);
         var projection = ProjectedRows(5000, out _);
         var retained = GC.GetTotalMemory(forceFullCollection: true) - before;

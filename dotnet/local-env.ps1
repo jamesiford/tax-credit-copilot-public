@@ -21,7 +21,7 @@ function Get-TaxCreditLocalEnvironment {
     if ($Mode -eq 'offline') {
         $settings.AUTH_MODE = 'none'
         $settings.DATA_SOURCE = 'csv'
-        $settings.TCC_PERSISTENCE_PROVIDER = 'sqlite'
+        $settings.PERSISTENCE_PROVIDER = 'sqlite'
         $settings.ARTIFACT_STORE = 'local'
         return $settings
     }
@@ -42,7 +42,7 @@ function Get-TaxCreditLocalEnvironment {
         if ($cfg[$name]) { $settings[$name] = $cfg[$name] }
     }
 # Same connections as a deployed host: results and operational data in the Warehouse (or Azure SQL), payroll from the lakehouse.
-    $settings.TCC_PERSISTENCE_PROVIDER = 'warehouse'
+    $settings.PERSISTENCE_PROVIDER = 'warehouse'
     $settings.FABRIC_SQL_SERVER = $cfg['WAREHOUSE_SERVER']
     $settings.FABRIC_SQL_DATABASE = $cfg['WAREHOUSE_DATABASE']
     # Artifacts go to Blob when the account is configured (as deployed); otherwise to local disk, which is the one remaining local-only store.

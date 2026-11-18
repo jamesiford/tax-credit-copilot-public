@@ -1,8 +1,8 @@
 """The artifact repository and byte-store contracts. [BLOB-3, BLOB-6]
 
 The repository runs on SQLite always and on the Warehouse with
-`TCC_FABRIC_TESTS=1`; the store runs on the local directory always and on Blob
-with `TCC_AZURE_TESTS=1`.
+`TEST_FABRIC=1`; the store runs on the local directory always and on Blob
+with `TEST_AZURE=1`.
 """
 from __future__ import annotations
 

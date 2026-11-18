@@ -2,7 +2,7 @@
 
 Everything here except the last test runs with no ODBC driver, no Azure
 credential and no Fabric capacity. The live round trip is opt-in behind
-`TCC_FABRIC_TESTS=1`, so CI never needs a warehouse.
+`TEST_FABRIC=1`, so CI never needs a warehouse.
 """
 from __future__ import annotations
 
@@ -23,8 +23,8 @@ from infrastructure.persistence.memory_runs import InMemoryRunManifestRepository
 
 
 def _requires_fabric():
-    if os.getenv("TCC_FABRIC_TESTS") != "1":
-        pytest.skip("set TCC_FABRIC_TESTS=1 to run tests that reach live Fabric")
+    if os.getenv("TEST_FABRIC") != "1":
+        pytest.skip("set TEST_FABRIC=1 to run tests that reach live Fabric")
 
 
 def _manifest(**overrides) -> RunManifest:

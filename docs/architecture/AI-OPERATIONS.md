@@ -81,7 +81,7 @@ back, pin the earlier version ([AI-RESILIENCE.md](AI-RESILIENCE.md)).
 
 `backend/tests/ai_evals/` holds three datasets and the thresholds:
 
-| Suite | Offline (CI) checks | Live (`TCC_AI_EVALS_LIVE=1`) checks |
+| Suite | Offline (CI) checks | Live (`TEST_AI_EVALS_LIVE=1`) checks |
 | --- | --- | --- |
 | routing | The keyword fallback names exactly the right capabilities, and a row's `forbidden` capability is never named (a question about one client must not reach the whole-book ranking) | The router model's JSON plan |
 | narration | The numeric guard rejects every recorded bad reply (changed digit, invented count, projection, rate) and passes the good ones. Rows with a `narration` (placeholders) run through the channel composer: a hedged figure (`roughly {{...}}`, `not rounded`, `up to`) must be dropped by the composer, and a kept narration must match its `must_contain` patterns and none of the forbidden wording (hedges, rank prose such as `position 1`) | Real narrations of the same briefs must all pass the guard |

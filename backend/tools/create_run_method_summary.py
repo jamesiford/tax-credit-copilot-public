@@ -22,9 +22,10 @@ from infrastructure.persistence.fabric_warehouse import (  # noqa: E402
     GOLD_SCHEMA,
     FabricWarehouseConnection,
 )
+from config import names
 
 _DDL = f"""
-CREATE TABLE {GOLD_SCHEMA}.run_method_summary
+CREATE TABLE {names.gold.run_method_summary}
 (
     client_id             BIGINT         NOT NULL,
     tax_year              INT            NOT NULL,
@@ -50,14 +51,14 @@ def main() -> int:
         cursor = link.cursor()
         cursor.execute(
             f"SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES "
-            f"WHERE TABLE_SCHEMA = '{GOLD_SCHEMA}' AND TABLE_NAME = 'run_method_summary'"
+            f"WHERE TABLE_SCHEMA = '{GOLD_SCHEMA}' AND TABLE_NAME = '{names.map.tables['gold.run_method_summary']['table']}'"
         )
         if cursor.fetchone()[0]:
             print("run_method_summary already exists; nothing to do.")
             return 0
         cursor.execute(_DDL)
         link.commit()
-    print(f"created {GOLD_SCHEMA}.run_method_summary")
+    print(f"created {names.gold.run_method_summary}")
     return 0
 
 

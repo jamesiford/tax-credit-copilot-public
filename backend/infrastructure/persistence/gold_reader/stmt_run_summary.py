@@ -1,13 +1,13 @@
 """What only the run knew: per-method summaries, the year series and the One/Zero matrix."""
 from __future__ import annotations
 
-from infrastructure.persistence.fabric_warehouse import GOLD_SCHEMA
+from config import names
 from infrastructure.persistence.gold_reader.columns import Statement
 
 
 def _stmt_method_summary(client_id: int, tax_year: int, method: str, run_id: str) -> Statement:
     return (
-        f"SELECT TOP 1 * FROM {GOLD_SCHEMA}.run_method_summary "
+        f"SELECT TOP 1 * FROM {names.gold.run_method_summary} "
         f"WHERE client_id = ? AND tax_year = ? AND method = ? AND run_id = ?",
         [client_id, tax_year, method, run_id],
     )
@@ -25,7 +25,7 @@ def _stmt_month_totals(client_id: int, tax_year: int, method: str, run_id: str) 
     # identically on every unit row of it, so MAX reads the one value.
     return (
         f"SELECT {sums}, MAX(unreachable_months) AS unreachable_months "
-        f"FROM {GOLD_SCHEMA}.unit_month_summary "
+        f"FROM {names.gold.unit_month_summary} "
         f"WHERE client_id = ? AND tax_year = ? AND method = ? AND run_id = ?",
         [client_id, tax_year, method, run_id],
     )
@@ -42,7 +42,7 @@ def _stmt_client_year_series(client_id: int, method: str, run_id: str) -> Statem
     return (
         f"SELECT tax_year, annual_average, eligible_employees, employees_evaluated, "
         f"  contested_months "
-        f"FROM {GOLD_SCHEMA}.run_method_summary "
+        f"FROM {names.gold.run_method_summary} "
         f"WHERE client_id = ? AND method = ? AND run_id = ? "
         f"ORDER BY tax_year",
         [client_id, method, run_id],
@@ -61,7 +61,7 @@ def _stmt_client_year_credit(client_id: int, method: str, program_code: str | No
         f"SELECT tax_year, SUM(annual_credit_usd) AS annual_credit_usd, "
         f"  MAX(CAST(is_base_year AS INT)) AS has_base_year, "
         f"  SUM(CAST(qualified AS INT)) AS qualified_units, COUNT(*) AS units "
-        f"FROM {GOLD_SCHEMA}.unit_year_master "
+        f"FROM {names.gold.unit_year_master} "
         f"WHERE client_id = ? AND method = ? AND is_current = 1{narrow} "
         f"GROUP BY tax_year ORDER BY tax_year",
         [client_id, method, *values],
@@ -72,7 +72,7 @@ def _stmt_onezero_matrix(client_id: int, tax_year: int, method: str, run_id: str
     months = ", ".join(f"month_{index:02d}" for index in range(1, 13))
     return (
         f"SELECT employee_id, record_token, worksite_id, entity_fein, weight, {months} "
-        f"FROM {GOLD_SCHEMA}.onezero_matrix "
+        f"FROM {names.gold.onezero_matrix} "
         f"WHERE client_id = ? AND tax_year = ? AND method = ? AND run_id = ? "
         f"ORDER BY worksite_id, employee_id",
         [client_id, tax_year, method, run_id],
@@ -107,7 +107,7 @@ def _stmt_unit_fein_summary(client_id: int, tax_year: int, method: str, run_id: 
         f"  COALESCE(NULLIF(m.entity_fein, ''), '(unattributed)') AS entity_fein, "
         f"  {months}, {total} AS total, "
         f"  ROUND(({total}) / 12.0, 2) AS average_headcount "
-        f"FROM {GOLD_SCHEMA}.onezero_matrix AS m "
+        f"FROM {names.gold.onezero_matrix} AS m "
         f"WHERE m.client_id = ? AND m.tax_year = ? AND m.method = ? AND m.run_id = ? "
         f"GROUP BY COALESCE(NULLIF(m.worksite_id, ''), '(unattributed)'), "
         f"  COALESCE(NULLIF(m.entity_fein, ''), '(unattributed)') "
@@ -124,7 +124,7 @@ def _stmt_client_year_rows(client_id: int, tax_year: int, method: str, program_c
     """
     narrow, values = (" AND program_code = ?", [program_code]) if program_code else ("", [])
     return (
-        f"SELECT COUNT(*) AS total FROM {GOLD_SCHEMA}.unit_year_master "
+        f"SELECT COUNT(*) AS total FROM {names.gold.unit_year_master} "
         f"WHERE client_id = ? AND tax_year = ? AND method = ? AND is_current = 1{narrow}",
         [client_id, tax_year, method, *values],
     )

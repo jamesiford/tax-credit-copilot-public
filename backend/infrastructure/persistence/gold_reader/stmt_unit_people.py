@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from infrastructure.persistence.fabric_warehouse import GOLD_SCHEMA
+from config import names
 from infrastructure.persistence.gold_reader.columns import Statement
 from tools.grid_filter import compile_filters
 
@@ -78,8 +78,8 @@ def _stmt_unit_employees(
     )
     statement = (
         f"SELECT {selected}"
-        f"FROM {GOLD_SCHEMA}.onezero_matrix AS m "
-        f"LEFT JOIN {GOLD_SCHEMA}.employee_eligibility AS e "
+        f"FROM {names.gold.onezero_matrix} AS m "
+        f"LEFT JOIN {names.gold.employee_eligibility} AS e "
         f"  ON e.record_token = m.record_token AND e.client_id = m.client_id "
         f" AND e.tax_year = m.tax_year AND e.method = m.method AND e.run_id = m.run_id "
         f"WHERE m.client_id = ? AND m.worksite_id = ? AND m.tax_year = ? "
@@ -117,8 +117,8 @@ def _stmt_unit_near_threshold(
     )
     statement = (
         f"SELECT DISTINCT {selected}"
-        f"FROM {GOLD_SCHEMA}.employee_eligibility AS e "
-        f"JOIN {GOLD_SCHEMA}.employee_period_fact AS p "
+        f"FROM {names.gold.employee_eligibility} AS e "
+        f"JOIN {names.gold.employee_period_fact} AS p "
         f"  ON p.record_token = e.record_token AND p.client_id = e.client_id "
         f" AND p.tax_year = e.tax_year "
         f"WHERE e.client_id = ? AND e.tax_year = ? AND e.method = ? "

@@ -99,7 +99,7 @@ run "independent_private_http_hosts" {
   }
   assert {
     condition = alltrue([for service in module.http_service :
-      service.deployment_contract.settings.TCC_PERSISTENCE_PROVIDER == "warehouse" &&
+      service.deployment_contract.settings.PERSISTENCE_PROVIDER == "warehouse" &&
       service.deployment_contract.settings.DATA_SOURCE == "lakehouse" &&
       service.deployment_contract.settings.FABRIC_SQL_SERVER == var.warehouse.server &&
       service.deployment_contract.settings.FABRIC_SQL_DATABASE == var.warehouse.database &&
@@ -108,7 +108,7 @@ run "independent_private_http_hosts" {
       service.deployment_contract.settings.SOURCE_SCHEMA == "" &&
       service.deployment_contract.settings.ARTIFACT_STORE == "blob" &&
       service.deployment_contract.settings.ARTIFACT_BLOB_ACCOUNT_URL == var.blob.account_url &&
-      service.deployment_contract.settings.TCC_REPOSITORY_ROOT == "/home/site/wwwroot/resources"
+      service.deployment_contract.settings.REPOSITORY_ROOT == "/home/site/wwwroot/resources"
     ])
     error_message = "Actual emitted settings must use native Warehouse/lakehouse SQL/Blob consumers and preserve an empty schema."
   }
@@ -121,7 +121,7 @@ run "independent_private_http_hosts" {
       service.deployment_contract.settings.CLIENT_ALLOWLIST == jsonencode(var.client_allowlist) &&
       service.deployment_contract.settings.CHANNEL_WRITER_SOURCE == "allowlist" &&
       service.deployment_contract.settings.CHANNEL_ENFORCE_WRITER_FOR_USERS == "true" &&
-      service.deployment_contract.settings.TCC_CONTRACT_HOOKS == "0" &&
+      service.deployment_contract.settings.CONTRACT_HOOKS == "0" &&
       service.deployment_contract.settings.GIT_COMMIT == var.git_commit &&
       service.deployment_contract.settings.Logging__Console__LogLevel__Default == "None"
     ])
@@ -136,7 +136,7 @@ run "independent_private_http_hosts" {
       module.http_service["gateway"].deployment_contract.settings.CHANNEL_CALLER_CHANNELS == "" &&
       alltrue([for service in module.http_service :
         length(setintersection(toset(keys(service.deployment_contract.settings)), toset([
-          "CLAIM_STORE", "RUN_MANIFEST_STORE", "FINDING_STORE", "API_BASE_URL", "TCC_RESOURCE_ROOT",
+          "CLAIM_STORE", "RUN_MANIFEST_STORE", "FINDING_STORE", "API_BASE_URL", "RESOURCE_ROOT",
           "RUN_LEASE_SECONDS", "RUN_WORKER_INLINE", "RUN_WORKER_CONCURRENCY", "SOURCE_MAPPING_FILE",
           "AI_EGRESS_POLICY", "AI_PROVIDER_CHAIN", "APPLICATIONINSIGHTS_CONNECTION_STRING", "WEBSITES_PORT"
         ]))) == 0

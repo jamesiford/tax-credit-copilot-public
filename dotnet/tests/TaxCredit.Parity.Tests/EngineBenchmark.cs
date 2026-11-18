@@ -8,16 +8,16 @@ namespace TaxCredit.Parity.Tests;
 
 /// <summary>
 /// Micro-benchmark of the C# engine on the same data as <c>parity/bench_python.py</c> (numbers only, no claims about
-/// production load). Runs only with <c>TCC_RUN_BENCH=1</c>; use <c>-c Release</c>.
+/// production load). Runs only with <c>BENCH_RUN=1</c>; use <c>-c Release</c>.
 /// </summary>
 public sealed class EngineBenchmark(ITestOutputHelper output)
 {
     [Fact]
     public void Time_the_engine_on_the_synthetic_and_a_generated_large_set()
     {
-        if (Environment.GetEnvironmentVariable("TCC_RUN_BENCH") != "1")
+        if (Environment.GetEnvironmentVariable("BENCH_RUN") != "1")
         {
-            output.WriteLine("skipped: set TCC_RUN_BENCH=1");
+            output.WriteLine("skipped: set BENCH_RUN=1");
             return;
         }
 

@@ -63,18 +63,18 @@ public sealed class ExecutableTests
         start.ArgumentList.Add(argument);
         foreach (var (key, value) in new Dictionary<string, string>
         {
-            ["TCC_CONTRACT_HOOKS"] = "0",
+            ["CONTRACT_HOOKS"] = "0",
             ["ENVIRONMENT"] = "local",
             ["AUTH_MODE"] = "none",
             ["DATA_SOURCE"] = "csv",
-            ["TCC_PERSISTENCE_PROVIDER"] = "sqlite",
+            ["PERSISTENCE_PROVIDER"] = "sqlite",
             ["OPERATIONAL_DB"] = database,
             ["ARTIFACT_STORE"] = "local",
             ["ARTIFACT_LOCAL_ROOT"] = artifacts,
             ["FOUNDRY_PROJECT_ENDPOINT"] = "",
             ["APPLICATIONINSIGHTS_CONNECTION_STRING"] = "",
-            ["TCC_FEATURE_ASSEMBLIES"] = "",
-            ["TCC_REPOSITORY_ROOT"] = Corpus.Root,
+            ["FEATURE_ASSEMBLIES"] = "",
+            ["REPOSITORY_ROOT"] = Corpus.Root,
         }) { start.Environment[key] = value; }
         var process = Process.Start(start)!;
         process.OutputDataReceived += (_, _) => { };

@@ -1,7 +1,7 @@
 """The people near a floor: those inside the credit who could fall out, and those outside who could reach it."""
 from __future__ import annotations
 
-from infrastructure.persistence.fabric_warehouse import GOLD_SCHEMA
+from config import names
 from infrastructure.persistence.gold_reader.columns import Statement
 
 
@@ -25,7 +25,7 @@ def _stmt_at_risk(
     return (
         f"SELECT employee_id, record_token, weeks_worked, total_hours, total_wages, "
         f"avg_weekly_hours, avg_weekly_wages, weight "
-        f"FROM {GOLD_SCHEMA}.employee_eligibility "
+        f"FROM {names.gold.employee_eligibility} "
         f"WHERE client_id = ? AND tax_year = ? AND method = ? AND run_id = ? "
         f"AND eligible = 1 AND avg_weekly_hours IS NOT NULL "
         f"AND (avg_weekly_hours < ? OR avg_weekly_wages < ?) "
@@ -41,7 +41,7 @@ def _stmt_at_risk_counts(
     return (
         f"SELECT COUNT(*) AS evaluated, "
         f"  SUM(CASE WHEN eligible = 1 THEN 1 ELSE 0 END) AS eligible_count "
-        f"FROM {GOLD_SCHEMA}.employee_eligibility "
+        f"FROM {names.gold.employee_eligibility} "
         f"WHERE client_id = ? AND tax_year = ? AND method = ? AND run_id = ? "
         f"AND avg_weekly_hours IS NOT NULL",
         [client_id, tax_year, method, run_id],
@@ -76,7 +76,7 @@ def _stmt_proximity_counts(
         f"           AND avg_weekly_wages <  ? THEN 1 ELSE 0 END) AS wages_only, "
         f"  SUM(CASE WHEN eligible = 0 AND avg_weekly_hours <  ? "
         f"           AND avg_weekly_wages <  ? THEN 1 ELSE 0 END) AS both "
-        f"FROM {GOLD_SCHEMA}.employee_eligibility "
+        f"FROM {names.gold.employee_eligibility} "
         f"WHERE client_id = ? AND tax_year = ? AND method = ? AND run_id = ? "
         f"AND avg_weekly_hours IS NOT NULL",
         [
@@ -109,7 +109,7 @@ def _stmt_proximity_candidates(
     return (
         f"SELECT employee_id, record_token, weeks_worked, total_hours, total_wages, "
         f"avg_weekly_hours, avg_weekly_wages, eligible, weight "
-        f"FROM {GOLD_SCHEMA}.employee_eligibility "
+        f"FROM {names.gold.employee_eligibility} "
         f"WHERE client_id = ? AND tax_year = ? AND method = ? AND run_id = ? "
         f"AND avg_weekly_hours IS NOT NULL AND avg_weekly_hours >= ?",
         [client_id, tax_year, method, run_id, float(reachable_at_or_above)],

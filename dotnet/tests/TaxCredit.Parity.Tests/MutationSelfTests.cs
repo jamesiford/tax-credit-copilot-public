@@ -8,7 +8,7 @@ namespace TaxCredit.Parity.Tests;
 /// Mutation self-test: proves the parity harness can fail. For each mutation, the Domain sources are copied to a scratch
 /// tree, one deliberate defect is applied (a rounding mode, a comparison, a sort tie-break), and the golden and
 /// differential-fuzz tests are run against that copy; they must FAIL. Slow (a build per mutation), so it runs only when
-/// <c>TCC_RUN_MUTATION_TESTS=1</c>; the result of the last run is recorded in <c>docs/parity-report.md</c>.
+/// <c>MUTATION_RUN=1</c>; the result of the last run is recorded in <c>docs/parity-report.md</c>.
 /// </summary>
 public sealed class MutationSelfTests(ITestOutputHelper output)
 {
@@ -208,7 +208,7 @@ public sealed class MutationSelfTests(ITestOutputHelper output)
         ("pipeline year window: the prior year is the following one", @"src\TaxCredit.Domain\Pipeline\ClientAssessment.cs", "requested.Select(y => y - 1)", "requested.Select(y => y + 1)"),
         ("pipeline year window: a stored rule shifts by the other labelling convention", @"src\TaxCredit.Domain\Pipeline\FiscalSource.cs", "convention == \"begins\" ? begin.Year : end.Year", "convention == \"begins\" ? end.Year : begin.Year"),
         // Family fuzz (FamilyFuzzTests): one rounding, one comparison and one ordering defect per family. Run them against the fuzz alone with
-        // TCC_MUTATION_FILTER=fuzz TCC_MUTATION_TEST_FILTER=FullyQualifiedName~FamilyFuzzTests.
+        // MUTATION_FILTER=fuzz MUTATION_TEST_FILTER=FullyQualifiedName~FamilyFuzzTests.
         ("fuzz proximity comparison: the hours floor is strict", @"src\TaxCredit.Domain\Calculation\Proximity.cs", "var passedHours = avgHours >= minHours;", "var passedHours = avgHours > minHours;"),
         ("fuzz proximity ordering: ties in the lever are ordered by id descending", @"src\TaxCredit.Domain\Calculation\ProximityCohorts.cs", "x.Lever > y.Lever ? 1 : PyStr.Compare(x.Id, y.Id);", "x.Lever > y.Lever ? 1 : PyStr.Compare(y.Id, x.Id);"),
         ("fuzz proximity rounding: gaps round half to even", @"src\TaxCredit.Domain\Calculation\ProximityCoerce.cs", "return OneZeroEligibility.RoundHalfUp(value, places);", "return Math.Round(value, places, MidpointRounding.ToEven);"),
@@ -229,9 +229,9 @@ public sealed class MutationSelfTests(ITestOutputHelper output)
     [Fact]
     public void Each_deliberate_defect_in_a_copy_of_the_port_is_caught_by_the_harness()
     {
-        if (Environment.GetEnvironmentVariable("TCC_RUN_MUTATION_TESTS") != "1")
+        if (Environment.GetEnvironmentVariable("MUTATION_RUN") != "1")
         {
-            output.WriteLine("skipped: set TCC_RUN_MUTATION_TESTS=1 to run (each mutation needs a build).");
+            output.WriteLine("skipped: set MUTATION_RUN=1 to run (each mutation needs a build).");
             return;
         }
 
@@ -239,9 +239,9 @@ public sealed class MutationSelfTests(ITestOutputHelper output)
         var repo = Directory.GetParent(parity)!.FullName;
         var caught = new List<string>();
         var missed = new List<string>();
-        // TCC_MUTATION_TEST_FILTER=FullyQualifiedName~ForecastParityTests narrows the test run of each mutant to the named classes.
-        // TCC_MUTATION_FILTER=performance,rollups runs only the mutations whose name contains one of the comma-separated terms.
-        var terms = (Environment.GetEnvironmentVariable("TCC_MUTATION_FILTER") ?? string.Empty).Split(',', StringSplitOptions.RemoveEmptyEntries);
+        // MUTATION_TEST_FILTER=FullyQualifiedName~ForecastParityTests narrows the test run of each mutant to the named classes.
+        // MUTATION_FILTER=performance,rollups runs only the mutations whose name contains one of the comma-separated terms.
+        var terms = (Environment.GetEnvironmentVariable("MUTATION_FILTER") ?? string.Empty).Split(',', StringSplitOptions.RemoveEmptyEntries);
         foreach (var (name, file, oldText, newText) in Mutations.Where(m => terms.Length == 0 || terms.Any(t => m.Name.Contains(t, StringComparison.OrdinalIgnoreCase))))
         {
             var root = Path.Combine(Path.GetTempPath(), "tcc-mutant-" + Guid.NewGuid().ToString("N")[..8]);
@@ -255,8 +255,8 @@ public sealed class MutationSelfTests(ITestOutputHelper output)
                 Assert.Contains(oldText, text, StringComparison.Ordinal);
                 File.WriteAllText(target, text.Replace(oldText, newText, StringComparison.Ordinal));
 
-                var env = new Dictionary<string, string> { ["TCC_FUZZ_N"] = "2000", ["TCC_RUN_MUTATION_TESTS"] = "0" };
-                var (exit, log) = Run("dotnet", "test tests\\TaxCredit.Parity.Tests --filter \"" + (Environment.GetEnvironmentVariable("TCC_MUTATION_TEST_FILTER") ?? "FullyQualifiedName~GoldenEngineTests|FullyQualifiedName~DifferentialFuzz|FullyQualifiedName~FamilyFuzzTests|FullyQualifiedName~Sum_matches_python|FullyQualifiedName~ProximityParityTests|FullyQualifiedName~ClaimsParityTests|FullyQualifiedName~CoverageParityTests|FullyQualifiedName~PerformanceParityTests|FullyQualifiedName~ModelsParityTests|FullyQualifiedName~RunsParityTests|FullyQualifiedName~DraftsParityTests|FullyQualifiedName~CreditMathParityTests|FullyQualifiedName~PackValidationParityTests|FullyQualifiedName~GoldParityTests|FullyQualifiedName~BaseYearParityTests|FullyQualifiedName~ForecastParityTests|FullyQualifiedName~CanonicalParityTests|FullyQualifiedName~GridFilterParityTests|FullyQualifiedName~QcTriggersParityTests|FullyQualifiedName~ClientCalculationParityTests|FullyQualifiedName~PayloadHelperParityTests") + "\"", Path.Combine(root, "dotnet"), env);
+                var env = new Dictionary<string, string> { ["FUZZ_N"] = "2000", ["MUTATION_RUN"] = "0" };
+                var (exit, log) = Run("dotnet", "test tests\\TaxCredit.Parity.Tests --filter \"" + (Environment.GetEnvironmentVariable("MUTATION_TEST_FILTER") ?? "FullyQualifiedName~GoldenEngineTests|FullyQualifiedName~DifferentialFuzz|FullyQualifiedName~FamilyFuzzTests|FullyQualifiedName~Sum_matches_python|FullyQualifiedName~ProximityParityTests|FullyQualifiedName~ClaimsParityTests|FullyQualifiedName~CoverageParityTests|FullyQualifiedName~PerformanceParityTests|FullyQualifiedName~ModelsParityTests|FullyQualifiedName~RunsParityTests|FullyQualifiedName~DraftsParityTests|FullyQualifiedName~CreditMathParityTests|FullyQualifiedName~PackValidationParityTests|FullyQualifiedName~GoldParityTests|FullyQualifiedName~BaseYearParityTests|FullyQualifiedName~ForecastParityTests|FullyQualifiedName~CanonicalParityTests|FullyQualifiedName~GridFilterParityTests|FullyQualifiedName~QcTriggersParityTests|FullyQualifiedName~ClientCalculationParityTests|FullyQualifiedName~PayloadHelperParityTests") + "\"", Path.Combine(root, "dotnet"), env);
                 var failedLines = log.Split('\n').Count(l => l.Contains("diverged", StringComparison.Ordinal) || l.Contains("mismatches", StringComparison.Ordinal));
                 output.WriteLine($"{name}: exit={exit}, {failedLines} failure summaries");
                 (exit != 0 && failedLines > 0 ? caught : missed).Add(name);

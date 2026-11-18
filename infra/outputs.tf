@@ -9,7 +9,7 @@ output "AZURE_RESOURCE_GROUP" {
   value = azurerm_resource_group.this.name
 }
 
-output "TCC_PROFILE" {
+output "DEPLOY_PROFILE" {
   value = var.profile
 }
 
@@ -89,7 +89,7 @@ output "SQL_DATABASE_NAME" {
   value       = local.azure_sql ? module.azure_sql.database_name : ""
 }
 
-output "TCC_SQL_CREATED" {
+output "SQL_CREATED" {
   description = "'true' only when this deployment created the Azure SQL database: the one case the destructive bootstrap may run."
   value       = tostring(module.azure_sql.created)
 }
@@ -98,7 +98,7 @@ output "SOURCE_SCHEMA" {
   value = var.source_schema
 }
 
-output "TCC_FABRIC_CREATED" {
+output "FABRIC_CREATED" {
   description = "'true' only when this deployment created the Warehouse: the one case the destructive bootstrap may run (D22)."
   value       = tostring(module.fabric.created)
 }

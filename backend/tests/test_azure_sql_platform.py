@@ -149,14 +149,14 @@ def test_a_mismatch_stops_before_any_connection_is_opened(monkeypatch):
 
 def test_the_deployed_target_needs_the_terraform_outputs_and_approves_the_bootstrap_only_when_created(monkeypatch):
     sql_common = _script("sql_common_azure2", "sql_common.py")
-    for name in ("SQL_SERVER_FQDN", "SQL_DATABASE_NAME", "TCC_SQL_CREATED"):
+    for name in ("SQL_SERVER_FQDN", "SQL_DATABASE_NAME", "SQL_CREATED"):
         monkeypatch.delenv(name, raising=False)
     with pytest.raises(TargetMismatch, match="SQL_SERVER_FQDN"):
         sql_common.allowed_sql_target("deployed")
     monkeypatch.setenv("SQL_SERVER_FQDN", "tcc-sql.database.windows.net")
     monkeypatch.setenv("SQL_DATABASE_NAME", "tcc")
     assert sql_common.allowed_sql_target("deployed").bootstrap_approved is False
-    monkeypatch.setenv("TCC_SQL_CREATED", "true")
+    monkeypatch.setenv("SQL_CREATED", "true")
     assert sql_common.allowed_sql_target("deployed").bootstrap_approved is True
 
 

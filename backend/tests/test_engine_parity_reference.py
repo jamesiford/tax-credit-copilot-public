@@ -49,14 +49,14 @@ _FIXTURES_PRESENT = all((_SOURCE_DIR / name).exists() for name in _SOURCE_FILES)
 # nothing: a partner could refactor the engine, see 443 tests pass, and never
 # learn that parity broke.
 #
-# So: skipping is opt-in and loud. Set TCC_REQUIRE_PARITY=1 in CI and in
+# So: skipping is opt-in and loud. Set TEST_REQUIRE_PARITY=1 in CI and in
 # any environment that HAS the fixtures, and a missing fixture becomes an error
 # instead of a skip.
-_REQUIRE_PARITY = os.environ.get("TCC_REQUIRE_PARITY", "").strip().lower() in {"1", "true", "yes"}
+_REQUIRE_PARITY = os.environ.get("TEST_REQUIRE_PARITY", "").strip().lower() in {"1", "true", "yes"}
 
 if _REQUIRE_PARITY and not _FIXTURES_PRESENT:
     raise RuntimeError(
-        "TCC_REQUIRE_PARITY is set but the partner's reference payroll extract "
+        "TEST_REQUIRE_PARITY is set but the partner's reference payroll extract "
         f"is missing from {_SOURCE_DIR}. The parity gate cannot run, and skipping "
         "it would report a false pass. Stage the fixtures or unset the variable."
     )
@@ -70,7 +70,7 @@ pytestmark = pytest.mark.skipif(
     not _FIXTURES_PRESENT,
     reason=(
         "the partner's reference payroll extract not present in this checkout. "
-        "Set TCC_REQUIRE_PARITY=1 to make this an error instead of a skip."
+        "Set TEST_REQUIRE_PARITY=1 to make this an error instead of a skip."
     ),
 )
 

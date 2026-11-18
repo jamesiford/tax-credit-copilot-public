@@ -9,7 +9,7 @@ namespace TaxCredit.Domain.Gold;
 public sealed class GoldRow
 {
     /// <summary>Creates a row.</summary>
-    /// <param name="table">The <c>tcc_gold</c> table name.</param>
+    /// <param name="table">The <c>gold</c> table name.</param>
     /// <param name="columns">The columns, in DDL order.</param>
     /// <param name="cells">One cell per column.</param>
     /// <exception cref="ArgumentException">When the counts differ.</exception>
@@ -55,7 +55,7 @@ public sealed class GoldRow
     }
 }
 
-/// <summary>The column lists of the seven <c>tcc_gold</c> projections (the <c>*_COLUMNS</c> tuples of <c>tools/gold_projection.py</c>).</summary>
+/// <summary>The column lists of the seven <c>gold</c> projections (the <c>*_COLUMNS</c> tuples of <c>tools/gold_projection.py</c>).</summary>
 public static class GoldColumns
 {
     private static string[] Months() => [.. Enumerable.Range(1, 12).Select(i => "month_" + i.ToString("D2", CultureInfo.InvariantCulture))];

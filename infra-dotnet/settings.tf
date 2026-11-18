@@ -15,11 +15,11 @@ locals {
     gateway = { dll = "TaxCredit.Gateway.dll" }
   } : {})
 
-  runtime_settings = {
+  runtime_settings = merge({
     ENVIRONMENT                      = "azure"
     DATA_CLASSIFICATION              = var.data_classification
     DATA_SOURCE                      = "lakehouse"
-    TCC_PERSISTENCE_PROVIDER         = "warehouse"
+    PERSISTENCE_PROVIDER             = "warehouse"
     FABRIC_SQL_SERVER                = var.warehouse.server
     FABRIC_SQL_DATABASE              = var.warehouse.database
     SOURCE_SQL_SERVER                = var.payroll_source.server
@@ -27,18 +27,18 @@ locals {
     SOURCE_SCHEMA                    = var.payroll_source.schema
     ARTIFACT_STORE                   = "blob"
     ARTIFACT_BLOB_ACCOUNT_URL        = var.blob.account_url
-    TCC_REPOSITORY_ROOT              = var.resource_root
+    REPOSITORY_ROOT                  = var.resource_root
     AUTH_MODE                        = "entra"
     AUTH_TENANT_ID                   = var.tenant_id
     API_AUDIENCE                     = var.api_audience
     CLIENT_ALLOWLIST                 = jsonencode(var.client_allowlist)
     CHANNEL_ENFORCE_WRITER_FOR_USERS = "true"
     CHANNEL_WRITER_SOURCE            = var.writer_source
-    TCC_CONTRACT_HOOKS               = "0"
+    CONTRACT_HOOKS                   = "0"
     GIT_COMMIT                       = var.git_commit
     PAY_CODE_POLICY                  = "strict"
     FISCAL_RULES_POLICY              = "strict"
-  }
+  }, var.data_map_file == "" ? {} : { DATA_MAP_FILE = var.data_map_file })
 
   gateway_settings = {
     TENANT_ID                      = var.tenant_id

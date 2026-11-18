@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from infrastructure.persistence.fabric_warehouse import GOLD_SCHEMA
+from config import names
 from infrastructure.persistence.gold_reader.columns import Statement, UNIT_YEAR_MASTER_COLUMNS
 
 
@@ -26,7 +26,7 @@ def _stmt_unit_years_count(
     client_id: int, method: str, tax_year: int | None, program_code: str | None
 ) -> Statement:
     where, values = _unit_year_where(client_id, method, tax_year, program_code, "m")
-    return f"SELECT COUNT(*) AS total FROM {GOLD_SCHEMA}.unit_year_master m WHERE {where}", values
+    return f"SELECT COUNT(*) AS total FROM {names.gold.unit_year_master} m WHERE {where}", values
 
 
 def _stmt_unit_years(
@@ -37,8 +37,8 @@ def _stmt_unit_years(
     selected = ", ".join(f"m.{column}" for column in UNIT_YEAR_MASTER_COLUMNS)
     return (
         f"SELECT {selected}, s.months_with_headcount, s.unreachable_months "
-        f"FROM {GOLD_SCHEMA}.unit_year_master m "
-        f"LEFT JOIN {GOLD_SCHEMA}.unit_month_summary s "
+        f"FROM {names.gold.unit_year_master} m "
+        f"LEFT JOIN {names.gold.unit_month_summary} s "
         f"  ON s.client_id = m.client_id AND s.tax_year = m.tax_year "
         f" AND s.method = m.method AND s.worksite_id = m.worksite_id "
         f" AND s.run_id = m.run_id "
@@ -53,7 +53,7 @@ def _stmt_month_summaries(
     client_id: int, method: str, run_id: str, tax_year: int | None
 ) -> Statement:
     statement = (
-        f"SELECT * FROM {GOLD_SCHEMA}.unit_month_summary "
+        f"SELECT * FROM {names.gold.unit_month_summary} "
         f"WHERE client_id = ? AND method = ? AND run_id = ?"
     )
     values: list[Any] = [client_id, method, run_id]
@@ -68,7 +68,7 @@ def _stmt_credit_columns(client_id: int, method: str, program_code: str | None) 
     return (
         f"SELECT worksite_id, tax_year, SUM(claimable_usd) AS claimable_usd, "
         f"MAX(CAST(projected AS INT)) AS projected, MIN(creation_year) AS creation_year "
-        f"FROM {GOLD_SCHEMA}.unit_credit_installment WHERE {where} "
+        f"FROM {names.gold.unit_credit_installment} WHERE {where} "
         f"GROUP BY worksite_id, tax_year ORDER BY worksite_id, tax_year",
         values,
     )
@@ -79,7 +79,7 @@ def _stmt_unit_totals(client_id: int, method: str, program_code: str | None) -> 
     return (
         f"SELECT worksite_id, SUM(annual_credit_usd) AS total_annual_credit_usd, "
         f"MAX(high_water_mark) AS final_high_water_mark "
-        f"FROM {GOLD_SCHEMA}.unit_year_master WHERE {where} "
+        f"FROM {names.gold.unit_year_master} WHERE {where} "
         f"GROUP BY worksite_id ORDER BY worksite_id",
         values,
     )
@@ -89,7 +89,7 @@ def _stmt_unit_lifetime(client_id: int, method: str, program_code: str | None) -
     where, values = _unit_year_where(client_id, method, None, program_code)
     return (
         f"SELECT worksite_id, SUM(claimable_usd) AS total_tranche_lifetime_usd "
-        f"FROM {GOLD_SCHEMA}.unit_credit_installment WHERE {where} "
+        f"FROM {names.gold.unit_credit_installment} WHERE {where} "
         f"GROUP BY worksite_id",
         values,
     )
@@ -128,8 +128,8 @@ def _stmt_unit_grid(
         f"MAX(m.high_water_mark) OVER (PARTITION BY m.worksite_id) "
         f"    AS final_high_water_mark, "
         f"COUNT(*) OVER () AS total_rows "
-        f"FROM {GOLD_SCHEMA}.unit_year_master m "
-        f"LEFT JOIN {GOLD_SCHEMA}.unit_month_summary s "
+        f"FROM {names.gold.unit_year_master} m "
+        f"LEFT JOIN {names.gold.unit_month_summary} s "
         f"  ON s.client_id = m.client_id AND s.tax_year = m.tax_year "
         f" AND s.method = m.method AND s.worksite_id = m.worksite_id "
         f" AND s.run_id = m.run_id "
@@ -152,7 +152,7 @@ def _stmt_credit_grid(client_id: int, method: str, program_code: str | None) -> 
         f"MAX(CAST(projected AS INT)) AS projected, MIN(creation_year) AS creation_year, "
         f"SUM(SUM(claimable_usd)) OVER (PARTITION BY worksite_id) "
         f"    AS total_tranche_lifetime_usd "
-        f"FROM {GOLD_SCHEMA}.unit_credit_installment WHERE {where} "
+        f"FROM {names.gold.unit_credit_installment} WHERE {where} "
         f"GROUP BY worksite_id, tax_year ORDER BY worksite_id, tax_year",
         values,
     )
@@ -163,7 +163,7 @@ def _stmt_unit(client_id: int, worksite_id: str, tax_year: int, method: str, pro
     narrow, values = (" AND program_code = ?", [program_code]) if program_code else ("", [])
     return (
         f"SELECT TOP 1 {', '.join(UNIT_YEAR_MASTER_COLUMNS)} "
-        f"FROM {GOLD_SCHEMA}.unit_year_master "
+        f"FROM {names.gold.unit_year_master} "
         f"WHERE client_id = ? AND worksite_id = ? AND tax_year = ? "
         f"AND method = ? AND is_current = 1{narrow}",
         [client_id, worksite_id, tax_year, method, *values],
@@ -174,7 +174,7 @@ def _stmt_unit_months(
     client_id: int, worksite_id: str, tax_year: int, method: str, run_id: str
 ) -> Statement:
     return (
-        f"SELECT TOP 1 * FROM {GOLD_SCHEMA}.unit_month_summary "
+        f"SELECT TOP 1 * FROM {names.gold.unit_month_summary} "
         f"WHERE client_id = ? AND worksite_id = ? AND tax_year = ? "
         f"AND method = ? AND run_id = ?",
         [client_id, worksite_id, tax_year, method, run_id],

@@ -3,7 +3,7 @@ set -eu
 # The SDK maps header assertions but cannot authenticate their original subject.
 # The preview SDK overrides --urls with ListenAnyIP. A flag is not containment:
 # permit proof only in a kernel network namespace containing loopback and nothing else.
-if [ "${TCC_ORCHESTRATOR_LOCAL_PROOF:-0}" != "1" ] ||
+if [ "${ORCHESTRATOR_LOCAL_PROOF:-0}" != "1" ] ||
    [ "${ENVIRONMENT:-}" != "local" ] ||
    [ "${DATA_CLASSIFICATION:-}" != "synthetic" ]; then
     echo "Orchestrator ingress unavailable: verified upstream subject/employer binding required." >&2

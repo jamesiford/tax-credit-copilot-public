@@ -4,6 +4,7 @@ using TaxCredit.Application.Ports.Auth;
 using TaxCredit.Application.Ports.Persistence;
 using TaxCredit.Application.Ports.Sources;
 using TaxCredit.Domain.Claims;
+using TaxCredit.Domain.DataMap;
 
 namespace TaxCredit.Application.Features.Ai.Capabilities;
 
@@ -83,7 +84,7 @@ internal sealed class CapabilityDirectReads(IClaimRepository claims, AiClientBoo
         {
             facts["program_code"] = program.Trim().ToUpperInvariant();
         }
-        return CapabilityRender.Render("client_trend", new CapabilityRead(facts, RunEvidence(series["run"], "tcc_gold")));
+        return CapabilityRender.Render("client_trend", new CapabilityRead(facts, RunEvidence(series["run"], PhysicalNames.Active.Map.GoldSchema)));
     }
 
     private async Task<CapabilityResult> ResolveAsync(JsonObject args, ApiPrincipal principal, CancellationToken cancellationToken)

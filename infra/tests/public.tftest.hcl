@@ -42,7 +42,7 @@ run "public_profile" {
   }
 
   assert {
-    condition     = output.TCC_FABRIC_CREATED == "true" && module.fabric.capacity_id != null
+    condition     = output.FABRIC_CREATED == "true" && module.fabric.capacity_id != null
     error_message = "create_fabric defaults to true for public and creates the capacity"
   }
 }
@@ -59,7 +59,7 @@ run "public_without_fabric" {
   }
 
   assert {
-    condition     = output.TCC_FABRIC_CREATED == "false" && module.fabric.capacity_id == null
+    condition     = output.FABRIC_CREATED == "false" && module.fabric.capacity_id == null
     error_message = "create_fabric = false creates no Fabric resources"
   }
 }

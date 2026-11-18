@@ -25,7 +25,7 @@ with which identity.
 
 ## 1. Profiles
 
-`TCC_PROFILE` selects a profile through `azd env set TCC_PROFILE
+`DEPLOY_PROFILE` selects a profile through `azd env set DEPLOY_PROFILE
 public|enterprise`. [`infra/main.tfvars.json`](../../infra/main.tfvars.json)
 maps it to the variable `profile`. `locals.tf` resolves the D25 matrix once,
 and every module reads those locals. If a variable is `null`, it takes the
@@ -251,7 +251,7 @@ Tags: §3.
 |---|---|
 | Resource | `azurerm_service_plan.this` (`asp-tcc-<s>`) · module [`app_service`](../../infra/modules/app_service/main.tf) |
 | Profiles | both |
-| OS / SKU | Linux · `app_service_sku`, default `P1v3` (azd: `TCC_APP_SERVICE_SKU`) |
+| OS / SKU | Linux · `app_service_sku`, default `P1v3` (azd: `APP_SERVICE_SKU`) |
 | Shared by | API app and web app |
 | Zone redundancy, worker count, autoscale | not set by Terraform (platform defaults) |
 | Diagnostics | `diag-plan`: `AllMetrics` to Log Analytics |
@@ -521,7 +521,7 @@ The schema-level T-SQL grants are never made by Terraform. See §5.
 |---|---|
 | Network | Fabric endpoints are public. Fabric private link isn't provisioned (NET-4: a customer prerequisite) |
 | Diagnostics | none |
-| Outputs | `FABRIC_WORKSPACE_ID`, `FABRIC_WORKSPACE`, `FABRIC_LAKEHOUSE`, `FABRIC_WAREHOUSE_ID`, `WAREHOUSE_SERVER`, `WAREHOUSE_DATABASE`, and `TCC_FABRIC_CREATED` (`"true"` only when this deployment created the Warehouse. That's the only case in which the destructive bootstrap may run, D22) |
+| Outputs | `FABRIC_WORKSPACE_ID`, `FABRIC_WORKSPACE`, `FABRIC_LAKEHOUSE`, `FABRIC_WAREHOUSE_ID`, `WAREHOUSE_SERVER`, `WAREHOUSE_DATABASE`, and `FABRIC_CREATED` (`"true"` only when this deployment created the Warehouse. That's the only case in which the destructive bootstrap may run, D22) |
 | Variables | `create_fabric`, `manage_fabric_access`, `fabric_capacity_sku`, `fabric_capacity_admin`, `fabric_workspace_role`, the BYO inputs above, `source_schema` |
 
 ### 4.13 Role assignments (all)
@@ -576,7 +576,7 @@ API's OpenTelemetry exporter.
 | **Fabric capacity admin** (`create_fabric = true`) | operator | `azd env set FABRIC_CAPACITY_ADMIN <UPN>`. The plan fails without it |
 | **T-SQL grants** | `scripts/grant-warehouse-sql.py` (azd postprovision and `deploy.yml`) | `GRANT SELECT, INSERT, UPDATE, DELETE ON SCHEMA::tcc_gold` and the same on `tcc_ops`, `TO [<API_IDENTITY_NAME>]`. Idempotent. With the channel enabled, a second run with `--profile gateway` grants `INSERT, SELECT ON OBJECT::tcc_ops.channel_audit TO [<GATEWAY_IDENTITY_NAME>]` and nothing else |
 | **Channel registrations and roles** (`enable_m365_channel`) | customer Entra admin / operator | Terraform creates no registration and assigns no directory role. Needed: the gateway registration (`GATEWAY_AUDIENCE`) with app role `Channel.Invoke` and delegated scope `Channel.Access`; the API's app role `TCC.Agent` assigned to the gateway identity (`GATEWAY_IDENTITY_PRINCIPAL_ID`); `Channel.Invoke` assigned to the orchestrator's agent identity; a Fabric workspace role for the gateway identity; and, only for a group-based writer source, Graph `GroupMember.Read.All`. Register `Microsoft.BotService` before the bot is published. Terraform never registers resource providers |
-| **Schema** | `scripts/apply-migrations.py` | Runs the DDL v2.0 bootstrap only when `TCC_FABRIC_CREATED = true` and the Warehouse has no `tcc_ops.schema_migration`. Otherwise it applies pending forward migrations (D22) |
+| **Schema** | `scripts/apply-migrations.py` | Runs the DDL v2.0 bootstrap only when `FABRIC_CREATED = true` and the Warehouse has no `tcc_ops.schema_migration`. Otherwise it applies pending forward migrations (D22) |
 | **Synthetic data and seed** | `scripts/postprovision.ps1` | load-synthetic (public profile only), then `seed-operational-store.ps1`. `deploy.yml` runs neither |
 | **Terraform state** | customer | Local by default. [`infra/backend.azurerm.tf.example`](../../infra/backend.azurerm.tf.example) is the remote template. `deploy.yml` requires remote state (`TF_BACKEND_*`) |
 | **GitHub OIDC** | customer | See [OIDC-SETUP](OIDC-SETUP.md) |

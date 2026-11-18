@@ -32,7 +32,7 @@ jobs:
           pip install -r requirements.txt -r requirements-test.txt
       - name: Run pytest
         # The private parity fixtures are not in the repo, so the reference
-        # gate SKIPS here; TCC_REQUIRE_PARITY=1 enforces it wherever they exist.
+        # gate SKIPS here; TEST_REQUIRE_PARITY=1 enforces it wherever they exist.
         run: pytest tests/ -q --tb=short
 
   frontend-tests:

@@ -127,7 +127,7 @@ def test_postprovision_grants_the_lakehouse_only_when_the_source_is_on_and_never
     text = (SCRIPTS / "postprovision.ps1").read_text(encoding="utf-8")
     start = text.index("--profile lakehouse")
     block = text[text.rindex("if (", 0, start):text.index("\n}\n", start)]
-    assert "$env:TCC_DATA_QUERY_SOURCE_ENABLED -eq 'true'" in block
+    assert "$env:DATA_QUERY_SOURCE_ENABLED -eq 'true'" in block
     assert "GATEWAY_IDENTITY_NAME" not in block and "--principal" not in block, "the API identity is the default principal"
     assert text.index("--profile gateway") < start, "after the schema grants the endpoint grant relies on"
     assert text.count("--profile lakehouse") == 1

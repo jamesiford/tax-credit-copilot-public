@@ -26,7 +26,7 @@ app/worker/channel Terraform modules were reference inputs only.
 
 Important findings:
 
-- Resource root is **`TCC_REPOSITORY_ROOT`**, not `TCC_RESOURCE_ROOT`.
+- Resource root is **`REPOSITORY_ROOT`**, not `RESOURCE_ROOT`.
 - Unset schema is `tcc_source`; trimmed empty is SQL **dbo**. Mapping overrides
   are not wired even though library patch support exists.
 - Lakehouse SQL server/database are independent explicit settings, with no

@@ -61,7 +61,7 @@ Supply these **runtime-only** inputs through an approved operator mechanism, nev
 
 | Input | Meaning |
 |---|---|
-| `TCC_SHADOW_APPROVED=yes` | Current session approval; does not itself admit any request |
+| `SPIKE_SHADOW_APPROVED=yes` | Current session approval; does not itself admit any request |
 | `SHADOW_CAPACITY_CHECK` | Current conductor read-only admission script path |
 | `SHADOW_PYTHON_ORIGIN`, `SHADOW_DOTNET_ORIGIN` | Reviewed existing HTTPS origins; root only, no embedded credentials/query |
 | `SHADOW_PYTHON_BEARER`, `SHADOW_DOTNET_BEARER` | Same permitted acting person/rights, host-valid audiences |

@@ -2,7 +2,7 @@
 
 WAREHOUSE_PLATFORM=azure_sql checks the server and database against the allow-list instead of resolving a Fabric
 item, uses the generated SQL Server bootstrap, and applies each migration with NOT ENFORCED removed. Approval for the
-bootstrap there is TCC_SQL_CREATED=true (or a pinned target with bootstrap_approved).
+bootstrap there is SQL_CREATED=true (or a pinned target with bootstrap_approved).
 
     python scripts/apply-migrations.py --target deployed
     python scripts/apply-migrations.py --target deployed --bootstrap      # postprovision, create_fabric only
@@ -10,7 +10,7 @@ bootstrap there is TCC_SQL_CREATED=true (or a pinned target with bootstrap_appro
 
 Without `<ops>.schema_migration` the Warehouse has never been bootstrapped, and
 this REFUSES unless `--bootstrap` is given AND the target is approved for it (a
-pinned target with bootstrap_approved, or `deployed` with TCC_FABRIC_CREATED=true).
+pinned target with bootstrap_approved, or `deployed` with FABRIC_CREATED=true).
 The bootstrap is DDL v2.0, which is destructive; it records version 0000.
 
 With the table present, `--bootstrap` is ignored (logged) — the bootstrap never
@@ -37,7 +37,9 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     common.load_env()
-    from config import GOLD_SCHEMA, OPS_SCHEMA
+    from config import OPS_SCHEMA
+    from config import DATA_MAP, names
+    from data_map_render import render
     from infrastructure.persistence.schema_admin import (
         MigrationError,
         TargetMismatch,
@@ -46,7 +48,6 @@ def main(argv: list[str] | None = None) -> int:
         bootstrap_sql,
         discover_migrations,
         pending_migrations,
-        rename_schemas,
         run_batches,
         split_batches,
     )
@@ -60,12 +61,11 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         available = discover_migrations(common.MIGRATIONS_DIR)
-        applied = applied_migrations(connection, OPS_SCHEMA)
-
+        applied = applied_migrations(connection, OPS_SCHEMA, names.migration_table)
         if applied is None:
             if not args.bootstrap:
                 print(
-                    f"REFUSED: {OPS_SCHEMA}.schema_migration does not exist, so this Warehouse has "
+                    f"REFUSED: {names.ops.schema_migration} does not exist, so this Warehouse has "
                     "never been bootstrapped. Re-run with --bootstrap on an approved target.",
                     file=sys.stderr,
                 )
@@ -73,11 +73,11 @@ def main(argv: list[str] | None = None) -> int:
             if not allowed.bootstrap_approved:
                 print(
                     f"REFUSED: target '{allowed.name}' is not approved for the destructive bootstrap "
-                    "(pinned bootstrap_approved, or deployed with TCC_FABRIC_CREATED=true / TCC_SQL_CREATED=true).",
+                    "(pinned bootstrap_approved, or deployed with FABRIC_CREATED=true / SQL_CREATED=true).",
                     file=sys.stderr,
                 )
                 return common.EXIT_FAILED
-            ddl = rename_schemas(common.translate_sql(common.bootstrap_ddl().read_text(encoding="utf-8")), gold=GOLD_SCHEMA, ops=OPS_SCHEMA)
+            ddl = render(common.translate_sql(common.bootstrap_ddl().read_text(encoding="utf-8")), DATA_MAP)
             batches = split_batches(bootstrap_sql(ddl))
             print(f"bootstrap: {len(batches)} batches from {common.bootstrap_ddl().name}")
             if args.dry_run:
@@ -89,10 +89,10 @@ def main(argv: list[str] | None = None) -> int:
             if any(r.error for r in results) or len(results) != len(batches):
                 print("bootstrap FAILED", file=sys.stderr)
                 return common.EXIT_FAILED
-            applied = applied_migrations(connection, OPS_SCHEMA) or {}
+            applied = applied_migrations(connection, OPS_SCHEMA, names.migration_table) or {}
             print(f"bootstrap applied; recorded versions: {sorted(applied)}")
         elif args.bootstrap:
-            print(f"bootstrap skipped: {OPS_SCHEMA}.schema_migration already exists (D22)")
+            print(f"bootstrap skipped: {names.ops.schema_migration} already exists (D22)")
 
         todo = pending_migrations(available, applied)
         print(f"recorded: {sorted(applied)}  available: {[m.version for m in available]}  pending: {len(todo)}")
@@ -100,7 +100,7 @@ def main(argv: list[str] | None = None) -> int:
             if args.dry_run:
                 print(f"  would apply {migration.version}_{migration.name}")
                 continue
-            apply_migration(connection, migration, OPS_SCHEMA, translate=common.translate_sql)
+            apply_migration(connection, migration, OPS_SCHEMA, translate=lambda s: render(common.translate_sql(s), DATA_MAP), table=names.migration_table)
             print(f"  applied {migration.version}_{migration.name} ({migration.sha256[:12]})")
         return common.EXIT_OK
     except MigrationError as exc:

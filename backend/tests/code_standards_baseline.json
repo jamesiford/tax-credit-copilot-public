@@ -429,7 +429,7 @@
   "module-lines|infrastructure/persistence/schema_admin.py": 462,
   "module-lines|infrastructure/persistence/sqlite_claims.py": 387,
   "module-lines|infrastructure/persistence/warehouse_claims.py": 352,
-  "module-lines|infrastructure/persistence/warehouse_gold.py": 461,
+  "module-lines|infrastructure/persistence/warehouse_gold.py": 460,
   "module-lines|tools/baseyear.py": 315,
   "module-lines|tools/build_approval_package.py": 359,
   "module-lines|tools/canonical.py": 264,

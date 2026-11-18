@@ -52,8 +52,8 @@ The demo admits the hosted runtime by opening the Foundry data plane to any addr
 (`foundry_allow_any_ip`) with a public network. Close both:
 
 ```pwsh
-azd env set TCC_FOUNDRY_PUBLIC_NETWORK_ACCESS false
-azd env set TCC_FOUNDRY_ALLOWED_IP_RANGES ""
+azd env set FOUNDRY_PUBLIC_NETWORK_ACCESS false
+azd env set FOUNDRY_ALLOWED_IP_RANGES ""
 ```
 
 and in `infra/m365-poc.auto.tfvars`:
@@ -124,8 +124,8 @@ The demo may let an Entra group, in addition to the allow-list, decide who may c
 to the allow-list only, then review who is on it:
 
 ```pwsh
-azd env set TCC_CHANNEL_WRITER_SOURCE allowlist
-azd env set TCC_CHANNEL_WRITER_GROUP_ID ""
+azd env set CHANNEL_WRITER_SOURCE allowlist
+azd env set CHANNEL_WRITER_GROUP_ID ""
 azd provision --no-prompt
 python scripts/channel-writers.py list
 python scripts/channel-writers.py remove <object-id>   # each demo operator who should not keep write access

@@ -54,7 +54,7 @@ test pass**. A change that moves them is either a real improvement that requires
 re-reconciliation, or a bug.
 
 ```pwsh
-cd backend ; $env:TCC_REQUIRE_PARITY=1 ; pytest tests/ -q
+cd backend ; $env:TEST_REQUIRE_PARITY=1 ; pytest tests/ -q
 python backend/tools/verify_reference_independent.py
 ```
 
@@ -121,11 +121,11 @@ client resolves, and every portfolio view is merely thin. `backend/.env.example`
 documents all three with their row counts.
 
 `backend/tests/test_fabric_source_selection.py` pins the distinction. Run it
-with `TCC_FABRIC_TESTS=1`; it skips cleanly otherwise.
+with `TEST_FABRIC=1`; it skips cleanly otherwise.
 
 ### Deploying
 
-`azd` over Terraform. `TCC_PROFILE` picks the profile: `public` (the default)
+`azd` over Terraform. `DEPLOY_PROFILE` picks the profile: `public` (the default)
 creates everything, including an F2 Fabric capacity, workspace, Lakehouse and
 Warehouse, and loads the synthetic dataset; `enterprise` brings its own
 network and Fabric (`infra/profiles/enterprise.tfvars.example`).
@@ -135,7 +135,7 @@ az login ; azd auth login
 azd env new <name> --no-prompt
 azd env set AZURE_LOCATION <region>
 azd env set AZURE_RESOURCE_GROUP <resource-group>
-azd env set TCC_PROFILE public
+azd env set DEPLOY_PROFILE public
 azd env set FABRIC_CAPACITY_ADMIN (az ad signed-in-user show --query userPrincipalName -o tsv)
 azd env set GIT_COMMIT (git rev-parse HEAD)   # stamps every run with the commit
 azd up --no-prompt
@@ -277,7 +277,7 @@ scripts/            postprovision, Warehouse migrations and grants, seed, packag
 ## Testing
 
 ```pwsh
-cd backend  ; $env:TCC_REQUIRE_PARITY=1 ; pytest tests/ -q
+cd backend  ; $env:TEST_REQUIRE_PARITY=1 ; pytest tests/ -q
 cd frontend ; npm test
 python backend/tools/verify_reference_independent.py
 ```
@@ -290,12 +290,12 @@ Three kinds of test carry most of the weight:
 
 - **The parity gate — private and public.** `tests/test_engine_parity_reference.py`
   pins the certified figures above, from the partner's real payroll extract
-  (`TCC_REQUIRE_PARITY=1` turns a missing fixture into a loud error rather than
+  (`TEST_REQUIRE_PARITY=1` turns a missing fixture into a loud error rather than
   a silent skip). `tests/test_engine_parity_synthetic.py` pins a second set of
   figures from the committed, synthetic `backend/data/payroll_pay_periods.csv`
   and never skips — this is the gate public CI runs, since CI has no partner
   data. Both run the same production engine. A third check,
-  `tests/test_reference_workspace_lakehouse.py` (opt-in, `TCC_FABRIC_TESTS=1`),
+  `tests/test_reference_workspace_lakehouse.py` (opt-in, `TEST_FABRIC=1`),
   reproduces the private figures again from the live lakehouse. Two
   implementations — or two sources — agreeing is worth more than one passing
   its own test.

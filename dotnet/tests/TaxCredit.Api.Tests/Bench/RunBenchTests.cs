@@ -15,24 +15,24 @@ using Xunit.Abstractions;
 namespace TaxCredit.Api.Tests.Bench;
 
 /// <summary>
-/// Opt-in stage timing of one queued client calculation end to end over a synthetic client (set <c>TCC_RUN_BENCH=1</c>;
-/// <c>TCC_BENCH_SIZES</c> overrides the 100000,400000,1000000 default). A normal test run does nothing here.
+/// Opt-in stage timing of one queued client calculation end to end over a synthetic client (set <c>BENCH_RUN=1</c>;
+/// <c>BENCH_SIZES</c> overrides the 100000,400000,1000000 default). A normal test run does nothing here.
 /// </summary>
 public sealed class RunBenchTests(ITestOutputHelper output)
 {
-    private const string Enable = "TCC_RUN_BENCH";
+    private const string Enable = "BENCH_RUN";
 
     [Fact]
     [Trait("Category", "bench")]
     public async Task One_queued_calculation_is_timed_per_stage()
     {
         if (Environment.GetEnvironmentVariable(Enable) != "1") { return; }
-        var sizes = (Environment.GetEnvironmentVariable("TCC_BENCH_SIZES") ?? "100000,400000,1000000")
+        var sizes = (Environment.GetEnvironmentVariable("BENCH_SIZES") ?? "100000,400000,1000000")
             .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
             .Select(s => long.Parse(s, CultureInfo.InvariantCulture)).ToArray();
         var directory = Path.Combine(Corpus.Root, "dotnet", "artifacts", "bench");
         Directory.CreateDirectory(directory);
-        var file = Path.Combine(directory, "bench-" + (Environment.GetEnvironmentVariable("TCC_BENCH_LABEL") ?? "run") + ".txt");
+        var file = Path.Combine(directory, "bench-" + (Environment.GetEnvironmentVariable("BENCH_LABEL") ?? "run") + ".txt");
         File.Delete(file);
         foreach (var size in sizes)
         {
@@ -66,7 +66,7 @@ public sealed class RunBenchTests(ITestOutputHelper output)
         wall.Stop();
         var item = queue.GetItem(SyntheticAnalyticsTransport.AccountId, BenchHost.ItemId)!;
         var path = host.App.Services.GetRequiredService<RuntimePaths>().Database;
-        var dumpDirectory = Environment.GetEnvironmentVariable("TCC_BENCH_DUMP");
+        var dumpDirectory = Environment.GetEnvironmentVariable("BENCH_DUMP");
         var dump = GoldDump.Hash(path, dumpDirectory is null ? null : Path.Combine(dumpDirectory, "gold-" + size.ToString(CultureInfo.InvariantCulture) + ".tsv"));
         var table = SpanTable.Render(spans.ToArray(), wall.Elapsed);
         return $"=== {transport.RowCount:N0} payroll rows | drained {drained} | item {item.Status} {item.ErrorDependency}/{item.ErrorMessage} | "

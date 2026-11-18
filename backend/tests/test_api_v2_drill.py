@@ -13,8 +13,8 @@ import pytest
 
 
 def _requires_fabric():
-    if os.getenv("TCC_FABRIC_TESTS") != "1":
-        pytest.skip("set TCC_FABRIC_TESTS=1 to run tests that reach live Fabric")
+    if os.getenv("TEST_FABRIC") != "1":
+        pytest.skip("set TEST_FABRIC=1 to run tests that reach live Fabric")
 
 
 @pytest.fixture

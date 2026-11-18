@@ -13,7 +13,7 @@ public sealed class ChannelStateRepository(PersistenceDatabase database) : IChan
         "confirmation_id", "token_sha256", "user_oid", "tool_name", "args_sha256", "idempotency_key", "created_at", "expires_at",
         "consumed_at", "outcome", "result_json",
     ];
-    private static string ConfirmationSelect => "SELECT " + string.Join(", ", ConfirmationColumns) + " FROM tcc_ops.channel_confirmation";
+    private static string ConfirmationSelect => "SELECT " + string.Join(", ", ConfirmationColumns) + " FROM {ops.channel_confirmation}";
 
     /// <inheritdoc />
     public WriterGrant Grant(WriterGrant grant)
@@ -26,9 +26,9 @@ public sealed class ChannelStateRepository(PersistenceDatabase database) : IChan
 
         return database.Transact(session =>
         {
-            session.ExecuteExempt(SqlExemption.ChannelIdentity, "UPDATE tcc_ops.channel_user SET removed_at = ? WHERE user_oid = ? AND removed_at IS NULL",
+            session.ExecuteExempt(SqlExemption.ChannelIdentity, "UPDATE {ops.channel_user} SET removed_at = ? WHERE user_oid = ? AND removed_at IS NULL",
                 OpsRow.Clock(session, grant.AddedAt), grant.UserOid);
-            session.InsertExempt(SqlExemption.ChannelIdentity, "tcc_ops.channel_user", GrantColumns,
+            session.InsertExempt(SqlExemption.ChannelIdentity, "ops.channel_user", GrantColumns,
                 [new object?[] { grant.UserOid, grant.DisplayName, grant.Role, grant.AddedBy, OpsRow.Clock(session, grant.AddedAt), null }]);
             return grant;
         });
@@ -36,7 +36,7 @@ public sealed class ChannelStateRepository(PersistenceDatabase database) : IChan
 
     /// <inheritdoc />
     public bool Revoke(string userOid, PyDateTime at) => database.Transact(session =>
-        session.ExecuteExempt(SqlExemption.ChannelIdentity, "UPDATE tcc_ops.channel_user SET removed_at = ? WHERE user_oid = ? AND removed_at IS NULL",
+        session.ExecuteExempt(SqlExemption.ChannelIdentity, "UPDATE {ops.channel_user} SET removed_at = ? WHERE user_oid = ? AND removed_at IS NULL",
             OpsRow.Clock(session, at), userOid) > 0);
 
     /// <inheritdoc />
@@ -44,7 +44,7 @@ public sealed class ChannelStateRepository(PersistenceDatabase database) : IChan
     {
         using var session = database.Open();
         return session.QueryExempt(SqlExemption.ChannelIdentity,
-            "SELECT user_oid FROM tcc_ops.channel_user WHERE user_oid = ? AND role = 'writer' AND removed_at IS NULL", userOid).Count > 0;
+            "SELECT user_oid FROM {ops.channel_user} WHERE user_oid = ? AND role = 'writer' AND removed_at IS NULL", userOid).Count > 0;
     }
 
     /// <inheritdoc />
@@ -52,7 +52,7 @@ public sealed class ChannelStateRepository(PersistenceDatabase database) : IChan
     {
         using var session = database.Open();
         return session.QueryExempt(SqlExemption.ChannelIdentity, "SELECT " + string.Join(", ", GrantColumns)
-            + " FROM tcc_ops.channel_user WHERE removed_at IS NULL ORDER BY added_at, user_oid").Select(values =>
+            + " FROM {ops.channel_user} WHERE removed_at IS NULL ORDER BY added_at, user_oid").Select(values =>
             {
                 var r = new OpsRow(values);
                 return new WriterGrant(r.Required("user_oid"), r.Text("display_name"), r.Required("role"), r.Required("added_by"),
@@ -77,13 +77,13 @@ public sealed class ChannelStateRepository(PersistenceDatabase database) : IChan
 
         return database.Transact(session =>
         {
-            if (session.QueryExempt(SqlExemption.ChannelIdentity, "SELECT confirmation_id FROM tcc_ops.channel_confirmation WHERE confirmation_id = ? OR token_sha256 = ?",
+            if (session.QueryExempt(SqlExemption.ChannelIdentity, "SELECT confirmation_id FROM {ops.channel_confirmation} WHERE confirmation_id = ? OR token_sha256 = ?",
                 confirmation.ConfirmationId, confirmation.TokenSha256).Count != 0)
             {
                 throw new InvalidOperationException("The confirmation identity or token digest is already recorded.");
             }
 
-            session.InsertExempt(SqlExemption.ChannelIdentity, "tcc_ops.channel_confirmation", ConfirmationColumns,
+            session.InsertExempt(SqlExemption.ChannelIdentity, "ops.channel_confirmation", ConfirmationColumns,
                 [new object?[] { confirmation.ConfirmationId, confirmation.TokenSha256, confirmation.UserOid, confirmation.ToolName, confirmation.ArgsSha256,
                     confirmation.IdempotencyKey, OpsRow.Clock(session, confirmation.CreatedAt), OpsRow.Clock(session, confirmation.ExpiresAt), null, null, confirmation.ResultJson }]);
             return confirmation;
@@ -109,7 +109,7 @@ public sealed class ChannelStateRepository(PersistenceDatabase database) : IChan
     /// <inheritdoc />
     public bool Consume(string confirmationId, string userOid, string argsSha256, PyDateTime at, string? idempotencyKey = null) =>
         database.Transact(session => session.ExecuteExempt(SqlExemption.ChannelIdentity,
-            "UPDATE tcc_ops.channel_confirmation SET consumed_at = ?, idempotency_key = ? WHERE confirmation_id = ? AND user_oid = ? "
+            "UPDATE {ops.channel_confirmation} SET consumed_at = ?, idempotency_key = ? WHERE confirmation_id = ? AND user_oid = ? "
             + "AND args_sha256 = ? AND consumed_at IS NULL AND expires_at > ?", OpsRow.Clock(session, at), idempotencyKey,
             confirmationId, userOid, argsSha256, OpsRow.Clock(session, at)) == 1);
 
@@ -119,7 +119,7 @@ public sealed class ChannelStateRepository(PersistenceDatabase database) : IChan
         ArgumentException.ThrowIfNullOrWhiteSpace(outcome);
         database.Transact(session =>
         {
-            var changed = session.ExecuteExempt(SqlExemption.ChannelIdentity, "UPDATE tcc_ops.channel_confirmation SET outcome = ?, result_json = ? "
+            var changed = session.ExecuteExempt(SqlExemption.ChannelIdentity, "UPDATE {ops.channel_confirmation} SET outcome = ?, result_json = ? "
                 + "WHERE confirmation_id = ? AND consumed_at IS NOT NULL AND outcome IS NULL", outcome, resultJson, confirmationId);
             if (changed == 0)
             {

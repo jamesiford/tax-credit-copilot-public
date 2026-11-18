@@ -1,7 +1,7 @@
 """Shared contract fixtures: every operational-store adapter, one suite. [DATA-2]
 
-SQLite runs always. The Warehouse runs only with `TCC_SQL_TESTS=1` (or the older
-`TCC_FABRIC_TESTS=1`), against the Fabric Warehouse or Azure SQL database named by
+SQLite runs always. The Warehouse runs only with `TEST_SQL=1` (or the older
+`TEST_FABRIC=1`), against the Fabric Warehouse or Azure SQL database named by
 WAREHOUSE_PLATFORM / WAREHOUSE_SERVER / WAREHOUSE_DATABASE, with a client_id
 range unique to this run that is deleted afterwards — so a live run never
 touches a real client's rows and never leaves its own behind.
@@ -14,9 +14,9 @@ import time
 
 import pytest
 
-#: `TCC_SQL_TESTS=1` is the platform-neutral gate: the suite runs against whatever WAREHOUSE_PLATFORM / WAREHOUSE_SERVER
-#: / WAREHOUSE_DATABASE name (the Fabric Warehouse or an Azure SQL test database). `TCC_FABRIC_TESTS=1` still works.
-LIVE = os.getenv("TCC_SQL_TESTS") == "1" or os.getenv("TCC_FABRIC_TESTS") == "1"
+#: `TEST_SQL=1` is the platform-neutral gate: the suite runs against whatever WAREHOUSE_PLATFORM / WAREHOUSE_SERVER
+#: / WAREHOUSE_DATABASE name (the Fabric Warehouse or an Azure SQL test database). `TEST_FABRIC=1` still works.
+LIVE = os.getenv("TEST_SQL") == "1" or os.getenv("TEST_FABRIC") == "1"
 
 #: Far above any real AccountId. Each run takes its own block of 1,000.
 _BASE = 900_000_000
@@ -68,7 +68,7 @@ _CLAIM_TABLES = ("program_claim", "program_engagement")
 _FINDING_TABLES = ("agent_finding_resolution",)
 
 _PARAMS = ["sqlite", pytest.param("warehouse", marks=pytest.mark.skipif(
-    not LIVE, reason="set TCC_SQL_TESTS=1 (or TCC_FABRIC_TESTS=1) to run the contract suite against the live Warehouse"))]
+    not LIVE, reason="set TEST_SQL=1 (or TEST_FABRIC=1) to run the contract suite against the live Warehouse"))]
 
 
 @pytest.fixture(params=_PARAMS)
@@ -119,7 +119,7 @@ def artifact_repo(request, tmp_path, client_ids):
     _purge_warehouse(_ARTIFACT_TABLES, client_ids.issued)
 
 
-AZURE = os.getenv("TCC_AZURE_TESTS") == "1"
+AZURE = os.getenv("TEST_AZURE") == "1"
 
 #: Per-run marker so a live run can find and delete exactly the rows it wrote in
 #: the channel tables, none of which is keyed by client_id alone.
@@ -194,7 +194,7 @@ def confirmation_repo(request, tmp_path, user_prefix):
 
 
 @pytest.fixture(params=["local", pytest.param("blob", marks=pytest.mark.skipif(
-    not AZURE, reason="set TCC_AZURE_TESTS=1 and ARTIFACT_BLOB_ACCOUNT_URL to run the store contract against Blob"))])
+    not AZURE, reason="set TEST_AZURE=1 and ARTIFACT_BLOB_ACCOUNT_URL to run the store contract against Blob"))])
 def artifact_store(request, tmp_path):
     if request.param == "local":
         from infrastructure.storage.local_store import LocalArtifactStore

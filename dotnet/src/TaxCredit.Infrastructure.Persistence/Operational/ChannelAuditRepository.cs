@@ -33,13 +33,13 @@ public sealed class ChannelAuditRepository(PersistenceDatabase database) : IChan
 
         database.Transact(session =>
         {
-            if (session.QueryExempt(SqlExemption.ChannelIdentity, "SELECT audit_id FROM tcc_ops.channel_audit WHERE audit_id = ? AND event_seq = ?",
+            if (session.QueryExempt(SqlExemption.ChannelIdentity, "SELECT audit_id FROM {ops.channel_audit} WHERE audit_id = ? AND event_seq = ?",
                 r.Required("audit_id"), r.Long("event_seq")).Count != 0)
             {
                 throw new InvalidOperationException("The channel event identity and sequence are already recorded.");
             }
 
-            Insert(session, "tcc_ops.channel_audit", EventColumns, auditEvent.Fields);
+            Insert(session, "ops.channel_audit", EventColumns, auditEvent.Fields);
             return true;
         });
     }
@@ -49,7 +49,7 @@ public sealed class ChannelAuditRepository(PersistenceDatabase database) : IChan
     {
         BoundLimit(limit);
         using var session = database.Open();
-        var sql = "SELECT " + string.Join(", ", EventColumns) + " FROM tcc_ops.channel_audit WHERE user_oid = ?";
+        var sql = "SELECT " + string.Join(", ", EventColumns) + " FROM {ops.channel_audit} WHERE user_oid = ?";
         var args = new List<object?> { userOid };
         if (since is { } begin)
         {
@@ -79,7 +79,7 @@ public sealed class ChannelAuditRepository(PersistenceDatabase database) : IChan
     {
         using var session = database.Open();
         return session.QueryExempt(SqlExemption.ChannelIdentity, "SELECT " + string.Join(", ", EventColumns)
-            + " FROM tcc_ops.channel_audit WHERE correlation_id = ? ORDER BY occurred_at, event_seq, audit_id", correlationId)
+            + " FROM {ops.channel_audit} WHERE correlation_id = ? ORDER BY occurred_at, event_seq, audit_id", correlationId)
             .Select(row => new ChannelAuditEvent(row)).ToArray();
     }
 
@@ -90,12 +90,12 @@ public sealed class ChannelAuditRepository(PersistenceDatabase database) : IChan
         database.Transact(session =>
         {
             var id = new OpsRow(action.Fields).Required("action_id");
-            if (session.QueryExempt(SqlExemption.ChannelIdentity, "SELECT action_id FROM tcc_ops.agent_action_audit WHERE action_id = ?", id).Count != 0)
+            if (session.QueryExempt(SqlExemption.ChannelIdentity, "SELECT action_id FROM {ops.agent_action_audit} WHERE action_id = ?", id).Count != 0)
             {
                 throw new InvalidOperationException("The agent action identity is already recorded.");
             }
 
-            Insert(session, "tcc_ops.agent_action_audit", ActionColumns, action.Fields);
+            Insert(session, "ops.agent_action_audit", ActionColumns, action.Fields);
             return true;
         });
     }
@@ -105,7 +105,7 @@ public sealed class ChannelAuditRepository(PersistenceDatabase database) : IChan
     {
         BoundLimit(limit);
         using var session = database.Open();
-        var sql = "SELECT " + string.Join(", ", ActionColumns) + " FROM tcc_ops.agent_action_audit"
+        var sql = "SELECT " + string.Join(", ", ActionColumns) + " FROM {ops.agent_action_audit}"
             + (agentName is null ? "" : " WHERE agent_name = ?") + " ORDER BY occurred_at DESC, action_id";
         return session.QueryExempt(SqlExemption.ChannelIdentity, session.Dialect.Page(sql, limit, 0), agentName is null ? [] : [agentName])
             .Select(row => new AgentActionAudit(row)).ToArray();

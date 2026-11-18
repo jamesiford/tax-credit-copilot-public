@@ -318,7 +318,7 @@ def probe(monkeypatch):
 
     monkeypatch.setenv("CLAIM_STORE", "warehouse")
     state = {"applied": {"0000": "x"}, "tables": {"program_claim", "program_engagement", "run_batch", "run_batch_item", "program_draft", "program_draft_document", "program_draft_event"}}
-    monkeypatch.setattr(schema_admin, "applied_migrations", lambda live, ops: state["applied"])
+    monkeypatch.setattr(schema_admin, "applied_migrations", lambda live, ops, table="schema_migration": state["applied"])
     monkeypatch.setattr(schema_admin, "table_exists", lambda live, schema, table: table in state["tables"])
     monkeypatch.setattr(OperationalStoreProbe, "_grants", lambda self, live: state.get("grants", []))
     return OperationalStoreProbe(_Conn()), state

@@ -25,7 +25,7 @@ eligible · 656 Pay Period eligible**. These are reconciled with the partner
 (30 July – 24 August 2026).
 
 ```pwsh
-cd backend ; $env:TCC_REQUIRE_PARITY=1 ; pytest tests/ -q
+cd backend ; $env:TEST_REQUIRE_PARITY=1 ; pytest tests/ -q
 python backend/tools/verify_reference_independent.py       # 17/17, exits 2 if fixtures absent
 ```
 
@@ -38,7 +38,7 @@ python backend/tools/verify_reference_independent.py       # 17/17, exits 2 if f
   `tests/test_certified_figures_contract.py` fails if they drift.
 - `verify_reference_independent.py` is **not redundant**. It was written without
   reference to the implementation and has caught two bugs the suite did not.
-- `TCC_REQUIRE_PARITY=1` turns a missing-fixture SKIP into a collection
+- `TEST_REQUIRE_PARITY=1` turns a missing-fixture SKIP into a collection
   ERROR, so the gate cannot report a false pass. Set it wherever the fixtures exist.
 
 ---
@@ -305,7 +305,7 @@ the row looks like nothing to discuss.
 
 Provision → package → deploy, then `postprovision`. `azd deploy` alone only
 pushes code. `azure.yaml` uses the **Terraform** provider over `infra/`
-(root plus `modules/`); `TCC_PROFILE` (`public` | `enterprise`) selects the
+(root plus `modules/`); `DEPLOY_PROFILE` (`public` | `enterprise`) selects the
 profile, `infra/main.tfvars.json` maps azd values into variables, and
 `infra/locals.tf` holds the profile matrix. Both services are **App Service
 (Linux)** apps on one plan, code-deployed — there is no container registry
@@ -434,7 +434,7 @@ thing already struggling. That converts the errors into successes; it does not
 make the capacity fast, and the lever for the remaining tens of seconds is the
 F2 SKU. `application/warmup.py` moves that cost to startup in a background
 thread — every step guarded, skipped unless the source is `lakehouse`, and
-`TCC_WARM_ON_START=0` opts out when you need to measure a cold request. Its third
+`WARM_ON_START=0` opts out when you need to measure a cold request. Its third
 step warms **the warehouse connection**, not an engine replay: the landing grid
 reads Gold, so warming `GetUnitTrendQuery` would have paid for a path no screen
 reads.
@@ -1438,17 +1438,17 @@ for a client whose Gold holds only TY2023. 964 rows had accumulated. Stub
 ## Tests
 
 ```pwsh
-cd backend ; $env:TCC_REQUIRE_PARITY=1 ; pytest tests/ -q
+cd backend ; $env:TEST_REQUIRE_PARITY=1 ; pytest tests/ -q
 cd frontend ; npm test ; npm run build
 ```
 
-- Live-Fabric tests are opt-in: `TCC_FABRIC_TESTS=1`. They skip cleanly so CI
+- Live-Fabric tests are opt-in: `TEST_FABRIC=1`. They skip cleanly so CI
   never needs a lakehouse. `conftest.py` copies only `FABRIC_*` out of `.env` —
   never `DATA_SOURCE`, which stays pinned to `csv` for the suite.
 - **Two parity gates, not one.** `tests/certified.py` pins the private
   reference figures (10,236/539/656) against `backend/data/payroll/`, which is
   gitignored — `test_engine_parity_reference.py` skips without it, and
-  `TCC_REQUIRE_PARITY=1` turns that skip into an error. `tests/certified_synthetic.py`
+  `TEST_REQUIRE_PARITY=1` turns that skip into an error. `tests/certified_synthetic.py`
   pins a second, smaller figure (81/51/49) against the **committed** synthetic
   `backend/data/payroll_pay_periods.csv` — `test_engine_parity_synthetic.py`
   never skips, so a clone of the public repo still proves the engine against

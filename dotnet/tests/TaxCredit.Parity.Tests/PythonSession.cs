@@ -11,7 +11,7 @@ internal sealed class PythonSession : IDisposable
 
     private PythonSession(Process process) => _process = process;
 
-    /// <summary>The oracle interpreter: <c>TCC_PYTHON</c>, verified once to be CPython 3.12; there is no default.</summary>
+    /// <summary>The oracle interpreter: <c>ORACLE_PYTHON</c>, verified once to be CPython 3.12; there is no default.</summary>
     public static string PythonExe => OracleInterpreter.Exe;
 
     public static PythonSession Start()

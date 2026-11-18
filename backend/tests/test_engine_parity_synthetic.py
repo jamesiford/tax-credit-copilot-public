@@ -4,7 +4,7 @@ PRODUCTION engine. [WL-11, D21]
 Unlike `test_engine_parity_reference.py`, this never skips: the fixture
 (`backend/data/payroll_pay_periods.csv`) is a committed, synthetic file, so a
 clone of the public repository can run it with no private extract and no
-`TCC_REQUIRE_PARITY` flag. CI runs this gate; it does not run the private one
+`TEST_REQUIRE_PARITY` flag. CI runs this gate; it does not run the private one
 (no fixtures, no flag) — see `certified_synthetic.py` for why this is a
 regression pin rather than a cross-implementation agreement.
 """

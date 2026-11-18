@@ -17,7 +17,7 @@ from infrastructure.persistence.gold_reader import (  # noqa: E402
     GoldReader,
     _stmt_unit_employees,
 )
-from infrastructure.persistence.fabric_warehouse import GOLD_SCHEMA  # noqa: E402
+from config import names  # noqa: E402
 
 from tools.reference_identity import require_reference_account_id
 CLIENT = require_reference_account_id()  # REFERENCE_ACCOUNT_ID; unset is an explained refusal
@@ -34,7 +34,7 @@ def main() -> None:
         with reader.connection.connect() as connection:
             cursor = connection.cursor()
             cursor.execute(
-                f"SELECT COUNT(DISTINCT employee_id) FROM {GOLD_SCHEMA}.employee_eligibility "
+                f"SELECT COUNT(DISTINCT employee_id) FROM {names.gold.employee_eligibility} "
                 f"WHERE client_id = ? AND tax_year = ? AND run_id = ?",
                 [CLIENT, YEAR, run_id],
             )
@@ -42,7 +42,7 @@ def main() -> None:
 
             for method in ("min_max", "pay_period"):
                 cursor.execute(
-                    f"SELECT COUNT(DISTINCT employee_id) FROM {GOLD_SCHEMA}.employee_eligibility "
+                    f"SELECT COUNT(DISTINCT employee_id) FROM {names.gold.employee_eligibility} "
                     f"WHERE client_id = ? AND tax_year = ? AND run_id = ? "
                     f"AND method = ? AND eligible = 1",
                     [CLIENT, YEAR, run_id, method],
@@ -51,7 +51,7 @@ def main() -> None:
 
             # A unit with enough people to make the point.
             cursor.execute(
-                f"SELECT TOP 1 worksite_id, COUNT(*) AS n FROM {GOLD_SCHEMA}.onezero_matrix "
+                f"SELECT TOP 1 worksite_id, COUNT(*) AS n FROM {names.gold.onezero_matrix} "
                 f"WHERE client_id = ? AND tax_year = ? AND run_id = ? AND method = 'min_max' "
                 f"GROUP BY worksite_id ORDER BY COUNT(*) DESC",
                 [CLIENT, YEAR, run_id],

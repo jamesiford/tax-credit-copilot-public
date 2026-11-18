@@ -15,8 +15,8 @@ import api.trend as trend_api
 
 
 def _requires_fabric():
-    if os.getenv("TCC_FABRIC_TESTS") != "1":
-        pytest.skip("set TCC_FABRIC_TESTS=1 to run tests that reach live Fabric")
+    if os.getenv("TEST_FABRIC") != "1":
+        pytest.skip("set TEST_FABRIC=1 to run tests that reach live Fabric")
 
 
 def test_the_fake_reader_answers_everything_the_real_one_does():

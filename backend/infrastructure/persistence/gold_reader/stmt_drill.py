@@ -1,7 +1,7 @@
 """One employee's derivation: verdicts, segments and pay periods, by record token."""
 from __future__ import annotations
 
-from infrastructure.persistence.fabric_warehouse import GOLD_SCHEMA
+from config import names
 from infrastructure.persistence.gold_reader.columns import Statement
 
 
@@ -17,7 +17,7 @@ def _stmt_drill_verdicts(client_id: int, tax_year: int, run_id: str, token: str)
         f"SELECT method, employee_id, weeks_worked, total_hours, total_wages, "
         f"  avg_weekly_hours, avg_weekly_wages, eligible, weight, days, "
         f"  first_start, last_end "
-        f"FROM {GOLD_SCHEMA}.employee_eligibility "
+        f"FROM {names.gold.employee_eligibility} "
         f"WHERE client_id = ? AND tax_year = ? AND run_id = ? AND record_token = ?",
         [client_id, tax_year, run_id, token],
     )
@@ -27,7 +27,7 @@ def _stmt_drill_segments(client_id: int, tax_year: int, run_id: str, token: str)
     months = ", ".join(f"month_{index:02d}" for index in range(1, 13))
     return (
         f"SELECT method, worksite_id, entity_fein, first_pps, last_ppe, weight, {months} "
-        f"FROM {GOLD_SCHEMA}.onezero_matrix "
+        f"FROM {names.gold.onezero_matrix} "
         f"WHERE client_id = ? AND tax_year = ? AND run_id = ? AND record_token = ? "
         f"ORDER BY method, worksite_id, first_pps",
         [client_id, tax_year, run_id, token],
@@ -38,7 +38,7 @@ def _stmt_drill_periods(client_id: int, tax_year: int, run_id: str, token: str) 
     return (
         f"SELECT worksite_id, entity_fein, job_title, pay_period_start, pay_period_end, "
         f"  pay_date, pay_frequency_code, hours, wages, pay_code, selection_decision "
-        f"FROM {GOLD_SCHEMA}.employee_period_fact "
+        f"FROM {names.gold.employee_period_fact} "
         f"WHERE client_id = ? AND tax_year = ? AND run_id = ? AND record_token = ? "
         f"ORDER BY pay_period_end",
         [client_id, tax_year, run_id, token],
@@ -49,7 +49,7 @@ def _stmt_cohort_periods(client_id: int, tax_year: int, run_id: str, tokens: lis
     marks = ", ".join("?" for _ in tokens)
     return (
         f"SELECT record_token, worksite_id, pay_period_start, pay_period_end, pay_date, hours, wages "
-        f"FROM {GOLD_SCHEMA}.employee_period_fact "
+        f"FROM {names.gold.employee_period_fact} "
         f"WHERE client_id = ? AND tax_year = ? AND run_id = ? AND record_token IN ({marks}) "
         f"ORDER BY record_token, pay_period_end",
         [client_id, tax_year, run_id, *tokens],

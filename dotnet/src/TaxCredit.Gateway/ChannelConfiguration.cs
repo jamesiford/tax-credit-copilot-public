@@ -8,7 +8,7 @@ internal static class ChannelConfiguration
     internal static void Validate(IRuntimeConfiguration settings)
     {
         _ = Rate(settings, 60);
-        var fixture = settings.Get("TCC_CONTRACT_HOOKS") == "1";
+        var fixture = settings.Get("CONTRACT_HOOKS") == "1";
         var tenant = settings.Get("TENANT_ID") ?? settings.Get("AUTH_TENANT_ID") ??
             (fixture ? "00000000-0000-0000-0000-0000000000aa" : "");
         if (!Guid.TryParseExact(tenant, "D", out _) ||

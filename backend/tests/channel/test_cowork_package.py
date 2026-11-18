@@ -135,7 +135,7 @@ def test_the_app_id_is_deterministic_and_changes_with_the_seed(tmp_path):
 def test_an_environment_value_overrides_the_file(tmp_path):
     path = tmp_path / "c.json"
     path.write_text(json.dumps(PLACEHOLDERS), encoding="utf-8")
-    loaded = load_settings(path, environ={"TCC_COWORK_GATEWAY_MCP_URL": "https://gateway.example.net/mcp"})
+    loaded = load_settings(path, environ={"COWORK_GATEWAY_MCP_URL": "https://gateway.example.net/mcp"})
     assert loaded.values["gateway_mcp_url"] == "https://gateway.example.net/mcp"
 
 

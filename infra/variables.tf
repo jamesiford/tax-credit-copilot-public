@@ -487,7 +487,7 @@ variable "foundry_public_network_access" {
 }
 
 variable "foundry_allowed_ip_ranges" {
-  description = "With foundry_public_network_access, the IPv4 CIDR ranges allowed through the account firewall (default action then Deny). A list of strings, or one comma-separated string (what azd passes from TCC_FOUNDRY_ALLOWED_IP_RANGES). Empty allows any address. A /32 is sent as a bare address; /31 is not supported."
+  description = "With foundry_public_network_access, the IPv4 CIDR ranges allowed through the account firewall (default action then Deny). A list of strings, or one comma-separated string (what azd passes from FOUNDRY_ALLOWED_IP_RANGES). Empty allows any address. A /32 is sent as a bare address; /31 is not supported."
   type        = any
   default     = []
 }

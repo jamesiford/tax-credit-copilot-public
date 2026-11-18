@@ -129,12 +129,12 @@ def test_the_vendored_shared_modules_do_not_import_config():
 
 
 def test_get_settings_rereads_the_environment_on_every_call(monkeypatch):
-    monkeypatch.delenv("TCC_TEST_SETTINGS_PROBE", raising=False)
-    assert "TCC_TEST_SETTINGS_PROBE" not in get_settings().environ
-    monkeypatch.setenv("TCC_TEST_SETTINGS_PROBE", "one")
-    assert get_settings().environ["TCC_TEST_SETTINGS_PROBE"] == "one"
-    monkeypatch.setenv("TCC_TEST_SETTINGS_PROBE", "two")
-    assert get_settings().environ["TCC_TEST_SETTINGS_PROBE"] == "two"
+    monkeypatch.delenv("TEST_SETTINGS_PROBE", raising=False)
+    assert "TEST_SETTINGS_PROBE" not in get_settings().environ
+    monkeypatch.setenv("TEST_SETTINGS_PROBE", "one")
+    assert get_settings().environ["TEST_SETTINGS_PROBE"] == "one"
+    monkeypatch.setenv("TEST_SETTINGS_PROBE", "two")
+    assert get_settings().environ["TEST_SETTINGS_PROBE"] == "two"
 
 
 def test_settings_are_a_frozen_snapshot_of_what_they_were_built_from():
@@ -177,7 +177,7 @@ def test_resolve_environ_prefers_what_it_is_handed():
 
 def test_a_bad_value_in_one_section_does_not_break_another():
     """Sections are parsed on first use, as each scattered reader parsed its own variable."""
-    settings = load_settings({"TCC_STRANDED_RUN_MINUTES": "soon", "LOG_LEVEL": "DEBUG"})
+    settings = load_settings({"STRANDED_RUN_MINUTES": "soon", "LOG_LEVEL": "DEBUG"})
     assert settings.runtime.log_level == "DEBUG"
     with pytest.raises(ValueError):
         settings.warehouse
@@ -205,7 +205,7 @@ def test_every_default_is_the_value_the_reader_used_before():
 
 def test_values_are_parsed_to_their_types():
     settings = load_settings({
-        "TCC_WARM_ON_START": " No ", "TCC_KEEPALIVE_SECONDS": "2", "DATA_SOURCE": " CSV ", "FIXTURE_ACCOUNT_ID": "42",
+        "WARM_ON_START": " No ", "KEEPALIVE_SECONDS": "2", "DATA_SOURCE": " CSV ", "FIXTURE_ACCOUNT_ID": "42",
         "WAREHOUSE_CONNECT_TIMEOUT": "7", "OUTPUTS_RETENTION_DAYS": "30", "WEBIQ_API_KEY": "", "OPERATIONAL_DB": "",
     })
     assert settings.runtime.warm_on_start is False
@@ -217,7 +217,7 @@ def test_values_are_parsed_to_their_types():
 
 
 def test_an_unparseable_keepalive_is_the_default_and_an_unparseable_number_elsewhere_raises():
-    assert load_settings({"TCC_KEEPALIVE_SECONDS": "often"}).runtime.keepalive_seconds == 30
+    assert load_settings({"KEEPALIVE_SECONDS": "often"}).runtime.keepalive_seconds == 30
     for name, section in (("FIXTURE_ACCOUNT_ID", "data_source"), ("WAREHOUSE_CONNECT_TIMEOUT", "warehouse"),
                           ("OUTPUTS_RETENTION_DAYS", "stores")):
         with pytest.raises(ValueError):

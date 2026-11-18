@@ -46,7 +46,7 @@ internal static class RuntimeCalculationRegistration
         {
             var clock = p.GetRequiredService<IClock>();
             var ids = p.GetRequiredService<IIdSource>();
-            return new ClientCalculationConfig(settings.Get("GIT_COMMIT") ?? (settings.Get("TCC_CONTRACT_HOOKS") == "1"
+            return new ClientCalculationConfig(settings.Get("GIT_COMMIT") ?? (settings.Get("CONTRACT_HOOKS") == "1"
                     ? "0000000000000000000000000000000000c0ffee" : "working-tree"),
                 AssumptionFiles.Read(Path.Combine(paths.Rules, "methodology")), GoldWriter.Section9QueryCount,
                 () => DateOnly.FromDateTime(clock.UtcNow.UtcDateTime), () => Instant(clock),

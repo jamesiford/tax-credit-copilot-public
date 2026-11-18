@@ -129,7 +129,7 @@ AppTraces
 `backend/application/warmup.py` times each startup step; the OneLake open
 alone is documented at 13–38 s against an Active capacity (the unauthenticated
 equivalent answers in under a second, so the latency is the storage path, not
-DNS or network). `TCC_WARM_ON_START=0` disables the background warm-up thread
+DNS or network). `WARM_ON_START=0` disables the background warm-up thread
 if you need to measure a genuinely cold first request instead.
 
 ## 5. Warehouse write conflicts
@@ -313,7 +313,7 @@ azd env get-values | ForEach-Object { if ($_ -match '^([^=]+)="?(.*?)"?$') { Set
 
 | Operation | Command | Notes |
 |---|---|---|
-| Redeploy code only (no infra change) | `azd deploy` (local azd environment) or dispatch `.github/workflows/deploy.yml` (`workflow_dispatch` only — there is no push trigger, D23) | `azd deploy` packages and zip-deploys both apps without re-running `terraform apply`; the postprovision hooks do not re-run. The `postdeploy` hook then runs `scripts/deploy-channel.ps1`, which deploys the channel gateway only when `TCC_ENABLE_M365_CHANNEL=true` and otherwise exits 0 (`pwsh scripts/deploy-channel.ps1 -WhatIf` shows what it would do) |
+| Redeploy code only (no infra change) | `azd deploy` (local azd environment) or dispatch `.github/workflows/deploy.yml` (`workflow_dispatch` only — there is no push trigger, D23) | `azd deploy` packages and zip-deploys both apps without re-running `terraform apply`; the postprovision hooks do not re-run. The `postdeploy` hook then runs `scripts/deploy-channel.ps1`, which deploys the channel gateway only when `M365_CHANNEL_ENABLED=true` and otherwise exits 0 (`pwsh scripts/deploy-channel.ps1 -WhatIf` shows what it would do) |
 | Full provision + deploy | `azd up --no-prompt` | Idempotent: a second `azd provision --preview` reports no changes |
 | Run pending migrations | `python scripts/apply-migrations.py --target deployed` | Never pass `--bootstrap` against a Warehouse that already has `tcc_ops.schema_migration` — bootstrap is destructive and is gated to run only once, on a Warehouse Terraform just created (D22) |
 | Re-grant Warehouse SQL | `python scripts/grant-warehouse-sql.py --target deployed` | `GRANT` is idempotent; re-run after rotating or recreating the API identity |
@@ -412,8 +412,8 @@ terraform -chdir=infra output network_posture      # or: azd env get-values | Se
 `private` is the default: the Foundry data plane has public access off, so `azd ai agent`, `scripts/publish-m365.ps1`,
 `scripts/create-model-connection.ps1` and a workstation smoke test **fail** (403 or no route) from outside the VNet. That
 is the posture working, not a fault. `demo-public-foundry` is the **demo-only** posture
-(`TCC_FOUNDRY_PUBLIC_NETWORK_ACCESS=true`): the account's public endpoint is on, Entra-only, optionally firewalled to
-`TCC_FOUNDRY_ALLOWED_IP_RANGES`. It is refused with the enterprise profile and with customer data, and the plan prints a
+(`FOUNDRY_PUBLIC_NETWORK_ACCESS=true`): the account's public endpoint is on, Entra-only, optionally firewalled to
+`FOUNDRY_ALLOWED_IP_RANGES`. It is refused with the enterprise profile and with customer data, and the plan prints a
 warning. After the demo set it back to `false` and `azd provision`; the account returns to private and nothing the demo
 created is lost. The plan for the later hardened posture, and the spike that must prove it first, are
 [HARDENING-PLAN.md](HARDENING-PLAN.md) and [HARDENING-SPIKE.md](../m365-channel/HARDENING-SPIKE.md).
@@ -615,4 +615,4 @@ infrastructure change is needed.
 | Second reviewer, author cannot approve | human | two real identities in a deployed environment |
 | Queue cost on a Warehouse | human | the scale script measures SQLite only; compare statements per item on the Warehouse's own query statistics |
 | Worker deployment, Teams and Cowork republish, export in a deployed app | human | infrastructure and publish steps (PUBLISHING.md) |
-| Browser sweeps for every page | automatable (offline) | `python frontend/tools/mock_api.py 8010`, a Vite server with `TCC_API_TARGET=http://127.0.0.1:8010` and `TCC_WEB_BASE`, then `check_a11y.py`, `check_states.py`, `check_brand.py`, `measure_ui.py`, `check_perf.py` (frontend/tools/README.md) |
+| Browser sweeps for every page | automatable (offline) | `python frontend/tools/mock_api.py 8010`, a Vite server with `API_TARGET=http://127.0.0.1:8010` and `WEB_BASE`, then `check_a11y.py`, `check_states.py`, `check_brand.py`, `measure_ui.py`, `check_perf.py` (frontend/tools/README.md) |

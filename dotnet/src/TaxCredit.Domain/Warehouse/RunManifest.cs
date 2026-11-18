@@ -12,7 +12,7 @@ public static class WarehouseVocabulary
     /// </summary>
     public static IReadOnlySet<string> RunStatuses { get; } = new HashSet<string>(["running", "success", "failed", "superseded"], StringComparer.Ordinal);
 
-    /// <summary><c>tcc_ops.run_manifest</c> column order, the DDL's (Python <c>RUN_MANIFEST_COLUMNS</c>); not the order of the dataclass fields.</summary>
+    /// <summary><c>ops.run_manifest</c> column order, the DDL's (Python <c>RUN_MANIFEST_COLUMNS</c>); not the order of the dataclass fields.</summary>
     public static IReadOnlyList<string> RunManifestColumns { get; } =
     [
         "run_id", "client_id", "entity_id", "program_code", "tax_year", "fiscal_year_begin", "fiscal_year_end", "source_snapshot_id",
@@ -20,7 +20,7 @@ public static class WarehouseVocabulary
         "code_commit", "calculation_id", "run_started_at", "run_completed_at", "run_status", "superseded_by_run_id", "triggered_by",
     ];
 
-    /// <summary><c>tcc_ops.manual_override.scope</c> values the DDL declares (Python <c>OVERRIDE_SCOPES</c>).</summary>
+    /// <summary><c>ops.manual_override.scope</c> values the DDL declares (Python <c>OVERRIDE_SCOPES</c>).</summary>
     public static IReadOnlySet<string> OverrideScopes { get; } = new HashSet<string>(["employee", "record", "unit"], StringComparer.Ordinal);
 
     /// <summary>Python <c>base_year_key</c>: the <c>target_key</c> for a location's base year, for example <c>GA_JTC:GA_GA-010</c>.</summary>
@@ -36,7 +36,7 @@ public static class WarehouseVocabulary
 }
 
 /// <summary>
-/// One calculation run, as <c>tcc_ops.run_manifest</c> stores it (Python <c>RunManifest</c>, a frozen dataclass whose
+/// One calculation run, as <c>ops.run_manifest</c> stores it (Python <c>RunManifest</c>, a frozen dataclass whose
 /// <c>__post_init__</c> validates). Field names and nullability mirror the deployed DDL column for column.
 /// </summary>
 /// <remarks>

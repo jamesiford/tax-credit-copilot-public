@@ -26,8 +26,8 @@ _YEAR = 2025
 
 
 def _requires_fabric():
-    if os.getenv("TCC_FABRIC_TESTS") != "1":
-        pytest.skip("set TCC_FABRIC_TESTS=1 to run tests that reach live Fabric")
+    if os.getenv("TEST_FABRIC") != "1":
+        pytest.skip("set TEST_FABRIC=1 to run tests that reach live Fabric")
 
 
 def _a_live_token(mediator, tax_year=2023, account_id=1001):

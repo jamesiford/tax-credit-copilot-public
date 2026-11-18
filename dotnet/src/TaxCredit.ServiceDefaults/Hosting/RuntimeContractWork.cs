@@ -22,7 +22,7 @@ public sealed class RuntimeContractWork(IServiceProvider services, RuntimeConfig
     public ValueTask Reset(string profile, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        if (settings.Get("TCC_CONTRACT_HOOKS") != "1") { throw new InvalidOperationException("Contract reset is disabled."); }
+        if (settings.Get("CONTRACT_HOOKS") != "1") { throw new InvalidOperationException("Contract reset is disabled."); }
         var seed = profile switch
         {
             "P2" => "P2",

@@ -25,7 +25,7 @@ internal sealed class AiSocketHost(WebApplication app, HttpClient client, string
         builder.Logging.ClearProviders();
         builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
         {
-            ["TCC_CONTRACT_HOOKS"] = "0",
+            ["CONTRACT_HOOKS"] = "0",
             ["AUTH_MODE"] = "none",
             ["ENVIRONMENT"] = "local",
             ["DATA_SOURCE"] = "csv",

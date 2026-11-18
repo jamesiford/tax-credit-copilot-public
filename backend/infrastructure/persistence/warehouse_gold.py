@@ -34,11 +34,10 @@ from typing import Any, Callable, Sequence
 
 from application.gold_ports import GoldWriteFailed
 from infrastructure.persistence.fabric_warehouse import (
-    GOLD_SCHEMA,
-    OPS_SCHEMA,
     STRANDED_RUN_MINUTES,
     FabricWarehouseConnection,
 )
+from config import names
 from infrastructure.persistence.tenant_sql import TenantScopedQuery, tenant_exempt
 
 logger = logging.getLogger(__name__)
@@ -169,14 +168,14 @@ class GoldWriter:
         scoped = TenantScopedQuery(client_id)
         for table in _VERSIONED_TABLES:
             sql = (
-                f"UPDATE {GOLD_SCHEMA}.{table} SET is_current = 0 "
+                f"UPDATE {names.gold(table)} SET is_current = 0 "
                 "WHERE {tenant} AND program_code = ? AND is_current = 1"
             )
             self._execute(lambda cursor, sql=sql: scoped.execute(cursor, sql, [program_code]))
 
     def _supersede_manifests(self, client_id: int, program_code: str, run_id: str) -> None:
         sql = (
-            f"UPDATE {OPS_SCHEMA}.run_manifest "
+            f"UPDATE {names.ops.run_manifest} "
             "SET run_status = 'superseded', superseded_by_run_id = ? "
             "WHERE {tenant} AND program_code = ? AND run_status = 'success' "
             "AND run_id <> ?"
@@ -195,7 +194,7 @@ class GoldWriter:
         self._drop_connection()
         try:
             scoped = self._scoped()
-            sql = f"UPDATE {OPS_SCHEMA}.run_manifest SET run_status = 'failed' " "WHERE {tenant} AND run_id = ?"
+            sql = f"UPDATE {names.ops.run_manifest} SET run_status = 'failed' " "WHERE {tenant} AND run_id = ?"
             self._execute(lambda cursor: scoped.execute(cursor, sql, [run_id]))
         except Exception:
             logger.exception(
@@ -207,7 +206,7 @@ class GoldWriter:
         """Stamp the run finished. Until this lands the run reads as in flight."""
         scoped = self._scoped()
         sql = (
-            f"UPDATE {OPS_SCHEMA}.run_manifest "
+            f"UPDATE {names.ops.run_manifest} "
             "SET run_status = 'success', run_completed_at = ? WHERE {tenant} AND run_id = ?"
         )
         self._execute(lambda cursor: scoped.execute(cursor, sql, [completed_at, run_id]))
@@ -230,7 +229,7 @@ class GoldWriter:
         minutes = STRANDED_RUN_MINUTES if older_than_minutes is None else older_than_minutes
         # SYSUTCDATETIME because run_started_at is written as naive UTC.
         sql = (
-            f"UPDATE {OPS_SCHEMA}.run_manifest "
+            f"UPDATE {names.ops.run_manifest} "
             f"SET run_status = 'failed' "
             f"WHERE run_status = 'running' AND run_completed_at IS NULL "
             f"AND run_started_at < DATEADD(minute, ?, SYSUTCDATETIME())"
@@ -282,7 +281,7 @@ class GoldWriter:
         counts: dict[str, int] = {}
         try:
             counts["run_manifest"] = self._insert(
-                f"{OPS_SCHEMA}.run_manifest",
+                f"{names.ops.run_manifest}",
                 payload["run_manifest_columns"], [payload["run_manifest_row"]],
             )
 
@@ -293,7 +292,7 @@ class GoldWriter:
                 ("unit_month_summary", gp.UNIT_MONTH_SUMMARY_COLUMNS, payload["unit_month_summary"]),
                 ("run_method_summary", gp.RUN_METHOD_SUMMARY_COLUMNS, payload["run_method_summary"]),
             ):
-                counts[table] = self._insert(f"{GOLD_SCHEMA}.{table}", columns, rows)
+                counts[table] = self._insert(f"{names.gold(table)}", columns, rows)
                 logger.info("run %s wrote %s rows to %s", run_id, counts[table], table)
 
             # The versioned pair: retire the old, then insert the new.
@@ -303,7 +302,7 @@ class GoldWriter:
                 ("unit_year_master", gp.UNIT_YEAR_MASTER_COLUMNS, payload["unit_year_master"]),
                 ("unit_credit_installment", gp.UNIT_CREDIT_INSTALLMENT_COLUMNS, payload["unit_credit_installment"]),
             ):
-                counts[table] = self._insert(f"{GOLD_SCHEMA}.{table}", columns, rows)
+                counts[table] = self._insert(f"{names.gold(table)}", columns, rows)
                 logger.info("run %s wrote %s rows to %s", run_id, counts[table], table)
 
             self._supersede_manifests(client_id, program_code, run_id)
@@ -353,35 +352,35 @@ class GoldWriter:
 SECTION_9_QUERIES: tuple[tuple[str, str], ...] = (
     ("9.1 one live claim per cell", f"""
         SELECT client_id, program_code, tax_year, COUNT(*) AS live_rows
-        FROM {OPS_SCHEMA}.program_claim WHERE effective_to IS NULL
+        FROM {names.ops.program_claim} WHERE effective_to IS NULL
         GROUP BY client_id, program_code, tax_year HAVING COUNT(*) > 1
     """),
     ("9.2 one live engagement per client-program", f"""
         SELECT client_id, program_code, COUNT(*) AS live_rows
-        FROM {OPS_SCHEMA}.program_engagement WHERE effective_to IS NULL
+        FROM {names.ops.program_engagement} WHERE effective_to IS NULL
         GROUP BY client_id, program_code HAVING COUNT(*) > 1
     """),
     ("9.3 one live resolution per finding", f"""
         SELECT client_id, finding_id, COUNT(*) AS live_rows
-        FROM {OPS_SCHEMA}.agent_finding_resolution WHERE superseded_at IS NULL
+        FROM {names.ops.agent_finding_resolution} WHERE superseded_at IS NULL
         GROUP BY client_id, finding_id HAVING COUNT(*) > 1
     """),
     ("9.4 one current row per unit-year-method", f"""
         SELECT client_id, worksite_id, program_code, method, tax_year, COUNT(*) AS current_rows
-        FROM {GOLD_SCHEMA}.unit_year_master WHERE is_current = 1
+        FROM {names.gold.unit_year_master} WHERE is_current = 1
         GROUP BY client_id, worksite_id, program_code, method, tax_year HAVING COUNT(*) > 1
     """),
     ("9.4b one current installment per window-year", f"""
         SELECT client_id, worksite_id, program_code, method, creation_year, tax_year,
                COUNT(*) AS current_rows
-        FROM {GOLD_SCHEMA}.unit_credit_installment WHERE is_current = 1
+        FROM {names.gold.unit_credit_installment} WHERE is_current = 1
         GROUP BY client_id, worksite_id, program_code, method, creation_year, tax_year
         HAVING COUNT(*) > 1
     """),
     ("9.4c installment arithmetic holds", f"""
         SELECT client_id, worksite_id, creation_year, tax_year,
                tranche_jobs, jobs_maintained, per_job_usd, claimable_usd
-        FROM {GOLD_SCHEMA}.unit_credit_installment
+        FROM {names.gold.unit_credit_installment}
         WHERE is_current = 1
           AND (   tax_year < creation_year
                OR jobs_maintained > tranche_jobs
@@ -390,72 +389,72 @@ SECTION_9_QUERIES: tuple[tuple[str, str], ...] = (
     ("9.4d annual credit equals jobs x rate", f"""
         SELECT client_id, worksite_id, tax_year, method,
                eligible_jobs, per_job_usd, annual_credit_usd
-        FROM {GOLD_SCHEMA}.unit_year_master
+        FROM {names.gold.unit_year_master}
         WHERE is_current = 1 AND eligible_jobs IS NOT NULL AND per_job_usd IS NOT NULL
           AND ABS(annual_credit_usd - ROUND(eligible_jobs * per_job_usd, 0)) > 0.51
     """),
     ("9.4e new jobs within net-new", f"""
         SELECT client_id, worksite_id, tax_year, method,
                net_new_vs_base, new_jobs_created, high_water_mark
-        FROM {GOLD_SCHEMA}.unit_year_master
+        FROM {names.gold.unit_year_master}
         WHERE is_current = 1 AND new_jobs_created > net_new_vs_base + 0.01
     """),
     ("9.5 declined claims carry a reason", f"""
         SELECT claim_id, client_id, program_code, tax_year
-        FROM {OPS_SCHEMA}.program_claim
+        FROM {names.ops.program_claim}
         WHERE status = 'declined'
           AND (decline_reason IS NULL OR LTRIM(RTRIM(decline_reason)) = '')
     """),
     ("9.6a program_claim.status in domain", f"""
-        SELECT DISTINCT status FROM {OPS_SCHEMA}.program_claim
+        SELECT DISTINCT status FROM {names.ops.program_claim}
         WHERE status NOT IN ('not_assessed','assessed','proposed','declined',
                              'claimed','certified','amended')
     """),
     ("9.6b program_claim.provenance in domain", f"""
-        SELECT DISTINCT provenance FROM {OPS_SCHEMA}.program_claim
+        SELECT DISTINCT provenance FROM {names.ops.program_claim}
         WHERE provenance NOT IN ('computed','filed_by_us','client_asserted',
                                  'inherited','authority_confirmed')
     """),
     ("9.6c program_engagement.scope in domain", f"""
-        SELECT DISTINCT scope FROM {OPS_SCHEMA}.program_engagement
+        SELECT DISTINCT scope FROM {names.ops.program_engagement}
         WHERE scope NOT IN ('in_scope','out_of_scope','prospective')
     """),
     ("9.6d finding resolution in domain", f"""
-        SELECT DISTINCT resolution FROM {OPS_SCHEMA}.agent_finding_resolution
+        SELECT DISTINCT resolution FROM {names.ops.agent_finding_resolution}
         WHERE resolution NOT IN ('accept','assign','drop','flag')
     """),
     ("9.6e eligibility method in domain", f"""
-        SELECT DISTINCT method FROM {GOLD_SCHEMA}.employee_eligibility
+        SELECT DISTINCT method FROM {names.gold.employee_eligibility}
         WHERE method NOT IN ('min_max','pay_period')
     """),
     ("9.6f unit_year_master.status in domain", f"""
-        SELECT DISTINCT status FROM {GOLD_SCHEMA}.unit_year_master
+        SELECT DISTINCT status FROM {names.gold.unit_year_master}
         WHERE status NOT IN ('base','above_minimum','below_minimum','partial','no_data',
                              'before_base','in_progress')
     """),
     ("9.6g threshold_source in domain", f"""
-        SELECT DISTINCT threshold_source FROM {GOLD_SCHEMA}.unit_year_master
+        SELECT DISTINCT threshold_source FROM {names.gold.unit_year_master}
         WHERE threshold_source IS NOT NULL
           AND threshold_source NOT IN ('designation','rule_pack')
     """),
     ("9.6h tier_source in domain", f"""
-        SELECT DISTINCT tier_source FROM {GOLD_SCHEMA}.unit_year_master
+        SELECT DISTINCT tier_source FROM {names.gold.unit_year_master}
         WHERE tier_source IS NOT NULL AND tier_source NOT IN ('prototype','unassigned')
     """),
     ("9.7 no orphaned run references", f"""
         SELECT DISTINCT g.run_id
-        FROM {GOLD_SCHEMA}.unit_month_summary g
-        LEFT JOIN {OPS_SCHEMA}.run_manifest r ON r.run_id = g.run_id
+        FROM {names.gold.unit_month_summary} g
+        LEFT JOIN {names.ops.run_manifest} r ON r.run_id = g.run_id
         WHERE r.run_id IS NULL
     """),
     ("9.8 average headcount is total / 12", f"""
         SELECT client_id, tax_year, method, worksite_id, total, average_headcount
-        FROM {GOLD_SCHEMA}.unit_month_summary
+        FROM {names.gold.unit_month_summary}
         WHERE ABS(average_headcount - (total / 12.0)) > 0.01
     """),
     ("9.9 no model wrote a figure", f"""
         SELECT action_id, agent_name, occurred_at
-        FROM {OPS_SCHEMA}.agent_action_audit
+        FROM {names.ops.agent_action_audit}
         WHERE is_deterministic_path = 0 AND run_id IS NOT NULL
     """),
 )

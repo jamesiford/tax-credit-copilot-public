@@ -47,7 +47,7 @@ function Get-DelegatedToken([string]$Audience) {
 Import-AzdEnvironment
 if (-not $UserOid) { $UserOid = az ad signed-in-user show --query id -o tsv }
 if (-not $GatewayBaseUrl) { $GatewayBaseUrl = $env:CHANNEL_BASE_URL }
-if (-not $GatewayAudience) { $GatewayAudience = $env:TCC_CHANNEL_GATEWAY_AUDIENCE }
+if (-not $GatewayAudience) { $GatewayAudience = $env:CHANNEL_GATEWAY_AUDIENCE }
 foreach ($required in 'WAREHOUSE_SERVER', 'WAREHOUSE_DATABASE') {
     if (-not [Environment]::GetEnvironmentVariable($required)) { throw "$required is not set; run from the repo with the azd environment selected." }
 }

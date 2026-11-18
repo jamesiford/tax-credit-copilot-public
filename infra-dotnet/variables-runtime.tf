@@ -51,6 +51,16 @@ variable "git_commit" {
   }
 }
 
+variable "data_map_file" {
+  description = "Optional path to a complete data map (docs/DATA-MAP.md) that renames the databases, schemas, tables and Lakehouse columns the application uses. Empty keeps the embedded shipped map and emits no DATA_MAP_FILE setting."
+  type        = string
+  default     = ""
+  validation {
+    condition     = var.data_map_file == "" || can(regex("^/[A-Za-z0-9_./-]+\\.json$", var.data_map_file))
+    error_message = "data_map_file must be empty or an absolute Linux path to a .json file."
+  }
+}
+
 variable "resource_root" {
   description = "RuntimePaths product resource root packaged by deployment staging; exact case-sensitive Linux path."
   type        = string

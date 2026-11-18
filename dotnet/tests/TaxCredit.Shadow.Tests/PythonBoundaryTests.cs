@@ -17,7 +17,7 @@ public sealed class PythonBoundaryTests
         Assert.NotNull(root);
         var start = new ProcessStartInfo
         {
-            FileName = Environment.GetEnvironmentVariable("TCC_PYTHON") ?? @"C:\Projects\py312-oracle\.venv\Scripts\python.exe",
+            FileName = Environment.GetEnvironmentVariable("ORACLE_PYTHON") ?? @"C:\Projects\py312-oracle\.venv\Scripts\python.exe",
             WorkingDirectory = Path.Combine(root.FullName, "dotnet"),
             RedirectStandardOutput = true,
             RedirectStandardError = true,

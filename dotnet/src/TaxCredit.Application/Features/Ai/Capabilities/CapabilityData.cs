@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using TaxCredit.Application.Ports.Auth;
 using TaxCredit.Application.Ports.Persistence;
+using TaxCredit.Domain.DataMap;
 using static TaxCredit.Application.Features.Ai.Capabilities.CapabilityResult;
 
 namespace TaxCredit.Application.Features.Ai.Capabilities;
@@ -189,5 +190,5 @@ internal sealed partial class CapabilityData(IGoldDataQueryPort query, IGoldRead
     private static CapabilityException ColumnRefusal(string code, string message) =>
         new(422, code, message, extra: new JsonObject { ["field"] = "column" });
 
-    private static string Source(string dataset) => $"Source: warehouse {(dataset == "run_manifest" ? "tcc_ops" : "tcc_gold")}.{dataset}";
+    private static string Source(string dataset) => $"Source: warehouse {(dataset == "run_manifest" ? PhysicalNames.Active.Map.OpsSchema : PhysicalNames.Active.Map.GoldSchema)}.{dataset}";
 }
