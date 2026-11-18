@@ -29,6 +29,32 @@ public sealed class ScopedPayrollMemoTests
         Assert.Equal(2, source.Reads);
     }
 
+    [Fact]
+    public void Rows_remembered_outside_a_fresh_scope_are_not_served_inside_one_but_rows_read_inside_are_reused()
+    {
+        var source = new CountingSource();
+        var memo = new ScopedPayrollMemo(source, new TaxCredit.Application.Ports.Sources.NoPayrollFreshness());
+        memo.LoadPayPeriods(1);
+        using (memo.RequireFresh())
+        {
+            memo.LoadPayPeriods(1);
+            memo.LoadPayPeriods(1);
+            Assert.Equal(2, source.Reads);
+        }
+        memo.LoadPayPeriods(1);
+        Assert.Equal(2, source.Reads);
+    }
+
+    [Fact]
+    public void Without_a_source_freshness_scope_the_memo_behaves_exactly_as_before()
+    {
+        var source = new CountingSource();
+        var memo = new ScopedPayrollMemo(source);
+        memo.LoadPayPeriods(1);
+        using (memo.RequireFresh()) { memo.LoadPayPeriods(1); }
+        Assert.Equal(1, source.Reads);
+    }
+
     private sealed class CountingSource : IPayrollSource
     {
         internal int Reads { get; private set; }

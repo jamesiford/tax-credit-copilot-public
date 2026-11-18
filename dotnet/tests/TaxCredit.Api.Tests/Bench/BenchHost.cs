@@ -14,7 +14,7 @@ internal static class BenchHost
 {
     internal const string ItemId = "bench-item";
 
-    internal static async Task<TestHost> Start(SyntheticAnalyticsTransport transport)
+    internal static async Task<TestHost> Start(SyntheticAnalyticsTransport transport, bool cache = false)
     {
         var host = await TestHost.Start(hooks: false,
             services: services =>
@@ -26,6 +26,7 @@ internal static class BenchHost
             configuration: new Dictionary<string, string?>
             {
                 ["DATA_SOURCE"] = "lakehouse",
+                ["SOURCE_CACHE_MODE"] = cache ? "on" : "off",
                 ["DATA_CLASSIFICATION"] = "synthetic",
                 ["PAY_CODE_POLICY"] = "assume",
                 ["FISCAL_RULES_POLICY"] = "assume",

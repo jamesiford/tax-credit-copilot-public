@@ -21,7 +21,8 @@ public static class Extensions
         ArgumentNullException.ThrowIfNull(builder);
         builder.Services.AddHealthChecks().AddCheck("self", () => HealthCheckResult.Healthy(), ["live"]);
         builder.Services.AddOpenTelemetry()
-            .WithMetrics(m => m.AddAspNetCoreInstrumentation().AddHttpClientInstrumentation().AddRuntimeInstrumentation())
+            .WithMetrics(m => m.AddAspNetCoreInstrumentation().AddHttpClientInstrumentation().AddRuntimeInstrumentation()
+                .AddMeter(TaxCredit.Infrastructure.Sources.Cache.ProjectionCacheMetrics.MeterName))
             .WithTracing(t => t.AddAspNetCoreInstrumentation().AddHttpClientInstrumentation().AddSource(TaxCredit.Application.Hosting.RunSpans.SourceName));
         builder.Services.ConfigureHttpClientDefaults(http => http.AddStandardResilienceHandler());
         return builder;

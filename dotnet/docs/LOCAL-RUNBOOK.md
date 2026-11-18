@@ -59,6 +59,10 @@ You normally set none by hand. `backend\.env` is the single input; `dotnet\local
 | `SOURCE_MAX_ACCOUNT_ROWS` | 1000000 | Most payroll rows one client may have; a bigger client is refused with a 422 naming this setting. Whole number, minimum 1000; anything else stops the host at startup. Memory is about 3.5 KB per row at peak (see `docs/SCALE-S2-REPORT.md`), so 1,000,000 rows needs about 3.5 GB. |
 | `SOURCE_PORTFOLIO_MAX_ACCOUNTS` | 25 | Most clients a portfolio-wide payroll load (entity portfolio simulation) will read; a bigger book is refused before any payroll is read. Whole number, minimum 1. |
 | `SOURCE_PORTFOLIO_MAX_ROWS` | 5000000 | Running payroll-row total a portfolio-wide load may not pass; checked per client from the SQL scope aggregate before that client's payroll is read. Whole number, minimum 1000. |
+| `SOURCE_CACHE_MODE` | `off` | `off` or `on`. `on` keeps each client's projected payroll in memory between requests (stage S3, `docs/SCALE-S3-REPORT.md`). **An operator decision with a stated staleness window; read section 7 first.** `off` is exactly the previous behaviour: no cache, no extra query. Anything else stops the host at startup. |
+| `SOURCE_CACHE_MB` | 512 | Estimated memory the cache may hold (an estimate of the row dictionaries, not a measurement). Whole number, minimum 16. Least recently used clients are dropped to fit. |
+| `SOURCE_CACHE_ACCOUNTS` | 64 | Most clients the cache may hold. Whole number, minimum 1. |
+| `SOURCE_VERSION_CHECK_SECONDS` | 300 | How long a matching source marker is trusted. Inside it a page read asks the source nothing; after it the next read takes the cheap marker again and reloads only if it changed. This is the **staleness window** for page reads. Whole number, minimum 1. Calculation runs ignore it. |
 | `RUN_BATCH_MAX_ITEMS` | 5000 | Largest batch a request may queue. |
 | `RUN_BATCH_CONFIRM_ABOVE` | 25 | A batch larger than this needs the typed confirmation count. |
 | `RUN_STALE_WORKER_SECONDS` | 60 | After this long with queued work and no live Worker lease, the Runs page shows "queued runs in this batch are not progressing". |
@@ -189,13 +193,37 @@ What is **not** in place, and matters at scale:
 |---|---|---|
 | Portfolio footprint: a refused, timed-out or switched-off read leaves the map and state filters empty (portfolio) or refuses the batch that needs it (planner). `auto` estimates rows from the SQL catalogue only; there is no Delta-log estimate, and no pre-aggregated summary yet. | Where clients operate is unknown above `PORTFOLIO_FOOTPRINT_MAX_ROWS` unless the mode is `on`. | Same settings, plus a Delta-log estimate and a one-hour decision cache |
 | Per-client row cap is a setting (`SOURCE_MAX_ACCOUNT_ROWS`, default 1,000,000) but the default is deliberately not Python's 50M: at about 3.5 KB of peak memory per row a 50M-row client would need about 170 GB in one process (`docs/SCALE-S2-REPORT.md`). | A client over the cap is refused with a 422 whose remedy names the setting and the limit. Candle Bottle is 384k (about 1.4 GB). | `SOURCE_MAX_ACCOUNT_ROWS`, default 50M |
-| No per-account dataset cache or version check; every run re-reads the client. | Repeat runs for one client pay the full read each time. | `SOURCE_CACHE_*`, `SOURCE_VERSION_CHECK_SECONDS` |
+| Per-client dataset cache is **opt-in** (`SOURCE_CACHE_MODE=on`, default `off`; stage S3, `docs/SCALE-S3-REPORT.md`). With it off every read re-reads the client. | Repeat reads and runs for one client pay the full read each time unless an operator turns the cache on. | `SOURCE_CACHE_*`, `SOURCE_VERSION_CHECK_SECONDS` (on by default) |
 | No Silver (account-partitioned) table path. | The `account_id` filter only prunes well if the Payroll table is partitioned or clustered by `account_id`. | `SOURCE_SILVER` |
 | `LoadPortfolioPayPeriods` (entity portfolio simulation) still holds every account's projected rows at once, but is now bounded: it refuses before reading when the book has more than `SOURCE_PORTFOLIO_MAX_ACCOUNTS` (25) clients or the running row total passes `SOURCE_PORTFOLIO_MAX_ROWS` (5,000,000). | A larger book gets a 422 `portfolio_too_large` telling the caller to select fewer clients. The default row bound is still about 13 GB of projected rows, so lower it on a smaller host. | n/a |
 
 Recommended next steps, in order: (1) serve the footprint from a small pre-aggregated summary table; (2) cut the per-row projection cost
 (the engine's dictionary row is 2.6 KB of the 3.5 KB, `docs/SCALE-S2-REPORT.md`); (3) partition or cluster the Payroll Delta table by `account_id`;
-(4) cache per-client datasets with a version check.
+(4) decide whether to turn the per-client cache on (below).
+
+### The per-client projection cache (`SOURCE_CACHE_MODE`, off by default)
+
+Payroll rows are deliberately **not** cached unless an operator turns this on. With `SOURCE_CACHE_MODE=on` one process-wide, bounded LRU
+(`SOURCE_CACHE_MB` estimated bytes **and** `SOURCE_CACHE_ACCOUNTS` clients) holds each client's finished projection, so the runs, scope,
+eligibility and trend reads of one client share one read of the lakehouse. Concurrent requests for one client run one read.
+
+- **Inside `SOURCE_VERSION_CHECK_SECONDS`** a page read asks the source nothing. **After it** the next read takes a cheap marker (the
+  fingerprint: payroll row count, maximum `modify_date`, the Payroll column mapping, plus a digest of the active pay-code lookups) and keeps
+  the entry only if it still matches.
+- **A calculation run, a queued run step and a claim assessment always take a fresh marker** and ignore the window, so the manifest's source
+  observation (taken uncached at write time) stays truthful and a run never trusts the clock.
+- A failed read, a client over `SOURCE_MAX_ACCOUNT_ROWS` and an unknown client are never cached. `SqlClientSource.ClearCache()` empties it.
+  Restarting the host empties it. Nothing is written to disk.
+- Hits, misses, evictions, reloads, entries and estimated bytes are on the OpenTelemetry meter `TaxCredit.SourceCache`
+  (`tcc.source_cache.*`). No client id is a label.
+
+**Staleness statement.** A page read can be up to `SOURCE_VERSION_CHECK_SECONDS` behind the source. After that, a change is detected **only**
+if it changes the Payroll row count, the maximum `modify_date` (and where `modify_date` is entirely null, only the count can detect a change),
+the Payroll column mapping or the active pay-code lookups. **Not detected, until a restart or `ClearCache()`:** an update that keeps both the
+count and the maximum modified date; any change to the dimension tables (Entity, Location, Address, StateCountyZip, PayCode, Employment, fiscal
+rules, pay frequency), which the marker does not look at; SQL endpoint synchronization lag; and the gap between the marker and the rows being
+two separate observations. A run carries the same undetected classes; it only refuses to be served from the clock. Turn the cache on only
+where those are acceptable for the data, and keep the window short for a source that is edited in place.
 
 ## 8. Troubleshooting
 
