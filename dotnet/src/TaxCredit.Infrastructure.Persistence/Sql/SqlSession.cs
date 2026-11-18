@@ -150,6 +150,11 @@ public sealed class SqlSession : IDisposable
         }
 
         var name = Dialect.Name(table);
+        if (Dialect is SqliteDialect)
+        {
+            return InsertPrepared(name, table, columns, rows);
+        }
+
         var size = Math.Min(500, 2090 / columns.Count);
         var count = 0;
         for (var start = 0; start < rows.Count; start += size)
@@ -173,6 +178,59 @@ public sealed class SqlSession : IDisposable
             }
 
             count += Run(new BoundStatement(sql, batch.SelectMany(r => r).ToArray()));
+        }
+
+        return count;
+    }
+
+    // Microsoft.Data.Sqlite resolves a named parameter by a linear scan of the collection, so one statement carrying thousands of
+    // parameters costs quadratic time (about 20 ms for 2,090). A single-row statement is prepared once and re-bound per row instead:
+    // same rows, same order, same transaction.
+    private int InsertPrepared(string name, string table, IReadOnlyList<string> columns, IReadOnlyList<IReadOnlyList<object?>> rows)
+    {
+        if (rows.Any(r => r.Count != columns.Count))
+        {
+            throw new TenantScopeViolation("Insert column/value count mismatch.");
+        }
+
+        if (rows.Count == 0)
+        {
+            return 0;
+        }
+
+        var sql = "INSERT INTO " + name + " (" + string.Join(",", columns) + ") VALUES ("
+            + string.Join(",", columns.Select((_, i) => "@p" + i.ToString(CultureInfo.InvariantCulture))) + ")";
+        using var statement = RunSpans.Start("sql.insert-batch");
+        if (statement is not null)
+        {
+            statement.SetTag("table", table);
+            statement.SetTag("rows", rows.Count);
+            statement.SetTag("bytes", sql.Length);
+            statement.SetTag("parameters", columns.Count);
+        }
+
+        using var command = _connection.CreateCommand();
+        command.CommandText = sql;
+        command.Transaction = _transaction;
+        command.CommandTimeout = 600;
+        var parameters = new DbParameter[columns.Count];
+        for (var i = 0; i < parameters.Length; i++)
+        {
+            parameters[i] = command.CreateParameter();
+            parameters[i].ParameterName = "@p" + i.ToString(CultureInfo.InvariantCulture);
+            command.Parameters.Add(parameters[i]);
+        }
+
+        var count = 0;
+        foreach (var row in rows)
+        {
+            for (var i = 0; i < parameters.Length; i++)
+            {
+                parameters[i].ResetDbType();
+                SqlValues.Bind(parameters[i], row[i], true);
+            }
+
+            count += command.ExecuteNonQuery();
         }
 
         return count;

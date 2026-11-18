@@ -119,9 +119,23 @@ Steps for a batch:
 3. Watch **Runs**: items go `queued` > `running` > `succeeded` / `skipped` / `failed`. Failures show their cause and can be retried.
 4. Results appear on the portfolio and on the client's pages.
 
-Measured on 2026-11-17: one client, 384,433 payroll rows, program GA_JTC, tax year 2024, live lakehouse: **3 min 35 s** end to end
-(about 28 s before the calculation starts, 79 s calculating, and about 108 s after it that was not profiled). Plan on minutes per client, not seconds.
+Measured live on 2026-11-17 (before the S4 changes): one client, 384,433 payroll rows, program GA_JTC, tax year 2024, live lakehouse: **3 min 35 s** end to end
+(about 28 s before the calculation starts, 79 s calculating, and about 108 s after it). The S4 profile (`RUN-PROFILE.md`) explains the last 108 s: SQLite
+inserts of the Gold rows plus a fourth read of the payroll. Two fixes followed: inserts re-bind one prepared statement, and a calculation reads the
+payroll once instead of four times.
 
+Measured offline (`.\dotnet\bench-run.ps1`: synthetic client, fake source transport, real worker, SQLite; a shared 12-core workstation, so +/- 2x noise).
+Live source latency is not in these numbers.
+
+| Payroll rows | Before | After | Peak memory before / after | Stored Gold rows |
+|---:|---:|---:|---:|---|
+| 100,000 | 52 s (median of 3) | 19 s (median of 3) | 1.5 GB / 0.7 GB | hash-identical |
+| 400,000 | 272 s | 94 s | 6.9 GB / 2.8 GB | hash-identical |
+| 1,000,000 | 1,337 s | 534 s | 14.1 GB / 6.1 GB | hash-identical |
+
+What remains is mostly the Domain run (engine, gold projection and unit replay: 66 s at 400,000 rows, several minutes at 1,000,000) and memory. Two things to know
+above about 500,000 rows: the worker lease is 600 s (`RunExecutionOptions`), and the whole payroll is held in memory (about 7 KB per row after the fix). Plan on
+minutes per client, not seconds.
 From the command line (no UI): `POST /api/v2/clients/{id}/runs` with `{"year": 2024, "state": "GA"}` (synchronous), or queue with the Run dialog and drain with `.\dotnet\run-worker.ps1 -Once`.
 
 ## 6. Agents

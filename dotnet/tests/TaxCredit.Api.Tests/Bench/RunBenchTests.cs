@@ -58,35 +58,13 @@ public sealed class RunBenchTests(ITestOutputHelper output)
         };
         ActivitySource.AddActivityListener(listener);
 
-        await using var host = await TestHost.Start(hooks: false,
-            services: services => services.AddSingleton<IAnalyticsTransport>(transport),
-            configuration: new Dictionary<string, string?>
-            {
-                ["DATA_SOURCE"] = "lakehouse",
-                ["DATA_CLASSIFICATION"] = "synthetic",
-                ["PAY_CODE_POLICY"] = "assume",
-                ["FISCAL_RULES_POLICY"] = "assume",
-            });
+        await using var host = await BenchHost.Start(transport);
         var queue = host.App.Services.GetRequiredService<IRunBatchRepository>();
-        var clock = host.App.Services.GetRequiredService<IClock>();
-        queue.Create(new RunBatch
-        {
-            BatchId = "bench",
-            Kind = BatchKind.Calculate,
-            ScopeKind = ScopeKind.One,
-            ScopeSpec = new PyDict().Add("client_ids", new List<object?> { SyntheticAnalyticsTransport.AccountId }),
-            TaxYears = [2024],
-            ProgramCode = "GA_JTC",
-            Force = true,
-            RequestedBy = "bench",
-            RequestedAt = PyDateTime.FromIsoFormat(clock.UtcNow.ToString("yyyy-MM-dd'T'HH:mm:ss.ffffffzzz", CultureInfo.InvariantCulture)),
-        }, [new RunBatchItem { ItemId = "bench-item", BatchId = "bench", ClientId = SyntheticAnalyticsTransport.AccountId, Seq = 0, TaxYear = 2024, ProgramCode = "GA_JTC" }]);
-
         var executor = host.App.Services.GetRequiredService<RunWorkExecutor>();
         var wall = Stopwatch.StartNew();
         var drained = await executor.Drain(CancellationToken.None);
         wall.Stop();
-        var item = queue.GetItem(SyntheticAnalyticsTransport.AccountId, "bench-item")!;
+        var item = queue.GetItem(SyntheticAnalyticsTransport.AccountId, BenchHost.ItemId)!;
         var path = host.App.Services.GetRequiredService<RuntimePaths>().Database;
         var dumpDirectory = Environment.GetEnvironmentVariable("TCC_BENCH_DUMP");
         var dump = GoldDump.Hash(path, dumpDirectory is null ? null : Path.Combine(dumpDirectory, "gold-" + size.ToString(CultureInfo.InvariantCulture) + ".tsv"));

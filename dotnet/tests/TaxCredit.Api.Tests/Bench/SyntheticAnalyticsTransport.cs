@@ -14,6 +14,8 @@ internal sealed class SyntheticAnalyticsTransport : IAnalyticsTransport
     internal const long AccountId = 5001;
     private const int Locations = 100;
     private const int PeriodsPerYear = 26;
+    private const int FirstYear = 2022;
+    private const int Years = 3;
     private readonly SourceMapping _mapping;
     private readonly MaterializedAnalyticsTransport _dimensions;
     private readonly long _employees;
@@ -21,8 +23,9 @@ internal sealed class SyntheticAnalyticsTransport : IAnalyticsTransport
     internal SyntheticAnalyticsTransport(long payrollRows)
     {
         _mapping = SourceMapping.Load();
-        _employees = Math.Max(1, payrollRows / PeriodsPerYear);
-        RowCount = _employees * PeriodsPerYear;
+        // A third of the staff are hired in each year, so headcount grows and a base year, net-new jobs and a credit all exist.
+        _employees = Math.Max(1, payrollRows / (PeriodsPerYear * 2));
+        RowCount = Enumerable.Range(0, (int)_employees).Sum(e => (long)(Years - HireIndex(e)) * PeriodsPerYear);
         _dimensions = new MaterializedAnalyticsTransport(_mapping, Dimensions());
     }
 
@@ -56,39 +59,44 @@ internal sealed class SyntheticAnalyticsTransport : IAnalyticsTransport
 
     private IEnumerable<IReadOnlyDictionary<string, object?>> Payroll(AnalyticsQuery query, CancellationToken cancellationToken)
     {
-        var first = new DateOnly(2024, 1, 1);
         long id = 0;
-        for (var period = 0; period < PeriodsPerYear; period++)
+        for (var year = 0; year < Years; year++)
         {
-            var start = first.AddDays(period * 14);
-            for (long employee = 0; employee < _employees; employee++)
+            var first = new DateOnly(FirstYear + year, 1, 1);
+            for (var period = 0; period < PeriodsPerYear; period++)
             {
-                cancellationToken.ThrowIfCancellationRequested();
-                var hours = 40 + ((employee * 7 + period * 3) % 50);
-                var rate = 10 + (employee % 15);
-                var location = employee % Locations;
-                var row = new Dictionary<string, object?>
+                var start = first.AddDays(period * 14);
+                for (long employee = 0; employee < _employees; employee++)
                 {
-                    ["payroll_id"] = ++id,
-                    ["account_id"] = AccountId,
-                    ["employee_id"] = 100_000 + employee,
-                    ["entity_id"] = 70L,
-                    ["location_id"] = 7000 + location,
-                    ["pay_frequency_id"] = 77L,
-                    ["pay_period_start"] = Iso(start),
-                    ["pay_period_end"] = Iso(start.AddDays(13)),
-                    ["pay_date"] = Iso(start.AddDays(18)),
-                    ["hours"] = hours.ToString("0.00", CultureInfo.InvariantCulture),
-                    ["wages"] = (hours * rate).ToString("0.00", CultureInfo.InvariantCulture),
-                    ["pay_code_id"] = 1L,
-                    ["worksite_location_id"] = null,
-                    ["modify_date"] = "2025-02-01T03:04:05",
-                };
-                yield return query.Columns.ToDictionary(p => p.Key, p => row[p.Key], StringComparer.Ordinal);
+                    if (HireIndex(employee) > year) { continue; }
+                    cancellationToken.ThrowIfCancellationRequested();
+                    var hours = 64 + ((employee * 7 + period * 3) % 25);
+                    var rate = 10 + (employee % 15);
+                    var location = employee % Locations;
+                    var row = new Dictionary<string, object?>
+                    {
+                        ["payroll_id"] = ++id,
+                        ["account_id"] = AccountId,
+                        ["employee_id"] = 100_000 + employee,
+                        ["entity_id"] = 70L,
+                        ["location_id"] = 7000 + location,
+                        ["pay_frequency_id"] = 77L,
+                        ["pay_period_start"] = Iso(start),
+                        ["pay_period_end"] = Iso(start.AddDays(13)),
+                        ["pay_date"] = Iso(start.AddDays(18)),
+                        ["hours"] = hours.ToString("0.00", CultureInfo.InvariantCulture),
+                        ["wages"] = (hours * rate).ToString("0.00", CultureInfo.InvariantCulture),
+                        ["pay_code_id"] = 1L,
+                        ["worksite_location_id"] = null,
+                        ["modify_date"] = "2025-02-01T03:04:05",
+                    };
+                    yield return query.Columns.ToDictionary(p => p.Key, p => row[p.Key], StringComparer.Ordinal);
+                }
             }
         }
     }
 
+    private static int HireIndex(long employee) => (int)(employee % Years);
     private static string Iso(DateOnly date) => date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
 
     private Dictionary<string, IReadOnlyList<IReadOnlyDictionary<string, object?>>> Dimensions()
