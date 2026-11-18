@@ -13,7 +13,7 @@ public sealed class ArtifactRepository(PersistenceDatabase database) : IArtifact
         "blob_path", "file_name", "content_type", "size_bytes", "sha256", "created_by", "created_at", "retain_until", "superseded_at",
     ];
     private static readonly string[] AccessColumns = ["access_id", "artifact_id", "client_id", "user_upn", "user_oid", "accessed_at", "outcome"];
-    private static string Select => "SELECT " + string.Join(", ", Columns) + " FROM tcc_ops.artifact";
+    private static string Select => "SELECT " + string.Join(", ", Columns) + " FROM {ops.artifact}";
 
     /// <inheritdoc />
     public ArtifactMetadata Record(ArtifactMetadata artifact)
@@ -22,7 +22,7 @@ public sealed class ArtifactRepository(PersistenceDatabase database) : IArtifact
         Validate(artifact);
         return database.Transact(session =>
         {
-            if (session.QueryExempt(SqlExemption.ChannelIdentity, "SELECT artifact_id FROM tcc_ops.artifact WHERE artifact_id = ? "
+            if (session.QueryExempt(SqlExemption.ChannelIdentity, "SELECT artifact_id FROM {ops.artifact} WHERE artifact_id = ? "
                 + "OR (container_name = ? AND blob_path = ?)", artifact.ArtifactId, artifact.ContainerName, artifact.BlobPath).Count > 0)
             {
                 throw new InvalidOperationException("An artifact identity or immutable blob path is already recorded.");
@@ -30,7 +30,7 @@ public sealed class ArtifactRepository(PersistenceDatabase database) : IArtifact
 
             if (artifact.Kind == "claim_package")
             {
-                session.Execute(artifact.ClientId!.Value, "UPDATE tcc_ops.artifact SET superseded_at = ? WHERE {tenant} AND kind = ? "
+                session.Execute(artifact.ClientId!.Value, "UPDATE {ops.artifact} SET superseded_at = ? WHERE {tenant} AND kind = ? "
                     + "AND (tax_year = ? OR (tax_year IS NULL AND ? IS NULL)) AND superseded_at IS NULL",
                     OpsRow.Timestamp(session, artifact.CreatedAt), artifact.Kind, artifact.TaxYear, artifact.TaxYear);
             }
@@ -43,11 +43,11 @@ public sealed class ArtifactRepository(PersistenceDatabase database) : IArtifact
             ];
             if (artifact.ClientId is { } client)
             {
-                session.Insert(client, "tcc_ops.artifact", Columns, [values]);
+                session.Insert(client, "ops.artifact", Columns, [values]);
             }
             else
             {
-                session.InsertExempt(SqlExemption.ChannelIdentity, "tcc_ops.artifact", Columns, [values]);
+                session.InsertExempt(SqlExemption.ChannelIdentity, "ops.artifact", Columns, [values]);
             }
 
             return artifact;
@@ -93,12 +93,12 @@ public sealed class ArtifactRepository(PersistenceDatabase database) : IArtifact
 
         return database.Transact(session =>
         {
-            if (session.QueryExempt(SqlExemption.ChannelIdentity, "SELECT access_id FROM tcc_ops.artifact_access WHERE access_id = ?", access.AccessId).Count != 0)
+            if (session.QueryExempt(SqlExemption.ChannelIdentity, "SELECT access_id FROM {ops.artifact_access} WHERE access_id = ?", access.AccessId).Count != 0)
             {
                 throw new InvalidOperationException("The artifact access identity is already recorded.");
             }
 
-            var metadata = session.QueryExempt(SqlExemption.ChannelIdentity, "SELECT client_id FROM tcc_ops.artifact WHERE artifact_id = ?", access.ArtifactId);
+            var metadata = session.QueryExempt(SqlExemption.ChannelIdentity, "SELECT client_id FROM {ops.artifact} WHERE artifact_id = ?", access.ArtifactId);
             if (access.Outcome == "served" && (metadata.Count != 1 || new OpsRow(metadata[0]).OptionalLong("client_id") != access.ClientId))
             {
                 throw new InvalidOperationException("A served access must name an artifact belonging to its client.");
@@ -107,11 +107,11 @@ public sealed class ArtifactRepository(PersistenceDatabase database) : IArtifact
             object?[] values = [access.AccessId, access.ArtifactId, access.ClientId, access.UserUpn, access.UserOid, OpsRow.Timestamp(session, access.AccessedAt), access.Outcome];
             if (access.ClientId is { } client)
             {
-                session.Insert(client, "tcc_ops.artifact_access", AccessColumns, [values]);
+                session.Insert(client, "ops.artifact_access", AccessColumns, [values]);
             }
             else
             {
-                session.InsertExempt(SqlExemption.ChannelIdentity, "tcc_ops.artifact_access", AccessColumns, [values]);
+                session.InsertExempt(SqlExemption.ChannelIdentity, "ops.artifact_access", AccessColumns, [values]);
             }
 
             return access;
@@ -123,7 +123,7 @@ public sealed class ArtifactRepository(PersistenceDatabase database) : IArtifact
     {
         using var session = database.Open();
         return session.Query(clientId, "SELECT " + string.Join(", ", AccessColumns)
-            + " FROM tcc_ops.artifact_access WHERE {tenant} ORDER BY accessed_at, access_id").Select(values =>
+            + " FROM {ops.artifact_access} WHERE {tenant} ORDER BY accessed_at, access_id").Select(values =>
             {
                 var r = new OpsRow(values);
                 return new ArtifactAccess(r.Required("access_id"), r.Required("artifact_id"), r.OptionalLong("client_id"),

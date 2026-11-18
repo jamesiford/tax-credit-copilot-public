@@ -3,7 +3,7 @@ using TaxCredit.Domain.Numerics;
 namespace TaxCredit.Domain.Warehouse;
 
 /// <summary>
-/// One human adjustment, as <c>tcc_ops.manual_override</c> records it (Python <c>ManualOverride</c>, a frozen dataclass whose
+/// One human adjustment, as <c>ops.manual_override</c> records it (Python <c>ManualOverride</c>, a frozen dataclass whose
 /// <c>__post_init__</c> checks the scope). Additive and append-only: clearing a base year is a new row whose <see cref="ValueAfter"/> is
 /// <c>null</c>, never a delete. See <see cref="RunManifest"/> for why <see cref="Replace"/> exists.
 /// </summary>

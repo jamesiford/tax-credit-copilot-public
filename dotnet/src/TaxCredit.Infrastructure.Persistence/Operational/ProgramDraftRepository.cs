@@ -18,13 +18,13 @@ public sealed class ProgramDraftRepository(PersistenceDatabase database) : IProg
         CheckEvent(draft, draftEvent);
         database.Transact(session =>
         {
-            if (session.QueryExempt(SqlExemption.ChannelIdentity, "SELECT draft_id FROM tcc_ops.program_draft WHERE draft_id = ? "
+            if (session.QueryExempt(SqlExemption.ChannelIdentity, "SELECT draft_id FROM {ops.program_draft} WHERE draft_id = ? "
                 + "OR (proposed_code = ? AND status NOT IN ('withdrawn', 'exported'))", draft.DraftId, draft.ProposedCode).Count != 0)
             {
                 throw new DraftConflict("A draft with this identity or a live draft for this code already exists.");
             }
 
-            session.InsertExempt(SqlExemption.ChannelIdentity, "tcc_ops.program_draft", ProgramDraftRows.Columns, [ProgramDraftRows.Values(session, draft)]);
+            session.InsertExempt(SqlExemption.ChannelIdentity, "ops.program_draft", ProgramDraftRows.Columns, [ProgramDraftRows.Values(session, draft)]);
             WriteDocuments(session, draft);
             Append(session, draftEvent);
             return true;
@@ -51,7 +51,7 @@ public sealed class ProgramDraftRepository(PersistenceDatabase database) : IProg
         {
             var columns = ProgramDraftRows.Columns.Skip(2).ToArray();
             var args = ProgramDraftRows.Values(session, draft).Skip(2).Concat([draft.DraftId, expectedVersion, draft.ProposedCode]).ToArray();
-            var changed = session.ExecuteExempt(SqlExemption.ChannelIdentity, "UPDATE tcc_ops.program_draft SET "
+            var changed = session.ExecuteExempt(SqlExemption.ChannelIdentity, "UPDATE {ops.program_draft} SET "
                 + string.Join(", ", columns.Select(column => column + " = ?")) + " WHERE draft_id = ? AND version = ? AND proposed_code = ?", args);
             if (changed != 1)
             {
@@ -75,7 +75,7 @@ public sealed class ProgramDraftRepository(PersistenceDatabase database) : IProg
             var where = string.IsNullOrEmpty(status) ? "" : " WHERE status = ?";
             object?[] args = string.IsNullOrEmpty(status) ? [] : [status];
             var count = session.Dialect is SqliteDialect ? "COUNT(*)" : "COUNT_BIG(*)";
-            var total = new OpsRow(session.QueryExempt(SqlExemption.ChannelIdentity, "SELECT " + count + " AS n FROM tcc_ops.program_draft" + where, args)[0]).Long("n");
+            var total = new OpsRow(session.QueryExempt(SqlExemption.ChannelIdentity, "SELECT " + count + " AS n FROM {ops.program_draft}" + where, args)[0]).Long("n");
             if (offset >= total)
             {
                 return ((IReadOnlyList<ProgramDraft>)Array.Empty<ProgramDraft>(), total);
@@ -92,7 +92,7 @@ public sealed class ProgramDraftRepository(PersistenceDatabase database) : IProg
     {
         using var session = database.Open();
         return session.QueryExempt(SqlExemption.ChannelIdentity, "SELECT draft_id, seq, event_type, actor, at, from_status, to_status, detail_json "
-            + "FROM tcc_ops.program_draft_event WHERE draft_id = ? ORDER BY seq", draftId).Select(values =>
+            + "FROM {ops.program_draft_event} WHERE draft_id = ? ORDER BY seq", draftId).Select(values =>
             {
                 var r = new OpsRow(values);
                 return new DraftEvent
@@ -124,7 +124,7 @@ public sealed class ProgramDraftRepository(PersistenceDatabase database) : IProg
             throw new ArgumentException("Draft year document keys or count exceed the storage contract.", nameof(draft));
         }
 
-        session.ExecuteExempt(SqlExemption.ChannelIdentity, "DELETE FROM tcc_ops.program_draft_document WHERE draft_id = ?", draft.DraftId);
+        session.ExecuteExempt(SqlExemption.ChannelIdentity, "DELETE FROM {ops.program_draft_document} WHERE draft_id = ?", draft.DraftId);
         var documents = new List<KeyValuePair<string, object?>>();
         if (draft.Pack is not null)
         {
@@ -136,7 +136,7 @@ public sealed class ProgramDraftRepository(PersistenceDatabase database) : IProg
         {
             var text = ProgramDraftRows.Document((PyDict)pair.Value!)!;
             var hash = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(text)));
-            session.InsertExempt(SqlExemption.ChannelIdentity, "tcc_ops.program_draft_document",
+            session.InsertExempt(SqlExemption.ChannelIdentity, "ops.program_draft_document",
                 ["draft_id", "doc_key", "content_json", "content_sha256"], [new object?[] { draft.DraftId, pair.Key, text, hash }]);
         }
     }
@@ -144,14 +144,14 @@ public sealed class ProgramDraftRepository(PersistenceDatabase database) : IProg
     private static void Append(SqlSession session, DraftEvent draftEvent)
     {
         var last = new OpsRow(session.QueryExempt(SqlExemption.ChannelIdentity,
-            "SELECT MAX(seq) AS n FROM tcc_ops.program_draft_event WHERE draft_id = ?", draftEvent.DraftId)[0]);
+            "SELECT MAX(seq) AS n FROM {ops.program_draft_event} WHERE draft_id = ?", draftEvent.DraftId)[0]);
         var text = OpsRow.Json(draftEvent.Detail);
         if (text is not null && text.EnumerateRunes().Count() > 4000)
         {
             throw new ArgumentException("The draft event detail exceeds its storage limit.", nameof(draftEvent));
         }
 
-        session.InsertExempt(SqlExemption.ChannelIdentity, "tcc_ops.program_draft_event",
+        session.InsertExempt(SqlExemption.ChannelIdentity, "ops.program_draft_event",
             ["draft_id", "seq", "event_type", "actor", "at", "from_status", "to_status", "detail_json"],
             [new object?[] { draftEvent.DraftId, last.Long("n") + 1, draftEvent.EventType, draftEvent.Actor,
                 OpsRow.Timestamp(session, draftEvent.At), draftEvent.FromStatus, draftEvent.ToStatus, text }]);
@@ -164,7 +164,7 @@ public sealed class ProgramDraftRepository(PersistenceDatabase database) : IProg
         if (documents)
         {
             foreach (var values in session.QueryExempt(SqlExemption.ChannelIdentity,
-                "SELECT doc_key, content_json, content_sha256 FROM tcc_ops.program_draft_document WHERE draft_id = ? ORDER BY doc_key", row["draft_id"]))
+                "SELECT doc_key, content_json, content_sha256 FROM {ops.program_draft_document} WHERE draft_id = ? ORDER BY doc_key", row["draft_id"]))
             {
                 var r = new OpsRow(values);
                 var text = r.Required("content_json");

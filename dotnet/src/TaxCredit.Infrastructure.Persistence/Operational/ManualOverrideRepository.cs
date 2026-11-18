@@ -23,13 +23,13 @@ public sealed class ManualOverrideRepository(PersistenceDatabase database) : IMa
         ArgumentNullException.ThrowIfNull(overrideRow);
         return database.Transact(session =>
         {
-            if (session.Query(overrideRow.ClientId, "SELECT override_id FROM tcc_ops.manual_override WHERE {tenant} AND override_id = ?", overrideRow.OverrideId).Count != 0)
+            if (session.Query(overrideRow.ClientId, "SELECT override_id FROM {ops.manual_override} WHERE {tenant} AND override_id = ?", overrideRow.OverrideId).Count != 0)
             {
                 throw new InvalidOperationException("The override identity is already recorded.");
             }
 
             var order = OverrideOrder.Next(session);
-            session.Insert(overrideRow.ClientId, "tcc_ops.manual_override", [.. Columns, "write_order"],
+            session.Insert(overrideRow.ClientId, "ops.manual_override", [.. Columns, "write_order"],
                 [new object?[] { overrideRow.OverrideId, overrideRow.RunId, overrideRow.ClientId, overrideRow.Scope, overrideRow.TargetKey,
                     overrideRow.FieldChanged, overrideRow.ValueBefore, overrideRow.ValueAfter, overrideRow.ReasonCode, overrideRow.JustificationText,
                     overrideRow.CreatedBy, OpsRow.Timestamp(session, overrideRow.CreatedAt), overrideRow.ApprovedBy, OpsRow.Timestamp(session, overrideRow.ApprovedAt), order }]);
@@ -65,7 +65,7 @@ public sealed class ManualOverrideRepository(PersistenceDatabase database) : IMa
     {
         using var session = database.Open();
         return session.Query(clientId, "SELECT " + string.Join(", ", Columns)
-            + " FROM tcc_ops.manual_override WHERE {tenant} ORDER BY write_order").Select(Hydrate).ToArray();
+            + " FROM {ops.manual_override} WHERE {tenant} ORDER BY write_order").Select(Hydrate).ToArray();
     }
 
     private static ManualOverride Hydrate(IReadOnlyDictionary<string, object?> values)

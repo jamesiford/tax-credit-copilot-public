@@ -92,7 +92,7 @@ public sealed class SeedImporter
     {
         using var session = _database.Open();
         return session.QueryExempt(SqlExemption.Seed,
-            "SELECT claim_id AS id FROM tcc_ops.program_claim UNION ALL SELECT run_id AS id FROM tcc_ops.run_manifest")
+            "SELECT claim_id AS id FROM {ops.program_claim} UNION ALL SELECT run_id AS id FROM {ops.run_manifest}")
             .Select(row => Guid.TryParse(row["id"] as string, out var id) ? id.ToString("N") : "")
             .Where(id => id.StartsWith("40000000000040008000", StringComparison.Ordinal))
             .Select(id => long.Parse(id[^12..], NumberStyles.HexNumber, CultureInfo.InvariantCulture)).DefaultIfEmpty().Max();
@@ -101,10 +101,11 @@ public sealed class SeedImporter
     private static SeedLoadResult Replace(SqlSession session, string profile, string folder, JsonElement tables,
         IReadOnlyDictionary<string, IReadOnlyList<StorageColumn>> schema)
     {
-        session.ExecuteExempt(SqlExemption.Seed, "CREATE TABLE IF NOT EXISTS tcc_source.seed_table (table_name TEXT PRIMARY KEY,columns_json TEXT NOT NULL) STRICT");
-        session.ExecuteExempt(SqlExemption.Seed, "CREATE TABLE IF NOT EXISTS tcc_source.seed_row (table_name TEXT NOT NULL,ordinal INTEGER NOT NULL,row_json TEXT NOT NULL,PRIMARY KEY(table_name,ordinal)) STRICT");
-        var names = session.QueryExempt(SqlExemption.Seed,
-            "SELECT name FROM sqlite_master WHERE type='table' AND name<>'tcc_ops_schema_migration' AND (name LIKE 'tcc_ops_%' OR name LIKE 'tcc_gold_%' OR name LIKE 'tcc_source_%')");
+        session.ExecuteExempt(SqlExemption.Seed, "CREATE TABLE IF NOT EXISTS " + SeedNames.Table(session) + " (table_name TEXT PRIMARY KEY,columns_json TEXT NOT NULL) STRICT");
+        session.ExecuteExempt(SqlExemption.Seed, "CREATE TABLE IF NOT EXISTS " + SeedNames.Row(session) + " (table_name TEXT NOT NULL,ordinal INTEGER NOT NULL,row_json TEXT NOT NULL,PRIMARY KEY(table_name,ordinal)) STRICT");
+        var clearable = SeedNames.Clearable(session);
+        var names = session.QueryExempt(SqlExemption.Seed, "SELECT name FROM sqlite_master WHERE type='table'")
+            .Where(row => clearable.Contains((string)row["name"]!)).ToList();
         foreach (var row in names)
         {
             session.ExecuteExempt(SqlExemption.Seed, "DELETE FROM " + session.Dialect.Name((string)row["name"]!));
@@ -116,9 +117,9 @@ public sealed class SeedImporter
             counts.Add(table.Name, ImportTable(session, folder, table.Name, table.Value, schema));
         }
 
-        if (names.Any(row => (string)row["name"]! == "tcc_ops_write_sequence"))
+        if (names.Any(row => (string)row["name"]! == session.Dialect.Names.Flat("ops.write_sequence")))
         {
-            session.ExecuteExempt(SqlExemption.Seed, "INSERT INTO tcc_ops.write_sequence (sequence_name,last_value) VALUES ('manual_override',0)");
+            session.ExecuteExempt(SqlExemption.Seed, "INSERT INTO {ops.write_sequence} (sequence_name,last_value) VALUES ('manual_override',0)");
         }
 
         return new SeedLoadResult(profile, counts);
@@ -130,11 +131,11 @@ public sealed class SeedImporter
         var split = path.Split('/');
         var table = split[1][..^9];
         var isSource = split[0] == "source";
-        var destination = (split[0] == "gold" ? "tcc_gold." : "tcc_ops.") + table;
+        var destination = (split[0] == "gold" ? "gold." : "ops.") + table;
         var columns = metadata.GetProperty("columns").EnumerateArray().Select(c => c.GetString()!).ToArray();
         if (isSource)
         {
-            session.InsertExempt(SqlExemption.Seed, "tcc_source.seed_table", ["table_name", "columns_json"],
+            session.InsertExempt(SqlExemption.Seed, SeedNames.TableKey(session), ["table_name", "columns_json"],
                 [new object?[] { table, JsonSerializer.Serialize(columns) }]);
         }
 
@@ -190,7 +191,7 @@ public sealed class SeedImporter
 
         if (source)
         {
-            session.InsertExempt(SqlExemption.Seed, "tcc_source.seed_row", ["table_name", "ordinal", "row_json"], rows);
+            session.InsertExempt(SqlExemption.Seed, SeedNames.RowKey(session), ["table_name", "ordinal", "row_json"], rows);
         }
         else
         {

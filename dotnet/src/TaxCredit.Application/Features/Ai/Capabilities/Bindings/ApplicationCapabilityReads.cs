@@ -1,3 +1,4 @@
+using TaxCredit.Domain.DataMap;
 using System.Text.Json.Nodes;
 using TaxCredit.Application.Features.ClaimsArtifactsRules.Findings;
 using TaxCredit.Application.Features.DraftsRuns;
@@ -55,13 +56,13 @@ public sealed class ApplicationCapabilityReads(CanonicalCapabilityReads canonica
     private async Task<CapabilityRead> Employee(JsonObject args, CancellationToken token)
     {
         var facts = await Query(new StoredReadQuery("drill", Arguments(args)), token).ConfigureAwait(false);
-        return new(facts, CapabilityDirectReads.RunEvidence(facts["run"] as JsonObject, "tcc_gold"));
+        return new(facts, CapabilityDirectReads.RunEvidence(facts["run"] as JsonObject, PhysicalNames.Active.Map.GoldSchema));
     }
 
     private async Task<CapabilityRead> Simulation(JsonObject args, CancellationToken token)
     {
         var facts = await Query(new CalculateViewQuery("POST /api/simulate/unit", Arguments(args)), token).ConfigureAwait(false);
-        return new(facts, CapabilityResult.Evidence(runId: Text(facts, "run_id"), source: "tcc_gold"));
+        return new(facts, CapabilityResult.Evidence(runId: Text(facts, "run_id"), source: PhysicalNames.Active.Map.GoldSchema));
     }
 
     private async Task<CapabilityRead> Programs(JsonObject args, CancellationToken token)

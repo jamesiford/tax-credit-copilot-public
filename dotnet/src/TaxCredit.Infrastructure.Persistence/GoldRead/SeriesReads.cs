@@ -3,7 +3,7 @@ namespace TaxCredit.Infrastructure.Persistence.GoldRead;
 public sealed partial class GoldReader
 {
     private IReadOnlyDictionary<string, object?>? MethodSummary(long clientId, int year, string method, string runId) =>
-        One(clientId, Page("SELECT * FROM tcc_gold.run_method_summary WHERE {tenant} AND tax_year = ? " +
+        One(clientId, Page("SELECT * FROM {gold.run_method_summary} WHERE {tenant} AND tax_year = ? " +
             "AND method = ? AND run_id = ? ORDER BY tax_year", 1), year, method, runId);
 
     /// <inheritdoc />
@@ -16,7 +16,7 @@ public sealed partial class GoldReader
         }
         var sums = string.Join(", ", GoldValues.Months.Select(c => $"SUM({c}) AS {c}"));
         var row = One(clientId, $"SELECT {sums}, MAX(unreachable_months) AS unreachable_months " +
-            "FROM tcc_gold.unit_month_summary WHERE {tenant} AND tax_year = ? AND method = ? AND run_id = ?",
+            "FROM {gold.unit_month_summary} WHERE {tenant} AND tax_year = ? AND method = ? AND run_id = ?",
             taxYear, method, run["run_id"])!;
         var summary = MethodSummary(clientId, taxYear, method, GoldValues.Text(run, "run_id"));
         var unreachable = GoldValues.Text(row, "unreachable_months").Split(',').Select(p => p.Trim())
@@ -40,11 +40,11 @@ public sealed partial class GoldReader
             return new Dictionary<string, object?> { ["run"] = null, ["years"] = GoldValues.EmptyRows };
         }
         var summary = Many(clientId, "SELECT tax_year, annual_average, eligible_employees, employees_evaluated, contested_months " +
-            "FROM tcc_gold.run_method_summary WHERE {tenant} AND method = ? AND run_id = ? ORDER BY tax_year", method, run["run_id"]);
+            "FROM {gold.run_method_summary} WHERE {tenant} AND method = ? AND run_id = ? ORDER BY tax_year", method, run["run_id"]);
         var (where, values) = UnitWhere(method, null, programCode);
         var credit = Many(clientId, $"SELECT tax_year, {Sum("annual_credit_usd")} AS annual_credit_usd, " +
             "MAX(CAST(is_base_year AS INT)) AS has_base_year, SUM(CAST(qualified AS INT)) AS qualified_units, COUNT(*) AS units " +
-            "FROM tcc_gold.unit_year_master WHERE " + where + " GROUP BY tax_year ORDER BY tax_year", values)
+            "FROM {gold.unit_year_master} WHERE " + where + " GROUP BY tax_year ORDER BY tax_year", values)
             .ToDictionary(r => GoldValues.Int(r, "tax_year"));
         var years = summary.Select(row =>
         {
@@ -76,13 +76,13 @@ public sealed partial class GoldReader
         }
         object?[] values = [taxYear, method, run!["run_id"]];
         result["matrix"] = Many(clientId, "SELECT employee_id, record_token, worksite_id, entity_fein, weight, " +
-            string.Join(", ", GoldValues.Months) + " FROM tcc_gold.onezero_matrix WHERE {tenant} AND tax_year = ? " +
+            string.Join(", ", GoldValues.Months) + " FROM {gold.onezero_matrix} WHERE {tenant} AND tax_year = ? " +
             "AND method = ? AND run_id = ? ORDER BY worksite_id, employee_id", values);
         var sums = string.Join(", ", GoldValues.Months.Select(c => $"SUM(m.{c}) AS {c}"));
         var total = string.Join(" + ", GoldValues.Months.Select(c => $"SUM(m.{c})"));
         result["units"] = Many(clientId, "SELECT COALESCE(NULLIF(m.worksite_id, ''), '(unattributed)') AS worksite_id, " +
             "COALESCE(NULLIF(m.entity_fein, ''), '(unattributed)') AS entity_fein, " + sums +
-            $", {total} AS total, ROUND(({total}) / 12.0, 2) AS average_headcount FROM tcc_gold.onezero_matrix m " +
+            $", {total} AS total, ROUND(({total}) / 12.0, 2) AS average_headcount FROM {{gold.onezero_matrix}} m " +
             "WHERE {tenant:m} AND m.tax_year = ? AND m.method = ? AND m.run_id = ? " +
             "GROUP BY COALESCE(NULLIF(m.worksite_id, ''), '(unattributed)'), COALESCE(NULLIF(m.entity_fein, ''), '(unattributed)') " +
             "ORDER BY worksite_id, entity_fein", values);

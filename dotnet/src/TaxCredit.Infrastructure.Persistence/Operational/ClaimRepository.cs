@@ -63,15 +63,15 @@ public sealed class ClaimRepository(PersistenceDatabase database) : IClaimReposi
         ArgumentNullException.ThrowIfNull(claim);
         return database.Transact(session =>
         {
-            if (session.QueryExempt(SqlExemption.Validation, "SELECT claim_id FROM tcc_ops.program_claim WHERE claim_id = ?", claim.ClaimId).Count != 0)
+            if (session.QueryExempt(SqlExemption.Validation, "SELECT claim_id FROM {ops.program_claim} WHERE claim_id = ?", claim.ClaimId).Count != 0)
             {
                 throw new InvalidOperationException("The claim identity is already recorded; reload it or use a new identity for a transition.");
             }
 
-            session.Execute(claim.ClientId, "UPDATE tcc_ops.program_claim SET effective_to = ? "
+            session.Execute(claim.ClientId, "UPDATE {ops.program_claim} SET effective_to = ? "
                 + "WHERE {tenant} AND program_code = ? AND tax_year = ? AND effective_to IS NULL",
                 OpsRow.EffectiveDate(session, claim.EffectiveFrom), claim.ProgramCode, claim.TaxYear);
-            session.Insert(claim.ClientId, "tcc_ops.program_claim", ClaimRows.Columns, [ClaimRows.Values(session, claim)]);
+            session.Insert(claim.ClientId, "ops.program_claim", ClaimRows.Columns, [ClaimRows.Values(session, claim)]);
             return claim;
         });
     }
@@ -83,7 +83,7 @@ public sealed class ClaimRepository(PersistenceDatabase database) : IClaimReposi
     {
         using var session = database.Open();
         return session.Query(clientId, "SELECT " + string.Join(", ", ClaimRows.EngagementColumns)
-            + " FROM tcc_ops.program_engagement WHERE {tenant} AND effective_to IS NULL ORDER BY program_code")
+            + " FROM {ops.program_engagement} WHERE {tenant} AND effective_to IS NULL ORDER BY program_code")
             .Select(ClaimRows.Engagement).ToArray();
     }
 
@@ -93,9 +93,9 @@ public sealed class ClaimRepository(PersistenceDatabase database) : IClaimReposi
         ArgumentNullException.ThrowIfNull(engagement);
         return database.Transact(session =>
         {
-            session.Execute(engagement.ClientId, "UPDATE tcc_ops.program_engagement SET effective_to = ? "
+            session.Execute(engagement.ClientId, "UPDATE {ops.program_engagement} SET effective_to = ? "
                 + "WHERE {tenant} AND program_code = ? AND effective_to IS NULL", OpsRow.EffectiveDate(session, engagement.EffectiveFrom), engagement.ProgramCode);
-            session.Insert(engagement.ClientId, "tcc_ops.program_engagement", ClaimRows.EngagementColumns,
+            session.Insert(engagement.ClientId, "ops.program_engagement", ClaimRows.EngagementColumns,
                 [new object?[] { engagement.ClientId, engagement.ProgramCode, engagement.Scope.Value(), OpsRow.EffectiveDate(session, engagement.EffectiveFrom),
                     OpsRow.EffectiveDate(session, engagement.EffectiveTo), engagement.Note, engagement.SetBy, OpsRow.Timestamp(session, engagement.SetAt) }]);
             return engagement;

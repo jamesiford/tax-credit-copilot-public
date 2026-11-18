@@ -66,7 +66,7 @@ public sealed partial class GoldReader
         var selected = "m.employee_id, m.record_token, m.worksite_id, m.entity_fein, m.first_pps, m.last_ppe, m.weight, " +
             string.Join(", ", GoldValues.Months.Select(c => "m." + c)) +
             ", e.avg_weekly_hours, e.avg_weekly_wages, e.weeks_worked, e.total_hours, e.total_wages, e.first_start, e.last_end ";
-        var sql = "SELECT " + selected + "FROM tcc_gold.onezero_matrix m LEFT JOIN tcc_gold.employee_eligibility e " +
+        var sql = "SELECT " + selected + "FROM {gold.onezero_matrix} m LEFT JOIN {gold.employee_eligibility} e " +
             "ON e.record_token = m.record_token AND e.client_id = m.client_id AND e.tax_year = m.tax_year " +
             "AND e.method = m.method AND e.run_id = m.run_id WHERE {tenant:m} AND m.worksite_id = ? " +
             "AND m.tax_year = ? AND m.method = ? AND m.run_id = ?";
@@ -80,8 +80,8 @@ public sealed partial class GoldReader
     private static (string Sql, List<object?> Values) NearStatement(string site, int year, string method, string run, double? minHours)
     {
         var sql = "SELECT DISTINCT e.employee_id, e.record_token, e.avg_weekly_hours, e.avg_weekly_wages, " +
-            "e.weeks_worked, e.total_hours, e.total_wages, e.first_start, e.last_end FROM tcc_gold.employee_eligibility e " +
-            "JOIN tcc_gold.employee_period_fact p ON p.record_token = e.record_token AND p.client_id = e.client_id " +
+            "e.weeks_worked, e.total_hours, e.total_wages, e.first_start, e.last_end FROM {gold.employee_eligibility} e " +
+            "JOIN {gold.employee_period_fact} p ON p.record_token = e.record_token AND p.client_id = e.client_id " +
             "AND p.tax_year = e.tax_year WHERE {tenant:e} AND e.tax_year = ? AND e.method = ? " +
             "AND e.run_id = ? AND e.eligible = 0 AND p.worksite_id = ?";
         var values = new List<object?> { year, method, run, site };

@@ -1,3 +1,4 @@
+using TaxCredit.Domain.DataMap;
 using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -189,5 +190,5 @@ internal sealed partial class CapabilityData(IGoldDataQueryPort query, IGoldRead
     private static CapabilityException ColumnRefusal(string code, string message) =>
         new(422, code, message, extra: new JsonObject { ["field"] = "column" });
 
-    private static string Source(string dataset) => $"Source: warehouse {(dataset == "run_manifest" ? "tcc_ops" : "tcc_gold")}.{dataset}";
+    private static string Source(string dataset) => $"Source: warehouse {(dataset == "run_manifest" ? PhysicalNames.Active.Map.OpsSchema : PhysicalNames.Active.Map.GoldSchema)}.{dataset}";
 }

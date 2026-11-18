@@ -11,7 +11,7 @@ public sealed class SourceSeedData(PersistenceDatabase database) : ISeedData
     public IReadOnlyDictionary<string, IReadOnlyList<string>> Tables()
     {
         using var session = database.Open();
-        return session.QueryExempt(SqlExemption.Seed, "SELECT table_name,columns_json FROM tcc_source.seed_table ORDER BY table_name")
+        return session.QueryExempt(SqlExemption.Seed, "SELECT table_name,columns_json FROM " + SeedNames.Table(session) + " ORDER BY table_name")
             .ToDictionary(r => (string)r["table_name"]!, r => (IReadOnlyList<string>)JsonSerializer.Deserialize<string[]>((string)r["columns_json"]!)!, StringComparer.Ordinal);
     }
 
@@ -25,7 +25,7 @@ public sealed class SourceSeedData(PersistenceDatabase database) : ISeedData
 
         using var session = database.Open();
         foreach (var row in session.StreamStringsExempt(SqlExemption.Seed,
-            "SELECT row_json FROM tcc_source.seed_row WHERE table_name=? ORDER BY ordinal", table))
+            "SELECT row_json FROM " + SeedNames.Row(session) + " WHERE table_name=? ORDER BY ordinal", table))
         {
             yield return row;
         }

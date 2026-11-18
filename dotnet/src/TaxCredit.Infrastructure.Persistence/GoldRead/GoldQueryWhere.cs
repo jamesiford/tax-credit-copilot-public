@@ -18,7 +18,7 @@ public sealed partial class GoldDataQuery
         else if (dataset.Currency == "live_run")
         {
             sql += " AND t.run_id = (" + _database.Dialect.Page(
-                "SELECT m.run_id FROM tcc_ops.run_manifest m WHERE {tenant:m} AND m.run_status = 'success' " +
+                "SELECT m.run_id FROM {ops.run_manifest} m WHERE {tenant:m} AND m.run_status = 'success' " +
                 "AND m.superseded_by_run_id IS NULL AND m.run_completed_at IS NOT NULL ORDER BY m.run_started_at DESC", 1, 0) + ")";
         }
         if (spec.TaxYears.Count > 0)

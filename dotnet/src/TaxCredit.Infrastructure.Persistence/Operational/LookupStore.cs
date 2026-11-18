@@ -33,10 +33,10 @@ public sealed class LookupStore(PersistenceDatabase database, IIdSource? ids = n
         database.Transact(session =>
         {
             var clock = OpsRow.Clock(session, at);
-            session.Execute(entry.ClientId, "UPDATE tcc_ops.lookup_override SET superseded_at = ? "
+            session.Execute(entry.ClientId, "UPDATE {ops.lookup_override} SET superseded_at = ? "
                 + "WHERE {tenant} AND lookup_name = ? AND key_kind = ? AND key_value = ? AND superseded_at IS NULL",
                 clock, entry.Lookup, entry.KeyKind, entry.Key);
-            session.Insert(entry.ClientId, "tcc_ops.lookup_override", Columns,
+            session.Insert(entry.ClientId, "ops.lookup_override", Columns,
                 [new object?[] { (ids?.NewId() ?? Guid.NewGuid()).ToString(), entry.Lookup, entry.ClientId, entry.KeyKind, entry.Key, entry.ValueJson,
                     entry.EffectiveFrom, entry.EffectiveTo, entry.AuthoredBy, clock, entry.Basis, entry.Inferred, null }]);
             AppendAudit(session, entry, "put", entry.AuthoredBy, clock);
@@ -49,7 +49,7 @@ public sealed class LookupStore(PersistenceDatabase database, IIdSource? ids = n
         database.Transact(session =>
         {
             var clock = OpsRow.Clock(session, at);
-            var count = session.Execute(clientId, "UPDATE tcc_ops.lookup_override SET superseded_at = ? "
+            var count = session.Execute(clientId, "UPDATE {ops.lookup_override} SET superseded_at = ? "
                 + "WHERE {tenant} AND lookup_name = ? AND key_kind = ? AND key_value = ? AND superseded_at IS NULL", clock, lookup, keyKind, key);
             if (count > 0)
             {
@@ -64,13 +64,13 @@ public sealed class LookupStore(PersistenceDatabase database, IIdSource? ids = n
     {
         using var session = database.Open();
         var sql = "SELECT audit_id, lookup_name, client_id, action, key_kind, key_value, value_json, actor, at, basis "
-            + "FROM tcc_ops.lookup_audit WHERE {tenant}" + (lookup is null ? "" : " AND lookup_name = ?") + " ORDER BY at, audit_id";
+            + "FROM {ops.lookup_audit} WHERE {tenant}" + (lookup is null ? "" : " AND lookup_name = ?") + " ORDER BY at, audit_id";
         return session.Query(clientId, sql, lookup is null ? [] : [lookup]);
     }
 
     private static List<LookupEntry> ReadEntries(SqlSession session, string lookup, long clientId) =>
         session.Query(clientId, "SELECT " + string.Join(", ", Columns)
-            + " FROM tcc_ops.lookup_override WHERE {tenant} AND lookup_name = ? AND superseded_at IS NULL ORDER BY key_kind, key_value", lookup)
+            + " FROM {ops.lookup_override} WHERE {tenant} AND lookup_name = ? AND superseded_at IS NULL ORDER BY key_kind, key_value", lookup)
             .Select(values =>
             {
                 var r = new OpsRow(values);
@@ -79,7 +79,7 @@ public sealed class LookupStore(PersistenceDatabase database, IIdSource? ids = n
             }).ToList();
 
     private void AppendAudit(SqlSession session, LookupEntry entry, string action, string actor, object? at) =>
-        session.Insert(entry.ClientId, "tcc_ops.lookup_audit",
+        session.Insert(entry.ClientId, "ops.lookup_audit",
             ["audit_id", "lookup_name", "client_id", "action", "key_kind", "key_value", "value_json", "actor", "at", "basis"],
             [new object?[] { (ids?.NewId() ?? Guid.NewGuid()).ToString(), entry.Lookup, entry.ClientId, action, entry.KeyKind, entry.Key,
                 action == "put" ? entry.ValueJson : null, actor, at, entry.Basis }]);

@@ -20,9 +20,9 @@ public sealed partial class RunBatchRepository
         {
             var clock = OpsRow.Clock(session, now);
             var sql = "SELECT " + string.Join(", ", RunBatchRows.ItemColumns.Select(column => "i." + column))
-                + " FROM tcc_ops.run_batch_item i JOIN tcc_ops.run_batch b ON b.batch_id = i.batch_id "
+                + " FROM {ops.run_batch_item} i JOIN {ops.run_batch} b ON b.batch_id = i.batch_id "
                 + "WHERE i.status = 'queued' AND b.cancel_requested = 0 AND (i.not_before IS NULL OR i.not_before <= ?) "
-                + "AND NOT EXISTS (SELECT 1 FROM tcc_ops.run_batch_item x WHERE x.client_id = i.client_id "
+                + "AND NOT EXISTS (SELECT 1 FROM {ops.run_batch_item} x WHERE x.client_id = i.client_id "
                 + "AND x.status IN ('leased', 'running') AND x.lease_expires_at > ?) ORDER BY b.requested_at, i.seq, i.item_id";
             var candidates = session.QueryExempt(SqlExemption.Worker, session.Dialect.Page(sql, Math.Min(10000, limit * 20 + 20), 0), clock, clock);
             var taken = new List<RunBatchItem>();
@@ -40,7 +40,7 @@ public sealed partial class RunBatchRepository
                 }
 
                 var expires = OpsRow.AddSeconds(now, leaseSeconds);
-                var won = session.Execute(candidate.ClientId, "UPDATE tcc_ops.run_batch_item "
+                var won = session.Execute(candidate.ClientId, "UPDATE {ops.run_batch_item} "
                     + "SET status = 'leased', lease_owner = ?, lease_expires_at = ?, heartbeat_at = ?, attempts = attempts + 1 "
                     + "WHERE {tenant} AND item_id = ? AND status = 'queued'", owner, OpsRow.Clock(session, expires), clock, candidate.ItemId);
                 if (won == 1)
@@ -64,7 +64,7 @@ public sealed partial class RunBatchRepository
     public bool Heartbeat(long clientId, string itemId, string owner, int leaseSeconds, PyDateTime now)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(leaseSeconds);
-        return database.Transact(session => session.Execute(clientId, "UPDATE tcc_ops.run_batch_item SET heartbeat_at = ?, lease_expires_at = ?"
+        return database.Transact(session => session.Execute(clientId, "UPDATE {ops.run_batch_item} SET heartbeat_at = ?, lease_expires_at = ?"
             + Owned, OpsRow.Clock(session, now), OpsRow.Clock(session, OpsRow.AddSeconds(now, leaseSeconds)), itemId, owner, OpsRow.Clock(session, now)) == 1);
     }
 
@@ -72,14 +72,14 @@ public sealed partial class RunBatchRepository
     public bool Reinstate(long clientId, string itemId, string owner, int leaseSeconds, PyDateTime now)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(leaseSeconds);
-        return database.Transact(session => session.Execute(clientId, "UPDATE tcc_ops.run_batch_item SET heartbeat_at = ?, lease_expires_at = ? "
+        return database.Transact(session => session.Execute(clientId, "UPDATE {ops.run_batch_item} SET heartbeat_at = ?, lease_expires_at = ? "
             + "WHERE {tenant} AND item_id = ? AND lease_owner = ? AND status IN ('leased', 'running')",
             OpsRow.Clock(session, now), OpsRow.Clock(session, OpsRow.AddSeconds(now, leaseSeconds)), itemId, owner) == 1);
     }
 
     /// <inheritdoc />
     public bool MarkRunning(long clientId, string itemId, string owner, long? taxYear, string? programCode, PyDateTime now) =>
-        database.Transact(session => session.Execute(clientId, "UPDATE tcc_ops.run_batch_item SET status = 'running', started_at = ?, tax_year = ?, program_code = ?"
+        database.Transact(session => session.Execute(clientId, "UPDATE {ops.run_batch_item} SET status = 'running', started_at = ?, tax_year = ?, program_code = ?"
             + Owned + " AND status = 'leased'", OpsRow.Clock(session, now), taxYear, programCode, itemId, owner, OpsRow.Clock(session, now)) == 1);
 
     /// <inheritdoc />
@@ -93,7 +93,7 @@ public sealed partial class RunBatchRepository
 
         return database.Transact(session =>
         {
-            var kept = session.Execute(clientId, "UPDATE tcc_ops.run_batch_item SET status = ?, finished_at = ?, run_id = ?, "
+            var kept = session.Execute(clientId, "UPDATE {ops.run_batch_item} SET status = ?, finished_at = ?, run_id = ?, "
                 + "skip_reason = ?, error_dependency = ?, error_message = ?, tax_year = COALESCE(?, tax_year), lease_owner = NULL, lease_expires_at = NULL"
                 + Owned + " AND batch_id = ?", result.Status.Value(), OpsRow.Clock(session, now), result.RunId, result.SkipReason, result.ErrorDependency,
                 Truncate(result.ErrorMessage), result.TaxYear, itemId, owner, OpsRow.Clock(session, now), batchId) == 1;
@@ -108,13 +108,13 @@ public sealed partial class RunBatchRepository
 
     /// <inheritdoc />
     public bool Requeue(long clientId, string itemId, string owner, PyDateTime now, PyDateTime notBefore, string? dependency, string? message) =>
-        database.Transact(session => session.Execute(clientId, "UPDATE tcc_ops.run_batch_item SET status = 'queued', not_before = ?, "
+        database.Transact(session => session.Execute(clientId, "UPDATE {ops.run_batch_item} SET status = 'queued', not_before = ?, "
             + "error_dependency = ?, error_message = ?, lease_owner = NULL, lease_expires_at = NULL"
             + Owned, OpsRow.Clock(session, notBefore), dependency, Truncate(message), itemId, owner, OpsRow.Clock(session, now)) == 1);
 
     /// <inheritdoc />
     public bool Release(long clientId, string itemId, string owner, PyDateTime now) =>
-        database.Transact(session => session.Execute(clientId, "UPDATE tcc_ops.run_batch_item SET status = 'queued', attempts = attempts - 1, "
+        database.Transact(session => session.Execute(clientId, "UPDATE {ops.run_batch_item} SET status = 'queued', attempts = attempts - 1, "
             + "lease_owner = NULL, lease_expires_at = NULL" + Owned, itemId, owner, OpsRow.Clock(session, now)) == 1);
 
     /// <inheritdoc />
@@ -129,7 +129,7 @@ public sealed partial class RunBatchRepository
             foreach (var item in lapsed)
             {
                 var spent = item.Attempts >= maxAttempts;
-                session.Execute(item.ClientId, "UPDATE tcc_ops.run_batch_item SET status = ?, lease_owner = NULL, lease_expires_at = NULL, "
+                session.Execute(item.ClientId, "UPDATE {ops.run_batch_item} SET status = ?, lease_owner = NULL, lease_expires_at = NULL, "
                     + "error_dependency = 'worker', error_message = 'the worker stopped before finishing this item', finished_at = ? "
                     + "WHERE {tenant} AND item_id = ? AND status IN ('leased', 'running') AND lease_expires_at <= ?",
                     spent ? "failed" : "queued", spent ? clock : null, item.ItemId, clock);
@@ -149,9 +149,9 @@ public sealed partial class RunBatchRepository
     public QueueHealth QueueHealth(PyDateTime now) => database.Transact(session =>
     {
         var queued = new OpsRow(session.QueryExempt(SqlExemption.Worker, "SELECT COUNT(*) AS n, MIN(b.requested_at) AS oldest "
-            + "FROM tcc_ops.run_batch_item i JOIN tcc_ops.run_batch b ON b.batch_id = i.batch_id WHERE i.status = 'queued' AND b.cancel_requested = 0")[0]);
+            + "FROM {ops.run_batch_item} i JOIN {ops.run_batch} b ON b.batch_id = i.batch_id WHERE i.status = 'queued' AND b.cancel_requested = 0")[0]);
         var live = new OpsRow(session.QueryExempt(SqlExemption.Worker, "SELECT COUNT(*) AS n, MAX(heartbeat_at) AS last "
-            + "FROM tcc_ops.run_batch_item WHERE status IN ('leased', 'running') AND lease_expires_at > ?", OpsRow.Clock(session, now))[0]);
+            + "FROM {ops.run_batch_item} WHERE status IN ('leased', 'running') AND lease_expires_at > ?", OpsRow.Clock(session, now))[0]);
         return new QueueHealth(queued.Long("n"), queued.Instant("oldest"), live.Long("n"), live.Instant("last"));
     });
 

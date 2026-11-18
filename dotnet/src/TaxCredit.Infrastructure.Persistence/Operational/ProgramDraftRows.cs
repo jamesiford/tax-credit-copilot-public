@@ -13,7 +13,7 @@ internal static class ProgramDraftRows
         "decision_comment", "decided_at", "approved_sha256", "exported_at", "export_sha256",
     ];
 
-    internal static string Select => "SELECT " + string.Join(", ", Columns) + " FROM tcc_ops.program_draft";
+    internal static string Select => "SELECT " + string.Join(", ", Columns) + " FROM {ops.program_draft}";
 
     internal static object?[] Values(SqlSession session, ProgramDraft draft) =>
     [

@@ -29,7 +29,7 @@ public sealed partial class GoldReader
         }
         columns.Add(collate.Length == 0 ? "MAX(total_hours) AS total_hours" : $"CAST(MAX(total_hours) AS TEXT){collate} AS total_hours");
         columns.Add(collate.Length == 0 ? "MAX(total_wages) AS total_wages" : $"CAST(MAX(total_wages) AS TEXT){collate} AS total_wages");
-        return "SELECT " + string.Join(", ", columns) + " FROM tcc_gold.employee_eligibility " +
+        return "SELECT " + string.Join(", ", columns) + " FROM {gold.employee_eligibility} " +
             "WHERE {tenant} AND tax_year = ? AND run_id = ? GROUP BY employee_id";
     }
 

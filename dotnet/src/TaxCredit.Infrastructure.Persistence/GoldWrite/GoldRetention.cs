@@ -56,7 +56,7 @@ public sealed record GoldRetention(int? KeepSuperseded, int MaximumRunsPerPass =
         using var span = RunSpans.Start("persist.prune");
         var candidates = database.Transact(session =>
         {
-            var superseded = session.Query(clientId, "SELECT run_id FROM tcc_ops.run_manifest WHERE {tenant} AND program_code=? AND run_status='superseded' "
+            var superseded = session.Query(clientId, "SELECT run_id FROM {ops.run_manifest} WHERE {tenant} AND program_code=? AND run_status='superseded' "
                 + "ORDER BY run_started_at DESC, run_id DESC", programCode).Select(r => (string)r["run_id"]!).Skip(keep).ToArray();
             if (superseded.Length == 0)
             {
@@ -66,7 +66,7 @@ public sealed record GoldRetention(int? KeepSuperseded, int MaximumRunsPerPass =
             var pending = new List<string>();
             foreach (var chunk in Enumerable.Reverse(superseded).Chunk(500))
             {
-                var holding = session.Query(clientId, "SELECT DISTINCT run_id FROM tcc_gold.employee_eligibility WHERE {tenant} AND run_id IN ("
+                var holding = session.Query(clientId, "SELECT DISTINCT run_id FROM {gold.employee_eligibility} WHERE {tenant} AND run_id IN ("
                     + string.Join(",", chunk.Select(_ => "?")) + ")", chunk.Cast<object?>().ToArray()).Select(r => (string)r["run_id"]!).ToHashSet(StringComparer.Ordinal);
                 pending.AddRange(chunk.Where(holding.Contains));
                 if (pending.Count >= MaximumRunsPerPass)
@@ -82,7 +82,7 @@ public sealed record GoldRetention(int? KeepSuperseded, int MaximumRunsPerPass =
             database.Transact(session =>
             {
                 // Re-checked inside the deleting transaction: only a run that is still superseded is ever pruned.
-                if (session.Query(clientId, "SELECT run_status FROM tcc_ops.run_manifest WHERE {tenant} AND run_id=?", run) is not [{ } row]
+                if (session.Query(clientId, "SELECT run_status FROM {ops.run_manifest} WHERE {tenant} AND run_id=?", run) is not [{ } row]
                     || (string?)row["run_status"] != "superseded")
                 {
                     return 0;
@@ -90,7 +90,7 @@ public sealed record GoldRetention(int? KeepSuperseded, int MaximumRunsPerPass =
 
                 foreach (var table in Tables)
                 {
-                    session.Execute(clientId, "DELETE FROM tcc_gold." + table + " WHERE {tenant} AND run_id=?", run);
+                    session.Execute(clientId, "DELETE FROM {gold." + table + "} WHERE {tenant} AND run_id=?", run);
                 }
 
                 return 1;

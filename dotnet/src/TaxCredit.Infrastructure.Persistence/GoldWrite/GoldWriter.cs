@@ -32,15 +32,15 @@ public sealed class GoldWriter : IGoldWriter
     {
         ArgumentNullException.ThrowIfNull(payload);
         ValidateShape(payload);
-        var manifest = payload.ManifestRow.Select((v, i) => _schema["tcc_ops.run_manifest"][i].ConvertValue(v)).ToArray();
+        var manifest = payload.ManifestRow.Select((v, i) => _schema["ops.run_manifest"][i].ConvertValue(v)).ToArray();
         _database.Transact(session =>
         {
-            if (session.Query(payload.ClientId, "SELECT run_id FROM tcc_ops.run_manifest WHERE {tenant} AND run_id=?", payload.RunId).Count > 0)
+            if (session.Query(payload.ClientId, "SELECT run_id FROM {ops.run_manifest} WHERE {tenant} AND run_id=?", payload.RunId).Count > 0)
             {
                 throw new InvalidOperationException("A run identity cannot be reused.");
             }
 
-            using (RunSpans.Start("persist.manifest")) { session.Insert(payload.ClientId, "tcc_ops.run_manifest", payload.ManifestColumns, [manifest]); }
+            using (RunSpans.Start("persist.manifest")) { session.Insert(payload.ClientId, "ops.run_manifest", payload.ManifestColumns, [manifest]); }
             return 0;
         });
         IReadOnlyList<KeyValuePair<string, long>> counts;
@@ -56,7 +56,7 @@ public sealed class GoldWriter : IGoldWriter
         catch
         {
             _database.Transact(session => session.Execute(payload.ClientId,
-                "UPDATE tcc_ops.run_manifest SET run_status='failed' WHERE {tenant} AND run_id=? AND run_status='running'", payload.RunId));
+                "UPDATE {ops.run_manifest} SET run_status='failed' WHERE {tenant} AND run_id=? AND run_status='running'", payload.RunId));
             throw;
         }
 
@@ -79,7 +79,7 @@ public sealed class GoldWriter : IGoldWriter
             // A lost queue lease stops the write at the next table boundary; the transaction then rolls back.
             RunLeaseScope.ThrowIfLost();
             var columns = GoldColumns.All[table];
-            var storage = _schema["tcc_gold." + table];
+            var storage = _schema["gold." + table];
             IReadOnlyList<object?>[] values;
             using (var prepare = RunSpans.Start("gold.prepare"))
             {
@@ -93,7 +93,7 @@ public sealed class GoldWriter : IGoldWriter
             {
                 insert?.SetTag("table", table);
                 insert?.SetTag("rows", values.Length);
-                written = session.Insert(payload.ClientId, "tcc_gold." + table, columns, values);
+                written = session.Insert(payload.ClientId, "gold." + table, columns, values);
             }
 
             counts.Add(new(table, written));
@@ -121,18 +121,18 @@ public sealed class GoldWriter : IGoldWriter
     {
         foreach (var table in new[] { "unit_year_master", "unit_credit_installment" })
         {
-            session.Execute(payload.ClientId, "UPDATE tcc_gold." + table
-                + " SET is_current=0 WHERE {tenant} AND program_code=? AND is_current=1", payload.ProgramCode);
+            session.Execute(payload.ClientId, "UPDATE {gold." + table
+                + "} SET is_current=0 WHERE {tenant} AND program_code=? AND is_current=1", payload.ProgramCode);
         }
     }
 
     private static void Supersede(SqlSession session, GoldRunPayload payload)
     {
         session.Execute(payload.ClientId,
-            "UPDATE tcc_ops.run_manifest SET run_status='superseded',superseded_by_run_id=? WHERE {tenant} AND program_code=? AND run_status='success' AND run_id<>?",
+            "UPDATE {ops.run_manifest} SET run_status='superseded',superseded_by_run_id=? WHERE {tenant} AND program_code=? AND run_status='success' AND run_id<>?",
             payload.RunId, payload.ProgramCode, payload.RunId);
         session.Execute(payload.ClientId,
-            "UPDATE tcc_ops.run_manifest SET run_status='success',run_completed_at=? WHERE {tenant} AND run_id=? AND run_status='running'",
+            "UPDATE {ops.run_manifest} SET run_status='success',run_completed_at=? WHERE {tenant} AND run_id=? AND run_status='running'",
             payload.RunCompletedAt, payload.RunId);
     }
     private static void ValidateShape(GoldRunPayload payload)
@@ -168,6 +168,6 @@ public sealed class GoldWriter : IGoldWriter
 
     /// <summary>Marks abandoned running manifests failed without inventing a completion timestamp.</summary>
     public int ReapStranded(DateTime cutoffUtc) => _database.Transact(session => session.ExecuteExempt(SqlExemption.Worker,
-        "UPDATE tcc_ops.run_manifest SET run_status='failed' WHERE run_status='running' AND run_completed_at IS NULL AND run_started_at<?",
+        "UPDATE {ops.run_manifest} SET run_status='failed' WHERE run_status='running' AND run_completed_at IS NULL AND run_started_at<?",
         cutoffUtc.ToString("yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture)));
 }

@@ -178,12 +178,12 @@ public sealed class SeedImporterTests
     {
         using var fixture = new PersistenceFixture();
         var schema = PersistenceSchema.Read(PersistenceFixture.Root);
-        Assert.Equal(19, schema["tcc_gold.employee_period_fact"].Count);
-        Assert.Equal(34, schema["tcc_gold.unit_year_master"].Count);
-        Assert.Equal(8, schema["tcc_ops.program_engagement"].Count);
+        Assert.Equal(19, schema["gold.employee_period_fact"].Count);
+        Assert.Equal(34, schema["gold.unit_year_master"].Count);
+        Assert.Equal(8, schema["ops.program_engagement"].Count);
         foreach (var (name, columns) in TaxCredit.Domain.Gold.GoldColumns.All)
         {
-            Assert.Equal(columns, schema["tcc_gold." + name].Select(c => c.Name));
+            Assert.Equal(columns, schema["gold." + name].Select(c => c.Name));
         }
 
         using (var session = fixture.Database.Open())
@@ -191,7 +191,7 @@ public sealed class SeedImporterTests
             Assert.Equal(6, session.QueryExempt(SqlExemption.Schema, "SELECT version FROM tcc_ops.schema_migration").Count);
         }
 
-        var column = Assert.Single(schema["tcc_gold.unit_year_master"], c => c.Name == "annual_credit_usd");
+        var column = Assert.Single(schema["gold.unit_year_master"], c => c.Name == "annual_credit_usd");
         Assert.Equal(19, column.Precision);
         Assert.Equal(4, column.Scale);
         Assert.Throws<InvalidOperationException>(() => column.ConvertValue("1.00001"));
@@ -211,6 +211,6 @@ public sealed class SeedImporterTests
             }
         }
 
-        Assert.Equal(schema["tcc_gold.employee_period_fact"].Select(c => c.Name), seen);
+        Assert.Equal(schema["gold.employee_period_fact"].Select(c => c.Name), seen);
     }
 }

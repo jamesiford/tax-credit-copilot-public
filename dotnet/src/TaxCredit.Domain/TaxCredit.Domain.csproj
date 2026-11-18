@@ -4,6 +4,9 @@
     <RootNamespace>TaxCredit.Domain</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <EmbeddedResource Include="..\..\..\docs\data\data-map.json" LogicalName="data-map.json" />
+  </ItemGroup>
+  <ItemGroup>
     <InternalsVisibleTo Include="TaxCredit.Parity.Tests" />
     <InternalsVisibleTo Include="TaxCredit.Domain.Tests" />
   </ItemGroup>

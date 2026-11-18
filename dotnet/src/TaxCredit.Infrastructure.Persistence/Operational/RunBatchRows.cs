@@ -7,8 +7,8 @@ namespace TaxCredit.Infrastructure.Persistence.Operational;
 
 internal static class RunBatchRows
 {
-    internal const string BatchTable = "tcc_ops.run_batch";
-    internal const string ItemTable = "tcc_ops.run_batch_item";
+    internal const string BatchTable = "{ops.run_batch}";
+    internal const string ItemTable = "{ops.run_batch_item}";
     internal static readonly string[] BatchColumns =
     [
         "batch_id", "kind", "scope_kind", "scope_spec", "program_code", "tax_years", "force_run", "include_code_commit",

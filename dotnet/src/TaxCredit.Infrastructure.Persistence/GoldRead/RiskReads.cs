@@ -5,7 +5,7 @@ namespace TaxCredit.Infrastructure.Persistence.GoldRead;
 public sealed partial class GoldReader
 {
     private const string RiskColumns = "employee_id, record_token, weeks_worked, total_hours, total_wages, avg_weekly_hours, avg_weekly_wages, weight";
-    private const string RiskWhere = " FROM tcc_gold.employee_eligibility WHERE {tenant} AND tax_year = ? AND method = ? AND run_id = ? AND avg_weekly_hours IS NOT NULL";
+    private const string RiskWhere = " FROM {gold.employee_eligibility} WHERE {tenant} AND tax_year = ? AND method = ? AND run_id = ? AND avg_weekly_hours IS NOT NULL";
 
     /// <inheritdoc />
     public IReadOnlyDictionary<string, object?> AtRisk(long clientId, int taxYear, string method, RiskOptions options)
@@ -61,7 +61,7 @@ public sealed partial class GoldReader
         {
             var marks = string.Join(", ", chunk.Select(_ => "?"));
             var rows = Many(clientId, "SELECT record_token, worksite_id, pay_period_start, pay_period_end, pay_date, hours, wages " +
-                "FROM tcc_gold.employee_period_fact WHERE {tenant} AND tax_year = ? AND run_id = ? " +
+                "FROM {gold.employee_period_fact} WHERE {tenant} AND tax_year = ? AND run_id = ? " +
                 $"AND record_token IN ({marks}) ORDER BY record_token, pay_period_end", [taxYear, runId, .. chunk]);
             foreach (var group in rows.GroupBy(r => GoldValues.Text(r, "record_token")))
             {

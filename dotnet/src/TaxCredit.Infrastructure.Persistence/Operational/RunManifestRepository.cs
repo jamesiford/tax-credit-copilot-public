@@ -6,7 +6,7 @@ namespace TaxCredit.Infrastructure.Persistence.Operational;
 /// <summary>The durable manifest port used by operational routes and the Gold writer's database.</summary>
 public sealed class RunManifestRepository(PersistenceDatabase database) : IRunManifestRepository
 {
-    private static string Select => "SELECT " + string.Join(", ", WarehouseVocabulary.RunManifestColumns) + " FROM tcc_ops.run_manifest";
+    private static string Select => "SELECT " + string.Join(", ", WarehouseVocabulary.RunManifestColumns) + " FROM {ops.run_manifest}";
 
     /// <summary>Indicates durable storage rather than a process-local manifest dictionary.</summary>
     public bool IsDurable { get; } = true;
@@ -17,12 +17,12 @@ public sealed class RunManifestRepository(PersistenceDatabase database) : IRunMa
         ArgumentNullException.ThrowIfNull(manifest);
         return database.Transact(session =>
         {
-            if (session.QueryExempt(SqlExemption.ManifestIdentity, "SELECT run_id FROM tcc_ops.run_manifest WHERE run_id = ?", manifest.RunId).Count != 0)
+            if (session.QueryExempt(SqlExemption.ManifestIdentity, "SELECT run_id FROM {ops.run_manifest} WHERE run_id = ?", manifest.RunId).Count != 0)
             {
                 throw new InvalidOperationException("The run identity is already recorded.");
             }
 
-            session.Insert(manifest.ClientId, "tcc_ops.run_manifest", WarehouseVocabulary.RunManifestColumns, [Values(session, manifest)]);
+            session.Insert(manifest.ClientId, "ops.run_manifest", WarehouseVocabulary.RunManifestColumns, [Values(session, manifest)]);
             return manifest;
         });
     }
@@ -54,7 +54,7 @@ public sealed class RunManifestRepository(PersistenceDatabase database) : IRunMa
     public long Count()
     {
         using var session = database.Open();
-        return new OpsRow(session.QueryExempt(SqlExemption.ManifestIdentity, "SELECT COUNT(*) AS n FROM tcc_ops.run_manifest")[0]).Long("n");
+        return new OpsRow(session.QueryExempt(SqlExemption.ManifestIdentity, "SELECT COUNT(*) AS n FROM {ops.run_manifest}")[0]).Long("n");
     }
 
     private static object?[] Values(SqlSession session, RunManifest m) =>

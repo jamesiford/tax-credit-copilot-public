@@ -1,3 +1,4 @@
+using TaxCredit.Domain.DataMap;
 using System.Globalization;
 using System.Text.Json.Nodes;
 using TaxCredit.Application.Features.Ai.Briefs;
@@ -47,7 +48,7 @@ public sealed class CanonicalCapabilityReads(IMediator mediator, ReadStatutes st
             context["current_average"]?.GetValue<double>(), context["prior_average"]?.GetValue<double>(), statute.ProgramCode));
         var facts = new JsonObject { ["snapshot"] = snapshot, ["credit"] = credit };
         if (asked is not null) { facts["program_code"] = statute.ProgramCode; }
-        var evidence = CapabilityDirectReads.RunEvidence(run is null ? null : CanonicalPageReads.Object(run), "tcc_gold");
+        var evidence = CapabilityDirectReads.RunEvidence(run is null ? null : CanonicalPageReads.Object(run), PhysicalNames.Active.Map.GoldSchema);
         evidence["trail_sha256"] = recorder.Steps.Count == 0 ? null
             : ((string)recorder.ToDict()["evidence_hash"]!)[7..];
         return new(facts, evidence);
@@ -82,7 +83,7 @@ public sealed class CanonicalCapabilityReads(IMediator mediator, ReadStatutes st
     {
         var snapshot = new JsonObject
         {
-            ["source"] = "tcc_gold \u2014 read from the run that computed it",
+            ["source"] = PhysicalNames.Active.Map.GoldSchema + " \u2014 read from the run that computed it",
             ["selected_client_id"] = client,
             ["selected_tax_year"] = year,
             ["state"] = state,

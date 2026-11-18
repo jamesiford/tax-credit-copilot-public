@@ -18,7 +18,7 @@ public sealed class InsertCostProbe(ITestOutputHelper output)
     {
         if (Environment.GetEnvironmentVariable("BENCH_RUN") != "1") { return; }
         using var fixture = new PersistenceFixture();
-        var schema = PersistenceSchema.Read(PersistenceFixture.Root)["tcc_gold.employee_period_fact"];
+        var schema = PersistenceSchema.Read(PersistenceFixture.Root)["gold.employee_period_fact"];
         var columns = GoldColumns.All["employee_period_fact"];
         var rows = Enumerable.Range(0, Rows).Select(i => (IReadOnlyList<object?>)schema.Select(c => Value(c, i)).ToArray()).ToArray();
         fixture.Database.Transact(s =>

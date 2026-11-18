@@ -1,3 +1,4 @@
+using TaxCredit.Domain.DataMap;
 using System.Text.Json.Nodes;
 using TaxCredit.Application.Features.ReadsCalc.Portfolio;
 using TaxCredit.Application.Ports.Persistence;
@@ -23,7 +24,7 @@ public sealed class CapabilityRiskReads(ReadsStoredPortfolioBriefs stored, Func<
         {
             facts = ZeroPopulation(args, resolved, method) ?? facts;
         }
-        return new(facts, CapabilityDirectReads.RunEvidence(run is null ? null : Object(run), "tcc_gold"),
+        return new(facts, CapabilityDirectReads.RunEvidence(run is null ? null : Object(run), PhysicalNames.Active.Map.GoldSchema),
             UserOnlyFacts: facts["cohort"] is JsonArray { Count: > 0 } ? ["cohort"] : []);
     }
 

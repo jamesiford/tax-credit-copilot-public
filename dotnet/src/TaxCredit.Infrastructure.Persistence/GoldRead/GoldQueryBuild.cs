@@ -51,7 +51,7 @@ public sealed partial class GoldDataQuery
             projections.Add(sql + (column.Unit == "USD" && _database.Dialect is SqliteDialect ? " COLLATE TCC_DECIMAL" : "") + " AS " + column.Name);
         }
         var where = Where(spec, dataset);
-        var table = dataset.Name == "run_manifest" ? "tcc_ops.run_manifest" : "tcc_gold." + dataset.Name;
+        var table = dataset.Name == "run_manifest" ? "{ops.run_manifest}" : "{gold." + dataset.Name + "}";
         var sqlText = "SELECT " + string.Join(", ", projections) + " FROM " + table + " t WHERE {tenant:t}" + where.Sql;
         if (group.Count > 0)
         {
