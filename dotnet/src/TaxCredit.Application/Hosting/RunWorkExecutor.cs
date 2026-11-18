@@ -36,6 +36,7 @@ public sealed class RunWorkExecutor(IServiceScopeFactory scopes, IRunBatchReposi
         try
         {
             cancellationToken.ThrowIfCancellationRequested();
+            using var span = RunSpans.Start("item");
             using var scope = scopes.CreateScope();
             var services = scope.ServiceProvider;
             var publication = services.GetRequiredService<IRunPublication>();

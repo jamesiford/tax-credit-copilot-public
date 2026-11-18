@@ -1,3 +1,4 @@
+using TaxCredit.Application.Hosting;
 using TaxCredit.Application.Ports.Persistence;
 using TaxCredit.Domain.Numerics;
 using TaxCredit.Domain.Runs;
@@ -32,6 +33,7 @@ public sealed class RunPublication(PersistenceDatabase database, IRunBatchReposi
         ArgumentNullException.ThrowIfNull(item);
         ArgumentNullException.ThrowIfNull(calculate);
         ArgumentNullException.ThrowIfNull(now);
+        using var span = RunSpans.Start("publish");
         try
         {
             database.Transact(session =>

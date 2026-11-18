@@ -1,4 +1,5 @@
 using System.Globalization;
+using TaxCredit.Application.Hosting;
 using TaxCredit.Application.Ports.Sources;
 using TaxCredit.Domain.Calculation;
 using TaxCredit.Domain.Pipeline;
@@ -41,8 +42,17 @@ public sealed class SqlClientSource(SourceScanner scanner, PayrollProjector proj
         Interlocked.Increment(ref _freshScopes);
         return new FreshScope(this);
     }
-    private PayrollProjection? LoadUncached(long accountId) =>
-        new SourceDatasetReader(scanner).Load(accountId) is { } dataset ? projector.Project(dataset) : null;
+    private PayrollProjection? LoadUncached(long accountId)
+    {
+        using var load = RunSpans.Start("source.load");
+        SourceDataset? dataset;
+        using (RunSpans.Start("source.read")) { dataset = new SourceDatasetReader(scanner).Load(accountId); }
+        if (dataset is null) { return null; }
+        using var project = RunSpans.Start("source.project");
+        var projection = projector.Project(dataset);
+        project?.SetTag("rows", projection.Rows.Count);
+        return projection;
+    }
     /// <summary>The comparison value: the cheap source marker plus what the operator's lookups would do to the same rows.</summary>
     private string Stamp(long accountId) =>
         new SourceFingerprintReader(scanner).Fingerprint(accountId).Sha256 + "|" + projector.LookupDigest(accountId);

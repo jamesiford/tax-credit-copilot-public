@@ -1,3 +1,4 @@
+using TaxCredit.Application.Hosting;
 using TaxCredit.Application.Ports.Persistence;
 using TaxCredit.Domain.Numerics;
 using TaxCredit.Domain.Pipeline;
@@ -8,5 +9,9 @@ namespace TaxCredit.Infrastructure.Persistence;
 public sealed class PersistedClientCalculation(ClientCalculation calculation, IPersistenceUnitOfWork unitOfWork) : IClientCalculationRunner
 {
     /// <inheritdoc />
-    public PyDict Run(RunClientCalculationCommand command) => unitOfWork.Execute(() => calculation.Run(command));
+    public PyDict Run(RunClientCalculationCommand command)
+    {
+        using var span = RunSpans.Start("run.calculation");
+        return unitOfWork.Execute(() => calculation.Run(command));
+    }
 }

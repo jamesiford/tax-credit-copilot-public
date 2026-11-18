@@ -47,3 +47,10 @@ Gates: build `-warnaserror` clean, `dotnet format --verify-no-changes` clean, Pa
 - The byte figure is an estimate; a hard memory limit needs a measured one.
 - Entry memory is the full projection (about 2.6 KB per row): one 1M-row client is about 2.6 GB. Choose `SOURCE_CACHE_MB` against `SOURCE_MAX_ACCOUNT_ROWS`.
 - The slow staged-source Api tests' 100 s client timeout is flaky on this machine independent of this work.
+
+## Merge with S4 (ScopedPayrollMemo, RunSpans)
+
+- Both kept. S4's ScopedPayrollMemo still reads a client's payroll once per request or queued item; S3's cache sits underneath it, in SqlClientSource.LoadProjection (the source.load/read/project spans wrap the uncached read only).
+- The memo is now also the scope's IPayrollFreshness: rows it remembered from a read made outside a require-fresh scope are never handed to code inside one, so a run cannot be served rows the source's freshness check did not vouch for; rows read inside a fresh scope are reused by the rest of that item (still one read per item). With SOURCE_CACHE_MODE=off the memo gets no source freshness scope and RequireFresh() is a no-op, so behaviour is identical to S4.
+- New tests: a queued item scans the payroll exactly once with the cache off and on (QueuedRunCostTests), a cache-on revalidation takes a fingerprint without rescanning, and two memo tests (non-fresh rows not served inside a fresh scope; no change without a freshness scope).
+- Gates after the merge: build -warnaserror clean, format clean, full dotnet test TaxCredit.slnx -m:1 green (Api 438, Persistence 145, Sources 189 + 4 skipped, Parity 152, Shadow 8, others unchanged), nothing flaky this run.
