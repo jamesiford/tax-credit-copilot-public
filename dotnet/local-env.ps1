@@ -13,8 +13,7 @@ function Read-DotEnv([string]$Path) {
 
 function Get-TaxCreditLocalEnvironment {
     param(
-        [ValidateSet('live', 'offline')][string]$Mode = 'live',
-        [ValidateSet('sqlite', 'warehouse')][string]$Persistence = 'sqlite'
+        [ValidateSet('live', 'offline')][string]$Mode = 'live'
     )
     $repo = Split-Path $PSScriptRoot -Parent
     $settings = [ordered]@{ ENVIRONMENT = 'local' }
@@ -29,7 +28,7 @@ function Get-TaxCreditLocalEnvironment {
 
     $envFile = Join-Path $repo 'backend\.env'
     $cfg = Read-DotEnv $envFile
-    foreach ($required in 'LAKEHOUSE_SQL_SERVER', 'LAKEHOUSE_SQL_DATABASE') {
+    foreach ($required in 'LAKEHOUSE_SQL_SERVER', 'LAKEHOUSE_SQL_DATABASE', 'WAREHOUSE_SERVER', 'WAREHOUSE_DATABASE') {
         if (-not $cfg[$required]) { throw "$required is missing from $envFile" }
     }
     $settings.AUTH_MODE = if ($cfg['AUTH_MODE']) { $cfg['AUTH_MODE'] } else { 'none' }
@@ -42,16 +41,17 @@ function Get-TaxCreditLocalEnvironment {
     foreach ($name in 'FABRIC_WORKSPACE', 'FABRIC_LAKEHOUSE', 'ONELAKE_ENDPOINT', 'REFERENCE_ACCOUNT_ID') {
         if ($cfg[$name]) { $settings[$name] = $cfg[$name] }
     }
-    $settings.ARTIFACT_STORE = 'local'
+# Same connections as a deployed host: results and operational data in the Warehouse (or Azure SQL), payroll from the lakehouse.
+    $settings.TCC_PERSISTENCE_PROVIDER = 'warehouse'
+    $settings.FABRIC_SQL_SERVER = $cfg['WAREHOUSE_SERVER']
+    $settings.FABRIC_SQL_DATABASE = $cfg['WAREHOUSE_DATABASE']
+    # Artifacts go to Blob when the account is configured (as deployed); otherwise to local disk, which is the one remaining local-only store.
+    if ($cfg['ARTIFACT_BLOB_ACCOUNT_URL']) {
+        $settings.ARTIFACT_STORE = 'blob'
+        $settings.ARTIFACT_BLOB_ACCOUNT_URL = $cfg['ARTIFACT_BLOB_ACCOUNT_URL']
+    }
+    else { $settings.ARTIFACT_STORE = 'local' }
     # DefaultAzureCredential would otherwise try Visual Studio / VS Code sign-ins first, which may be a different account.
     $settings.AZURE_TOKEN_CREDENTIALS = 'AzureCliCredential'
-    $settings.TCC_PERSISTENCE_PROVIDER = $Persistence
-    if ($Persistence -eq 'warehouse') {
-        foreach ($required in 'WAREHOUSE_SERVER', 'WAREHOUSE_DATABASE') {
-            if (-not $cfg[$required]) { throw "$required is missing from $envFile" }
-        }
-        $settings.FABRIC_SQL_SERVER = $cfg['WAREHOUSE_SERVER']
-        $settings.FABRIC_SQL_DATABASE = $cfg['WAREHOUSE_DATABASE']
-    }
     return $settings
 }
