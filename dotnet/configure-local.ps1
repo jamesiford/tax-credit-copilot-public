@@ -8,24 +8,22 @@
   PowerShell session. Then pick the profile in Visual Studio and press Run, or use `dotnet run --launch-profile`.
 
   Profiles written:
-    "TaxCredit.Api - live lakehouse"   reads the live lakehouse (backend\.env), local SQLite for operational state
+    "TaxCredit.Api - live lakehouse"   same data sources as a deployed host: the lakehouse for payroll, the Warehouse for results (backend\.env)
     "TaxCredit.Api - offline"          synthetic seed data, no Azure calls
 
 .EXAMPLE
   .\dotnet\configure-local.ps1                 # write the profiles
   .\dotnet\configure-local.ps1 -Session        # also export the live variables into this PowerShell session
-  .\dotnet\configure-local.ps1 -Persistence warehouse   # live profile also writes claims/findings/runs to the Warehouse
 #>
 param(
     [int]$Port = 8000,
-    [ValidateSet('sqlite', 'warehouse')][string]$Persistence = 'sqlite',
     [switch]$Session
 )
 
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'local-env.ps1')
 
-$live = Get-TaxCreditLocalEnvironment -Mode live -Persistence $Persistence
+$live = Get-TaxCreditLocalEnvironment -Mode live
 $offline = Get-TaxCreditLocalEnvironment -Mode offline
 
 function New-Profile($variables) {
@@ -72,9 +70,7 @@ Write-Host "Wrote $workerTarget" -ForegroundColor Green
 Write-Host "In Visual Studio: right-click the solution > Configure Startup Projects > Multiple startup projects: TaxCredit.Api = Start and TaxCredit.Worker = Start, then pick each project's profile next to the Run button and press Run." -ForegroundColor Cyan
 Write-Host "Runs are queued by the API and executed by the Worker: without the Worker a run stays 'queued'." -ForegroundColor Yellow
 
-if ($Persistence -eq 'warehouse') {
-    Write-Host 'Warehouse persistence: claims, findings and runs WRITE to the Fabric Warehouse (unvalidated; needs tcc_ops.finding_audit).' -ForegroundColor Yellow
-}
+Write-Host 'The live profiles WRITE claims, findings and runs to the Warehouse named in backend\.env.' -ForegroundColor Yellow
 
 if ($Session) {
     foreach ($key in $live.Keys) { Set-Item -Path "Env:$key" -Value $live[$key] }

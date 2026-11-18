@@ -69,6 +69,15 @@ public sealed partial class RunBatchRepository
     }
 
     /// <inheritdoc />
+    public bool Reinstate(long clientId, string itemId, string owner, int leaseSeconds, PyDateTime now)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(leaseSeconds);
+        return database.Transact(session => session.Execute(clientId, "UPDATE tcc_ops.run_batch_item SET heartbeat_at = ?, lease_expires_at = ? "
+            + "WHERE {tenant} AND item_id = ? AND lease_owner = ? AND status IN ('leased', 'running')",
+            OpsRow.Clock(session, now), OpsRow.Clock(session, OpsRow.AddSeconds(now, leaseSeconds)), itemId, owner) == 1);
+    }
+
+    /// <inheritdoc />
     public bool MarkRunning(long clientId, string itemId, string owner, long? taxYear, string? programCode, PyDateTime now) =>
         database.Transact(session => session.Execute(clientId, "UPDATE tcc_ops.run_batch_item SET status = 'running', started_at = ?, tax_year = ?, program_code = ?"
             + Owned + " AND status = 'leased'", OpsRow.Clock(session, now), taxYear, programCode, itemId, owner, OpsRow.Clock(session, now)) == 1);

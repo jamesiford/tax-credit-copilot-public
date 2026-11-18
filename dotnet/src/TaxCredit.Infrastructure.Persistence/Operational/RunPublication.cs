@@ -11,6 +11,9 @@ namespace TaxCredit.Infrastructure.Persistence.Operational;
 public sealed class RunPublication(PersistenceDatabase database, IRunBatchRepository queue, IRunManifestRepository manifests) : IRunPublication
 {
     /// <inheritdoc />
+    public bool RenewalsReachTheQueue => database.Dialect is not SqliteDialect;
+
+    /// <inheritdoc />
     public string Identity(RunBatchItem item, string owner, PyDateTime now, Func<string> newId)
     {
         ArgumentNullException.ThrowIfNull(item);
@@ -28,7 +31,7 @@ public sealed class RunPublication(PersistenceDatabase database, IRunBatchReposi
 
     /// <inheritdoc />
     public void Publish(RunBatchItem item, string owner, string? runId, Func<ItemResult> calculate,
-        Func<PyDateTime> now, CancellationToken cancellationToken, int leaseSeconds = 600)
+        Func<PyDateTime> now, CancellationToken cancellationToken, int leaseSeconds = 600, IRunLease? lease = null)
     {
         ArgumentNullException.ThrowIfNull(item);
         ArgumentNullException.ThrowIfNull(calculate);
@@ -36,6 +39,12 @@ public sealed class RunPublication(PersistenceDatabase database, IRunBatchReposi
         using var span = RunSpans.Start("publish");
         try
         {
+            if (lease is not null)
+            {
+                PublishRenewed(item, owner, runId, calculate, now, lease, leaseSeconds, cancellationToken);
+                return;
+            }
+
             database.Transact(session =>
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -66,6 +75,42 @@ public sealed class RunPublication(PersistenceDatabase database, IRunBatchReposi
             if (persisted is null || !RunStateMachine.TerminalItems.Contains(persisted.Status)) { throw; }
             if (persisted.RunId is { } accepted && Accepted(item.ClientId, accepted) is null) { throw; }
         }
+    }
+
+    private void PublishRenewed(RunBatchItem item, string owner, string? runId, Func<ItemResult> calculate, Func<PyDateTime> now,
+        IRunLease lease, int leaseSeconds, CancellationToken cancellationToken)
+    {
+        // The long transaction never reads or writes the queue row, so the renewal (its own connection) neither blocks on it nor conflicts with it.
+        var result = database.Transact(_ =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            lease.ThrowIfLost();
+            var accepted = runId is null ? null : Accepted(item.ClientId, runId);
+            ItemResult outcome;
+            using (lease.Enter())
+            {
+                outcome = accepted is null ? calculate() : new ItemResult { Status = ItemStatus.Succeeded, RunId = accepted.RunId, TaxYear = accepted.TaxYear };
+            }
+
+            cancellationToken.ThrowIfCancellationRequested();
+            // Fenced by the clock: a claimant cannot take the item before the last renewed expiry, so committing before it is safe.
+            lease.ThrowIfLost();
+            return outcome;
+        }, deferWriteLock: true);
+        lease.Quiesce();
+        if (!RenewalsReachTheQueue && !queue.Reinstate(item.ClientId, item.ItemId, owner, leaseSeconds, now())) { throw new RunLeaseLost(); }
+        database.Transact(session =>
+        {
+            Own(item, owner, now());
+            if (result.RunId is { } resultId && Accepted(item.ClientId, resultId) is { } manifest)
+            {
+                session.Execute(item.ClientId, "UPDATE tcc_ops.run_batch_item SET program_code = ? WHERE {tenant} AND item_id = ? AND lease_owner = ?",
+                    manifest.ProgramCode, item.ItemId, owner);
+            }
+
+            if (!queue.Finish(item.ClientId, item.ItemId, owner, now(), result, item.BatchId)) { throw new RunLeaseLost(); }
+            return true;
+        });
     }
 
     private RunManifest? Accepted(long clientId, string runId)

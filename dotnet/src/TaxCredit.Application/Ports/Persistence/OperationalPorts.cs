@@ -33,6 +33,8 @@ public interface IRunBatchRepository
     IReadOnlyList<RunBatchItem> Claim(string owner, int limit, int leaseSeconds, PyDateTime now);
     /// <summary>Renews an unexpired lease held by this worker.</summary>
     bool Heartbeat(long clientId, string itemId, string owner, int leaseSeconds, PyDateTime now);
+    /// <summary>Extends a lease this worker still holds even if its clock ran out, provided nobody reaped or claimed the item meanwhile.</summary>
+    bool Reinstate(long clientId, string itemId, string owner, int leaseSeconds, PyDateTime now);
     /// <summary>Starts a leased item with its resolved scope.</summary>
     bool MarkRunning(long clientId, string itemId, string owner, long? taxYear, string? programCode, PyDateTime now);
     /// <summary>Finishes an owned item and refreshes its batch counters atomically.</summary>

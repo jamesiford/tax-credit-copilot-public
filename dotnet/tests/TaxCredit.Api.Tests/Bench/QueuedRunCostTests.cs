@@ -54,7 +54,10 @@ public sealed class QueuedRunCostTests
         System.Diagnostics.ActivitySource.AddActivityListener(listener);
         await using var host = await BenchHost.Start(new SyntheticAnalyticsTransport(3000));
         await host.App.Services.GetRequiredService<RunWorkExecutor>().Drain(CancellationToken.None);
-        Assert.NotEmpty(parameters);
-        Assert.All(parameters, count => Assert.InRange(count, 1, 128));
+        // The listener is process-wide, so spans of other tests running at the same time arrive on other threads: read a snapshot.
+        long[] seen;
+        lock (parameters) { seen = [.. parameters]; }
+        Assert.NotEmpty(seen);
+        Assert.All(seen, count => Assert.InRange(count, 1, 128));
     }
 }

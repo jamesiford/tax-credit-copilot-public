@@ -63,6 +63,12 @@ You normally set none by hand. `backend\.env` is the single input; `dotnet\local
 | `SOURCE_CACHE_MB` | 512 | Estimated memory the cache may hold (an estimate of the row dictionaries, not a measurement). Whole number, minimum 16. Least recently used clients are dropped to fit. |
 | `SOURCE_CACHE_ACCOUNTS` | 64 | Most clients the cache may hold. Whole number, minimum 1. |
 | `SOURCE_VERSION_CHECK_SECONDS` | 300 | How long a matching source marker is trusted. Inside it a page read asks the source nothing; after it the next read takes the cheap marker again and reloads only if it changed. This is the **staleness window** for page reads. Whole number, minimum 1. Calculation runs ignore it. |
+| `TCC_BULK_LOAD` | `on` | SQL Server-family stores only (Warehouse, Azure SQL): large inserts use `SqlBulkCopy` inside the publish transaction. `off` is the kill switch and restores multi-row INSERT statements (about 500 rows/s on the Warehouse). |
+| `TCC_BULK_LOAD_MIN_ROWS` | 1000 | Inserts smaller than this keep using statements. |
+| `TCC_BULK_TIMEOUT_SECONDS` | 3600 | Timeout of one table's bulk load. |
+| `TCC_RETAIN_SUPERSEDED_RUNS` | 2 | How many superseded runs per client-program keep their employee-grain Gold rows (`employee_period_fact`, `onezero_matrix`, `employee_eligibility`); older ones are pruned after the publish commits. Whole number, minimum 1; `all` prunes nothing. Manifests and unit-level tables are never pruned. |
+| `RUN_LEASE_SECONDS` | 600 | Queue lease of an item; a worker that goes silent for this long loses it. |
+| `RUN_LEASE_RENEW_SECONDS` | a third of the lease | How often a running item renews its lease while it calculates and writes. Must be shorter than the lease. |
 | `RUN_BATCH_MAX_ITEMS` | 5000 | Largest batch a request may queue. |
 | `RUN_BATCH_CONFIRM_ABOVE` | 25 | A batch larger than this needs the typed confirmation count. |
 | `RUN_STALE_WORKER_SECONDS` | 60 | After this long with queued work and no live Worker lease, the Runs page shows "queued runs in this batch are not progressing". |
@@ -200,6 +206,12 @@ What is **not** in place, and matters at scale:
 Recommended next steps, in order: (1) serve the footprint from a small pre-aggregated summary table; (2) cut the per-row projection cost
 (the engine's dictionary row is 2.6 KB of the 3.5 KB, `docs/SCALE-S2-REPORT.md`); (3) partition or cluster the Payroll Delta table by `account_id`;
 (4) decide whether to turn the per-client cache on (below).
+
+### Persisting a run to the Warehouse (stage S5, `docs/SCALE-S5-REPORT.md`)
+
+Measured on the live Fabric Warehouse with `SqlBulkCopy` (one connection, inside the publish transaction), synthetic client, `employee_period_fact` rows: 100,000 rows 37 s, 400,000 rows 58 s, 1,000,000 rows 99 s in total
+(the `employee_period_fact` table itself 7.7 s, 28 s and 63 s). The multi-row INSERT path it replaces took more than 35 minutes for a 384,418-row client. A running item now renews its queue lease on a timer, so a write that
+outlasts the lease no longer loses it. If a Warehouse ever rejects the bulk protocol, set `TCC_BULK_LOAD=off`.
 
 ### The per-client projection cache (`SOURCE_CACHE_MODE`, off by default)
 

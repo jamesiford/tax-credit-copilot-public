@@ -41,7 +41,7 @@ public static class RuntimeRegistration
         {
             var connections = new EntraSqlConnections(Required(settings, "FABRIC_SQL_SERVER"),
                 Required(settings, "FABRIC_SQL_DATABASE"), new CredentialSqlTokens(new DefaultAzureCredential()));
-            database = connections.Database();
+            database = connections.Database(bulk: BulkLoadPolicy.FromSettings(settings.Get));
             services.AddSingleton(connections);
         }
         else
@@ -49,19 +49,37 @@ public static class RuntimeRegistration
             throw new InvalidOperationException("Unknown TCC_PERSISTENCE_PROVIDER.");
         }
 
-        services.AddPersistence(database, paths.Repository, paths.Seeds);
+        services.AddPersistence(database, paths.Repository, paths.Seeds, retention: GoldRetention.FromSettings(settings.Get));
         services.AddRuntimeSources(settings, paths);
         services.AddRuntimeCalculation(settings, paths);
         services.AddRuntimeTrust(settings);
         services.AddRuntimeAi(settings);
         services.AddRuntimeArtifacts(settings, paths, hooks);
         services.AddSingleton<RunWorkGate>();
-        services.AddSingleton(new RunExecutionOptions());
+        services.AddSingleton(ExecutionOptions(settings));
         services.AddSingleton<RunWorkExecutor>();
         services.AddSingleton<IContractWork, RuntimeContractWork>();
         services.AddSingleton<RuntimeStatus>();
         services.AddSingleton<TaxCredit.Application.Features.Framework.IHostStatus>(p => p.GetRequiredService<RuntimeStatus>());
         return services;
+    }
+
+    // RUN_LEASE_SECONDS (default 600) is how long a silent worker keeps an item; RUN_LEASE_RENEW_SECONDS (default a third of it) is how often a running item renews.
+    private static RunExecutionOptions ExecutionOptions(RuntimeConfiguration settings)
+    {
+        int Whole(string key, int fallback)
+        {
+            var text = settings.Get(key);
+            return string.IsNullOrWhiteSpace(text) ? fallback
+                : int.TryParse(text, System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out var value) && value >= 1 ? value
+                : throw new InvalidOperationException("Invalid setting " + key + ": a whole number of seconds, at least 1.");
+        }
+
+        var lease = Whole("RUN_LEASE_SECONDS", 600);
+        var renew = Whole("RUN_LEASE_RENEW_SECONDS", 0);
+        return renew >= lease && settings.Get("RUN_LEASE_RENEW_SECONDS") is not null
+            ? throw new InvalidOperationException("RUN_LEASE_RENEW_SECONDS must be shorter than RUN_LEASE_SECONDS.")
+            : new RunExecutionOptions(lease, RenewSeconds: renew);
     }
 
     internal static string Required(IRuntimeConfiguration settings, string key) =>

@@ -107,10 +107,10 @@ public sealed class SqlSession : IDisposable
         }
     }
 
-    internal void Begin()
+    internal void Begin(bool deferWriteLock = false)
     {
         using var span = RunSpans.Start("db.begin");
-        _transaction = _connection.BeginTransaction(IsolationLevel.Serializable);
+        _transaction = _connection.BeginTransaction(deferWriteLock && Dialect is SqliteDialect ? IsolationLevel.ReadCommitted : IsolationLevel.Serializable);
     }
 
     internal void Commit()
@@ -155,10 +155,17 @@ public sealed class SqlSession : IDisposable
             return InsertPrepared(name, table, columns, rows);
         }
 
+        if (Dialect is SqlServerDialect { Bulk: { Enabled: true } policy } server && rows.Count >= policy.MinimumRows
+            && server.Writer.CanWrite(_connection, rows))
+        {
+            return BulkInsert(server.Writer, policy, table, name, columns, rows);
+        }
+
         var size = Math.Min(500, 2090 / columns.Count);
         var count = 0;
         for (var start = 0; start < rows.Count; start += size)
         {
+            RunLeaseScope.ThrowIfLost();
             var batch = rows.Skip(start).Take(size).ToArray();
             if (batch.Any(r => r.Count != columns.Count))
             {
@@ -181,6 +188,25 @@ public sealed class SqlSession : IDisposable
         }
 
         return count;
+    }
+
+    private int BulkInsert(IBulkWriter writer, BulkLoadPolicy policy, string table, string name, IReadOnlyList<string> columns,
+        IReadOnlyList<IReadOnlyList<object?>> rows)
+    {
+        if (rows.Any(r => r.Count != columns.Count))
+        {
+            throw new TenantScopeViolation("Insert column/value count mismatch.");
+        }
+
+        using var span = RunSpans.Start("sql.bulk-copy");
+        if (span is not null)
+        {
+            span.SetTag("table", table);
+            span.SetTag("rows", rows.Count);
+            span.SetTag("parameters", columns.Count);
+        }
+
+        return writer.Write(_connection, _transaction, name, columns, rows, policy);
     }
 
     // Microsoft.Data.Sqlite resolves a named parameter by a linear scan of the collection, so one statement carrying thousands of
