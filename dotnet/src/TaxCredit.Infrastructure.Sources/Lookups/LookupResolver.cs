@@ -27,6 +27,7 @@ public sealed class LookupResolver
     private readonly ISourceLookupReader? _reader;
     private readonly LookupSeed? _seed;
     private readonly TimeProvider _clock;
+    private string? _seedIdentity;
     /// <summary>The policy for this source instance.</summary>
     public SourceLookupOptions Options { get; }
 
@@ -66,6 +67,25 @@ public sealed class LookupResolver
         }
         return new PayCodeResolution(null, "none", false);
     }
+
+    /// <summary>
+    /// A digest of what decides a pay code's category today for this client: the active override entries (client and global) and the seed.
+    /// The projection cache compares it, because an operator's lookup edit changes a projection without touching the source.
+    /// </summary>
+    public string PayCodeDigest(long accountId)
+    {
+        var lines = Entries("pay_code_category", accountId).OrderBy(e => e.ClientId).ThenBy(e => e.Kind, StringComparer.Ordinal)
+            .ThenBy(e => e.Key, StringComparer.Ordinal).ThenBy(e => e.Value, StringComparer.Ordinal)
+            .Select(e => string.Join('\u001f', e.ClientId.ToString(CultureInfo.InvariantCulture), e.Kind, e.Key, e.Value, e.Inferred ? "1" : "0"));
+        return Sha256(SeedIdentity + "\n" + string.Join('\n', lines));
+    }
+
+    /// <summary>The seed's version, provenance flag and a hash of its entries, or <c>none</c>; constant for the life of the resolver.</summary>
+    public string SeedIdentity => _seedIdentity ??= _seed is null ? "none" : string.Join('|', _seed.Version.ToString(CultureInfo.InvariantCulture),
+        _seed.Inferred ? "inferred" : "authored", Sha256(string.Join('\n', _seed.Entries.OrderBy(e => e.Key, StringComparer.Ordinal).Select(e => e.Key + "=" + e.Value))));
+
+    private static string Sha256(string text) =>
+        Convert.ToHexStringLower(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(text)));
 
     /// <summary>Client rules precede global rules; malformed authored dates fail at the boundary even under assume policy.</summary>
     public IReadOnlyList<FiscalRule> FiscalOverrides(long accountId)

@@ -3,6 +3,7 @@ using TaxCredit.Application.Ports.Sources;
 using TaxCredit.Domain.Calculation;
 using TaxCredit.Domain.Pipeline;
 using TaxCredit.Infrastructure.Payroll;
+using TaxCredit.Infrastructure.Sources.Cache;
 using TaxCredit.Infrastructure.Sources.Fiscal;
 using TaxCredit.Infrastructure.Sources.Projection;
 using TaxCredit.Infrastructure.Sources.Sql;
@@ -10,19 +11,49 @@ using TaxCredit.Infrastructure.Sources.Sql;
 namespace TaxCredit.Infrastructure.Sources;
 
 /// <summary>SQL-served logical lakehouse payroll and its catalogue share the certified Domain port.</summary>
+/// <remarks>
+/// With a <see cref="ClientProjectionCache"/> a client's projection is reused until its stamp (source fingerprint plus pay-code lookup
+/// digest) changes or the version-check window lapses; without one (the default) every read goes to the source exactly as before.
+/// </remarks>
 public sealed class SqlClientSource(SourceScanner scanner, PayrollProjector projector, FiscalRuleAdapter fiscal,
-    FootprintGuard? guard = null, SourceLimits? limits = null)
-    : IClientPayrollSource, ISourceReader, ISourceCatalogue
+    FootprintGuard? guard = null, SourceLimits? limits = null, ClientProjectionCache? cache = null)
+    : IClientPayrollSource, ISourceReader, ISourceCatalogue, IPayrollFreshness
 {
+    private int _freshScopes;
     /// <inheritdoc />
     public long? FixtureAccountId => null;
     /// <inheritdoc />
     public bool IsConfigured => scanner.IsConfigured;
-    /// <summary>Explicit metadata reset; payroll aggregates and payroll rows are deliberately not cached.</summary>
-    public void ClearCache() => scanner.ClearCache();
+    /// <summary>Explicit reset: payroll aggregates, and the projection cache when one is on. With the cache off payroll rows are not cached.</summary>
+    public void ClearCache()
+    {
+        scanner.ClearCache();
+        cache?.Clear();
+    }
     /// <summary>Controls and optional-table absence for the selected client, null only for an unknown account.</summary>
-    public PayrollProjection? LoadProjection(long accountId) =>
+    public PayrollProjection? LoadProjection(long accountId) => cache is null ? LoadUncached(accountId)
+        : cache.GetOrLoad(new ProjectionKey(accountId, projector.CacheIdentity), Volatile.Read(ref _freshScopes) > 0,
+            () => Stamp(accountId), () => LoadUncached(accountId));
+    /// <inheritdoc />
+    public IDisposable RequireFresh()
+    {
+        if (cache is null) { return NoPayrollFreshness.Instance.RequireFresh(); }
+        Interlocked.Increment(ref _freshScopes);
+        return new FreshScope(this);
+    }
+    private PayrollProjection? LoadUncached(long accountId) =>
         new SourceDatasetReader(scanner).Load(accountId) is { } dataset ? projector.Project(dataset) : null;
+    /// <summary>The comparison value: the cheap source marker plus what the operator's lookups would do to the same rows.</summary>
+    private string Stamp(long accountId) =>
+        new SourceFingerprintReader(scanner).Fingerprint(accountId).Sha256 + "|" + projector.LookupDigest(accountId);
+    private sealed class FreshScope(SqlClientSource owner) : IDisposable
+    {
+        private int _open = 1;
+        public void Dispose()
+        {
+            if (Interlocked.Exchange(ref _open, 0) == 1) { Interlocked.Decrement(ref owner._freshScopes); }
+        }
+    }
     /// <inheritdoc />
     public IReadOnlyList<PayRow> LoadPayPeriods(long? accountId) =>
         accountId is { } id ? LoadProjection(id)?.Rows ?? [] : [];

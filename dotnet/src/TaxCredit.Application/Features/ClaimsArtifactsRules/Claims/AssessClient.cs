@@ -16,11 +16,13 @@ public sealed record AssessClient(long ClientId, string? ProgramCode, IReadOnlyL
 }
 
 internal sealed class AssessClientHandler(IClientPayrollSource payroll, ClientAssessment assessment,
-    IClaimRepository repository, FiscalSource fiscal) : IRequestHandler<AssessClient, object>
+    IClaimRepository repository, FiscalSource fiscal, IPayrollFreshness? freshness = null) : IRequestHandler<AssessClient, object>
 {
     public ValueTask<object> Handle(AssessClient request, CancellationToken cancellationToken)
     {
         if (request.ClientId <= 0) { throw new FeatureRefusalException(422, "client_id must be positive"); }
+        // A claim is a recorded number: it is never assessed from a cached projection that was only trusted by the clock.
+        using var fresh = freshness?.RequireFresh();
         var rows = payroll.LoadPayPeriods(request.ClientId);
         if (rows.Count == 0) { throw new FeatureRefusalException(404, "No payroll for this client in the active data source."); }
         var sink = new AssessmentSink(repository);

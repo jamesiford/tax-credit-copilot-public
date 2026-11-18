@@ -56,6 +56,7 @@ public sealed class RuntimeContractWork(IServiceProvider services, RuntimeConfig
         cancellationToken.ThrowIfCancellationRequested();
         RuntimeTrustRegistration.ValidateDynamic(settings);
         services.GetRequiredService<SeedAnalytics>().Reset();
+        services.GetService<TaxCredit.Infrastructure.Sources.Cache.ClientProjectionCache>()?.Clear();
         services.GetRequiredService<RuntimeLimits>().Reset();
         services.GetRequiredService<RuntimeWriters>().Reset();
         services.GetRequiredService<ITokenBudget>().Reset();

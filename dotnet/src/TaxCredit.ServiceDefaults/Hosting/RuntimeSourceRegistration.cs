@@ -6,7 +6,9 @@ using TaxCredit.Application.Ports.Persistence;
 using TaxCredit.Application.Ports.Sources;
 using TaxCredit.Domain.Pipeline;
 using TaxCredit.Domain.Programs;
+using TaxCredit.Infrastructure.Persistence;
 using TaxCredit.Infrastructure.Sources;
+using TaxCredit.Infrastructure.Sources.Cache;
 using TaxCredit.Infrastructure.Sources.Fiscal;
 using TaxCredit.Infrastructure.Sources.Lookups;
 using TaxCredit.Infrastructure.Sources.Mapping;
@@ -49,7 +51,23 @@ internal static class RuntimeSourceRegistration
         services.AddScoped<IFiscalRuleSource>(p => p.GetRequiredService<FiscalRuleAdapter>());
         services.AddScoped(p => new CsvClientSource(settings.Get("PAYROLL_PATH") ?? paths.Csv, 1001, p.GetRequiredService<FiscalRuleAdapter>()));
         services.AddSingleton(p => new FootprintGuard(settings, p.GetRequiredService<TimeProvider>()));
-        services.AddScoped<SqlClientSource>();
+        var cacheOptions = ProjectionCacheOptions.From(settings);
+        services.AddSingleton(cacheOptions);
+        services.RemoveAll<ClientProjectionCache>();
+        if (cacheOptions.Enabled)
+        {
+            services.AddSingleton(p => new ClientProjectionCache(cacheOptions, p.GetRequiredService<TimeProvider>()));
+        }
+        services.AddScoped(p => new SqlClientSource(p.GetRequiredService<SourceScanner>(), p.GetRequiredService<PayrollProjector>(),
+            p.GetRequiredService<FiscalRuleAdapter>(), p.GetRequiredService<FootprintGuard>(), p.GetRequiredService<SourceLimits>(),
+            p.GetService<ClientProjectionCache>()));
+        services.AddScoped<IPayrollFreshness>(p => IsCsv(settings) ? NoPayrollFreshness.Instance : p.GetRequiredService<SqlClientSource>());
+        if (cacheOptions.Enabled)
+        {
+            services.RemoveAll<IClientCalculationRunner>();
+            services.AddTransient<IClientCalculationRunner>(p => new FreshSourceRunner(
+                ActivatorUtilities.CreateInstance<PersistedClientCalculation>(p), p.GetRequiredService<IPayrollFreshness>()));
+        }
         services.AddScoped<IClientPayrollSource>(p => IsCsv(settings) ? p.GetRequiredService<CsvClientSource>() : p.GetRequiredService<SqlClientSource>());
         services.AddScoped<IPayrollSource>(p => p.GetRequiredService<IClientPayrollSource>());
         services.AddScoped<ISourceReader>(p => (ISourceReader)p.GetRequiredService<IClientPayrollSource>());
