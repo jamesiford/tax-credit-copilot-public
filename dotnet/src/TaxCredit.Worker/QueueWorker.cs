@@ -10,6 +10,9 @@ public sealed class QueueWorker(RunWorkExecutor executor, RunWorkGate gate, Runt
     private static readonly Action<ILogger, string, Exception?> Failed = LoggerMessage.Define<string>(LogLevel.Error,
         new EventId(10, "QueueFailure"), "Queue execution stopped this poll ({FailureType}).");
 
+    private static readonly Action<ILogger, string, int, Exception?> FailedSql = LoggerMessage.Define<string, int>(LogLevel.Error,
+        new EventId(11, "QueueSqlFailure"), "Queue execution stopped this poll ({FailureType}, SQL error number {SqlErrorNumber}).");
+
     /// <inheritdoc />
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -24,7 +27,9 @@ public sealed class QueueWorker(RunWorkExecutor executor, RunWorkGate gate, Runt
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested) { break; }
             catch (Exception error) when (error is System.Data.Common.DbException or AmbiguousCommitException or Application.Ports.Persistence.RunLeaseLost)
             {
-                Failed(logger, error.GetType().Name, null);
+                // Only the type and the SQL error number are logged, never the message, which can carry object names or values.
+                if (error is Microsoft.Data.SqlClient.SqlException sql) { FailedSql(logger, error.GetType().Name, sql.Number, null); }
+                else { Failed(logger, error.GetType().Name, null); }
             }
             await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken).ConfigureAwait(false);
         }
