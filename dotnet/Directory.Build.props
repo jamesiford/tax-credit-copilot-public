@@ -22,6 +22,10 @@
     <VSTestSetting>$(MSBuildThisFileDirectory)tests\TaxCredit.Parity.Tests\oracle.runsettings</VSTestSetting>
   </PropertyGroup>
 
+  <!-- One-release fallback for the renamed test switches (a developer's shell may still carry the old names). -->
+  <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.Tests'))">
+    <Compile Include="$(MSBuildThisFileDirectory)tests\Shared\LegacyTestEnvironment.cs" Link="Shared\LegacyTestEnvironment.cs" />
+  </ItemGroup>
   <!-- Production projects: XML docs on every public member (CS1591 is an error via TreatWarningsAsErrors). -->
   <PropertyGroup Condition="'$(MSBuildProjectDirectory.Contains(&quot;\src\&quot;))' == 'true'">
     <GenerateDocumentationFile>true</GenerateDocumentationFile>

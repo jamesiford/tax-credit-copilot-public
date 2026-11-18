@@ -33,6 +33,8 @@
 [CmdletBinding()]
 param()
 
+# One-release fallback for the pre-rename TCC_ names (scripts/legacy-env.ps1).
+. "$PSScriptRoot/legacy-env.ps1"
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot
 $venvPython = Join-Path $repoRoot '.venv\Scripts\python.exe'

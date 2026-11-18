@@ -9,7 +9,7 @@ var once = args.Contains("--once", StringComparer.Ordinal);
 var builder = Host.CreateApplicationBuilder(args.Where(a => a != "--once").ToArray());
 builder.AddServiceDefaults();
 builder.Services.AddApplication().AddInfrastructure().AddTaxCreditRuntime(builder.Configuration);
-if (once || builder.Configuration["WORKER_ONCE"] == "1")
+if (once || builder.Configuration.Setting("WORKER_ONCE") == "1")
 {
     using var host = builder.Build();
     host.Services.GetRequiredService<RuntimeStatus>().Settle();

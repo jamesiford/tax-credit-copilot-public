@@ -13,7 +13,7 @@ public sealed class ContractEndpoints(IConfiguration configuration) : IEndpointG
     public void Map(IEndpointRouteBuilder endpoints)
     {
         ArgumentNullException.ThrowIfNull(endpoints);
-        if (configuration["CONTRACT_HOOKS"] != "1")
+        if (configuration.Setting("CONTRACT_HOOKS") != "1")
         {
             return;
         }

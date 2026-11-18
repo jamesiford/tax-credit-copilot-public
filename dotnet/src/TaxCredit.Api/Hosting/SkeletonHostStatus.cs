@@ -1,5 +1,6 @@
 using TaxCredit.Application.Features.Framework;
 using TaxCredit.Application.Ports.Contract;
+using TaxCredit.ServiceDefaults.Hosting;
 
 namespace TaxCredit.Api.Hosting;
 
@@ -28,7 +29,7 @@ public sealed class SkeletonHostStatus(IRuntimeConfiguration configuration, ICon
     {
         get
         {
-            var hermetic = startup["CONTRACT_HOOKS"] == "1";
+            var hermetic = startup.Setting("CONTRACT_HOOKS") == "1";
             return new Dictionary<string, object?>(StringComparer.Ordinal)
             {
                 ["ready"] = hermetic,

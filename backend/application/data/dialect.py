@@ -4,7 +4,7 @@ Two dialects are built: T-SQL (the Fabric Warehouse and the lakehouse SQL analyt
 endpoint) and SQLite (offline tests and local development). They differ in quoting, row
 limiting, and what a bound value may be, and nowhere else: the builder is one code path.
 
-Schema names are configuration (`TCC_GOLD_SCHEMA` and friends), so the model holds only a
+Schema names are configuration (`GOLD_SCHEMA` and friends), so the model holds only a
 logical key and the deployed name arrives here, validated as a plain identifier, because
 it is interpolated.
 """

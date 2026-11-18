@@ -18,8 +18,9 @@ public static class RuntimeRegistration
         ArgumentNullException.ThrowIfNull(services);
         ArgumentNullException.ThrowIfNull(configuration);
         var settings = new RuntimeConfiguration(configuration);
+        LegacySettingAliases.Report(configuration, Console.Error.WriteLine);
         var paths = new RuntimePaths(settings);
-        var hooks = configuration["CONTRACT_HOOKS"] == "1";
+        var hooks = configuration.Setting("CONTRACT_HOOKS") == "1";
         Validate(settings, hooks);
         services.AddSingleton(settings);
         services.AddSingleton<IRuntimeConfiguration>(settings);

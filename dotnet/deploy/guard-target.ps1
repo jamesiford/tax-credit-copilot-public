@@ -1,4 +1,6 @@
 param([Parameter(Mandatory)][ValidateSet('api', 'gateway', 'worker', 'infrastructure')][string] $Service)
+# One-release fallback for the pre-rename TCC_ names (scripts/legacy-env.ps1).
+. "$PSScriptRoot/../../scripts/legacy-env.ps1"
 $ErrorActionPreference = 'Stop'
 if ($Service -eq 'worker') { throw 'Worker App Service topology unavailable: no lifecycle-coupled HTTP health/progress seam.' }
 if ($Service -eq 'infrastructure') {

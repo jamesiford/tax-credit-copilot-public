@@ -160,7 +160,7 @@ def spawn(settings):
         return DockerProbe(run(command).stdout.strip())
     env = os.environ.copy()
     for key in list(env):
-        if key.startswith(("OTEL_", "APPLICATIONINSIGHTS_", "TCC_TELEMETRY_", "CORECLR_")):
+        if key.startswith(("OTEL_", "APPLICATIONINSIGHTS_", "TELEMETRY_", "TCC_TELEMETRY_", "CORECLR_")):
             del env[key]
     env.pop("PROBE_DEPENDENCY", None)
     env.update(settings)

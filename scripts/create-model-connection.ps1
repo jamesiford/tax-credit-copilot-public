@@ -42,6 +42,8 @@ param(
     [string]$DeploymentName = 'tcc-model-connection'
 )
 
+# One-release fallback for the pre-rename TCC_ names (scripts/legacy-env.ps1).
+. "$PSScriptRoot/legacy-env.ps1"
 $ErrorActionPreference = 'Stop'
 $secretVariable = 'AI_GATEWAY_SECRET'
 

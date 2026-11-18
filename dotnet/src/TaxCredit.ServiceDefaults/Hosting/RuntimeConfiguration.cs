@@ -14,8 +14,8 @@ public sealed class RuntimeConfiguration(IConfiguration original) : IRuntimeConf
     {
         lock (_lock)
         {
-            if (name == "CONTRACT_HOOKS") { return original[name]; }
-            return _overlay.TryGetValue(name, out var value) ? value : original[name] ?? Default(name);
+            if (name == "CONTRACT_HOOKS") { return LegacySettingAliases.Read(original, name); }
+            return _overlay.TryGetValue(name, out var value) ? value : LegacySettingAliases.Read(original, name) ?? Default(name);
         }
     }
 

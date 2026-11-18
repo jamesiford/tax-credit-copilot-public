@@ -60,7 +60,7 @@ Not run: a live non-writer refusal over Teams or Cowork (needs a second person; 
 ## How to run, build and deploy
 
 ```pwsh
-cd backend ; ..\.venv\Scripts\python.exe -m pytest tests/ -q            # full backend suite (TCC_REQUIRE_PARITY unset without private fixtures)
+cd backend ; ..\.venv\Scripts\python.exe -m pytest tests/ -q            # full backend suite (TEST_REQUIRE_PARITY unset without private fixtures)
 cd frontend ; $env:NODE_OPTIONS='--no-experimental-webstorage' ; npx vitest run ; npm run build
 python scripts/render-icons.py                                           # icons into dist/branding/
 python scripts/build-cowork-plugin.py --config overlays/<name>/cowork.config.json --strict --out <folder>

@@ -10,6 +10,19 @@ infra:
   path: infra
 
 hooks:
+  # Before every provision: an azd environment that still holds a pre-rename TCC_
+  # value gets the new name written beside it (one release, scripts/legacy-env.ps1),
+  # because infra/main.tfvars.json reads only the new names.
+  preprovision:
+    windows:
+      shell: pwsh
+      run: ./scripts/legacy-env.ps1 -AzdEnv
+      continueOnError: false
+    posix:
+      shell: sh
+      run: pwsh ./scripts/legacy-env.ps1 -AzdEnv
+      continueOnError: false
+
   # After every provision, in order (D22):
   #   1. apply-migrations  - bootstraps DDL v2.0 ONLY on a Warehouse this
   #                          deployment just created; otherwise applies pending

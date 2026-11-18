@@ -40,6 +40,8 @@ param(
     [int]$HealthIntervalSeconds = 10
 )
 
+# One-release fallback for the pre-rename TCC_ names (scripts/legacy-env.ps1).
+. "$PSScriptRoot/legacy-env.ps1"
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path -Parent $PSScriptRoot
 
