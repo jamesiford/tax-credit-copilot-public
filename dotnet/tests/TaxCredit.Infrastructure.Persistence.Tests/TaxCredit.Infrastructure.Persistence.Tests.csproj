@@ -2,6 +2,8 @@
   <PropertyGroup>
     <IsPackable>false</IsPackable>
     <RootNamespace>TaxCredit.Infrastructure.Persistence.Tests</RootNamespace>
+    <!-- Microsoft.Data.SqlClient does not support invariant globalization; the SQL Server-family tests open real connections. -->
+    <InvariantGlobalization>false</InvariantGlobalization>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" />

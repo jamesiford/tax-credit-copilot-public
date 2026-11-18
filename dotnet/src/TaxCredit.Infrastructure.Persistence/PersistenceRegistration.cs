@@ -15,7 +15,7 @@ public static class PersistenceRegistration
 {
     /// <summary>Registers persistence; deployed schema administration remains the Python operator's responsibility.</summary>
     public static IServiceCollection AddPersistence(this IServiceCollection services, PersistenceDatabase database,
-        string repositoryRoot, string seedRoot, Func<long, bool>? authorizeEmployeeQuery = null)
+        string repositoryRoot, string seedRoot, Func<long, bool>? authorizeEmployeeQuery = null, GoldRetention? retention = null)
     {
         ArgumentNullException.ThrowIfNull(services);
         ArgumentNullException.ThrowIfNull(database);
@@ -33,7 +33,7 @@ public static class PersistenceRegistration
         }
 
         services.AddSingleton(database);
-        services.AddSingleton<GoldWriter>(s => new GoldWriter(s.GetRequiredService<PersistenceDatabase>(), repositoryRoot));
+        services.AddSingleton<GoldWriter>(s => new GoldWriter(s.GetRequiredService<PersistenceDatabase>(), repositoryRoot, retention: retention));
         services.AddSingleton<IGoldWriter>(s => s.GetRequiredService<GoldWriter>());
         services.AddSingleton<IGoldReadPort, GoldReader>();
         services.AddSingleton<IGoldDataQueryPort>(s =>

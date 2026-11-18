@@ -14,6 +14,7 @@ public sealed class PersistenceDatabase
     private readonly Action<TimeSpan> _delay;
     private readonly IReadOnlyList<string> _sourceColumns;
     private readonly AsyncLocal<SqlSession?> _ambient = new();
+    private readonly AsyncLocal<List<Action>?> _afterCommit = new();
 
     /// <summary>Configures a provider and injectable connection/log/retry boundaries.</summary>
     public PersistenceDatabase(Func<DbConnection> factory, ISqlDialect dialect, Action<string>? log = null,
@@ -56,8 +57,39 @@ public sealed class PersistenceDatabase
         }
     }
 
-    /// <summary>Retries only a confirmed aborted native-conflict transaction, never an ambiguous commit.</summary>
-    public T Transact<T>(Func<SqlSession, T> work, int attempts = 5)
+    /// <summary>
+    /// Runs <paramref name="work" /> once the outermost transaction has committed, or at once when none is open. It never runs after a rollback or an
+    /// ambiguous commit, and a failure in it is logged, never thrown: it is housekeeping that must not change the outcome of what it follows.
+    /// </summary>
+    public void AfterCommit(Action work)
+    {
+        ArgumentNullException.ThrowIfNull(work);
+        if (_ambient.Value is null)
+        {
+            Housekeeping(work);
+            return;
+        }
+
+        (_afterCommit.Value ??= []).Add(work);
+    }
+
+    private void Housekeeping(Action work)
+    {
+        try
+        {
+            work();
+        }
+        catch (Exception error)
+        {
+            _log("Post-commit housekeeping failed and was skipped: " + error.GetType().Name + ": " + error.Message);
+        }
+    }
+
+    /// <summary>
+    /// Retries only a confirmed aborted native-conflict transaction, never an ambiguous commit. <paramref name="deferWriteLock" /> lets SQLite take its
+    /// single write lock at the first write instead of at BEGIN, so a long transaction that is still computing does not block other connections (lease renewal).
+    /// </summary>
+    public T Transact<T>(Func<SqlSession, T> work, int attempts = 5, bool deferWriteLock = false)
     {
         ArgumentNullException.ThrowIfNull(work);
         ArgumentOutOfRangeException.ThrowIfLessThan(attempts, 1);
@@ -71,14 +103,16 @@ public sealed class PersistenceDatabase
         {
             using var session = Open();
             T result;
+            _afterCommit.Value = null;
             try
             {
-                session.Begin();
+                session.Begin(deferWriteLock);
                 _ambient.Value = session;
                 result = work(session);
             }
             catch (Exception error)
             {
+                _afterCommit.Value = null;
                 session.Rollback();
                 if (!SqlConflicts.IsAbortedConflict(error) || attempt == attempts)
                 {
@@ -100,10 +134,12 @@ public sealed class PersistenceDatabase
             }
             catch (Exception error) when (!SqlConflicts.IsAbortedConflict(error))
             {
+                _afterCommit.Value = null;
                 throw new AmbiguousCommitException("Commit outcome is unknown; reconcile the operation identity before retry.", error);
             }
             catch
             {
+                _afterCommit.Value = null;
                 session.Rollback();
                 if (attempt == attempts)
                 {
@@ -112,6 +148,13 @@ public sealed class PersistenceDatabase
 
                 _delay(TimeSpan.FromMilliseconds(Math.Min(3200, 200 * Math.Pow(2, attempt - 1))));
                 continue;
+            }
+
+            var pending = _afterCommit.Value;
+            _afterCommit.Value = null;
+            foreach (var queued in pending ?? [])
+            {
+                Housekeeping(queued);
             }
 
             return result;
@@ -126,6 +169,14 @@ public sealed class PersistenceDatabase
         return new PersistenceDatabase(() =>
         {
             var connection = new SqliteConnection(settings.ConnectionString);
+            // Write-ahead logging lets a lease renewal (its own connection) commit while a long transaction has only read, instead of waiting for it.
+            connection.Open();
+            using (var pragma = connection.CreateCommand())
+            {
+                pragma.CommandText = "PRAGMA journal_mode=WAL";
+                pragma.ExecuteNonQuery();
+            }
+
             connection.CreateCollation("TCC_DECIMAL", (a, b) => PyDecimalOps.Compare(PyDecimal.Parse(a), PyDecimal.Parse(b)));
             connection.CreateAggregate<string?, PyDecimal, string>("tcc_decimal_sum", PyDecimal.Parse("0"),
                 (sum, value) => value is null ? sum : PyDecimalOps.Add(sum, PyDecimal.Parse(value)), sum => sum.ToString());

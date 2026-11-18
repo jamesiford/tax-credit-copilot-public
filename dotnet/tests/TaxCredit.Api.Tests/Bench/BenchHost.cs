@@ -14,7 +14,7 @@ internal static class BenchHost
 {
     internal const string ItemId = "bench-item";
 
-    internal static async Task<TestHost> Start(SyntheticAnalyticsTransport transport, bool cache = false)
+    internal static async Task<TestHost> Start(SyntheticAnalyticsTransport transport, bool cache = false, Action<IServiceCollection>? configure = null)
     {
         var host = await TestHost.Start(hooks: false,
             services: services =>
@@ -22,6 +22,7 @@ internal static class BenchHost
                 services.AddSingleton<IAnalyticsTransport>(transport);
                 // The default 10-minute lease is itself a finding at the largest size; the harness keeps the item alive so every size can be timed.
                 services.AddSingleton(new RunExecutionOptions(LeaseSeconds: 7200));
+                configure?.Invoke(services);
             },
             configuration: new Dictionary<string, string?>
             {

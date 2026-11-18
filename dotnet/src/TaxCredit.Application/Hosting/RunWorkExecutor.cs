@@ -45,9 +45,12 @@ public sealed class RunWorkExecutor(IServiceScopeFactory scopes, IRunBatchReposi
             if (!queue.Heartbeat(item.ClientId, item.ItemId, owner, options.LeaseSeconds, Now())) { throw new RunLeaseLost(); }
             if (!queue.MarkRunning(item.ClientId, item.ItemId, owner, item.TaxYear, item.ProgramCode, Now())) { throw new RunLeaseLost(); }
             var runId = batch.Kind == BatchKind.Assess ? null : publication.Identity(item, owner, Now(), () => ids.NewId().ToString("N"));
+            // The lease is renewed on its own task and connection for as long as the calculation and the write run.
+            using var keeper = new RunLeaseKeeper(queue, item, owner, options.LeaseSeconds, options.Renewal, clock, publication.RenewalsReachTheQueue);
+            keeper.Start();
             publication.Publish(item, owner, runId,
                 () => batch.Kind == BatchKind.Assess ? operation.Assess(item, batch)
-                    : operation.Calculate(item, batch, operation.Resolve(item, batch), runId!), Now, cancellationToken, options.LeaseSeconds);
+                    : operation.Calculate(item, batch, operation.Resolve(item, batch), runId!), Now, cancellationToken, options.LeaseSeconds, keeper);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
@@ -84,5 +87,12 @@ public sealed class RunWorkExecutor(IServiceScopeFactory scopes, IRunBatchReposi
         PyDateTime.FromIsoFormat(now.ToString("yyyy-MM-dd'T'HH:mm:ss.ffffff'+00:00'", CultureInfo.InvariantCulture));
 }
 
-/// <summary>The lease bounds a non-interruptible certified calculation; publication rechecks it before commit.</summary>
-public sealed record RunExecutionOptions(int LeaseSeconds = 600, int MaxAttempts = 3);
+/// <summary>
+/// The lease is renewed every <see cref="Renewal" /> seconds while an item runs, so it bounds a stall, not the length of a calculation and write;
+/// publication still rechecks it before commit. <paramref name="RenewSeconds" /> of zero means a third of the lease.
+/// </summary>
+public sealed record RunExecutionOptions(int LeaseSeconds = 600, int MaxAttempts = 3, int RenewSeconds = 0)
+{
+    /// <summary>The renewal interval in seconds.</summary>
+    public int Renewal => RenewSeconds > 0 ? RenewSeconds : Math.Max(1, LeaseSeconds / 3);
+}

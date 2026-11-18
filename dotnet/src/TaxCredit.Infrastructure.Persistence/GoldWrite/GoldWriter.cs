@@ -15,14 +15,16 @@ public sealed class GoldWriter : IGoldWriter
     private readonly PersistenceDatabase _database;
     private readonly IReadOnlyDictionary<string, IReadOnlyList<StorageColumn>> _schema;
     private readonly Action<string>? _checkpoint;
+    private readonly GoldRetention _retention;
 
-    /// <summary>Uses the deployed column contract and an optional fault-injection checkpoint.</summary>
-    public GoldWriter(PersistenceDatabase database, string repositoryRoot, Action<string>? checkpoint = null)
+    /// <summary>Uses the deployed column contract, an optional fault-injection checkpoint and a retention policy (none by default).</summary>
+    public GoldWriter(PersistenceDatabase database, string repositoryRoot, Action<string>? checkpoint = null, GoldRetention? retention = null)
     {
         ArgumentNullException.ThrowIfNull(database);
         _database = database;
         _schema = PersistenceSchema.Read(repositoryRoot);
         _checkpoint = checkpoint;
+        _retention = retention ?? GoldRetention.Off;
     }
 
     /// <inheritdoc />
@@ -41,9 +43,10 @@ public sealed class GoldWriter : IGoldWriter
             using (RunSpans.Start("persist.manifest")) { session.Insert(payload.ClientId, "tcc_ops.run_manifest", payload.ManifestColumns, [manifest]); }
             return 0;
         });
+        IReadOnlyList<KeyValuePair<string, long>> counts;
         try
         {
-            return _database.Transact(session => Publish(session, payload));
+            counts = _database.Transact(session => Publish(session, payload));
         }
         catch (AmbiguousCommitException)
         {
@@ -56,6 +59,10 @@ public sealed class GoldWriter : IGoldWriter
                 "UPDATE tcc_ops.run_manifest SET run_status='failed' WHERE {tenant} AND run_id=? AND run_status='running'", payload.RunId));
             throw;
         }
+
+        // After the publication has committed (the outermost transaction, when a caller holds one open), never inside it.
+        _database.AfterCommit(() => _retention.Prune(_database, payload.ClientId, payload.ProgramCode));
+        return counts;
     }
 
     private List<KeyValuePair<string, long>> Publish(SqlSession session, GoldRunPayload payload)
@@ -69,6 +76,8 @@ public sealed class GoldWriter : IGoldWriter
         _checkpoint?.Invoke("prior-current-retired");
         foreach (var (table, rows) in payload.Tables)
         {
+            // A lost queue lease stops the write at the next table boundary; the transaction then rolls back.
+            RunLeaseScope.ThrowIfLost();
             var columns = GoldColumns.All[table];
             var storage = _schema["tcc_gold." + table];
             IReadOnlyList<object?>[] values;

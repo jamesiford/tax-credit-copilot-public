@@ -68,3 +68,10 @@ Hermetic native SQL tests verify statements, parameter types, tenant binding and
 ordering. They do **not** establish deployed DDL compatibility, conflict/lock
 behavior, managed-identity grants, pooling refresh, or cross-replica uniqueness.
 Those are operator validation prerequisites, not gates claimed by this session.
+
+## Stage S5 (bulk persist and retention): what it needs
+
+- **No new table, staging table, schema change or storage account.** The bulk load (`SqlBulkCopy`) writes straight into the existing `tcc_gold` tables on the connection and inside the transaction the publish already uses.
+- **Permissions.** The bulk protocol needs the same `INSERT` right on `tcc_gold.*` the statement path needed (Warehouse: the workspace role plus the existing T-SQL grants); nothing extra was needed on the live Warehouse used for the measurements.
+- **Retention** (`TCC_RETAIN_SUPERSEDED_RUNS`, default 2) additionally uses `DELETE` on `tcc_gold.employee_period_fact`, `tcc_gold.onezero_matrix` and `tcc_gold.employee_eligibility`. Where the identity has no `DELETE`, a pass fails, is logged and skipped and nothing else is affected; set the setting to `all` to switch it off.
+- `RUN_LEASE_SECONDS` and `RUN_LEASE_RENEW_SECONDS` need nothing from the database beyond the `UPDATE` on `tcc_ops.run_batch_item` the queue already uses.

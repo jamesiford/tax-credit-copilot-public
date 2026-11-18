@@ -17,11 +17,31 @@ public interface ISqlDialect
 
     /// <summary>Rewrites trusted adapter SQL for the selected provider.</summary>
     string Translate(string sql);
+
+    /// <summary>How large inserts are sent; <see cref="BulkLoadPolicy.Off" /> keeps bounded multi-row statements.</summary>
+    BulkLoadPolicy Bulk { get; }
 }
 
 /// <summary>SQL Server and Warehouse use the same parameterized transport and syntax.</summary>
 public sealed class SqlServerDialect : ISqlDialect
 {
+    /// <summary>Uses the default bulk-load policy.</summary>
+    public SqlServerDialect() : this(null) { }
+
+    /// <summary>Selects how large inserts are sent; a null policy means <see cref="BulkLoadPolicy.Default" />.</summary>
+    public SqlServerDialect(BulkLoadPolicy? bulk) : this(bulk, new SqlBulkCopyWriter()) { }
+
+    internal SqlServerDialect(BulkLoadPolicy? bulk, IBulkWriter writer)
+    {
+        Bulk = bulk ?? BulkLoadPolicy.Default;
+        Writer = writer;
+    }
+
+    /// <inheritdoc />
+    public BulkLoadPolicy Bulk { get; }
+
+    internal IBulkWriter Writer { get; }
+
     /// <inheritdoc />
     public string Name(string qualifiedName) => SqlNames.Qualified(qualifiedName, false);
 
@@ -42,6 +62,9 @@ public sealed class SqlServerDialect : ISqlDialect
 /// <summary>SQLite executes the same repository statements without credentials.</summary>
 public sealed partial class SqliteDialect : ISqlDialect
 {
+    /// <inheritdoc />
+    public BulkLoadPolicy Bulk => BulkLoadPolicy.Off;
+
     /// <inheritdoc />
     public string Name(string qualifiedName) => SqlNames.Qualified(qualifiedName, true);
 
