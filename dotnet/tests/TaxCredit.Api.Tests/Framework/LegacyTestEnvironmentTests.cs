@@ -10,7 +10,9 @@ public sealed class LegacyTestEnvironmentTests
     {
         var environment = new Dictionary<string, string?>
         {
-            ["TCC_RUN_BENCH"] = "secret-1", ["TCC_FUZZ_N"] = "secret-2", ["FUZZ_N"] = "5",
+            ["TCC_RUN_BENCH"] = "secret-1",
+            ["TCC_FUZZ_N"] = "secret-2",
+            ["FUZZ_N"] = "5",
         };
         var lines = new List<string>();
         LegacyTestEnvironment.Apply(name => environment.GetValueOrDefault(name), (name, value) => environment[name] = value, lines.Add);

@@ -94,6 +94,110 @@ All notable changes to this project are recorded here, so changes can be followe
 - `docs/data/SOURCE-LAYOUT-GUIDANCE.md`: layout recommendations for the customer's lakehouse (recommended, not applied).
 
 ### Changed
+- **No environment variable carries the product prefix any more** (the customer may rename the product). Every `TCC_*` variable was renamed; defaults, values and behaviour are unchanged. The old names still work for one release: every host (the .NET API, Worker and Gateway, the Python backend and scripts, the PowerShell scripts, the azd environment and the test setup) accepts the old name when the new one is unset, logs one line naming the deprecated variable (never its value), and the new name wins when both are set. Everything the repository emits (Terraform app settings, azd values, `configure-local.ps1`, `run-*.ps1`, `.env.example`, docs) uses only the new names. What to do: rename the variables in your pipelines, shells and azd environments (`azd env set NEW value`); the first provision also copies any old azd value to its new name. Four azd inputs took an `EXISTING_` prefix because the bare name is a Terraform output of a different meaning. Reasons: `docs/rename-r1-mapping.md`; the aliases and how to remove them: `docs/RENAME-R1-REPORT.md`. Full old-to-new table:
+
+| Old name | New name |
+| --- | --- |
+| `TCC_PERSISTENCE_PROVIDER` | `PERSISTENCE_PROVIDER` |
+| `TCC_REPOSITORY_ROOT` | `REPOSITORY_ROOT` |
+| `TCC_REPO_ROOT` | `REPOSITORY_ROOT` |
+| `TCC_SEED_ROOT` | `SEED_ROOT` |
+| `TCC_RESOURCE_ROOT` | `RESOURCE_ROOT` |
+| `TCC_WORKER_ONCE` | `WORKER_ONCE` |
+| `TCC_ENABLE_RUN_WORKER` | `ENABLE_RUN_WORKER` |
+| `TCC_CONTRACT_HOOKS` | `CONTRACT_HOOKS` |
+| `TCC_CONTRACT_PROFILE` | `CONTRACT_PROFILE` |
+| `TCC_CONTRACT_DIR` | `CONTRACT_DIR` |
+| `TCC_FEATURE_ASSEMBLIES` | `FEATURE_ASSEMBLIES` |
+| `TCC_WARM_CLIENTS` | `WARM_CLIENTS` |
+| `TCC_WARM_ON_START` | `WARM_ON_START` |
+| `TCC_KEEPALIVE_SECONDS` | `KEEPALIVE_SECONDS` |
+| `TCC_STRANDED_RUN_MINUTES` | `STRANDED_RUN_MINUTES` |
+| `TCC_ALLOW_SEED` | `ALLOW_SEED` |
+| `TCC_TELEMETRY_ENABLED` | `TELEMETRY_ENABLED` |
+| `TCC_TELEMETRY_ENDPOINT` | `TELEMETRY_ENDPOINT` |
+| `TCC_TELEMETRY_VERSION` | `TELEMETRY_VERSION` |
+| `TCC_RECEIPT_ENDPOINT` | `TELEMETRY_RECEIPT_ENDPOINT` |
+| `TCC_BULK_LOAD` | `BULK_LOAD` |
+| `TCC_BULK_LOAD_MIN_ROWS` | `BULK_LOAD_MIN_ROWS` |
+| `TCC_BULK_TIMEOUT_SECONDS` | `BULK_TIMEOUT_SECONDS` |
+| `TCC_RETAIN_SUPERSEDED_RUNS` | `RETAIN_SUPERSEDED_RUNS` |
+| `TCC_GATEWAY_SECRET` | `AI_GATEWAY_SECRET` |
+| `TCC_COWORK_` | `COWORK_` |
+| `TCC_COWORK_GATEWAY_MCP_URL` | `COWORK_GATEWAY_MCP_URL` |
+| `TCC_BACKEND` | `BACKEND_DIR` |
+| `TCC_ORCHESTRATOR_LOCAL_PROOF` | `ORCHESTRATOR_LOCAL_PROOF` |
+| `TCC_PROFILE` | `DEPLOY_PROFILE` |
+| `TCC_TENANT_ID` | `TENANT_ID` |
+| `TCC_API_CLIENT_ID` | `API_CLIENT_ID` |
+| `TCC_WEB_CLIENT_ID` | `WEB_CLIENT_ID` |
+| `TCC_API_AUDIENCE` | `API_AUDIENCE` |
+| `TCC_APP_SERVICE_SKU` | `APP_SERVICE_SKU` |
+| `TCC_APP_SUBNET_ID` | `APP_SUBNET_ID` |
+| `TCC_PRIVATE_ENDPOINT_SUBNET_ID` | `PRIVATE_ENDPOINT_SUBNET_ID` |
+| `TCC_FABRIC_WORKSPACE_ID` | `EXISTING_FABRIC_WORKSPACE_ID` |
+| `TCC_FABRIC_WAREHOUSE_ID` | `EXISTING_FABRIC_WAREHOUSE_ID` |
+| `TCC_WAREHOUSE_SERVER` | `EXISTING_WAREHOUSE_SERVER` |
+| `TCC_WAREHOUSE_DATABASE` | `EXISTING_WAREHOUSE_DATABASE` |
+| `TCC_WAREHOUSE_PLATFORM` | `WAREHOUSE_PLATFORM` |
+| `TCC_FABRIC_WORKSPACE_NAME` | `FABRIC_WORKSPACE_NAME` |
+| `TCC_FABRIC_LAKEHOUSE_NAME` | `FABRIC_LAKEHOUSE_NAME` |
+| `TCC_FABRIC_CREATED` | `FABRIC_CREATED` |
+| `TCC_SQL_CREATED` | `SQL_CREATED` |
+| `TCC_SQL_ADMIN_GROUP_NAME` | `SQL_ADMIN_GROUP_NAME` |
+| `TCC_SQL_ADMIN_GROUP_OBJECT_ID` | `SQL_ADMIN_GROUP_OBJECT_ID` |
+| `TCC_LAKEHOUSE_SQL_SERVER` | `LAKEHOUSE_SQL_SERVER` |
+| `TCC_LAKEHOUSE_SQL_DATABASE` | `LAKEHOUSE_SQL_DATABASE` |
+| `TCC_DATA_QUERY_SOURCE_ENABLED` | `DATA_QUERY_SOURCE_ENABLED` |
+| `TCC_DATA_QUERY_TIMEOUT_SECONDS` | `DATA_QUERY_TIMEOUT_SECONDS` |
+| `TCC_DATA_QUERY_MAX_ROWS` | `DATA_QUERY_MAX_ROWS` |
+| `TCC_DATA_QUERY_RATE_PER_MINUTE` | `DATA_QUERY_RATE_PER_MINUTE` |
+| `TCC_DATA_QUERY_MAX_CONCURRENCY` | `DATA_QUERY_MAX_CONCURRENCY` |
+| `TCC_FOUNDRY_ALLOWED_IP_RANGES` | `FOUNDRY_ALLOWED_IP_RANGES` |
+| `TCC_FOUNDRY_PUBLIC_NETWORK_ACCESS` | `FOUNDRY_PUBLIC_NETWORK_ACCESS` |
+| `TCC_ENABLE_M365_CHANNEL` | `M365_CHANNEL_ENABLED` |
+| `TCC_CHANNEL_GATEWAY_AUDIENCE` | `CHANNEL_GATEWAY_AUDIENCE` |
+| `TCC_CHANNEL_WRITER_SOURCE` | `CHANNEL_WRITER_SOURCE` |
+| `TCC_CHANNEL_WRITER_GROUP_ID` | `CHANNEL_WRITER_GROUP_ID` |
+| `TCC_CHANNEL_RESOLVE_DISPLAY_NAMES` | `CHANNEL_RESOLVE_DISPLAY_NAMES` |
+| `TCC_CHANNEL_HEALTH_CHECK` | `CHANNEL_HEALTH_CHECK` |
+| `TCC_DEPLOY_PYTHON` | `DEPLOY_PYTHON` |
+| `TCC_DOTNET_ACTIVATE` | `DEPLOY_DOTNET_ACTIVATE` |
+| `TCC_FABRIC_TESTS` | `TEST_FABRIC` |
+| `TCC_SQL_TESTS` | `TEST_SQL` |
+| `TCC_AZURE_TESTS` | `TEST_AZURE` |
+| `TCC_REQUIRE_PARITY` | `TEST_REQUIRE_PARITY` |
+| `TCC_TEST_SETTINGS_PROBE` | `TEST_SETTINGS_PROBE` |
+| `TCC_TEST_SCHEMA` | `TEST_SCHEMA` |
+| `TCC_AI_EVALS_LIVE` | `TEST_AI_EVALS_LIVE` |
+| `TCC_SQLSERVER_TEST` | `TEST_SQLSERVER` |
+| `TCC_LIVE_PROFILE` | `TEST_LIVE_PROFILE` |
+| `TCC_LIVE_SQL_SERVER` | `TEST_LIVE_SQL_SERVER` |
+| `TCC_LIVE_SQL_DATABASE` | `TEST_LIVE_SQL_DATABASE` |
+| `TCC_ENV_FILE` | `TEST_ENV_FILE` |
+| `TCC_UPDATE_DEVIATIONS` | `TEST_UPDATE_DEVIATIONS` |
+| `TCC_PYTHON` | `ORACLE_PYTHON` |
+| `TCC_ALLOW_OTHER_PYTHON` | `ORACLE_ALLOW_OTHER_PYTHON` |
+| `TCC_RUN_BENCH` | `BENCH_RUN` |
+| `TCC_BENCH_SIZES` | `BENCH_SIZES` |
+| `TCC_BENCH_LABEL` | `BENCH_LABEL` |
+| `TCC_BENCH_DUMP` | `BENCH_DUMP` |
+| `TCC_BENCH_OUT` | `BENCH_OUT` |
+| `TCC_FUZZ_N` | `FUZZ_N` |
+| `TCC_FUZZ_SEED` | `FUZZ_SEED` |
+| `TCC_FUZZ_PARALLEL` | `FUZZ_PARALLEL` |
+| `TCC_FUZZ_BATCH` | `FUZZ_BATCH` |
+| `TCC_RUN_MUTATION_TESTS` | `MUTATION_RUN` |
+| `TCC_MUTATION_FILTER` | `MUTATION_FILTER` |
+| `TCC_MUTATION_TEST_FILTER` | `MUTATION_TEST_FILTER` |
+| `TCC_PLATFORM_SPIKE_APPROVED` | `SPIKE_PLATFORM_APPROVED` |
+| `TCC_SHADOW_APPROVED` | `SPIKE_SHADOW_APPROVED` |
+| `TCC_REPO` | `SPIKE_REPO` |
+| `TCC_THEME` | `UI_THEME` |
+| `TCC_API_TARGET` | `API_TARGET` |
+| `TCC_WEB_BASE` | `WEB_BASE` |
+| `TCC_STRICT_CLASSIC` | `STRICT_CLASSIC` |
+
 - Run queue cost per item fell from 13 statements in 8 transactions to 10 in 4 (measured on the SQLite stand-in by `scripts/run-batch-scale-check.py`, which now prints both): the batch counters are recomputed in the transaction that finishes the item, a claim returns its items from its own transaction, the per-client busy check is part of the candidate query, and the worker looks for lapsed leases every quarter of a lease instead of every tick (a dead worker's items return at most that much later). Leases and the one-run-per-client rule are unchanged; the local SQLite queue gains three indexes. No setting changes; nothing to run on a Warehouse.
 - The program draft second-reviewer rule compares Entra object ids (with the tenant id), recorded as `actor_oid` and `actor_tenant` on every draft event, so one person with two UPNs cannot approve their own draft. Local development (no token) keeps comparing names.
 - A run item's stored error is a typed cause plus a fixed remedy; the raw message (which could echo a request value) is kept only in the worker's log (logger `tcc.runs`) and no longer appears in the stored item or the API response.
@@ -122,6 +226,7 @@ All notable changes to this project are recorded here, so changes can be followe
 - With `ENVIRONMENT=local` (the default) the Azure credential no longer includes the managed-identity probe, which removes the long wait on a developer machine. Deployed behaviour (managed identity selected by `AZURE_CLIENT_ID`) is unchanged. To restore the probe locally set `AZURE_TOKEN_CREDENTIALS=managedidentitycredential`.
 
 ### Deprecated
+- The `TCC_`-prefixed environment variables in the table above: accepted for one release, then removed.
 
 ### Removed
 
