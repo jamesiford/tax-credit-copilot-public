@@ -15,7 +15,7 @@ locals {
     gateway = { dll = "TaxCredit.Gateway.dll" }
   } : {})
 
-  runtime_settings = {
+  runtime_settings = merge({
     ENVIRONMENT                      = "azure"
     DATA_CLASSIFICATION              = var.data_classification
     DATA_SOURCE                      = "lakehouse"
@@ -38,7 +38,7 @@ locals {
     GIT_COMMIT                       = var.git_commit
     PAY_CODE_POLICY                  = "strict"
     FISCAL_RULES_POLICY              = "strict"
-  }
+  }, var.data_map_file == "" ? {} : { DATA_MAP_FILE = var.data_map_file })
 
   gateway_settings = {
     TENANT_ID                      = var.tenant_id

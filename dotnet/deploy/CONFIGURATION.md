@@ -62,7 +62,8 @@ auth, rule, source and artifact graph.
 | `FABRIC_SQL_SERVER`, `FABRIC_SQL_DATABASE` | Required Warehouse host/database. Explicit translation from Python `WAREHOUSE_SERVER` / `WAREHOUSE_DATABASE`; old names are **not aliases**. |
 | `DATA_SOURCE` | Exact `lakehouse` deployed, meaning SQL analytics. Unset defaults **csv**; empty/unknown rejected, unlike Python. `flex` is accepted only outside deployed validation. |
 | `SOURCE_SQL_SERVER`, `SOURCE_SQL_DATABASE` | Lakehouse SQL analytics endpoint and database. Resolve explicitly from verified endpoint metadata; translate `LAKEHOUSE_SQL_*` manually. No Warehouse-host or item-name fallback. |
-| `SOURCE_SCHEMA` | **Unset → `tcc_source`; empty/whitespace → SQL `dbo`**. `SourceScanner.TableName` quotes `[dbo].[physical]` for the blank case and sets `HasBlankSchemaWarning`; it never emits Python's empty SQL qualification. Nonblank identifier regex: `[A-Za-z0-9_][A-Za-z0-9_-]{0,127}`. Old azd default `flex` is not a .NET default. |
+| `SOURCE_SCHEMA` | **Unset → the data map's `lakehouse.schema` (`tcc_source` in the shipped map); empty/whitespace → SQL `dbo`**. `SourceScanner.TableName` quotes `[dbo].[physical]` for the blank case and sets `HasBlankSchemaWarning`; it never emits Python's empty SQL qualification. Nonblank identifier regex: `[A-Za-z0-9_][A-Za-z0-9_-]{0,127}`. Old azd default `flex` is not a .NET default. |
+| `DATA_MAP_FILE` | Optional path to a **complete** data map: every database, schema, table and column the application uses, Lakehouse and Warehouse. Unset → the embedded shipped map (`docs/data/data-map.json`). Read once at start-up; an invalid or incomplete file stops the host naming the first bad key. `/api/ready` reports `data_map: {status, source, sha256}`, never the values. `SOURCE_SQL_DATABASE`, `FABRIC_SQL_DATABASE` and `SOURCE_SCHEMA` take precedence over the map's names. Servers and credentials never go in the map. |
 | `SOURCE_MAX_ACCOUNT_ROWS` | Unset/blank → 1,000,000. Whole number ≥ 1000; anything else is a startup `InvalidOperationException`. Most payroll rows one client may have; over it the read stops one row past the limit and the API answers 422 `account_too_large` whose remedy names this setting and the limit. About 3.5 KB of peak memory per row (`docs/SCALE-S2-REPORT.md`). |
 | `SOURCE_PORTFOLIO_MAX_ACCOUNTS` | Unset/blank → 25. Whole number ≥ 1. A portfolio-wide payroll load (entity portfolio simulation) over this many clients is refused before reading (422 `portfolio_too_large`). |
 | `SOURCE_PORTFOLIO_MAX_ROWS` | Unset/blank → 5,000,000. Whole number ≥ 1000. The same load is refused before reading any client whose rows would take the running total (from the SQL scope aggregate) over this. |
@@ -139,15 +140,18 @@ external JSON runtime dependency.
 
 ## Unsupported controls are not successful configuration
 
-`RuntimeSourceRegistration` calls `SourceMapping.Load()` **without a patch**.
-`SOURCE_MAPPING_FILE`, `SOURCE_TABLE_PREFIX`, `SOURCE_TABLE_CASE`,
+`RuntimeSourceRegistration` loads the Lakehouse mapping from the **data map**
+(`DATA_MAP_FILE`, see [`docs/DATA-MAP.md`](../../docs/DATA-MAP.md)). The .NET host does not read
+`SOURCE_MAPPING_FILE` (the Python backend keeps it as a deprecated alias for a complete map).
+`SOURCE_TABLE_PREFIX`, `SOURCE_TABLE_CASE`,
 `SOURCE_TABLE_MAP`, `WORKSITE_LOCATION_SOURCE` and `NULL_PAY_DATE_POLICY` have no
-environment wiring, despite typed mapping support in the library. Source cache,
+environment wiring: name them in the map's `lakehouse` section. Source cache,
 Silver, Delta version, OneLake transport, schema-validation mode and Python
 footprint guards likewise have no runtime setting consumer.
 
-Shared persistence ignores Python individual store selectors. Gold/ops schemas are
-fixed; `GOLD_SCHEMA` / `OPS_SCHEMA` cannot rebind .NET SQL. Governed data privacy has
+Shared persistence ignores Python individual store selectors. Gold/ops schemas, table
+names and Lakehouse names come from the data map; `GOLD_SCHEMA` / `OPS_SCHEMA` still
+cannot rebind .NET SQL (name the schemas in the map). Governed data privacy has
 typed defaults (including `CapabilityOptions.MinimumGroupSize=5`) but
 `DATA_MIN_GROUP_SIZE` and other `DATA_QUERY_*` flags are not wired. Their presence
 must never be reported as a raised privacy floor or enabled raw source queries.

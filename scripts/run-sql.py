@@ -34,11 +34,11 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     common.load_env()
-    from config import GOLD_SCHEMA, OPS_SCHEMA
+    from config import DATA_MAP
+    from data_map_render import render
     from infrastructure.persistence.schema_admin import (
         TargetMismatch,
         extract_section,
-        rename_schemas,
         run_batches,
         split_batches,
         split_statements,
@@ -63,7 +63,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.resolve:
         return common.EXIT_OK
 
-    text = rename_schemas(common.translate_sql(args.file.read_text(encoding="utf-8")), gold=GOLD_SCHEMA, ops=OPS_SCHEMA)
+    text = render(common.translate_sql(args.file.read_text(encoding="utf-8")), DATA_MAP)
     if args.section:
         batches = split_statements(extract_section(text, args.section))
     else:

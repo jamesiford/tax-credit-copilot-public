@@ -37,8 +37,9 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     common.load_env()
-    from config import GOLD_SCHEMA, OPS_SCHEMA
-    from config import names
+    from config import OPS_SCHEMA
+    from config import DATA_MAP, names
+    from data_map_render import render
     from infrastructure.persistence.schema_admin import (
         MigrationError,
         TargetMismatch,
@@ -47,7 +48,6 @@ def main(argv: list[str] | None = None) -> int:
         bootstrap_sql,
         discover_migrations,
         pending_migrations,
-        rename_schemas,
         run_batches,
         split_batches,
     )
@@ -77,7 +77,7 @@ def main(argv: list[str] | None = None) -> int:
                     file=sys.stderr,
                 )
                 return common.EXIT_FAILED
-            ddl = rename_schemas(common.translate_sql(common.bootstrap_ddl().read_text(encoding="utf-8")), gold=GOLD_SCHEMA, ops=OPS_SCHEMA)
+            ddl = render(common.translate_sql(common.bootstrap_ddl().read_text(encoding="utf-8")), DATA_MAP)
             batches = split_batches(bootstrap_sql(ddl))
             print(f"bootstrap: {len(batches)} batches from {common.bootstrap_ddl().name}")
             if args.dry_run:
@@ -100,7 +100,7 @@ def main(argv: list[str] | None = None) -> int:
             if args.dry_run:
                 print(f"  would apply {migration.version}_{migration.name}")
                 continue
-            apply_migration(connection, migration, OPS_SCHEMA, translate=common.translate_sql, table=names.migration_table)
+            apply_migration(connection, migration, OPS_SCHEMA, translate=lambda s: render(common.translate_sql(s), DATA_MAP), table=names.migration_table)
             print(f"  applied {migration.version}_{migration.name} ({migration.sha256[:12]})")
         return common.EXIT_OK
     except MigrationError as exc:

@@ -2,6 +2,7 @@ FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:10.0.404@sha256:fe0f
 WORKDIR /src/dotnet
 COPY dotnet/ ./
 COPY backend/data/source/mapping/default.json /src/backend/data/source/mapping/default.json
+COPY docs/data/data-map.json /src/docs/data/data-map.json
 COPY packages/ /packages/
 ARG NUGET_SOURCE=https://api.nuget.org/v3/index.json
 ARG NUGET_AUDIT=true

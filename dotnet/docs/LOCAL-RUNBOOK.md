@@ -1,5 +1,7 @@
 # Local runbook: configure, run and calculate (.NET host)
 
+> **Names:** the `tcc_gold`, `tcc_ops` and `tcc_source` schema names and table names in this runbook are the shipped defaults. They come from the data map (`DATA_MAP_FILE`, [`docs/DATA-MAP.md`](../../docs/DATA-MAP.md)); with a customer map the same objects have the customer's names.
+
 How to set the environment, deploy the agents, run the backend and frontend, and generate calculations for clients.
 Everything here was checked against the code in this repository on 2026-11-17 unless a line says **unverified**.
 

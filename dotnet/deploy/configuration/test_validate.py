@@ -195,8 +195,8 @@ class ModelAndPrivacyTests(unittest.TestCase):
     def test_selected_actual_consumer_expressions_are_verified(self):
         folder = ROOT / "dotnet" / "src" / "TaxCredit.ServiceDefaults" / "Hosting"
         source = (folder / "RuntimeSourceRegistration.cs").read_text(encoding="utf-8")
-        self.assertIn('SourceMapping.Load()', source)
-        self.assertIn('settings.Get("SOURCE_SCHEMA") ?? "tcc_source"', source)
+        self.assertIn('SourceMapping.Load(dataMap)', source)
+        self.assertIn('settings.Get("SOURCE_SCHEMA") ?? dataMap.SourceSchema', source)
         paths = (folder / "RuntimePaths.cs").read_text(encoding="utf-8")
         self.assertIn('settings.Get("REPOSITORY_ROOT") ?? Discover()', paths)
         self.assertNotIn("RESOURCE_ROOT", paths)

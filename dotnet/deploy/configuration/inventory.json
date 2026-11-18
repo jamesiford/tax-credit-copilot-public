@@ -58,7 +58,7 @@
       "classification": "unchanged",
       "consumers": {"api": "SD/RuntimeSourceRegistration.cs; Infrastructure.Sources/Sql/SourceScanner.cs", "worker": "SD/RuntimeSourceRegistration.cs; Infrastructure.Sources/Sql/SourceScanner.cs", "gateway": "SD/RuntimeSourceRegistration.cs; Infrastructure.Sources/Sql/SourceScanner.cs"},
       "required": "Optional; explicitly select actual SQL schema",
-      "unset": "tcc_source via ??; not the old azd flex default",
+      "unset": "The data map's lakehouse.schema (tcc_source in the shipped map)",
       "empty": "Trimmed empty: [dbo].[table], metadata dbo; HasBlankSchemaWarning=true; never tcc_source",
       "source": "Reviewed source SQL schema; empty requires operator confirmation"
     },
@@ -70,6 +70,16 @@
       "unset": "Sealed loopback views may name missing settings", "empty": "Same as unset",
       "source": "Optional Fabric item metadata only; resolve real SQL endpoint separately",
       "note": "No OneLake consumer. FABRIC_LAKEHOUSE may be translated manually to SOURCE_SQL_DATABASE only after verifying SQL database metadata."
+    },
+    {
+      "names": ["DATA_MAP_FILE"],
+      "classification": "new",
+      "consumers": {"api": "SD/RuntimeRegistration.cs; Domain/DataMap/DataMapLoader.cs", "worker": "SD/RuntimeRegistration.cs; Domain/DataMap/DataMapLoader.cs", "gateway": "SD/RuntimeRegistration.cs; Domain/DataMap/DataMapLoader.cs"},
+      "required": "Optional; path to a COMPLETE data map file (docs/data/data-map.json is the example)",
+      "unset": "The embedded shipped map; readiness reports data_map.source=embedded",
+      "empty": "Same as unset",
+      "source": "Operator-supplied file, read once at start-up; an incomplete or invalid file stops the host naming the key",
+      "note": "The .NET host does not read SOURCE_MAPPING_FILE (the Python backend keeps it as a deprecated alias); use DATA_MAP_FILE. A complete map, not a patch. DATA_MAP_FILE wins over nothing else: SOURCE_SQL_DATABASE, FABRIC_SQL_DATABASE and SOURCE_SCHEMA still take precedence over the map's names."
     },
     {
       "names": ["SOURCE_TABLE_PREFIX", "SOURCE_TABLE_CASE", "SOURCE_TABLE_MAP", "SOURCE_MAPPING_FILE", "SOURCE_SCHEMA_VALIDATION", "WORKSITE_LOCATION_SOURCE", "NULL_PAY_DATE_POLICY", "SOURCE_CACHE_MB", "SOURCE_CACHE_ACCOUNTS", "SOURCE_MAX_ACCOUNT_ROWS", "SOURCE_VERSION_CHECK_SECONDS", "SOURCE_SILVER", "SOURCE_READ_MODE", "SOURCE_FALLBACK", "PORTFOLIO_FOOTPRINT_MODE", "PORTFOLIO_FOOTPRINT_MAX_ROWS", "PORTFOLIO_FOOTPRINT_TIMEOUT_SECONDS", "ONELAKE_ENDPOINT", "ONELAKE_PATH_STYLE"],

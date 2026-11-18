@@ -1,5 +1,7 @@
 # Composition schema provisioning
 
+> **Names:** `tcc_ops`, `tcc_gold` and the table names below are the shipped defaults. The hosts resolve them through the data map (`DATA_MAP_FILE`, [`docs/DATA-MAP.md`](../../docs/DATA-MAP.md)). To provision under your own names, render the DDL with `backend/data_map_render.py` (it is the identity under the shipped map) and apply `0100_dotnet_operational_objects.sql` rendered the same way; the migration hashes recorded in `schema_migration` are of the shipped text and stay valid. Warehouse column names cannot be renamed yet.
+
 ## Scope and proof boundary
 
 The existing Python migration/grant tools are unchanged. This document is the
