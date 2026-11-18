@@ -406,5 +406,10 @@ def test_the_adapters_read_the_configured_schema_names():
     from infrastructure.persistence import fabric_warehouse, gold_reader, warehouse_gold
 
     for module in (fabric_warehouse, gold_reader, warehouse_gold):
-        assert module.GOLD_SCHEMA == config.GOLD_SCHEMA
-        assert module.OPS_SCHEMA == config.OPS_SCHEMA
+        if hasattr(module, "GOLD_SCHEMA"):
+            assert module.GOLD_SCHEMA == config.GOLD_SCHEMA
+            assert module.OPS_SCHEMA == config.OPS_SCHEMA
+        if hasattr(module, "names"):
+            assert module.names is config.names
+    assert config.names.gold.run_method_summary == f"{config.GOLD_SCHEMA}.run_method_summary"
+    assert config.names.ops.run_manifest == f"{config.OPS_SCHEMA}.run_manifest"

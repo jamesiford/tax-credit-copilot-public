@@ -19,14 +19,13 @@ for.
 from __future__ import annotations
 
 import argparse
-import sys
 import time
 
 from dotenv import load_dotenv
 
 load_dotenv()
 
-from infrastructure.persistence.fabric_warehouse import GOLD_SCHEMA  # noqa: E402
+from config import names  # noqa: E402
 from infrastructure.persistence.gold_reader import GoldReader  # noqa: E402
 
 _TABLES = (
@@ -44,7 +43,7 @@ def coverage() -> dict[str, dict[int, set[int]]]:
         for table in _TABLES:
             current = " AND is_current = 1" if table == "unit_year_master" else ""
             cursor.execute(
-                f"SELECT client_id, tax_year FROM {GOLD_SCHEMA}.{table} "
+                f"SELECT client_id, tax_year FROM {names.gold(table)} "
                 f"WHERE 1 = 1{current} GROUP BY client_id, tax_year"
             )
             held: dict[int, set[int]] = {}

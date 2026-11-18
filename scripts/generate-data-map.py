@@ -16,11 +16,12 @@ import json
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "backend"))
 from data_map_ddl import ROOT, read_warehouse_ddl  # noqa: E402
 
 SHIPPED = ROOT / "docs" / "data" / "data-map.json"
 LAKEHOUSE_DEFAULT = ROOT / "backend" / "data" / "source" / "mapping" / "default.json"
+BACKEND_COPY = ROOT / "backend" / "data" / "data-map.default.json"  # what the backend package ships; docs/ is not deployed
 DOC = "Keys starting with an underscore are ignored by the loader and may be used for notes."
 
 
@@ -136,10 +137,12 @@ def main(argv: list[str] | None = None) -> int:
         text = render(build_defaults())
         if args.check:
             current = args.out.read_text(encoding="utf-8") if args.out.exists() else ""
-            if current != text:
-                print(f"{args.out} differs from the generated defaults; run without --check", file=sys.stderr)
+            copy = BACKEND_COPY.read_text(encoding="utf-8") if BACKEND_COPY.exists() else ""
+            if current != text or copy != text:
+                print(f"{args.out} or {BACKEND_COPY} differs from the generated defaults; run without --check", file=sys.stderr)
                 return 1
             return 0
+        BACKEND_COPY.write_text(text, encoding="utf-8", newline="\n")
     else:
         if not (args.lakehouse_conn and args.warehouse_conn):
             p.error("--from-database needs --lakehouse-conn and --warehouse-conn")

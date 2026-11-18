@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from infrastructure.persistence.fabric_warehouse import GOLD_SCHEMA
+from config import names
 from infrastructure.persistence.gold_reader.columns import Statement
 
 
@@ -29,7 +29,7 @@ SELECT employee_id,
        MAX(CASE WHEN method = 'pay_period' THEN CAST(eligible AS int) END) AS pp_eligible,
        MAX(total_hours) AS total_hours,
        MAX(total_wages) AS total_wages
-FROM {GOLD_SCHEMA}.employee_eligibility
+FROM {names.gold.employee_eligibility}
 WHERE client_id = ? AND tax_year = ? AND run_id = ?
 GROUP BY employee_id
 """

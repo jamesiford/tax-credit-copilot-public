@@ -12,12 +12,12 @@ from datetime import date, datetime, timezone
 from typing import Any
 
 from data.lookups.store import GLOBAL_CLIENT, OverrideEntry
-from infrastructure.persistence.fabric_warehouse import OPS_SCHEMA, FabricWarehouseConnection
+from infrastructure.persistence.fabric_warehouse import names, FabricWarehouseConnection
 from infrastructure.persistence.tenant_sql import TenantScopedQuery, run_in_transaction
 from infrastructure.persistence.warehouse_claims import rows_as_dicts, to_db_instant
 
-_OVERRIDE = f"{OPS_SCHEMA}.lookup_override"
-_AUDIT = f"{OPS_SCHEMA}.lookup_audit"
+_OVERRIDE = f"{names.ops.lookup_override}"
+_AUDIT = f"{names.ops.lookup_audit}"
 _COLUMNS = ("override_id", "lookup_name", "client_id", "key_kind", "key_value", "value_json", "effective_from",
             "effective_to", "authored_by", "authored_on", "basis", "inferred", "superseded_at")
 

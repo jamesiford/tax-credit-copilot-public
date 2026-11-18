@@ -11,7 +11,7 @@ import json
 from datetime import datetime, timezone
 from typing import Any
 
-from infrastructure.persistence.fabric_warehouse import OPS_SCHEMA, FabricWarehouseConnection
+from infrastructure.persistence.fabric_warehouse import names, FabricWarehouseConnection
 from infrastructure.persistence.sqlite_findings import FindingResolution
 from infrastructure.persistence.tenant_sql import TenantScopedQuery, run_in_transaction
 from infrastructure.persistence.warehouse_claims import from_db_instant, rows_as_dicts, to_db_instant
@@ -64,7 +64,7 @@ class WarehouseFindingRepository:
 
     def live(self, client_id: int, tax_year: int | None = None) -> list[FindingResolution]:
         sql = (
-            f"SELECT {', '.join(_COLUMNS)} FROM {OPS_SCHEMA}.agent_finding_resolution "
+            f"SELECT {', '.join(_COLUMNS)} FROM {names.ops.agent_finding_resolution} "
             "WHERE {tenant} AND superseded_at IS NULL"
         )
         params: list[Any] = []
@@ -76,7 +76,7 @@ class WarehouseFindingRepository:
     def history(self, client_id: int, finding_id: str) -> list[FindingResolution]:
         return self._read(
             client_id,
-            f"SELECT {', '.join(_COLUMNS)} FROM {OPS_SCHEMA}.agent_finding_resolution "
+            f"SELECT {', '.join(_COLUMNS)} FROM {names.ops.agent_finding_resolution} "
             "WHERE {tenant} AND finding_id = ? "
             "ORDER BY decided_at, CASE WHEN superseded_at IS NULL THEN 1 ELSE 0 END",
             [finding_id],
@@ -89,13 +89,13 @@ class WarehouseFindingRepository:
         def work(cursor: Any) -> None:
             scoped.execute(
                 cursor,
-                f"UPDATE {OPS_SCHEMA}.agent_finding_resolution SET superseded_at = ? "
+                f"UPDATE {names.ops.agent_finding_resolution} SET superseded_at = ? "
                 "WHERE {tenant} AND finding_id = ? AND superseded_at IS NULL",
                 [_instant(resolution.decided_at), resolution.finding_id],
             )
             scoped.insert(
                 cursor,
-                f"{OPS_SCHEMA}.agent_finding_resolution",
+                f"{names.ops.agent_finding_resolution}",
                 _COLUMNS,
                 [[
                     resolution.finding_id,
@@ -122,7 +122,7 @@ class WarehouseFindingRepository:
         def work(cursor: Any) -> None:
             scoped.execute(
                 cursor,
-                f"UPDATE {OPS_SCHEMA}.agent_finding_resolution SET superseded_at = ? "
+                f"UPDATE {names.ops.agent_finding_resolution} SET superseded_at = ? "
                 "WHERE {tenant} AND finding_id = ? AND superseded_at IS NULL",
                 [now, finding_id],
             )

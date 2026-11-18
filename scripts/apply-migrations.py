@@ -38,6 +38,7 @@ def main(argv: list[str] | None = None) -> int:
 
     common.load_env()
     from config import GOLD_SCHEMA, OPS_SCHEMA
+    from config import names
     from infrastructure.persistence.schema_admin import (
         MigrationError,
         TargetMismatch,
@@ -60,12 +61,11 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         available = discover_migrations(common.MIGRATIONS_DIR)
-        applied = applied_migrations(connection, OPS_SCHEMA)
-
+        applied = applied_migrations(connection, OPS_SCHEMA, names.migration_table)
         if applied is None:
             if not args.bootstrap:
                 print(
-                    f"REFUSED: {OPS_SCHEMA}.schema_migration does not exist, so this Warehouse has "
+                    f"REFUSED: {names.ops.schema_migration} does not exist, so this Warehouse has "
                     "never been bootstrapped. Re-run with --bootstrap on an approved target.",
                     file=sys.stderr,
                 )
@@ -89,10 +89,10 @@ def main(argv: list[str] | None = None) -> int:
             if any(r.error for r in results) or len(results) != len(batches):
                 print("bootstrap FAILED", file=sys.stderr)
                 return common.EXIT_FAILED
-            applied = applied_migrations(connection, OPS_SCHEMA) or {}
+            applied = applied_migrations(connection, OPS_SCHEMA, names.migration_table) or {}
             print(f"bootstrap applied; recorded versions: {sorted(applied)}")
         elif args.bootstrap:
-            print(f"bootstrap skipped: {OPS_SCHEMA}.schema_migration already exists (D22)")
+            print(f"bootstrap skipped: {names.ops.schema_migration} already exists (D22)")
 
         todo = pending_migrations(available, applied)
         print(f"recorded: {sorted(applied)}  available: {[m.version for m in available]}  pending: {len(todo)}")
@@ -100,7 +100,7 @@ def main(argv: list[str] | None = None) -> int:
             if args.dry_run:
                 print(f"  would apply {migration.version}_{migration.name}")
                 continue
-            apply_migration(connection, migration, OPS_SCHEMA, translate=common.translate_sql)
+            apply_migration(connection, migration, OPS_SCHEMA, translate=common.translate_sql, table=names.migration_table)
             print(f"  applied {migration.version}_{migration.name} ({migration.sha256[:12]})")
         return common.EXIT_OK
     except MigrationError as exc:

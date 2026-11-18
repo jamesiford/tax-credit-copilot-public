@@ -36,7 +36,7 @@ from domain.claims import (
     ProgramEngagement,
     Provenance,
 )
-from infrastructure.persistence.fabric_warehouse import OPS_SCHEMA, FabricWarehouseConnection
+from infrastructure.persistence.fabric_warehouse import names, FabricWarehouseConnection
 from infrastructure.persistence.tenant_sql import (
     TenantScopedQuery,
     run_in_transaction,
@@ -207,7 +207,7 @@ class WarehouseClaimRepository:
     def current(self, client_id: int, program_code: str, tax_year: int) -> ProgramClaim | None:
         rows = self._read(
             client_id,
-            f"SELECT TOP 1 {', '.join(_COLUMNS)} FROM {OPS_SCHEMA}.program_claim "
+            f"SELECT TOP 1 {', '.join(_COLUMNS)} FROM {names.ops.program_claim} "
             "WHERE {tenant} AND program_code = ? AND tax_year = ? AND effective_to IS NULL "
             "ORDER BY effective_from DESC, decided_at DESC",
             [program_code.upper(), tax_year],
@@ -217,7 +217,7 @@ class WarehouseClaimRepository:
     def history(self, client_id: int, program_code: str, tax_year: int) -> list[ProgramClaim]:
         rows = self._read(
             client_id,
-            f"SELECT {', '.join(_COLUMNS)} FROM {OPS_SCHEMA}.program_claim "
+            f"SELECT {', '.join(_COLUMNS)} FROM {names.ops.program_claim} "
             "WHERE {tenant} AND program_code = ? AND tax_year = ? "
             "ORDER BY effective_from, CASE WHEN effective_to IS NULL THEN 1 ELSE 0 END, decided_at",
             [program_code.upper(), tax_year],
@@ -232,7 +232,7 @@ class WarehouseClaimRepository:
         tax_years: Iterable[int] | None = None,
     ) -> list[ProgramClaim]:
         sql = (
-            f"SELECT {', '.join(_COLUMNS)} FROM {OPS_SCHEMA}.program_claim "
+            f"SELECT {', '.join(_COLUMNS)} FROM {names.ops.program_claim} "
             "WHERE {tenant} AND effective_to IS NULL"
         )
         params: list[Any] = []
@@ -257,7 +257,7 @@ class WarehouseClaimRepository:
         client_ids: Iterable[int] | None = None,
         tax_years: Iterable[int] | None = None,
     ) -> list[ProgramClaim]:
-        sql = f"SELECT {', '.join(_COLUMNS)} FROM {OPS_SCHEMA}.program_claim WHERE effective_to IS NULL"
+        sql = f"SELECT {', '.join(_COLUMNS)} FROM {names.ops.program_claim} WHERE effective_to IS NULL"
         params: list[Any] = []
         ids = list(client_ids) if client_ids is not None else None
         if ids is not None:
@@ -289,11 +289,11 @@ class WarehouseClaimRepository:
         def work(cursor: Any) -> None:
             scoped.execute(
                 cursor,
-                f"UPDATE {OPS_SCHEMA}.program_claim SET effective_to = ? "
+                f"UPDATE {names.ops.program_claim} SET effective_to = ? "
                 "WHERE {tenant} AND program_code = ? AND tax_year = ? AND effective_to IS NULL",
                 [to_db_date(claim.effective_from), claim.program_code, claim.tax_year],
             )
-            scoped.insert(cursor, f"{OPS_SCHEMA}.program_claim", _COLUMNS, [_claim_values(claim)])
+            scoped.insert(cursor, f"{names.ops.program_claim}", _COLUMNS, [_claim_values(claim)])
 
         with self._connection.connect() as connection:
             run_in_transaction(connection, work)
@@ -304,7 +304,7 @@ class WarehouseClaimRepository:
     def engagements(self, client_id: int) -> list[ProgramEngagement]:
         rows = self._read(
             client_id,
-            f"SELECT {', '.join(_ENGAGEMENT_COLUMNS)} FROM {OPS_SCHEMA}.program_engagement "
+            f"SELECT {', '.join(_ENGAGEMENT_COLUMNS)} FROM {names.ops.program_engagement} "
             "WHERE {tenant} AND effective_to IS NULL ORDER BY program_code",
         )
         return [
@@ -327,13 +327,13 @@ class WarehouseClaimRepository:
         def work(cursor: Any) -> None:
             scoped.execute(
                 cursor,
-                f"UPDATE {OPS_SCHEMA}.program_engagement SET effective_to = ? "
+                f"UPDATE {names.ops.program_engagement} SET effective_to = ? "
                 "WHERE {tenant} AND program_code = ? AND effective_to IS NULL",
                 [to_db_date(engagement.effective_from), engagement.program_code],
             )
             scoped.insert(
                 cursor,
-                f"{OPS_SCHEMA}.program_engagement",
+                f"{names.ops.program_engagement}",
                 _ENGAGEMENT_COLUMNS,
                 [[
                     engagement.client_id,

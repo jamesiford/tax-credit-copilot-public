@@ -10,7 +10,7 @@ from __future__ import annotations
 from typing import Any
 
 from application.artifacts import Artifact, ArtifactAccess
-from infrastructure.persistence.fabric_warehouse import OPS_SCHEMA, FabricWarehouseConnection
+from infrastructure.persistence.fabric_warehouse import names, FabricWarehouseConnection
 from infrastructure.persistence.sqlite_artifacts import ACCESS_COLUMNS, ARTIFACT_COLUMNS, artifact_from_row
 from infrastructure.persistence.tenant_sql import TenantScopedQuery, run_in_transaction, tenant_exempt
 from infrastructure.persistence.warehouse_claims import from_db_instant, rows_as_dicts, to_db_instant
@@ -38,7 +38,7 @@ class WarehouseArtifactRepository:
 
     def record(self, artifact: Artifact) -> Artifact:
         values = [_value(artifact, c) for c in ARTIFACT_COLUMNS]
-        table = f"{OPS_SCHEMA}.artifact"
+        table = f"{names.ops.artifact}"
 
         def work(cursor: Any) -> None:
             if artifact.client_id is None:
@@ -69,7 +69,7 @@ class WarehouseArtifactRepository:
             try:
                 _LOOKUP.execute(
                     cursor,
-                    f"SELECT {', '.join(ARTIFACT_COLUMNS)} FROM {OPS_SCHEMA}.artifact WHERE artifact_id = ?",
+                    f"SELECT {', '.join(ARTIFACT_COLUMNS)} FROM {names.ops.artifact} WHERE artifact_id = ?",
                     [artifact_id],
                 )
                 rows = rows_as_dicts(cursor)
@@ -79,7 +79,7 @@ class WarehouseArtifactRepository:
 
     def live(self, client_id: int, *, kind: str | None = None, tax_year: int | None = None) -> list[Artifact]:
         sql = (
-            f"SELECT {', '.join(ARTIFACT_COLUMNS)} FROM {OPS_SCHEMA}.artifact "
+            f"SELECT {', '.join(ARTIFACT_COLUMNS)} FROM {names.ops.artifact} "
             "WHERE {tenant} AND superseded_at IS NULL"
         )
         params: list[Any] = []
@@ -99,7 +99,7 @@ class WarehouseArtifactRepository:
 
     def record_access(self, access: ArtifactAccess) -> ArtifactAccess:
         values = [_value(access, c) for c in ACCESS_COLUMNS]
-        table = f"{OPS_SCHEMA}.artifact_access"
+        table = f"{names.ops.artifact_access}"
 
         def work(cursor: Any) -> None:
             if access.client_id is None:
@@ -122,7 +122,7 @@ class WarehouseArtifactRepository:
             try:
                 TenantScopedQuery(client_id).execute(
                     cursor,
-                    f"SELECT {', '.join(ACCESS_COLUMNS)} FROM {OPS_SCHEMA}.artifact_access "
+                    f"SELECT {', '.join(ACCESS_COLUMNS)} FROM {names.ops.artifact_access} "
                     "WHERE {tenant} ORDER BY accessed_at, access_id",
                 )
                 rows = rows_as_dicts(cursor)

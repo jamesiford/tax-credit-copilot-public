@@ -18,10 +18,9 @@ from dotenv import load_dotenv  # noqa: E402
 load_dotenv(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".env"))
 
 from infrastructure.persistence.fabric_warehouse import (  # noqa: E402
-    GOLD_SCHEMA,
-    OPS_SCHEMA,
     FabricWarehouseConnection,
 )
+from config import names
 
 from tools.reference_identity import require_reference_account_id
 CLIENT = require_reference_account_id()  # REFERENCE_ACCOUNT_ID; unset is an explained refusal
@@ -31,7 +30,7 @@ with FabricWarehouseConnection().scope() as conn:
     cur = conn.cursor()
 
     cur.execute(
-        f"SELECT TOP 1 run_id, tax_year FROM {OPS_SCHEMA}.run_manifest "
+        f"SELECT TOP 1 run_id, tax_year FROM {names.ops.run_manifest} "
         f"WHERE client_id = ? AND run_status = 'success' "
         f"AND superseded_by_run_id IS NULL AND run_completed_at IS NOT NULL "
         f"ORDER BY run_started_at DESC", [CLIENT],
@@ -40,7 +39,7 @@ with FabricWarehouseConnection().scope() as conn:
     print(f"live run: {run_id}  TY{tax_year}")
 
     cur.execute(
-        f"SELECT COUNT(DISTINCT employee_id) FROM {GOLD_SCHEMA}.employee_eligibility "
+        f"SELECT COUNT(DISTINCT employee_id) FROM {names.gold.employee_eligibility} "
         f"WHERE run_id = ?", [run_id],
     )
     employees = cur.fetchone()[0]
@@ -48,7 +47,7 @@ with FabricWarehouseConnection().scope() as conn:
     counts = {}
     for method in ("min_max", "pay_period"):
         cur.execute(
-            f"SELECT COUNT(DISTINCT employee_id) FROM {GOLD_SCHEMA}.employee_eligibility "
+            f"SELECT COUNT(DISTINCT employee_id) FROM {names.gold.employee_eligibility} "
             f"WHERE run_id = ? AND method = ? AND eligible = 1", [run_id, method],
         )
         counts[method] = cur.fetchone()[0]
@@ -66,12 +65,12 @@ with FabricWarehouseConnection().scope() as conn:
 
     print("\n-- sanity: unfiltered count sums every run")
     cur.execute(
-        f"SELECT COUNT(DISTINCT employee_id) FROM {GOLD_SCHEMA}.employee_eligibility "
+        f"SELECT COUNT(DISTINCT employee_id) FROM {names.gold.employee_eligibility} "
         f"WHERE client_id = ?", [CLIENT],
     )
     print("   distinct employees across ALL runs:", cur.fetchone()[0])
     cur.execute(
-        f"SELECT COUNT(*) FROM {GOLD_SCHEMA}.employee_eligibility "
+        f"SELECT COUNT(*) FROM {names.gold.employee_eligibility} "
         f"WHERE client_id = ? AND method = 'min_max' AND eligible = 1", [CLIENT],
     )
     print("   min_max eligible rows across ALL runs:", cur.fetchone()[0])

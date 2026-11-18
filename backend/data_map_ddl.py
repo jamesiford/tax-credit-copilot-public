@@ -65,6 +65,11 @@ def _column(definition: str) -> tuple[str, str] | None:
 
 
 def read_warehouse_ddl() -> "OrderedDict[str, list[tuple[str, str]]]":
+    """Every Warehouse table and column the DDL files create, in DDL order, keyed `gold.x` / `ops.x`.
+
+    The data map must list exactly this inventory; reading it from the DDL rather than
+    restating it is what stops the shipped map drifting from the schema it describes.
+    """
     tables: "OrderedDict[str, list[tuple[str, str]]]" = OrderedDict()
     for path in DDL_FILES:
         text = _strip_comments(path.read_text(encoding="utf-8"))

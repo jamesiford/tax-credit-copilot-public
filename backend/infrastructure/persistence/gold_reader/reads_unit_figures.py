@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from infrastructure.persistence.fabric_warehouse import GOLD_SCHEMA
+from config import names
 from infrastructure.persistence.gold_reader.columns import _rows
 from infrastructure.persistence.gold_reader.reader_base import ReaderBase
 from infrastructure.persistence.gold_reader.stmt_units import _stmt_credit_columns, _stmt_month_summaries, _stmt_unit, _stmt_unit_lifetime, _stmt_unit_months, _stmt_unit_totals, _stmt_unit_years, _stmt_unit_years_count
@@ -62,7 +62,7 @@ class UnitFigureReads(ReaderBase):
         the grid has no YR1..YRn columns to show.
         """
         statement = (
-            f"SELECT * FROM {GOLD_SCHEMA}.unit_credit_installment "
+            f"SELECT * FROM {names.gold.unit_credit_installment} "
             f"WHERE client_id = ? AND method = ? AND is_current = 1"
         )
         values: list[Any] = [client_id, method]

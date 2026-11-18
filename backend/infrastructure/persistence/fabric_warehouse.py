@@ -37,7 +37,7 @@ import time
 from contextlib import contextmanager
 from typing import Any, Iterator
 
-from config import GOLD_SCHEMA, OPS_SCHEMA, get_settings  # noqa: F401 - GOLD/OPS re-exported for the adapters
+from config import GOLD_SCHEMA, OPS_SCHEMA, get_settings, names  # noqa: F401 - GOLD/OPS/names re-exported for the adapters
 from domain.warehouse import RUN_MANIFEST_COLUMNS, RunManifest
 from infrastructure.persistence import pool_policy, sql_errors
 from infrastructure.persistence.tenant_sql import TenantScopedQuery, tenant_exempt
@@ -465,7 +465,7 @@ class FabricRunManifestRepository:
             try:
                 with sql_errors.duplicate_key_as(f"run_id={manifest.run_id!r} is already recorded"):
                     TenantScopedQuery(manifest.client_id).insert(
-                        cursor, f"{OPS_SCHEMA}.run_manifest", _MANIFEST_COLUMNS, [values]
+                        cursor, f"{names.ops.run_manifest}", _MANIFEST_COLUMNS, [values]
                     )
                     connection.commit()
             finally:
@@ -475,7 +475,7 @@ class FabricRunManifestRepository:
     def get(self, run_id: str) -> RunManifest | None:
         statement = (
             f"SELECT {', '.join(_MANIFEST_COLUMNS)} "
-            f"FROM {OPS_SCHEMA}.run_manifest WHERE run_id = ?"
+            f"FROM {names.ops.run_manifest} WHERE run_id = ?"
         )
         with self._connection.connect() as connection:
             cursor = connection.cursor()
@@ -492,7 +492,7 @@ class FabricRunManifestRepository:
         with self._connection.connect() as connection:
             cursor = connection.cursor()
             try:
-                _RUN_BY_ID.execute(cursor, f"SELECT COUNT(*) FROM {OPS_SCHEMA}.run_manifest")
+                _RUN_BY_ID.execute(cursor, f"SELECT COUNT(*) FROM {names.ops.run_manifest}")
                 return int(cursor.fetchone()[0])
             finally:
                 cursor.close()
@@ -500,7 +500,7 @@ class FabricRunManifestRepository:
     def latest(self, client_id: int, *, program_code: str | None = None) -> RunManifest | None:
         statement = (
             f"SELECT TOP 1 {', '.join(_MANIFEST_COLUMNS)} "
-            f"FROM {OPS_SCHEMA}.run_manifest "
+            f"FROM {names.ops.run_manifest} "
             "WHERE {tenant} AND run_status = 'success' "
             "AND superseded_by_run_id IS NULL"
         )
@@ -546,7 +546,7 @@ class FabricManualOverrideRepository:
             cursor = connection.cursor()
             try:
                 TenantScopedQuery(override.client_id).insert(
-                    cursor, f"{OPS_SCHEMA}.manual_override", _OVERRIDE_COLUMNS, [values]
+                    cursor, f"{names.ops.manual_override}", _OVERRIDE_COLUMNS, [values]
                 )
                 connection.commit()
             finally:
@@ -557,7 +557,7 @@ class FabricManualOverrideRepository:
         from domain.warehouse import ManualOverride
 
         statement = (
-            f"SELECT {', '.join(_OVERRIDE_COLUMNS)} FROM {OPS_SCHEMA}.manual_override "
+            f"SELECT {', '.join(_OVERRIDE_COLUMNS)} FROM {names.ops.manual_override} "
             "WHERE {tenant} ORDER BY created_at, override_id"
         )
         with self._connection.connect() as connection:

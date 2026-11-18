@@ -1,7 +1,7 @@
 """Which run is live for a client, and whether one is still in flight."""
 from __future__ import annotations
 
-from infrastructure.persistence.fabric_warehouse import OPS_SCHEMA, STRANDED_RUN_MINUTES
+from infrastructure.persistence.fabric_warehouse import names, STRANDED_RUN_MINUTES
 from infrastructure.persistence.gold_reader.columns import Statement
 
 
@@ -30,7 +30,7 @@ def _stmt_latest_run(client_id: int, program_code: str | None = None) -> Stateme
     """
     narrow, values = ("AND program_code = ? ", [client_id, program_code]) if program_code else ("", [client_id])
     return (
-        f"SELECT TOP 1 {', '.join(_MANIFEST_COLUMNS)} FROM {OPS_SCHEMA}.run_manifest "
+        f"SELECT TOP 1 {', '.join(_MANIFEST_COLUMNS)} FROM {names.ops.run_manifest} "
         f"WHERE client_id = ? AND run_status = 'success' {narrow}"
         f"AND superseded_by_run_id IS NULL AND run_completed_at IS NOT NULL "
         f"ORDER BY run_started_at DESC",
@@ -44,7 +44,7 @@ def _stmt_run_in_flight(client_id: int) -> Statement:
     # run can strand at any moment and the next read must not repeat the lie.
     return (
         f"SELECT TOP 1 run_id, run_started_at, triggered_by, tax_year "
-        f"FROM {OPS_SCHEMA}.run_manifest "
+        f"FROM {names.ops.run_manifest} "
         f"WHERE client_id = ? AND run_completed_at IS NULL "
         f"AND run_status = 'running' "
         f"AND run_started_at >= DATEADD(minute, ?, SYSUTCDATETIME()) "

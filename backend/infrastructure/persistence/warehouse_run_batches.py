@@ -10,7 +10,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import Any, Callable, TypeVar
 
-from infrastructure.persistence.fabric_warehouse import OPS_SCHEMA, FabricWarehouseConnection
+from infrastructure.persistence.fabric_warehouse import names, FabricWarehouseConnection
 from infrastructure.persistence.run_batch_queue import RunBatchRepository
 from infrastructure.persistence.tenant_sql import run_in_transaction, tenant_exempt
 from infrastructure.persistence.warehouse_claims import from_db_instant, rows_as_dicts, to_db_instant
@@ -40,7 +40,7 @@ class WarehouseBackend:
         self._connection = connection or FabricWarehouseConnection()
 
     def table(self, name: str) -> str:
-        return f"{OPS_SCHEMA}.{name}"
+        return f"{names.ops(name)}"
 
     def bind(self, value: datetime | None) -> datetime | None:
         return to_db_instant(value)

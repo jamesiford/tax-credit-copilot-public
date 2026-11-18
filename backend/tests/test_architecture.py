@@ -727,7 +727,7 @@ _CHANNEL_EXEMPTIONS = frozenset({
     "channel_user allow-list is not per client",
     "channel_confirmation tokens are not per client",
 })
-_OPS_TABLE = re.compile(r"\{OPS_SCHEMA\}\.([A-Za-z_][A-Za-z0-9_]*)")
+_OPS_TABLE = re.compile(r"\{names\.ops\.([A-Za-z_][A-Za-z0-9_]*)\}")
 
 
 def exemption_reasons(source: str) -> set[str]:
@@ -781,8 +781,8 @@ def test_the_channel_exemption_rules_catch_a_crafted_violation():
         "_X = tenant_exempt('channel_user allow-list is not per client')\n"
         "_Y = tenant_exempt('read every claim')\n"
         "def f(cursor):\n"
-        "    _X.execute(cursor, f'SELECT * FROM {OPS_SCHEMA}.program_claim')\n"
+        "    _X.execute(cursor, f'SELECT * FROM {names.ops.program_claim}')\n"
     )
     assert exemption_reasons(widened) - _CHANNEL_EXEMPTIONS == {"read every claim"}
     assert not ops_tables(widened) <= _CHANNEL_TABLES
-    assert ops_tables("f'SELECT 1 FROM {OPS_SCHEMA}.channel_audit'") <= _CHANNEL_TABLES
+    assert ops_tables("f'SELECT 1 FROM {names.ops.channel_audit}'") <= _CHANNEL_TABLES

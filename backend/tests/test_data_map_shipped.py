@@ -10,6 +10,8 @@ from pathlib import Path
 import jsonschema
 import pytest
 
+from data_map_ddl import read_warehouse_ddl
+
 ROOT = Path(__file__).resolve().parents[2]
 SHIPPED = ROOT / "docs" / "data" / "data-map.json"
 SCHEMA = ROOT / "docs" / "data" / "data-map.schema.json"
@@ -39,7 +41,7 @@ def test_the_schema_validates_the_shipped_file(shipped):
 
 
 def test_the_shipped_file_lists_every_ddl_table_and_column_and_nothing_else(shipped):
-    ddl = _script("data_map_ddl.py").read_warehouse_ddl()
+    ddl = read_warehouse_ddl()
     assert len(ddl) == 38 and sum(len(c) for c in ddl.values()) == 498
     listed = {k: [(n, c["type"]) for n, c in t["columns"].items()] for k, t in shipped["warehouse"]["tables"].items()}
     assert listed == {k: list(v) for k, v in ddl.items()}

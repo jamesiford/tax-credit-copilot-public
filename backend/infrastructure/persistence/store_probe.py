@@ -15,6 +15,7 @@ from application.deployment import store_choice
 from application.errors import as_dependency_failure
 from application.store_readiness import Finding
 from config import OPS_SCHEMA, get_settings
+from config import names
 
 log = logging.getLogger(__name__)
 
@@ -79,16 +80,17 @@ class OperationalStoreProbe:
     def _inspect(self, live: Any, available_migrations: list[Any] | None) -> list[Finding]:
         from infrastructure.persistence.schema_admin import applied_migrations, pending_migrations, table_exists
 
-        applied = applied_migrations(live, OPS_SCHEMA)
+        applied = applied_migrations(live, OPS_SCHEMA, names.migration_table)
         if applied is None:
             return [Finding(
-                "migration_table_missing", f"{OPS_SCHEMA}.schema_migration not found: the schema was never created here.",
+                "migration_table_missing", f"{names.ops.schema_migration} not found: the schema was never created here.",
                 _AZURE_REMEDIES["bootstrap"] if _azure() else "Run `python scripts/apply-migrations.py --target deployed --bootstrap` on a new Warehouse.",
             )]
-        missing = [t for t in (*_CLAIM_TABLES, *_RUN_TABLES, *_DRAFT_TABLES) if not table_exists(live, OPS_SCHEMA, t)]
+        missing = [t for t in (*_CLAIM_TABLES, *_RUN_TABLES, *_DRAFT_TABLES)
+                   if not table_exists(live, OPS_SCHEMA, names.map.tables[f"ops.{t}"]["table"])]
         if missing:
             return [Finding(
-                "tables_missing", f"{OPS_SCHEMA}.{missing[0]} not found: run the migration.",
+                "tables_missing", f"{names.ops(missing[0])} not found: run the migration.",
                 "Run `python scripts/apply-migrations.py --target deployed`.",
             )]
         findings: list[Finding] = []
@@ -106,18 +108,18 @@ class OperationalStoreProbe:
         cursor = live.cursor()
         try:
             try:
-                cursor.execute(f"SELECT TOP 0 * FROM {OPS_SCHEMA}.program_claim")
+                cursor.execute(f"SELECT TOP 0 * FROM {names.ops.program_claim}")
             except Exception as exc:  # noqa: BLE001 - a denied SELECT is the finding
                 if as_dependency_failure("operational_store", exc) is None:
                     raise
-                return [Finding("select_not_granted", f"cannot read {OPS_SCHEMA}.program_claim.", remedy)]
+                return [Finding("select_not_granted", f"cannot read {names.ops.program_claim}.", remedy)]
             try:
-                cursor.execute(f"SELECT HAS_PERMS_BY_NAME('{OPS_SCHEMA}.program_claim', 'OBJECT', 'INSERT')")
+                cursor.execute(f"SELECT HAS_PERMS_BY_NAME('{names.ops.program_claim}', 'OBJECT', 'INSERT')")
                 row = cursor.fetchone()
             except Exception:  # noqa: BLE001 - not every engine can answer; absence of an answer is not a denial
                 return [Finding("write_grant_unverified", "could not verify the INSERT grant.", remedy, "warning")]
             if row is not None and row[0] is not None and int(row[0]) == 0:
-                return [Finding("insert_not_granted", f"cannot write {OPS_SCHEMA}.program_claim.", remedy)]
+                return [Finding("insert_not_granted", f"cannot write {names.ops.program_claim}.", remedy)]
             return []
         finally:
             cursor.close()

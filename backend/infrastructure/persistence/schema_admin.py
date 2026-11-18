@@ -425,19 +425,19 @@ def table_exists(connection: Any, schema: str, table: str) -> bool:
         cursor.close()
 
 
-def applied_migrations(connection: Any, ops: str) -> dict[str, str] | None:
-    """{version: sha256} recorded in `<ops>.schema_migration`, or None if absent."""
-    if not table_exists(connection, ops, "schema_migration"):
+def applied_migrations(connection: Any, ops: str, table: str = "schema_migration") -> dict[str, str] | None:
+    """{version: sha256} recorded in `<ops>.<table>` (the data map's migration table), or None if absent."""
+    if not table_exists(connection, ops, table):
         return None
     cursor = connection.cursor()
     try:
-        cursor.execute(f"SELECT version, sha256 FROM {ops}.schema_migration")
+        cursor.execute(f"SELECT version, sha256 FROM {ops}.{table}")
         return {str(v).strip(): str(s).strip() for v, s in cursor.fetchall()}
     finally:
         cursor.close()
 
 
-def apply_migration(connection: Any, migration: Migration, ops: str, translate: Callable[[str], str] = str) -> list[BatchResult]:
+def apply_migration(connection: Any, migration: Migration, ops: str, translate: Callable[[str], str] = str, table: str = "schema_migration") -> list[BatchResult]:
     """Run one migration's batches, then record it. Not recorded if any batch fails."""
     text = translate(migration.path.read_text(encoding="utf-8"))
     results = run_batches(connection, split_batches(text))
@@ -449,7 +449,7 @@ def apply_migration(connection: Any, migration: Migration, ops: str, translate: 
     cursor = connection.cursor()
     try:
         cursor.execute(
-            f"INSERT INTO {ops}.schema_migration (version, name, sha256, applied_at, applied_by) "
+            f"INSERT INTO {ops}.{table} (version, name, sha256, applied_at, applied_by) "
             "VALUES (?, ?, ?, SYSUTCDATETIME(), SUSER_SNAME())",
             migration.version,
             migration.name,
