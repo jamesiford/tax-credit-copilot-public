@@ -1,6 +1,7 @@
 using System.Data;
 using System.Data.Common;
 using System.Globalization;
+using TaxCredit.Application.Hosting;
 
 namespace TaxCredit.Infrastructure.Persistence.Sql;
 
@@ -106,9 +107,17 @@ public sealed class SqlSession : IDisposable
         }
     }
 
-    internal void Begin() => _transaction = _connection.BeginTransaction(IsolationLevel.Serializable);
+    internal void Begin()
+    {
+        using var span = RunSpans.Start("db.begin");
+        _transaction = _connection.BeginTransaction(IsolationLevel.Serializable);
+    }
 
-    internal void Commit() => _transaction!.Commit();
+    internal void Commit()
+    {
+        using var span = RunSpans.Start("db.commit");
+        _transaction!.Commit();
+    }
 
     internal void Rollback() => _transaction?.Rollback();
 
@@ -141,6 +150,11 @@ public sealed class SqlSession : IDisposable
         }
 
         var name = Dialect.Name(table);
+        if (Dialect is SqliteDialect)
+        {
+            return InsertPrepared(name, table, columns, rows);
+        }
+
         var size = Math.Min(500, 2090 / columns.Count);
         var count = 0;
         for (var start = 0; start < rows.Count; start += size)
@@ -154,7 +168,69 @@ public sealed class SqlSession : IDisposable
             var tuple = "(" + string.Join(",", columns.Select(_ => "?")) + ")";
             var sql = "INSERT INTO " + name + " (" + string.Join(",", columns) + ") VALUES "
                 + string.Join(",", batch.Select(_ => tuple));
+            using var statement = RunSpans.Start("sql.insert-batch");
+            if (statement is not null)
+            {
+                statement.SetTag("table", table);
+                statement.SetTag("rows", batch.Length);
+                statement.SetTag("bytes", sql.Length);
+                statement.SetTag("parameters", batch.Length * columns.Count);
+            }
+
             count += Run(new BoundStatement(sql, batch.SelectMany(r => r).ToArray()));
+        }
+
+        return count;
+    }
+
+    // Microsoft.Data.Sqlite resolves a named parameter by a linear scan of the collection, so one statement carrying thousands of
+    // parameters costs quadratic time (about 20 ms for 2,090). A single-row statement is prepared once and re-bound per row instead:
+    // same rows, same order, same transaction.
+    private int InsertPrepared(string name, string table, IReadOnlyList<string> columns, IReadOnlyList<IReadOnlyList<object?>> rows)
+    {
+        if (rows.Any(r => r.Count != columns.Count))
+        {
+            throw new TenantScopeViolation("Insert column/value count mismatch.");
+        }
+
+        if (rows.Count == 0)
+        {
+            return 0;
+        }
+
+        var sql = "INSERT INTO " + name + " (" + string.Join(",", columns) + ") VALUES ("
+            + string.Join(",", columns.Select((_, i) => "@p" + i.ToString(CultureInfo.InvariantCulture))) + ")";
+        using var statement = RunSpans.Start("sql.insert-batch");
+        if (statement is not null)
+        {
+            statement.SetTag("table", table);
+            statement.SetTag("rows", rows.Count);
+            statement.SetTag("bytes", sql.Length);
+            statement.SetTag("parameters", columns.Count);
+        }
+
+        using var command = _connection.CreateCommand();
+        command.CommandText = sql;
+        command.Transaction = _transaction;
+        command.CommandTimeout = 600;
+        var parameters = new DbParameter[columns.Count];
+        for (var i = 0; i < parameters.Length; i++)
+        {
+            parameters[i] = command.CreateParameter();
+            parameters[i].ParameterName = "@p" + i.ToString(CultureInfo.InvariantCulture);
+            command.Parameters.Add(parameters[i]);
+        }
+
+        var count = 0;
+        foreach (var row in rows)
+        {
+            for (var i = 0; i < parameters.Length; i++)
+            {
+                parameters[i].ResetDbType();
+                SqlValues.Bind(parameters[i], row[i], true);
+            }
+
+            count += command.ExecuteNonQuery();
         }
 
         return count;
@@ -188,12 +264,14 @@ public sealed class SqlSession : IDisposable
 
     private int Run(BoundStatement statement)
     {
+        using var span = RunSpans.Start("sql.execute");
         using var command = Command(statement);
         return command.ExecuteNonQuery();
     }
 
     private List<IReadOnlyDictionary<string, object?>> Read(BoundStatement statement)
     {
+        using var span = RunSpans.Start("sql.query");
         using var command = Command(statement);
         using var reader = command.ExecuteReader();
         var rows = new List<IReadOnlyDictionary<string, object?>>();

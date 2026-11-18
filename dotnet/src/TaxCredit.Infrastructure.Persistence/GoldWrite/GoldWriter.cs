@@ -1,3 +1,4 @@
+using TaxCredit.Application.Hosting;
 using TaxCredit.Domain.Gold;
 using TaxCredit.Domain.Pipeline;
 using TaxCredit.Domain.Warehouse;
@@ -37,7 +38,7 @@ public sealed class GoldWriter : IGoldWriter
                 throw new InvalidOperationException("A run identity cannot be reused.");
             }
 
-            session.Insert(payload.ClientId, "tcc_ops.run_manifest", payload.ManifestColumns, [manifest]);
+            using (RunSpans.Start("persist.manifest")) { session.Insert(payload.ClientId, "tcc_ops.run_manifest", payload.ManifestColumns, [manifest]); }
             return 0;
         });
         try
@@ -60,10 +61,9 @@ public sealed class GoldWriter : IGoldWriter
     private List<KeyValuePair<string, long>> Publish(SqlSession session, GoldRunPayload payload)
     {
         var counts = new List<KeyValuePair<string, long>> { new("run_manifest", 1) };
-        foreach (var table in new[] { "unit_year_master", "unit_credit_installment" })
+        using (RunSpans.Start("persist.retire"))
         {
-            session.Execute(payload.ClientId, "UPDATE tcc_gold." + table
-                + " SET is_current=0 WHERE {tenant} AND program_code=? AND is_current=1", payload.ProgramCode);
+            RetirePrior(session, payload);
         }
 
         _checkpoint?.Invoke("prior-current-retired");
@@ -71,28 +71,61 @@ public sealed class GoldWriter : IGoldWriter
         {
             var columns = GoldColumns.All[table];
             var storage = _schema["tcc_gold." + table];
-            var values = rows.Select(row => (IReadOnlyList<object?>)row.Cells
-                .Select((cell, i) => storage[i].ConvertValue(cell)).ToArray()).ToArray();
-            var written = session.Insert(payload.ClientId, "tcc_gold." + table, columns, values);
+            IReadOnlyList<object?>[] values;
+            using (var prepare = RunSpans.Start("gold.prepare"))
+            {
+                prepare?.SetTag("table", table);
+                values = rows.Select(row => (IReadOnlyList<object?>)row.Cells
+                    .Select((cell, i) => storage[i].ConvertValue(cell)).ToArray()).ToArray();
+            }
+
+            int written;
+            using (var insert = RunSpans.Start("persist.insert"))
+            {
+                insert?.SetTag("table", table);
+                insert?.SetTag("rows", values.Length);
+                written = session.Insert(payload.ClientId, "tcc_gold." + table, columns, values);
+            }
+
             counts.Add(new(table, written));
             _checkpoint?.Invoke(table);
         }
 
-        var failures = GoldValidation.Check(session, payload.RunId);
-        if (failures.Count > 0)
+        using (RunSpans.Start("persist.validate"))
         {
-            throw new GoldWriteFailed("Gold invariant violation: " + string.Join("; ", failures.Select(f => f.Query)));
+            var failures = GoldValidation.Check(session, payload.RunId);
+            if (failures.Count > 0)
+            {
+                throw new GoldWriteFailed("Gold invariant violation: " + string.Join("; ", failures.Select(f => f.Query)));
+            }
         }
 
+        using (RunSpans.Start("persist.supersede"))
+        {
+            Supersede(session, payload);
+        }
+
+        return counts;
+    }
+
+    private static void RetirePrior(SqlSession session, GoldRunPayload payload)
+    {
+        foreach (var table in new[] { "unit_year_master", "unit_credit_installment" })
+        {
+            session.Execute(payload.ClientId, "UPDATE tcc_gold." + table
+                + " SET is_current=0 WHERE {tenant} AND program_code=? AND is_current=1", payload.ProgramCode);
+        }
+    }
+
+    private static void Supersede(SqlSession session, GoldRunPayload payload)
+    {
         session.Execute(payload.ClientId,
             "UPDATE tcc_ops.run_manifest SET run_status='superseded',superseded_by_run_id=? WHERE {tenant} AND program_code=? AND run_status='success' AND run_id<>?",
             payload.RunId, payload.ProgramCode, payload.RunId);
         session.Execute(payload.ClientId,
             "UPDATE tcc_ops.run_manifest SET run_status='success',run_completed_at=? WHERE {tenant} AND run_id=? AND run_status='running'",
             payload.RunCompletedAt, payload.RunId);
-        return counts;
     }
-
     private static void ValidateShape(GoldRunPayload payload)
     {
         if (!payload.ManifestColumns.SequenceEqual(WarehouseVocabulary.RunManifestColumns) || payload.ManifestRow.Count != payload.ManifestColumns.Count ||
@@ -119,6 +152,7 @@ public sealed class GoldWriter : IGoldWriter
     /// <inheritdoc />
     public IReadOnlyList<(string Query, long RowCount)> Validate()
     {
+        using var span = RunSpans.Start("gold.validate");
         using var session = _database.Open();
         return GoldValidation.Check(session);
     }

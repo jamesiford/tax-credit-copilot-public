@@ -98,6 +98,7 @@ public sealed class SourceFingerprintReader(SourceScanner scanner, string? prove
     /// <inheritdoc />
     public SourceFingerprint Fingerprint(long accountId)
     {
+        using var span = TaxCredit.Application.Hosting.RunSpans.Start("fingerprint");
         var (query, hasModified) = new SourceQueries(scanner).Fingerprint(accountId);
         var rows = scanner.ReadAggregate(query).ToArray();
         if (rows.Length != 1) { throw new SourceSchemaMismatch("Payroll", ["fingerprint_aggregate"]); }

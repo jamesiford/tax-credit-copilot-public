@@ -1,3 +1,4 @@
+using TaxCredit.Application.Hosting;
 using TaxCredit.Application.Ports.Persistence;
 using TaxCredit.Application.Ports.Sources;
 using TaxCredit.Domain.Pipeline;
@@ -10,9 +11,10 @@ internal sealed class ObservedGoldWriter(GoldWriter writer, ISourceFingerprintRe
 {
     public IReadOnlyList<KeyValuePair<string, long>> WriteRun(GoldRunPayload payload)
     {
+        using var span = RunSpans.Start("gold.write");
         var marker = source.Fingerprint(payload.ClientId);
         var counts = writer.WriteRun(payload);
-        observations.Record(payload.ClientId, payload.RunId, marker);
+        using (RunSpans.Start("persist.observation")) { observations.Record(payload.ClientId, payload.RunId, marker); }
         return counts;
     }
 
