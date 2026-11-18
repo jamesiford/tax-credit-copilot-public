@@ -1,4 +1,5 @@
 using System.Globalization;
+using TaxCredit.Application.Hosting;
 using TaxCredit.Application.Ports.Sources;
 using TaxCredit.Domain.Calculation;
 using TaxCredit.Domain.Pipeline;
@@ -21,8 +22,17 @@ public sealed class SqlClientSource(SourceScanner scanner, PayrollProjector proj
     /// <summary>Explicit metadata reset; payroll aggregates and payroll rows are deliberately not cached.</summary>
     public void ClearCache() => scanner.ClearCache();
     /// <summary>Controls and optional-table absence for the selected client, null only for an unknown account.</summary>
-    public PayrollProjection? LoadProjection(long accountId) =>
-        new SourceDatasetReader(scanner).Load(accountId) is { } dataset ? projector.Project(dataset) : null;
+    public PayrollProjection? LoadProjection(long accountId)
+    {
+        using var load = RunSpans.Start("source.load");
+        SourceDataset? dataset;
+        using (RunSpans.Start("source.read")) { dataset = new SourceDatasetReader(scanner).Load(accountId); }
+        if (dataset is null) { return null; }
+        using var project = RunSpans.Start("source.project");
+        var projection = projector.Project(dataset);
+        project?.SetTag("rows", projection.Rows.Count);
+        return projection;
+    }
     /// <inheritdoc />
     public IReadOnlyList<PayRow> LoadPayPeriods(long? accountId) =>
         accountId is { } id ? LoadProjection(id)?.Rows ?? [] : [];

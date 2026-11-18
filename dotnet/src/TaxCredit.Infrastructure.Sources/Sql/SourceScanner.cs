@@ -77,6 +77,8 @@ public sealed class SourceScanner
         var batches = accountId is { } account ? new[] { new object?[] { account } }
             : key is not null ? (ids ?? []).Distinct().Order().Chunk(IdBatchSize).Select(b => b.Cast<object?>().ToArray())
             : new[] { Array.Empty<object?>() };
+        using var span = TaxCredit.Application.Hosting.RunSpans.Start("source.scan");
+        span?.SetTag("table", logical);
         var output = new List<IReadOnlyDictionary<string, object?>>();
         foreach (var batch in batches)
         {
@@ -93,6 +95,7 @@ public sealed class SourceScanner
                 output.Add(row);
             }
         }
+        span?.SetTag("rows", output.Count);
         return output;
     }
 

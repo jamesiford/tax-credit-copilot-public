@@ -17,6 +17,7 @@ public sealed class RunItemExecution(ClientRunResolver resolver, IPayrollSource 
     {
         ArgumentNullException.ThrowIfNull(item);
         ArgumentNullException.ThrowIfNull(batch);
+        using var span = RunSpans.Start("resolve");
         var rows = payroll.LoadPayPeriods(item.ClientId);
         var years = item.TaxYear is { } year ? new[] { year } : ClientAssessment.FiscalYears(rows).OrderDescending().ToArray();
         foreach (var candidate in years)
@@ -45,8 +46,10 @@ public sealed class RunItemExecution(ClientRunResolver resolver, IPayrollSource 
     /// <summary>The unchanged rule needs known evidence on both sides; a missing field means run.</summary>
     public ItemResult Calculate(RunBatchItem item, RunBatch batch, ClientRun run, string runId)
     {
+        using var span = RunSpans.Start("calculate");
         if (!batch.Force && batch.SkipUnchanged)
         {
+            using var unchanged = RunSpans.Start("unchanged-check");
             var last = manifests.Latest(item.ClientId, run.ProgramCode);
             var decision = UnchangedRule.Decide(RunFingerprint.OfManifest(last),
                 fingerprints.Current(run, config.Assumptions, config.CodeCommit), batch.IncludeCodeCommit);

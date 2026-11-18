@@ -1,6 +1,7 @@
 using Azure.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using TaxCredit.Application.Hosting;
 using TaxCredit.Application.Ports.Contract;
 using TaxCredit.Application.Ports.Persistence;
 using TaxCredit.Application.Ports.Sources;
@@ -51,7 +52,7 @@ internal static class RuntimeSourceRegistration
         services.AddSingleton(p => new FootprintGuard(settings, p.GetRequiredService<TimeProvider>()));
         services.AddScoped<SqlClientSource>();
         services.AddScoped<IClientPayrollSource>(p => IsCsv(settings) ? p.GetRequiredService<CsvClientSource>() : p.GetRequiredService<SqlClientSource>());
-        services.AddScoped<IPayrollSource>(p => p.GetRequiredService<IClientPayrollSource>());
+        services.AddScoped<IPayrollSource>(p => new ScopedPayrollMemo(p.GetRequiredService<IClientPayrollSource>()));
         services.AddScoped<ISourceReader>(p => (ISourceReader)p.GetRequiredService<IClientPayrollSource>());
         services.AddScoped<ISourceCatalogue>(p => (ISourceCatalogue)p.GetRequiredService<IClientPayrollSource>());
         services.AddScoped<ISourceFingerprintReader>(p => IsCsv(settings)
