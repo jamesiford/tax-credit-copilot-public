@@ -1,8 +1,8 @@
-using TaxCredit.Domain.DataMap;
 using System.Text.Json.Nodes;
 using TaxCredit.Application.Features.ReadsCalc.Portfolio;
 using TaxCredit.Application.Ports.Persistence;
 using TaxCredit.Domain.Calculation;
+using TaxCredit.Domain.DataMap;
 using TaxCredit.Domain.Numerics;
 using TaxCredit.Domain.Pipeline;
 using static TaxCredit.Application.Features.Ai.Capabilities.Bindings.CapabilityBindingValues;

@@ -55,5 +55,6 @@ public sealed class EntraSqlConnections
     public SqlConnection Create() => new(_connectionString) { AccessTokenCallback = _callback };
 
     /// <summary>Creates the persistence boundary without exposing a credential-bearing connection string.</summary>
-    public PersistenceDatabase Database(Action<string>? log = null, BulkLoadPolicy? bulk = null) => new(Create, new SqlServerDialect(bulk), log);
+    public PersistenceDatabase Database(Action<string>? log = null, BulkLoadPolicy? bulk = null, Domain.DataMap.PhysicalNames? names = null) =>
+        new(Create, names is null ? new SqlServerDialect(bulk) : new SqlServerDialect(bulk, names), log);
 }

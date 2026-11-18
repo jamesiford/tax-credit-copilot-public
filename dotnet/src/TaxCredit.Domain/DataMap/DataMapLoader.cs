@@ -117,19 +117,17 @@ public static partial class DataMapLoader
 
             physical[schema + "." + table] = key;
             var columns = new Dictionary<string, string>(StringComparer.Ordinal);
-            var seen = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             foreach (var (logical, cNode) in Entries(Obj(t, "columns", path)))
             {
                 var cPath = $"{path}.columns.{logical}";
                 var c = cNode as JsonObject ?? throw new DataMapException($"{cPath} must be an object.");
                 Known(c, cPath, "column", "type");
                 var column = Ident(c, "column", cPath);
-                if (seen.TryGetValue(column, out var dup))
+                if (column != logical)
                 {
-                    throw new DataMapException($"{cPath}: column '{column}' is already mapped from {dup}.");
+                    throw new DataMapException($"{cPath}: Warehouse column renaming is not implemented (R2.7 is open); the column must be '{logical}', not '{column}'.");
                 }
 
-                seen[column] = logical;
                 columns[logical] = column;
             }
 

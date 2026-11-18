@@ -23,7 +23,7 @@ public static class SourceRegistration
 
     /// <summary>Registers one SQL source instance behind both rich Application and certified Domain contracts.</summary>
     public static IServiceCollection AddTaxCreditSqlSources(this IServiceCollection services, SourceMapping mapping,
-        LookupResolver lookups, string? schema = "tcc_source", long maximumRows = 1_000_000,
+        LookupResolver lookups, string? schema = null, long maximumRows = 1_000_000,
         bool allowFixtureFallback = false, IFiscalRuleReader? fixtureFallback = null)
     {
         ArgumentNullException.ThrowIfNull(services);

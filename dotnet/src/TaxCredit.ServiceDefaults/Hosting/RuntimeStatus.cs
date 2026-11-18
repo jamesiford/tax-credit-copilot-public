@@ -10,7 +10,7 @@ using TaxCredit.Infrastructure.Ai.Runtime;
 namespace TaxCredit.ServiceDefaults.Hosting;
 
 /// <summary>Health probes read settled observations; neither a hook flag nor configuration alone proves store readiness.</summary>
-public sealed class RuntimeStatus(IServiceScopeFactory scopes, RuntimeConfiguration settings, ModelRouter models) : IHostStatus
+public sealed class RuntimeStatus(IServiceScopeFactory scopes, RuntimeConfiguration settings, ModelRouter models, Domain.DataMap.DataMap dataMap) : IHostStatus
 {
     private IReadOnlyDictionary<string, object?> _readiness = new Dictionary<string, object?>(StringComparer.Ordinal) { ["ready"] = false };
 
@@ -50,6 +50,7 @@ public sealed class RuntimeStatus(IServiceScopeFactory scopes, RuntimeConfigurat
             ["ai"] = AiState(),
             ["stores"] = new { status = store is null ? "ready" : "unavailable", problems = store is null ? Array.Empty<string>() : [store], warnings = Array.Empty<string>() },
             ["source_schema"] = new { status = source is null ? "ready" : "unavailable", accounts, problem = source },
+            ["data_map"] = new { status = "ready", source = dataMap.Source, sha256 = dataMap.Sha256 },
         });
     }
 

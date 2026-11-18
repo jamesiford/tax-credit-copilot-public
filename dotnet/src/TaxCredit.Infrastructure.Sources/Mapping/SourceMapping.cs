@@ -66,6 +66,9 @@ public sealed partial class SourceMapping
         return new SourceMapping(root);
     }
 
+    /// <summary>Loads the mapping from the data map's Lakehouse section; names and columns come only from that file.</summary>
+    public static SourceMapping Load(Domain.DataMap.DataMap map) => new((JsonObject)map.Lakehouse.DeepClone());
+
     /// <summary>Quotes identifiers after validation; no values are interpolated.</summary>
     public static string Quote(string identifier) => "[" + identifier.Replace("]", "]]", StringComparison.Ordinal) + "]";
 

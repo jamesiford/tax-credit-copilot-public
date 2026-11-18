@@ -162,7 +162,7 @@ public sealed class PersistenceDatabase
     }
 
     /// <summary>Creates a file-backed hermetic destination with exact-decimal SQL functions.</summary>
-    public static PersistenceDatabase Sqlite(string path, Action<string>? log = null)
+    public static PersistenceDatabase Sqlite(string path, Action<string>? log = null, Domain.DataMap.PhysicalNames? names = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
         var settings = new SqliteConnectionStringBuilder { DataSource = path, Pooling = false, DefaultTimeout = 30 };
@@ -193,7 +193,7 @@ public sealed class PersistenceDatabase
                     && fixedValue.Coefficient.ToString(System.Globalization.CultureInfo.InvariantCulture).Length <= precision;
             });
             return connection;
-        }, new SqliteDialect(), log);
+        }, names is null ? new SqliteDialect() : new SqliteDialect(names), log);
     }
 }
 

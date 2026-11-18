@@ -1,4 +1,3 @@
-using TaxCredit.Domain.DataMap;
 using System.Globalization;
 using System.Text.Json.Nodes;
 using TaxCredit.Application.Features.Ai.Briefs;
@@ -8,6 +7,7 @@ using TaxCredit.Application.Features.ReadsCalc.Stored;
 using TaxCredit.Application.Messaging;
 using TaxCredit.Application.Ports.Auth;
 using TaxCredit.Domain.Calculation;
+using TaxCredit.Domain.DataMap;
 
 namespace TaxCredit.Application.Features.Ai.Capabilities;
 

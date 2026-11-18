@@ -1,9 +1,9 @@
-using TaxCredit.Domain.DataMap;
 using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using TaxCredit.Application.Ports.Auth;
 using TaxCredit.Application.Ports.Persistence;
+using TaxCredit.Domain.DataMap;
 using static TaxCredit.Application.Features.Ai.Capabilities.CapabilityResult;
 
 namespace TaxCredit.Application.Features.Ai.Capabilities;

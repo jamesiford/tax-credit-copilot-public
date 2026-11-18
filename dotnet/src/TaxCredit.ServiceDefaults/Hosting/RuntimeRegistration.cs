@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using TaxCredit.Application.Hosting;
 using TaxCredit.Application.Ports.Contract;
+using TaxCredit.Domain.DataMap;
 using TaxCredit.Infrastructure.Persistence;
 using TaxCredit.Infrastructure.Persistence.Sql;
 
@@ -19,6 +20,11 @@ public static class RuntimeRegistration
         ArgumentNullException.ThrowIfNull(configuration);
         var settings = new RuntimeConfiguration(configuration);
         LegacySettingAliases.Report(configuration, Console.Error.WriteLine);
+        var dataMap = DataMapLoader.Load(settings.Get("DATA_MAP_FILE"));
+        var names = new PhysicalNames(dataMap);
+        PhysicalNames.Use(names);
+        services.AddSingleton(dataMap);
+        services.AddSingleton(names);
         var paths = new RuntimePaths(settings);
         var hooks = configuration.Setting("CONTRACT_HOOKS") == "1";
         Validate(settings, hooks);
@@ -36,13 +42,14 @@ public static class RuntimeRegistration
         if (provider == "sqlite")
         {
             Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(paths.Database))!);
-            database = PersistenceDatabase.Sqlite(paths.Database);
+            database = PersistenceDatabase.Sqlite(paths.Database, names: names);
         }
         else if (provider is "sqlserver" or "warehouse")
         {
             var connections = new EntraSqlConnections(Required(settings, "FABRIC_SQL_SERVER"),
-                Required(settings, "FABRIC_SQL_DATABASE"), new CredentialSqlTokens(new DefaultAzureCredential()));
-            database = connections.Database(bulk: BulkLoadPolicy.FromSettings(settings.Get));
+                settings.Get("FABRIC_SQL_DATABASE") is { Length: > 0 } warehouse ? warehouse
+                    : dataMap.WarehouseDatabase ?? Required(settings, "FABRIC_SQL_DATABASE"), new CredentialSqlTokens(new DefaultAzureCredential()));
+            database = connections.Database(bulk: BulkLoadPolicy.FromSettings(settings.Get), names: names);
             services.AddSingleton(connections);
         }
         else
@@ -51,7 +58,7 @@ public static class RuntimeRegistration
         }
 
         services.AddPersistence(database, paths.Repository, paths.Seeds, retention: GoldRetention.FromSettings(settings.Get));
-        services.AddRuntimeSources(settings, paths);
+        services.AddRuntimeSources(settings, paths, dataMap);
         services.AddRuntimeCalculation(settings, paths);
         services.AddRuntimeTrust(settings);
         services.AddRuntimeAi(settings);

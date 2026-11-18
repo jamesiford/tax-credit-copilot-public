@@ -1,4 +1,3 @@
-using TaxCredit.Domain.DataMap;
 using System.Text.Json.Nodes;
 using TaxCredit.Application.Features.ClaimsArtifactsRules.Findings;
 using TaxCredit.Application.Features.DraftsRuns;
@@ -7,6 +6,7 @@ using TaxCredit.Application.Features.ReadsCalc.Portfolio;
 using TaxCredit.Application.Messaging;
 using TaxCredit.Application.Ports.Auth;
 using TaxCredit.Domain.Calculation;
+using TaxCredit.Domain.DataMap;
 using TaxCredit.Domain.Programs;
 using static TaxCredit.Application.Features.Ai.Capabilities.Bindings.CapabilityBindingValues;
 

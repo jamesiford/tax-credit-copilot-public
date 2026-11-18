@@ -1,10 +1,10 @@
-using TaxCredit.Domain.DataMap;
 using System.Text.Json.Nodes;
 using TaxCredit.Application.Features.Ai.Chat;
 using TaxCredit.Application.Ports.Auth;
 using TaxCredit.Application.Ports.Persistence;
 using TaxCredit.Application.Ports.Sources;
 using TaxCredit.Domain.Claims;
+using TaxCredit.Domain.DataMap;
 
 namespace TaxCredit.Application.Features.Ai.Capabilities;
 
