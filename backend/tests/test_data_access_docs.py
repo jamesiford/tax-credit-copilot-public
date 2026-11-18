@@ -46,7 +46,7 @@ def test_each_variable_has_an_azd_value_and_the_source_flag_defaults_to_false():
     mapping = json.loads(read("infra", "main.tfvars.json"))
     for variable in DATA_SETTINGS.values():
         assert variable in mapping, f"{variable} has no azd value in main.tfvars.json"
-        assert re.fullmatch(r"\$\{TCC_[A-Z_]+(=[a-z]+)?\}", mapping[variable])
+        assert re.fullmatch(r"\$\{[A-Z_]+(=[a-z]+)?\}", mapping[variable])
     assert mapping["data_query_source_enabled"] == "${DATA_QUERY_SOURCE_ENABLED=false}"
 
 

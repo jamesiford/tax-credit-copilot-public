@@ -69,6 +69,7 @@ otherwise. "Run by" says who invokes it: **azd** (an `azure.yaml` hook), **CI** 
 | `assign-channel-roles.ps1` | Assigns the Entra app roles the channel needs, through Graph with your own sign-in. Supports `-WhatIf`. | principal ids as parameters | owner, test |
 | `publish-m365.ps1` | Publishes a Foundry hosted agent to Microsoft 365 Copilot and Teams (idempotent REST flow). | agent and tenant parameters | owner, test |
 | `poc-pause.ps1` | Pauses or resumes the PoC's compute; `-Resume` reverses it. | `-Resume` | owner |
+| `legacy-env.ps1` | One-release fallback for the deployment settings renamed away from the `TCC_` prefix: copies an old value to its new name when the new one is unset, warns with the NAME only, and with `-AzdEnv` also writes the new name into the azd environment. | `-AzdEnv`; the old names are in the script | `azure.yaml` (`preprovision`), `postprovision.ps1`, `deploy-channel.ps1`, `create-model-connection.ps1`, `dotnet/deploy/publish.ps1`, `dotnet/deploy/guard-target.ps1` |
 | `create-model-connection.ps1` | Creates a Foundry Model Gateway connection without putting a secret in the repo or state. | connection parameters | owner, test |
 | `grant-fabric-mi-access.ps1` | Grants the API's managed identity a role on an existing Fabric workspace when Terraform does not manage access. | workspace and identity parameters | owner |
 | `run-sql.py` | Runs T-SQL against a guarded Warehouse target; `--resolve` only prints the target. | `--target`, `--file`, `--section` | owner |
